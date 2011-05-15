@@ -23,6 +23,10 @@ if [ ! -e "$APPLICATIONS_NAME_LIST" ]; then
     echo "File: $APPLICATIONS_NAME_LIST undefined. This file tells which apps are 'bundles' to built."
     exit 0
 fi
+if [ "$APPLICATIONS" = "" ]; then
+    echo "Empty applications list!"
+    exit 0
+fi
 echo "Application bundles defined for: $APPLICATIONS"
 
 for application in $APPLICATIONS; do
