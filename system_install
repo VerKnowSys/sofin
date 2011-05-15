@@ -1,0 +1,130 @@
+#!/bin/sh
+
+PATH=/bin:/usr/bin:/sbin:/usr/sbin
+unset LDFLAGS
+unset CFLAGS
+
+echo "Loading config"
+source ./config
+
+if [ ! -e "$SOURCE_DIR" ]; then
+    echo "No $SOURCE_DIR found! Creating dir tree.."
+    mkdir -p "$SOURCE_DIR"
+fi
+
+if [ ! -e "$DEFINITIONS_DIR" ]; then
+    echo "No definitions folder found. Creating one at: $DEFINITIONS_DIR"
+    "$MKDIR_BIN" -p "$DEFINITIONS_DIR"
+    echo "All definition files (*.def) should be placed there"
+fi
+
+APPLICATIONS=`$CAT_BIN $APPLICATIONS_NAME_LIST`
+if [ ! -e "$APPLICATIONS_NAME_LIST" ]; then
+    echo "File: $APPLICATIONS_NAME_LIST undefined. This file tells which apps are 'bundles' to built."
+    exit 0
+fi
+echo "Application bundles defined for: $APPLICATIONS"
+
+for application in $APPLICATIONS; do
+    for definition in "$DEFINITIONS_DIR/$application".def; do
+        echo "Reading definition: $definition"
+        . $definition
+        PREFIX=$OPT_DIR$APP_NAME-$APP_VERSION-$APP_POSTFIX
+        
+        # check requirements (all definition requirements must be present/available):
+        echo "App Requirements: $APP_REQUIREMENTS"
+        for req in $APP_REQUIREMENTS; do
+            
+            req_definition_file="$DEFINITIONS_DIR$req.def"
+            echo "Checking requirement: $req file: $req_definition_file"
+            if [ ! -e $req_definition_file ]; then
+                echo "Definition file for requirement: $req does not exists!"
+                echo "Dependency not met for application: $definition"
+                exit 0
+            fi
+            
+            echo "Configuring requirement: $req"
+            . $req_definition_file
+            
+            BUILD_DIR="/tmp/$req/"
+            echo "Destroying, and Recreating build dir: $BUILD_DIR"
+            $RM_BIN -rf "$BUILD_DIR"
+            $MKDIR_BIN -p "$BUILD_DIR"
+            CUR_DIR=`pwd`
+            cd "$BUILD_DIR"
+            
+            echo "Fetching requirement source code"
+            $FETCH_BIN $APP_HTTP_PATH
+            
+            echo "Unpacking source code"
+            $TAR_BIN xf $BUILD_DIR$APP_NAME*
+            echo "Entrering $BUILD_DIR$APP_NAME*"
+            
+            for dir in `$LS_BIN -F $BUILD_DIR | $GREP_BIN \/$`; do
+                echo "Changing dir to: $dir"
+                cd "$dir"
+                
+                echo "Running requirement configure script for: $req with args: --prefix=$PREFIX $APP_CONFIGURE_ARGS"
+                ./$APP_CONFIGURE_SCRIPT --prefix=$PREFIX $APP_CONFIGURE_ARGS
+                
+                echo "Building requirement: $req"
+                $APP_MAKE_METHOD -s
+
+                echo "Installing requirement: $req"
+                $APP_INSTALL_METHOD -s
+                
+                echo "Cleaning $build_dir$APP_NAME*"
+                $RM_BIN -rf $build_dir$APP_NAME*
+            done
+            
+            cd $CUR_DIR
+        done
+
+        . $definition # NOTE: reload back main app definition values
+
+        echo "App Prefix: $PREFIX"
+        echo "App Full Name: $APP_FULL_NAME"
+        echo "App Fetch Source Path: $APP_HTTP_PATH"
+        echo "App Name (executable): $APP_NAME"
+        echo "App Name Postfix: $APP_POSTFIX"
+        echo "App Version: $APP_VERSION"
+        echo "App Configure Args: $APP_CONFIGURE_ARGS"
+        echo "App Requirements (required definitions): $APP_REQUIREMENTS"
+        echo "App Configure Script: $APP_CONFIGURE_SCRIPT"
+        echo "App Make Method: $APP_MAKE_METHOD"
+        echo "App Install Method: $APP_INSTALL_METHOD"
+        
+        BUILD_DIR="/tmp/$APP_NAME/"
+        echo "Destroying, and Recreating build dir: $BUILD_DIR"
+        $RM_BIN -rf "$BUILD_DIR"
+        $MKDIR_BIN -p "$BUILD_DIR"
+        CUR_DIR=`pwd`
+        cd "$BUILD_DIR"
+        
+        echo "Fetching requirement source code"
+        $FETCH_BIN $APP_HTTP_PATH
+        
+        echo "Unpacking source code"
+        $TAR_BIN xf $BUILD_DIR$APP_NAME*
+        
+        for dir in `$LS_BIN -F $BUILD_DIR | $GREP_BIN \/$`; do
+            echo "Changing dir to: $dir/$APP_SOURCE_DIR_POSTFIX"
+            cd "$dir/$APP_SOURCE_DIR_POSTFIX"
+            
+            echo "Configuring application: $application"
+            ./$APP_CONFIGURE_SCRIPT --prefix=$PREFIX $APP_CONFIGURE_ARGS --with-search-path=$PREFIX CXXFLAGS="-I${PREFIX}/include" CFLAGS="-I${PREFIX}/include" LDFLAGS="-L${PREFIX}/lib"
+
+            echo "Building application: $application"
+            $APP_MAKE_METHOD -s
+
+            echo "Installing application: $application"
+            $APP_INSTALL_METHOD -s
+        done
+        
+        cd $CUR_DIR
+    done
+    
+    echo "Job's done."
+    
+done
+

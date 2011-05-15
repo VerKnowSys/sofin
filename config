@@ -1,0 +1,21 @@
+#!/bin/sh
+
+LN_BIN="/bin/ln"
+LS_BIN="/bin/ls"
+CAT_BIN="/bin/cat"
+RM_BIN="/bin/rm"
+MKDIR_BIN="/bin/mkdir"
+UNAME_BIN="/usr/bin/uname"
+TAR_BIN="/usr/bin/tar"
+GREP_BIN="/usr/bin/grep"
+
+if [ `$UNAME_BIN` = "Darwin" ]; then
+    FETCH_BIN="/usr/local/bin/wget"
+else
+    FETCH_BIN="/usr/bin/fetch"
+fi
+
+OPT_DIR="/opt/"
+SOURCE_DIR="$OPT_DIR/src/"
+APPLICATIONS_NAME_LIST="definitions/applications"
+DEFINITIONS_DIR="definitions/"
