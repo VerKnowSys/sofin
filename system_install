@@ -117,7 +117,7 @@ for application in $APPLICATIONS; do
                 echo "Configuring requirement: $req"
                 execute_process $req
             done
-            execute_process $definition
+            execute_process $application
         fi
     done
     
