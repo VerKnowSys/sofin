@@ -72,6 +72,10 @@ for application in $APPLICATIONS; do
             echo "Application already installed: $PREFIX. Skipped."
         else
             function execute_process () {
+                if [ -z "$1" ]; then
+                    echo "No param given for execute_process()!"
+                    exit 0
+                fi
                 req_definition_file="$DEFINITIONS_DIR$1.def"
                 echo "Checking requirement: $1 file: $req_definition_file"
                 if [ ! -e $req_definition_file ]; then
