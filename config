@@ -18,7 +18,7 @@ else
     FETCH_BIN="/usr/bin/fetch"
 fi
 
-OPT_DIR="/opt/"
-SOURCE_DIR="$OPT_DIR/src/"
+export OPT_DIR="/opt/"
+SOURCE_DIR="${OPT_DIR}src/"
 APPLICATIONS_NAME_LIST="definitions/applications"
 DEFINITIONS_DIR="definitions/"
