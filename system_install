@@ -22,8 +22,8 @@ function check_command_result () {
 
 function run () {
     if [ ! -z "$1" ]; then
-        echo "Running '$@'"
-        eval $@
+        echo "Running '$@' @ `$DATE_BIN`" >> $LOG
+        eval $@ 1>> $LOG 2>> $LOG
         check_command_result $?
     else
         echo "Empty command to run?"
@@ -68,112 +68,114 @@ for application in $APPLICATIONS; do
             export PREFIX=$OPT_DIR$APP_NAME-$APP_VERSION-$APP_POSTFIX
         fi
         
-        # check requirements (all definition requirements must be present/available):
-        echo "App Requirements: $APP_REQUIREMENTS"
-        for req in $APP_REQUIREMENTS; do
-            
-            req_definition_file="$DEFINITIONS_DIR$req.def"
-            echo "Checking requirement: $req file: $req_definition_file"
-            if [ ! -e $req_definition_file ]; then
-                echo "Definition file for requirement: $req does not exists!"
-                echo "Dependency not met for application: $definition"
-                exit 0
-            fi
-            
-            echo "Configuring requirement: $req"
-            . $req_definition_file
-            
-            BUILD_DIR="/tmp/$req/"
+        if [ -e $PREFIX ]; then
+            echo "Application already installed: $PREFIX. Skipped."
+        else
+            # check requirements (all definition requirements must be present/available):
+            echo "App Requirements: $APP_REQUIREMENTS"
+            for req in $APP_REQUIREMENTS; do
+
+                req_definition_file="$DEFINITIONS_DIR$req.def"
+                echo "Checking requirement: $req file: $req_definition_file"
+                if [ ! -e $req_definition_file ]; then
+                    echo "Definition file for requirement: $req does not exists!"
+                    echo "Dependency not met for application: $definition"
+                    exit 0
+                fi
+
+                echo "Configuring requirement: $req"
+                . $req_definition_file
+
+                BUILD_DIR="/tmp/$req/"
+                echo "Destroying, and Recreating build dir: $BUILD_DIR"
+                $RM_BIN -rf "$BUILD_DIR"
+                $MKDIR_BIN -p "$BUILD_DIR"
+                CUR_DIR=`pwd`
+                cd "$BUILD_DIR"
+
+                echo "Fetching requirement source code"
+                run $FETCH_BIN $APP_HTTP_PATH
+
+                echo "Unpacking source code"
+                run $TAR_BIN xf $BUILD_DIR$APP_NAME*
+
+                echo "Entrering $BUILD_DIR$APP_NAME*"
+
+                for dir in `$LS_BIN -F $BUILD_DIR | $GREP_BIN \/$`; do
+                    echo "Changing dir to: $dir"
+                    cd "$dir"
+
+                    echo "Running requirement configure script for: $req with args: --prefix=$PREFIX $APP_CONFIGURE_ARGS"
+
+                    export CXXFLAGS="-I${PREFIX}/include $APP_COMPILER_ARGS"
+                    export CFLAGS="-I${PREFIX}/include $APP_COMPILER_ARGS"
+                    export LDFLAGS="-L${PREFIX}/lib $APP_LINKER_ARGS"
+                    echo "CXXFLAGS: $CXXFLAGS"
+                    echo "CFLAGS: $CFLAGS"
+                    echo "LDFLAGS: $LDFLAGS"
+                    run ./$APP_CONFIGURE_SCRIPT $APP_CONFIGURE_ARGS --prefix=$PREFIX
+
+                    echo "Building requirement: $req"
+                    run $APP_MAKE_METHOD -s
+
+                    echo "Installing requirement: $req"
+                    run $APP_INSTALL_METHOD -s
+
+                    echo "Cleaning $build_dir$APP_NAME*"
+                    $RM_BIN -rf $build_dir$APP_NAME*
+                done
+
+                cd $CUR_DIR
+            done
+
+            . $definition # NOTE: reload back main app definition values
+
+            echo "App Prefix: $PREFIX"
+            echo "App Full Name: $APP_FULL_NAME"
+            echo "App Fetch Source Path: $APP_HTTP_PATH"
+            echo "App Name (executable): $APP_NAME"
+            echo "App Name Postfix: $APP_POSTFIX"
+            echo "App Version: $APP_VERSION"
+            echo "App Configure Args: $APP_CONFIGURE_ARGS"
+            echo "App Requirements (required definitions): $APP_REQUIREMENTS"
+            echo "App Configure Script: $APP_CONFIGURE_SCRIPT"
+            echo "App Make Method: $APP_MAKE_METHOD"
+            echo "App Install Method: $APP_INSTALL_METHOD"
+
+            BUILD_DIR="/tmp/$APP_NAME/"
             echo "Destroying, and Recreating build dir: $BUILD_DIR"
             $RM_BIN -rf "$BUILD_DIR"
             $MKDIR_BIN -p "$BUILD_DIR"
             CUR_DIR=`pwd`
             cd "$BUILD_DIR"
-            
+
             echo "Fetching requirement source code"
             run $FETCH_BIN $APP_HTTP_PATH
-            
+
             echo "Unpacking source code"
             run $TAR_BIN xf $BUILD_DIR$APP_NAME*
-            
-            echo "Entrering $BUILD_DIR$APP_NAME*"
-            
+
             for dir in `$LS_BIN -F $BUILD_DIR | $GREP_BIN \/$`; do
-                echo "Changing dir to: $dir"
-                cd "$dir"
-                
-                echo "Running requirement configure script for: $req with args: --prefix=$PREFIX $APP_CONFIGURE_ARGS"
-                
+                echo "Changing dir to: $dir/$APP_SOURCE_DIR_POSTFIX"
+                cd "$dir/$APP_SOURCE_DIR_POSTFIX"
+
+                echo "Configuring application: $application"
                 export CXXFLAGS="-I${PREFIX}/include $APP_COMPILER_ARGS"
                 export CFLAGS="-I${PREFIX}/include $APP_COMPILER_ARGS"
                 export LDFLAGS="-L${PREFIX}/lib $APP_LINKER_ARGS"
-                echo "CXXFLAGS: $CXXFLAGS"
-                echo "CFLAGS: $CFLAGS"
-                echo "LDFLAGS: $LDFLAGS"
-                run ./$APP_CONFIGURE_SCRIPT --prefix=$PREFIX $APP_CONFIGURE_ARGS $APP_LINKER_ARGS
-                
-                echo "Building requirement: $req"
+                run ./$APP_CONFIGURE_SCRIPT $APP_CONFIGURE_ARGS --prefix=$PREFIX
+
+                echo "Building application: $application"
                 run $APP_MAKE_METHOD -s
-                
-                echo "Installing requirement: $req"
+
+                echo "Installing application: $application"
                 run $APP_INSTALL_METHOD -s
-                
-                echo "Cleaning $build_dir$APP_NAME*"
-                $RM_BIN -rf $build_dir$APP_NAME*
             done
-            
             cd $CUR_DIR
-        done
-
-        . $definition # NOTE: reload back main app definition values
-
-        echo "App Prefix: $PREFIX"
-        echo "App Full Name: $APP_FULL_NAME"
-        echo "App Fetch Source Path: $APP_HTTP_PATH"
-        echo "App Name (executable): $APP_NAME"
-        echo "App Name Postfix: $APP_POSTFIX"
-        echo "App Version: $APP_VERSION"
-        echo "App Configure Args: $APP_CONFIGURE_ARGS"
-        echo "App Requirements (required definitions): $APP_REQUIREMENTS"
-        echo "App Configure Script: $APP_CONFIGURE_SCRIPT"
-        echo "App Make Method: $APP_MAKE_METHOD"
-        echo "App Install Method: $APP_INSTALL_METHOD"
-        
-        BUILD_DIR="/tmp/$APP_NAME/"
-        echo "Destroying, and Recreating build dir: $BUILD_DIR"
-        $RM_BIN -rf "$BUILD_DIR"
-        $MKDIR_BIN -p "$BUILD_DIR"
-        CUR_DIR=`pwd`
-        cd "$BUILD_DIR"
-        
-        echo "Fetching requirement source code"
-        run $FETCH_BIN $APP_HTTP_PATH
-        
-        echo "Unpacking source code"
-        run $TAR_BIN xf $BUILD_DIR$APP_NAME*
-        
-        for dir in `$LS_BIN -F $BUILD_DIR | $GREP_BIN \/$`; do
-            echo "Changing dir to: $dir/$APP_SOURCE_DIR_POSTFIX"
-            cd "$dir/$APP_SOURCE_DIR_POSTFIX"
-            
-            echo "Configuring application: $application"
-            export CXXFLAGS="-I${PREFIX}/include $APP_COMPILER_ARGS"
-            export CFLAGS="-I${PREFIX}/include $APP_COMPILER_ARGS"
-            export LDFLAGS="-L${PREFIX}/lib $APP_LINKER_ARGS"
-            run ./$APP_CONFIGURE_SCRIPT $APP_CONFIGURE_ARGS --prefix=$PREFIX
-
-            echo "Building application: $application"
-            run $APP_MAKE_METHOD -s
-
-            echo "Installing application: $application"
-            run $APP_INSTALL_METHOD -s
-        done
-        
-        cd $CUR_DIR
+        fi
     done
     
     echo "Job's done."
+    exit 0
     
 done
-
-exit 0

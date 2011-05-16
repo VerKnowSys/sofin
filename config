@@ -1,6 +1,9 @@
 #!/bin/sh
 
+LOG="/opt/INSTALL_LOG"
+
 LN_BIN="/bin/ln"
+DATE_BIN="/bin/date"
 LS_BIN="/bin/ls"
 CAT_BIN="/bin/cat"
 RM_BIN="/bin/rm"
