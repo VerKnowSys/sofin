@@ -67,6 +67,7 @@ for application in $APPLICATIONS; do
         else
             export PREFIX=$OPT_DIR$APP_NAME-$APP_VERSION-$APP_POSTFIX
         fi
+        export LD_LIBRARY_PATH="$PREFIX/lib:$LD_LIBRARY_PATH"
         
         if [ -e $PREFIX ]; then
             echo "Application already installed: $PREFIX. Skipped."
@@ -104,6 +105,7 @@ for application in $APPLICATIONS; do
                     echo "CXXFLAGS: $CXXFLAGS"
                     echo "CFLAGS: $CFLAGS"
                     echo "LDFLAGS: $LDFLAGS"
+                    echo "LD_LIBRARY_PATH: $LD_LIBRARY_PATH"
                     run ./$APP_CONFIGURE_SCRIPT $APP_CONFIGURE_ARGS --prefix=$PREFIX
                     echo "Building requirement: $1"
                     run $APP_MAKE_METHOD -s
