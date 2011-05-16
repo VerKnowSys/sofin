@@ -1,0 +1,15 @@
+# ncurses definition
+APP_FULL_NAME="NCurses Library"
+APP_HTTP_PATH="http://ftp.gnu.org/pub/gnu/ncurses/ncurses-5.9.tar.gz"
+APP_NAME="ncurses"
+APP_VERSION="5.9"
+APP_POSTFIX=""
+APP_CONFIGURE_ARGS="--enable-widec --without-debug"
+APP_REQUIREMENTS=""
+APP_COMPILER_ARGS="-fPIC -O2"
+APP_LINKER_ARGS=""
+APP_CONFIGURE_SCRIPT="configure"
+APP_MAKE_METHOD="/usr/bin/make"
+APP_INSTALL_METHOD="/usr/bin/make install"
+APP_SOURCE_DIR_POSTFIX=""
+

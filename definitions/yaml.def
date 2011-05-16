@@ -1,0 +1,15 @@
+# libyaml definition
+APP_FULL_NAME="YAML Library"
+APP_HTTP_PATH="http://pyyaml.org/download/libyaml/yaml-0.1.3.tar.gz"
+APP_NAME="yaml"
+APP_VERSION="0.1.3"
+APP_POSTFIX=""
+APP_CONFIGURE_ARGS=""
+APP_REQUIREMENTS=""
+APP_COMPILER_ARGS="-fPIC -O2"
+APP_LINKER_ARGS=""
+APP_CONFIGURE_SCRIPT="configure"
+APP_MAKE_METHOD="/usr/bin/make"
+APP_INSTALL_METHOD="/usr/bin/make install"
+APP_SOURCE_DIR_POSTFIX=""
+
