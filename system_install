@@ -104,9 +104,12 @@ for application in $APPLICATIONS; do
                 
                 echo "Running requirement configure script for: $req with args: --prefix=$PREFIX $APP_CONFIGURE_ARGS"
                 
-                CXXFLAGS="-I${PREFIX}/include"
-                CFLAGS="-I${PREFIX}/include $APP_COMPILER_ARGS"
-                LDFLAGS="-L${PREFIX}/lib"
+                export CXXFLAGS="-I${PREFIX}/include $APP_COMPILER_ARGS"
+                export CFLAGS="-I${PREFIX}/include $APP_COMPILER_ARGS"
+                export LDFLAGS="-L${PREFIX}/lib $APP_LINKER_ARGS"
+                echo "CXXFLAGS: $CXXFLAGS"
+                echo "CFLAGS: $CFLAGS"
+                echo "LDFLAGS: $LDFLAGS"
                 run ./$APP_CONFIGURE_SCRIPT --prefix=$PREFIX $APP_CONFIGURE_ARGS $APP_LINKER_ARGS
                 
                 echo "Building requirement: $req"
@@ -154,10 +157,10 @@ for application in $APPLICATIONS; do
             cd "$dir/$APP_SOURCE_DIR_POSTFIX"
             
             echo "Configuring application: $application"
-            CXXFLAGS="-I${PREFIX}/include"
-            CFLAGS="-I${PREFIX}/include $APP_COMPILER_ARGS"
-            LDFLAGS="-L${PREFIX}/lib"
-            run ./$APP_CONFIGURE_SCRIPT --prefix=$PREFIX $APP_CONFIGURE_ARGS $APP_LINKER_ARGS
+            export CXXFLAGS="-I${PREFIX}/include $APP_COMPILER_ARGS"
+            export CFLAGS="-I${PREFIX}/include $APP_COMPILER_ARGS"
+            export LDFLAGS="-L${PREFIX}/lib $APP_LINKER_ARGS"
+            run ./$APP_CONFIGURE_SCRIPT $APP_CONFIGURE_ARGS --prefix=$PREFIX
 
             echo "Building application: $application"
             run $APP_MAKE_METHOD -s
