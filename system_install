@@ -5,7 +5,7 @@ unset LDFLAGS
 unset CFLAGS
 
 echo "Loading config"
-source ./config
+. ./config
 
 if [ ! -e "$SOURCE_DIR" ]; then
     echo "No $SOURCE_DIR found! Creating dir tree.."
