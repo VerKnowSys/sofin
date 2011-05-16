@@ -3,37 +3,70 @@
 PATH=/bin:/usr/bin:/sbin:/usr/sbin
 unset LDFLAGS
 unset CFLAGS
-
-echo "Loading config"
 . ./config
 
-if [ ! -e "$SOURCE_DIR" ]; then
-    echo "No $SOURCE_DIR found! Creating dir tree.."
-    mkdir -p "$SOURCE_DIR"
-fi
 
-if [ ! -e "$DEFINITIONS_DIR" ]; then
-    echo "No definitions folder found. Creating one at: $DEFINITIONS_DIR"
-    "$MKDIR_BIN" -p "$DEFINITIONS_DIR"
-    echo "All definition files (*.def) should be placed there"
-fi
+function check_command_result () {
+    if [ -z "$1" ]; then
+        echo "No param given for check_command_result()!"
+        exit 0
+    fi
+    if [ "$1" == "0" ]; then
+        echo "Ok."
+    else
+        echo "FAILURE."
+        exit 0
+    fi
+}
 
-APPLICATIONS=`$CAT_BIN $APPLICATIONS_NAME_LIST`
-if [ ! -e "$APPLICATIONS_NAME_LIST" ]; then
-    echo "File: $APPLICATIONS_NAME_LIST undefined. This file tells which apps are 'bundles' to built."
-    exit 0
-fi
-if [ "$APPLICATIONS" = "" ]; then
-    echo "Empty applications list!"
-    exit 0
-fi
+
+function run () {
+    if [ ! -z "$1" ]; then
+        echo "Running '$@'"
+        eval $@
+        check_command_result $?
+    else
+        echo "Empty command to run?"
+        exit 0
+    fi
+}
+
+
+function check_requirements () {
+    if [ ! -e "$SOURCE_DIR" ]; then
+        echo "No $SOURCE_DIR found! Creating dir tree.."
+        mkdir -p "$SOURCE_DIR"
+    fi
+    if [ ! -e "$DEFINITIONS_DIR" ]; then
+        echo "No definitions folder found. Creating one at: $DEFINITIONS_DIR"
+        "$MKDIR_BIN" -p "$DEFINITIONS_DIR"
+        echo "All definition files (*.def) should be placed there"
+    fi
+    if [ ! -e "$APPLICATIONS_NAME_LIST" ]; then
+        echo "File: $APPLICATIONS_NAME_LIST undefined. This file tells which apps are 'bundles' to built."
+        exit 0
+    fi
+    if [ "$APPLICATIONS" = "" ]; then
+        echo "Empty applications list!"
+        exit 0
+    fi
+}
+
+
+echo "Loaded config"
 echo "Application bundles defined for: $APPLICATIONS"
+APPLICATIONS=`$CAT_BIN $APPLICATIONS_NAME_LIST`
+check_requirements
 
 for application in $APPLICATIONS; do
     for definition in "$DEFINITIONS_DIR/$application".def; do
         echo "Reading definition: $definition"
         . $definition
-        PREFIX=$OPT_DIR$APP_NAME-$APP_VERSION-$APP_POSTFIX
+        if [ -z $APP_POSTFIX ]; then
+            export PREFIX=$OPT_DIR$APP_NAME-$APP_VERSION
+        else
+            export PREFIX=$OPT_DIR$APP_NAME-$APP_VERSION-$APP_POSTFIX
+        fi
         
         # check requirements (all definition requirements must be present/available):
         echo "App Requirements: $APP_REQUIREMENTS"
@@ -58,10 +91,11 @@ for application in $APPLICATIONS; do
             cd "$BUILD_DIR"
             
             echo "Fetching requirement source code"
-            $FETCH_BIN $APP_HTTP_PATH
+            run $FETCH_BIN $APP_HTTP_PATH
             
             echo "Unpacking source code"
-            $TAR_BIN xf $BUILD_DIR$APP_NAME*
+            run $TAR_BIN xf $BUILD_DIR$APP_NAME*
+            
             echo "Entrering $BUILD_DIR$APP_NAME*"
             
             for dir in `$LS_BIN -F $BUILD_DIR | $GREP_BIN \/$`; do
@@ -69,13 +103,17 @@ for application in $APPLICATIONS; do
                 cd "$dir"
                 
                 echo "Running requirement configure script for: $req with args: --prefix=$PREFIX $APP_CONFIGURE_ARGS"
-                ./$APP_CONFIGURE_SCRIPT --prefix=$PREFIX $APP_CONFIGURE_ARGS
+                
+                CXXFLAGS="-I${PREFIX}/include"
+                CFLAGS="-I${PREFIX}/include $APP_COMPILER_ARGS"
+                LDFLAGS="-L${PREFIX}/lib"
+                run ./$APP_CONFIGURE_SCRIPT --prefix=$PREFIX $APP_CONFIGURE_ARGS $APP_LINKER_ARGS
                 
                 echo "Building requirement: $req"
-                $APP_MAKE_METHOD -s
-
+                run $APP_MAKE_METHOD -s
+                
                 echo "Installing requirement: $req"
-                $APP_INSTALL_METHOD -s
+                run $APP_INSTALL_METHOD -s
                 
                 echo "Cleaning $build_dir$APP_NAME*"
                 $RM_BIN -rf $build_dir$APP_NAME*
@@ -106,23 +144,26 @@ for application in $APPLICATIONS; do
         cd "$BUILD_DIR"
         
         echo "Fetching requirement source code"
-        $FETCH_BIN $APP_HTTP_PATH
+        run $FETCH_BIN $APP_HTTP_PATH
         
         echo "Unpacking source code"
-        $TAR_BIN xf $BUILD_DIR$APP_NAME*
+        run $TAR_BIN xf $BUILD_DIR$APP_NAME*
         
         for dir in `$LS_BIN -F $BUILD_DIR | $GREP_BIN \/$`; do
             echo "Changing dir to: $dir/$APP_SOURCE_DIR_POSTFIX"
             cd "$dir/$APP_SOURCE_DIR_POSTFIX"
             
             echo "Configuring application: $application"
-            ./$APP_CONFIGURE_SCRIPT --prefix=$PREFIX $APP_CONFIGURE_ARGS --with-search-path=$PREFIX CXXFLAGS="-I${PREFIX}/include" CFLAGS="-I${PREFIX}/include" LDFLAGS="-L${PREFIX}/lib"
+            CXXFLAGS="-I${PREFIX}/include"
+            CFLAGS="-I${PREFIX}/include $APP_COMPILER_ARGS"
+            LDFLAGS="-L${PREFIX}/lib"
+            run ./$APP_CONFIGURE_SCRIPT --prefix=$PREFIX $APP_CONFIGURE_ARGS $APP_LINKER_ARGS
 
             echo "Building application: $application"
-            $APP_MAKE_METHOD -s
+            run $APP_MAKE_METHOD -s
 
             echo "Installing application: $application"
-            $APP_INSTALL_METHOD -s
+            run $APP_INSTALL_METHOD -s
         done
         
         cd $CUR_DIR
@@ -132,3 +173,4 @@ for application in $APPLICATIONS; do
     
 done
 
+exit 0
