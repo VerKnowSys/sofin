@@ -1,12 +1,12 @@
-# ruby ee definition
-APP_FULL_NAME="Ruby Enterprise Edition"
-APP_HTTP_PATH="http://rubyenterpriseedition.googlecode.com/files/ruby-enterprise-1.8.7-2011.03.tar.gz"
+# ruby definition
+APP_FULL_NAME="Ruby"
+APP_HTTP_PATH="http://ftp.ruby-lang.org/pub/ruby/1.9/ruby-1.9.2-p180.tar.gz"
 APP_NAME="ruby"
-APP_VERSION="1.8.7"
-APP_POSTFIX="ree"
-APP_CONFIGURE_ARGS="--disable-pthread --enable-mbari-api"
+APP_VERSION="1.9.2"
+APP_POSTFIX=""
+APP_CONFIGURE_ARGS="--disable-pthread"
 APP_REQUIREMENTS="iconv openssl readline"
 APP_CONFIGURE_SCRIPT="configure"
 APP_MAKE_METHOD="/usr/bin/make"
 APP_INSTALL_METHOD="/usr/bin/make install"
-APP_SOURCE_DIR_POSTFIX="source/" # if real sources are in different directory than ./
+APP_SOURCE_DIR_POSTFIX="" # if real sources are in different directory than ./
