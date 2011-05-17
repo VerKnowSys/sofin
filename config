@@ -1,5 +1,12 @@
 #!/bin/sh
 
+SCRIPT_ROOT="/opt/SvdOpt/"
+OPT_DIR="/Software/"
+
+DEFINITIONS_DIR="${SCRIPT_ROOT}definitions/"
+APPLICATIONS_NAME_LIST="${DEFINITIONS_DIR}applications"
+LOG="${OPT_DIR}INSTALL_LOG"
+
 LN_BIN="/bin/ln"
 DATE_BIN="/bin/date"
 SED_BIN="/usr/bin/sed"
@@ -21,8 +28,3 @@ FETCH_BIN="/usr/bin/fetch"
 if [ `$UNAME_BIN` = "Darwin" ]; then
 FETCH_BIN="/usr/bin/curl -L -O"
 fi
-
-OPT_DIR="/Software/"
-LOG="${OPT_DIR}INSTALL_LOG"
-APPLICATIONS_NAME_LIST="definitions/applications"
-DEFINITIONS_DIR="definitions/"
