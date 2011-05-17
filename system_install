@@ -56,6 +56,7 @@ check_requirements () {
 echo "Loaded config"
 echo "Application bundles defined for: $APPLICATIONS"
 APPLICATIONS=`$CAT_BIN $APPLICATIONS_NAME_LIST`
+echo "Applications: $APPLICATIONS"
 check_requirements
 
 for application in $APPLICATIONS; do
@@ -111,6 +112,11 @@ for application in $APPLICATIONS; do
                     run $APP_MAKE_METHOD -s
                     echo "Installing requirement: $1"
                     run $APP_INSTALL_METHOD -s
+                    if [ ! "$APP_AFTER_INSTALL_CALLBACK" = "" ]; then
+                        echo "After install callback: $APP_AFTER_INSTALL_CALLBACK"
+                        run $APP_AFTER_INSTALL_CALLBACK
+                    fi
+                    $APP_AFTER_INSTALL_CALLBACK
                     echo "Cleaning $build_dir$APP_NAME*"
                     $RM_BIN -rf $build_dir$APP_NAME*
                 done
@@ -127,7 +133,7 @@ for application in $APPLICATIONS; do
         fi
     done
     
-    echo "Job's done."
-    exit 0
-    
 done
+
+echo "Job's done."
+exit 0

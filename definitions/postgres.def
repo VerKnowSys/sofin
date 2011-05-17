@@ -1,0 +1,15 @@
+# postgresql definition
+APP_FULL_NAME="PostgreSQL 9"
+APP_HTTP_PATH="http://wwwmaster.postgresql.org/redir/33/h/source/v9.0.4/postgresql-9.0.4.tar.gz"
+APP_NAME="postgresql"
+APP_VERSION="9.0.4"
+APP_POSTFIX=""
+APP_CONFIGURE_ARGS="--without-ldap --with-zlib --with-openssl --disable-debug --disable-nls --without-perl --without-python --without-libxml"
+APP_REQUIREMENTS="zlib iconv"
+APP_COMPILER_ARGS="-fPIC -O2 -msse -msse2 -msse3 -mfpmath=sse"
+APP_LINKER_ARGS=""
+APP_CONFIGURE_SCRIPT="configure"
+APP_MAKE_METHOD="/usr/bin/make"
+APP_INSTALL_METHOD="/usr/bin/make install"
+APP_SOURCE_DIR_POSTFIX="" # if real sources are in different directory than ./
+APP_AFTER_INSTALL_CALLBACK="cd /tmp/postgresql/*/contrib/pg_archivecleanup && /usr/bin/make install" # usually to test instalation or do post install actions
