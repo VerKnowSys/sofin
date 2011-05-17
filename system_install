@@ -14,7 +14,8 @@ check_command_result () {
     if [ "$1" = "0" ]; then
         echo "Ok."
     else
-        echo "FAILURE."
+        echo "FAILURE. Last log:"
+        $TAIL_BIN -n 40 $LOG
         exit 0
     fi
 }
@@ -103,6 +104,9 @@ for application in $APPLICATIONS; do
                     export CXXFLAGS="-I${PREFIX}/include $APP_COMPILER_ARGS"
                     export CFLAGS="-I${PREFIX}/include $APP_COMPILER_ARGS"
                     export LDFLAGS="-L${PREFIX}/lib $APP_LINKER_ARGS"
+                    OLDPATH=$PATH
+                    export PATH="$PREFIX/bin:$PREFIX/sbin:$PATH"
+                    echo "PATH: $PATH"
                     echo "CXXFLAGS: $CXXFLAGS"
                     echo "CFLAGS: $CFLAGS"
                     echo "LDFLAGS: $LDFLAGS"
@@ -116,9 +120,9 @@ for application in $APPLICATIONS; do
                         echo "After install callback: $APP_AFTER_INSTALL_CALLBACK"
                         run $APP_AFTER_INSTALL_CALLBACK
                     fi
-                    $APP_AFTER_INSTALL_CALLBACK
-                    echo "Cleaning $build_dir$APP_NAME*"
-                    $RM_BIN -rf $build_dir$APP_NAME*
+                    echo "Cleaning $BUILD_DIR$APP_NAME"
+                    $RM_BIN -rf "$BUILD_DIR$APP_NAME"
+                    export PATH=$OLDPATH
                 done
                 cd $CUR_DIR
             }

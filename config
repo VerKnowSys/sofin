@@ -12,6 +12,7 @@ UNAME_BIN="/usr/bin/uname"
 TAR_BIN="/usr/bin/tar"
 GREP_BIN="/usr/bin/grep"
 LDCONFIG_BIN="/sbin/ldconfig"
+TAIL_BIN="/usr/bin/tail"
 
 if [ `$UNAME_BIN` = "Darwin" ]; then
     FETCH_BIN="/usr/local/bin/wget"
