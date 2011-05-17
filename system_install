@@ -29,8 +29,22 @@ check_command_result () {
 }
 
 
+definition_dir_check () {
+    if [ ! -d "$OPT_DIR" ]; then
+        echo "No $OPT_DIR found. Creating one."
+        "$MKDIR_BIN" -p "$OPT_DIR"
+    fi
+    if [ ! -d "$DEFINITIONS_DIR" ]; then
+        echo "No definitions folder found. Creating one at: $DEFINITIONS_DIR"
+        "$MKDIR_BIN" -p "$DEFINITIONS_DIR"
+        echo "All definition files (*.def) should be placed there"
+    fi
+}
+
+
 run () {
     if [ ! -z "$1" ]; then
+        definition_dir_check
         if [ ! -e "$LOG" ]; then
             $TOUCH_BIN "$LOG"
         fi
@@ -45,11 +59,7 @@ run () {
 
 
 check_requirements () {
-    if [ ! -e "$DEFINITIONS_DIR" ]; then
-        echo "No definitions folder found. Creating one at: $DEFINITIONS_DIR"
-        "$MKDIR_BIN" -p "$DEFINITIONS_DIR"
-        echo "All definition files (*.def) should be placed there"
-    fi
+    definition_dir_check
     if [ ! -e "$APPLICATIONS_NAME_LIST" ]; then
         echo "File: $APPLICATIONS_NAME_LIST undefined. This file tells which apps are 'bundles' to built."
         exit
