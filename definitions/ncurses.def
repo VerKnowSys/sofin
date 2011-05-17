@@ -1,6 +1,6 @@
 # ncurses definition
 APP_FULL_NAME="NCurses Library"
-APP_HTTP_PATH="http://ftp.gnu.org/pub/gnu/ncurses/ncurses-5.9.tar.gz"
+APP_HTTP_PATH="http://software.verknowsys.com/ncurses-5.9.tar.gz"
 APP_NAME="ncurses"
 APP_VERSION="5.9"
 APP_POSTFIX=""

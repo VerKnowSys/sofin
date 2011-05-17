@@ -1,6 +1,6 @@
 # zlib definition
 APP_FULL_NAME="Z Library"
-APP_HTTP_PATH="http://zlib.net/zlib-1.2.5.tar.gz"
+APP_HTTP_PATH="http://software.verknowsys.com/zlib-1.2.5.tar.gz"
 APP_NAME="zlib"
 APP_VERSION="1.2.5"
 APP_POSTFIX=""

@@ -1,6 +1,6 @@
 # readline library
 APP_FULL_NAME="Readline Library"
-APP_HTTP_PATH="ftp://ftp.cwru.edu/pub/bash/readline-6.2.tar.gz"
+APP_HTTP_PATH="http://software.verknowsys.com/readline-6.2.tar.gz"
 APP_NAME="readline"
 APP_VERSION="6.2"
 APP_POSTFIX=""

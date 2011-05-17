@@ -1,6 +1,6 @@
 # ruby definition
 APP_FULL_NAME="Ruby"
-APP_HTTP_PATH="http://ftp.ruby-lang.org/pub/ruby/1.9/ruby-1.9.2-p180.tar.gz"
+APP_HTTP_PATH="http://software.verknowsys.com/ruby-1.9.2-p180.tar.gz"
 APP_NAME="ruby"
 APP_VERSION="1.9.2"
 APP_POSTFIX=""

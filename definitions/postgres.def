@@ -1,6 +1,6 @@
 # postgresql definition
 APP_FULL_NAME="PostgreSQL 9"
-APP_HTTP_PATH="http://wwwmaster.postgresql.org/redir/33/h/source/v9.0.4/postgresql-9.0.4.tar.gz"
+APP_HTTP_PATH="http://software.verknowsys.com/postgresql-9.0.4.tar.gz"
 APP_NAME="postgresql"
 APP_VERSION="9.0.4"
 APP_POSTFIX=""
