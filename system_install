@@ -54,6 +54,7 @@ check_requirements () {
 }
 
 
+
 echo "Loaded config"
 echo "Application bundles defined for: $APPLICATIONS"
 APPLICATIONS=`$CAT_BIN $APPLICATIONS_NAME_LIST`
@@ -61,15 +62,20 @@ echo "Applications: $APPLICATIONS"
 check_requirements
 
 for application in $APPLICATIONS; do
-    for definition in "$DEFINITIONS_DIR/$application".def; do
+    for definition in "$DEFINITIONS_DIR$application".def; do
         echo "Reading definition: $definition"
         . $definition
+
+        # fancy old style Capitalize
+        APP_NAME="$(echo "$APP_NAME" | $CUT_BIN -c1 | $TR_BIN '[a-z]' '[A-Z]')$(echo "$APP_NAME" | $SED_BIN 's/^[a-z]//')"
+        echo "Application name: $APP_NAME"
         if [ -z $APP_POSTFIX ]; then
             export PREFIX=$OPT_DIR$APP_NAME-$APP_VERSION
         else
             export PREFIX=$OPT_DIR$APP_NAME-$APP_VERSION-$APP_POSTFIX
         fi
-        export LD_LIBRARY_PATH="$PREFIX/lib:$LD_LIBRARY_PATH"
+        OLD_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+        export LD_LIBRARY_PATH="$PREFIX/lib"
         
         if [ -e $PREFIX ]; then
             echo "Application already installed: $PREFIX. Skipped."
@@ -120,8 +126,8 @@ for application in $APPLICATIONS; do
                         echo "After install callback: $APP_AFTER_INSTALL_CALLBACK"
                         run $APP_AFTER_INSTALL_CALLBACK
                     fi
-                    echo "Cleaning $BUILD_DIR$APP_NAME"
-                    $RM_BIN -rf "$BUILD_DIR$APP_NAME"
+                    echo "Cleaning $BUILD_DIR"
+                    $RM_BIN -rf "$BUILD_DIR"
                     export PATH=$OLDPATH
                 done
                 cd $CUR_DIR
@@ -135,8 +141,16 @@ for application in $APPLICATIONS; do
             done
             execute_process $application
         fi
+        export LD_LIBRARY_PATH="$OLD_LD_LIBRARY_PATH"
     done
     
+    echo "Updating LD_LIBRARY_PATH for application: $application"
+    export LD_LIBRARY_PATH="$PREFIX/lib:$PREFIX/libexec:$LD_LIBRARY_PATH"
+    echo "You may append 'export LD_LIBRARY_PATH=$LD_LIBRARY_PATH' to startup script."
+    
+    echo "Updating PATH for application: $application"
+    export PATH="$PREFIX/bin:$PREFIX/sbin:$PATH"
+    echo "You may append 'export PATH=$PATH' to startup script."
 done
 
 echo "Job's done."
