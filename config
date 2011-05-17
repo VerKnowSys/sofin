@@ -19,7 +19,7 @@ TAIL_BIN="/usr/bin/tail"
 FETCH_BIN="/usr/bin/fetch"
 
 if [ `$UNAME_BIN` = "Darwin" ]; then
-FETCH_BIN="/usr/local/bin/wget"
+FETCH_BIN="/usr/bin/curl -L -O"
 fi
 
 OPT_DIR="/Software/"
