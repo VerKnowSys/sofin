@@ -1,9 +1,10 @@
 #!/bin/sh
 
-LOG="/opt/INSTALL_LOG"
-
 LN_BIN="/bin/ln"
 DATE_BIN="/bin/date"
+SED_BIN="/usr/bin/sed"
+CUT_BIN="/usr/bin/cut"
+TR_BIN="/usr/bin/tr"
 LS_BIN="/bin/ls"
 CAT_BIN="/bin/cat"
 RM_BIN="/bin/rm"
@@ -20,7 +21,8 @@ else
     FETCH_BIN="/usr/bin/fetch"
 fi
 
-OPT_DIR="/opt/"
-SOURCE_DIR="${OPT_DIR}src/"
+OPT_DIR="/Software/"
+LOG="$OPT_DIR/INSTALL_LOG"
+SOURCE_DIR="${OPT_DIR}sources/"
 APPLICATIONS_NAME_LIST="definitions/applications"
 DEFINITIONS_DIR="definitions/"
