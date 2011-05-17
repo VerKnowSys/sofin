@@ -10,19 +10,19 @@ CAT_BIN="/bin/cat"
 RM_BIN="/bin/rm"
 MKDIR_BIN="/bin/mkdir"
 UNAME_BIN="/usr/bin/uname"
+TOUCH_BIN="/usr/bin/touch"
 TAR_BIN="/usr/bin/tar"
+ID_BIN="/usr/bin/id"
 GREP_BIN="/usr/bin/grep"
 LDCONFIG_BIN="/sbin/ldconfig"
 TAIL_BIN="/usr/bin/tail"
+FETCH_BIN="/usr/bin/fetch"
 
 if [ `$UNAME_BIN` = "Darwin" ]; then
-    FETCH_BIN="/usr/local/bin/wget"
-else
-    FETCH_BIN="/usr/bin/fetch"
+FETCH_BIN="/usr/local/bin/wget"
 fi
 
 OPT_DIR="/Software/"
-LOG="$OPT_DIR/INSTALL_LOG"
-SOURCE_DIR="${OPT_DIR}sources/"
+LOG="${OPT_DIR}INSTALL_LOG"
 APPLICATIONS_NAME_LIST="definitions/applications"
 DEFINITIONS_DIR="definitions/"

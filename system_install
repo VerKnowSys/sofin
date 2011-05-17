@@ -6,38 +6,45 @@ unset CFLAGS
 . ./config
 
 
+check_root () {
+    if [ ! "`$ID_BIN -u`" = "0" ]; then
+        echo "This command should be run as root in current stage."
+        exit
+    fi
+}
+
+
 check_command_result () {
     if [ -z "$1" ]; then
         echo "No param given for check_command_result()!"
-        exit 0
+        exit
     fi
     if [ "$1" = "0" ]; then
         echo "Ok."
     else
         echo "FAILURE. Last log:"
         $TAIL_BIN -n 40 $LOG
-        exit 0
+        exit
     fi
 }
 
 
 run () {
     if [ ! -z "$1" ]; then
-        echo "Running '$@' @ `$DATE_BIN`" >> $LOG
-        eval $@ 1>> $LOG 2>> $LOG
+        if [ ! -e "$LOG" ]; then
+            $TOUCH_BIN "$LOG"
+        fi
+        echo "Running '$@' @ `$DATE_BIN`" >> "$LOG"
+        eval $@ 1>> "$LOG" 2>> "$LOG"
         check_command_result $?
     else
         echo "Empty command to run?"
-        exit 0
+        exit
     fi
 }
 
 
 check_requirements () {
-    if [ ! -e "$SOURCE_DIR" ]; then
-        echo "No $SOURCE_DIR found! Creating dir tree.."
-        mkdir -p "$SOURCE_DIR"
-    fi
     if [ ! -e "$DEFINITIONS_DIR" ]; then
         echo "No definitions folder found. Creating one at: $DEFINITIONS_DIR"
         "$MKDIR_BIN" -p "$DEFINITIONS_DIR"
@@ -45,16 +52,16 @@ check_requirements () {
     fi
     if [ ! -e "$APPLICATIONS_NAME_LIST" ]; then
         echo "File: $APPLICATIONS_NAME_LIST undefined. This file tells which apps are 'bundles' to built."
-        exit 0
+        exit
     fi
     if [ "$APPLICATIONS" = "" ]; then
         echo "Empty applications list!"
-        exit 0
+        exit
     fi
 }
 
 
-
+check_root
 echo "Loaded config"
 echo "Application bundles defined for: $APPLICATIONS"
 APPLICATIONS=`$CAT_BIN $APPLICATIONS_NAME_LIST`
@@ -83,13 +90,13 @@ for application in $APPLICATIONS; do
             execute_process () {
                 if [ -z "$1" ]; then
                     echo "No param given for execute_process()!"
-                    exit 0
+                    exit
                 fi
                 req_definition_file="$DEFINITIONS_DIR$1.def"
                 echo "Checking requirement: $1 file: $req_definition_file"
                 if [ ! -e $req_definition_file ]; then
                     echo "Definition file for requirement: $1 does not exists!"
-                    exit 0
+                    exit
                 fi
                 . $req_definition_file
                 BUILD_DIR="/tmp/$APP_NAME/"
@@ -144,14 +151,16 @@ for application in $APPLICATIONS; do
         export LD_LIBRARY_PATH="$OLD_LD_LIBRARY_PATH"
     done
     
-    echo "Updating LD_LIBRARY_PATH for application: $application"
-    export LD_LIBRARY_PATH="$PREFIX/lib:$PREFIX/libexec:$LD_LIBRARY_PATH"
-    echo "You may append 'export LD_LIBRARY_PATH=$LD_LIBRARY_PATH' to startup script."
-    
-    echo "Updating PATH for application: $application"
-    export PATH="$PREFIX/bin:$PREFIX/sbin:$PATH"
-    echo "You may append 'export PATH=$PATH' to startup script."
 done
 
+# echo "Updating LD_LIBRARY_PATH for application: $application"
+# export LD_LIBRARY_PATH="$PREFIX/lib:$PREFIX/libexec:$LD_LIBRARY_PATH"
+# echo "You may append 'export LD_LIBRARY_PATH=$LD_LIBRARY_PATH' to startup script."
+# 
+# echo "Updating PATH for application: $application"
+# export PATH="$PREFIX/bin:$PREFIX/sbin:$PATH"
+# echo "You may append 'export PATH=$PATH' to startup script."
+
 echo "Job's done."
-exit 0
+
+exit
