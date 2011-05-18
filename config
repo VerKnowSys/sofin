@@ -2,10 +2,11 @@
 
 SCRIPT_ROOT="/opt/SvdOpt/"
 OPT_DIR="/Software/"
-
 DEFINITIONS_DIR="${SCRIPT_ROOT}definitions/"
+SKELETON="${DEFINITIONS_DIR}skeleton.def"
 APPLICATIONS_NAME_LIST="${DEFINITIONS_DIR}applications"
 LOG="${OPT_DIR}INSTALL_LOG"
+DEFAULT_PATH="/bin:/usr/bin:/sbin:/usr/sbin"
 
 PATCH_BIN="/usr/bin/patch"
 LN_BIN="/bin/ln"
