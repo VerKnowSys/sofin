@@ -147,11 +147,11 @@ for application in $APPLICATIONS; do
                     echo "Current DIR: $BUILD_DIR$dir"
                     LIST_DIR=${DEFINITIONS_DIR}patches/$application
                     if [ -d $LIST_DIR ]; then
-                        if [ "$application" = "$APP_NAME" ]; then
+                        if [ "$application" = "$APP_NAME" ]; then # apply patch only when preparing application for which patch is for
                             echo "Applying patches for application: $application"
                             for patch in $LIST_DIR/*; do
                                 echo "Patching source code with patch: $patch"
-                                $PATCH_BIN -i "$patch" >> $LOG
+                                run $PATCH_BIN -i "$patch"
                             done
                         fi
                     fi
