@@ -20,9 +20,10 @@ check_command_result () {
         exit
     fi
     if [ "$1" = "0" ]; then
-        echo "Ok."
+        echo "CORRECT"
     else
-        echo "FAILURE. Last log:"
+        echo
+        echo "FAILURE! ------> Last log:"
         $TAIL_BIN -n 40 $LOG
         exit
     fi
@@ -47,10 +48,12 @@ run () {
         definition_dir_check
         if [ ! -e "$LOG" ]; then
             $TOUCH_BIN "$LOG"
-        fi
+        fi        
         echo "Running '$@' @ `$DATE_BIN`" >> "$LOG"
         eval $@ 1>> "$LOG" 2>> "$LOG"
         check_command_result $?
+        echo "------------------------------------------------------------------------------"
+        echo "##############################################################################"
     else
         echo "Empty command to run?"
         exit
@@ -109,14 +112,22 @@ for application in $APPLICATIONS; do
                     exit
                 fi
                 . $req_definition_file
-                BUILD_DIR="/tmp/$APP_NAME/"
-                echo "Destroying, and Recreating build dir: $BUILD_DIR"
-                $RM_BIN -rf "$BUILD_DIR"
+                BUILD_DIR="/tmp/SvdOpt/$APP_NAME/"
                 $MKDIR_BIN -p "$BUILD_DIR"
                 CUR_DIR=`pwd`
                 cd "$BUILD_DIR"
                 echo "Fetching requirement source from: $APP_HTTP_PATH"
-                run $FETCH_BIN $APP_HTTP_PATH
+                for bd in $BUILD_DIR/*; do
+                    if [ -d $bd ]; then
+                        echo "Unpacked source code found in build dir. Removing: $bd"
+                        $RM_BIN -rf $bd
+                    fi
+                done
+                if [ ! -e $BUILD_DIR$1*tar.gz ]; then
+                    run $FETCH_BIN $APP_HTTP_PATH
+                else
+                    echo "Already fetched. Using tarball from cache"
+                fi
                 echo "Unpacking source code of: $APP_NAME"
                 run $TAR_BIN xf $BUILD_DIR$APP_NAME*
                 echo "Entrering $BUILD_DIR$APP_NAME*" >> $LOG
@@ -133,12 +144,17 @@ for application in $APPLICATIONS; do
                     echo "CFLAGS: $CFLAGS"
                     echo "LDFLAGS: $LDFLAGS"
                     echo "LD_LIBRARY_PATH: $LD_LIBRARY_PATH"
-                    echo "Current DIR: $BUILD_DIR$dir (pwd: `pwd`)"
-                    echo "Applying patches for application: $application"
-                    for patch in ${DEFINITIONS_DIR}patches/$application/*; do
-                        echo "Patching source code with patch: $patch"
-                        $PATCH_BIN -i "$patch" >> $LOG
-                    done
+                    echo "Current DIR: $BUILD_DIR$dir"
+                    LIST_DIR=${DEFINITIONS_DIR}patches/$application
+                    if [ -d $LIST_DIR ]; then
+                        if [ "$application" = "$APP_NAME" ]; then
+                            echo "Applying patches for application: $application"
+                            for patch in $LIST_DIR/*; do
+                                echo "Patching source code with patch: $patch"
+                                $PATCH_BIN -i "$patch" >> $LOG
+                            done
+                        fi
+                    fi
                     echo "Running requirement configure script for: $1 with args: --prefix=$PREFIX $APP_CONFIGURE_ARGS"
                     run ./$APP_CONFIGURE_SCRIPT $APP_CONFIGURE_ARGS --prefix=$PREFIX
                     echo "Building requirement: $1"
@@ -149,8 +165,6 @@ for application in $APPLICATIONS; do
                         echo "After install callback: $APP_AFTER_INSTALL_CALLBACK"
                         run $APP_AFTER_INSTALL_CALLBACK
                     fi
-                    echo "Cleaning $BUILD_DIR"
-                    $RM_BIN -rf "$BUILD_DIR"
                     export PATH=$OLDPATH
                 done
                 cd $CUR_DIR
