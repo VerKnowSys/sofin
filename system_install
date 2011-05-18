@@ -1,9 +1,10 @@
 #!/bin/sh
 
-PATH=/bin:/usr/bin:/sbin:/usr/sbin
 unset LDFLAGS
 unset CFLAGS
 . ./config
+. $SKELETON
+PATH=$DEFAULT_PATH
 
 
 check_root () {
@@ -43,24 +44,6 @@ definition_dir_check () {
 }
 
 
-run () {
-    if [ ! -z "$1" ]; then
-        definition_dir_check
-        if [ ! -e "$LOG" ]; then
-            $TOUCH_BIN "$LOG"
-        fi        
-        echo "Running '$@' @ `$DATE_BIN`" >> "$LOG"
-        eval $@ 1>> "$LOG" 2>> "$LOG"
-        check_command_result $?
-        echo "------------------------------------------------------------------------------"
-        echo "##############################################################################"
-    else
-        echo "Empty command to run?"
-        exit
-    fi
-}
-
-
 check_requirements () {
     definition_dir_check
     if [ ! -e "$APPLICATIONS_NAME_LIST" ]; then
@@ -84,6 +67,7 @@ check_requirements
 for application in $APPLICATIONS; do
     for definition in "$DEFINITIONS_DIR$application".def; do
         echo "Reading definition: $definition"
+        . $SKELETON
         . $definition
 
         # fancy old style Capitalize
@@ -94,12 +78,33 @@ for application in $APPLICATIONS; do
         else
             export PREFIX=$OPT_DIR$APP_NAME-$APP_VERSION-$APP_POSTFIX
         fi
-        OLD_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
-        export LD_LIBRARY_PATH="$PREFIX/lib"
-        
+
         if [ -e $PREFIX ]; then
             echo "Application already installed: $PREFIX. Skipped."
         else
+            run () {
+                if [ ! -z "$1" ]; then
+                    export PATH="$PREFIX/bin:$PREFIX/sbin:$DEFAULT_PATH"
+                    export LD_LIBRARY_PATH="$PREFIX/lib:$PREFIX/libexec"
+                    echo "PATH: $PATH" >> $LOG
+                    echo "CXXFLAGS: $CXXFLAGS" >> $LOG
+                    echo "CFLAGS: $CFLAGS" >> $LOG
+                    echo "LDFLAGS: $LDFLAGS" >> $LOG
+                    echo "LD_LIBRARY_PATH: $LD_LIBRARY_PATH" >> $LOG
+                    echo "Current DIR: $BUILD_DIR$dir" >> $LOG
+                    definition_dir_check
+                    if [ ! -e "$LOG" ]; then
+                        $TOUCH_BIN "$LOG"
+                    fi        
+                    echo "Running '$@' @ `$DATE_BIN`" >> "$LOG"
+                    eval PATH=$PATH $@ 1>> "$LOG" 2>> "$LOG"
+                    check_command_result $?
+                    echo "------------------------------------------------------------------------------"
+                else
+                    echo "Empty command to run?"
+                    exit
+                fi
+            }
             execute_process () {
                 if [ -z "$1" ]; then
                     echo "No param given for execute_process()!"
@@ -108,9 +113,10 @@ for application in $APPLICATIONS; do
                 req_definition_file="$DEFINITIONS_DIR$1.def"
                 echo "Checking requirement: $1 file: $req_definition_file"
                 if [ ! -e $req_definition_file ]; then
-                    echo "Definition file for requirement: $1 does not exists!"
+                    echo "Definition file for requirement: '$1' does not exists!"
                     exit
                 fi
+                . $SKELETON
                 . $req_definition_file
                 BUILD_DIR="/tmp/SvdOpt/$APP_NAME/"
                 $MKDIR_BIN -p "$BUILD_DIR"
@@ -137,21 +143,13 @@ for application in $APPLICATIONS; do
                     export CXXFLAGS="-I${PREFIX}/include $APP_COMPILER_ARGS"
                     export CFLAGS="-I${PREFIX}/include $APP_COMPILER_ARGS"
                     export LDFLAGS="-L${PREFIX}/lib $APP_LINKER_ARGS"
-                    OLDPATH=$PATH
-                    export PATH="$PREFIX/bin:$PREFIX/sbin:$PATH"
-                    echo "PATH: $PATH"
-                    echo "CXXFLAGS: $CXXFLAGS"
-                    echo "CFLAGS: $CFLAGS"
-                    echo "LDFLAGS: $LDFLAGS"
-                    echo "LD_LIBRARY_PATH: $LD_LIBRARY_PATH"
-                    echo "Current DIR: $BUILD_DIR$dir"
                     LIST_DIR=${DEFINITIONS_DIR}patches/$application
                     if [ -d $LIST_DIR ]; then
                         if [ "$application" = "$APP_NAME" ]; then # apply patch only when preparing application for which patch is for
                             echo "Applying patches for application: $application"
                             for patch in $LIST_DIR/*; do
                                 echo "Patching source code with patch: $patch"
-                                run $PATCH_BIN -i "$patch"
+                                run $PATCH_BIN -p0 -i "$patch"
                             done
                         fi
                     fi
@@ -165,7 +163,6 @@ for application in $APPLICATIONS; do
                         echo "After install callback: $APP_AFTER_INSTALL_CALLBACK"
                         run $APP_AFTER_INSTALL_CALLBACK
                     fi
-                    export PATH=$OLDPATH
                 done
                 cd $CUR_DIR
             }
@@ -178,18 +175,9 @@ for application in $APPLICATIONS; do
             done
             execute_process $application
         fi
-        export LD_LIBRARY_PATH="$OLD_LD_LIBRARY_PATH"
     done
     
 done
-
-# echo "Updating LD_LIBRARY_PATH for application: $application"
-# export LD_LIBRARY_PATH="$PREFIX/lib:$PREFIX/libexec:$LD_LIBRARY_PATH"
-# echo "You may append 'export LD_LIBRARY_PATH=$LD_LIBRARY_PATH' to startup script."
-# 
-# echo "Updating PATH for application: $application"
-# export PATH="$PREFIX/bin:$PREFIX/sbin:$PATH"
-# echo "You may append 'export PATH=$PATH' to startup script."
 
 echo "Job's done."
 
