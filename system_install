@@ -123,7 +123,6 @@ for application in $APPLICATIONS; do
                 for dir in `$LS_BIN -F $BUILD_DIR | $GREP_BIN \/$`; do
                     echo "Changing dir to: $dir" >> $LOG
                     cd "$dir"
-                    echo "Running requirement configure script for: $1 with args: --prefix=$PREFIX $APP_CONFIGURE_ARGS"
                     export CXXFLAGS="-I${PREFIX}/include $APP_COMPILER_ARGS"
                     export CFLAGS="-I${PREFIX}/include $APP_COMPILER_ARGS"
                     export LDFLAGS="-L${PREFIX}/lib $APP_LINKER_ARGS"
@@ -134,6 +133,13 @@ for application in $APPLICATIONS; do
                     echo "CFLAGS: $CFLAGS"
                     echo "LDFLAGS: $LDFLAGS"
                     echo "LD_LIBRARY_PATH: $LD_LIBRARY_PATH"
+                    echo "Current DIR: $BUILD_DIR$dir (pwd: `pwd`)"
+                    echo "Applying patches for application: $application"
+                    for patch in ${DEFINITIONS_DIR}patches/$application/*; do
+                        echo "Patching source code with patch: $patch"
+                        $PATCH_BIN -i "$patch" >> $LOG
+                    done
+                    echo "Running requirement configure script for: $1 with args: --prefix=$PREFIX $APP_CONFIGURE_ARGS"
                     run ./$APP_CONFIGURE_SCRIPT $APP_CONFIGURE_ARGS --prefix=$PREFIX
                     echo "Building requirement: $1"
                     run $APP_MAKE_METHOD -s
