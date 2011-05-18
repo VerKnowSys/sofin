@@ -1,7 +1,7 @@
 # zsh definition
 APP_FULL_NAME="Z Shell"
 APP_HTTP_PATH="http://software.verknowsys.com/zsh-4.3.10.tar.gz"
-APP_NAME="expat"
+APP_NAME="zsh"
 APP_VERSION="4.3.10"
 APP_POSTFIX=""
 APP_CONFIGURE_ARGS="--enable-pcre --enable-multibyte"
