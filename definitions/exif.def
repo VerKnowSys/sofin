@@ -1,0 +1,9 @@
+# exif definition
+APP_FULL_NAME="Exif Library"
+APP_HTTP_PATH="http://software.verknowsys.com/libexif-0.6.20.tar.gz"
+APP_NAME="libexif"
+APP_VERSION="0.6.20"
+APP_COMPILER_ARGS="-fPIC -O2 -msse -msse2 -msse3 -mfpmath=sse"
+APP_CONFIGURE_SCRIPT="configure"
+APP_MAKE_METHOD="make"
+APP_INSTALL_METHOD="make install"
