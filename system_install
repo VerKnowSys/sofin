@@ -187,14 +187,12 @@ for application in $APPLICATIONS; do
                             fi
                         fi
                         
-                        # NOTE: special case: no configure script attached to bundle/library
-                        if [ "$APP_CONFIGURE_SCRIPT" = "true" ]; then
-                            note "Skipping configuration step."
+                        debug "Running requirement configure script for: $1 with args: --prefix=$PREFIX $APP_CONFIGURE_ARGS"
+                        if [ "$APP_CONFIGURE_SCRIPT" = "cmake" ]; then
+                            run $APP_CONFIGURE_SCRIPT . -LH -DCMAKE_INSTALL_PREFIX=$PREFIX
                         else
-                            debug "Running requirement configure script for: $1 with args: --prefix=$PREFIX $APP_CONFIGURE_ARGS"
-                            run ./$APP_CONFIGURE_SCRIPT $APP_CONFIGURE_ARGS --prefix=$PREFIX
+                            run $APP_CONFIGURE_SCRIPT $APP_CONFIGURE_ARGS --prefix=$PREFIX
                         fi
-                        
                         note "Building requirement: $1"
                         run $APP_MAKE_METHOD -s
                         note "Installing requirement: $1"
