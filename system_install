@@ -7,9 +7,24 @@ unset CFLAGS
 PATH=$DEFAULT_PATH
 
 
+info () {
+    echo " INFO: $1"
+}
+
+
+debug () {
+    echo "DEBUG: $1"
+}
+
+
+error () {
+    echo "ERROR: $1"
+}
+
+
 check_root () {
-    if [ ! "`$ID_BIN -u`" = "0" ]; then
-        echo "This command should be run as root in current stage."
+    if [ ! "$($ID_BIN -u)" = "0" ]; then
+        error "This command should be run as root in current stage."
         exit
     fi
 }
@@ -17,14 +32,14 @@ check_root () {
 
 check_command_result () {
     if [ -z "$1" ]; then
-        echo "No param given for check_command_result()!"
+        error "No param given for check_command_result()!"
         exit
     fi
     if [ "$1" = "0" ]; then
-        echo "CORRECT"
+        info "CORRECT"
     else
-        echo
-        echo "FAILURE! ------> Last log:"
+        error
+        error "FAILURE! --------------> Last log:"
         $TAIL_BIN -n 20 $LOG
         exit
     fi
@@ -33,13 +48,13 @@ check_command_result () {
 
 definition_dir_check () {
     if [ ! -d "$OPT_DIR" ]; then
-        echo "No $OPT_DIR found. Creating one."
+        info "No $OPT_DIR found. Creating one."
         "$MKDIR_BIN" -p "$OPT_DIR"
     fi
     if [ ! -d "$DEFINITIONS_DIR" ]; then
-        echo "No definitions folder found. Creating one at: $DEFINITIONS_DIR"
+        info "No definitions folder found. Creating one at: $DEFINITIONS_DIR"
         "$MKDIR_BIN" -p "$DEFINITIONS_DIR"
-        echo "All definition files (*.def) should be placed there"
+        info "All definition files (*.def) should be placed there"
     fi
 }
 
@@ -47,33 +62,33 @@ definition_dir_check () {
 check_requirements () {
     definition_dir_check
     if [ ! -e "$APPLICATIONS_NAME_LIST" ]; then
-        echo "File: $APPLICATIONS_NAME_LIST undefined. This file tells which apps are 'bundles' to built."
+        error "File: $APPLICATIONS_NAME_LIST undefined. This file tells which apps are 'bundles' to built."
         exit
     fi
     if [ "$APPLICATIONS" = "" ]; then
-        echo "Empty applications list!"
+        error "Empty applications list!"
         exit
     fi
 }
 
 
 check_root
-echo "Loaded config"
-echo "Application bundles defined for: $APPLICATIONS"
-APPLICATIONS=`$CAT_BIN $APPLICATIONS_NAME_LIST`
-echo "Applications: $APPLICATIONS"
+info "Loaded config"
+info "Application bundles defined for: $APPLICATIONS"
+APPLICATIONS="$($CAT_BIN $APPLICATIONS_NAME_LIST)"
+debug "Applications: $APPLICATIONS"
 check_requirements
 
 for application in $APPLICATIONS; do
     
     for definition in "$DEFINITIONS_DIR$application".def; do
-        echo "Reading definition: $definition"
+        debug "Reading definition: $definition"
         . $DEFAULTS
         . $definition
         
         # fancy old style Capitalize
         APP_NAME="$(echo "$APP_NAME" | $CUT_BIN -c1 | $TR_BIN '[a-z]' '[A-Z]')$(echo "$APP_NAME" | $SED_BIN 's/^[a-zA-Z]//')"
-        echo "Application name: $APP_NAME"
+        info "Application name: $APP_NAME"
         if [ -z $APP_POSTFIX ]; then
             export PREFIX=$OPT_DIR$APP_NAME-$APP_VERSION
         else
@@ -81,40 +96,40 @@ for application in $APPLICATIONS; do
         fi
 
         if [ -e $PREFIX ]; then
-            echo "Application already installed: $PREFIX. Skipped."
+            info "Application already installed: $PREFIX. Skipped."
         else
             run () {
                 if [ ! -z "$1" ]; then
                     export PATH="$PREFIX/bin:$PREFIX/sbin:$DEFAULT_PATH"
                     export LD_LIBRARY_PATH="$PREFIX/lib:$PREFIX/libexec"
-                    echo "PATH: $PATH" >> $LOG
-                    echo "CXXFLAGS: $CXXFLAGS" >> $LOG
-                    echo "CFLAGS: $CFLAGS" >> $LOG
-                    echo "LDFLAGS: $LDFLAGS" >> $LOG
-                    echo "LD_LIBRARY_PATH: $LD_LIBRARY_PATH" >> $LOG
-                    echo "Current DIR: $BUILD_DIR$dir" >> $LOG
+                    debug "PATH: $PATH" >> $LOG
+                    debug "CXXFLAGS: $CXXFLAGS" >> $LOG
+                    debug "CFLAGS: $CFLAGS" >> $LOG
+                    debug "LDFLAGS: $LDFLAGS" >> $LOG
+                    debug "LD_LIBRARY_PATH: $LD_LIBRARY_PATH" >> $LOG
+                    debug "Current DIR: $BUILD_DIR$dir" >> $LOG
                     definition_dir_check
                     if [ ! -e "$LOG" ]; then
                         $TOUCH_BIN "$LOG"
                     fi        
-                    echo "Running '$@' @ `$DATE_BIN`" >> "$LOG"
+                    debug "Running '$@' @ `$DATE_BIN`" >> "$LOG"
                     eval PATH=$PATH $@ 1>> "$LOG" 2>> "$LOG"
                     check_command_result $?
-                    echo "------------------------------------------------------------------------------"
+                    info "------------------------------------------------------------------------------"
                 else
-                    echo "Empty command to run?"
+                    error "Empty command to run?"
                     exit
                 fi
             }
             execute_process () {
                 if [ -z "$1" ]; then
-                    echo "No param given for execute_process()!"
+                    error "No param given for execute_process()!"
                     exit
                 fi
                 req_definition_file="$DEFINITIONS_DIR$1.def"
-                echo "Checking requirement: $1 file: $req_definition_file"
+                debug "Checking requirement: $1 file: $req_definition_file"
                 if [ ! -e $req_definition_file ]; then
-                    echo "Definition file for requirement: '$1' does not exists!"
+                    error "Definition file for requirement: '$1' does not exists!"
                     exit
                 fi
                 . $DEFAULTS
@@ -129,61 +144,69 @@ for application in $APPLICATIONS; do
                     done
                 fi
                 if [ "$ALLOW" = "1" ]; then
-                    BUILD_DIR="/tmp/SvdOpt/$APP_NAME/"
+                    BUILD_DIR="$TMP_ROOT$APP_NAME/"
                     $MKDIR_BIN -p "$BUILD_DIR"
                     CUR_DIR=`pwd`
                     cd "$BUILD_DIR"
-                    echo "Fetching requirement source from: $APP_HTTP_PATH"
+                    info "Fetching requirement source from: $APP_HTTP_PATH"
                     for bd in $BUILD_DIR/*; do
                         if [ -d $bd ]; then
-                            echo "Unpacked source code found in build dir. Removing: $bd"
+                            debug "Unpacked source code found in build dir. Removing: $bd"
                             $RM_BIN -rf $bd
                         fi
                     done
                     if [ ! -e $BUILD_DIR$1*tar.gz ]; then
                         run $FETCH_BIN $APP_HTTP_PATH
                     else
-                        echo "Already fetched. Using tarball from cache"
+                        debug "Already fetched. Using tarball from cache"
                     fi
-                    echo "Unpacking source code of: $APP_NAME"
+                    info "Unpacking source code of: $APP_NAME"
                     run $TAR_BIN xf $BUILD_DIR$APP_NAME*
-                    echo "Entrering $BUILD_DIR$APP_NAME*" >> $LOG
+                    debug "Entrering $BUILD_DIR$APP_NAME*" >> $LOG
                     for dir in `$LS_BIN -F $BUILD_DIR | $GREP_BIN \/$`; do
-                        echo "Changing dir to: $dir" >> $LOG
+                        debug "Changing dir to: $dir" >> $LOG
                         cd "$dir"
                         export CXXFLAGS="-I${PREFIX}/include $APP_COMPILER_ARGS"
                         export CFLAGS="-I${PREFIX}/include $APP_COMPILER_ARGS"
                         export LDFLAGS="-L${PREFIX}/lib $APP_LINKER_ARGS"
-                        LIST_DIR=${DEFINITIONS_DIR}patches/$application
+                        LIST_DIR=${DEFINITIONS_DIR}patches/$1
                         if [ -d $LIST_DIR ]; then
-                            if [ "$application" = "$APP_NAME" ]; then # apply patch only when preparing application for which patch is for
-                                echo "Applying patches for application: $application"
+                            if [ "$1" = "$APP_NAME" ]; then # apply patch only when application/requirement for which patch is designed for
+                                debug "Applying patches for application: $application"
                                 for patch in $LIST_DIR/*; do
-                                    echo "Patching source code with patch: $patch"
-                                    run $PATCH_BIN -p0 -i "$patch"
+                                    debug "Patching source code with patch: $patch"
+                                    run $PATCH_BIN -i "$patch"
                                 done
                             fi
                         fi
-                        echo "Running requirement configure script for: $1 with args: --prefix=$PREFIX $APP_CONFIGURE_ARGS"
-                        run ./$APP_CONFIGURE_SCRIPT $APP_CONFIGURE_ARGS --prefix=$PREFIX
-                        echo "Building requirement: $1"
+                        
+                        # NOTE: special case: no configure script attached to bundle/library
+                        if [ "$APP_CONFIGURE_SCRIPT" = "true" ]; then
+                            info "Skipping configuration step."
+                        else
+                            debug "Running requirement configure script for: $1 with args: --prefix=$PREFIX $APP_CONFIGURE_ARGS"
+                            run ./$APP_CONFIGURE_SCRIPT $APP_CONFIGURE_ARGS --prefix=$PREFIX
+                        fi
+                        
+                        info "Building requirement: $1"
                         run $APP_MAKE_METHOD -s
-                        echo "Installing requirement: $1"
+                        info "Installing requirement: $1"
                         run $APP_INSTALL_METHOD -s
                         if [ ! "$APP_AFTER_INSTALL_CALLBACK" = "" ]; then
-                            echo "After install callback: $APP_AFTER_INSTALL_CALLBACK"
+                            debug "After install callback: $APP_AFTER_INSTALL_CALLBACK"
                             run $APP_AFTER_INSTALL_CALLBACK
                         fi
+                        info "Installed: $1"
                     done
                     cd $CUR_DIR
                 else
-                    echo "This bundle is disabled on current architecture. Skipped"
+                    info "This bundle is disabled on current architecture. Skipped"
                 fi
             }
 
-            echo "App Requirements: $APP_REQUIREMENTS"
+            info "App Requirements: $APP_REQUIREMENTS"
             for req in $APP_REQUIREMENTS; do
-                echo "Configuring requirement: $req"
+                info "Configuring requirement: $req"
                 execute_process $req
             done
             execute_process $application
@@ -191,6 +214,6 @@ for application in $APPLICATIONS; do
     done
 done
 
-echo "Job's done."
+info "Job's done."
 
 exit
