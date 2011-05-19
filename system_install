@@ -13,7 +13,9 @@ info () {
 
 
 debug () {
-    echo "DEBUG: $1"
+    if [ ! "$DEBUG" = "" ]; then
+        echo "DEBUG: $1"
+    fi
 }
 
 
@@ -36,7 +38,7 @@ check_command_result () {
         exit
     fi
     if [ "$1" = "0" ]; then
-        info "CORRECT"
+        debug "CORRECT"
     else
         error
         error "FAILURE! --------------> Last log:"
@@ -73,10 +75,9 @@ check_requirements () {
 
 
 check_root
-info "Loaded config"
-info "Application bundles defined for: $APPLICATIONS"
-APPLICATIONS="$($CAT_BIN $APPLICATIONS_NAME_LIST)"
-debug "Applications: $APPLICATIONS"
+debug "Loaded config"
+APPLICATIONS="$($CAT_BIN $APPLICATIONS_NAME_LIST | $TR_BIN '\n' ' ')"
+info "Applications definitions: $APPLICATIONS"
 check_requirements
 
 for application in $APPLICATIONS; do
@@ -88,7 +89,7 @@ for application in $APPLICATIONS; do
         
         # fancy old style Capitalize
         APP_NAME="$(echo "$APP_NAME" | $CUT_BIN -c1 | $TR_BIN '[a-z]' '[A-Z]')$(echo "$APP_NAME" | $SED_BIN 's/^[a-zA-Z]//')"
-        info "Application name: $APP_NAME"
+        info "Preparing application: $APP_NAME"
         if [ -z $APP_POSTFIX ]; then
             export PREFIX=$OPT_DIR$APP_NAME-$APP_VERSION
         else
@@ -115,7 +116,6 @@ for application in $APPLICATIONS; do
                     debug "Running '$@' @ `$DATE_BIN`" >> "$LOG"
                     eval PATH=$PATH $@ 1>> "$LOG" 2>> "$LOG"
                     check_command_result $?
-                    info "------------------------------------------------------------------------------"
                 else
                     error "Empty command to run?"
                     exit
@@ -196,7 +196,7 @@ for application in $APPLICATIONS; do
                             debug "After install callback: $APP_AFTER_INSTALL_CALLBACK"
                             run $APP_AFTER_INSTALL_CALLBACK
                         fi
-                        info "Installed: $1"
+                        info "Installed in: $PREFIX"
                     done
                     cd $CUR_DIR
                 else
@@ -204,7 +204,7 @@ for application in $APPLICATIONS; do
                 fi
             }
 
-            info "App Requirements: $APP_REQUIREMENTS"
+            debug "App Requirements: $APP_REQUIREMENTS"
             for req in $APP_REQUIREMENTS; do
                 info "Configuring requirement: $req"
                 execute_process $req
