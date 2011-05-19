@@ -1,0 +1,5 @@
+APP_FULL_NAME="PNG Library"
+APP_HTTP_PATH="http://software.verknowsys.com/libpng-1.5.2.tar.gz"
+APP_NAME="libpng"
+APP_VERSION="1.5.2"
+APP_REQUIREMENTS="zlib"

@@ -1,0 +1,5 @@
+APP_FULL_NAME="GD Graphics Library"
+APP_HTTP_PATH="http://software.verknowsys.com/gd-2.0.35.tar.gz"
+APP_NAME="gd"
+APP_VERSION="2.0.35"
+APP_REQUIREMENTS="zlib iconv jpeg png freetype"

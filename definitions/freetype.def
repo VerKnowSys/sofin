@@ -1,0 +1,4 @@
+APP_FULL_NAME="Freetype 2 Library"
+APP_HTTP_PATH="http://software.verknowsys.com/freetype-2.4.4.tar.gz"
+APP_NAME="freetype"
+APP_VERSION="2.4.4"
