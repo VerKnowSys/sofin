@@ -1,0 +1,12 @@
+. ./config
+APP_FULL_NAME="PHP"
+APP_HTTP_PATH="http://software.verknowsys.com/php-5.3.6.tar.gz"
+APP_NAME="php"
+APP_VERSION="5.3.6"
+APP_CONFIGURE_ARGS="--with-layout=GNU --disable-all --with-libxml-dir=$OPT_DIR/Php-$APP_VERSION --with-pcre-regex=$OPT_DIR/Php-$APP_VERSION --with-zlib-dir=$OPT_DIR/Php-$APP_VERSION --with-gettext=$OPT_DIR/Php-$APP_VERSION --enable-exif --enable-zend-multibyte --without-apache --disable-debug --disable-ipv6 --enable-fpm"
+APP_REQUIREMENTS="gmake iconv gettext zlib m4 bison xml pcre exif expat"
+APP_COMPILER_ARGS="-fPIC -O2 -msse -msse2 -msse3 -mfpmath=sse"
+APP_CONFIGURE_SCRIPT="configure"
+APP_MAKE_METHOD="make"
+APP_INSTALL_METHOD="make install"
+
