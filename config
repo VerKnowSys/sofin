@@ -1,5 +1,7 @@
 #!/bin/sh
 
+VERSION="0.1.4"
+
 SCRIPT_ROOT="/opt/SvdOpt/"
 OPT_DIR="/Software/"
 TMP_ROOT="/tmp/SvdOpt/"

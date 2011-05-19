@@ -74,6 +74,7 @@ check_requirements () {
 }
 
 
+info "SvdOpt v$VERSION. VerKnowSys 2o11 (c)"
 check_root
 debug "Loaded config"
 APPLICATIONS="$($CAT_BIN $APPLICATIONS_NAME_LIST | $TR_BIN '\n' ' ')"
