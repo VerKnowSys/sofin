@@ -1,13 +1,13 @@
-#!/bin/sh
+#!/bin/shnote 
 
 unset LDFLAGS
 unset CFLAGS
+unset CPPFLAGS
+
 . ./config
-. $DEFAULTS
-PATH=$DEFAULT_PATH
 
 
-info () {
+note () {
     echo " INFO: $1"
 }
 
@@ -50,13 +50,13 @@ check_command_result () {
 
 definition_dir_check () {
     if [ ! -d "$OPT_DIR" ]; then
-        info "No $OPT_DIR found. Creating one."
+        note "No $OPT_DIR found. Creating one."
         "$MKDIR_BIN" -p "$OPT_DIR"
     fi
     if [ ! -d "$DEFINITIONS_DIR" ]; then
-        info "No definitions folder found. Creating one at: $DEFINITIONS_DIR"
+        note "No definitions folder found. Creating one at: $DEFINITIONS_DIR"
         "$MKDIR_BIN" -p "$DEFINITIONS_DIR"
-        info "All definition files (*.def) should be placed there"
+        note "All definition files (*.def) should be placed there"
     fi
 }
 
@@ -74,12 +74,17 @@ check_requirements () {
 }
 
 
-info "SvdOpt v$VERSION. VerKnowSys 2o11 (c)"
-check_root
-debug "Loaded config"
+. $DEFAULTS
+debug "Loaded defaults"
+PATH=$DEFAULT_PATH
+note "SvdOpt v$VERSION. VerKnowSys 2o11 (c)"
+note
+debug "Default path set ($DEFAULT_PATH)"
+
 APPLICATIONS="$($CAT_BIN $APPLICATIONS_NAME_LIST | $TR_BIN '\n' ' ')"
-info "Applications definitions: $APPLICATIONS"
+note "Application definitions: $APPLICATIONS"
 check_requirements
+check_root
 
 for application in $APPLICATIONS; do
     
@@ -90,8 +95,8 @@ for application in $APPLICATIONS; do
         
         # fancy old style Capitalize
         APP_NAME="$(echo "$APP_NAME" | $CUT_BIN -c1 | $TR_BIN '[a-z]' '[A-Z]')$(echo "$APP_NAME" | $SED_BIN 's/^[a-zA-Z]//')"
-        info
-        info "Preparing application: $APP_NAME"
+        note
+        note "Preparing application: $APP_NAME"
         if [ -z $APP_POSTFIX ]; then
             export PREFIX=$OPT_DIR$APP_NAME-$APP_VERSION
         else
@@ -99,7 +104,7 @@ for application in $APPLICATIONS; do
         fi
 
         if [ -e $PREFIX ]; then
-            info "Application already installed: $PREFIX. Skipped."
+            note "Application already installed in $PREFIX."
         else
             run () {
                 if [ ! -z "$1" ]; then
@@ -150,7 +155,7 @@ for application in $APPLICATIONS; do
                     $MKDIR_BIN -p "$BUILD_DIR"
                     CUR_DIR=`pwd`
                     cd "$BUILD_DIR"
-                    info "Fetching requirement source from: $APP_HTTP_PATH"
+                    note "Fetching requirement source from: $APP_HTTP_PATH"
                     for bd in $BUILD_DIR/*; do
                         if [ -d $bd ]; then
                             debug "Unpacked source code found in build dir. Removing: $bd"
@@ -162,7 +167,7 @@ for application in $APPLICATIONS; do
                     else
                         debug "Already fetched. Using tarball from cache"
                     fi
-                    info "Unpacking source code of: $APP_NAME"
+                    note "Unpacking source code of: $APP_NAME"
                     run $TAR_BIN xf $BUILD_DIR$APP_NAME*
                     debug "Entrering $BUILD_DIR$APP_NAME*" >> $LOG
                     for dir in `$LS_BIN -F $BUILD_DIR | $GREP_BIN \/$`; do
@@ -184,31 +189,31 @@ for application in $APPLICATIONS; do
                         
                         # NOTE: special case: no configure script attached to bundle/library
                         if [ "$APP_CONFIGURE_SCRIPT" = "true" ]; then
-                            info "Skipping configuration step."
+                            note "Skipping configuration step."
                         else
                             debug "Running requirement configure script for: $1 with args: --prefix=$PREFIX $APP_CONFIGURE_ARGS"
                             run ./$APP_CONFIGURE_SCRIPT $APP_CONFIGURE_ARGS --prefix=$PREFIX
                         fi
                         
-                        info "Building requirement: $1"
+                        note "Building requirement: $1"
                         run $APP_MAKE_METHOD -s
-                        info "Installing requirement: $1"
+                        note "Installing requirement: $1"
                         run $APP_INSTALL_METHOD -s
                         if [ ! "$APP_AFTER_INSTALL_CALLBACK" = "" ]; then
                             debug "After install callback: $APP_AFTER_INSTALL_CALLBACK"
                             run $APP_AFTER_INSTALL_CALLBACK
                         fi
-                        info "Installed in: $PREFIX"
+                        note "Installed in: $PREFIX"
                     done
                     cd $CUR_DIR
                 else
-                    info "This bundle is disabled on current architecture. Skipped"
+                    note "This bundle is disabled on current architecture. Skipped"
                 fi
             }
 
             debug "App Requirements: $APP_REQUIREMENTS"
             for req in $APP_REQUIREMENTS; do
-                info "Configuring requirement: $req"
+                note "Configuring requirement: $req"
                 execute_process $req
             done
             execute_process $application
@@ -218,5 +223,5 @@ for application in $APPLICATIONS; do
     
 done
 
-info "Job's done."
+note "Job's done."
 exit
