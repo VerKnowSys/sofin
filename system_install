@@ -3,7 +3,7 @@
 unset LDFLAGS
 unset CFLAGS
 . ./config
-. $SKELETON
+. $DEFAULTS
 PATH=$DEFAULT_PATH
 
 
@@ -25,7 +25,7 @@ check_command_result () {
     else
         echo
         echo "FAILURE! ------> Last log:"
-        $TAIL_BIN -n 40 $LOG
+        $TAIL_BIN -n 20 $LOG
         exit
     fi
 }
@@ -65,11 +65,12 @@ echo "Applications: $APPLICATIONS"
 check_requirements
 
 for application in $APPLICATIONS; do
+    
     for definition in "$DEFINITIONS_DIR$application".def; do
         echo "Reading definition: $definition"
-        . $SKELETON
+        . $DEFAULTS
         . $definition
-
+        
         # fancy old style Capitalize
         APP_NAME="$(echo "$APP_NAME" | $CUT_BIN -c1 | $TR_BIN '[a-z]' '[A-Z]')$(echo "$APP_NAME" | $SED_BIN 's/^[a-zA-Z]//')"
         echo "Application name: $APP_NAME"
@@ -116,58 +117,70 @@ for application in $APPLICATIONS; do
                     echo "Definition file for requirement: '$1' does not exists!"
                     exit
                 fi
-                . $SKELETON
+                . $DEFAULTS
                 . $req_definition_file
-                BUILD_DIR="/tmp/SvdOpt/$APP_NAME/"
-                $MKDIR_BIN -p "$BUILD_DIR"
-                CUR_DIR=`pwd`
-                cd "$BUILD_DIR"
-                echo "Fetching requirement source from: $APP_HTTP_PATH"
-                for bd in $BUILD_DIR/*; do
-                    if [ -d $bd ]; then
-                        echo "Unpacked source code found in build dir. Removing: $bd"
-                        $RM_BIN -rf $bd
-                    fi
-                done
-                if [ ! -e $BUILD_DIR$1*tar.gz ]; then
-                    run $FETCH_BIN $APP_HTTP_PATH
+                if [ "$DISABLE_ON" = "" ]; then
+                    export ALLOW=1
                 else
-                    echo "Already fetched. Using tarball from cache"
-                fi
-                echo "Unpacking source code of: $APP_NAME"
-                run $TAR_BIN xf $BUILD_DIR$APP_NAME*
-                echo "Entrering $BUILD_DIR$APP_NAME*" >> $LOG
-                for dir in `$LS_BIN -F $BUILD_DIR | $GREP_BIN \/$`; do
-                    echo "Changing dir to: $dir" >> $LOG
-                    cd "$dir"
-                    export CXXFLAGS="-I${PREFIX}/include $APP_COMPILER_ARGS"
-                    export CFLAGS="-I${PREFIX}/include $APP_COMPILER_ARGS"
-                    export LDFLAGS="-L${PREFIX}/lib $APP_LINKER_ARGS"
-                    LIST_DIR=${DEFINITIONS_DIR}patches/$application
-                    if [ -d $LIST_DIR ]; then
-                        if [ "$application" = "$APP_NAME" ]; then # apply patch only when preparing application for which patch is for
-                            echo "Applying patches for application: $application"
-                            for patch in $LIST_DIR/*; do
-                                echo "Patching source code with patch: $patch"
-                                run $PATCH_BIN -p0 -i "$patch"
-                            done
+                    for i in $DISABLE_ON; do
+                        if [ `$UNAME_BIN` = "$i" ]; then
+                            export ALLOW=0
                         fi
+                    done
+                fi
+                if [ "$ALLOW" = "1" ]; then
+                    BUILD_DIR="/tmp/SvdOpt/$APP_NAME/"
+                    $MKDIR_BIN -p "$BUILD_DIR"
+                    CUR_DIR=`pwd`
+                    cd "$BUILD_DIR"
+                    echo "Fetching requirement source from: $APP_HTTP_PATH"
+                    for bd in $BUILD_DIR/*; do
+                        if [ -d $bd ]; then
+                            echo "Unpacked source code found in build dir. Removing: $bd"
+                            $RM_BIN -rf $bd
+                        fi
+                    done
+                    if [ ! -e $BUILD_DIR$1*tar.gz ]; then
+                        run $FETCH_BIN $APP_HTTP_PATH
+                    else
+                        echo "Already fetched. Using tarball from cache"
                     fi
-                    echo "Running requirement configure script for: $1 with args: --prefix=$PREFIX $APP_CONFIGURE_ARGS"
-                    run ./$APP_CONFIGURE_SCRIPT $APP_CONFIGURE_ARGS --prefix=$PREFIX
-                    echo "Building requirement: $1"
-                    run $APP_MAKE_METHOD -s
-                    echo "Installing requirement: $1"
-                    run $APP_INSTALL_METHOD -s
-                    if [ ! "$APP_AFTER_INSTALL_CALLBACK" = "" ]; then
-                        echo "After install callback: $APP_AFTER_INSTALL_CALLBACK"
-                        run $APP_AFTER_INSTALL_CALLBACK
-                    fi
-                done
-                cd $CUR_DIR
+                    echo "Unpacking source code of: $APP_NAME"
+                    run $TAR_BIN xf $BUILD_DIR$APP_NAME*
+                    echo "Entrering $BUILD_DIR$APP_NAME*" >> $LOG
+                    for dir in `$LS_BIN -F $BUILD_DIR | $GREP_BIN \/$`; do
+                        echo "Changing dir to: $dir" >> $LOG
+                        cd "$dir"
+                        export CXXFLAGS="-I${PREFIX}/include $APP_COMPILER_ARGS"
+                        export CFLAGS="-I${PREFIX}/include $APP_COMPILER_ARGS"
+                        export LDFLAGS="-L${PREFIX}/lib $APP_LINKER_ARGS"
+                        LIST_DIR=${DEFINITIONS_DIR}patches/$application
+                        if [ -d $LIST_DIR ]; then
+                            if [ "$application" = "$APP_NAME" ]; then # apply patch only when preparing application for which patch is for
+                                echo "Applying patches for application: $application"
+                                for patch in $LIST_DIR/*; do
+                                    echo "Patching source code with patch: $patch"
+                                    run $PATCH_BIN -p0 -i "$patch"
+                                done
+                            fi
+                        fi
+                        echo "Running requirement configure script for: $1 with args: --prefix=$PREFIX $APP_CONFIGURE_ARGS"
+                        run ./$APP_CONFIGURE_SCRIPT $APP_CONFIGURE_ARGS --prefix=$PREFIX
+                        echo "Building requirement: $1"
+                        run $APP_MAKE_METHOD -s
+                        echo "Installing requirement: $1"
+                        run $APP_INSTALL_METHOD -s
+                        if [ ! "$APP_AFTER_INSTALL_CALLBACK" = "" ]; then
+                            echo "After install callback: $APP_AFTER_INSTALL_CALLBACK"
+                            run $APP_AFTER_INSTALL_CALLBACK
+                        fi
+                    done
+                    cd $CUR_DIR
+                else
+                    echo "This bundle is disabled on current architecture. Skipped"
+                fi
             }
 
-            # check/build requirements (all definition requirements must be present/available):
             echo "App Requirements: $APP_REQUIREMENTS"
             for req in $APP_REQUIREMENTS; do
                 echo "Configuring requirement: $req"
@@ -176,7 +189,6 @@ for application in $APPLICATIONS; do
             execute_process $application
         fi
     done
-    
 done
 
 echo "Job's done."
