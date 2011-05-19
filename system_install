@@ -90,6 +90,7 @@ for application in $APPLICATIONS; do
         
         # fancy old style Capitalize
         APP_NAME="$(echo "$APP_NAME" | $CUT_BIN -c1 | $TR_BIN '[a-z]' '[A-Z]')$(echo "$APP_NAME" | $SED_BIN 's/^[a-zA-Z]//')"
+        info
         info "Preparing application: $APP_NAME"
         if [ -z $APP_POSTFIX ]; then
             export PREFIX=$OPT_DIR$APP_NAME-$APP_VERSION
@@ -212,9 +213,10 @@ for application in $APPLICATIONS; do
             done
             execute_process $application
         fi
+        
     done
+    
 done
 
 info "Job's done."
-
 exit
