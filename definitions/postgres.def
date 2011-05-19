@@ -1,7 +1,8 @@
+. ./config
 APP_FULL_NAME="PostgreSQL 9"
 APP_HTTP_PATH="http://software.verknowsys.com/postgresql-9.0.4.tar.gz"
 APP_NAME="postgresql"
 APP_VERSION="9.0.4"
 APP_CONFIGURE_ARGS="--without-ldap --with-zlib --with-openssl --disable-debug --disable-nls --without-perl --without-python --without-libxml"
-APP_REQUIREMENTS="gmake zlib iconv"
-APP_AFTER_INSTALL_CALLBACK="cd /tmp/postgresql/*/contrib/pg_archivecleanup && make install"
+APP_REQUIREMENTS="make zlib iconv"
+APP_AFTER_INSTALL_CALLBACK="cd $TMP_ROOT/postgresql/*/contrib/pg_archivecleanup && make install"

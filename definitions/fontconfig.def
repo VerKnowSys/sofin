@@ -1,0 +1,6 @@
+. ./config
+APP_FULL_NAME="Fontconfig Library"
+APP_HTTP_PATH="http://software.verknowsys.com/fontconfig-2.8.0.tar.gz"
+APP_NAME="fontconfig"
+APP_VERSION="2.8.0"
+APP_REQUIREMENTS="make freetype expat"
