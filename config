@@ -1,6 +1,6 @@
 #!/bin/sh
 
-VERSION="0.1.7"
+VERSION="0.2.0"
 
 SCRIPT_ROOT="/opt/SvdOpt/"
 SOFTWARE_DIR="/Software/"
@@ -15,6 +15,7 @@ DEFAULT_PATH="/bin:/usr/bin:/sbin:/usr/sbin"
 # DEBUG="true"
 
 PATCH_BIN="/usr/bin/patch"
+CP_BIN="/bin/cp"
 LN_BIN="/bin/ln"
 DATE_BIN="/bin/date"
 SED_BIN="/usr/bin/sed"

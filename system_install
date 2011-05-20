@@ -76,7 +76,7 @@ check_requirements () {
 
 usage_howto () {
     error "No task param given!"
-    error "Possible choices: libraries, applications, custom, destroyall"
+    error "Possible choices: libraries, applications, destroyall, clean, custom_name"
     exit
 }
 
@@ -112,6 +112,10 @@ if [ ! "$1" = "" ]; then
         note "Done."
         exit
         ;;
+        
+    clean)
+        error "Cleaning not yet implemented!"
+        exit
         
     *)
         usage_howto
@@ -203,8 +207,10 @@ for application in $APPLICATIONS; do
                         fi
                     done
                     if [ ! -e $BUILD_DIR$1*tar.gz ]; then
-                        note "Fetching requirement source from: $APP_HTTP_PATH"
-                        run $FETCH_BIN $APP_HTTP_PATH
+                        if [ ! -e $BUILD_DIR$1*tbz ]; then
+                            note "Fetching requirement source from: $APP_HTTP_PATH"
+                            run $FETCH_BIN $APP_HTTP_PATH
+                        fi
                     else
                         debug "Already fetched. Using tarball from cache"
                     fi
@@ -230,15 +236,29 @@ for application in $APPLICATIONS; do
                         
                         debug "Running configuration script for: $1 with args: --prefix=$PREFIX $APP_CONFIGURE_ARGS"
                         note "Configuring requirement: $1"
-                        if [ "$APP_CONFIGURE_SCRIPT" = "cmake" ]; then
-                            run $APP_CONFIGURE_SCRIPT . -LH -DCMAKE_INSTALL_PREFIX=$PREFIX
-                        elif [ "$APP_CONFIGURE_SCRIPT" = "no-conf" ]; then
-                            note "Skipped configuration for $1"
-                            export APP_MAKE_METHOD="$APP_MAKE_METHOD PREFIX=$PREFIX"
-                            export APP_INSTALL_METHOD="$APP_INSTALL_METHOD PREFIX=$PREFIX"
-                        else
-                            run $APP_CONFIGURE_SCRIPT $APP_CONFIGURE_ARGS --prefix=$PREFIX
-                        fi
+                        case $APP_CONFIGURE_SCRIPT in
+                            no-conf)
+                                note "Skipped configuration for $1"
+                                export APP_MAKE_METHOD="$APP_MAKE_METHOD PREFIX=$PREFIX"
+                                export APP_INSTALL_METHOD="$APP_INSTALL_METHOD PREFIX=$PREFIX"
+                                ;;
+                                
+                            binary)
+                                note "Binary definition: $1"
+                                export APP_MAKE_METHOD="true"
+                                export APP_INSTALL_METHOD="true"
+                                ;;
+                                
+                            cmake)
+                                run $APP_CONFIGURE_SCRIPT . -LH -DCMAKE_INSTALL_PREFIX=$PREFIX
+                                ;;
+                            
+                            *)
+                                run $APP_CONFIGURE_SCRIPT $APP_CONFIGURE_ARGS --prefix=$PREFIX
+                                ;;
+                                
+                        esac
+                        
                         note "Building requirement: $1"
                         run $APP_MAKE_METHOD
                         note "Installing requirement: $1"
