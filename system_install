@@ -194,9 +194,9 @@ for application in $APPLICATIONS; do
                             run $APP_CONFIGURE_SCRIPT $APP_CONFIGURE_ARGS --prefix=$PREFIX
                         fi
                         note "Building requirement: $1"
-                        run $APP_MAKE_METHOD -s
+                        run $APP_MAKE_METHOD
                         note "Installing requirement: $1"
-                        run $APP_INSTALL_METHOD -s
+                        run $APP_INSTALL_METHOD
                         if [ ! "$APP_AFTER_INSTALL_CALLBACK" = "" ]; then
                             debug "After install callback: $APP_AFTER_INSTALL_CALLBACK"
                             run $APP_AFTER_INSTALL_CALLBACK
