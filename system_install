@@ -74,6 +74,13 @@ check_requirements () {
 }
 
 
+usage_howto () {
+    error "No task param given!"
+    error "Possible choices: libraries, applications, custom, destroyall"
+    exit
+}
+
+
 . $DEFAULTS
 debug "Loaded defaults"
 PATH=$DEFAULT_PATH
@@ -82,13 +89,37 @@ note
 debug "Default path set ($DEFAULT_PATH)"
 
 if [ ! "$1" = "" ]; then
-    if [ "$1" = "libraries" ]; then
+    case $1 in
+        
+    libraries)
         export APPLICATIONS="$($CAT_BIN $LIBRARIES_NAME_LIST | $TR_BIN '\n' ' ')"
         note "Library definitions: $APPLICATIONS"
-    else
+        ;;
+        
+    applications)
         export APPLICATIONS="$($CAT_BIN $APPLICATIONS_NAME_LIST | $TR_BIN '\n' ' ')"
         note "Application definitions: $APPLICATIONS"
-    fi
+        ;;
+    
+    custom)
+        export APPLICATIONS="$($CAT_BIN ${DEFINITIONS_DIR}$1 | $TR_BIN '\n' ' ')"
+        note "Application definitions: $APPLICATIONS"
+        ;;
+        
+    destroyall)
+        note "All applications and libraries will be permanently destroyed in $SOFTWARE_DIR"
+        $RM_BIN -rf "$SOFTWARE_DIR"
+        note "Done."
+        exit
+        ;;
+        
+    *)
+        usage_howto
+        ;;
+        
+    esac
+else
+    usage_howto
 fi
 
 

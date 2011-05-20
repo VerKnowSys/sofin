@@ -1,6 +1,6 @@
 #!/bin/sh
 
-VERSION="0.1.6"
+VERSION="0.1.7"
 
 SCRIPT_ROOT="/opt/SvdOpt/"
 SOFTWARE_DIR="/Software/"
