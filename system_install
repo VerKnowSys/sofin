@@ -116,6 +116,7 @@ if [ ! "$1" = "" ]; then
     clean)
         error "Cleaning not yet implemented!"
         exit
+        ;;
         
     *)
         usage_howto
