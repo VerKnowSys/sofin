@@ -49,9 +49,9 @@ check_command_result () {
 
 
 definition_dir_check () {
-    if [ ! -d "$OPT_DIR" ]; then
-        note "No $OPT_DIR found. Creating one."
-        "$MKDIR_BIN" -p "$OPT_DIR"
+    if [ ! -d "$SOFTWARE_DIR" ]; then
+        note "No $SOFTWARE_DIR found. Creating one."
+        "$MKDIR_BIN" -p "$SOFTWARE_DIR"
     fi
     if [ ! -d "$DEFINITIONS_DIR" ]; then
         note "No definitions folder found. Creating one at: $DEFINITIONS_DIR"
@@ -98,9 +98,9 @@ for application in $APPLICATIONS; do
         note
         note "Preparing application: $APP_NAME"
         if [ -z $APP_POSTFIX ]; then
-            export PREFIX=$OPT_DIR$APP_NAME-$APP_VERSION
+            export PREFIX=$SOFTWARE_DIR$APP_NAME-$APP_VERSION
         else
-            export PREFIX=$OPT_DIR$APP_NAME-$APP_VERSION-$APP_POSTFIX
+            export PREFIX=$SOFTWARE_DIR$APP_NAME-$APP_VERSION-$APP_POSTFIX
         fi
 
         if [ -e $PREFIX ]; then
