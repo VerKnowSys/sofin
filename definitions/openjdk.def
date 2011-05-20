@@ -1,0 +1,7 @@
+. ./config
+APP_FULL_NAME="OpenJDK 6"
+APP_HTTP_PATH="http://software.verknowsys.com/openjdk6-b22_5.tbz"
+APP_NAME="openjdk"
+APP_VERSION="6-b22_5"
+APP_CONFIGURE_SCRIPT="binary"
+APP_AFTER_INSTALL_CALLBACK="$CP_BIN -r ${TMP_ROOT}openjdk/openjdk6 ${SOFTWARE_DIR}Openjdk-${APP_VERSION}"

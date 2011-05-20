@@ -3,6 +3,7 @@ make
 git
 mysql
 oidentd
+openjdk
 perl
 php
 postgres
