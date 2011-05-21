@@ -1,14 +1,14 @@
 #!/bin/sh
 
-VERSION="0.2.0"
+VERSION="0.2.1"
 
 SCRIPT_ROOT="/opt/SvdOpt/"
 SOFTWARE_DIR="/Software/"
 TMP_ROOT="/tmp/SvdOpt/"
 DEFINITIONS_DIR="${SCRIPT_ROOT}definitions/"
 DEFAULTS="${DEFINITIONS_DIR}defaults.def"
-APPLICATIONS_NAME_LIST="${DEFINITIONS_DIR}applications"
-LIBRARIES_NAME_LIST="${DEFINITIONS_DIR}libraries"
+APPLICATIONS_NAME_LIST="applications"
+LIBRARIES_NAME_LIST="libraries"
 LOG="${SOFTWARE_DIR}INSTALL_LOG"
 DEFAULT_PATH="/bin:/usr/bin:/sbin:/usr/sbin"
 

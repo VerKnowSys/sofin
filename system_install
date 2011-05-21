@@ -187,11 +187,12 @@ for application in $APPLICATIONS; do
                 fi
                 . $DEFAULTS
                 . $req_definition_file
-                if [ "$DISABLE_ON" = "" ]; then
-                    export ALLOW=1
-                else
-                    for i in $DISABLE_ON; do
-                        if [ `$UNAME_BIN` = "$i" ]; then
+                export ALLOW=1
+                if [ ! "$DISABLE_ON" = "" ]; then
+                    for disabled in $DISABLE_ON; do
+                        debug "Running system: $($UNAME_BIN)"
+                        debug "DisableOn element: $disabled"
+                        if [ $($UNAME_BIN) = "$disabled" ]; then
                             export ALLOW=0
                         fi
                     done
@@ -208,10 +209,8 @@ for application in $APPLICATIONS; do
                         fi
                     done
                     if [ ! -e $BUILD_DIR$1*tar.gz ]; then
-                        if [ ! -e $BUILD_DIR$1*tbz ]; then
-                            note "Fetching requirement source from: $APP_HTTP_PATH"
-                            run $FETCH_BIN $APP_HTTP_PATH
-                        fi
+                        note "Fetching requirement source from: $APP_HTTP_PATH"
+                        run $FETCH_BIN $APP_HTTP_PATH
                     else
                         debug "Already fetched. Using tarball from cache"
                     fi
@@ -220,7 +219,7 @@ for application in $APPLICATIONS; do
                     debug "Entrering $BUILD_DIR$APP_NAME*" >> $LOG
                     for dir in `$LS_BIN -F $BUILD_DIR | $GREP_BIN \/$`; do
                         debug "Changing dir to: $dir" >> $LOG
-                        cd "$dir"
+                        cd "$dir$APP_SOURCE_DIR_POSTFIX"
                         export CXXFLAGS="-I${PREFIX}/include $APP_COMPILER_ARGS"
                         export CFLAGS="-I${PREFIX}/include $APP_COMPILER_ARGS"
                         export LDFLAGS="-L${PREFIX}/lib $APP_LINKER_ARGS"
@@ -272,7 +271,7 @@ for application in $APPLICATIONS; do
                     done
                     cd $CUR_DIR
                 else
-                    note "This bundle is disabled on current architecture. Skipped"
+                    note "This bundle is disabled on current architecture ($($UNAME_BIN)). Skipped"
                 fi
             }
 
