@@ -130,7 +130,7 @@ if [ ! "$1" = "" ]; then
         done
         echo "export PATH=$result"
         unset result
-        ldresult=""
+        ldresult="/lib:/usr/lib"
         for lib in $SOFTWARE_DIR*; do
             if [ -e "${lib}/lib" ]; then
                 ldresult="${lib}/lib:$ldresult"
