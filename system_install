@@ -141,6 +141,7 @@ if [ ! "$1" = "" ]; then
         done
         echo "export LD_LIBRARY_PATH=$ldresult"
         unset ldresult
+        exit
         ;;
         
     clean)
