@@ -1,6 +1,6 @@
 . ./config
 APP_FULL_NAME="PostgreSQL 9"
-APP_HTTP_PATH="http://software.verknowsys.com/postgresql-9.0.4.tar.gz"
+APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}postgresql-9.0.4.tar.gz"
 APP_NAME="postgresql"
 APP_VERSION="9.0.4"
 APP_CONFIGURE_ARGS="--without-ldap --with-zlib --with-openssl --disable-debug --disable-nls --without-perl --without-python --without-libxml"

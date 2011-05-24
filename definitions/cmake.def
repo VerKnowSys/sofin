@@ -1,5 +1,5 @@
 APP_FULL_NAME="C Make"
-APP_HTTP_PATH="http://software.verknowsys.com/cmake-2.8.4.tar.gz"
+APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}cmake-2.8.4.tar.gz"
 APP_NAME="cmake"
 APP_VERSION="2.8.4"
 APP_CONFIGURE_ARGS="--no-qt-gui --parallel=2"

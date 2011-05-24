@@ -1,5 +1,5 @@
 APP_FULL_NAME="Ruby"
-APP_HTTP_PATH="http://software.verknowsys.com/ruby-1.9.2-p180.tar.gz"
+APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}ruby-1.9.2-p180.tar.gz"
 APP_NAME="ruby"
 APP_VERSION="1.9.2"
 APP_CONFIGURE_ARGS="--disable-pthread"

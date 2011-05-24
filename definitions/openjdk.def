@@ -1,7 +1,7 @@
 . ./config
 DISABLE_ON="Darwin"
 APP_FULL_NAME="OpenJDK 6 (fiend build)"
-APP_HTTP_PATH="http://software.verknowsys.com/openjdk6-1.6.0-b22.tar.gz"
+APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}openjdk6-1.6.0-b22.tar.gz"
 APP_NAME="openjdk"
 APP_VERSION="1.6.0-b22"
 APP_CONFIGURE_SCRIPT="binary"

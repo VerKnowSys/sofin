@@ -1,4 +1,4 @@
 APP_FULL_NAME="Expat Library"
-APP_HTTP_PATH="http://software.verknowsys.com/expat-2.0.1.tar.gz"
+APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}expat-2.0.1.tar.gz"
 APP_NAME="expat"
 APP_VERSION="2.0.1"

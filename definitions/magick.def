@@ -1,5 +1,5 @@
 APP_FULL_NAME="Magick Graphics Library"
-APP_HTTP_PATH="http://software.verknowsys.com/ImageMagick-6.6.9-9.tar.gz"
+APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}ImageMagick-6.6.9-9.tar.gz"
 APP_NAME="ImageMagick"
 APP_VERSION="6.6.9-9"
 APP_REQUIREMENTS="zlib xml jpeg png"

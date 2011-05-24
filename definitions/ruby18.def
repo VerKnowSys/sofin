@@ -1,5 +1,5 @@
 APP_FULL_NAME="Ruby OldStable 1.8"
-APP_HTTP_PATH="http://software.verknowsys.com/ruby-1.8.7-p330.tar.gz"
+APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}ruby-1.8.7-p330.tar.gz"
 APP_NAME="ruby"
 APP_VERSION="1.8.7"
 APP_CONFIGURE_ARGS="--disable-pthread"

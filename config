@@ -1,6 +1,6 @@
 #!/bin/sh
 
-VERSION="0.2.1"
+VERSION="0.2.2"
 
 SCRIPT_ROOT="/opt/SvdOpt/"
 SOFTWARE_DIR="/Software/"
@@ -13,6 +13,7 @@ LOG="${SOFTWARE_DIR}INSTALL_LOG"
 DEFAULT_PATH="/bin:/usr/bin:/sbin:/usr/sbin"
 
 # DEBUG="true"
+MAIN_SOURCE_REPOSITORY="http://software.verknowsys.com/"
 
 PATCH_BIN="/usr/bin/patch"
 CP_BIN="/bin/cp"
@@ -33,7 +34,9 @@ GREP_BIN="/usr/bin/grep"
 LDCONFIG_BIN="/sbin/ldconfig"
 TAIL_BIN="/usr/bin/tail"
 FETCH_BIN="/usr/bin/fetch"
+CHMOD_BIN="/bin/chmod"
+FIND_BIN="/usr/bin/find"
 
-if [ `$UNAME_BIN` = "Darwin" ]; then
+if [ $($UNAME_BIN) = "Darwin" ]; then
 FETCH_BIN="/usr/bin/curl -L -O"
 fi

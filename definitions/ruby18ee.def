@@ -1,6 +1,6 @@
 DISABLE_ON="FreeBSD"
 APP_FULL_NAME="Ruby Enterprise Edition"
-APP_HTTP_PATH="http://software.verknowsys.com/ruby-enterprise-1.8.7-2011.03.tar.gz"
+APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}ruby-enterprise-1.8.7-2011.03.tar.gz"
 APP_NAME="ruby"
 APP_VERSION="1.8.7"
 APP_POSTFIX="ree"

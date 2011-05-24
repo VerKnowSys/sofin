@@ -1,5 +1,5 @@
 APP_FULL_NAME="Python"
-APP_HTTP_PATH="http://software.verknowsys.com/Python-3.2.tgz"
+APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}Python-3.2.tgz"
 APP_NAME="Python"
 APP_VERSION="3.2"
 APP_CONFIGURE_ARGS="--with-fpectl --without-pydebug --disable-ipv6"

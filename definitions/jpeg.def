@@ -1,4 +1,4 @@
 APP_FULL_NAME="JPEG Library"
-APP_HTTP_PATH="http://software.verknowsys.com/jpegsrc.v8c.tar.gz"
+APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}jpegsrc.v8c.tar.gz"
 APP_NAME="jpeg"
 APP_VERSION="8c"

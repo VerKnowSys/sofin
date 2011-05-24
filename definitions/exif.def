@@ -1,5 +1,5 @@
 APP_FULL_NAME="Exif Library"
-APP_HTTP_PATH="http://software.verknowsys.com/libexif-0.6.20.tar.gz"
+APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}libexif-0.6.20.tar.gz"
 APP_NAME="libexif"
 APP_VERSION="0.6.20"
 APP_REQUIREMENTS="make"
