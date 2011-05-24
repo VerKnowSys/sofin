@@ -229,7 +229,7 @@ for application in $APPLICATIONS; do
                     done
                 fi
                 if [ "$ALLOW" = "1" ]; then
-                    BUILD_DIR="$TMP_ROOT$APP_NAME/"
+                    BUILD_DIR="$TMP_ROOT$APP_NAME-$APP_VERSION/"
                     $MKDIR_BIN -p "$BUILD_DIR"
                     CUR_DIR=$(pwd)
                     cd "$BUILD_DIR"
