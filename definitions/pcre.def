@@ -1,5 +1,5 @@
 APP_FULL_NAME="PCRE Library"
-APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}pcre-8.12.tar.gz"
 APP_NAME="pcre"
 APP_VERSION="8.12"
+APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
 APP_CONFIGURE_ARGS="--enable-utf8 --enable-unicode-properties"

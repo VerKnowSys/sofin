@@ -1,6 +1,6 @@
 DISABLE_ON="Darwin"
 APP_FULL_NAME="OIdent daemon"
-APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}oidentd-2.0.8.tar.gz"
 APP_NAME="oidentd"
 APP_VERSION="2.0.8"
+APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
 APP_CONFIGURE_ARGS="--disable-ipv6 --disable-debug --disable-masq"
