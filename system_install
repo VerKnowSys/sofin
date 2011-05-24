@@ -1,4 +1,4 @@
-#!/bin/shnote 
+#!/bin/sh
 
 unset LDFLAGS
 unset CFLAGS
@@ -76,7 +76,7 @@ check_requirements () {
 
 usage_howto () {
     error "No task param given!"
-    error "Possible choices: libraries, applications, destroyall, clean, getshellvals, custom_name"
+    error "Possible choices: libraries, applications, destroyall, clean, getshellvals, custom name_of_file"
     exit
 }
 
@@ -102,7 +102,7 @@ if [ ! "$1" = "" ]; then
         ;;
     
     custom)
-        export APPLICATIONS="$($CAT_BIN ${DEFINITIONS_DIR}$1 | $TR_BIN '\n' ' ')"
+        export APPLICATIONS="$($CAT_BIN $2 | $TR_BIN '\n' ' ')"
         note "Application definitions: $APPLICATIONS"
         ;;
         
