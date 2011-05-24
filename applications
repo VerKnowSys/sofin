@@ -1,3 +1,7 @@
+sbt
+maven
+ant
+scala
 cmake
 make
 git

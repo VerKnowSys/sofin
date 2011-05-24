@@ -1,0 +1,19 @@
+. ./config
+APP_FULL_NAME="Simple Build Tool (for Scala)"
+APP_NAME="sbt"
+APP_VERSION="0.7.7"
+APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
+APP_CONFIGURE_SCRIPT="binary"
+APP_REQUIREMENTS="openjdk"
+
+generatedBatch="""
+#!/bin/sh
+\n
+if test -f ~/.sbtconfig; then\n
+  . ~/.sbtconfig\n
+fi\n
+\n
+exec java -Xmx512M ${SBT_OPTS} -jar ${SOFTWARE_DIR}Sbt-${APP_VERSION}/libexec/sbt-launch-${APP_VERSION}.jar "$@"\n
+"""
+
+APP_AFTER_INSTALL_CALLBACK="$CP_BIN -R ${TMP_ROOT}${APP_NAME}/${APP_NAME}-${APP_VERSION} ${SOFTWARE_DIR}Sbt-${APP_VERSION} && echo '$generatedBatch' > ${SOFTWARE_DIR}Sbt-${APP_VERSION}/bin/$APP_NAME && $CHMOD_BIN 755 ${SOFTWARE_DIR}Sbt-${APP_VERSION}/bin/$APP_NAME"
