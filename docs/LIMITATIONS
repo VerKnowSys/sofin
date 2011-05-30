@@ -4,3 +4,4 @@ Early version of SvdOpt implies some limitations:
 2. only tar.gz files are cached
 3. only gzip format of source/package is supported. In case of using different format it wont be recognized and failure will happen.
 4. missing md5 checking or any checking of validity of downloaded software packages
+5. relations/dependency between binary packages currently wont be bundled in one root dir
