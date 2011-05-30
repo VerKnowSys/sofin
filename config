@@ -20,6 +20,7 @@ MAIN_SOURCE_REPOSITORY="http://software.verknowsys.com/"
 
 FREEBSDUPDATE_BIN="/usr/sbin/freebsd-update"
 PATCH_BIN="/usr/bin/patch"
+PW_BIN="/usr/sbin/pw"
 CP_BIN="/bin/cp"
 LN_BIN="/bin/ln"
 DATE_BIN="/bin/date"
@@ -40,7 +41,9 @@ LDCONFIG_BIN="/sbin/ldconfig"
 TAIL_BIN="/usr/bin/tail"
 FETCH_BIN="/usr/bin/fetch"
 CHMOD_BIN="/bin/chmod"
+CHOWN_BIN="/usr/sbin/chown"
 FIND_BIN="/usr/bin/find"
+TOUCH_BIN="/usr/bin/touch"
 PWD_MKDB_BIN="/usr/sbin/pwd_mkdb"
 
 if [ $($UNAME_BIN) = "Darwin" ]; then
