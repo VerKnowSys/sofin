@@ -1,20 +1,24 @@
 #!/bin/sh
 
-VERSION="0.2.2"
+VERSION="0.2.3"
 
 SCRIPT_ROOT="/opt/SvdOpt/"
 SOFTWARE_DIR="/Software/"
 TMP_ROOT="/tmp/SvdOpt/"
+RC_CONF_FILE="/etc/rc.conf"
 DEFINITIONS_DIR="${SCRIPT_ROOT}definitions/"
 DEFAULTS="${DEFINITIONS_DIR}defaults.def"
 APPLICATIONS_NAME_LIST="applications"
 LIBRARIES_NAME_LIST="libraries"
 LOG="${SOFTWARE_DIR}INSTALL_LOG"
 DEFAULT_PATH="/bin:/usr/bin:/sbin:/usr/sbin"
+PREFILES="${SCRIPT_ROOT}prefiles/etc/"
+# Append cmake to path if built.
 
 # DEBUG="true"
 MAIN_SOURCE_REPOSITORY="http://software.verknowsys.com/"
 
+FREEBSDUPDATE_BIN="/usr/sbin/freebsd-update"
 PATCH_BIN="/usr/bin/patch"
 CP_BIN="/bin/cp"
 LN_BIN="/bin/ln"
@@ -31,11 +35,13 @@ TOUCH_BIN="/usr/bin/touch"
 TAR_BIN="/usr/bin/tar"
 ID_BIN="/usr/bin/id"
 GREP_BIN="/usr/bin/grep"
+IFCONFIG_BIN="/sbin/ifconfig"
 LDCONFIG_BIN="/sbin/ldconfig"
 TAIL_BIN="/usr/bin/tail"
 FETCH_BIN="/usr/bin/fetch"
 CHMOD_BIN="/bin/chmod"
 FIND_BIN="/usr/bin/find"
+PWD_MKDB_BIN="/usr/sbin/pwd_mkdb"
 
 if [ $($UNAME_BIN) = "Darwin" ]; then
 FETCH_BIN="/usr/bin/curl -L -O"
