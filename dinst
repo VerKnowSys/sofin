@@ -7,23 +7,6 @@ unset CPPFLAGS
 . ./config
 
 
-note () {
-    echo " INFO: $1"
-}
-
-
-debug () {
-    if [ ! "$DEBUG" = "" ]; then
-        echo "DEBUG: $1"
-    fi
-}
-
-
-error () {
-    echo "ERROR: $1"
-}
-
-
 check_root () {
     if [ ! "$($ID_BIN -u)" = "0" ]; then
         error "This command should be run as root in current stage."
@@ -63,10 +46,6 @@ definition_dir_check () {
 
 check_requirements () {
     definition_dir_check
-    if [ ! -e "$APPLICATIONS_NAME_LIST" ]; then
-        error "File: $APPLICATIONS_NAME_LIST undefined. This file tells which apps are 'bundles' to built."
-        exit
-    fi
     if [ "$APPLICATIONS" = "" ]; then
         error "Empty applications list!"
         exit
@@ -76,7 +55,7 @@ check_requirements () {
 
 usage_howto () {
     error "No task param given!"
-    error "Possible choices: libraries, applications, destroyall, clean, getshellvals, custom name_of_file"
+    error "Built in tasks: destroyall, getshellpath, getshellld, custom-definition-list-file"
     exit
 }
 
@@ -87,21 +66,6 @@ debug "Default path set ($DEFAULT_PATH)"
 
 if [ ! "$1" = "" ]; then
     case $1 in
-        
-    libraries)
-        export APPLICATIONS="$($CAT_BIN $LIBRARIES_NAME_LIST | $TR_BIN '\n' ' ')"
-        note "Library definitions: $APPLICATIONS"
-        ;;
-        
-    applications)
-        export APPLICATIONS="$($CAT_BIN $APPLICATIONS_NAME_LIST | $TR_BIN '\n' ' ')"
-        note "Application definitions: $APPLICATIONS"
-        ;;
-    
-    custom)
-        export APPLICATIONS="$($CAT_BIN $2 | $TR_BIN '\n' ' ')"
-        note "Application definitions: $APPLICATIONS"
-        ;;
         
     destroyall)
         note "All applications and libraries will be permanently destroyed in $SOFTWARE_DIR"
@@ -143,13 +107,10 @@ if [ ! "$1" = "" ]; then
         exit
         ;;
         
-    clean)
-        error "Cleaning not yet implemented!"
-        exit
-        ;;
-        
     *)
-        usage_howto
+        export APPLICATIONS="$($CAT_BIN $1 | $TR_BIN '\n' ' ')"
+        note "Parsing definitions: $APPLICATIONS"
+        
         ;;
         
     esac

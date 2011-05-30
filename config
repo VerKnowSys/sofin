@@ -1,6 +1,6 @@
 #!/bin/sh
 
-VERSION="0.2.3"
+VERSION="0.3.0"
 
 SCRIPT_ROOT="/opt/SvdOpt/"
 SOFTWARE_DIR="/Software/"
@@ -8,14 +8,15 @@ TMP_ROOT="/tmp/SvdOpt/"
 RC_CONF_FILE="/etc/rc.conf"
 DEFINITIONS_DIR="${SCRIPT_ROOT}definitions/"
 DEFAULTS="${DEFINITIONS_DIR}defaults.def"
-APPLICATIONS_NAME_LIST="applications"
-LIBRARIES_NAME_LIST="libraries"
 LOG="${SOFTWARE_DIR}INSTALL_LOG"
 DEFAULT_PATH="/bin:/usr/bin:/sbin:/usr/sbin"
 PREFILES="${SCRIPT_ROOT}prefiles/etc/"
-# Append cmake to path if built.
+SYSTEM_GET_SHELL_PATH="./dinst getshellpath"
+SYSTEM_GET_SHELL_LDLIB="./dinst getshellld"
+DEFAULT_SSH_PORT="60022"
 
 # DEBUG="true"
+
 MAIN_SOURCE_REPOSITORY="http://software.verknowsys.com/"
 
 FREEBSDUPDATE_BIN="/usr/sbin/freebsd-update"
@@ -45,7 +46,58 @@ CHOWN_BIN="/usr/sbin/chown"
 FIND_BIN="/usr/bin/find"
 TOUCH_BIN="/usr/bin/touch"
 PWD_MKDB_BIN="/usr/sbin/pwd_mkdb"
+MKTEMP_BIN="/usr/bin/mktemp"
+BASENAME_BIN="/usr/bin/basename"
 
 if [ $($UNAME_BIN) = "Darwin" ]; then
 FETCH_BIN="/usr/bin/curl -L -O"
 fi
+
+
+# helpers:
+
+note () {
+    echo " INFO: $1"
+}
+
+
+debug () {
+    if [ ! "$DEBUG" = "" ]; then
+        echo "DEBUG: $1"
+    fi
+}
+
+
+error () {
+    echo "ERROR: $1"
+}
+
+
+# quick hashmap implementation
+export mapdir=$($MKTEMP_BIN -dt $($BASENAME_BIN $0))
+
+
+put () {
+  [ "$#" != 3 ] && exit 1
+  mapname=$1; key=$2; value=$3
+  [ -d "${mapdir}/${mapname}" ] || $MKDIR_BIN "${mapdir}/${mapname}"
+  echo $value >"${mapdir}/${mapname}/${key}"
+}
+
+
+get () {
+  [ "$#" != 2 ] && exit 1
+  mapname=$1; key=$2
+  $CAT_BIN "${mapdir}/${mapname}/${key}"
+}
+
+
+trap "rm -r ${mapdir}" EXIT
+
+
+SYSUSERS="dmilith teamon"
+SYSGROUP="wheel"
+SERVICES="pf pflog ntpd sshd syslogd"
+
+put "SYSUSERS" "dmilith" "666"
+put "SYSUSERS" "teamon" "1337"
