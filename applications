@@ -1,9 +1,5 @@
+zsh
 screen
-sbt
-maven
-ant
-scala
-cmake
 make
 git
 mysql
@@ -15,4 +11,3 @@ postgres
 python
 ruby
 ruby18
-zsh
