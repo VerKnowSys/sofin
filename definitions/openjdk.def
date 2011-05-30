@@ -1,8 +1,17 @@
 . ./config
-DISABLE_ON="Darwin"
-APP_FULL_NAME="OpenJDK 6 (fiend build)"
+sbtEntry="""
+#!/bin/sh
+
+if test -f ~/.sbtconfig; then
+  . ~/.sbtconfig
+fi
+
+exec java -Xmx512M -jar ${SOFTWARE_DIR}Openjdk-${APP_VERSION}/lib/sbt-launch-${APP_VERSION}.jar "$@"
+"""
+
+APP_FULL_NAME="OpenJDK 6 (tools included: sbt, ant, maven)"
 APP_NAME="openjdk"
 APP_VERSION="1.6.0-b22"
 APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}6-${APP_VERSION}.tar.gz"
 APP_CONFIGURE_SCRIPT="binary"
-APP_AFTER_INSTALL_CALLBACK="$CP_BIN -R ${TMP_ROOT}openjdk-${APP_VERSION}/openjdk6 ${SOFTWARE_DIR}Openjdk-${APP_VERSION}"
+APP_AFTER_INSTALL_CALLBACK="$CP_BIN -R ${TMP_ROOT}openjdk-${APP_VERSION}/openjdk6 ${SOFTWARE_DIR}Openjdk-${APP_VERSION} && echo '$sbtEntry' > ${SOFTWARE_DIR}Openjdk-${APP_VERSION}/bin/sbt && $CHMOD_BIN 755 ${SOFTWARE_DIR}Openjdk-${APP_VERSION}/bin/sbt"

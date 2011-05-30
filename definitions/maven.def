@@ -1,8 +1,0 @@
-. ./config
-APP_FULL_NAME="Apache Maven"
-APP_NAME="apache-maven"
-APP_VERSION="3.0.3"
-APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}-bin.tar.gz"
-APP_CONFIGURE_SCRIPT="binary"
-APP_REQUIREMENTS="openjdk"
-APP_AFTER_INSTALL_CALLBACK="$CP_BIN -R ${TMP_ROOT}${APP_NAME}-${APP_VERSION}/${APP_NAME}-${APP_VERSION} ${SOFTWARE_DIR}Apache-maven-${APP_VERSION} && $FIND_BIN ${SOFTWARE_DIR}Apache-maven-${APP_VERSION} -name '*.bat' -delete && $FIND_BIN ${SOFTWARE_DIR}Apache-maven-${APP_VERSION} -name '*.cmd' -delete"
