@@ -75,7 +75,6 @@ echo "Port $DEFAULT_SSH_PORT" >> /etc/ssh/ssh_config
 note "Getting ServeD from git repository"
 cd /tmp
 if [ -d /tmp/ServeD ]; then
-    $RM_BIN -rf /opt/ServeD
     cd /tmp/ServeD
     git pull origin master
     $CP_BIN -r /tmp/ServeD /opt
@@ -87,7 +86,11 @@ fi
 note "Building ServeD"
 cd /opt/ServeD
 sbt update
-sbt install
+sbt compile
+
+note "Installing required native libraries for OpenJDK"
+# XXX: hardcoded
+$CP_BIN /opt/ServeD/libs.native.64/FreeBSD_8_1/libsigar-amd64-freebsd-8.so /Software/Openjdk-1.6.0-b22/jre/lib/amd64/
 
 note "Updating FreeBSD release"
 $FREEBSDUPDATE_BIN fetch >> $LOG
