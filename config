@@ -1,6 +1,6 @@
 #!/bin/sh
 
-VERSION="0.3.0"
+VERSION="0.3.1"
 
 SCRIPT_ROOT="/opt/SvdOpt/"
 SOFTWARE_DIR="/Software/"
@@ -9,10 +9,15 @@ RC_CONF_FILE="/etc/rc.conf"
 DEFINITIONS_DIR="${SCRIPT_ROOT}definitions/"
 DEFAULTS="${DEFINITIONS_DIR}defaults.def"
 LOG="${SOFTWARE_DIR}INSTALL_LOG"
-DEFAULT_PATH="/bin:/usr/bin:/sbin:/usr/sbin"
 PREFILES="${SCRIPT_ROOT}prefiles/etc/"
-SYSTEM_GET_SHELL_PATH="./dinst getshellpath"
-SYSTEM_GET_SHELL_LDLIB="./dinst getshellld"
+DINSTAPP="$(pwd)/dinst"
+if [ ! -x ${DINSTAPP} ]; then
+    echo "Couldn't find required executable: ${DINSTAPP} in $(pwd)"
+    exit
+fi
+DEFAULT_PATH="/bin:/usr/bin:/sbin:/usr/sbin"
+SYSTEM_GET_SHELL_PATH="$DINSTAPP getshellpath"
+SYSTEM_GET_SHELL_LDLIB="$DINSTAPP getshellld"
 DEFAULT_SSH_PORT="60022"
 
 # DEBUG="true"
@@ -48,6 +53,7 @@ TOUCH_BIN="/usr/bin/touch"
 PWD_MKDB_BIN="/usr/sbin/pwd_mkdb"
 MKTEMP_BIN="/usr/bin/mktemp"
 BASENAME_BIN="/usr/bin/basename"
+TZSETUP_BIN="/usr/sbin/tzsetup"
 
 if [ $($UNAME_BIN) = "Darwin" ]; then
 FETCH_BIN="/usr/bin/curl -L -O"

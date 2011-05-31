@@ -4,7 +4,11 @@ unset LDFLAGS
 unset CFLAGS
 unset CPPFLAGS
 
-. ./config
+if [ ! -e $(pwd)/config ]; then
+    error "Unable to find config: $(pwd)/config"
+    exit
+fi
+. $(pwd)/config
 
 
 check_root () {
@@ -55,7 +59,7 @@ check_requirements () {
 
 usage_howto () {
     error "No task param given!"
-    error "Built in tasks: destroyall, getshellpath, getshellld, custom-definition-list-file"
+    error "Built in tasks: list, destroyall, getshellpath, getshellld, custom-definition-list-file"
     exit
 }
 
@@ -66,6 +70,16 @@ debug "Default path set ($DEFAULT_PATH)"
 
 if [ ! "$1" = "" ]; then
     case $1 in
+    
+    list)
+        note "Listing of installed software:"
+        if [ -d $SOFTWARE_DIR ]; then
+            note "($LS_BIN -m $SOFTWARE_DIR)"
+        else
+            note "No software installed"
+        fi
+        exit
+        ;;
         
     destroyall)
         note "All applications and libraries will be permanently destroyed in $SOFTWARE_DIR"
@@ -108,9 +122,12 @@ if [ ! "$1" = "" ]; then
         ;;
         
     *)
+        if [ ! -e $1 ]; then
+            error "Definition not found: $1"
+            exit
+        fi
         export APPLICATIONS="$($CAT_BIN $1 | $TR_BIN '\n' ' ')"
         note "Parsing definitions: $APPLICATIONS"
-        
         ;;
         
     esac

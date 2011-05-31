@@ -1,6 +1,13 @@
 #!/bin/sh
 
-. ./config
+if [ ! -e $(pwd)/config ]; then
+    error "Unable to find config: $(pwd)/config"
+    exit
+fi
+. $(pwd)/config
+
+note "Installing base in ${SOFTWARE_DIR}"
+$DINSTAPP base
 
 if [ ! "$($UNAME_BIN)" = "FreeBSD" ]; then
     note "This script is designed to be executed on FreeBSD 8.x systems only."
@@ -10,7 +17,7 @@ fi
 RMLIST="/media /mnt /COPYRIGHT /etc/bluetooth /etc/mail /etc/ntp /etc/ppp /etc/skel /etc/X11 /etc/csh.* /etc/ftpusers /etc/hosts.lpd /etc/mail.rc /usr/sbin/sendmail /usr/bin/mail /var/mail"
 
 for i in ${RMLIST}; do
-   note "Removing: $i"
+   debug "Removing: $i"
    $RM_BIN -rf "$i"
 done
 
@@ -85,6 +92,9 @@ sbt install
 note "Updating FreeBSD release"
 $FREEBSDUPDATE_BIN fetch >> $LOG
 $FREEBSDUPDATE_BIN install >> $LOG
+
+note "Setting time zone"
+$TZSETUP_BIN
 
 note "Restarting system services"
 for service in ${SERVICES}; do
