@@ -1,8 +1,9 @@
 #!/bin/sh
 
+HOST_NODE_NAME="vore"
+
 VERSION="0.3.2"
 
-HOST_NODE="vore"
 DFS_MOUNT_POINT="/dfs"
 DFS_CACHE_DIR="/var/dfs/cache"
 SCRIPT_ROOT="/opt/SvdOpt/"

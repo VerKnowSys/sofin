@@ -17,7 +17,7 @@ $MKDIR_BIN -p '${DFS_MOUNT_POINT}'; \
 $CP_BIN -vf /usr/local/etc/openafs/CellServDB.sample /usr/local/etc/openafs/server/CellServDB; \
 echo '' > /usr/local/etc/openafs/server/KeyFile; \
 echo '' > /usr/local/etc/openafs/server/UserList; \
-echo '${HOST_NODE}' > /usr/local/etc/openafs/server/ThisCell; \
+echo '${HOST_NODE_NAME}' > /usr/local/etc/openafs/server/ThisCell; \
 echo '${DFS_MOUNT_POINT}:${DFS_CACHE_DIR}:150000' > /usr/local/etc/openafs/cacheinfo; \
 $SERVICE_BIN afsserver restart; \
 $SERVICE_BIN afsd restart; \
