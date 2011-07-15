@@ -1,8 +1,8 @@
 # $FreeBSD: releng/8.2/etc/master.passwd 147062 2005-06-06 20:19:56Z brooks $
 #
-root:$1$Mbq3y3ps$gPzmkUU/xPP0wf0fJY0sZ/:0:0::0:0:Root:/root:/bin/sh
-toor:*:0:0::0:0:Bourne-again Superuser:/root:
-daemon:*:1:1::0:0:Owner of many system processes:/root:/usr/sbin/nologin
+root:$1$Mbq3y3ps$gPzmkUU/xPP0wf0fJY0sZ/:0:0::0:0:Root:/usr/root:/bin/sh
+toor:*:0:0::0:0:Bourne-again Superuser:/usr/root:
+daemon:*:1:1::0:0:Owner of many system processes:/usr/root:/usr/sbin/nologin
 operator:*:2:5::0:0:System:/:/usr/sbin/nologin
 bin:*:3:7::0:0:Binaries Commands and Source:/:/usr/sbin/nologin
 tty:*:4:65533::0:0:Tty Sandbox:/:/usr/sbin/nologin
