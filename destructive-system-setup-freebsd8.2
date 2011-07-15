@@ -14,7 +14,7 @@ if [ ! "$($UNAME_BIN)" = "FreeBSD" ]; then
     exit 1
 fi
 
-RMLIST="/media /mnt /COPYRIGHT /etc/bluetooth /etc/mail /etc/ntp /etc/ppp /etc/skel /etc/X11 /etc/csh.* /etc/ftpusers /etc/hosts.lpd /etc/mail.rc /usr/sbin/sendmail /usr/bin/mail /var/mail"
+RMLIST="/media /mnt /proc /srv /cdrom /root /home /COPYRIGHT /etc/bluetooth /etc/rc.d/sendmail /etc/mail /etc/ntp /etc/ppp /etc/skel /etc/X11 /etc/csh.* /etc/ftpusers /etc/hosts.lpd /etc/mail.rc /usr/sbin/sendmail /usr/bin/mail /var/mail"
 
 for i in ${RMLIST}; do
    debug "Removing: $i"
@@ -23,15 +23,14 @@ done
 
 note "Some touches and removes from beginning. Shot first, questions later."
 $TOUCH_BIN /var/log/console.log
-$RM_BIN -rf /home
+$RM_BIN -rf /usr/home
+$MKDIR_BIN -p /usr/root
 
 note "Copying ${PREFILES} to /etc"
 $CP_BIN -r ${PREFILES} /etc
 
 note "Filling additional configurations"
-echo "Enter hostname:"
-read HOSTNAME
-echo "hostname=\"$HOSTNAME\"" >> $RC_CONF_FILE
+echo "hostname=\"$HOST_NODE_NAME\"" >> $RC_CONF_FILE
 
 note "Setting interfaces.."
 for interface in $($IFCONFIG_BIN -l); do
@@ -59,12 +58,12 @@ echo "$(which zsh)" >> /etc/shells
 
 note "Adding default users"
 for user in $SYSUSERS; do
-    if [ ! -d /home/${user} ]; then
-        $MKDIR_BIN -p /home/${user}
+    if [ ! -d /usr/home/${user} ]; then
+        $MKDIR_BIN -p /usr/home/${user}
     fi
-    $PW_BIN useradd $user -u $(get "SYSUSERS" "${user}") -d /home/${user} -g $SYSGROUP -s "$(which zsh)"
-    $TOUCH_BIN /home/${user}/.zshrc
-    $CHOWN_BIN -R ${user}:$SYSGROUP /home/${user}
+    $PW_BIN useradd $user -u $(get "SYSUSERS" "${user}") -d /usr/home/${user} -g $SYSGROUP -s "$(which zsh)"
+    $TOUCH_BIN /usr/home/${user}/.zshrc
+    $CHOWN_BIN -R ${user}:$SYSGROUP /usr/home/${user}
 done
 
 note "Updating ssh config"
