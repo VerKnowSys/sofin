@@ -1,10 +1,13 @@
 #!/bin/sh
 
-VERSION="0.3.1"
+VERSION="0.3.2"
 
+HOST_NODE="vore"
+DFS_MOUNT_POINT="/dfs"
+DFS_CACHE_DIR="/var/dfs/cache"
 SCRIPT_ROOT="/opt/SvdOpt/"
 SOFTWARE_DIR="/Software/"
-TMP_ROOT="/tmp/SvdOpt/"
+TMP_ROOT="/var/SvdOpt/"
 RC_CONF_FILE="/etc/rc.conf"
 DEFINITIONS_DIR="${SCRIPT_ROOT}definitions/"
 DEFAULTS="${DEFINITIONS_DIR}defaults.def"
@@ -15,7 +18,7 @@ if [ ! -x ${DINSTAPP} ]; then
     echo "Couldn't find required executable: ${DINSTAPP} in $(pwd)"
     exit
 fi
-DEFAULT_PATH="/bin:/usr/bin:/sbin:/usr/sbin"
+DEFAULT_PATH="/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin"
 SYSTEM_GET_SHELL_PATH="$DINSTAPP getshellpath"
 SYSTEM_GET_SHELL_LDLIB="$DINSTAPP getshellld"
 DEFAULT_SSH_PORT="60022"
@@ -25,6 +28,8 @@ DEFAULT_SSH_PORT="60022"
 MAIN_SOURCE_REPOSITORY="http://software.verknowsys.com/"
 
 FREEBSDUPDATE_BIN="/usr/sbin/freebsd-update"
+KLDLOAD_BIN="/sbin/kldload"
+SERVICE_BIN="/usr/sbin/service"
 PATCH_BIN="/usr/bin/patch"
 PW_BIN="/usr/sbin/pw"
 CP_BIN="/bin/cp"
