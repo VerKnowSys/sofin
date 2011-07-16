@@ -2,8 +2,13 @@
 
 HOST_NODE_NAME="vore"
 
-VERSION="0.3.2"
+VERSION="0.3.3"
+SYSUSERS="dmilith teamon"
+SYSGROUP="wheel"
+SERVICES="pf pflog ntpd sshd syslogd afsserver afsd"
 
+
+# DEBUG="true"
 DFS_MOUNT_POINT="/dfs"
 DFS_CACHE_DIR="/var/dfs/cache"
 SCRIPT_ROOT="/opt/SvdOpt/"
@@ -23,9 +28,6 @@ DEFAULT_PATH="/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin"
 SYSTEM_GET_SHELL_PATH="$DINSTAPP getshellpath"
 SYSTEM_GET_SHELL_LDLIB="$DINSTAPP getshellld"
 DEFAULT_SSH_PORT="60022"
-
-# DEBUG="true"
-
 MAIN_SOURCE_REPOSITORY="http://software.verknowsys.com/"
 
 FREEBSDUPDATE_BIN="/usr/sbin/freebsd-update"
@@ -105,11 +107,6 @@ get () {
 
 
 trap "rm -r ${mapdir}" EXIT
-
-
-SYSUSERS="dmilith teamon"
-SYSGROUP="wheel"
-SERVICES="pf pflog ntpd sshd syslogd"
 
 put "SYSUSERS" "dmilith" "666"
 put "SYSUSERS" "teamon" "1337"
