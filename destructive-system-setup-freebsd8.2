@@ -74,8 +74,8 @@ note "Updating FreeBSD release"
 $FREEBSDUPDATE_BIN fetch >> $LOG
 $FREEBSDUPDATE_BIN install >> $LOG
 
-note "Syncing to NTP server"
-$NTPDATE_BIN ${NFS_FIRST_FETCH}
+# note "Syncing to NTP server"
+# $NTPDATE_BIN ${NFS_FIRST_FETCH}
 
 note "Restarting system services"
 for service in ${SERVICES}; do
