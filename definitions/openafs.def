@@ -1,16 +1,14 @@
 . ./config
 APP_FULL_NAME="Open Andrew File System"
 APP_NAME="openafs-amd64-fbsd_82"
-APP_VERSION="1.6pre6"
+APP_VERSION="1.6pre7"
 APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
 APP_CONFIGURE_SCRIPT="binary"
-KERNEL_MODULE_FILE="/boot/kernel/libafs.ko"
+KERNEL_MODULE_FILE="/boot/modules/libafs.ko"
 APP_AFTER_INSTALL_CALLBACK="$CP_BIN -vr ${TMP_ROOT}${APP_NAME}-${APP_VERSION}/${APP_NAME}-${APP_VERSION}/* /usr/local; \
 $CP_BIN -vf /usr/local${KERNEL_MODULE_FILE} $KERNEL_MODULE_FILE; \
 $RM_BIN -rf /usr/local/boot; \
 $KLDLOAD_BIN ${KERNEL_MODULE_FILE}; \
-echo 'afsserver_enable=\"YES\"' >> /etc/rc.conf; \
-echo 'afsd_enable=\"YES\"' >> /etc/rc.conf; \
 $MKDIR_BIN /usr/local/etc/openafs/server; \
 $MKDIR_BIN -p '${DFS_CACHE_DIR}'; \
 $MKDIR_BIN -p '${DFS_MOUNT_POINT}'; \
@@ -19,6 +17,8 @@ echo '' > /usr/local/etc/openafs/server/KeyFile; \
 echo '' > /usr/local/etc/openafs/server/UserList; \
 echo '${HOST_NODE_NAME}' > /usr/local/etc/openafs/server/ThisCell; \
 echo '${DFS_MOUNT_POINT}:${DFS_CACHE_DIR}:150000' > /usr/local/etc/openafs/cacheinfo; \
+echo 'afsserver_enable=\"YES\"' >> /etc/rc.conf; \
+echo 'afsd_enable=\"YES\"' >> /etc/rc.conf; \
 $SERVICE_BIN afsserver restart; \
 $SERVICE_BIN afsd restart; \
 $MKDIR_BIN ${SOFTWARE_DIR}/Openafs-amd64-fbsd_82-${APP_VERSION}; \
