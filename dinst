@@ -205,79 +205,85 @@ for application in $APPLICATIONS; do
                         fi
                     done
                 fi
+                
                 if [ "$ALLOW" = "1" ]; then
-                    BUILD_DIR="$TMP_ROOT$APP_NAME-$APP_VERSION/"
-                    $MKDIR_BIN -p "$BUILD_DIR"
-                    CUR_DIR=$(pwd)
-                    cd "$BUILD_DIR"
-                    for bd in $BUILD_DIR/*; do
-                        if [ -d $bd ]; then
-                            debug "Unpacked source code found in build dir. Removing: $bd"
-                            $RM_BIN -rf $bd
-                        fi
-                    done
-                    if [ ! -e $BUILD_DIR$1*tar.gz ]; then
-                        note "Fetching requirement source from: $APP_HTTP_PATH"
-                        run $FETCH_BIN $APP_HTTP_PATH
+                    if [ -z "$APP_HTTP_PATH" ]; then
+                        debug "After install callback: $APP_AFTER_INSTALL_CALLBACK"
+                        run $APP_AFTER_INSTALL_CALLBACK
                     else
-                        debug "Already fetched. Using tarball from cache"
-                    fi
-                    note "Unpacking source code of: $APP_NAME"
-                    run $TAR_BIN xf $BUILD_DIR$APP_NAME*
-                    debug "Entrering $BUILD_DIR$APP_NAME*" >> $LOG
-                    for dir in `$LS_BIN -F $BUILD_DIR | $GREP_BIN \/$`; do
-                        debug "Changing dir to: $dir" >> $LOG
-                        cd "$dir$APP_SOURCE_DIR_POSTFIX"
-                        export CXXFLAGS="-I${PREFIX}/include $APP_COMPILER_ARGS"
-                        export CFLAGS="-I${PREFIX}/include $APP_COMPILER_ARGS"
-                        export LDFLAGS="-L${PREFIX}/lib $APP_LINKER_ARGS"
-                        LIST_DIR=${DEFINITIONS_DIR}patches/$1
-                        if [ -d $LIST_DIR ]; then
-                            if [ "$1" = "$APP_NAME" ]; then # apply patch only when application/requirement for which patch is designed for
-                                debug "Applying patches for application: $application"
-                                for patch in $LIST_DIR/*; do
-                                    debug "Patching source code with patch: $patch"
-                                    run $PATCH_BIN -i "$patch"
-                                done
+                        BUILD_DIR="$TMP_ROOT$APP_NAME-$APP_VERSION/"
+                        $MKDIR_BIN -p "$BUILD_DIR"
+                        CUR_DIR=$(pwd)
+                        cd "$BUILD_DIR"
+                        for bd in $BUILD_DIR/*; do
+                            if [ -d $bd ]; then
+                                debug "Unpacked source code found in build dir. Removing: $bd"
+                                $RM_BIN -rf $bd
                             fi
+                        done
+                        if [ ! -e $BUILD_DIR$1*tar.gz ]; then
+                            note "Fetching requirement source from: $APP_HTTP_PATH"
+                            run $FETCH_BIN $APP_HTTP_PATH
+                        else
+                            debug "Already fetched. Using tarball from cache"
                         fi
-                        
-                        debug "Running configuration script for: $1 with args: --prefix=$PREFIX $APP_CONFIGURE_ARGS"
-                        note "Configuring requirement: $1"
-                        case $APP_CONFIGURE_SCRIPT in
-                            no-conf)
-                                note "Skipped configuration for $1"
-                                export APP_MAKE_METHOD="$APP_MAKE_METHOD PREFIX=$PREFIX"
-                                export APP_INSTALL_METHOD="$APP_INSTALL_METHOD PREFIX=$PREFIX"
-                                ;;
-                                
-                            binary)
-                                note "Binary definition: $1"
-                                export APP_MAKE_METHOD="true"
-                                export APP_INSTALL_METHOD="true"
-                                ;;
-                                
-                            cmake)
-                                run $APP_CONFIGURE_SCRIPT . -LH -DCMAKE_INSTALL_PREFIX=$PREFIX
-                                ;;
-                            
-                            *)
-                                run $APP_CONFIGURE_SCRIPT $APP_CONFIGURE_ARGS --prefix=$PREFIX
-                                ;;
-                                
-                        esac
-                        
-                        note "Building requirement: $1"
-                        run $APP_MAKE_METHOD
-                        note "Installing requirement: $1"
-                        run $APP_INSTALL_METHOD
-                        if [ ! "$APP_AFTER_INSTALL_CALLBACK" = "" ]; then
-                            debug "After install callback: $APP_AFTER_INSTALL_CALLBACK"
-                            run $APP_AFTER_INSTALL_CALLBACK
-                        fi
-                        note "Installed '$1' in: $PREFIX"
-                    done
-                    cd $CUR_DIR
+                        note "Unpacking source code of: $APP_NAME"
+                        run $TAR_BIN xf $BUILD_DIR$APP_NAME*
+                        debug "Entrering $BUILD_DIR$APP_NAME*" >> $LOG
+                        for dir in `$LS_BIN -F $BUILD_DIR | $GREP_BIN \/$`; do
+                            debug "Changing dir to: $dir" >> $LOG
+                            cd "$dir$APP_SOURCE_DIR_POSTFIX"
+                            export CXXFLAGS="-I${PREFIX}/include $APP_COMPILER_ARGS"
+                            export CFLAGS="-I${PREFIX}/include $APP_COMPILER_ARGS"
+                            export LDFLAGS="-L${PREFIX}/lib $APP_LINKER_ARGS"
+                            LIST_DIR=${DEFINITIONS_DIR}patches/$1
+                            if [ -d $LIST_DIR ]; then
+                                if [ "$1" = "$APP_NAME" ]; then # apply patch only when application/requirement for which patch is designed for
+                                    debug "Applying patches for application: $application"
+                                    for patch in $LIST_DIR/*; do
+                                        debug "Patching source code with patch: $patch"
+                                        run $PATCH_BIN -i "$patch"
+                                    done
+                                fi
+                            fi
+
+                            debug "Running configuration script for: $1 with args: --prefix=$PREFIX $APP_CONFIGURE_ARGS"
+                            note "Configuring requirement: $1"
+                            case $APP_CONFIGURE_SCRIPT in
+                                no-conf)
+                                    note "Skipped configuration for $1"
+                                    export APP_MAKE_METHOD="$APP_MAKE_METHOD PREFIX=$PREFIX"
+                                    export APP_INSTALL_METHOD="$APP_INSTALL_METHOD PREFIX=$PREFIX"
+                                    ;;
+
+                                binary)
+                                    note "Binary definition: $1"
+                                    export APP_MAKE_METHOD="true"
+                                    export APP_INSTALL_METHOD="true"
+                                    ;;
+
+                                cmake)
+                                    run $APP_CONFIGURE_SCRIPT . -LH -DCMAKE_INSTALL_PREFIX=$PREFIX
+                                    ;;
+
+                                *)
+                                    run $APP_CONFIGURE_SCRIPT $APP_CONFIGURE_ARGS --prefix=$PREFIX
+                                    ;;
+
+                            esac
+
+                            note "Building requirement: $1"
+                            run $APP_MAKE_METHOD
+                            note "Installing requirement: $1"
+                            run $APP_INSTALL_METHOD
+                            if [ ! "$APP_AFTER_INSTALL_CALLBACK" = "" ]; then
+                                debug "After install callback: $APP_AFTER_INSTALL_CALLBACK"
+                                run $APP_AFTER_INSTALL_CALLBACK
+                            fi
+                            note "Installed '$1' in: $PREFIX"
+                        done
+                        cd $CUR_DIR
+                    fi
                 else
                     note "This bundle is disabled on current architecture ($($UNAME_BIN)). Skipped"
                 fi
