@@ -4,11 +4,12 @@ ListenAddress 0.0.0.0
 HostKey /etc/ssh/ssh_host_rsa_key
 HostKey /etc/ssh/ssh_host_dsa_key
 
-PermitRootLogin yes
+GSSAPIAuthentication yes
+PermitRootLogin no
 RSAAuthentication yes
 PubkeyAuthentication yes
 PasswordAuthentication yes
-UsePAM no
+UsePAM yes
 AllowTcpForwarding yes
 # GatewayPorts no
 X11Forwarding no
