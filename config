@@ -5,7 +5,7 @@ HOST_NODE_NAME="vore"
 VERSION="0.3.3"
 SYSUSERS="dmilith teamon"
 SYSGROUP="wheel"
-SERVICES="pf pflog ntpd sshd syslogd afsserver afsd"
+SERVICES="pf ntpd sshd syslogd afsserver afsd"
 
 
 # DEBUG="true"
