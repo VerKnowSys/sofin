@@ -1,11 +1,14 @@
 #!/bin/sh
 
-HOST_NODE_NAME="vore"
+export PACKAGESITE='http://ftp.freebsd.org/pub/FreeBSD/ports/amd64/packages-stable/Latest/'
 
-VERSION="0.3.3"
+
+HOST_NODE_NAME="grunt-$(/sbin/sha1 -qs \\"`date`\\")"
+
+VERSION="0.4.0"
 SYSUSERS="dmilith teamon"
 SYSGROUP="wheel"
-SERVICES="pf ntpd sshd syslogd afsserver afsd"
+SERVICES="pf ntpd sshd syslogd"
 
 
 # DEBUG="true"
@@ -19,7 +22,7 @@ DEFINITIONS_DIR="${SCRIPT_ROOT}definitions/"
 DEFAULTS="${DEFINITIONS_DIR}defaults.def"
 LOG="${SOFTWARE_DIR}INSTALL_LOG"
 PREFILES="${SCRIPT_ROOT}prefiles/etc/"
-DINSTAPP="$(pwd)/dinst"
+DINSTAPP="$(pwd)/SOFTWARE-INSTALLER"
 if [ ! -x ${DINSTAPP} ]; then
     echo "Couldn't find required executable: ${DINSTAPP} in $(pwd)"
     exit
@@ -31,6 +34,11 @@ DEFAULT_SSH_PORT="60022"
 MAIN_SOURCE_REPOSITORY="http://software.verknowsys.com/"
 
 FREEBSDUPDATE_BIN="/usr/sbin/freebsd-update"
+PORTSNAP_BIN="/usr/sbin/portsnap"
+CSUP_BIN="/usr/bin/csup"
+BSDMAKE_BIN="/usr/bin/make"
+NEXTBOOT_BIN="/sbin/nextboot"
+PKG_ADD_BIN="/usr/sbin/pkg_add"
 KLDLOAD_BIN="/sbin/kldload"
 SERVICE_BIN="/usr/sbin/service"
 PATCH_BIN="/usr/bin/patch"
