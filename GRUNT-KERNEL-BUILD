@@ -1,0 +1,32 @@
+#!/bin/sh
+
+if [ ! -e $(pwd)/config ]; then
+    error "Unable to find config: $(pwd)/config"
+    exit
+fi
+. $(pwd)/config
+
+note "Please make sure that system has updated kernel sources. Run $(ls GRUNT-POST-*) script before executing this one!"
+
+if [ ! "$($UNAME_BIN)" = "FreeBSD" ]; then
+    note "This script is designed to be executed on FreeBSD 8.x systems only."
+    exit 1
+fi
+
+if [ ! -e "/usr/src/sys" ]; then
+    note "Use sysinstall first and install BSD kernel sources"
+    exit 1
+fi
+
+note "Linking VERKNOWSYS kernel config"
+$RM_BIN "/usr/src/sys/amd64/conf/VERKNOWSYS"
+$LN_BIN -s "$(pwd)/VERKNOWSYS" /usr/src/sys/amd64/conf/VERKNOWSYS
+cd /usr/src
+$BSDMAKE_BIN cleanworld && $BSDMAKE_BIN cleandir
+$BSDMAKE_BIN buildkernel KERNCONF=VERKNOWSYS
+$BSDMAKE_BIN installkernel -f KERNCONF=VERKNOWSYS
+
+#$NEXTBOOT_BIN -k VERKNOWSYS
+
+note "Done"
+exit
