@@ -9,7 +9,7 @@ VERSION="0.4.0"
 SYSUSERS="dmilith teamon"
 SYSGROUP="wheel"
 SERVICES="pf ntpd sshd syslogd"
-
+KERNEL_CONFIG="VERKNOWSYS"
 
 # DEBUG="true"
 DFS_MOUNT_POINT="/dfs"
@@ -23,6 +23,7 @@ DEFAULTS="${DEFINITIONS_DIR}defaults.def"
 LOG="${SOFTWARE_DIR}INSTALL_LOG"
 PREFILES="${SCRIPT_ROOT}prefiles/etc/"
 DINSTAPP="$(pwd)/SOFTWARE-INSTALLER"
+KERNELBUILDAPP="$(pwd)/GRUNT-KERNEL-BUILD"
 if [ ! -x ${DINSTAPP} ]; then
     echo "Couldn't find required executable: ${DINSTAPP} in $(pwd)"
     exit
