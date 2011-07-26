@@ -1,5 +1,0 @@
-APP_FULL_NAME="ISC DHCP Server 4.2"
-APP_NAME="dhcpd"
-APP_VERSION="4.2"
-APP_CONFIGURE_SCRIPT="binary"
-APP_AFTER_INSTALL_CALLBACK="export PACKAGESITE='http://ftp.freebsd.org/pub/FreeBSD/ports/amd64/packages-stable/Latest/' && pkg_add -r isc-dhcp42-server"
