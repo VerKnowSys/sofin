@@ -38,6 +38,9 @@ $MKDIR_BIN -p /usr/root
 if [ ! -e "/usr/obj/usr/src/sys/$KERNEL_CONFIG" ]; then
     note "Building and installing $KERNEL_CONFIG kernel"
     . ${KERNELBUILDAPP}
+    echo 'vfs.zfs.prefetch_disable="1"' >> $BOOT_LOADER_CONF
+    echo 'vfs.zfs.txg.timeout="5"' >> $BOOT_LOADER_CONF
+    echo 'vfs.zfs.zil_disable="0"' >> $BOOT_LOADER_CONF
 else
     note "Kernel $KERNEL_CONFIG already built. Skipping"
 fi
