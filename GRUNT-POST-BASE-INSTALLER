@@ -18,13 +18,21 @@ for i in ${RMLIST}; do
    $RM_BIN -rf "$i"
 done
 
+# First copy prefiles to destination directory (includes freebsd-update, src & make configurations, which must be ready before building kernel)
+note "Copying ${PREFILES} to /etc"
+$CP_BIN -r "${PREFILES}" /etc
+
+note "Fetching FreeBSD sources for development server (grunt)"
+$CSUP_BIN /etc/csup.grunt
+
+note "Updating FreeBSD release with sources"
+$FREEBSDUPDATE_BIN fetch >> $LOG
+$FREEBSDUPDATE_BIN install >> $LOG
+
 note "Some touches and removes from beginning. Shot first, questions later."
 $TOUCH_BIN /var/log/console.log
 $RM_BIN -rf /usr/home
 $MKDIR_BIN -p /usr/root
-
-note "Copying ${PREFILES} to /etc"
-$CP_BIN -r "${PREFILES}" /etc
 
 note "Filling additional configurations"
 echo "hostname=\"$HOST_NODE_NAME\"" >> $RC_CONF_FILE
@@ -40,7 +48,7 @@ note "Updating passwd cache database"
 $PWD_MKDB_BIN -p /etc/master.passwd
 
 note "Installing base in ${SOFTWARE_DIR}"
-$DINSTAPP base
+$DINSTAPP lists/base
 
 note "Setting PATH & LDDIR"
 echo $($SYSTEM_GET_SHELL_PATH) >> /etc/profile
@@ -69,10 +77,6 @@ note "Updating ssh config"
 echo "" >> /etc/ssh/ssh_config
 echo "Host verknowsys.com git.verknowsys.com fiend.pl" >> /etc/ssh/ssh_config
 echo "Port $DEFAULT_SSH_PORT" >> /etc/ssh/ssh_config
-
-note "Updating FreeBSD release"
-$FREEBSDUPDATE_BIN fetch >> $LOG
-$FREEBSDUPDATE_BIN install >> $LOG
 
 # note "Syncing to NTP server"
 # $NTPDATE_BIN ${NFS_FIRST_FETCH}
