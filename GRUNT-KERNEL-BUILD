@@ -18,15 +18,13 @@ if [ ! -e "/usr/src/sys" ]; then
     exit 1
 fi
 
-note "Linking VERKNOWSYS kernel config"
-$RM_BIN "/usr/src/sys/amd64/conf/VERKNOWSYS"
-$LN_BIN -s "$(pwd)/VERKNOWSYS" /usr/src/sys/amd64/conf/VERKNOWSYS
+note "Linking $KERNEL_CONFIG kernel config"
+$RM_BIN "/usr/src/sys/amd64/conf/$KERNEL_CONFIG"
+$LN_BIN -s "$(pwd)/$KERNEL_CONFIG" /usr/src/sys/amd64/conf/$KERNEL_CONFIG
 cd /usr/src
 $BSDMAKE_BIN cleanworld && $BSDMAKE_BIN cleandir
-$BSDMAKE_BIN buildkernel KERNCONF=VERKNOWSYS
-$BSDMAKE_BIN installkernel -f KERNCONF=VERKNOWSYS
-
-#$NEXTBOOT_BIN -k VERKNOWSYS
+$BSDMAKE_BIN buildkernel KERNCONF=$KERNEL_CONFIG
+$BSDMAKE_BIN installkernel KERNCONF=$KERNEL_CONFIG
 
 note "Done"
 exit

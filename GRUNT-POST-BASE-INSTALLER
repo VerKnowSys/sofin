@@ -25,7 +25,7 @@ $CP_BIN -r "${PREFILES}" /etc
 note "Fetching FreeBSD sources for development server (grunt)"
 $CSUP_BIN /etc/csup.grunt
 
-note "Updating FreeBSD release with sources"
+note "Updating FreeBSD release and sources"
 $FREEBSDUPDATE_BIN fetch >> $LOG
 $FREEBSDUPDATE_BIN install >> $LOG
 
@@ -33,6 +33,14 @@ note "Some touches and removes from beginning. Shot first, questions later."
 $TOUCH_BIN /var/log/console.log
 $RM_BIN -rf /usr/home
 $MKDIR_BIN -p /usr/root
+# $RM_BIN -rf /boot/kernel.* # remove old kernels
+
+if [ ! -e "/usr/obj/usr/src/sys/$KERNEL_CONFIG" ]; then
+    note "Building and installing $KERNEL_CONFIG kernel"
+    . ${KERNELBUILDAPP}
+else
+    note "Kernel $KERNEL_CONFIG already built. Skipping"
+fi
 
 note "Filling additional configurations"
 echo "hostname=\"$HOST_NODE_NAME\"" >> $RC_CONF_FILE
