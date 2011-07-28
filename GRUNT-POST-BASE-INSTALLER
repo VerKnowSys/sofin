@@ -35,7 +35,7 @@ $RM_BIN -rf /usr/home
 $MKDIR_BIN -p /usr/root
 # $RM_BIN -rf /boot/kernel.* # remove old kernels
 
-if [ ! -e "/usr/obj/usr/src/sys/$KERNEL_CONFIG" ]; then
+if [ ! -e "/usr/obj/opt/src/sys/$KERNEL_CONFIG" ]; then
     note "Building and installing $KERNEL_CONFIG kernel"
     . ${KERNELBUILDAPP}
     echo 'vfs.zfs.prefetch_disable="1"' >> $BOOT_LOADER_CONF
