@@ -1,9 +1,9 @@
 #!/bin/sh
 
-export PACKAGESITE='http://ftp.freebsd.org/pub/FreeBSD/ports/amd64/packages-stable/Latest/'
+# NOTE: STABLE -> export PACKAGESITE='http://ftp.freebsd.org/pub/FreeBSD/ports/amd64/packages-stable/Latest/'
+export PACKAGESITE='http://ftp.freebsd.org/pub/FreeBSD/ports/amd64/packages-9-current/'
 
-
-VERSION="0.4.0"
+VERSION="0.5.0"
 
 # DEBUG="true"
 
@@ -26,9 +26,9 @@ DEFINITIONS_DIR="${SCRIPT_ROOT}definitions/"
 DEFAULTS="${DEFINITIONS_DIR}defaults.def"
 LOG="${SOFTWARE_DIR}INSTALL_LOG"
 PREFILES="${SCRIPT_ROOT}prefiles/etc/"
+DINSTAPP="$(pwd)/SOFTWARE-INSTALLER"
 SYSTEM_GET_SHELL_PATH="$DINSTAPP getshellpath"
 SYSTEM_GET_SHELL_LDLIB="$DINSTAPP getshellld"
-DINSTAPP="$(pwd)/SOFTWARE-INSTALLER"
 KERNELBUILDAPP="$(pwd)/GRUNT-KERNEL-BUILD"
 
 FREEBSDUPDATE_BIN="/usr/sbin/freebsd-update"
