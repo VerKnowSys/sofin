@@ -70,7 +70,7 @@
 # 5-stable, 4-stable, 3-stable, or 2.2-stable, change to "RELENG_7",
 # "RELENG_6", "RELENG_5", "RELENG_4", "RELENG_3", or "RELENG_2_2"
 # respectively.
-*default release=cvs tag=RELENG_8_2
+*default release=cvs tag=.
 *default delete use-rel-suffix
 
 # If you seem to be limited by CPU rather than network or disk bandwidth, try
@@ -88,29 +88,29 @@
 # These are the individual collections that make up "src-all".  If you
 # use these, be sure to comment out "src-all" above.
 src-base
-#src-bin
-#src-cddl
-#src-contrib
-#src-etc
+src-bin
+src-cddl
+src-contrib
+src-etc
 #src-games
 #src-gnu
-#src-include
-#src-kerberos5
+src-include
+src-kerberos5
 #src-kerberosIV
-#src-lib
-#src-libexec
+src-lib
+src-libexec
 #src-release
 #src-rescue
-#src-sbin
+src-sbin
 #src-share
 src-sys
-#src-tools
-#src-usrbin
-#src-usrsbin
+src-tools
+src-usrbin
+src-usrsbin
 # These are the individual collections that make up FreeBSD's crypto
 # collection. They are no longer export-restricted and are a part of
 # src-all
 src-crypto
-#src-eBones
+# src-eBones
 src-secure
 src-sys-crypto
