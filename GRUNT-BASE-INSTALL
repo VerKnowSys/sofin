@@ -1,0 +1,64 @@
+#!/bin/sh
+
+if [ ! -e $(pwd)/config ]; then
+    error "Unable to find config: $(pwd)/config"
+    exit
+fi
+. $(pwd)/config
+
+if [ ! "$($UNAME_BIN)" = "FreeBSD" ]; then
+    note "This script is designed to be executed on FreeBSD 8.x systems only."
+    exit 1
+fi
+
+
+kernel="kernel.tar.gz"
+base="clang_base_snapshot_9_b1.tar.gz"
+
+cd /opt
+if [ ! -e "/opt/${kernel}" ]; then # HACK
+    $FETCH_BIN $MAIN_SOURCE_REPOSITORY/${kernel}
+fi
+
+if [ ! -e "/opt/${base}" ]; then # HACK
+    $FETCH_BIN $MAIN_SOURCE_REPOSITORY/${base}
+fi
+
+if [ ! -d "/opt/clang_root" ]; then
+    $TAR_BIN xf ${base}
+fi
+
+
+cd /
+
+RMLIST="/lib /libexec /bin /boot /usr /sbin"
+for i in ${RMLIST}; do
+    note "Removing block flag on file: ${i}"
+    /rescue/chflags -R 0 ${i}
+done
+
+for i in ${RMLIST}; do
+   note "Removing: ${i}"
+   /rescue/rm -rf "${i}"
+   note "Installing: ${i}"
+   /rescue/cp -r /opt/clang_root${i} /
+done
+
+cd /boot
+
+/bin/chflags -R 0 /rescue
+$RM_BIN -rf /rescue
+$CP_BIN -r /opt/clang_root/rescue /
+
+cd /boot
+note "Installing kernel binary"
+/rescue/tar xf /opt/${kernel}
+
+note "Preparing src and obj links"
+$RM_BIN -rf /usr/src
+$RM_BIN -rf /usr/obj
+$LN_BIN -s /opt/obj /usr/obj
+$LN_BIN -s /opt/src /usr/src
+
+note "Done"
+exit
