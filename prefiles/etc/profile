@@ -17,4 +17,4 @@
 # Allow terminal messages
 # mesg y
 
-export PACKAGESITE="http://ftp.freebsd.org/pub/FreeBSD/ports/amd64/packages-stable/Latest/"
+export PACKAGESITE='http://ftp.freebsd.org/pub/FreeBSD/ports/amd64/packages-9-current/'
