@@ -13,7 +13,7 @@ fi
 
 
 kernel="kernel.tar.gz"
-base="clang_base_snapshot_9_b1.tar.gz"
+base="${SNAPSHOT_ROOT}"
 
 cd /opt
 if [ ! -e "/opt/${kernel}" ]; then # HACK

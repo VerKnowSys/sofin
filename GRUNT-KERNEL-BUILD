@@ -18,13 +18,20 @@ if [ ! -e "/usr/src/sys" ]; then
     exit 1
 fi
 
+note "Fetching FreeBSD sources for development server (grunt)"
+$CSUP_BIN /etc/csup.grunt
+
+note "Updating FreeBSD release and sources"
+$FREEBSDUPDATE_BIN fetch >> $LOG
+$FREEBSDUPDATE_BIN install >> $LOG
+
 note "Linking $KERNEL_CONFIG kernel config"
 $RM_BIN "/usr/src/sys/amd64/conf/${KERNEL_CONFIG}"
 $LN_BIN -s "$(pwd)/${KERNEL_CONFIG}" /usr/src/sys/amd64/conf/${KERNEL_CONFIG}
 
 cd /usr/src
 $BSDMAKE_BIN cleandir
-$BSDMAKE_BIN buildkernel KERNCONF=$KERNEL_CONFIG && \
+$BSDMAKE_BIN -j2 buildkernel KERNCONF=$KERNEL_CONFIG && \
 $BSDMAKE_BIN installkernel KERNCONF=$KERNEL_CONFIG && \
 note "Done"
 

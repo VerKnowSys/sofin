@@ -18,23 +18,31 @@ if [ ! -e "/usr/src/sys" ]; then
     exit 1
 fi
 
+note "Fetching FreeBSD sources for development server (grunt)"
+$CSUP_BIN /etc/csup.grunt
+
+note "Updating FreeBSD release and sources"
+$FREEBSDUPDATE_BIN fetch >> $LOG
+$FREEBSDUPDATE_BIN install >> $LOG
+
 note "Linking $KERNEL_CONFIG kernel config"
 $RM_BIN "/usr/src/sys/amd64/conf/${KERNEL_CONFIG}"
-$LN_BIN -s "$(pwd)/${KERNEL_CONFIG}" /usr/src/sys/amd64/conf/${KERNEL_CONFIG}
+$LN_BIN -s "$(pwd)/${KERNEL_CONFIG}" "/usr/src/sys/amd64/conf/${KERNEL_CONFIG}"
 
 
 MTREE_PATH="/opt/src/etc/mtree/"
 
 cd /usr/src
-$MKDIR_BIN -p /opt/clang_root
+$MKDIR_BIN -p "${SNAPSHOT_ROOT}"
 
-/bin/chflags -R 0 /opt/clang_root && \
-$RM_BIN -rf /opt/clang_root && \
-$BSDMAKE_BIN buildworld && \
-$CP_BIN rvf ${SCRIPT_ROOT}prefiles/${MTREE_PATH}BSD.var.dist "${MTREE_PATH}" && \
-$CP_BIN rvf ${SCRIPT_ROOT}prefiles/${MTREE_PATH}BSD.usr.dist "${MTREE_PATH}" && \
-$CP_BIN rvf ${SCRIPT_ROOT}prefiles/${MTREE_PATH}BIND.chroot.dist "${MTREE_PATH}" && \
-$BSDMAKE_BIN installworld DESTDIR=/opt/clang_root && \
+/bin/chflags -R 0 "${SNAPSHOT_ROOT}" && \
+$RM_BIN -rf "${SNAPSHOT_ROOT}" && \
+$BSDMAKE_BIN -j2 buildworld && \
+$CP_BIN rv "${SCRIPT_ROOT}prefiles/${MTREE_PATH}BSD.var.dist" "${MTREE_PATH}" && \
+$CP_BIN rv "${SCRIPT_ROOT}prefiles/${MTREE_PATH}BSD.usr.dist" "${MTREE_PATH}" && \
+$CP_BIN rv "${SCRIPT_ROOT}prefiles/${MTREE_PATH}BIND.chroot.dist" "${MTREE_PATH}" && \
+$BSDMAKE_BIN installworld DESTDIR="${SNAPSHOT_ROOT}" && \
+$TAR_BIN cfv "/opt/${SNAPSHOT_NAME}.tar.gz" "${SNAPSHOT_ROOT}"
 note "Done"
 
 exit
