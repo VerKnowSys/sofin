@@ -1,0 +1,24 @@
+#!/bin/sh
+
+. $(pwd)/config
+
+if [ ! -e "${SOFTWARE_DIR}" ]; then
+    error "Unable to find software directory: ${SOFTWARE_DIR}. Try to run GRUNT-POST-BASE-INSTALLER first"
+    exit
+fi
+
+if [ ! "$($UNAME_BIN)" = "FreeBSD" ]; then
+    note "This script is designed to be executed on FreeBSD 8.x systems only."
+    exit 1
+fi
+
+
+cd "${SOFTWARE_DIR}"
+for element in *; do
+    note "Preparing archive of: $element"
+    $TAR_BIN cf ${element}.tar.gz ./${element}
+done
+
+
+note "Done"
+exit
