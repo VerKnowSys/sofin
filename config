@@ -1,9 +1,9 @@
 #!/bin/sh
 
-# NOTE: STABLE -> export PACKAGESITE='http://ftp.freebsd.org/pub/FreeBSD/ports/amd64/packages-stable/Latest/'
-export PACKAGESITE='http://ftp.freebsd.org/pub/FreeBSD/ports/amd64/packages-9-current/'
+export PACKAGESITE='http://ftp.freebsd.org/pub/FreeBSD/ports/amd64/packages-stable/Latest/'
+# NOTE: 9.0 -> export PACKAGESITE='http://ftp.freebsd.org/pub/FreeBSD/ports/amd64/packages-9-current/'
 
-VERSION="0.5.0"
+VERSION="0.6.0"
 
 # DEBUG="true"
 
