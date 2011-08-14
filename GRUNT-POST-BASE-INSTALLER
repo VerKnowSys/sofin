@@ -18,37 +18,16 @@ for i in ${RMLIST}; do
    $RM_BIN -rf "$i"
 done
 
-# First copy prefiles to destination directory (includes freebsd-update, src & make configurations, which must be ready before building kernel)
-note "Copying ${PREFILES} to /etc"
-$CP_BIN -r "${PREFILES}" /etc
-
-note "Fetching FreeBSD sources for development server (grunt)"
-$CSUP_BIN /etc/csup.grunt
-
-note "Updating FreeBSD release and sources"
-$FREEBSDUPDATE_BIN fetch >> $LOG
-$FREEBSDUPDATE_BIN install >> $LOG
-
 note "Some touches and removes from beginning. Shot first, questions later."
 $TOUCH_BIN /var/log/console.log
 $RM_BIN -rf /usr/home
 $MKDIR_BIN -p /usr/root
 # $RM_BIN -rf /boot/kernel.* # remove old kernels
 
-if [ ! -e "/usr/obj/opt/src/sys/$KERNEL_CONFIG" ]; then
-    note "Building and installing $KERNEL_CONFIG kernel"
-    . ${KERNELBUILDAPP}
-    echo 'vfs.zfs.prefetch_disable="1"' >> $BOOT_LOADER_CONF
-    echo 'vfs.zfs.txg.timeout="5"' >> $BOOT_LOADER_CONF
-    echo 'vfs.zfs.zil_disable="0"' >> $BOOT_LOADER_CONF
-else
-    note "Kernel $KERNEL_CONFIG already built. Skipping"
-fi
-
 note "Filling additional configurations"
 echo "hostname=\"$HOST_NODE_NAME\"" >> $RC_CONF_FILE
 
-note "Setting interfaces.."
+note "Setting network interfaces.."
 for interface in $($IFCONFIG_BIN -l); do
     if [ ! "$interface" = "lo0" ]; then
         echo "ifconfig_${interface}=\"DHCP\"" >> $RC_CONF_FILE
@@ -112,9 +91,6 @@ note "Building ServeD"
 cd /opt/ServeD
 sbt update
 sbt compile
-
-note "Installing required native libraries for OpenJDK" # XXX: hardcoded
-$CP_BIN /opt/ServeD/libs.native.64/FreeBSD_8_1/libsigar-amd64-freebsd-8.so /Software/Openjdk-1.6.0-b22/jre/lib/amd64/
 
 # note "Setting time zone"
 # $TZSETUP_BIN

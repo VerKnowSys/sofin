@@ -13,10 +13,10 @@ if [ ! "$($UNAME_BIN)" = "FreeBSD" ]; then
     exit 1
 fi
 
-if [ ! -e "/usr/src/sys" ]; then
-    note "Use sysinstall first and install BSD kernel sources"
-    exit 1
-fi
+# First copy prefiles to destination directory (includes freebsd-update, src & make configurations, which must be ready before building kernel)
+$MKDIR_BIN -p "$SOFTWARE_DIR"
+note "Copying ${PREFILES} to /etc"
+$CP_BIN -r "${PREFILES}" /etc
 
 note "Fetching FreeBSD sources for development server (grunt)"
 $CSUP_BIN /etc/csup.grunt
@@ -30,13 +30,14 @@ $RM_BIN "/usr/src/sys/amd64/conf/${KERNEL_CONFIG}"
 $LN_BIN -s "$(pwd)/${KERNEL_CONFIG}" /usr/src/sys/amd64/conf/${KERNEL_CONFIG}
 
 cd /usr/src
-$BSDMAKE_BIN cleandir
+$BSDMAKE_BIN cleandir >> $LOG
 $BSDMAKE_BIN -j2 buildkernel KERNCONF=$KERNEL_CONFIG && \
 $BSDMAKE_BIN installkernel KERNCONF=$KERNEL_CONFIG && \
 note "Done"
 
-# $BSDMAKE_BIN buildworld && \
-# mergemaster -p && \
-# $BSDMAKE_BIN installworld && \
+note "Enabling some additional options in $BOOT_LOADER_CONF"
+echo 'vfs.zfs.prefetch_disable="1"' >> $BOOT_LOADER_CONF
+echo 'vfs.zfs.txg.timeout="5"' >> $BOOT_LOADER_CONF
+echo 'vfs.zfs.zil_disable="0"' >> $BOOT_LOADER_CONF
 
 exit
