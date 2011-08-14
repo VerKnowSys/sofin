@@ -1,0 +1,6 @@
+APP_FULL_NAME="Nginx"
+APP_NAME="nginx"
+APP_VERSION="1.0.5"
+APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
+APP_REQUIREMENTS="make pcre"
+APP_CONFIGURE_ARGS="--with-pcre --with-pcre=${SOFTWARE_DIR}Nginx-${APP_VERSION}/include"
