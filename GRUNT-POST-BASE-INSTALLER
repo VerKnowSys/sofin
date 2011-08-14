@@ -89,8 +89,7 @@ fi
 
 note "Building ServeD"
 cd /opt/ServeD
-sbt update
-sbt compile
+bin/sbt compile
 
 # note "Setting time zone"
 # $TZSETUP_BIN
