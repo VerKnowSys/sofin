@@ -1,0 +1,76 @@
+#!/bin/sh
+
+. ./config
+. definitions/defaults.def
+
+check_root () {
+    if [ ! "$($ID_BIN -u)" = "0" ]; then
+        error "This command should be run as root."
+        exit
+    fi
+}
+
+check_root
+
+
+PREFIX="/Software/Coreginx/"
+BUILD_DIR="/tmp/coreginx/"
+
+
+NGINX_NAME="nginx"
+NGINX_VERSION="1.0.5"
+NGINX_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${NGINX_NAME}-${NGINX_VERSION}.tar.gz"
+
+PCRE_NAME="pcre"
+PCRE_VERSION="8.12"
+PCRE_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${PCRE_NAME}-${PCRE_VERSION}.tar.gz"
+
+
+APP_CONFIGURE_ARGS="--with-ipv6 --with-http_gzip_static_module --with-http_ssl_module --with-pcre=${BUILD_DIR}${PCRE_NAME}-${PCRE_VERSION}"
+
+
+LOG="${BUILD_DIR}NGINX-LOG"
+
+
+run () {
+    if [ ! -z "$1" ]; then
+        export PATH="${PREFIX}bin:${PREFIX}sbin:${DEFAULT_PATH}"
+        export LD_LIBRARY_PATH="${PREFIX}lib:${PREFIX}libexec"
+        debug "PATH: $PATH" >> "$LOG"
+        debug "CXXFLAGS: $CXXFLAGS" >> "$LOG"
+        debug "CFLAGS: $CFLAGS" >> "$LOG"
+        debug "LDFLAGS: $LDFLAGS" >> "$LOG"
+        debug "LD_LIBRARY_PATH: $LD_LIBRARY_PATH" >> "$LOG"
+        eval PATH=$PATH $@ 1>> "$LOG" 2>> "$LOG"
+    else
+        error "Empty command to run?"
+        exit
+    fi
+}
+
+
+if [ ! -d "$BUILD_DIR" ]; then
+    rm -rf "$BUILD_DIR"
+    mkdir -p "$BUILD_DIR"
+fi
+cd "$BUILD_DIR"
+
+
+run $FETCH_BIN $NGINX_HTTP_PATH
+run $FETCH_BIN $PCRE_HTTP_PATH
+
+run $TAR_BIN xf ${BUILD_DIR}${NGINX_NAME}*
+run $TAR_BIN xf ${BUILD_DIR}${PCRE_NAME}*
+
+
+cd $BUILD_DIR${NGINX_NAME}-${NGINX_VERSION}
+export CXXFLAGS="-I${PREFIX}include $APP_COMPILER_ARGS"
+export CFLAGS="-I${PREFIX}include $APP_COMPILER_ARGS"
+export LDFLAGS="-L${PREFIX}lib $APP_LINKER_ARGS"
+
+echo "Proceeding in dir: $(pwd)"
+echo "Executing ${APP_CONFIGURE_SCRIPT} ${APP_CONFIGURE_ARGS} --prefix=${PREFIX}"
+run ${APP_CONFIGURE_SCRIPT} "--prefix=${PREFIX} ${APP_CONFIGURE_ARGS}"
+echo "Executing ${APP_MAKE_METHOD}"
+run ${APP_MAKE_METHOD}
+run ${APP_INSTALL_METHOD}
