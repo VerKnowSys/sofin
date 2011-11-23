@@ -10,37 +10,37 @@
 # currently using an X display server, you should run CVSup as follows
 # to keep your CVS tree up-to-date:
 #
-#	cvsup stable-supfile
+#   cvsup stable-supfile
 #
 # If not running X, or invoking cvsup from a non-interactive script, then
 # run it as follows:
 #
-#	cvsup -g -L 2 stable-supfile
+#   cvsup -g -L 2 stable-supfile
 #
 # You may wish to change some of the settings in this file to better
 # suit your system:
 #
 # host=CHANGE_THIS.FreeBSD.org
-#		This specifies the server host which will supply the
-#		file updates.  You must change it to one of the CVSup
-#		mirror sites listed in the FreeBSD Handbook at
-#		http://www.freebsd.org/doc/handbook/mirrors.html.
-#		You can	override this setting on the command line
-#		with cvsup's "-h host" option.
+#       This specifies the server host which will supply the
+#       file updates.  You must change it to one of the CVSup
+#       mirror sites listed in the FreeBSD Handbook at
+#       http://www.freebsd.org/doc/handbook/mirrors.html.
+#       You can override this setting on the command line
+#       with cvsup's "-h host" option.
 #
 # base=/var/db
-#		This specifies the root where CVSup will store information
-#		about the collections you have transferred to your system.
-#		A setting of "/var/db" will generate this information in
-#		/var/db/sup.  You can override the "base" setting on the
-#		command line with cvsup's "-b base" option.  This directory
-#		must exist in order to run CVSup.
+#       This specifies the root where CVSup will store information
+#       about the collections you have transferred to your system.
+#       A setting of "/var/db" will generate this information in
+#       /var/db/sup.  You can override the "base" setting on the
+#       command line with cvsup's "-b base" option.  This directory
+#       must exist in order to run CVSup.
 #
 # prefix=/usr
-#		This specifies where to place the requested files.  A
-#		setting of "/usr" will place all of the files requested
-#		in "/usr/src" (e.g., "/usr/src/bin", "/usr/src/lib").
-#		The prefix directory must exist in order to run CVSup.
+#       This specifies where to place the requested files.  A
+#       setting of "/usr" will place all of the files requested
+#       in "/usr/src" (e.g., "/usr/src/bin", "/usr/src/lib").
+#       The prefix directory must exist in order to run CVSup.
 #
 ###############################################################################
 #
@@ -54,7 +54,7 @@
 #
 # If you leave out the "tag=." portion, CVSup will delete all of
 # the files in your ports or doc tree.  That is because the ports and doc
-# collections do not use the same tags as the main part of the FreeBSD 
+# collections do not use the same tags as the main part of the FreeBSD
 # source tree.
 #
 ###############################################################################
@@ -70,7 +70,7 @@
 # 5-stable, 4-stable, 3-stable, or 2.2-stable, change to "RELENG_7",
 # "RELENG_6", "RELENG_5", "RELENG_4", "RELENG_3", or "RELENG_2_2"
 # respectively.
-*default release=cvs tag=RELENG_8_2
+*default release=cvs tag=RELENG_9
 *default delete use-rel-suffix
 
 # If you seem to be limited by CPU rather than network or disk bandwidth, try
@@ -83,34 +83,34 @@
 # The easiest way to get the main source tree is to use the "src-all"
 # mega-collection.  It includes all of the individual "src-*" collections.
 # Please note:  If you want to track -STABLE, leave this uncommented.
-#src-all
+src-all
 
 # These are the individual collections that make up "src-all".  If you
 # use these, be sure to comment out "src-all" above.
-src-base
-src-bin
-src-cddl
-src-contrib
-src-etc
+# src-base
+# src-bin
+# src-cddl
+# src-contrib
+# src-etc
 #src-games
 #src-gnu
-src-include
-src-kerberos5
+# src-include
+# src-kerberos5
 #src-kerberosIV
-src-lib
-src-libexec
+# src-lib
+# src-libexec
 #src-release
 #src-rescue
-src-sbin
+# src-sbin
 #src-share
-src-sys
-src-tools
-src-usrbin
-src-usrsbin
+# src-sys
+# src-tools
+# src-usrbin
+# src-usrsbin
 # These are the individual collections that make up FreeBSD's crypto
 # collection. They are no longer export-restricted and are a part of
 # src-all
-src-crypto
+# src-crypto
 # src-eBones
-src-secure
-src-sys-crypto
+# src-secure
+# src-sys-crypto
