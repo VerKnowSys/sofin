@@ -35,9 +35,9 @@ $BSDMAKE_BIN -j2 buildkernel KERNCONF=$KERNEL_CONFIG && \
 $BSDMAKE_BIN installkernel KERNCONF=$KERNEL_CONFIG && \
 note "Done"
 
-note "Enabling some additional options in $BOOT_LOADER_CONF"
-echo 'vfs.zfs.prefetch_disable="1"' >> $BOOT_LOADER_CONF
-echo 'vfs.zfs.txg.timeout="5"' >> $BOOT_LOADER_CONF
-echo 'vfs.zfs.zil_disable="0"' >> $BOOT_LOADER_CONF
+# note "Enabling some additional options in $BOOT_LOADER_CONF"
+# echo 'vfs.zfs.prefetch_disable="1"' >> $BOOT_LOADER_CONF
+# echo 'vfs.zfs.txg.timeout="5"' >> $BOOT_LOADER_CONF
+# echo 'vfs.zfs.zil_disable="0"' >> $BOOT_LOADER_CONF
 
 exit

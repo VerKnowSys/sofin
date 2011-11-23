@@ -26,8 +26,8 @@ $FREEBSDUPDATE_BIN fetch >> $LOG
 $FREEBSDUPDATE_BIN install >> $LOG
 
 note "Linking $KERNEL_CONFIG kernel config"
-$RM_BIN "/usr/src/sys/amd64/conf/${KERNEL_CONFIG}"
-$LN_BIN -s "$(pwd)/${KERNEL_CONFIG}" "/usr/src/sys/amd64/conf/${KERNEL_CONFIG}"
+$RM_BIN "/usr/src/sys/${SYSTEM_ARCH}/conf/${KERNEL_CONFIG}"
+$LN_BIN -s "$(pwd)/${KERNEL_CONFIG}" "/usr/src/sys/${SYSTEM_ARCH}/conf/${KERNEL_CONFIG}"
 
 
 MTREE_PATH="/opt/src/etc/mtree/"

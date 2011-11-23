@@ -7,10 +7,10 @@ if [ ! -e "${SOFTWARE_DIR}" ]; then
     exit
 fi
 
-if [ ! "$($UNAME_BIN)" = "FreeBSD" ]; then
-    note "This script is designed to be executed on FreeBSD 8.x systems only."
-    exit 1
-fi
+# if [ ! "$($UNAME_BIN)" = "FreeBSD" ]; then
+#     note "This script is designed to be executed on FreeBSD 8.x systems only."
+#     exit 1
+# fi
 
 
 cd "${SOFTWARE_DIR}"
@@ -19,6 +19,8 @@ for element in *; do
     $TAR_BIN cf ${element}.tar.gz ./${element}
 done
 
+
+note "Creating software index for current architecture"
 
 note "Done"
 exit
