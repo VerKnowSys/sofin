@@ -1,20 +1,26 @@
 #!/bin/sh
 
-export PACKAGESITE='http://ftp.freebsd.org/pub/FreeBSD/ports/amd64/packages-stable/Latest/'
-# NOTE: 9.0 -> export PACKAGESITE='http://ftp.freebsd.org/pub/FreeBSD/ports/amd64/packages-9-current/'
+#export PACKAGESITE='http://ftp.freebsd.org/pub/FreeBSD/ports/amd64/packages-stable/Latest/'
+# NOTE: 9.0 ->
+export PACKAGESITE='http://ftp.freebsd.org/pub/FreeBSD/ports/amd64/packages-9-current/'
 
-VERSION="0.6.0"
+VERSION="0.7.0"
 
-# DEBUG="true"
+DEBUG="true"
 
-MAIN_SOURCE_REPOSITORY="http://software.verknowsys.com/"
-HOST_NODE_NAME="grunt-$(/sbin/sha1 -qs \\"`date`\\")"
+OPTDIR="/opt/"
+CONFDIR="/etc/"
+OPENJDK7_FBSD9_32BIT_BUILD_NAME="openjdk7_fbsd9.tar.gz"
+SYSTEM_ARCH=$(uname -p)
+MAIN_SOURCE_REPOSITORY="http://software.verknowsys.com/source/"
+MAIN_BINARY_REPOSITORY="http://software.verknowsys.com/binary/${SYSTEM_ARCH}/"
+HOST_NODE_NAME="drahk-grunt" #-$(/sbin/sha1 -qs \\"`date`\\")"
 DEFAULT_PATH="/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin"
 SNAPSHOT_NAME="clang_fbsd64_9_basesystem_snapshot"
-SNAPSHOT_ROOT="/opt/clang_root"
+SNAPSHOT_ROOT="$OPTDIR/clang_root"
 DFS_MOUNT_POINT="/dfs"
 DFS_CACHE_DIR="/var/dfs/cache"
-SCRIPT_ROOT="/opt/SvdOpt/"
+SCRIPT_ROOT="$OPTDIR/SvdOpt/"
 SOFTWARE_DIR="/Software/"
 TMP_ROOT="/var/SvdOpt/"
 DEFAULT_SSH_PORT="60022"
@@ -32,7 +38,6 @@ DINSTAPP="$(pwd)/SOFTWARE-INSTALLER"
 SYSTEM_GET_SHELL_PATH="$DINSTAPP getshellpath"
 SYSTEM_GET_SHELL_LDLIB="$DINSTAPP getshellld"
 KERNELBUILDAPP="$(pwd)/GRUNT-KERNEL-BUILD"
-
 FREEBSDUPDATE_BIN="/usr/sbin/freebsd-update"
 PORTSNAP_BIN="/usr/sbin/portsnap"
 CSUP_BIN="/usr/bin/csup"
@@ -72,7 +77,7 @@ BASENAME_BIN="/usr/bin/basename"
 TZSETUP_BIN="/usr/sbin/tzsetup"
 
 if [ $($UNAME_BIN) = "Darwin" ]; then
-FETCH_BIN="/usr/bin/curl -L -O"
+FETCH_BIN="/usr/bin/curl --progress-bar -C - -L -O"
 fi
 
 
