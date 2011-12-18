@@ -11,12 +11,22 @@ if [ ! "$($UNAME_BIN)" = "FreeBSD" ]; then
     exit 1
 fi
 
-RMLIST="/media /mnt /proc /srv /cdrom /root /home /COPYRIGHT /etc/bluetooth /etc/rc.d/sendmail /etc/mail /etc/ntp /etc/ppp /etc/skel /etc/X11 /etc/csh.* /etc/ftpusers /etc/hosts.lpd /etc/mail.rc /usr/sbin/sendmail /usr/bin/mail /var/mail"
+$MKDIR_BIN ${OPTDIR} > /dev/null
+note "Getting OpenJDK"
+cd ${OPTDIR}
+$FETCH_BIN "${MAIN_BINARY_REPOSITORY}/common/${OPENJDK7_FBSD9_32BIT_BUILD_NAME}"
+$TAR_BIN xf "${OPENJDK7_FBSD9_32BIT_BUILD_NAME}"
+export JAVA_HOME="${OPTDIR}/openjdk7"
+
+RMLIST="/usr/libexec/sendmail /mnt /proc /srv /cdrom /root /home /COPYRIGHT /etc/bluetooth /etc/rc.d/sendmail /etc/mail /etc/X11 /etc/csh.* /etc/ftpusers /etc/hosts.lpd /etc/mail.rc /usr/sbin/sendmail /usr/bin/mail /var/mail"
 
 for i in ${RMLIST}; do
    debug "Removing: $i"
    $RM_BIN -rf "$i"
 done
+
+note "Copying ${PREFILES} to /etc"
+$CP_BIN -r "${PREFILES}" /etc
 
 note "Some touches and removes from beginning. Shot first, questions later."
 $TOUCH_BIN /var/log/console.log
@@ -41,7 +51,7 @@ note "Installing base in ${SOFTWARE_DIR}"
 $DINSTAPP lists/base
 
 note "Setting PATH & LDDIR"
-echo $($SYSTEM_GET_SHELL_PATH) >> /etc/profile
+echo "$($SYSTEM_GET_SHELL_PATH):$JAVA_HOME" >> /etc/profile
 echo "" >> /etc/profile
 echo $($SYSTEM_GET_SHELL_LDLIB) >> /etc/profile
 echo "" >> /etc/profile
@@ -65,7 +75,7 @@ done
 
 note "Updating ssh config"
 echo "" >> /etc/ssh/ssh_config
-echo "Host verknowsys.com git.verknowsys.com fiend.pl" >> /etc/ssh/ssh_config
+echo "Host verknowsys.com git.verknowsys.com" >> /etc/ssh/ssh_config
 echo "Port $DEFAULT_SSH_PORT" >> /etc/ssh/ssh_config
 
 # note "Syncing to NTP server"
@@ -73,6 +83,7 @@ echo "Port $DEFAULT_SSH_PORT" >> /etc/ssh/ssh_config
 
 note "Restarting system services"
 for service in ${SERVICES}; do
+    note "$service"
     service $service restart 2>> $LOG >> $LOG &
 done
 
@@ -81,14 +92,14 @@ cd ${TMP_ROOT}
 if [ -d ${TMP_ROOT}/ServeD ]; then
     cd ${TMP_ROOT}/ServeD
     git pull origin master
-    $CP_BIN -r ${TMP_ROOT}/ServeD /opt
+    $CP_BIN -r ${TMP_ROOT}/ServeD ${OPTDIR}
 else
     git clone ssh://tunemates@git.verknowsys.com/git/ServeD.git
-    $CP_BIN -r ${TMP_ROOT}/ServeD /opt
+    $CP_BIN -r ${TMP_ROOT}/ServeD ${OPTDIR}
 fi
 
 note "Building ServeD"
-cd /opt/ServeD
+cd ${OPTDIR}/ServeD
 bin/sbt compile
 
 # note "Setting time zone"
