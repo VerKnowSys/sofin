@@ -1,8 +1,0 @@
-. ./config
-APP_FULL_NAME="OpenJDK 6 (tools included: sbt, ant, maven)"
-APP_NAME="openjdk"
-APP_VERSION="1.6.0-b22"
-SBT_VERSION="0.7.7"
-APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}6-${APP_VERSION}.tar.gz"
-APP_CONFIGURE_SCRIPT="binary"
-APP_AFTER_INSTALL_CALLBACK="$CP_BIN -R ${TMP_ROOT}openjdk-${APP_VERSION}/openjdk6 ${SOFTWARE_DIR}Openjdk-${APP_VERSION} && echo 'exec java -Xmx512M -jar ${SOFTWARE_DIR}Openjdk-${APP_VERSION}/lib/sbt-launch-${SBT_VERSION}.jar \"\$@\"' >> ${SOFTWARE_DIR}Openjdk-${APP_VERSION}/bin/sbt && mount -t fdescfs fdesc /dev/fd"
