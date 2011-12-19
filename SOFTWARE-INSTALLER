@@ -198,9 +198,9 @@ for application in $APPLICATIONS; do
                 export ALLOW=1
                 if [ ! "$DISABLE_ON" = "" ]; then
                     for disabled in $DISABLE_ON; do
-                        debug "Running system: $($UNAME_BIN)"
+                        debug "Running system: $SYSTEM_NAME"
                         debug "DisableOn element: $disabled"
-                        if [ $($UNAME_BIN) = "$disabled" ]; then
+                        if [ "$SYSTEM_NAME" = "$disabled" ]; then
                             export ALLOW=0
                         fi
                     done
@@ -285,7 +285,7 @@ for application in $APPLICATIONS; do
                         cd $CUR_DIR
                     fi
                 else
-                    note "This bundle is disabled on current architecture ($($UNAME_BIN)). Skipped"
+                    note "This bundle is disabled on current architecture ($SYSTEM_NAME). Skipped"
                 fi
             }
 
