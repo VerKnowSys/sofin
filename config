@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# LD_LIBRARY_PATH on linux: /lib/ld-2.11.2.so --library-path /Software/Git-1.7.5/lib /Software/Git-1.7.5/bin/git
+
 #export PACKAGESITE='http://ftp.freebsd.org/pub/FreeBSD/ports/amd64/packages-stable/Latest/'
 # NOTE: 9.0 ->
 export PACKAGESITE='http://ftp.freebsd.org/pub/FreeBSD/ports/amd64/packages-9-current/'
@@ -12,6 +14,7 @@ OPTDIR="/opt/"
 CONFDIR="/etc/"
 OPENJDK7_FBSD9_32BIT_BUILD_NAME="openjdk7_fbsd9.tar.gz"
 SYSTEM_ARCH=$(uname -p)
+SYSTEM_NAME=$(uname)
 MAIN_SOURCE_REPOSITORY="http://software.verknowsys.com/source/"
 MAIN_BINARY_REPOSITORY="http://software.verknowsys.com/binary/${SYSTEM_ARCH}/"
 HOST_NODE_NAME="drahk-grunt" #-$(/sbin/sha1 -qs \\"`date`\\")"
@@ -58,7 +61,6 @@ LS_BIN="/bin/ls"
 CAT_BIN="/bin/cat"
 RM_BIN="/bin/rm"
 MKDIR_BIN="/bin/mkdir"
-UNAME_BIN="/usr/bin/uname"
 TOUCH_BIN="/usr/bin/touch"
 TAR_BIN="/usr/bin/tar"
 ID_BIN="/usr/bin/id"
@@ -66,7 +68,6 @@ GREP_BIN="/usr/bin/grep"
 IFCONFIG_BIN="/sbin/ifconfig"
 LDCONFIG_BIN="/sbin/ldconfig"
 TAIL_BIN="/usr/bin/tail"
-FETCH_BIN="/usr/bin/fetch"
 CHMOD_BIN="/bin/chmod"
 CHOWN_BIN="/usr/sbin/chown"
 FIND_BIN="/usr/bin/find"
@@ -75,9 +76,18 @@ PWD_MKDB_BIN="/usr/sbin/pwd_mkdb"
 MKTEMP_BIN="/usr/bin/mktemp"
 BASENAME_BIN="/usr/bin/basename"
 TZSETUP_BIN="/usr/sbin/tzsetup"
+FETCH_BIN="/usr/bin/fetch"
 
-if [ $($UNAME_BIN) = "Darwin" ]; then
-FETCH_BIN="/usr/bin/curl --progress-bar -C - -L -O"
+if [ "$SYSTEM_NAME" = "Linux" ]; then
+    SED_BIN="/bin/sed"
+    MKTEMP_BIN="/bin/mktemp"
+    TAR_BIN="/bin/tar"
+    FETCH_BIN="/usr/bin/wget"
+    GREP_BIN="/bin/grep"
+fi
+
+if [ "$SYSTEM_NAME" = "Darwin" ]; then
+    FETCH_BIN="/usr/bin/curl --progress-bar -C - -L -O"
 fi
 
 
