@@ -15,16 +15,16 @@ fi
 kernel="kernel.tar.gz"
 base="${SNAPSHOT_ROOT}"
 
-cd /opt
-if [ ! -e "/opt/${kernel}" ]; then # HACK
+cd ${OPTDIR}
+if [ ! -e "${OPTDIR}${kernel}" ]; then # HACK
     $FETCH_BIN $MAIN_SOURCE_REPOSITORY/${kernel}
 fi
 
-if [ ! -e "/opt/${base}" ]; then # HACK
+if [ ! -e "${OPTDIR}${base}" ]; then # HACK
     $FETCH_BIN $MAIN_SOURCE_REPOSITORY/${base}
 fi
 
-if [ ! -d "/opt/clang_root" ]; then
+if [ ! -d "${OPTDIR}clang_root" ]; then
     $TAR_BIN xf ${base}
 fi
 
