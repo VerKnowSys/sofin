@@ -70,7 +70,7 @@ debug "Default path set ($DEFAULT_PATH)"
 
 if [ ! "$1" = "" ]; then
     case $1 in
-    
+
     list)
         note "Listing of installed software:"
         if [ -d $SOFTWARE_DIR ]; then
@@ -80,14 +80,14 @@ if [ ! "$1" = "" ]; then
         fi
         exit
         ;;
-        
+
     destroyall)
         note "All applications and libraries will be permanently destroyed in $SOFTWARE_DIR"
         $RM_BIN -rf "$SOFTWARE_DIR"
         note "Done."
         exit
         ;;
-    
+
     getshellpath)
         result="$DEFAULT_PATH"
         for app in $SOFTWARE_DIR*; do
@@ -105,7 +105,7 @@ if [ ! "$1" = "" ]; then
         unset result
         exit
         ;;
-    
+
     getshellld)
         ldresult="/lib:/usr/lib"
         for lib in $SOFTWARE_DIR*; do
@@ -120,7 +120,7 @@ if [ ! "$1" = "" ]; then
         unset ldresult
         exit
         ;;
-        
+
     *)
         if [ ! -e $1 ]; then
             error "Definition not found: $1"
@@ -129,7 +129,7 @@ if [ ! "$1" = "" ]; then
         export APPLICATIONS="$($CAT_BIN $1 | $TR_BIN '\n' ' ')"
         note "Parsing definitions: $APPLICATIONS"
         ;;
-        
+
     esac
 else
     usage_howto
@@ -141,12 +141,12 @@ check_requirements
 check_root
 
 for application in $APPLICATIONS; do
-    
+
     for definition in "$DEFINITIONS_DIR$application".def; do
         debug "Reading definition: $definition"
         . $DEFAULTS
         . $definition
-        
+
         # fancy old style Capitalize
         APP_NAME="$(echo "$APP_NAME" | $CUT_BIN -c1 | $TR_BIN '[a-z]' '[A-Z]')$(echo "$APP_NAME" | $SED_BIN 's/^[a-zA-Z]//')"
         note
@@ -173,7 +173,7 @@ for application in $APPLICATIONS; do
                     definition_dir_check
                     if [ ! -e "$LOG" ]; then
                         $TOUCH_BIN "$LOG"
-                    fi        
+                    fi
                     debug "Running '$@' @ `$DATE_BIN`" >> "$LOG"
                     eval PATH=$PATH $@ 1>> "$LOG" 2>> "$LOG"
                     check_command_result $?
@@ -205,7 +205,7 @@ for application in $APPLICATIONS; do
                         fi
                     done
                 fi
-                
+
                 if [ "$ALLOW" = "1" ]; then
                     if [ -z "$APP_HTTP_PATH" ]; then
                         debug "After install callback: $APP_AFTER_INSTALL_CALLBACK"
@@ -295,10 +295,26 @@ for application in $APPLICATIONS; do
                 execute_process $req
             done
             execute_process $application
+
+            # making app symlink to current version of given app
+            req_definition_file="$DEFINITIONS_DIR$application.def"
+            . $DEFAULTS
+            . $req_definition_file
+            if [ -z $APP_POSTFIX ]; then
+                export PREFIX=$SOFTWARE_DIR$APP_NAME-$APP_VERSION
+            else
+                export PREFIX=$SOFTWARE_DIR$APP_NAME-$APP_VERSION-$APP_POSTFIX
+            fi
+            APP_NAME="$(echo "$APP_NAME" | $CUT_BIN -c1 | $TR_BIN '[a-z]' '[A-Z]')$(echo "$APP_NAME" | $SED_BIN 's/^[a-zA-Z]//')"
+            note "Removing current symlink to latest version of $APP_NAME"
+            $RM_BIN -f $SOFTWARE_DIR$APP_NAME
+            note "Making symlink to latest version of $APP_NAME pointing to $SOFTWARE_DIR$APP_NAME"
+            $LN_BIN -s $PREFIX $SOFTWARE_DIR$APP_NAME
+
         fi
-        
+
     done
-    
+
 done
 
 note "Job's done."
