@@ -300,12 +300,12 @@ for application in $APPLICATIONS; do
             req_definition_file="$DEFINITIONS_DIR$application.def"
             . $DEFAULTS
             . $req_definition_file
+            APP_NAME="$(echo "$APP_NAME" | $CUT_BIN -c1 | $TR_BIN '[a-z]' '[A-Z]')$(echo "$APP_NAME" | $SED_BIN 's/^[a-zA-Z]//')"
             if [ -z $APP_POSTFIX ]; then
                 export PREFIX=$SOFTWARE_DIR$APP_NAME-$APP_VERSION
             else
                 export PREFIX=$SOFTWARE_DIR$APP_NAME-$APP_VERSION-$APP_POSTFIX
             fi
-            APP_NAME="$(echo "$APP_NAME" | $CUT_BIN -c1 | $TR_BIN '[a-z]' '[A-Z]')$(echo "$APP_NAME" | $SED_BIN 's/^[a-zA-Z]//')"
             note "Removing current symlink to latest version of $APP_NAME"
             $RM_BIN -f $SOFTWARE_DIR$APP_NAME
             note "Making symlink to latest version of $APP_NAME pointing to $SOFTWARE_DIR$APP_NAME"
