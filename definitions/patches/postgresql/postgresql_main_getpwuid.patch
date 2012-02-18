@@ -1,0 +1,41 @@
+--- src/backend/main/main.c	2012-02-18 17:11:30.000000000 +0100
++++ src/backend/main/main_patched.c	2012-02-18 17:10:22.000000000 +0100
+@@ -369,30 +369,13 @@
+ static char *
+ get_current_username(const char *progname)
+ {
+-#ifndef WIN32
+-	struct passwd *pw;
++    /**
++     *    @author dmilith
++     *
++     *   This patch is required for ServeD system. We don't use /etc/passwd at all
++     */
++    char result[11]; // max length of int number
+
+-	pw = getpwuid(geteuid());
+-	if (pw == NULL)
+-	{
+-		write_stderr("%s: invalid effective UID: %d\n",
+-					 progname, (int) geteuid());
+-		exit(1);
+-	}
+-	/* Allocate new memory because later getpwuid() calls can overwrite it. */
+-	return strdup(pw->pw_name);
+-#else
+-	long		namesize = 256 /* UNLEN */ + 1;
+-	char	   *name;
+-
+-	name = malloc(namesize);
+-	if (!GetUserName(name, &namesize))
+-	{
+-		write_stderr("%s: could not determine user name (GetUserName failed)\n",
+-					 progname);
+-		exit(1);
+-	}
+-
+-	return name;
+-#endif
++    sprintf(result, "%d", geteuid());
++    return strdup(result);
+ }
