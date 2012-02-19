@@ -7,20 +7,24 @@ if [ ! -e "${SOFTWARE_DIR}" ]; then
     exit
 fi
 
-# if [ ! "$SYSTEM_NAME" = "FreeBSD" ]; then
-#     note "This script is designed to be executed on FreeBSD 8.x systems only."
-#     exit 1
-# fi
 
+postfix=".tar.gz"
 
 cd "${SOFTWARE_DIR}"
+$RM_BIN -vf "*${postfix}"
 for element in *; do
-    note "Preparing archive of: $element"
-    $TAR_BIN cf ${element}.tar.gz ./${element}
+    if [ -d $element ]; then
+        if [ ! -L $element ]; then
+            note "Preparing archive of: $element"
+            $TAR_BIN cf ${element}${postfix} ./${element}
+            note "Sending archive to remote: ${MAIN_BINARY_REPOSITORY_DESTINATION}"
+            $SCP_BIN "${element}${postfix}" "${MAIN_BINARY_REPOSITORY_DESTINATION}${element}${postfix}"
+        fi
+    fi
 done
 
 
-note "Creating software index for current architecture"
+# note "Creating software index for current architecture"
 
 note "Done"
 exit
