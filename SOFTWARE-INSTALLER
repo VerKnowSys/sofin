@@ -175,7 +175,7 @@ for application in $APPLICATIONS; do
                         $TOUCH_BIN "$LOG"
                     fi
                     debug "Running '$@' @ `$DATE_BIN`" >> "$LOG"
-                    eval PATH=$PATH $@ 1>> "$LOG" 2>> "$LOG"
+                    eval PATH=$PATH "$@" 1>> "$LOG" 2>> "$LOG"
                     check_command_result $?
                 else
                     error "Empty command to run?"
@@ -250,6 +250,10 @@ for application in $APPLICATIONS; do
                             debug "Running configuration script for: $1 with args: --prefix=$PREFIX $APP_CONFIGURE_ARGS"
                             note "Configuring requirement: $1"
                             case $APP_CONFIGURE_SCRIPT in
+                                ignore)
+                                    note "Ignored configuration part $1"
+                                    ;;
+                                    
                                 no-conf)
                                     note "Skipped configuration for $1"
                                     export APP_MAKE_METHOD="$APP_MAKE_METHOD PREFIX=$PREFIX"
@@ -273,12 +277,12 @@ for application in $APPLICATIONS; do
                             esac
 
                             note "Building requirement: $1"
-                            run $APP_MAKE_METHOD
+                            run "$APP_MAKE_METHOD"
                             note "Installing requirement: $1"
-                            run $APP_INSTALL_METHOD
+                            run "$APP_INSTALL_METHOD"
                             if [ ! "$APP_AFTER_INSTALL_CALLBACK" = "" ]; then
                                 debug "After install callback: $APP_AFTER_INSTALL_CALLBACK"
-                                run $APP_AFTER_INSTALL_CALLBACK
+                                run "$APP_AFTER_INSTALL_CALLBACK"
                             fi
                             note "Installed '$1' in: $PREFIX"
                         done
