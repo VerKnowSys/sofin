@@ -1,0 +1,6 @@
+APP_FULL_NAME="Python 2"
+APP_NAME="Python"
+APP_VERSION="2.7.2"
+APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tgz"
+APP_CONFIGURE_ARGS="--with-fpectl --without-pydebug --disable-ipv6"
+APP_REQUIREMENTS="zlib yaml ncurses iconv"
