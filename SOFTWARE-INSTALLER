@@ -150,11 +150,11 @@ for application in $APPLICATIONS; do
         # fancy old style Capitalize
         APP_NAME="$(echo "$APP_NAME" | $CUT_BIN -c1 | $TR_BIN '[a-z]' '[A-Z]')$(echo "$APP_NAME" | $SED_BIN 's/^[a-zA-Z]//')"
         note
-        note "Preparing application: $APP_NAME"
+        note "Preparing application: ${APP_NAME} (${APP_FULL_NAME})"
         if [ -z $APP_POSTFIX ]; then
-            export PREFIX=$SOFTWARE_DIR$APP_NAME-$APP_VERSION
+            export PREFIX=${SOFTWARE_DIR}${APP_NAME}-${APP_VERSION}
         else
-            export PREFIX=$SOFTWARE_DIR$APP_NAME-$APP_VERSION-$APP_POSTFIX
+            export PREFIX=${SOFTWARE_DIR}${APP_NAME}-${APP_VERSION}-${APP_POSTFIX}
         fi
 
         if [ -e $PREFIX ]; then
@@ -267,11 +267,11 @@ for application in $APPLICATIONS; do
                                     ;;
 
                                 cmake)
-                                    run $APP_CONFIGURE_SCRIPT . -LH -DCMAKE_INSTALL_PREFIX=$PREFIX
+                                    run ${APP_CONFIGURE_SCRIPT} . -LH -DCMAKE_INSTALL_PREFIX=$PREFIX
                                     ;;
 
                                 *)
-                                    run $APP_CONFIGURE_SCRIPT $APP_CONFIGURE_ARGS --prefix=$PREFIX
+                                    run ${APP_CONFIGURE_SCRIPT} ${APP_CONFIGURE_ARGS} --prefix=$PREFIX
                                     ;;
 
                             esac
