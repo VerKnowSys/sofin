@@ -8,7 +8,7 @@ export PACKAGESITE='http://ftp.freebsd.org/pub/FreeBSD/ports/amd64/packages-9-cu
 
 VERSION="0.7.0"
 
-DEBUG="true"
+#DEBUG="true"
 
 OPTDIR="/opt/"
 CONFDIR="/etc/"
