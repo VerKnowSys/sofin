@@ -94,3 +94,4 @@ alias screen='screen -U'
 alias pstree='pstree -g 3'
 
 ulimit -c 0
+. /etc/profile

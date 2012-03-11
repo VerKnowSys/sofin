@@ -325,5 +325,11 @@ for application in $APPLICATIONS; do
 
 done
 
+note "Adding /etc/profile settings"
+shift
+echo $($0 getshellpath) > /etc/profile
+shift
+echo $($0 getshellld) >> /etc/profile
+
 note "Job's done."
 exit
