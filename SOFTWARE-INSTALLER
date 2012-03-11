@@ -91,14 +91,16 @@ if [ ! "$1" = "" ]; then
     getshellpath)
         result="$DEFAULT_PATH"
         for app in $SOFTWARE_DIR*; do
-            if [ -e "${app}/bin" ]; then
-                result="${app}/bin:$result"
-            fi
-            if [ -e "${app}/sbin" ]; then
-                result="${app}/sbin:$result"
-            fi
-            if [ -e "${app}/libexec" ]; then
-                result="${app}/libexec:$result"
+            if [ -L $app ]; then
+                if [ -e "${app}/bin" ]; then
+                    result="${app}/bin:$result"
+                fi
+                if [ -e "${app}/sbin" ]; then
+                    result="${app}/sbin:$result"
+                fi
+                if [ -e "${app}/libexec" ]; then
+                    result="${app}/libexec:$result"
+                fi
             fi
         done
         echo "export PATH=$result"
@@ -109,11 +111,13 @@ if [ ! "$1" = "" ]; then
     getshellld)
         ldresult="/lib:/usr/lib"
         for lib in $SOFTWARE_DIR*; do
-            if [ -e "${lib}/lib" ]; then
-                ldresult="${lib}/lib:$ldresult"
-            fi
-            if [ -e "${lib}/libexec" ]; then
-                ldresult="${lib}/libexec:$ldresult"
+            if [ -L $lib ]; then
+                if [ -e "${lib}/lib" ]; then
+                    ldresult="${lib}/lib:$ldresult"
+                fi
+                if [ -e "${lib}/libexec" ]; then
+                    ldresult="${lib}/libexec:$ldresult"
+                fi
             fi
         done
         echo "export LD_LIBRARY_PATH=$ldresult"
