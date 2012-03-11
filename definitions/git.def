@@ -1,7 +1,7 @@
 . ./config
-APP_FULL_NAME="GNU Make"
+APP_FULL_NAME="Git SCM"
 APP_NAME="git"
-APP_VERSION="1.7.5"
+APP_VERSION="1.7.9.3"
 APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
 APP_CONFIGURE_ARGS="--without-tcltk --with-zlib --without-python --with-perl=$SOFTWARE_DIR/Git-$APP_VERSION/bin/perl"
 APP_REQUIREMENTS="make zlib iconv expat perl"
