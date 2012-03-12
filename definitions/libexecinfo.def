@@ -1,0 +1,6 @@
+APP_FULL_NAME="libexecinfo for Nodejs"
+APP_NAME="libexecinfo"
+APP_VERSION="1.1"
+APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
+APP_CONFIGURE_SCRIPT="ignore"
+APP_INSTALL_METHOD="cp libexecinfo.so libexecinfo.so.1 libexecinfo.a execinfo.So stacktraverse.So ${SOFTWARE_DIR}Node-**/lib ; cp execinfo.h ${SOFTWARE_DIR}Node-**/include"
