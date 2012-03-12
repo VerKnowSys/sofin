@@ -1,6 +1,9 @@
 #!/bin/sh
 
 
+# TODO: resign from APP-VERSION in folder name. Put version into .INSTALLED files!
+
+
 unset LDFLAGS
 unset CFLAGS
 unset CPPFLAGS
