@@ -68,14 +68,13 @@ check_requirements () {
 
 usage_howto () {
     error "No task param given!"
-    error "Built in tasks: list, destroyall, getshellpath, getshellld, one, custom-definition-list-file"
+    error "Built in tasks: list, destroyall, getshellpath, getshellld, one, user, custom-definition-list-file"
     exit
 }
 
 
 . $DEFAULTS
 PATH=$DEFAULT_PATH
-debug "Default path set ($DEFAULT_PATH)"
 
 if [ ! "$1" = "" ]; then
     case $1 in
@@ -140,15 +139,26 @@ if [ ! "$1" = "" ]; then
             exit 1
         fi
         if [ "$3" = "" ]; then
-            error "For \"one\" application installation mode, third argument with Application def file name (without extension) is required!"
+            error "For \"one\" application installation mode, third argument with application definition name is required!"
             exit 1
         fi
-        
-        note "One app installation mode for given UID: $2 of definition: $3 on the way…"
         export APPLICATIONS="$3"
         export UID="$2"
-        note "Parsing definition: $APPLICATIONS"
+        note "Installation mode for given UID: $UID of definition: $APPLICATIONS"
+        ;;
 
+    user)
+        if [ "$2" = "" ]; then
+            error "For \"user\" application installation mode, second argument with UID is required!"
+            exit 1
+        fi
+        if [ "$3" = "" ]; then
+            error "For \"user\" application installation mode, third argument with application list is required!"
+            exit 1
+        fi
+        export APPLICATIONS="$($CAT_BIN $3 | $TR_BIN '\n' ' ')"
+        export UID="$2"
+        note "Installation mode for given UID: $UID of definitions: $APPLICATIONS"
         ;;
         
     *)
@@ -284,7 +294,6 @@ for application in $APPLICATIONS; do
                             fi
                         fi
 
-                        debug "Running configuration script for: $1"
                         note "Configuring requirement: $1"
                         case $APP_CONFIGURE_SCRIPT in
                             ignore)
@@ -321,7 +330,7 @@ for application in $APPLICATIONS; do
                             debug "After install callback: $APP_AFTER_INSTALL_CALLBACK"
                             run "$APP_AFTER_INSTALL_CALLBACK"
                         fi
-                        note "Marking installed '$1' in: $PREFIX"
+                        debug "Marking installed '$1' in: $PREFIX"
                         $TOUCH_BIN "$PREFIX/$1.INSTALLED"
                     done
                     cd $CUR_DIR
@@ -372,11 +381,11 @@ for application in $APPLICATIONS; do
             $LN_BIN -s $PREFIX $SOFTWARE_DIR$APP_NAME
         fi
             
-        note "Marking definition: $application installed"
+        debug "Marking definition: $application installed"
         $TOUCH_BIN "$PREFIX/$application.INSTALLED"
             
         if [ ! "$UID" = "" ]; then
-            note "Setting owner of $PREFIX to UID: $UID"
+            note "Setting owner of $PREFIX recursively to UID: $UID"
             $CHOWN_BIN -R $UID "$PREFIX"
         fi
 
