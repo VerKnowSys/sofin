@@ -1,4 +1,3 @@
-. lib/config
 APP_FULL_NAME="MySQL 5"
 APP_NAME="mysql"
 APP_VERSION="5.5.12"

@@ -1,4 +1,3 @@
-. lib/config
 DISABLE_ON="Darwin"
 APP_FULL_NAME="Open Andrew File System"
 APP_NAME="openafs"
@@ -6,7 +5,7 @@ APP_VERSION="1.6.0pre7"
 APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}-src.tar.gz"
 APP_CONFIGURE_ARGS="--disable-fuse-client --with-bsd-kernel-build=/usr/obj/usr/src/sys/VERKNOWSYS/"
 KERNEL_MODULE_FILE="/boot/modules/libafs.ko"
-APP_AFTER_INSTALL_CALLBACK="$CP_BIN -vf ${SOFTWARE_DIR}/Openafs-${APP_VERSION}/lib/openafs/libafs.ko ${KERNEL_MODULE_FILE}; \
+APP_AFTER_INSTALL_CALLBACK="$CP_BIN -vf ${PREFIX}/lib/openafs/libafs.ko ${KERNEL_MODULE_FILE}; \
 $KLDLOAD_BIN ${KERNEL_MODULE_FILE}; \
 $MKDIR_BIN -p '${DFS_CACHE_DIR}'; \
 $MKDIR_BIN -p '${DFS_MOUNT_POINT}';"
