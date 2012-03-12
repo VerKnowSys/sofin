@@ -1,4 +1,4 @@
-. ./config
+. lib/config
 APP_FULL_NAME="Git SCM"
 APP_NAME="git"
 APP_VERSION="1.7.9.3"

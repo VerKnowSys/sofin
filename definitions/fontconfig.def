@@ -1,4 +1,4 @@
-. ./config
+. lib/config
 APP_FULL_NAME="Fontconfig Library"
 APP_NAME="fontconfig"
 APP_VERSION="2.8.0"

@@ -1,4 +1,4 @@
-. ./config
+. lib/config
 DISABLE_ON="Darwin"
 APP_FULL_NAME="Open Andrew File System"
 APP_NAME="openafs"

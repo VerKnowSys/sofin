@@ -1,4 +1,4 @@
-. ./config
+. lib/config
 APP_FULL_NAME="PostgreSQL 9"
 APP_NAME="postgresql"
 APP_VERSION="9.0.6"
