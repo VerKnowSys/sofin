@@ -1,7 +1,8 @@
 #!/bin/sh
 
-. ./config
-. definitions/defaults.def
+. "lib/config"
+. "lib/helpers"
+. "definitions/defaults.def"
 
 check_root () {
     if [ ! "$($ID_BIN -u)" = "0" ]; then

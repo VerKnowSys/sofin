@@ -1,6 +1,7 @@
 #!/bin/sh
 
-. $(pwd)/config
+. "lib/config"
+. "lib/helpers"
 
 if [ ! -e "${SOFTWARE_DIR}" ]; then
     error "Unable to find software directory: ${SOFTWARE_DIR}. Try to run GRUNT-POST-BASE-INSTALLER first"
