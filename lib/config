@@ -6,7 +6,7 @@
 # NOTE: 9.0 ->
 export PACKAGESITE='http://ftp.freebsd.org/pub/FreeBSD/ports/amd64/packages-9-current/'
 
-VERSION="0.8.0"
+VERSION="0.8.2"
 
 #DEBUG="true"
 
