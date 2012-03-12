@@ -1,0 +1,45 @@
+#!/bin/sh
+
+
+# helpers:
+
+note () {
+    echo " * $1"
+}
+
+
+debug () {
+    if [ "$DEBUG" = "true" ]; then
+        echo "DEBUG: $1"
+    fi
+}
+
+
+error () {
+    echo "# $1"
+}
+
+
+# quick hashmap implementation
+# export mapdir=$($MKTEMP_BIN -dt $($BASENAME_BIN $0))
+# 
+# 
+# put () {
+#   [ "$#" != 3 ] && exit 1
+#   mapname=$1; key=$2; value=$3
+#   [ -d "${mapdir}/${mapname}" ] || $MKDIR_BIN "${mapdir}/${mapname}"
+#   echo $value >"${mapdir}/${mapname}/${key}"
+# }
+# 
+# 
+# get () {
+#   [ "$#" != 2 ] && exit 1
+#   mapname=$1; key=$2
+#   $CAT_BIN "${mapdir}/${mapname}/${key}"
+# }
+# 
+# 
+# trap "rm -r ${mapdir}" EXIT
+# 
+# put "SYSUSERS" "dmilith" "666"
+# put "SYSUSERS" "teamon" "1337"

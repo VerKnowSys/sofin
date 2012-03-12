@@ -6,7 +6,7 @@
 # NOTE: 9.0 ->
 export PACKAGESITE='http://ftp.freebsd.org/pub/FreeBSD/ports/amd64/packages-9-current/'
 
-VERSION="0.7.0"
+VERSION="0.8.0"
 
 #DEBUG="true"
 
@@ -51,6 +51,17 @@ UNAME_BIN="/usr/bin/uname"
 
 OPTDIR="/opt/"
 CONFDIR="/etc/"
+SYSUSERS="dmilith teamon"
+SYSGROUP="staff"
+SERVICES="pf sshd syslogd"
+DEFAULT_SSH_PORT="60022"
+KERNEL_CONFIG="VERKNOWSYS"
+SOFTWARE_DIR="/Software/"
+HOME_DIR="/Users/"
+HOME_APPS_DIR="Apps/"
+TMP_ROOT="/var/SvdOpt/"
+RC_CONF_FILE="/etc/rc.conf"
+
 OPENJDK7_FBSD9_32BIT_BUILD_NAME="openjdk7_fbsd9.tar.gz"
 SYSTEM_ARCH="64"
 SYSTEM_VERSION=$($UNAME_BIN -r)
@@ -62,23 +73,15 @@ HOST_NODE_NAME="drahk-grunt" #-$(/sbin/sha1 -qs \\"`date`\\")"
 DEFAULT_PATH="/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin"
 SNAPSHOT_NAME="clang_fbsd64_9_basesystem_snapshot"
 SNAPSHOT_ROOT="$OPTDIR/clang_root"
-DFS_MOUNT_POINT="/dfs"
-DFS_CACHE_DIR="/var/dfs/cache"
+# DFS_MOUNT_POINT="/dfs"
+# DFS_CACHE_DIR="/var/dfs/cache"
 SCRIPT_ROOT="$OPTDIR/SvdOpt/"
-SOFTWARE_DIR="/Software/"
-TMP_ROOT="/var/SvdOpt/"
-DEFAULT_SSH_PORT="60022"
-SYSUSERS="dmilith teamon"
-SYSGROUP="wheel"
-SERVICES="pf sshd syslogd"
-KERNEL_CONFIG="VERKNOWSYS"
 BOOT_LOADER_CONFIG="/boot/loader.conf"
-RC_CONF_FILE="/etc/rc.conf"
 DEFINITIONS_DIR="${SCRIPT_ROOT}definitions/"
 DEFAULTS="${DEFINITIONS_DIR}defaults.def"
 LOG="${SOFTWARE_DIR}INSTALL_LOG"
 PREFILES="${SCRIPT_ROOT}prefiles/etc/"
-DINSTAPP="$(pwd)/SOFTWARE-INSTALLER"
+DINSTAPP="${SCRIPT_ROOT}}SOFTWARE-INSTALLER"
 SYSTEM_GET_SHELL_PATH="$DINSTAPP getshellpath"
 SYSTEM_GET_SHELL_LDLIB="$DINSTAPP getshellld"
 KERNELBUILDAPP="$(pwd)/GRUNT-KERNEL-BUILD"
@@ -95,47 +98,3 @@ fi
 if [ "$SYSTEM_NAME" = "Darwin" ]; then
     FETCH_BIN="/usr/bin/curl --progress-bar -C - -L -O"
 fi
-
-
-# helpers:
-
-note () {
-    echo " INFO: $1"
-}
-
-
-debug () {
-    if [ ! "$DEBUG" = "" ]; then
-        echo "DEBUG: $1"
-    fi
-}
-
-
-error () {
-    echo "ERROR: $1"
-}
-
-
-# quick hashmap implementation
-export mapdir=$($MKTEMP_BIN -dt $($BASENAME_BIN $0))
-
-
-put () {
-  [ "$#" != 3 ] && exit 1
-  mapname=$1; key=$2; value=$3
-  [ -d "${mapdir}/${mapname}" ] || $MKDIR_BIN "${mapdir}/${mapname}"
-  echo $value >"${mapdir}/${mapname}/${key}"
-}
-
-
-get () {
-  [ "$#" != 2 ] && exit 1
-  mapname=$1; key=$2
-  $CAT_BIN "${mapdir}/${mapname}/${key}"
-}
-
-
-trap "rm -r ${mapdir}" EXIT
-
-put "SYSUSERS" "dmilith" "666"
-put "SYSUSERS" "teamon" "1337"
