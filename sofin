@@ -4,9 +4,21 @@
 
 # config settings
 DEBUG="false"
-VERSION="0.9.3ß"
+VERSION="0.9.4ß"
 
+#compiler settings
+USE_CLANG="true"
+if [ "${USE_CLANG}" = "true" ]; then
+    export CC="clang"
+    export CXX="clang++"
+    export CPP="clang -E"
+else
+    unset CC
+    unset CXX
+    unset CPP
+fi
 
+# global script settings
 SCRIPT_NAME="$0"
 MAIN_SOURCE_REPOSITORY="http://software.verknowsys.com/source/"
 SOFTWARE_DIR="/Software/"
@@ -320,6 +332,9 @@ for application in ${APPLICATIONS}; do
                 export PATH="${PREFIX}/bin:${PREFIX}/sbin:${DEFAULT_PATH}"
                 export LD_LIBRARY_PATH="${PREFIX}/lib:${PREFIX}/libexec"
                 debug "PATH: ${PATH}" >> "${LOG}"
+                debug "CC: ${CC}" >> "${LOG}"
+                debug "CXX: ${CXX}" >> "${LOG}"
+                debug "CPP: ${CPP}" >> "${LOG}"
                 debug "CXXFLAGS: ${CXXFLAGS}" >> "${LOG}"
                 debug "CFLAGS: ${CFLAGS}" >> "${LOG}"
                 debug "LDFLAGS: ${LDFLAGS}" >> "${LOG}"
@@ -369,7 +384,7 @@ for application in ${APPLICATIONS}; do
                 else
                     BUILD_DIR="${CACHE_DIR}cache/${APP_NAME}${APP_POSTFIX}-${APP_VERSION}/"
                     ${MKDIR_BIN} -p "${BUILD_DIR}"
-                    CUR_DIR=$(pwd)
+                    CUR_DIR="$(pwd)"
                     cd "${BUILD_DIR}"
                     for bd in ${BUILD_DIR}/*; do
                         if [ -d ${bd} ]; then
