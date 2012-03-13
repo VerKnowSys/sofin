@@ -33,21 +33,21 @@ customizable software for FreeBSD servers.
 
 ## Examples:
 * Install software defined in a list called "http" (by default it will install definitions from list into /Software/):
-        sofin http
+    `sofin http`
         
 * Install one software from definition called "ruby.def" for user "dmilith" (by default it will point to /Users/dmilith/Apps/Ruby/):
-        sofin one dmilith ruby 
+    `sofin one dmilith ruby`
         
 * Install software list called "databases" for user "dmilith" (by default it will point to /Users/dmilith/Apps/):
-        sofin user dmilith databases
+    `sofin user dmilith databases`
 
 * Show list of installed software:
-        sofin list
+    `sofin list`
 
 * Uninstall installed software? Just remove app directory:
-        rm -r /Software/AppName
-        or
-        rm -r /Users/USER/Apps/AppName
+    `rm -r /Software/AppName`
+    or
+    `rm -r /Users/USER/Apps/AppName`
 
 
 ## Pitfalls/ Limitations:
