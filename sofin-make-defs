@@ -1,0 +1,112 @@
+#!/bin/sh
+# @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
+
+
+# config settings
+DEBUG="false"
+
+DEFINITION_SNAPSHOT_FILE="defs.tar.gz"
+
+# config binary requirements definitions
+DIRNAME_BIN="/usr/bin/dirname"
+TAIL_BIN="/usr/bin/tail"
+CUT_BIN="/usr/bin/cut"
+LS_BIN="/bin/ls"
+ID_BIN="/usr/bin/id"
+MKDIR_BIN="/bin/mkdir"
+TAR_BIN="/usr/bin/tar"
+CAT_BIN="/bin/cat"
+TR_BIN="/usr/bin/tr"
+TOUCH_BIN="/usr/bin/touch"
+RM_BIN="/bin/rm"
+DATE_BIN="/bin/date"
+PATCH_BIN="/usr/bin/patch"
+SED_BIN="/usr/bin/sed"
+CHOWN_BIN="/usr/sbin/chown"
+GREP_BIN="/usr/bin/grep"
+FETCH_BIN="/usr/bin/fetch"
+UNAME_BIN="/usr/bin/uname"
+
+
+# ANSI color definitions
+red='\033[31;40m'
+green='\033[32;40m'
+yellow='\033[33;40m'
+blue='\033[34;40m'
+magenta='\033[35;40m'
+cyan='\033[36;40m'
+gray='\033[37;40m'
+white='\033[38;40m'
+reset='\033[0m'
+
+
+# helpers
+
+cecho () {
+    if [ "${ECHOE}" = "false" ]; then
+        echo "${2}${1}${reset}"
+    else
+        echo -e "${2}${1}${reset}"
+    fi
+    return
+}
+
+
+note () {
+    cecho " * $1" ${white}
+}
+
+
+debug () {
+    if [ "${DEBUG}" = "true" ]; then
+        cecho " ~ $1" ${magenta}
+    fi
+}
+
+
+error () {
+    cecho " # $1" ${red}
+}
+
+
+check_command_result () {
+    if [ -z "$1" ]; then
+        error "No param given for check_command_result()!"
+        exit 1
+    fi
+    if [ "$1" = "0" ]; then
+        debug "CORRECT"
+    else
+        error
+        error
+        error "FAILED. Last log below:"
+        error
+        ${TAIL_BIN} -n 50 "${LOG}"
+        exit 1
+    fi
+}
+
+
+check_required_dirs_and_create_snaphot () {
+    REQS="definitions lists"
+    note "Checking directories…"
+    for req in ${REQS}; do
+        if [ ! -d "${req}" ]; then
+            note "No '${req}' folder found in current directory. Aborting…"
+            exit 1
+        fi
+    done
+    note "Creating snapshot…"
+    tar_options="cf"
+    if [ "${DEBUG}" = "true" ]; then
+        tar_options="${tar_options}v"
+    fi
+    ${TAR_BIN} ${tar_options} "${DEFINITION_SNAPSHOT_FILE}" ${REQS}
+}
+
+
+note "Creating definitions and lists package: ${DEFINITION_SNAPSHOT_FILE}"
+check_required_dirs_and_create_snaphot
+
+note "Job's done."
+exit
