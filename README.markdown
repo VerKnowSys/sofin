@@ -22,7 +22,7 @@
     * To see usage, run sofin without any params.
     
     
-## Pitfalls:
+## Pitfalls/ Limitations:
     * Because every software bundle has own root dir, no ld information is provided by default by system, so software which uses shared libraries will require to set "LD_LIBRARY_PATH" for ld linker. To generate this variable for currently installed software just spawn sofin with "getshellld" param. To get user side values give it additional param of user name (f.e. sofin getshellld username).
     * To generate "PATH" variable from installed software use "getshellpath" param. To get user side values give it additional param of user name (f.e. sofin getshellpath username).
     * Currently only "tar.gz" archives files are cached and supported. In case of using different archive type a failure will happen.
