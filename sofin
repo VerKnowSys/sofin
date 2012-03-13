@@ -1,0 +1,498 @@
+#!/bin/sh
+# @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
+
+
+# config settings
+DEBUG="true"
+VERSION="0.9.2ß"
+
+
+SCRIPT_NAME="$0"
+MAIN_SOURCE_REPOSITORY="http://software.verknowsys.com/source/"
+SOFTWARE_DIR="/Software/"
+HOME_DIR="/Users/"
+HOME_APPS_DIR="Apps/"
+CACHE_DIR="${SOFTWARE_DIR}.cache/"
+DEFINITIONS_DIR="${CACHE_DIR}definitions/"
+LISTS_DIR="${CACHE_DIR}lists/"
+DEFINITION_SNAPSHOT_FILE="defs.tar.gz"
+DEFAULTS="${DEFINITIONS_DIR}defaults.def"
+LOG="${CACHE_DIR}install.log"
+DEFAULT_PATH="/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin"
+ECHOE="true"
+
+# config binary requirements definitions
+DIRNAME_BIN="/usr/bin/dirname"
+TAIL_BIN="/usr/bin/tail"
+CUT_BIN="/usr/bin/cut"
+LS_BIN="/bin/ls"
+ID_BIN="/usr/bin/id"
+MKDIR_BIN="/bin/mkdir"
+TAR_BIN="/usr/bin/tar"
+CAT_BIN="/bin/cat"
+TR_BIN="/usr/bin/tr"
+TOUCH_BIN="/usr/bin/touch"
+RM_BIN="/bin/rm"
+DATE_BIN="/bin/date"
+PATCH_BIN="/usr/bin/patch"
+SED_BIN="/usr/bin/sed"
+CHOWN_BIN="/usr/sbin/chown"
+GREP_BIN="/usr/bin/grep"
+FETCH_BIN="/usr/bin/fetch"
+UNAME_BIN="/usr/bin/uname"
+
+
+# ANSI color definitions
+red='\033[31;40m'
+green='\033[32;40m'
+yellow='\033[33;40m'
+blue='\033[34;40m'
+magenta='\033[35;40m'
+cyan='\033[36;40m'
+gray='\033[37;40m'
+white='\033[38;40m'
+reset='\033[0m'
+
+
+# helpers
+
+cecho () {
+    if [ "${ECHOE}" = "false" ]; then
+        echo "${2}${1}${reset}"
+    else
+        echo -e "${2}${1}${reset}"
+    fi
+    return
+}
+
+
+note () {
+    cecho " * $1" ${green}
+}
+
+
+debug () {
+    if [ "${DEBUG}" = "true" ]; then
+        cecho " ~ $1" ${magenta}
+    fi
+}
+
+
+error () {
+    cecho " # $1" ${red}
+}
+
+
+check_command_result () {
+    if [ -z "$1" ]; then
+        error "No param given for check_command_result()!"
+        exit 1
+    fi
+    if [ "$1" = "0" ]; then
+        debug "CORRECT"
+    else
+        error
+        error
+        error "FAILED. Last log below:"
+        error
+        ${TAIL_BIN} -n 50 "${LOG}"
+        exit 1
+    fi
+}
+
+
+check_definition_dir () {
+    if [ ! -d "${SOFTWARE_DIR}" ]; then
+        note "No ${SOFTWARE_DIR} found. Creating one."
+        "${MKDIR_BIN}" -p "${SOFTWARE_DIR}"
+    fi
+    if [ ! -d "${CACHE_DIR}" ]; then
+        note "No cache folder found. Creating one at: ${CACHE_DIR}"
+        "${MKDIR_BIN}" -p "${CACHE_DIR}"
+    fi
+}
+
+
+check_requirements () {
+    if [ "${APPLICATIONS}" = "" ]; then
+        error "Empty applications list!"
+        exit 1
+    fi
+}
+
+
+update_definitions () {
+    cd "${CACHE_DIR}"
+    tar_options="xf"
+    rm_options="-rf"
+    if [ "${DEBUG}" = "true" ]; then
+        tar_options="${tar_options}v"
+        rm_options="${rm_options}v"
+    fi
+    debug "Removing old definitions, patches and lists…"
+    ${RM_BIN} ${rm_options} "${LISTS_DIR}" >> "${LOG}"
+    ${RM_BIN} ${rm_options} "${DEFINITIONS_DIR}" >> "${LOG}"
+    ${RM_BIN} ${rm_options} "${CACHE_DIR}${DEFINITION_SNAPSHOT_FILE}" >> "${LOG}"
+    note "Updating definitions snapshot from: ${MAIN_SOURCE_REPOSITORY}definitions/${DEFINITION_SNAPSHOT_FILE}"    
+    ${FETCH_BIN} "${MAIN_SOURCE_REPOSITORY}definitions/${DEFINITION_SNAPSHOT_FILE}" >> "${LOG}" 2>> "${LOG}"
+    ${TAR_BIN} ${tar_options} "${DEFINITION_SNAPSHOT_FILE}" >> "${LOG}" 2>> "${LOG}"
+}
+
+
+usage_howto () {
+    error "No task param given!"
+    error "Built in tasks: list, destroyall, getshellpath, getshellld, one, user, custom-definition-list-file"
+    exit
+}
+
+
+check_root () {
+    if [ ! "$(${ID_BIN} -u)" = "0" ]; then
+        error "This command should be run as root."
+        exit
+    fi
+}
+
+
+check_os () {
+    if [ "$(${UNAME_BIN})" != "FreeBSD" ]; then
+        error "Currently only FreeBSD host is supported."
+        exit
+    fi
+}
+
+
+# first part of checks
+check_os
+check_root
+check_definition_dir
+
+
+# unset conflicting environment variables
+unset LDFLAGS
+unset CFLAGS
+unset CPPFLAGS
+unset PATH
+unset LD_LIBRARY_PATH
+unset LD_PRELOAD
+
+
+if [ ! "$1" = "" ]; then
+    case $1 in
+
+    list)
+        SOFT_DIR="${SOFTWARE_DIR}"
+        if [ ! -z "$2" ]; then
+            SOFT_DIR="${HOME_DIR}$2/${HOME_APPS_DIR}"
+        fi
+        if [ -d ${SOFT_DIR} ]; then
+            cecho "$(${LS_BIN} -mTI ${SOFT_DIR})" ${green}
+        else
+            cecho "No software installed" ${yellow}
+        fi
+        exit
+        ;;
+
+    getshellpath)
+        result="${DEFAULT_PATH}"
+        for app in ${SOFTWARE_DIR}*; do
+            if [ -e "${app}/bin" ]; then
+                result="${result}:${app}/bin"
+            fi
+            if [ -e "${app}/sbin" ]; then
+                result="${result}:${app}/sbin"
+            fi
+            if [ -e "${app}/libexec" ]; then
+                result="${result}:${app}/libexec"
+            fi
+        done
+        echo "export PATH=${result}"
+        unset result
+        exit
+        ;;
+
+    getshellld)
+        ldresult="/lib:/usr/lib"
+        for lib in ${SOFTWARE_DIR}*; do
+            if [ -e "${lib}/lib" ]; then
+                ldresult="${lib}/lib:${ldresult}"
+            fi
+            if [ -e "${lib}/libexec" ]; then
+                ldresult="${lib}/libexec:${ldresult}"
+            fi
+        done
+        echo "export LD_LIBRARY_PATH=${ldresult}"
+        unset ldresult
+        exit
+        ;;
+
+    one)
+        update_definitions
+        if [ "$2" = "" ]; then
+            error "For \"one\" application installation mode, second argument with user is required!"
+            exit 1
+        fi
+        if [ "$3" = "" ]; then
+            error "For \"one\" application installation mode, third argument with application definition name is required!"
+            exit 1
+        fi
+        export APPLICATIONS="$3"
+        export USER_UID="$2"
+        note "Installation mode for given user: ${USER_UID} of definition: ${APPLICATIONS}"
+        ;;
+
+    user)
+        update_definitions
+        if [ "$2" = "" ]; then
+            error "For \"user\" application installation mode, second argument with user is required!"
+            exit 1
+        fi
+        if [ "$3" = "" ]; then
+            error "For \"user\" application installation mode, third argument with application list is required!"
+            exit 1
+        fi
+        export APPLICATIONS="$(${CAT_BIN} ${LISTS_DIR}$3 | ${TR_BIN} '\n' ' ')"
+        export USER_UID="$2"
+        note "Installation mode for given user: ${USER_UID} of definitions: ${APPLICATIONS}"
+        ;;
+        
+    *)
+        update_definitions
+        if [ ! -e "${LISTS_DIR}$1" ]; then
+            error "Definition not found: ${LISTS_DIR}$1"
+            exit 1
+        fi
+        export APPLICATIONS="$($CAT_BIN ${LISTS_DIR}$1 | ${TR_BIN} '\n' ' ')"
+        note "Definitions to install: ${APPLICATIONS}"
+        ;;
+
+    esac
+else
+    usage_howto
+fi
+
+
+# Update definitions and perform more checks
+check_requirements
+
+
+. ${DEFAULTS}
+PATH=${DEFAULT_PATH}
+
+for application in ${APPLICATIONS}; do
+
+    for definition in ${DEFINITIONS_DIR}${application}.def; do
+        debug "Reading definition: ${definition}"
+        . ${DEFAULTS}
+        . ${definition}
+
+        # fancy old style Capitalize
+        APP_NAME="$(echo "${APP_NAME}" | ${CUT_BIN} -c1 | ${TR_BIN} '[a-z]' '[A-Z]')$(echo "${APP_NAME}" | ${SED_BIN} 's/^[a-zA-Z]//')"
+        note
+        note "Preparing application: ${APP_NAME} (${APP_FULL_NAME} v${APP_VERSION})"
+        if [ "${USER_UID}" = "" ]; then
+            debug "Normal build"
+            export PREFIX="${SOFTWARE_DIR}${APP_NAME}"
+        else
+            debug "User build: ${USER_UID}"
+            export PREFIX="${HOME_DIR}${USER_UID}/${HOME_APPS_DIR}${APP_NAME}"
+        fi
+        
+        # append app postfix
+        if [ ! -z "$APP_POSTFIX" ]; then
+            export PREFIX="${PREFIX}${APP_POSTFIX}"
+        fi
+
+
+        run () {
+            if [ ! -z "$1" ]; then
+                export PATH="${PREFIX}/bin:${PREFIX}/sbin:${DEFAULT_PATH}"
+                export LD_LIBRARY_PATH="${PREFIX}/lib:${PREFIX}/libexec"
+                debug "PATH: ${PATH}" >> "${LOG}"
+                debug "CXXFLAGS: ${CXXFLAGS}" >> "${LOG}"
+                debug "CFLAGS: ${CFLAGS}" >> "${LOG}"
+                debug "LDFLAGS: ${LDFLAGS}" >> "${LOG}"
+                debug "LD_LIBRARY_PATH: ${LD_LIBRARY_PATH}" >> "${LOG}"
+                debug "Current DIR: ${BUILD_DIR}${dir}" >> "${LOG}"
+                if [ ! -e "${LOG}" ]; then
+                    ${TOUCH_BIN} "${LOG}"
+                fi
+                debug "Running '$@' @ $(${DATE_BIN})" >> "${LOG}"
+                eval PATH=${PATH} "$@" 1>> "${LOG}" 2>> "${LOG}"
+                check_command_result $?
+            else
+                error "Empty command to run?"
+                exit
+            fi
+        }
+
+        execute_process () {
+            if [ -z "$1" ]; then
+                error "No param given for execute_process()!"
+                exit 1
+            fi
+            req_definition_file="${DEFINITIONS_DIR}${1}.def"
+            debug "Checking requirement: $1 file: $req_definition_file"
+            if [ ! -e "${req_definition_file}" ]; then
+                error "Cannot fetch definition ${req_definition_file}! Aborting!"
+                exit 1
+            fi
+
+            . $DEFAULTS
+            . $req_definition_file
+            export ALLOW=1
+            if [ ! "$DISABLE_ON" = "" ]; then
+                for disabled in ${DISABLE_ON}; do
+                    debug "Running system: $SYSTEM_NAME"
+                    debug "DisableOn element: $disabled"
+                    if [ "$SYSTEM_NAME" = "$disabled" ]; then
+                        export ALLOW=0
+                    fi
+                done
+            fi
+
+            if [ "$ALLOW" = "1" ]; then
+                if [ -z "$APP_HTTP_PATH" ]; then
+                    debug "After install callback: $APP_AFTER_INSTALL_CALLBACK"
+                    run $APP_AFTER_INSTALL_CALLBACK
+                else
+                    BUILD_DIR="${CACHE_DIR}cache/${APP_NAME}${APP_POSTFIX}-${APP_VERSION}/"
+                    ${MKDIR_BIN} -p "${BUILD_DIR}"
+                    CUR_DIR=$(pwd)
+                    cd "${BUILD_DIR}"
+                    for bd in ${BUILD_DIR}/*; do
+                        if [ -d ${bd} ]; then
+                            debug "Unpacked source code found in build dir. Removing: ${bd}"
+                            if [ "${bd}" != "/" ]; then # it's better to be safe than sorry
+                                ${RM_BIN} -rf "${bd}"
+                            fi
+                        fi
+                    done
+                    if [ ! -e ${BUILD_DIR}${1}*tar.gz ]; then # TODO: tar.gz is currently the only supported format
+                        note "Fetching requirement source from: ${APP_HTTP_PATH}"
+                        run ${FETCH_BIN} ${APP_HTTP_PATH}
+                    else
+                        debug "Already fetched. Using tarball from cache"
+                    fi
+                    note "Unpacking source code of: ${APP_NAME}"
+                    debug "Build dir: ${BUILD_DIR}"
+                    run ${TAR_BIN} xf ${BUILD_DIR}${APP_NAME}*
+                    debug "Entrering ${BUILD_DIR}${APP_NAME}*" >> "${LOG}"
+                    for dir in $(${LS_BIN} -F ${BUILD_DIR} | ${GREP_BIN} \/$); do
+                        debug "Changing dir to: $dir" >> "${LOG}"
+                        cd "${dir}${APP_SOURCE_DIR_POSTFIX}"
+                        export CXXFLAGS="-I${PREFIX}/include ${APP_COMPILER_ARGS}"
+                        export CFLAGS="-I${PREFIX}/include ${APP_COMPILER_ARGS}"
+                        export LDFLAGS="-L${PREFIX}/lib ${APP_LINKER_ARGS}"
+                        LIST_DIR="${DEFINITIONS_DIR}patches/$1"
+                        if [ -d "${LIST_DIR}" ]; then
+                            if [ "$1" = "${APP_NAME}" ]; then # apply patch only when application/requirement for which patch is designed for
+                                note "Applying patches for application: ${application}"
+                                for patch in ${LIST_DIR}/*; do
+                                    debug "Patching source code with patch: ${patch}"
+                                    run ${PATCH_BIN} -i "${patch}"
+                                done
+                            fi
+                        fi
+
+                        note "Configuring requirement: $1"
+                        case ${APP_CONFIGURE_SCRIPT} in
+                            ignore)
+                                note "Ignored configuration part $1"
+                                ;;
+                                    
+                            no-conf)
+                                note "Skipped configuration for $1"
+                                export APP_MAKE_METHOD="${APP_MAKE_METHOD} PREFIX=${PREFIX}"
+                                export APP_INSTALL_METHOD="${APP_INSTALL_METHOD} PREFIX=${PREFIX}"
+                                ;;
+
+                            binary)
+                                note "Binary definition: $1"
+                                export APP_MAKE_METHOD="true"
+                                export APP_INSTALL_METHOD="true"
+                                ;;
+
+                            cmake)
+                                run ${APP_CONFIGURE_SCRIPT} . -LH -DCMAKE_INSTALL_PREFIX="${PREFIX}"
+                                ;;
+
+                            *)
+                                run ${APP_CONFIGURE_SCRIPT} ${APP_CONFIGURE_ARGS} --prefix="${PREFIX}"
+                                ;;
+
+                        esac
+
+                        note "Building requirement: $1"
+                        run "${APP_MAKE_METHOD}"
+                        note "Installing requirement: $1"
+                        run "${APP_INSTALL_METHOD}"
+                        if [ ! "${APP_AFTER_INSTALL_CALLBACK}" = "" ]; then
+                            debug "After install callback: ${APP_AFTER_INSTALL_CALLBACK}"
+                            run "${APP_AFTER_INSTALL_CALLBACK}"
+                        fi
+                        debug "Marking as installed '$1' in: ${PREFIX}"
+                        ${TOUCH_BIN} "${PREFIX}/$1.INSTALLED"
+                        debug "Writing version: ${APP_VERSION} of app: '${APP_NAME}' installed in: ${PREFIX}"
+                        echo "${APP_VERSION}" > "${PREFIX}/$1.INSTALLED"
+                    done
+                    cd "${CUR_DIR}"
+                fi
+            else
+                note "This bundle is disabled on current architecture ($(${UNAME_BIN})). Skipped…"
+            fi
+        }
+        
+        debug "Installing app requirements: ${APP_REQUIREMENTS}"
+        for req in ${APP_REQUIREMENTS}; do
+            if [ -z "${req}" ]; then
+                note "No requirements required. Skipping…"
+                break
+            else
+                note "Processing requirement: $req"
+                if [ -e "${PREFIX}/${req}.INSTALLED" ]; then
+                    note "Requirement: ${req} marked as installed. Skipping…"
+                else
+                    export CHANGED="true"
+                    execute_process "${req}"
+                fi
+            fi
+        done
+        
+        mark () {
+            debug "Marking definition: ${application} installed"
+            ${TOUCH_BIN} "${PREFIX}/${application}.INSTALLED"
+            debug "Writing version: ${APP_VERSION} of app: '${application}' installed in: ${PREFIX}"
+            echo "${APP_VERSION}" > "${PREFIX}/${application}.INSTALLED"
+        }
+        
+        if [ -e "${PREFIX}/${application}.INSTALLED" ]; then
+            if [ "${CHANGED}" = "true" ]; then
+                note "At least one of app dependencies has been changed. Forced rebuild of application…"
+                execute_process "${application}"
+                unset CHANGED
+                mark
+            else
+                note "Requirement: ${application} marked as installed. Skipping…"
+            fi
+        else
+            execute_process "${application}"
+            mark
+        fi
+            
+        if [ ! "${USER_UID}" = "" ]; then
+            debug "Setting owner of ${PREFIX} recursively to user: ${USER_UID}"
+            ${CHOWN_BIN} -R "${USER_UID}" "${PREFIX}"
+        fi
+
+    done
+
+done
+
+
+note "Adding /etc/profile settings using ${SCRIPT_NAME}"
+echo $(${SCRIPT_NAME} getshellpath) > /etc/profile
+echo $(${SCRIPT_NAME} getshellld) >> /etc/profile
+
+note "All done."
+exit
