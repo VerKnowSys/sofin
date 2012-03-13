@@ -14,8 +14,9 @@ customizable software for FreeBSD servers.
 * Every "software" has own definition ("def" file) with defined flat dependency list and basic data.
   Every definition is sh script itself (More in skeleton.def and defaults.def files)
 * Simple flat dependency managment. It's flexible enough to bundle almost any mix of requirements in bundle.
-* Simple way of creating "lists" of definitions to build. Just create a text file with your definitions list,
-  create/update definitions snapshot and give it to sofin as param and it will do the rest. It's that simple.
+* Simple way of creating "lists" of definitions to build. Just create a text file with your definitions in "lists/",
+  directory, create/update definitions snapshot (using sofin-make-defs) and give that list filename to sofin
+  as parameter. It's that simple (see examples).
 * Software patches are supported automatically. The only thing required is to put patches into
   "definitions/patches/definition_file_name/" directory. Sofin will do the rest.
 * Every application is bundled separately with all dependencies in own root directory. The only external
