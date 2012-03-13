@@ -304,6 +304,9 @@ for application in ${APPLICATIONS}; do
         else
             debug "User build: ${USER_UID}"
             export PREFIX="${HOME_DIR}${USER_UID}/${HOME_APPS_DIR}${APP_NAME}"
+            if [ ! -d "${HOME_DIR}${USER_UID}/${HOME_APPS_DIR}" ]; then
+                ${MKDIR_BIN} -p "${HOME_DIR}${USER_UID}/${HOME_APPS_DIR}"
+            fi
         fi
         
         # append app postfix
