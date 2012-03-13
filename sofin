@@ -3,8 +3,8 @@
 
 
 # config settings
-DEBUG="true"
-VERSION="0.9.2ß"
+DEBUG="false"
+VERSION="0.9.3ß"
 
 
 SCRIPT_NAME="$0"
@@ -501,7 +501,7 @@ for application in ${APPLICATIONS}; do
 done
 
 
-note "Adding /etc/profile settings using ${SCRIPT_NAME}"
+note "Adding /etc/profile_sofin settings using ${SCRIPT_NAME}"
 echo $(${SCRIPT_NAME} getshellpath) > /etc/profile
 echo $(${SCRIPT_NAME} getshellld) >> /etc/profile
 
