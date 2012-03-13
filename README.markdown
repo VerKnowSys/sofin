@@ -14,8 +14,8 @@ customizable software for FreeBSD servers.
 * Every "software" has own definition ("def" file) with defined flat dependency list and basic data.
   Every definition is sh script itself (More in skeleton.def and defaults.def files)
 * Simple flat dependency managment. It's flexible enough to bundle almost any mix of requirements in bundle.
-* Simple way of creating "lists" of definitions to build. Just create a text file with your definitions list
-  and give it to sofin as param and it will do the rest. It's that simple.
+* Simple way of creating "lists" of definitions to build. Just create a text file with your definitions list,
+  create/update definitions snapshot and give it to sofin as param and it will do the rest. It's that simple.
 * Software patches are supported automatically. The only thing required is to put patches into
   "definitions/patches/definition_file_name/" directory. Sofin will do the rest.
 * Every application is bundled separately with all dependencies in own root directory. The only external
@@ -49,22 +49,36 @@ customizable software for FreeBSD servers.
     or
     `rm -r /Users/USER/Apps/AppName`
 
+* Give me "PATH" for all applications installed system wide (explained in pitfalls):
+    `sofin getshellpath`
+
+* Give me "PATH" for all applications of user "dmilith" (explained in pitfalls):
+    `sofin getshellpath dmilith`
+
+* Give me "LD_LIBRARY_PATH" for all applications of user "dmilith" (explained in pitfalls):
+    `sofin getshellld dmilith`
+
+
 
 ## Pitfalls/ Limitations:
-* Because every software bundle has own root dir, no ld information is provided by default by system,
-  so software which uses shared libraries will require to set "LD_LIBRARY_PATH" for ld linker.
-  To generate this variable for currently installed software just spawn sofin with "getshellld" param.
+* Sofin requires to be installed or symlinked to system default PATH location (/bin:/usr/bin or similar)
+* Because every software bundle has own root dir, no ld information about libraries is provided by default
+  by system, so software which uses shared libraries will require to have "LD_LIBRARY_PATH" set for linker.
+  To generate this variable for currently installed software just run sofin with "getshellld" param.
   To get user side values give it additional param of user name (f.e. sofin getshellld username).
 * To generate "PATH" variable from installed software use "getshellpath" param. To get user side values
   give it additional param of user name (f.e. sofin getshellpath username).
 * Currently only "tar.gz" archives files are cached and supported. In case of using different archive
   type a failure will happen.
-* Any kind of sha/md5 checksumming isn't supported at all.
-* Currently VerKnowSys.com repository is hardcoded into script. To maintain own definitions You may just
+* Currently all software used by current definitions is mirrored on software.verknowsys.com/source
+* Currently software.verknowsys.com repository is hardcoded into script. To maintain own definitions You may just
   fork and create own defs which I just merge into this repository or create own one somewhere.
-* After each software installation Sofin updates "/etc/profile_sofin" with current "PATH" and "LD_LIBRARY_PATH",
-  based on currently installed software. If You're using ZSH shell, just append ". /etc/profile_sofin" into
+* Currently any kind of sha/md5 checksumming isn't supported at all.
+* After each system wide software installation Sofin updates "/etc/profile_sofin" with current "PATH" and "LD_LIBRARY_PATH",
+  based on currently installed software in /Software. If You're using ZSH shell, just append ". /etc/profile_sofin" into
   Your zshrc file. If You're using bash, You'll achieve same thing by "source /etc/profile_sofin".
+* Currently some definitions provided by Sofin include a couple of custom patches on software required
+  by VerKnowSys ServeD © System. It *shouldn't* but **may** break the way how software works on different systems.
 
 
 ## License:
