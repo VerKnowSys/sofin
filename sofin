@@ -501,9 +501,11 @@ for application in ${APPLICATIONS}; do
 done
 
 
-note "Adding /etc/profile_sofin settings using ${SCRIPT_NAME}"
-echo $(${SCRIPT_NAME} getshellpath) > /etc/profile
-echo $(${SCRIPT_NAME} getshellld) >> /etc/profile
+if [ "${USER_UID}" = "" ]; then
+    note "Adding /etc/profile_sofin settings using ${SCRIPT_NAME}"
+    echo $(${SCRIPT_NAME} getshellpath) > /etc/profile_sofin
+    echo $(${SCRIPT_NAME} getshellld) >> /etc/profile_sofin
+fi
 
 note "All done."
 exit
