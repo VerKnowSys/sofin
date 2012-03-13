@@ -195,7 +195,11 @@ if [ ! "$1" = "" ]; then
 
     getshellpath)
         result="${DEFAULT_PATH}"
-        for app in ${SOFTWARE_DIR}*; do
+        SOFT_DIR="${SOFTWARE_DIR}"
+        if [ ! -z "$2" ]; then
+            SOFT_DIR="${HOME_DIR}$2/${HOME_APPS_DIR}"
+        fi
+        for app in ${SOFT_DIR}*; do
             if [ -e "${app}/bin" ]; then
                 result="${result}:${app}/bin"
             fi
@@ -210,10 +214,14 @@ if [ ! "$1" = "" ]; then
         unset result
         exit
         ;;
-
+        
     getshellld)
         ldresult="/lib:/usr/lib"
-        for lib in ${SOFTWARE_DIR}*; do
+        SOFT_DIR="${SOFTWARE_DIR}"
+        if [ ! -z "$2" ]; then
+            SOFT_DIR="${HOME_DIR}$2/${HOME_APPS_DIR}"
+        fi
+        for lib in ${SOFT_DIR}*; do
             if [ -e "${lib}/lib" ]; then
                 ldresult="${lib}/lib:${ldresult}"
             fi
