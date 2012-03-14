@@ -6,18 +6,6 @@
 DEBUG="false"
 VERSION="0.9.4ß"
 
-#compiler settings
-USE_CLANG="true"
-if [ "${USE_CLANG}" = "true" ]; then
-    export CC="clang"
-    export CXX="clang++"
-    export CPP="clang -E"
-else
-    unset CC
-    unset CXX
-    unset CPP
-fi
-
 # global script settings
 SCRIPT_NAME="$0"
 MAIN_SOURCE_REPOSITORY="http://software.verknowsys.com/source/"
@@ -34,7 +22,7 @@ DEFAULT_PATH="/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin"
 ECHOE="true"
 
 # config binary requirements definitions
-DIRNAME_BIN="/usr/bin/dirname"
+WHICH_BIN="/usr/bin/which"
 TAIL_BIN="/usr/bin/tail"
 CUT_BIN="/usr/bin/cut"
 LS_BIN="/bin/ls"
@@ -53,7 +41,6 @@ GREP_BIN="/usr/bin/grep"
 FETCH_BIN="/usr/bin/fetch"
 UNAME_BIN="/usr/bin/uname"
 
-
 # ANSI color definitions
 red='\033[31;40m'
 green='\033[32;40m'
@@ -67,6 +54,21 @@ reset='\033[0m'
 
 
 # helpers
+
+set_default_compiler () {
+    #compiler settings
+    $(${WHICH_BIN} clang > /dev/null) 
+    if [ "$?" = "0" ]; then
+        export CC="clang"
+        export CXX="clang++"
+        export CPP="clang -E"
+    else
+        unset CC
+        unset CXX
+        unset CPP
+    fi
+}
+
 
 cecho () {
     if [ "${ECHOE}" = "false" ]; then
@@ -178,6 +180,7 @@ check_os () {
 check_os
 check_root
 check_definition_dir
+set_default_compiler
 
 
 # unset conflicting environment variables
@@ -366,6 +369,15 @@ for application in ${APPLICATIONS}; do
 
             . $DEFAULTS
             . $req_definition_file
+            # force GNU compiler usage on definition side:
+            if [ ! -z "${FORCE_GNU_COMPILER}" ]; then
+                debug "Forcing use of GNU compiler for application: ${APP_NAME}"
+                export CC="gcc"
+                export CXX="g++"
+                export CPP="cpp"
+            else
+                set_default_compiler
+            fi
             export ALLOW=1
             if [ ! "$DISABLE_ON" = "" ]; then
                 for disabled in ${DISABLE_ON}; do
