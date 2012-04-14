@@ -99,7 +99,7 @@ check_required_dirs_and_create_snapshot () {
         fi
     done
     note "Creating snapshot…"
-    tar_options="cf"
+    tar_options="cfj"
     if [ "${DEBUG}" = "true" ]; then
         tar_options="${tar_options}v"
     fi
