@@ -6,7 +6,7 @@
 DEBUG="false"
 
 DEFINITION_SNAPSHOT_FILE="defs.tar.gz"
-DESTINATION_REPOSITORY_SERVER="dmilith@verknowsys.com:/opt/software/source/definitions/"
+DESTINATION_REPOSITORY_SERVER="dmilith@software.verknowsys.com:/opt/software/source/definitions/"
 
 # config binary requirements definitions
 DIRNAME_BIN="/usr/bin/dirname"
