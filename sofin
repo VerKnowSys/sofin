@@ -4,7 +4,7 @@
 
 # config settings
 DEBUG="false"
-VERSION="0.9.4ß"
+VERSION="0.9.5ß"
 
 # global script settings
 SCRIPT_NAME="$0"
@@ -155,7 +155,7 @@ update_definitions () {
 
 usage_howto () {
     error "No task param given!"
-    error "Built in tasks: list, destroyall, getshellpath, getshellld, one, user, custom-definition-list-file"
+    error "Built in tasks: log, list, destroyall, getshellpath, getshellld, one, user, custom-definition-list-file"
     exit
 }
 
@@ -194,7 +194,11 @@ unset LD_PRELOAD
 
 if [ ! "$1" = "" ]; then
     case $1 in
-
+    
+    log)
+        ${TAIL_BIN} -F ${LOG}
+        ;;
+    
     list)
         SOFT_DIR="${SOFTWARE_DIR}"
         if [ ! -z "$2" ]; then
@@ -347,7 +351,7 @@ for application in ${APPLICATIONS}; do
                     ${TOUCH_BIN} "${LOG}"
                 fi
                 debug "Running '$@' @ $(${DATE_BIN})" >> "${LOG}"
-                eval PATH=${PATH} "$@" 1>> "${LOG}" 2>> "${LOG}"
+                eval PATH=${PATH} time "$@" 1>> "${LOG}" 2>> "${LOG}"
                 check_command_result $?
             else
                 error "Empty command to run?"
@@ -520,6 +524,7 @@ for application in ${APPLICATIONS}; do
             
         if [ ! "${USER_UID}" = "" ]; then
             debug "Setting owner of ${PREFIX} recursively to user: ${USER_UID}"
+            ${CHOWN_BIN} "${USER_UID}" "/Users/${USER_UID}" # NOTE: sanity check.
             ${CHOWN_BIN} -R "${USER_UID}" "${PREFIX}"
         fi
 
