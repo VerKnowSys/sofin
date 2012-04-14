@@ -6,6 +6,7 @@
 DEBUG="false"
 
 DEFINITION_SNAPSHOT_FILE="defs.tar.gz"
+DESTINATION_REPOSITORY_SERVER="dmilith@verknowsys.com:/opt/software/source/definitions/"
 
 # config binary requirements definitions
 DIRNAME_BIN="/usr/bin/dirname"
@@ -26,6 +27,7 @@ CHOWN_BIN="/usr/sbin/chown"
 GREP_BIN="/usr/bin/grep"
 FETCH_BIN="/usr/bin/fetch"
 UNAME_BIN="/usr/bin/uname"
+SCP_BIN="/usr/bin/scp"
 
 
 # ANSI color definitions
@@ -87,7 +89,7 @@ check_command_result () {
 }
 
 
-check_required_dirs_and_create_snaphot () {
+check_required_dirs_and_create_snapshot () {
     REQS="definitions lists"
     note "Checking directories…"
     for req in ${REQS}; do
@@ -106,7 +108,15 @@ check_required_dirs_and_create_snaphot () {
 
 
 note "Creating definitions and lists package: ${DEFINITION_SNAPSHOT_FILE}"
-check_required_dirs_and_create_snaphot
+check_required_dirs_and_create_snapshot
+
+if [ ! -z "${DESTINATION_REPOSITORY_SERVER}" ]; then
+    note "Sending definitions to repository…"
+    ${SCP_BIN} ${DEFINITION_SNAPSHOT_FILE} ${DESTINATION_REPOSITORY_SERVER}
+fi
+
+note "Removing cached ${DEFINITION_SNAPSHOT_FILE}…"
+${RM_BIN} ${DEFINITION_SNAPSHOT_FILE}
 
 note "Job's done."
 exit
