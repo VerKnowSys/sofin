@@ -1,0 +1,4 @@
+APP_FULL_NAME="Protocol Buffers - Google's data interchange format"
+APP_NAME="protobuf"
+APP_VERSION="2.4.1"
+APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
