@@ -67,8 +67,7 @@ customizable software for FreeBSD servers.
 * Create a list called "databases", with definitions: "postgresql" and "mysql", and install it with Sofin:
     `cd Sofin`
     `echo "postgresql\nmysql" > lists/databases`
-    run `sofin-make-defs` to create a snapshot,
-    put "defs.tar.gz" to location defined by "MAIN_SOURCE_REPOSITORY" (inside sofin script)
+    run `sofin-make-defs` to create a snapshot and upload it to Your remote respository.
     run `sofin databases`
 
 
