@@ -532,6 +532,10 @@ if [ "${USER_UID}" = "" ]; then
     note "Adding /etc/profile_sofin settings using ${SCRIPT_NAME}"
     echo $(${SCRIPT_NAME} getshellpath) > /etc/profile_sofin
     echo $(${SCRIPT_NAME} getshellld) >> /etc/profile_sofin
+else
+    note "Adding /Users/${USER_UID}/.profile settings using ${SCRIPT_NAME}"
+    echo $(${SCRIPT_NAME} getshellpath ${USER_UID}) > /Users/${USER_UID}/.profile
+    echo $(${SCRIPT_NAME} getshellld ${USER_UID}) >> /Users/${USER_UID}/.profile
 fi
 
 note "All done."
