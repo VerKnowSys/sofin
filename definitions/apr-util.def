@@ -1,0 +1,6 @@
+APP_FULL_NAME="Apache Portable RUntime Utility"
+APP_NAME="apr-util"
+APP_VERSION="1.4.1"
+APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
+APP_REQUIREMENTS="apr"
+APP_CONFIGURE_ARGS="--with-apr=${PREFIX}"
