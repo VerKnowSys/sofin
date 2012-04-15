@@ -1,0 +1,35 @@
+--- SConstruct.orig	2012-03-21 22:02:02.000000000 +0100
++++ SConstruct	2012-03-21 23:21:09.000000000 +0100
+@@ -714,7 +714,10 @@
+ 
+     #make scons colorgcc friendly
+     env['ENV']['HOME'] = os.environ['HOME']
+-    env['ENV']['TERM'] = os.environ['TERM']
++    try:
++        env['ENV']['TERM'] = os.environ['TERM']
++    except KeyError:
++        env['ENV']['TERM'] = 'dumb'
+ 
+     if linux and has_option( "sharedclient" ):
+         env.Append( LINKFLAGS=" -Wl,--as-needed -Wl,-zdefs " )
+@@ -797,8 +800,9 @@
+     options_topass["nix"] = nix
+     
+     if has_option( "use-system-" + shortName ) or has_option( "use-system-all" ):
+-        print( "using system version of: " + shortName )
+-        myModule.configureSystem( env , fileLists , options_topass )
++        if not (shortName == 'sm' and usev8):
++            print( "using system version of: " + shortName )
++            myModule.configureSystem( env , fileLists , options_topass )
+     else:
+         myModule.configure( env , fileLists , options_topass )
+ 
+@@ -1458,7 +1462,7 @@
+     fullInstallName = installDir + "/bin/" + name
+ 
+     allBinaries += [ name ]
+-    if (solaris or linux) and (not has_option("nostrip")):
++    if (solaris or linux or freebsd) and (not has_option("nostrip")):
+         e.AddPostAction( inst, e.Action( 'strip ' + fullInstallName ) )
+ 
+     if not has_option( "no-glibc-check" ) and linux and len( COMMAND_LINE_TARGETS ) == 1 and str( COMMAND_LINE_TARGETS[0] ) == "s3dist":

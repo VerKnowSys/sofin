@@ -1,0 +1,8 @@
+APP_FULL_NAME="V8 JavaScript engine"
+APP_NAME="v8"
+APP_VERSION="3.9.5"
+APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
+APP_REQUIREMENTS="libexecinfo python2 scons make"
+APP_CONFIGURE_SCRIPT="ignore"
+APP_MAKE_METHOD="true"
+APP_INSTALL_METHOD="make native werror=no OUTDIR=${PREFIX} CXX=/usr/bin/clang++ CC=/usr/bin/clang GYP_DEFINES='clang=1'"

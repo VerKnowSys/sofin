@@ -1,0 +1,8 @@
+APP_FULL_NAME="Mongodb database"
+APP_NAME="mongodb"
+APP_VERSION="2.0.4"
+APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-src-r${APP_VERSION}.tar.gz"
+APP_REQUIREMENTS="zlib iconv libexecinfo pcre python2 scons boost make v8"
+APP_CONFIGURE_SCRIPT="ignore"
+APP_MAKE_METHOD="true"
+APP_INSTALL_METHOD="scons --release --extrapath=${PREFIX} --usev8 install"
