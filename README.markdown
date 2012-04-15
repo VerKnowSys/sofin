@@ -94,5 +94,11 @@ customizable software for FreeBSD servers.
   by VerKnowSys ServeD © System. It *shouldn't* but **may** break the way how software works on different systems.
 
 
+## We don't want to support broken technologies:
+* Like.. for example: Subversion. Don't even try to create definition for this monster. It's not worth it. We support git and mercurial.
+  That's enough for Your beautiful life. Believe me.
+* TODO: fill this list with more.
+
+
 ## License:
   Released under the BSD license.
