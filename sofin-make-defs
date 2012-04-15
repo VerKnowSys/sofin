@@ -5,6 +5,7 @@
 # config settings
 DEBUG="false"
 
+LOG="/tmp/sofin-make-defs.log"
 DEFINITION_SNAPSHOT_FILE="defs.tar.gz"
 DESTINATION_REPOSITORY_SERVER="dmilith@software.verknowsys.com:/opt/software/source/definitions/"
 
@@ -29,7 +30,6 @@ FETCH_BIN="/usr/bin/fetch"
 UNAME_BIN="/usr/bin/uname"
 SCP_BIN="/usr/bin/scp"
 
-
 # ANSI color definitions
 red='\033[31;40m'
 green='\033[32;40m'
@@ -41,8 +41,8 @@ gray='\033[37;40m'
 white='\033[38;40m'
 reset='\033[0m'
 
-
 # helpers
+ECHOE="false"
 
 cecho () {
     if [ "${ECHOE}" = "false" ]; then
@@ -55,7 +55,7 @@ cecho () {
 
 
 note () {
-    cecho " * $1" ${white}
+    cecho " * $1" ${green}
 }
 
 
@@ -104,6 +104,7 @@ check_required_dirs_and_create_snapshot () {
         tar_options="${tar_options}v"
     fi
     ${TAR_BIN} ${tar_options} "${DEFINITION_SNAPSHOT_FILE}" ${REQS}
+    check_command_result $?
 }
 
 
@@ -112,7 +113,8 @@ check_required_dirs_and_create_snapshot
 
 if [ ! -z "${DESTINATION_REPOSITORY_SERVER}" ]; then
     note "Sending definitions to repository…"
-    ${SCP_BIN} ${DEFINITION_SNAPSHOT_FILE} ${DESTINATION_REPOSITORY_SERVER}
+    ${SCP_BIN} ${DEFINITION_SNAPSHOT_FILE} ${DESTINATION_REPOSITORY_SERVER} >> ${LOG}
+    check_command_result $?
 fi
 
 note "Removing cached ${DEFINITION_SNAPSHOT_FILE}…"
