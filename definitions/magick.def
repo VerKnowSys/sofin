@@ -1,6 +1,0 @@
-APP_FULL_NAME="Magick Graphics Library"
-APP_NAME="ImageMagick"
-APP_VERSION="6.6.9-9"
-APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
-APP_REQUIREMENTS="zlib xml jpeg png"
-APP_EXPORTS="convert identify"
