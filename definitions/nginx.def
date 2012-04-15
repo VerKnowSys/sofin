@@ -1,0 +1,8 @@
+APP_FULL_NAME="Nginx Standalone"
+APP_NAME="nginx"
+APP_VERSION="1.0.15"
+APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
+APP_REQUIREMENTS="iconv zlib pcre"
+PCRE_VERSION="8.12"
+APP_CONFIGURE_ARGS="--with-http_ssl_module --with-poll_module --with-http_gzip_static_module --user=nobody --group=nogroup --with-pcre=${CACHE_DIR}cache/pcre-${PCRE_VERSION}/pcre-${PCRE_VERSION}"
+APP_EXPORTS="nginx"
