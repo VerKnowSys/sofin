@@ -1,0 +1,6 @@
+APP_FULL_NAME="ImageMagick Graphics Library"
+APP_NAME="ImageMagick"
+APP_VERSION="6.7.6-5"
+APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
+APP_REQUIREMENTS="make zlib expat freetype fontconfig iconv jpeg png tiff"
+APP_EXPORTS="convert display identify animate compare composite conjure mogrify montage thumbnail stream Magick++-config Magick-config MagickWand-config Wand-config MagickCore-config libpng15-config freetype-config libpng-config"
