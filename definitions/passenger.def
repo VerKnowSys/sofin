@@ -6,3 +6,4 @@ APP_REQUIREMENTS="zlib xml yaml ncurses iconv curl libffi libexecinfo python2 sc
 APP_CONFIGURE_SCRIPT="ignore"
 APP_MAKE_METHOD="${PREFIX}/bin/gem install rake rack bundler"
 APP_INSTALL_METHOD="${PREFIX}/bin/ruby bin/passenger-install-nginx-module --auto --auto-download --prefix=${PREFIX}"
+APP_EXPORTS="passenger nginx bundle rack rake gem irb ruby"

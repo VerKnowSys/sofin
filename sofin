@@ -4,7 +4,7 @@
 
 # config settings
 DEBUG="false"
-VERSION="0.9.5ß"
+VERSION="0.9.6ß"
 
 # global script settings
 SCRIPT_NAME="$0"
@@ -22,6 +22,7 @@ DEFAULT_PATH="/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin"
 ECHOE="true"
 
 # config binary requirements definitions
+LN_BIN="/bin/ln"
 WHICH_BIN="/usr/bin/which"
 TAIL_BIN="/usr/bin/tail"
 CUT_BIN="/usr/bin/cut"
@@ -219,14 +220,9 @@ if [ ! "$1" = "" ]; then
             SOFT_DIR="${HOME_DIR}$2/${HOME_APPS_DIR}"
         fi
         for app in ${SOFT_DIR}*; do
-            if [ -e "${app}/bin" ]; then
-                result="${result}:${app}/bin"
-            fi
-            if [ -e "${app}/sbin" ]; then
-                result="${result}:${app}/sbin"
-            fi
-            if [ -e "${app}/libexec" ]; then
-                result="${result}:${app}/libexec"
+            exp="${app}/exports"
+            if [ -e "${exp}" ]; then
+                result="${result}:${exp}"
             fi
         done
         echo "export PATH=${result}"
@@ -473,6 +469,7 @@ for application in ${APPLICATIONS}; do
                             debug "After install callback: ${APP_AFTER_INSTALL_CALLBACK}"
                             run "${APP_AFTER_INSTALL_CALLBACK}"
                         fi
+                        
                         debug "Marking as installed '$1' in: ${PREFIX}"
                         ${TOUCH_BIN} "${PREFIX}/$1.INSTALLED"
                         debug "Writing version: ${APP_VERSION} of app: '${APP_NAME}' installed in: ${PREFIX}"
@@ -521,6 +518,21 @@ for application in ${APPLICATIONS}; do
             execute_process "${application}"
             mark
         fi
+        
+        . ${DEFINITIONS_DIR}${application}.def
+        ${MKDIR_BIN} -p "${PREFIX}/exports"
+        for exp in ${APP_EXPORTS}; do
+            for dir in "/bin/" "/sbin/" "/libexec/"; do
+                debug "Testing ${dir} looking into: ${PREFIX}${dir}${exp}"
+                if [ -e "${PREFIX}${dir}${exp}" ]; then
+                    note "Exporting binary: ${PREFIX}${dir}${exp}"
+                    ${LN_BIN} -fs "${PREFIX}${dir}${exp}" "${PREFIX}/exports/${exp}" >> $LOG
+                fi
+            done
+        done
+        
+        # TODO: XXX: rethink getshellld with cross dependencies possibility!
+
             
         if [ ! "${USER_UID}" = "" ]; then
             debug "Setting owner of ${PREFIX} recursively to user: ${USER_UID}"
