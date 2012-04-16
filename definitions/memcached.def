@@ -1,0 +1,7 @@
+APP_FULL_NAME="Memcached"
+APP_NAME="memcached"
+APP_VERSION="1.4.13"
+APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
+APP_REQUIREMENTS="libevent"
+APP_CONFIGURE_ARGS="CFLAGS=-werror --with-libevent=${PREFIX} --enable-64bit --disable-docs"
+APP_EXPORTS="memcached"
