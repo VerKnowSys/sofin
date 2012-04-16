@@ -3,8 +3,8 @@
 
 
 # config settings
-DEBUG="false"
-VERSION="0.9.6ß"
+DEBUG="true"
+VERSION="0.9.7ß"
 
 # global script settings
 SCRIPT_NAME="$0"
@@ -222,7 +222,7 @@ if [ ! "$1" = "" ]; then
         for app in ${SOFT_DIR}*; do
             exp="${app}/exports"
             if [ -e "${exp}" ]; then
-                result="${result}:${exp}"
+                result="${exp}:${result}"
             fi
         done
         echo "export PATH=${result}"
