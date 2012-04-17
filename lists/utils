@@ -1,2 +1,3 @@
-rsync
+valgrind-freebsd
 sudo
+rsync
