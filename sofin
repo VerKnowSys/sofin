@@ -4,7 +4,7 @@
 
 # config settings
 DEBUG="true"
-VERSION="0.9.8"
+VERSION="0.10.0"
 
 # global script settings
 SCRIPT_NAME="$0"
@@ -136,29 +136,42 @@ check_requirements () {
 }
 
 
-update_definitions () {
+update_definitions () { # accepts optional user uid param
     note "Sofin v${VERSION}"
-    cd "${CACHE_DIR}"
     tar_options="xf"
     rm_options="-rf"
     if [ "${DEBUG}" = "true" ]; then
         tar_options="${tar_options}v"
         rm_options="${rm_options}v"
     fi
-    debug "Removing old definitions, patches and lists…"
-    ${RM_BIN} ${rm_options} "${LISTS_DIR}" >> "${LOG}"
-    ${RM_BIN} ${rm_options} "${DEFINITIONS_DIR}" >> "${LOG}"
-    ${RM_BIN} ${rm_options} "${CACHE_DIR}${DEFINITION_SNAPSHOT_FILE}" >> "${LOG}"
+    debug "Checking for destination directories existance…"
+    for element in "${LISTS_DIR}" "${DEFINITIONS_DIR}"; do
+        debug "Creating dir: ${element}"
+        ${MKDIR_BIN} -p "${element}" > /dev/null
+        if [ ! -z "${1}" ]; then # param with uid not given
+            ${TOUCH_BIN} ${LOG}
+            if [ "$(${ID_BIN} -u)" = "0" ]; then
+                debug "Chowning ${element} for user: ${1}"
+                ${CHOWN_BIN} -R ${1} "${element}" >> ${LOG}
+            fi
+        fi
+        debug "Removing old definitions: ${element}"
+        ${RM_BIN} ${rm_options} "${element}" >> ${LOG}
+    done
+    cd "${CACHE_DIR}"
     note "Updating definitions snapshot from: ${MAIN_SOURCE_REPOSITORY}definitions/${DEFINITION_SNAPSHOT_FILE}"    
     ${FETCH_BIN} "${MAIN_SOURCE_REPOSITORY}definitions/${DEFINITION_SNAPSHOT_FILE}" >> "${LOG}" 2>> "${LOG}"
     ${TAR_BIN} ${tar_options} "${DEFINITION_SNAPSHOT_FILE}" >> "${LOG}" 2>> "${LOG}"
+    if [ "$(${ID_BIN} -u)" = "0" ]; then
+        debug "Chowning definitions for user: ${1}"
+        ${CHOWN_BIN} -R ${1} "${CACHE_DIR}" >> ${LOG}
+    fi
 }
 
 
 usage_howto () {
-    error "No task param given!"
-    error "Built in tasks:"
-    error "log, list, destroyall, getshellpath, getshellld, one, user, export, available custom-definition-list-file"
+    error "No task param given! Built in tasks:"
+    error "install, uninstall, cherrypick, exportapp, log, installed, getshellpath, getshellld"
     exit
 }
 
@@ -196,23 +209,37 @@ unset LD_PRELOAD
 
 if [ ! "$1" = "" ]; then
     case $1 in
-    
+
+
     log)
-        if [ -z "$2" ]; then
-            check_root
-        fi
-        if [ ! "$(${ID_BIN} -u)" = "$2" ]; then
-            check_root
+        if [ -z "${2}" ]; then
+            export LOG="${HOME_DIR}$(${ID_BIN} -u)/install.log"
+            if [ "$(${ID_BIN} -u)" = "0" ]; then
+                check_root
+                export LOG="${CACHE_DIR}install.log"
+            fi
         else
-            export LOG="${HOME_DIR}$2/install.log"
+            export LOG="${HOME_DIR}${2}/install.log"
+            if [ ! "$(${ID_BIN} -u)" = "${2}" ]; then
+                check_root
+            fi
         fi
         ${TAIL_BIN} -F ${LOG}
         ;;
-    
-    list)
-        SOFT_DIR="${SOFTWARE_DIR}"
-        if [ ! -z "$2" ]; then
-            SOFT_DIR="${HOME_DIR}$2/${HOME_APPS_DIR}"
+
+
+    installed)
+        if [ -z "${2}" ]; then
+            export SOFT_DIR="${HOME_DIR}$(${ID_BIN} -u)/${HOME_APPS_DIR}"
+            if [ "$(${ID_BIN} -u)" = "0" ]; then
+                check_root
+                export SOFT_DIR="${SOFTWARE_DIR}"
+            fi
+        else
+            export SOFT_DIR="${HOME_DIR}$2/${HOME_APPS_DIR}"
+            if [ ! "$(${ID_BIN} -u)" = "${2}" ]; then
+                check_root
+            fi
         fi
         if [ -d ${SOFT_DIR} ]; then
             cecho "$(${LS_BIN} -mTI ${SOFT_DIR})" ${green}
@@ -221,6 +248,7 @@ if [ ! "$1" = "" ]; then
         fi
         exit
         ;;
+
 
     getshellpath)
         result="${DEFAULT_PATH}"
@@ -238,7 +266,8 @@ if [ ! "$1" = "" ]; then
         unset result
         exit
         ;;
-        
+
+
     getshellld)
         ldresult="/lib:/usr/lib"
         SOFT_DIR="${SOFTWARE_DIR}"
@@ -258,62 +287,105 @@ if [ ! "$1" = "" ]; then
         exit
         ;;
 
-    one)
+
+    cherrypick)
         if [ "$2" = "" ]; then
-            error "For \"one\" application installation mode, second argument with user is required!"
+            error "For \"$1\" application installation mode, second argument with application definition name is required!"
             exit 1
         fi
-        if [ "$3" = "" ]; then
-            error "For \"one\" application installation mode, third argument with application definition name is required!"
-            exit 1
-        fi
-        export APPLICATIONS="$3"
-        export USER_UID="$2"
-        if [ ! "$(${ID_BIN} -u)" = "$2" ]; then
-            check_root
+        export APPLICATIONS="$2"
+        if [ -z "${3}" ]; then
+            export USER_UID="$(${ID_BIN} -u)"
         else
-            export LOG="${HOME_DIR}$2/sofin.log"
-            export CACHE_DIR="${HOME_DIR}$2/.cache/"
+            export USER_UID="$3"
+        fi
+        if [ ! "$(${ID_BIN} -u)" = "${USER_UID}" ]; then
+            check_root
+        fi
+        if [ "${USER_UID}" = "0" ]; then
+            unset USER_UID
+        else
+            export LOG="${HOME_DIR}${USER_UID}/install.log"
+            export CACHE_DIR="${HOME_DIR}${USER_UID}/.cache/"
             export DEFINITIONS_DIR="${CACHE_DIR}definitions/"
             export LISTS_DIR="${CACHE_DIR}lists/"
             export DEFAULTS="${DEFINITIONS_DIR}defaults.def"
         fi
-        update_definitions
+        update_definitions ${USER_UID}
         note "Installation mode for given user: ${USER_UID} of definition: ${APPLICATIONS}"
         ;;
 
-    user)
+
+    install)
         if [ "$2" = "" ]; then
-            error "For \"user\" application installation mode, second argument with user is required!"
+            error "For \"$1\" application installation mode, second argument with application list is required!"
             exit 1
         fi
-        if [ "$3" = "" ]; then
-            error "For \"user\" application installation mode, third argument with application list is required!"
-            exit 1
-        fi
-        export APPLICATIONS="$(${CAT_BIN} ${LISTS_DIR}$3 | ${TR_BIN} '\n' ' ')"
-        export USER_UID="$2"
-        if [ ! "$(${ID_BIN} -u)" = "$2" ]; then
-            check_root
+        export APPLICATIONS="$(${CAT_BIN} ${LISTS_DIR}$2 | ${TR_BIN} '\n' ' ')"
+        if [ -z "${3}" ]; then
+            export USER_UID="$(${ID_BIN} -u)"
         else
-            export LOG="${HOME_DIR}$2/sofin.log"
-            export CACHE_DIR="${HOME_DIR}$2/.cache/"
+            export USER_UID="$3"
+        fi
+        if [ ! "$(${ID_BIN} -u)" = "${USER_UID}" ]; then
+            check_root
+        fi
+        if [ "${USER_UID}" = "0" ]; then
+            unset USER_UID
+        else
+            export LOG="${HOME_DIR}${USER_UID}/install.log"
+            export CACHE_DIR="${HOME_DIR}${USER_UID}/.cache/"
             export DEFINITIONS_DIR="${CACHE_DIR}definitions/"
             export LISTS_DIR="${CACHE_DIR}lists/"
             export DEFAULTS="${DEFINITIONS_DIR}defaults.def"
         fi
-        update_definitions
+        update_definitions ${USER_UID}
         note "Installation mode for given user: ${USER_UID} of definitions: ${APPLICATIONS}"
         ;;
 
+
+    delete|remove|uninstall)
+        if [ "$2" = "" ]; then
+            error "For \"$1\" task, second argument with application name(s) (capitalized) is required!"
+            exit 1
+        fi
+        if [ -z "${3}" ]; then # uid/user name not given
+            if [ "$(${ID_BIN} -u)" = "0" ]; then
+                check_root
+                export SOFT_DIR="${SOFTWARE_DIR}"
+            else
+                export LOG="${HOME_DIR}$(${ID_BIN} -u)/install.log"
+                export SOFT_DIR="${HOME_DIR}$(${ID_BIN} -u)/${HOME_APPS_DIR}"
+            fi
+        else
+            if [ ! "$(${ID_BIN} -u)" = "${3}" ]; then
+                check_root
+                export LOG="${HOME_DIR}${3}/install.log"
+                export SOFT_DIR="${HOME_DIR}${3}/${HOME_APPS_DIR}"
+            else
+                export LOG="${HOME_DIR}${3}/install.log"
+                export SOFT_DIR="${HOME_DIR}${3}/${HOME_APPS_DIR}"
+            fi
+        fi
+        note "Removing application: $2"
+        if [ "$2" = "/" ]; then
+            error "Czy Ty orzeszki?"
+            exit 1
+        fi
+        debug "Removing software from: ${SOFT_DIR}${2}"
+        ${RM_BIN} -rfv "${SOFT_DIR}${2}" >> ${LOG}
+        exit
+        ;;
+
+
     available)
-        update_definitions
-        cd ${DEFINITIONS_DIR}
+        cd "${DEFINITIONS_DIR}"
         ${LS_BIN} -x *def
         exit
         ;;
+
         
-    export)
+    exportapp)
         if [ "$2" = "" ]; then
             error "Missing second argument with user name is required!"
             exit 1
@@ -333,7 +405,7 @@ if [ ! "$1" = "" ]; then
             if [ ! "$(${ID_BIN} -u)" = "$2" ]; then
                 check_root
             fi
-            export LOG="${HOME_DIR}$2/sofin.log"
+            export LOG="${HOME_DIR}$2/install.log"
             export SOFT_DIR="${HOME_DIR}$2/${HOME_APPS_DIR}"
         fi
         for dir in "/bin/" "/sbin/" "/libexec/"; do
@@ -345,21 +417,13 @@ if [ ! "$1" = "" ]; then
         done
         exit
         ;;
-        
+
+
     *)
-        check_root
-        update_definitions
-        if [ ! -e "${LISTS_DIR}$1" ]; then
-            error "Definition not found: ${LISTS_DIR}$1"
-            exit 1
-        fi
-        export APPLICATIONS="$($CAT_BIN ${LISTS_DIR}$1 | ${TR_BIN} '\n' ' ')"
-        note "Definitions to install: ${APPLICATIONS}"
+        usage_howto
         ;;
 
     esac
-else
-    usage_howto
 fi
 
 
@@ -599,17 +663,14 @@ for application in ${APPLICATIONS}; do
             done
         done
         
-        # TODO: XXX: rethink getshellld with cross dependencies possibility!
-
-            
-        if [ ! "${USER_UID}" = "" ]; then
+        if [ ! -z "${USER_UID}" ]; then
             debug "Setting owner of ${PREFIX} recursively to user: ${USER_UID}"
-            ${CHOWN_BIN} "${USER_UID}" "/Users/${USER_UID}" # NOTE: sanity check.
-            ${CHOWN_BIN} -R "${USER_UID}" "${PREFIX}"
+            if [ "$(${ID_BIN} -u)" = "0" ]; then
+                ${CHOWN_BIN} -R ${USER_UID} "${HOME_DIR}${USER_UID}" # NOTE: sanity check.
+            fi
         fi
 
     done
-
 done
 
 
