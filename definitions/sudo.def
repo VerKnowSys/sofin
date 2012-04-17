@@ -1,6 +1,0 @@
-APP_FULL_NAME="Sudo"
-APP_NAME="sudo"
-APP_VERSION="1.8.4p2"
-APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
-APP_CONFIGURE_ARGS="--without-sendmail --without-mail-if-no-user --without-lecture --without-umask"
-APP_EXPORTS="sudo"
