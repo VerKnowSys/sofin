@@ -387,32 +387,37 @@ if [ ! "$1" = "" ]; then
         
     exportapp)
         if [ "$2" = "" ]; then
-            error "Missing second argument with user name is required!"
+            error "Missing second argument with export app is required!"
             exit 1
         fi
         if [ "$3" = "" ]; then
-            error "Missing third argument with app name (capitalized) is required!"
+            error "Missing third argument with source app (capitalized name) is required!"
             exit 1
         fi
-        if [ "$4" = "" ]; then
-            error "Missing fourth argument with export name is required!"
-            exit 1
-        fi
-        if [ "$2" = "0" ]; then
-            check_root
-            export SOFT_DIR="${SOFTWARE_DIR}"
-        else
-            if [ ! "$(${ID_BIN} -u)" = "$2" ]; then
-                check_root
+        EXPORT="$2"
+        APP="$3"
+        UID="$4"
+        export SOFT_DIR="${SOFTWARE_DIR}"
+        if [ -z "${UID}" ]; then
+            export UID="$(${ID_BIN} -u)"
+            if [ ! "${UID}" = "0" ]; then
+                export SOFT_DIR="${HOME_DIR}${UID}/${HOME_APPS_DIR}"
+                export LOG="${HOME_DIR}${UID}/install.log"
             fi
-            export LOG="${HOME_DIR}$2/install.log"
-            export SOFT_DIR="${HOME_DIR}$2/${HOME_APPS_DIR}"
+        else # uid given?
+            if [ ! "${UID}" = "0" ]; then
+                export SOFT_DIR="${HOME_DIR}${UID}/${HOME_APPS_DIR}"
+                export LOG="${HOME_DIR}${UID}/install.log"
+                if [ ! "${UID}" = "$(${ID_BIN} -u)" ]; then
+                    check_root
+                fi
+            fi
         fi
         for dir in "/bin/" "/sbin/" "/libexec/"; do
-            debug "Testing ${dir} looking into: ${SOFT_DIR}${3}${dir}"
-            if [ -e "${SOFT_DIR}${3}${dir}${4}" ]; then
-                note "Exporting binary: ${SOFT_DIR}${3}${dir}${4}"
-                ${LN_BIN} -vfs "${SOFT_DIR}${3}${dir}${4}" "${SOFT_DIR}${3}/exports/${4}" >> $LOG
+            debug "Testing ${dir} looking into: ${SOFT_DIR}${APP}${dir}"
+            if [ -e "${SOFT_DIR}${APP}${dir}${EXPORT}" ]; then
+                note "Exporting binary: ${SOFT_DIR}${APP}${dir}${EXPORT}"
+                ${LN_BIN} -vfs "${SOFT_DIR}${APP}${dir}${EXPORT}" "${SOFT_DIR}${APP}/exports/${EXPORT}" >> $LOG
             fi
         done
         exit
@@ -424,6 +429,8 @@ if [ ! "$1" = "" ]; then
         ;;
 
     esac
+else
+    usage_howto
 fi
 
 
