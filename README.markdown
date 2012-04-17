@@ -10,7 +10,7 @@ customizable software for FreeBSD servers.
     
 ## Features:
 * User friendly, clean and clear colorful information. No magic. KISS and DRY driven development.
-* Simple, <500LOC solution, based on legacy /bin/sh shell scripting language.
+* Simple, <700LOC solution, based on legacy /bin/sh shell scripting language.
 * Designed to work on all *BSD, but currently maintained and tested on FreeBSD only (>= 9.0-STABLE).
 * Every "software" has own definition ("def" file) with defined flat dependency list and basic data.
   Every definition is sh script itself (More in definitions/skeleton.def and definitions/defaults.def)
@@ -34,26 +34,24 @@ customizable software for FreeBSD servers.
 * Sofin is designed to not touch any part of system. The only exception is /etc/profile_sofin created after
   system wide software installation (/Software/)
 * By default Sofin verbosity is limited to minimum. More detailed information is written to LOG file.
-  (located in /Software/.cache/install.log by default)
+  (located in /Software/.cache/install.log by default or /Users/USER_NAME/.cache/install.log)
 
 
 ## Examples:
 * Install software defined in a list called "http" (by default it will install definitions from list into /Software/):
-    `sofin http`
+    `sofin install http`
         
 * Install one software from definition called "ruby.def" for user "dmilith" (by default it will point to /Users/dmilith/Apps/Ruby/):
-    `sofin one dmilith ruby`
+    `sofin cherrypick ruby dmilith`
         
 * Install software list called "databases" for user "dmilith" (by default it will point to /Users/dmilith/Apps/):
-    `sofin user dmilith databases`
+    `sofin install databases dmilith`
 
 * Show list of installed software:
-    `sofin list`
+    `sofin installed`
 
-* Uninstall installed software? Just remove app directory:
-    `rm -r /Software/AppName`
-    or
-    `rm -r /Users/USER/Apps/AppName`
+* Uninstall installed software "SomeApp"?
+    `sofin uninstall SomeApp`
 
 * Give me "PATH" for all applications installed system wide (explained in pitfalls):
     `sofin getshellpath`
@@ -68,7 +66,7 @@ customizable software for FreeBSD servers.
     `cd Sofin`
     `echo "postgresql\nmysql" > lists/databases`
     run `sofin-make-defs` to create a snapshot and upload it to Your remote respository.
-    run `sofin databases`
+    run `sofin install databases`
 
 
 ## Pitfalls/ Limitations:
@@ -87,9 +85,6 @@ customizable software for FreeBSD servers.
 * Currently software.verknowsys.com repository is hardcoded into script. To maintain own definitions You may just
   fork and create own defs which I just merge into this repository or create own one somewhere.
 * Currently any kind of sha/md5 checksumming isn't supported at all.
-* After each system wide software installation Sofin updates "/etc/profile_sofin" with current "PATH" and "LD_LIBRARY_PATH",
-  based on currently installed software in /Software. If You're using ZSH shell, just append ". /etc/profile_sofin" into
-  Your zshrc file. If You're using bash, You'll achieve same thing by "source /etc/profile_sofin".
 * Currently some definitions provided by Sofin include a couple of custom patches on software required
   by VerKnowSys ServeD © System. It *shouldn't* but **may** break the way how software works on different systems.
 
@@ -97,7 +92,7 @@ customizable software for FreeBSD servers.
 ## We don't want to support broken technologies:
 * Like.. for example: Subversion. Don't even try to create definition for this monster. It's not worth it. We support git and mercurial.
   That's enough for Your beautiful life. Believe me.
-* TODO: fill this list with more.
+* TODO: fill this list with more GNU-ish software.
 
 
 ## License:
