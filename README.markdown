@@ -35,6 +35,8 @@ customizable software for FreeBSD servers.
   system wide software installation (/Software/)
 * By default Sofin verbosity is limited to minimum. More detailed information is written to LOG file.
   (located in /Software/.cache/install.log by default or /Users/USER_NAME/.cache/install.log)
+* Exports. Each app has own ROOT_DIR/exports/ with symlinks to exported software. Exported software are just simple symlinks,
+  used to generate PATH environment variable.
 
 
 ## Examples:
@@ -47,8 +49,13 @@ customizable software for FreeBSD servers.
 * Install software list called "databases" for user "dmilith" (by default it will point to /Users/dmilith/Apps/):
     `sofin install databases dmilith`
 
+* Show list of available software:
+    `sofin available`
+
 * Show list of installed software:
     `sofin installed`
+
+* Add "ruby19" to exports of application "Passenger": `sofin exportapp ruby19 Passenger`
 
 * Uninstall installed software "SomeApp"?
     `sofin uninstall SomeApp`
