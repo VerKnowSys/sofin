@@ -4,7 +4,7 @@
 
 # config settings
 DEBUG="true"
-VERSION="0.9.7ß"
+VERSION="0.9.8"
 
 # global script settings
 SCRIPT_NAME="$0"
@@ -13,11 +13,11 @@ SOFTWARE_DIR="/Software/"
 HOME_DIR="/Users/"
 HOME_APPS_DIR="Apps/"
 CACHE_DIR="${SOFTWARE_DIR}.cache/"
+LOG="${CACHE_DIR}install.log"
 DEFINITIONS_DIR="${CACHE_DIR}definitions/"
 LISTS_DIR="${CACHE_DIR}lists/"
-DEFINITION_SNAPSHOT_FILE="defs.tar.gz"
 DEFAULTS="${DEFINITIONS_DIR}defaults.def"
-LOG="${CACHE_DIR}install.log"
+DEFINITION_SNAPSHOT_FILE="defs.tar.gz"
 DEFAULT_PATH="/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin"
 ECHOE="true"
 
@@ -137,6 +137,7 @@ check_requirements () {
 
 
 update_definitions () {
+    note "Sofin v${VERSION}"
     cd "${CACHE_DIR}"
     tar_options="xf"
     rm_options="-rf"
@@ -156,7 +157,8 @@ update_definitions () {
 
 usage_howto () {
     error "No task param given!"
-    error "Built in tasks: log, list, destroyall, getshellpath, getshellld, one, user, custom-definition-list-file"
+    error "Built in tasks:"
+    error "log, list, destroyall, getshellpath, getshellld, one, user, export, available custom-definition-list-file"
     exit
 }
 
@@ -179,7 +181,6 @@ check_os () {
 
 # first part of checks
 check_os
-check_root
 check_definition_dir
 set_default_compiler
 
@@ -197,6 +198,14 @@ if [ ! "$1" = "" ]; then
     case $1 in
     
     log)
+        if [ -z "$2" ]; then
+            check_root
+        fi
+        if [ ! "$(${ID_BIN} -u)" = "$2" ]; then
+            check_root
+        else
+            export LOG="${HOME_DIR}$2/install.log"
+        fi
         ${TAIL_BIN} -F ${LOG}
         ;;
     
@@ -250,7 +259,6 @@ if [ ! "$1" = "" ]; then
         ;;
 
     one)
-        update_definitions
         if [ "$2" = "" ]; then
             error "For \"one\" application installation mode, second argument with user is required!"
             exit 1
@@ -261,11 +269,20 @@ if [ ! "$1" = "" ]; then
         fi
         export APPLICATIONS="$3"
         export USER_UID="$2"
+        if [ ! "$(${ID_BIN} -u)" = "$2" ]; then
+            check_root
+        else
+            export LOG="${HOME_DIR}$2/sofin.log"
+            export CACHE_DIR="${HOME_DIR}$2/.cache/"
+            export DEFINITIONS_DIR="${CACHE_DIR}definitions/"
+            export LISTS_DIR="${CACHE_DIR}lists/"
+            export DEFAULTS="${DEFINITIONS_DIR}defaults.def"
+        fi
+        update_definitions
         note "Installation mode for given user: ${USER_UID} of definition: ${APPLICATIONS}"
         ;;
 
     user)
-        update_definitions
         if [ "$2" = "" ]; then
             error "For \"user\" application installation mode, second argument with user is required!"
             exit 1
@@ -276,10 +293,61 @@ if [ ! "$1" = "" ]; then
         fi
         export APPLICATIONS="$(${CAT_BIN} ${LISTS_DIR}$3 | ${TR_BIN} '\n' ' ')"
         export USER_UID="$2"
+        if [ ! "$(${ID_BIN} -u)" = "$2" ]; then
+            check_root
+        else
+            export LOG="${HOME_DIR}$2/sofin.log"
+            export CACHE_DIR="${HOME_DIR}$2/.cache/"
+            export DEFINITIONS_DIR="${CACHE_DIR}definitions/"
+            export LISTS_DIR="${CACHE_DIR}lists/"
+            export DEFAULTS="${DEFINITIONS_DIR}defaults.def"
+        fi
+        update_definitions
         note "Installation mode for given user: ${USER_UID} of definitions: ${APPLICATIONS}"
+        ;;
+
+    available)
+        update_definitions
+        cd ${DEFINITIONS_DIR}
+        ${LS_BIN} -x *def
+        exit
+        ;;
+        
+    export)
+        if [ "$2" = "" ]; then
+            error "Missing second argument with user name is required!"
+            exit 1
+        fi
+        if [ "$3" = "" ]; then
+            error "Missing third argument with app name (capitalized) is required!"
+            exit 1
+        fi
+        if [ "$4" = "" ]; then
+            error "Missing fourth argument with export name is required!"
+            exit 1
+        fi
+        if [ "$2" = "0" ]; then
+            check_root
+            export SOFT_DIR="${SOFTWARE_DIR}"
+        else
+            if [ ! "$(${ID_BIN} -u)" = "$2" ]; then
+                check_root
+            fi
+            export LOG="${HOME_DIR}$2/sofin.log"
+            export SOFT_DIR="${HOME_DIR}$2/${HOME_APPS_DIR}"
+        fi
+        for dir in "/bin/" "/sbin/" "/libexec/"; do
+            debug "Testing ${dir} looking into: ${SOFT_DIR}${3}${dir}"
+            if [ -e "${SOFT_DIR}${3}${dir}${4}" ]; then
+                note "Exporting binary: ${SOFT_DIR}${3}${dir}${4}"
+                ${LN_BIN} -vfs "${SOFT_DIR}${3}${dir}${4}" "${SOFT_DIR}${3}/exports/${4}" >> $LOG
+            fi
+        done
+        exit
         ;;
         
     *)
+        check_root
         update_definitions
         if [ ! -e "${LISTS_DIR}$1" ]; then
             error "Definition not found: ${LISTS_DIR}$1"
@@ -526,7 +594,7 @@ for application in ${APPLICATIONS}; do
                 debug "Testing ${dir} looking into: ${PREFIX}${dir}${exp}"
                 if [ -e "${PREFIX}${dir}${exp}" ]; then
                     note "Exporting binary: ${PREFIX}${dir}${exp}"
-                    ${LN_BIN} -fs "${PREFIX}${dir}${exp}" "${PREFIX}/exports/${exp}" >> $LOG
+                    ${LN_BIN} -vfs "${PREFIX}${dir}${exp}" "${PREFIX}/exports/${exp}" >> $LOG
                 fi
             done
         done
