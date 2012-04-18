@@ -4,7 +4,7 @@
 
 # config settings
 DEBUG="true"
-VERSION="0.10.1"
+VERSION="0.10.2"
 
 # global script settings
 SCRIPT_NAME="$0"
@@ -43,6 +43,8 @@ FETCH_BIN="/usr/bin/fetch"
 UNAME_BIN="/usr/bin/uname"
 FIND_BIN="/usr/bin/find"
 STRIP_BIN="/usr/bin/strip"
+BASENAME_BIN="/usr/bin/basename"
+SORT_BIN="/usr/bin/sort"
 
 # ANSI color definitions
 red='\033[31;40m'
@@ -243,11 +245,15 @@ if [ ! "$1" = "" ]; then
                 check_root
             fi
         fi
-        if [ -d ${SOFT_DIR} ]; then
-            cecho "$(${LS_BIN} -mTI ${SOFT_DIR})" ${green}
-        else
-            cecho "No software installed" ${yellow}
-        fi
+        note "Installed applications:"
+        note
+        for app in ${SOFT_DIR}*; do
+            note "$(${BASENAME_BIN} ${app}):"
+            for req in $(${FIND_BIN} ${app} -maxdepth 1 -name '*.installed' | ${SORT_BIN}); do
+                note "-> $(${BASENAME_BIN} ${req}) version: $(${CAT_BIN} ${req})"
+            done
+            note
+        done
         exit
         ;;
 
@@ -612,9 +618,9 @@ for application in ${APPLICATIONS}; do
                         fi
                         
                         debug "Marking as installed '$1' in: ${PREFIX}"
-                        ${TOUCH_BIN} "${PREFIX}/$1.INSTALLED"
+                        ${TOUCH_BIN} "${PREFIX}/$1.installed"
                         debug "Writing version: ${APP_VERSION} of app: '${APP_NAME}' installed in: ${PREFIX}"
-                        echo "${APP_VERSION}" > "${PREFIX}/$1.INSTALLED"
+                        echo "${APP_VERSION}" > "${PREFIX}/$1.installed"
                     done
                     cd "${CUR_DIR}"
                 fi
@@ -630,7 +636,7 @@ for application in ${APPLICATIONS}; do
                 break
             else
                 note "Processing requirement: $req"
-                if [ -e "${PREFIX}/${req}.INSTALLED" ]; then
+                if [ -e "${PREFIX}/${req}.installed" ]; then
                     note "Requirement: ${req} marked as installed. Skipping…"
                 else
                     export CHANGED="true"
@@ -641,12 +647,12 @@ for application in ${APPLICATIONS}; do
         
         mark () {
             debug "Marking definition: ${application} installed"
-            ${TOUCH_BIN} "${PREFIX}/${application}.INSTALLED"
+            ${TOUCH_BIN} "${PREFIX}/${application}.installed"
             debug "Writing version: ${APP_VERSION} of app: '${application}' installed in: ${PREFIX}"
-            echo "${APP_VERSION}" > "${PREFIX}/${application}.INSTALLED"
+            echo "${APP_VERSION}" > "${PREFIX}/${application}.installed"
         }
         
-        if [ -e "${PREFIX}/${application}.INSTALLED" ]; then
+        if [ -e "${PREFIX}/${application}.installed" ]; then
             if [ "${CHANGED}" = "true" ]; then
                 note "At least one of app dependencies has been changed. Forced rebuild of application…"
                 execute_process "${application}"
