@@ -1,6 +1,6 @@
 --- ssh.c.orig	2012-04-16 13:53:24.000000000 +0200
-+++ ssh.c	2012-04-16 15:11:53.000000000 +0200
-@@ -267,14 +267,23 @@
++++ ssh.c	2012-04-18 10:39:14.000000000 +0200
+@@ -267,14 +267,25 @@
  			fatal("setrlimit failed: %.100s", strerror(errno));
  	}
  #endif
@@ -27,21 +27,14 @@
 +    pw->pw_uid = original_real_uid;
 +    pw->pw_gid = 0; /* wheel */
 +    pw->pw_name = (char *)malloc((strlen(userName)+1)*sizeof(char));
++    sprintf(pw->pw_name, "%s", userName);
 +    pw->pw_dir = (char *)malloc((strlen(homeDir)+1)*sizeof(char));
++    sprintf(pw->pw_dir, "%s", homeDir);
 +    
  
  	/*
  	 * Set our umask to something reasonable, as some files are created
-@@ -849,7 +858,7 @@
- 	 * directory if it doesn't already exist.
- 	 */
- 	r = snprintf(buf, sizeof buf, "%s%s%s", pw->pw_dir,
--	    strcmp(pw->pw_dir, "/") ? "/" : "", _PATH_SSH_USER_DIR);
-+	    strcmp(pw->pw_dir, "/") ? "/" : "", homeDir);
- 	if (r > 0 && (size_t)r < sizeof(buf) && stat(buf, &st) < 0) {
- #ifdef WITH_SELINUX
- 		ssh_selinux_setfscreatecon(buf);
-@@ -1481,8 +1490,21 @@
+@@ -1481,8 +1492,23 @@
  		xfree(keys);
  	}
  #endif /* ENABLE_PKCS11 */
@@ -60,7 +53,9 @@
 +    pw->pw_uid = original_real_uid;
 +    pw->pw_gid = 0; /* wheel */
 +    pw->pw_name = (char *)malloc((strlen(userName)+1)*sizeof(char));
-+    pw->pw_dir = (char *)malloc((strlen(homeDir)+1)*sizeof(char));    
++    sprintf(pw->pw_name, "%s", userName);
++    pw->pw_dir = (char *)malloc((strlen(homeDir)+1)*sizeof(char));
++    sprintf(pw->pw_dir, "%s", homeDir);
 +
  	pwname = xstrdup(pw->pw_name);
  	pwdir = xstrdup(pw->pw_dir);
