@@ -4,7 +4,7 @@
 
 # config settings
 DEBUG="true"
-VERSION="0.10.0"
+VERSION="0.10.1"
 
 # global script settings
 SCRIPT_NAME="$0"
@@ -146,7 +146,6 @@ update_definitions () { # accepts optional user uid param
     fi
     debug "Checking for destination directories existance…"
     for element in "${LISTS_DIR}" "${DEFINITIONS_DIR}"; do
-        debug "Creating dir: ${element}"
         ${MKDIR_BIN} -p "${element}" > /dev/null
         if [ ! -z "${1}" ]; then # param with uid not given
             ${TOUCH_BIN} ${LOG}
@@ -156,10 +155,11 @@ update_definitions () { # accepts optional user uid param
             fi
         fi
         debug "Removing old definitions: ${element}"
-        ${RM_BIN} ${rm_options} "${element}" >> ${LOG}
+        ${RM_BIN} ${rm_options} ${element} >> ${LOG}
     done
     cd "${CACHE_DIR}"
-    note "Updating definitions snapshot from: ${MAIN_SOURCE_REPOSITORY}definitions/${DEFINITION_SNAPSHOT_FILE}"    
+    debug "Working in cache dir: ${CACHE_DIR}"
+    note "Updating definitions snapshot from: ${MAIN_SOURCE_REPOSITORY}definitions/${DEFINITION_SNAPSHOT_FILE}"
     ${FETCH_BIN} "${MAIN_SOURCE_REPOSITORY}definitions/${DEFINITION_SNAPSHOT_FILE}" >> "${LOG}" 2>> "${LOG}"
     ${TAR_BIN} ${tar_options} "${DEFINITION_SNAPSHOT_FILE}" >> "${LOG}" 2>> "${LOG}"
     if [ "$(${ID_BIN} -u)" = "0" ]; then
@@ -228,7 +228,7 @@ if [ ! "$1" = "" ]; then
         ;;
 
 
-    installed)
+    installed|list)
         if [ -z "${2}" ]; then
             export SOFT_DIR="${HOME_DIR}$(${ID_BIN} -u)/${HOME_APPS_DIR}"
             if [ "$(${ID_BIN} -u)" = "0" ]; then
@@ -288,7 +288,7 @@ if [ ! "$1" = "" ]; then
         ;;
 
 
-    cherrypick)
+    cherrypick|one)
         if [ "$2" = "" ]; then
             error "For \"$1\" application installation mode, second argument with application definition name is required!"
             exit 1
@@ -316,12 +316,11 @@ if [ ! "$1" = "" ]; then
         ;;
 
 
-    install)
+    install|add)
         if [ "$2" = "" ]; then
             error "For \"$1\" application installation mode, second argument with application list is required!"
             exit 1
         fi
-        export APPLICATIONS="$(${CAT_BIN} ${LISTS_DIR}$2 | ${TR_BIN} '\n' ' ')"
         if [ -z "${3}" ]; then
             export USER_UID="$(${ID_BIN} -u)"
         else
@@ -340,6 +339,7 @@ if [ ! "$1" = "" ]; then
             export DEFAULTS="${DEFINITIONS_DIR}defaults.def"
         fi
         update_definitions ${USER_UID}
+        export APPLICATIONS="$(${CAT_BIN} ${LISTS_DIR}$2 | ${TR_BIN} '\n' ' ')"
         note "Installation mode for given user: ${USER_UID} of definitions: ${APPLICATIONS}"
         ;;
 
@@ -385,7 +385,7 @@ if [ ! "$1" = "" ]; then
         ;;
 
         
-    exportapp)
+    exportapp|export|exp)
         if [ "$2" = "" ]; then
             error "Missing second argument with export app is required!"
             exit 1
