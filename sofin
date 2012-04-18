@@ -41,6 +41,8 @@ CHOWN_BIN="/usr/sbin/chown"
 GREP_BIN="/usr/bin/grep"
 FETCH_BIN="/usr/bin/fetch"
 UNAME_BIN="/usr/bin/uname"
+FIND_BIN="/usr/bin/find"
+STRIP_BIN="/usr/bin/strip"
 
 # ANSI color definitions
 red='\033[31;40m'
@@ -668,6 +670,23 @@ for application in ${APPLICATIONS}; do
                     ${LN_BIN} -vfs "${PREFIX}${dir}${exp}" "${PREFIX}/exports/${exp}" >> $LOG
                 fi
             done
+        done
+        
+        note "Stripping libraries…"
+        for elem in $(${FIND_BIN} ${PREFIX} -name '*.so'); do
+            debug "Stripping: ${elem}"
+            "${STRIP_BIN}" -sv "${elem}" >> ${LOG} 2>> ${LOG}
+        done
+        note "Stripping binaries…"
+        for elem in "/bin/" "/sbin/" "/libexec/"; do
+            if [ -d "${PREFIX}${elem}" ]; then
+                for e in $(${FIND_BIN} ${PREFIX}${elem}); do
+                    if [ -f "${e}" ]; then
+                        debug "Stripping: ${e}"
+                        "${STRIP_BIN}" -sv "${e}" >> ${LOG} 2>> ${LOG}
+                    fi
+                done
+            fi
         done
         
         if [ ! -z "${USER_UID}" ]; then

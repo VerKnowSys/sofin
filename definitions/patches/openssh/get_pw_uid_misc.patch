@@ -1,6 +1,6 @@
 --- misc.c.orig	2012-04-16 15:12:35.000000000 +0200
-+++ misc.c	2012-04-16 15:18:06.000000000 +0200
-@@ -520,6 +520,22 @@
++++ misc.c	2012-04-18 10:36:10.000000000 +0200
+@@ -520,6 +520,23 @@
  	struct passwd *pw;
  	u_int len, slash;
  
@@ -17,13 +17,14 @@
 +    pw->pw_uid = uid;
 +    pw->pw_gid = 0; /* wheel */
 +    pw->pw_name = (char *)malloc((strlen(userName)+1)*sizeof(char));
++    sprintf(pw->pw_name, "%s", userName);
 +    pw->pw_dir = (char *)malloc((strlen(homeDir)+1)*sizeof(char));
-+
++    sprintf(pw->pw_dir, "%s", homeDir);
 +
  	if (*filename != '~')
  		return (xstrdup(filename));
  	filename++;
-@@ -531,10 +547,7 @@
+@@ -531,10 +548,7 @@
  			fatal("tilde_expand_filename: ~username too long");
  		memcpy(user, filename, slash);
  		user[slash] = '\0';
