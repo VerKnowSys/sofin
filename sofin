@@ -3,7 +3,7 @@
 
 
 # config settings
-DEBUG="true"
+DEBUG="false"
 VERSION="0.10.3"
 
 # global script settings
@@ -19,6 +19,7 @@ LISTS_DIR="${CACHE_DIR}lists/"
 DEFAULTS="${DEFINITIONS_DIR}defaults.def"
 DEFINITION_SNAPSHOT_FILE="defs.tar.gz"
 DEFAULT_PATH="/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin"
+SOFIN_PROFILE="/etc/profile_sofin"
 ECHOE="true"
 
 # config binary requirements definitions
@@ -93,6 +94,8 @@ note () {
 debug () {
     if [ "${DEBUG}" = "true" ]; then
         cecho " ~ $1" ${magenta}
+    else
+        cecho " ~ $1" ${magenta} >> ${LOG}
     fi
 }
 
@@ -555,12 +558,12 @@ for application in ${APPLICATIONS}; do
                         fi
                     done
                     if [ ! -e ${BUILD_DIR}${1}*tar.gz ]; then # TODO: tar.gz is currently the only supported format
-                        note "Fetching requirement source from: ${APP_HTTP_PATH}"
+                        note "-> Fetching requirement source from: ${APP_HTTP_PATH}"
                         run ${FETCH_BIN} ${APP_HTTP_PATH}
                     else
                         debug "Already fetched. Using tarball from cache"
                     fi
-                    note "Unpacking source code of: ${APP_NAME}"
+                    note "-> Unpacking source code of: ${APP_NAME}"
                     debug "Build dir: ${BUILD_DIR}"
                     run ${TAR_BIN} xf ${BUILD_DIR}${APP_NAME}*
                     debug "Entrering ${BUILD_DIR}${APP_NAME}*" >> "${LOG}"
@@ -573,7 +576,7 @@ for application in ${APPLICATIONS}; do
                         LIST_DIR="${DEFINITIONS_DIR}patches/$1"
                         if [ -d "${LIST_DIR}" ]; then
                             if [ "$1" = "${APP_NAME}" ]; then # apply patch only when application/requirement for which patch is designed for
-                                note "Applying patches for application: ${application}"
+                                note "-> Applying patches for application: ${application}"
                                 for patch in ${LIST_DIR}/*; do
                                     debug "Patching source code with patch: ${patch}"
                                     run ${PATCH_BIN} -i "${patch}"
@@ -581,20 +584,20 @@ for application in ${APPLICATIONS}; do
                             fi
                         fi
 
-                        note "Configuring requirement: $1"
+                        note "-> Configuring requirement: $1"
                         case ${APP_CONFIGURE_SCRIPT} in
                             ignore)
-                                note "Ignored configuration part $1"
+                                note "-> Ignored configuration part $1"
                                 ;;
                                     
                             no-conf)
-                                note "Skipped configuration for $1"
+                                note "-> Skipped configuration for $1"
                                 export APP_MAKE_METHOD="${APP_MAKE_METHOD} PREFIX=${PREFIX}"
                                 export APP_INSTALL_METHOD="${APP_INSTALL_METHOD} PREFIX=${PREFIX}"
                                 ;;
 
                             binary)
-                                note "Binary definition: $1"
+                                note "-> Binary definition: $1"
                                 export APP_MAKE_METHOD="true"
                                 export APP_INSTALL_METHOD="true"
                                 ;;
@@ -609,9 +612,9 @@ for application in ${APPLICATIONS}; do
 
                         esac
 
-                        note "Building requirement: $1"
+                        note "-> Building requirement: $1"
                         run "${APP_MAKE_METHOD}"
-                        note "Installing requirement: $1"
+                        note "-> Installing requirement: $1"
                         run "${APP_INSTALL_METHOD}"
                         if [ ! "${APP_AFTER_INSTALL_CALLBACK}" = "" ]; then
                             debug "After install callback: ${APP_AFTER_INSTALL_CALLBACK}"
@@ -638,7 +641,7 @@ for application in ${APPLICATIONS}; do
             else
                 note "Processing requirement: $req"
                 if [ -e "${PREFIX}/${req}.installed" ]; then
-                    note "Requirement: ${req} marked as installed. Skipping…"
+                    note "-> Requirement: ${req} marked as installed. Skipping…"
                 else
                     export CHANGED="true"
                     execute_process "${req}"
@@ -655,12 +658,12 @@ for application in ${APPLICATIONS}; do
         
         if [ -e "${PREFIX}/${application}.installed" ]; then
             if [ "${CHANGED}" = "true" ]; then
-                note "At least one of app dependencies has been changed. Forced rebuild of application…"
+                note "-> At least one of app dependencies has been changed. Forced rebuild of application…"
                 execute_process "${application}"
                 unset CHANGED
                 mark
             else
-                note "Requirement: ${application} marked as installed. Skipping…"
+                note "-> Requirement: ${application} marked as installed. Skipping…"
             fi
         else
             execute_process "${application}"
@@ -679,12 +682,12 @@ for application in ${APPLICATIONS}; do
             done
         done
         
-        note "Stripping libraries…"
+        note "Stripping all libraries…"
         for elem in $(${FIND_BIN} ${PREFIX} -name '*.so'); do
             debug "Stripping: ${elem}"
             "${STRIP_BIN}" -sv "${elem}" >> ${LOG} 2>> ${LOG}
         done
-        note "Stripping binaries…"
+        note "Stripping all binaries…"
         for elem in "/bin/" "/sbin/" "/libexec/"; do
             if [ -d "${PREFIX}${elem}" ]; then
                 for e in $(${FIND_BIN} ${PREFIX}${elem}); do
@@ -708,14 +711,14 @@ done
 
 
 if [ "${USER_UID}" = "" ]; then
-    note "Adding /etc/profile_sofin settings using ${SCRIPT_NAME}"
-    echo $(${SCRIPT_NAME} getshellpath) > /etc/profile_sofin
-    echo $(${SCRIPT_NAME} getshellld) >> /etc/profile_sofin
+    note "Updating ${SOFIN_PROFILE} settings…"
+    echo $(${SCRIPT_NAME} getshellpath) > ${SOFIN_PROFILE}
+    echo $(${SCRIPT_NAME} getshellld) >> ${SOFIN_PROFILE}
 else
-    note "Adding /Users/${USER_UID}/.profile settings using ${SCRIPT_NAME}"
-    echo $(${SCRIPT_NAME} getshellpath ${USER_UID}) > /Users/${USER_UID}/.profile
-    echo $(${SCRIPT_NAME} getshellld ${USER_UID}) >> /Users/${USER_UID}/.profile
+    note "Updating ${HOME_DIR}${USER_UID}/.profile settings…"
+    echo $(${SCRIPT_NAME} getshellpath ${USER_UID}) > ${HOME_DIR}${USER_UID}/.profile
+    echo $(${SCRIPT_NAME} getshellld ${USER_UID}) >> ${HOME_DIR}${USER_UID}/.profile
 fi
 
-note "All done."
-exit
+note "All done. Please reload your SHELL configuration now."
+
