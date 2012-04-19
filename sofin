@@ -333,7 +333,7 @@ if [ ! "$1" = "" ]; then
             export DEFAULTS="${DEFINITIONS_DIR}defaults.def"
         fi
         update_definitions ${USER_UID}
-        note "Installation mode for given user: ${USER_UID} of definition: ${APPLICATIONS}"
+        note "Installing software: ${APPLICATIONS}"
         ;;
 
 
@@ -389,7 +389,7 @@ if [ ! "$1" = "" ]; then
         fi
         update_definitions ${USER_UID}
         export APPLICATIONS="$(${CAT_BIN} ${LISTS_DIR}$2 | ${TR_BIN} '\n' ' ')"
-        note "Installation mode for given user: ${USER_UID} of definitions: ${APPLICATIONS}"
+        note "Installing software: ${APPLICATIONS}"
         ;;
 
 
