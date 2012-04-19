@@ -256,13 +256,15 @@ if [ ! "$1" = "" ]; then
         fi
         note "Installed applications:"
         note
-        for app in ${SOFT_DIR}*; do
-            note "$(${BASENAME_BIN} ${app}):"
-            for req in $(${FIND_BIN} ${app} -maxdepth 1 -name '*.installed' | ${SORT_BIN}); do
-                note "-> $(${BASENAME_BIN} ${req}) version: $(${CAT_BIN} ${req})"
+        if [ -d ${SOFT_DIR} ]; then
+            for app in ${SOFT_DIR}*; do
+                note "$(${BASENAME_BIN} ${app}):"
+                for req in $(${FIND_BIN} ${app} -maxdepth 1 -name '*.installed' | ${SORT_BIN}); do
+                    note "-> $(${BASENAME_BIN} ${req}) version: $(${CAT_BIN} ${req})"
+                done
+                note
             done
-            note
-        done
+        fi
         exit
         ;;
 
