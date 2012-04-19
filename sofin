@@ -269,16 +269,18 @@ if [ ! "$1" = "" ]; then
 
     getshellpath)
         result="${DEFAULT_PATH}"
-        SOFT_DIR="${SOFTWARE_DIR}"
+        process () {
+            for app in ${1}*; do # SOFT_DIR
+                exp="${app}/exports"
+                if [ -e "${exp}" ]; then
+                    result="${exp}:${result}"
+                fi
+            done
+        }
+        process ${SOFTWARE_DIR}
         if [ ! -z "$2" ]; then
-            SOFT_DIR="${HOME_DIR}$2/${HOME_APPS_DIR}"
+            process ${HOME_DIR}${2}/${HOME_APPS_DIR}
         fi
-        for app in ${SOFT_DIR}*; do
-            exp="${app}/exports"
-            if [ -e "${exp}" ]; then
-                result="${exp}:${result}"
-            fi
-        done
         echo "export PATH=${result}"
         unset result
         exit
@@ -287,18 +289,20 @@ if [ ! "$1" = "" ]; then
 
     getshellld)
         ldresult="/lib:/usr/lib"
-        SOFT_DIR="${SOFTWARE_DIR}"
+        process () {
+            for lib in ${1}*; do # LIB_DIR
+                if [ -e "${lib}/lib" ]; then
+                    ldresult="${lib}/lib:${ldresult}"
+                fi
+                if [ -e "${lib}/libexec" ]; then
+                    ldresult="${lib}/libexec:${ldresult}"
+                fi
+            done
+        }
+        process ${SOFTWARE_DIR}
         if [ ! -z "$2" ]; then
-            SOFT_DIR="${HOME_DIR}$2/${HOME_APPS_DIR}"
+            process ${HOME_DIR}$2/${HOME_APPS_DIR}
         fi
-        for lib in ${SOFT_DIR}*; do
-            if [ -e "${lib}/lib" ]; then
-                ldresult="${lib}/lib:${ldresult}"
-            fi
-            if [ -e "${lib}/libexec" ]; then
-                ldresult="${lib}/libexec:${ldresult}"
-            fi
-        done
         echo "export LD_LIBRARY_PATH=${ldresult}"
         unset ldresult
         exit
@@ -752,6 +756,7 @@ else
     note "Updating ${HOME_DIR}${USER_UID}/.profile settings…"
     echo $(${SCRIPT_NAME} getshellpath ${USER_UID}) > ${HOME_DIR}${USER_UID}/.profile
     echo $(${SCRIPT_NAME} getshellld ${USER_UID}) >> ${HOME_DIR}${USER_UID}/.profile
+    
 fi
 
 note "All done. Please reload your SHELL configuration now."
