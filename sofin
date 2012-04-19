@@ -459,7 +459,7 @@ for application in ${APPLICATIONS}; do
         # fancy old style Capitalize
         APP_NAME="$(echo "${APP_NAME}" | ${CUT_BIN} -c1 | ${TR_BIN} '[a-z]' '[A-Z]')$(echo "${APP_NAME}" | ${SED_BIN} 's/^[a-zA-Z]//')"
         note
-        note "Preparing application: ${APP_NAME} (${APP_FULL_NAME} v${APP_VERSION})"
+        note "Preparing application: ${APP_NAME}${APP_POSTFIX} (${APP_FULL_NAME} v${APP_VERSION})"
         if [ "${USER_UID}" = "" ]; then
             debug "Normal build"
             export PREFIX="${SOFTWARE_DIR}${APP_NAME}"
