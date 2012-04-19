@@ -2,6 +2,6 @@ node
 php
 perl
 python
-python2
+python-legacy
 ruby
-ruby18
+ruby-legacy
