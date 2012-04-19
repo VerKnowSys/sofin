@@ -4,3 +4,5 @@ APP_VERSION="5.8p2"
 APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
 APP_CONFIGURE_ARGS="--without-shadow --without-pam"
 APP_EXPORTS="ssh"
+APP_AFTER_INSTALL_CALLBACK="echo 'Host *.verknowsys.com
+Port 60022' >> ${PREFIX}/etc/ssh_config"
