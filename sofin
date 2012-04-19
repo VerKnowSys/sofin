@@ -4,7 +4,7 @@
 
 # config settings
 DEBUG="true"
-VERSION="0.10.2"
+VERSION="0.10.3"
 
 # global script settings
 SCRIPT_NAME="$0"
@@ -354,7 +354,7 @@ if [ ! "$1" = "" ]; then
 
     delete|remove|uninstall)
         if [ "$2" = "" ]; then
-            error "For \"$1\" task, second argument with application name(s) (capitalized) is required!"
+            error "For \"$1\" task, second argument with application name is required!"
             exit 1
         fi
         if [ -z "${3}" ]; then # uid/user name not given
@@ -375,13 +375,14 @@ if [ ! "$1" = "" ]; then
                 export SOFT_DIR="${HOME_DIR}${3}/${HOME_APPS_DIR}"
             fi
         fi
-        note "Removing application: $2"
-        if [ "$2" = "/" ]; then
+        APP_NAME="$(echo "${2}" | ${CUT_BIN} -c1 | ${TR_BIN} '[a-z]' '[A-Z]')$(echo "${2}" | ${SED_BIN} 's/^[a-zA-Z]//')"
+        note "Removing application: ${APP_NAME}"
+        if [ "${APP_NAME}" = "/" ]; then
             error "Czy Ty orzeszki?"
             exit 1
         fi
-        debug "Removing software from: ${SOFT_DIR}${2}"
-        ${RM_BIN} -rfv "${SOFT_DIR}${2}" >> ${LOG}
+        debug "Removing software from: ${SOFT_DIR}${APP_NAME}"
+        ${RM_BIN} -rfv "${SOFT_DIR}${APP_NAME}" >> ${LOG}
         exit
         ;;
 
@@ -399,11 +400,11 @@ if [ ! "$1" = "" ]; then
             exit 1
         fi
         if [ "$3" = "" ]; then
-            error "Missing third argument with source app (capitalized name) is required!"
+            error "Missing third argument with source app is required!"
             exit 1
         fi
         EXPORT="$2"
-        APP="$3"
+        APP="$(echo "${3}" | ${CUT_BIN} -c1 | ${TR_BIN} '[a-z]' '[A-Z]')$(echo "${3}" | ${SED_BIN} 's/^[a-zA-Z]//')"
         UID="$4"
         export SOFT_DIR="${SOFTWARE_DIR}"
         if [ -z "${UID}" ]; then
