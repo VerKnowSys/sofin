@@ -4,7 +4,7 @@
 
 # config settings
 DEBUG="false"
-VERSION="0.10.3"
+VERSION="0.10.4"
 
 # global script settings
 SCRIPT_NAME="$0"
@@ -20,9 +20,11 @@ DEFAULTS="${DEFINITIONS_DIR}defaults.def"
 DEFINITION_SNAPSHOT_FILE="defs.tar.gz"
 DEFAULT_PATH="/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin"
 SOFIN_PROFILE="/etc/profile_sofin"
+DEPENDENCIES_FILE=".dependencies"
 ECHOE="true"
 
 # config binary requirements definitions
+PWD_BIN="/bin/pwd"
 LN_BIN="/bin/ln"
 WHICH_BIN="/usr/bin/which"
 TAIL_BIN="/usr/bin/tail"
@@ -157,8 +159,10 @@ update_definitions () { # accepts optional user uid param
         if [ ! -z "${1}" ]; then # param with uid not given
             ${TOUCH_BIN} ${LOG}
             if [ "$(${ID_BIN} -u)" = "0" ]; then
-                debug "Chowning ${element} for user: ${1}"
-                ${CHOWN_BIN} -R ${1} "${element}" >> ${LOG}
+                if [ ! -z "${1}" ]; then
+                    debug "Chowning ${element} for user: ${1}"
+                    ${CHOWN_BIN} -R ${1} "${element}" >> ${LOG}
+                fi
             fi
         fi
         debug "Removing old definitions: ${element}"
@@ -170,15 +174,17 @@ update_definitions () { # accepts optional user uid param
     ${FETCH_BIN} "${MAIN_SOURCE_REPOSITORY}definitions/${DEFINITION_SNAPSHOT_FILE}" >> "${LOG}" 2>> "${LOG}"
     ${TAR_BIN} ${tar_options} "${DEFINITION_SNAPSHOT_FILE}" >> "${LOG}" 2>> "${LOG}"
     if [ "$(${ID_BIN} -u)" = "0" ]; then
-        debug "Chowning definitions for user: ${1}"
-        ${CHOWN_BIN} -R ${1} "${CACHE_DIR}" >> ${LOG}
+        if [ ! -z "${1}" ]; then
+            debug "Chowning definitions for user: ${1}"
+            ${CHOWN_BIN} -R ${1} "${CACHE_DIR}" >> ${LOG}
+        fi
     fi
 }
 
 
 usage_howto () {
     error "No task param given! Built in tasks:"
-    error "install, uninstall, cherrypick, exportapp, log, installed, getshellpath, getshellld"
+    error "install, uninstall, cherrypick, exportapp, log, installed, getshellpath, getshellld, dependencies"
     exit
 }
 
@@ -324,6 +330,34 @@ if [ ! "$1" = "" ]; then
         fi
         update_definitions ${USER_UID}
         note "Installation mode for given user: ${USER_UID} of definition: ${APPLICATIONS}"
+        ;;
+
+
+    deps|dependencies|local)
+        LOCAL_DIR="$(${PWD_BIN})/"
+        export USER_UID="$(${ID_BIN} -u)"
+        if [ ! "$(${ID_BIN} -u)" = "${USER_UID}" ]; then
+            check_root
+        fi
+        if [ "${USER_UID}" = "0" ]; then
+            error "Installation of project dependencies cannot be run as root!"
+            exit 1
+        else
+            export LOG="${HOME_DIR}${USER_UID}/install.log"
+            export CACHE_DIR="${HOME_DIR}${USER_UID}/.cache/"
+            export DEFINITIONS_DIR="${CACHE_DIR}definitions/"
+            export LISTS_DIR="${CACHE_DIR}lists/"
+            export DEFAULTS="${DEFINITIONS_DIR}defaults.def"
+        fi
+        update_definitions ${USER_UID}
+        cd ${LOCAL_DIR}
+        note "Looking for ${DEPENDENCIES_FILE} file in current directory: $(${PWD_BIN})/"
+        if [ ! -e "$(${PWD_BIN})/${DEPENDENCIES_FILE}" ]; then
+            error "Local dependencies file not found!"
+            exit 1
+        fi
+        export APPLICATIONS="$(${CAT_BIN} ${LOCAL_DIR}${DEPENDENCIES_FILE} | ${TR_BIN} '\n' ' ')"
+        note "Installing dependencies: ${APPLICATIONS}"        
         ;;
 
 
@@ -547,7 +581,7 @@ for application in ${APPLICATIONS}; do
                 else
                     BUILD_DIR="${CACHE_DIR}cache/${APP_NAME}${APP_POSTFIX}-${APP_VERSION}/"
                     ${MKDIR_BIN} -p "${BUILD_DIR}"
-                    CUR_DIR="$(pwd)"
+                    CUR_DIR="$(${PWD_BIN})"
                     cd "${BUILD_DIR}"
                     for bd in ${BUILD_DIR}/*; do
                         if [ -d ${bd} ]; then
