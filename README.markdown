@@ -10,7 +10,7 @@ customizable software for FreeBSD servers.
     
 ## Features:
 * User friendly, clean and clear colorful information. No magic. KISS and DRY driven development.
-* Simple, <700LOC solution, based on legacy /bin/sh shell scripting language.
+* Simple, <1k LOC solution, based on legacy /bin/sh shell scripting language.
 * Designed to work on all *BSD, but currently maintained and tested on FreeBSD only (>= 9.0-STABLE).
 * Every "software" has own definition ("def" file) with defined flat dependency list and basic data.
   Every definition is sh script itself (More in definitions/skeleton.def and definitions/defaults.def)
@@ -44,7 +44,7 @@ customizable software for FreeBSD servers.
     `sofin install http`
         
 * Install one software from definition called "ruby.def" for user "dmilith" (by default it will point to /Users/dmilith/Apps/Ruby/):
-    `sofin cherrypick ruby dmilith`
+    `sofin one ruby dmilith`
         
 * Install software list called "databases" for user "dmilith" (by default it will point to /Users/dmilith/Apps/):
     `sofin install databases dmilith`
@@ -72,7 +72,7 @@ customizable software for FreeBSD servers.
 * Create a list called "databases", with definitions: "postgresql" and "mysql", and install it with Sofin:
     `cd Sofin`
     `echo "postgresql\nmysql" > lists/databases`
-    run `sofin-make-defs` to create a snapshot and upload it to Your remote respository.
+    run `./sofin-make-defs` to create a snapshot and upload it to Your remote respository.
     run `sofin install databases`
 
 
@@ -80,12 +80,6 @@ customizable software for FreeBSD servers.
 * Sofin requires to be installed or symlinked to system default PATH location (/bin:/usr/bin or similar)
 * Each software bundle includes all dependencies of given software, hence each application requires more disk
   space than it does with "old fasioned, system wide, shared software".
-* Because every software bundle has own root dir, no ld information about libraries is provided by default
-  by system, so software which uses shared libraries will require to have "LD_LIBRARY_PATH" set for linker.
-  To generate this variable for currently installed software just run sofin with "getshellld" param.
-  To get user side values give it additional param of user name (f.e. sofin getshellld username).
-* To generate "PATH" variable from installed software use "getshellpath" param. To get user side values
-  give it additional param of user name (f.e. sofin getshellpath username).
 * Currently only "tar.gz" archives files are cached and supported. In case of using different archive
   type a failure will happen.
 * Currently all software used by current definitions is mirrored on software.verknowsys.com/source
