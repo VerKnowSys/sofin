@@ -55,7 +55,7 @@ customizable software for FreeBSD servers.
 * Show list of installed software:
     `sofin installed`
 
-* Add "ruby19" to exports of application "Passenger": `sofin exportapp ruby19 Passenger`
+* Add "ruby" to exports of application "Passenger": `sofin exportapp ruby Passenger`
 
 * Uninstall installed software "SomeApp"?
     `sofin uninstall SomeApp`
