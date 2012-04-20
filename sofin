@@ -26,6 +26,7 @@ INSTALLED_MARK=".installed"
 ECHOE="true"
 
 # config binary requirements definitions
+KILL_BIN="/bin/kill"
 PWD_BIN="/bin/pwd"
 MV_BIN="/bin/mv"
 LN_BIN="/bin/ln"
@@ -88,6 +89,11 @@ cecho () {
         echo -e "${2}${1}${reset}"
     fi
     return
+}
+
+
+warn () {
+    cecho " * $1" ${yellow}
 }
 
 
@@ -837,5 +843,17 @@ else
     echo $(${SCRIPT_NAME} getshellvars ${USER_UID}) > ${HOME_DIR}${USER_UID}/.profile
 fi
 
-note "All done. Please reload your SHELL configuration now."
-
+if [ ! -z "${SHELL_PID}" ]; then
+    note "All done. Reloading configuration of $(${BASENAME_BIN} ${SHELL}) with pid: ${SHELL_PID}…"
+    ${KILL_BIN} -SIGUSR2 ${SHELL_PID}
+else
+    note
+    warn "You'll need to restart Your shell before using installed software in order to update environment variables."
+    warn "To get this done automatically, put these lines to Your /etc/zshrc :"
+    echo
+    echo "if [ -e \$HOME/.profile ]; then"
+    echo "  . \$HOME/.profile"
+    echo "  trap \"source \$HOME/.profile\" USR2"
+    echo "fi"
+    echo "export SHELL_PID="\$\$""
+fi
