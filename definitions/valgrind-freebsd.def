@@ -1,8 +1,0 @@
-APP_FULL_NAME="Valgrind for BSD"
-APP_NAME="valgrind-freebsd"
-APP_VERSION="3.6.1-2"
-APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
-APP_CONFIGURE_ARGS="--enable-tls --enable-only64bit"
-APP_REQUIREMENTS="make zlib perl"
-FORCE_GNU_COMPILER="true"
-APP_EXPORTS="valgrind"
