@@ -42,12 +42,21 @@ customizable software for FreeBSD servers.
 ## Examples:
 * Install software defined in a list called "http" (by default it will install definitions from list into /Software/):
     `sofin install http`
+
+* Install one software from definition called "ruby.def" for already logged in user:
+    `sofin one ruby`
         
 * Install one software from definition called "ruby.def" for user "dmilith" (by default it will point to /Users/dmilith/Apps/Ruby/):
     `sofin one ruby dmilith`
         
 * Install software list called "databases" for user "dmilith" (by default it will point to /Users/dmilith/Apps/):
     `sofin install databases dmilith`
+
+* Upgrade application requirement: Xml in bundle Ruby as logged in user:
+    `sofin upgrade xml ruby`
+
+* Upgrade Ruby in Ruby bundle without recompiling all requirements (already compiled requirements will be reused):
+    `sofin upgrade ruby ruby`
 
 * Show list of available software:
     `sofin available`
