@@ -4,7 +4,7 @@
 
 # config settings
 DEBUG="false"
-VERSION="0.10.5"
+VERSION="0.10.6"
 
 # global script settings
 HEADER="Sofin v${VERSION}"
@@ -22,6 +22,7 @@ DEFINITION_SNAPSHOT_FILE="defs.tar.gz"
 DEFAULT_PATH="/bin:/usr/bin:/sbin:/usr/sbin"
 SOFIN_PROFILE="/etc/profile_sofin"
 DEPENDENCIES_FILE=".dependencies"
+INSTALLED_MARK=".installed"
 ECHOE="true"
 
 # config binary requirements definitions
@@ -189,6 +190,7 @@ usage_howto () {
     note "Built in tasks:"
     note
     note "install                              - installs software from list (example: ${SCRIPT_NAME} install languages)"
+    note "upgrade                              - upgrades one of dependencies of installed definition (example: ${SCRIPT_NAME} upgrade iconv ruby - to upgrade iconv in Ruby bundle)"
     note "dependencies | deps | local          - installs software from list defined in '${DEPENDENCIES_FILE}' file in current directory"
     note "one | cherrypick | get               - installs one application from definition (example: ${SCRIPT_NAME} get ruby)"
     note "uninstall | remove | delete          - removes one application (example: ${SCRIPT_NAME} uninstall ruby)"
@@ -268,7 +270,7 @@ if [ ! "$1" = "" ]; then
         if [ -d ${SOFT_DIR} ]; then
             for app in ${SOFT_DIR}*; do
                 note "$(${BASENAME_BIN} ${app}):"
-                for req in $(${FIND_BIN} ${app} -maxdepth 1 -name '*.installed' | ${SORT_BIN}); do
+                for req in $(${FIND_BIN} ${app} -maxdepth 1 -name '*${INSTALLED_MARK}' | ${SORT_BIN}); do
                     note "-> $(${BASENAME_BIN} ${req}) version: $(${CAT_BIN} ${req})"
                 done
                 note
@@ -339,6 +341,37 @@ if [ ! "$1" = "" ]; then
         exit
         ;;
 
+
+    upgrade)
+        if [ "$2" = "" ]; then
+            error "For application \"$1\", second argument with application requirement name is required!"
+            exit 1
+        fi
+        if [ "$3" = "" ]; then
+            error "For application \"$1\", third argument with application name is required!"
+            exit 1
+        fi
+        if [ -z "${4}" ]; then
+            export USER_UID="$(${ID_BIN} -u)"
+        else
+            export USER_UID="$4"
+        fi
+        if [ "${USER_UID}" = "0" ]; then
+            export SOFT_DIR="${SOFTWARE_DIR}${HOME_APPS_DIR}"
+        else
+            export SOFT_DIR="${HOME_DIR}${USER_UID}/${HOME_APPS_DIR}"
+            export LOG="${HOME_DIR}${USER_UID}/install.log"
+        fi
+        REQ="${2}"
+        APP="$(echo "${3}" | ${CUT_BIN} -c1 | ${TR_BIN} '[a-z]' '[A-Z]')$(echo "${3}" | ${SED_BIN} 's/^[a-zA-Z]//')"
+        note "Performing upgrade of requirement: ${REQ} in application bundle: ${APP}"
+        REM="${SOFT_DIR}${APP}/${REQ}${INSTALLED_MARK}"
+        debug "Removing file: ${REM}"
+        ${RM_BIN} -f ${REM} >> ${LOG}
+        ${SCRIPT_NAME} one ${3} ${USER_UID}
+        exit
+        ;;
+        
 
     cherrypick|one|getone|get)
         if [ "$2" = "" ]; then
@@ -691,9 +724,9 @@ for application in ${APPLICATIONS}; do
                         fi
                         
                         debug "Marking as installed '$1' in: ${PREFIX}"
-                        ${TOUCH_BIN} "${PREFIX}/$1.installed"
+                        ${TOUCH_BIN} "${PREFIX}/$1${INSTALLED_MARK}"
                         debug "Writing version: ${APP_VERSION} of app: '${APP_NAME}' installed in: ${PREFIX}"
-                        echo "${APP_VERSION}" > "${PREFIX}/$1.installed"
+                        echo "${APP_VERSION}" > "${PREFIX}/$1${INSTALLED_MARK}"
                     done
                     cd "${CUR_DIR}"
                 fi
@@ -709,7 +742,7 @@ for application in ${APPLICATIONS}; do
                 break
             else
                 note "Processing requirement: $req"
-                if [ -e "${PREFIX}/${req}.installed" ]; then
+                if [ -e "${PREFIX}/${req}${INSTALLED_MARK}" ]; then
                     note "-> Requirement: ${req} marked as installed. Skipping…"
                 else
                     export CHANGED="true"
@@ -720,12 +753,12 @@ for application in ${APPLICATIONS}; do
         
         mark () {
             debug "Marking definition: ${application} installed"
-            ${TOUCH_BIN} "${PREFIX}/${application}.installed"
+            ${TOUCH_BIN} "${PREFIX}/${application}${INSTALLED_MARK}"
             debug "Writing version: ${APP_VERSION} of app: '${application}' installed in: ${PREFIX}"
-            echo "${APP_VERSION}" > "${PREFIX}/${application}.installed"
+            echo "${APP_VERSION}" > "${PREFIX}/${application}${INSTALLED_MARK}"
         }
         
-        if [ -e "${PREFIX}/${application}.installed" ]; then
+        if [ -e "${PREFIX}/${application}${INSTALLED_MARK}" ]; then
             if [ "${CHANGED}" = "true" ]; then
                 note "-> At least one of app dependencies has been changed. Forced rebuild of application…"
                 execute_process "${application}"
