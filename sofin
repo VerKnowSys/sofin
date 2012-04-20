@@ -4,9 +4,10 @@
 
 # config settings
 DEBUG="false"
-VERSION="0.10.4"
+VERSION="0.10.5"
 
 # global script settings
+HEADER="Sofin v${VERSION}"
 SCRIPT_NAME="$0"
 MAIN_SOURCE_REPOSITORY="http://software.verknowsys.com/source/"
 SOFTWARE_DIR="/Software/"
@@ -18,7 +19,7 @@ DEFINITIONS_DIR="${CACHE_DIR}definitions/"
 LISTS_DIR="${CACHE_DIR}lists/"
 DEFAULTS="${DEFINITIONS_DIR}defaults.def"
 DEFINITION_SNAPSHOT_FILE="defs.tar.gz"
-DEFAULT_PATH="/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin"
+DEFAULT_PATH="/bin:/usr/bin:/sbin:/usr/sbin"
 SOFIN_PROFILE="/etc/profile_sofin"
 DEPENDENCIES_FILE=".dependencies"
 ECHOE="true"
@@ -146,7 +147,7 @@ check_requirements () {
 
 
 update_definitions () { # accepts optional user uid param
-    note "Sofin v${VERSION}"
+    note "${HEADER}"
     tar_options="xf"
     rm_options="-rf"
     if [ "${DEBUG}" = "true" ]; then
@@ -183,8 +184,17 @@ update_definitions () { # accepts optional user uid param
 
 
 usage_howto () {
-    error "No task param given! Built in tasks:"
-    error "install, uninstall, cherrypick, exportapp, log, installed, getshellpath, getshellld, dependencies"
+    note "${HEADER}"
+    note
+    note "Built in tasks:"
+    note
+    note "install                              - installs software from list (example: ${SCRIPT_NAME} install languages)"
+    note "dependencies | deps | local          - installs software from list defined in '${DEPENDENCIES_FILE}' file in current directory"
+    note "one | cherrypick | get               - installs one application from definition (example: ${SCRIPT_NAME} get ruby)"
+    note "uninstall | remove | delete          - removes one application (example: ${SCRIPT_NAME} uninstall ruby)"
+    note "export | exp | exportapp             - adds given command to application exports (example: ${SCRIPT_NAME} export rails ruby)"
+    note "getshellvars | shellvars | vars      - returns shell variables for installed software"
+    note "log                                  - shows and watches log file (for debug messages and verbose info)"
     exit
 }
 
@@ -218,7 +228,6 @@ unset CPPFLAGS
 unset PATH
 unset LD_LIBRARY_PATH
 unset LD_PRELOAD
-
 
 if [ ! "$1" = "" ]; then
     case $1 in
@@ -269,7 +278,9 @@ if [ ! "$1" = "" ]; then
         ;;
 
 
-    getshellpath)
+    getshellvars|shellvars|vars)
+        
+        # PATH:
         result="${DEFAULT_PATH}"
         process () {
             for app in ${1}*; do # SOFT_DIR
@@ -284,20 +295,19 @@ if [ ! "$1" = "" ]; then
             process ${HOME_DIR}${2}/${HOME_APPS_DIR}
         fi
         echo "export PATH=${result}"
-        unset result
-        exit
-        ;;
 
-
-    getshellld)
+        # LD_LIBRARY_PATH, LDFLAGS:
         ldresult="/lib:/usr/lib"
+        ldflags="${LDFLAGS}"
         process () {
             for lib in ${1}*; do # LIB_DIR
                 if [ -e "${lib}/lib" ]; then
                     ldresult="${lib}/lib:${ldresult}"
+                    ldflags="-L${lib}/lib ${ldflags}"
                 fi
                 if [ -e "${lib}/libexec" ]; then
                     ldresult="${lib}/libexec:${ldresult}"
+                    ldflags="-L${lib}/libexec ${ldflags}"
                 fi
             done
         }
@@ -305,13 +315,32 @@ if [ ! "$1" = "" ]; then
         if [ ! -z "$2" ]; then
             process ${HOME_DIR}$2/${HOME_APPS_DIR}
         fi
-        echo "export LD_LIBRARY_PATH=${ldresult}"
-        unset ldresult
+        echo "export LD_LIBRARY_PATH='${ldresult}'"
+        echo "export LDFLAGS='${ldflags}'"
+
+        # CFLAGS, CXXFLAGS:
+        cflags="${CFLAGS}"
+        process () {
+            for app in ${1}*; do # SOFT_DIR
+                exp="${app}/include"
+                if [ -e "${exp}" ]; then
+                    cflags="-I${exp} ${cflags}"
+                fi
+            done
+        }
+        process ${SOFTWARE_DIR}
+        if [ ! -z "$2" ]; then
+            process ${HOME_DIR}${2}/${HOME_APPS_DIR}
+        fi
+        cxxflags="${cflags}"
+        echo "export CFLAGS='${cflags}'"
+        echo "export CXXFLAGS='${cxxflags}'"
+
         exit
         ;;
 
 
-    cherrypick|one)
+    cherrypick|one|getone|get)
         if [ "$2" = "" ]; then
             error "For \"$1\" application installation mode, second argument with application definition name is required!"
             exit 1
@@ -752,13 +781,10 @@ done
 
 if [ "${USER_UID}" = "" ]; then
     note "Updating ${SOFIN_PROFILE} settings…"
-    echo $(${SCRIPT_NAME} getshellpath) > ${SOFIN_PROFILE}
-    echo $(${SCRIPT_NAME} getshellld) >> ${SOFIN_PROFILE}
+    echo $(${SCRIPT_NAME} getshellvars) > ${SOFIN_PROFILE}
 else
     note "Updating ${HOME_DIR}${USER_UID}/.profile settings…"
-    echo $(${SCRIPT_NAME} getshellpath ${USER_UID}) > ${HOME_DIR}${USER_UID}/.profile
-    echo $(${SCRIPT_NAME} getshellld ${USER_UID}) >> ${HOME_DIR}${USER_UID}/.profile
-    
+    echo $(${SCRIPT_NAME} getshellvars ${USER_UID}) > ${HOME_DIR}${USER_UID}/.profile
 fi
 
 note "All done. Please reload your SHELL configuration now."
