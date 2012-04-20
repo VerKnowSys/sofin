@@ -339,6 +339,22 @@ if [ ! "$1" = "" ]; then
         echo "export CFLAGS='${cflags}'"
         echo "export CXXFLAGS='${cxxflags}'"
 
+        # MANPATH
+        manpath="${MANPATH}"
+        process () {
+            for app in ${1}*; do # SOFT_DIR
+                exp="${app}/man"
+                if [ -e "${exp}" ]; then
+                    manpath="${exp}:${manpath}"
+                fi
+            done
+        }
+        process ${SOFTWARE_DIR}
+        if [ ! -z "$2" ]; then
+            process ${HOME_DIR}${2}/${HOME_APPS_DIR}
+        fi
+        echo "export MANPATH='${manpath}'"
+
         exit
         ;;
 
