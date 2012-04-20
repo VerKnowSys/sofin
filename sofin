@@ -27,6 +27,7 @@ ECHOE="true"
 
 # config binary requirements definitions
 PWD_BIN="/bin/pwd"
+MV_BIN="/bin/mv"
 LN_BIN="/bin/ln"
 WHICH_BIN="/usr/bin/which"
 TAIL_BIN="/usr/bin/tail"
