@@ -383,7 +383,7 @@ if [ ! "$1" = "" ]; then
             export USER_UID="$4"
         fi
         if [ "${USER_UID}" = "0" ]; then
-            export SOFT_DIR="${SOFTWARE_DIR}${HOME_APPS_DIR}"
+            export SOFT_DIR="${SOFTWARE_DIR}"
         else
             export SOFT_DIR="${HOME_DIR}${USER_UID}/${HOME_APPS_DIR}"
             export LOG="${HOME_DIR}${USER_UID}/install.log"
