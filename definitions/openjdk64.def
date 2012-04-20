@@ -1,0 +1,7 @@
+APP_FULL_NAME="OpenJDK6 64bit"
+APP_NAME="Openjdk64"
+APP_VERSION="1.6.0_30"
+APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
+APP_CONFIGURE_SCRIPT="binary"
+APP_AFTER_INSTALL_CALLBACK="${MV_BIN} ${CACHE_DIR}cache/${APP_NAME}-${APP_VERSION}/${APP_NAME} ${PREFIX}"
+#APP_EXPORTS="appletviewer idlj java javah jdb jmap jsadebugd jstatd orbd rmic schemagen tnameserv wsimport apt jar javac javap jhat jps jstack keytool pack200 rmid serialver unpack200 xjc extcheck jarsigner javadoc jconsole jinfo jrunscript jstat native2ascii policytool rmiregistry servertool wsgen"
