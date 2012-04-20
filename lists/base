@@ -2,3 +2,5 @@ zsh
 git
 openssh
 mercurial
+openjdk
+openjdk64
