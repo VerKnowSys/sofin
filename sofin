@@ -52,6 +52,7 @@ FIND_BIN="/usr/bin/find"
 STRIP_BIN="/usr/bin/strip"
 BASENAME_BIN="/usr/bin/basename"
 SORT_BIN="/usr/bin/sort"
+WC_BIN="/usr/bin/wc"
 
 # ANSI color definitions
 red='\033[31;40m'
@@ -201,6 +202,8 @@ usage_howto () {
     note "dependencies | deps | local          - installs software from list defined in '${DEPENDENCIES_FILE}' file in current directory"
     note "one | cherrypick | get               - installs one application from definition (example: ${SCRIPT_NAME} get ruby)"
     note "uninstall | remove | delete          - removes one application (example: ${SCRIPT_NAME} uninstall ruby)"
+    note "list | installed                     - lists installed software"
+    note "available                            - lists available software"
     note "export | exp | exportapp             - adds given command to application exports (example: ${SCRIPT_NAME} export rails ruby)"
     note "getshellvars | shellvars | vars      - returns shell variables for installed software"
     note "log                                  - shows and watches log file (for debug messages and verbose info)"
@@ -517,7 +520,10 @@ if [ ! "$1" = "" ]; then
 
     available)
         cd "${DEFINITIONS_DIR}"
-        ${LS_BIN} -x *def
+        note "Available definitions:"
+        ${LS_BIN} -m *def | ${SED_BIN} 's/\.def//g'
+        note "Definitions count:"
+        ${LS_BIN} -a *def | ${WC_BIN} -l
         exit
         ;;
 
