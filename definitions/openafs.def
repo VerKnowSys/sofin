@@ -1,27 +1,8 @@
 DISABLE_ON="Darwin"
 APP_FULL_NAME="Open Andrew File System"
 APP_NAME="openafs"
-APP_VERSION="1.6.0pre7"
+APP_VERSION="1.6.1"
 APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}-src.tar.gz"
-APP_CONFIGURE_ARGS="--disable-fuse-client --with-bsd-kernel-build=/usr/obj/usr/src/sys/VERKNOWSYS/"
+APP_CONFIGURE_ARGS="--disable-fuse-client --with-bsd-kernel-build=/usr/obj/usr/src/sys/GENERIC/"
 KERNEL_MODULE_FILE="/boot/modules/libafs.ko"
-APP_AFTER_INSTALL_CALLBACK="$CP_BIN -vf ${PREFIX}/lib/openafs/libafs.ko ${KERNEL_MODULE_FILE}; \
-$KLDLOAD_BIN ${KERNEL_MODULE_FILE}; \
-$MKDIR_BIN -p '${DFS_CACHE_DIR}'; \
-$MKDIR_BIN -p '${DFS_MOUNT_POINT}';"
-
-# $CP_BIN -vf /usr/local/etc/openafs/CellServDB.sample /usr/local/etc/openafs/server/CellServDB; \
-# echo '' > /usr/local/etc/openafs/server/KeyFile; \
-# echo '' > /usr/local/etc/openafs/server/UserList; \
-# echo '${HOST_NODE_NAME}' > /usr/local/etc/openafs/server/ThisCell; \
-# echo '${DFS_MOUNT_POINT}:${DFS_CACHE_DIR}:150000' > /usr/local/etc/openafs/cacheinfo; \
-# echo 'afsserver_enable=\"YES\"' >> /etc/rc.conf; \
-# echo 'afsd_enable=\"YES\"' >> /etc/rc.conf; \
-# $SERVICE_BIN afsserver restart; \
-# $SERVICE_BIN afsd restart; \
-# $MKDIR_BIN ${SOFTWARE_DIR}/Openafs-amd64-fbsd_82-${APP_VERSION}; \
-# $TOUCH_BIN ${SOFTWARE_DIR}/Openafs-amd64-fbsd_82-${APP_VERSION}/INSTALLED_IN_USR_LOCAL; \
-# echo 'LibAFS installed.'"
-# 
-# 
-
+APP_AFTER_INSTALL_CALLBACK="${CP_BIN} -vf ${PREFIX}/lib/openafs/libafs.ko ${KERNEL_MODULE_FILE}; ${KLDLOAD_BIN} ${KERNEL_MODULE_FILE}"
