@@ -1,6 +1,6 @@
 bison
 bzip2
-exif
+libexif
 expat
 fontconfig
 freetype
@@ -13,8 +13,8 @@ magick
 ncurses
 openssl
 pcre
-png
+libpng
 readline
-xml
+libxml2
 yaml
 zlib
