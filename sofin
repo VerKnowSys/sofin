@@ -238,6 +238,7 @@ set_default_compiler
 # unset conflicting environment variables
 unset LDFLAGS
 unset CFLAGS
+unset CXXFLAGS
 unset CPPFLAGS
 unset PATH
 unset LD_LIBRARY_PATH
