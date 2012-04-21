@@ -53,7 +53,7 @@ customizable software for FreeBSD servers.
     `sofin install databases dmilith`
 
 * Upgrade application requirement: Xml in bundle Ruby as logged in user:
-    `sofin upgrade xml ruby`
+    `sofin upgrade libxml2 ruby`
 
 * Upgrade Ruby in Ruby bundle without recompiling all requirements (already compiled requirements will be reused):
     `sofin upgrade ruby ruby`
