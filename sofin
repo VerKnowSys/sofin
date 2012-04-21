@@ -740,8 +740,8 @@ for application in ${APPLICATIONS}; do
 
             if [ "$ALLOW" = "1" ]; then
                 if [ -z "$APP_HTTP_PATH" ]; then
-                    debug "After install callback: $APP_AFTER_INSTALL_CALLBACK"
-                    run $APP_AFTER_INSTALL_CALLBACK
+                    debug "After install callback: ${APP_AFTER_INSTALL_CALLBACK}"
+                    run "${APP_AFTER_INSTALL_CALLBACK}"
                 else
                     BUILD_DIR="${CACHE_DIR}cache/${APP_NAME}${APP_POSTFIX}-${APP_VERSION}/"
                     ${MKDIR_BIN} -p "${BUILD_DIR}"
@@ -757,14 +757,15 @@ for application in ${APPLICATIONS}; do
                     done
                     if [ ! -e ${BUILD_DIR}${1}*tar.gz ]; then # TODO: tar.gz is currently the only supported format
                         note "-> Fetching requirement source from: ${APP_HTTP_PATH}"
-                        run ${FETCH_BIN} ${APP_HTTP_PATH}
+                        run "${FETCH_BIN} ${APP_HTTP_PATH}"
                     else
                         debug "Already fetched. Using tarball from cache"
                     fi
                     note "-> Unpacking source code of: ${APP_NAME}"
                     debug "Build dir: ${BUILD_DIR}"
-                    run ${TAR_BIN} xf ${BUILD_DIR}${APP_NAME}*
-                    debug "Entrering ${BUILD_DIR}${APP_NAME}*" >> "${LOG}"
+                    APP_LOC=${BUILD_DIR}${APP_NAME}
+                    debug "Entrering ${APP_LOC}" >> "${LOG}"
+                    run "${TAR_BIN} xf ${APP_LOC}*"
                     for dir in $(${LS_BIN} -F ${BUILD_DIR} | ${GREP_BIN} \/$); do
                         debug "Changing dir to: $dir" >> "${LOG}"
                         cd "${dir}${APP_SOURCE_DIR_POSTFIX}"
@@ -777,7 +778,7 @@ for application in ${APPLICATIONS}; do
                                 note "-> Applying patches for application: ${application}"
                                 for patch in ${LIST_DIR}/*; do
                                     debug "Patching source code with patch: ${patch}"
-                                    run ${PATCH_BIN} -i "${patch}"
+                                    run "${PATCH_BIN} -i ${patch}"
                                 done
                             fi
                         fi
@@ -801,11 +802,11 @@ for application in ${APPLICATIONS}; do
                                 ;;
 
                             cmake)
-                                run ${APP_CONFIGURE_SCRIPT} . -LH -DCMAKE_INSTALL_PREFIX="${PREFIX}"
+                                run "${APP_CONFIGURE_SCRIPT} . -LH -DCMAKE_INSTALL_PREFIX=${PREFIX}"
                                 ;;
 
                             *)
-                                run ${APP_CONFIGURE_SCRIPT} ${APP_CONFIGURE_ARGS} --prefix="${PREFIX}"
+                                run "${APP_CONFIGURE_SCRIPT} ${APP_CONFIGURE_ARGS} --prefix=${PREFIX}"
                                 ;;
 
                         esac
