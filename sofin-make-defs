@@ -10,6 +10,7 @@ DEFINITION_SNAPSHOT_FILE="defs.tar.gz"
 DESTINATION_REPOSITORY_SERVER="dmilith@software.verknowsys.com:/opt/software/source/definitions/"
 
 # config binary requirements definitions
+PRINTF_BIN="/usr/bin/printf"
 DIRNAME_BIN="/usr/bin/dirname"
 TAIL_BIN="/usr/bin/tail"
 CUT_BIN="/usr/bin/cut"
@@ -42,27 +43,27 @@ white='\033[38;40m'
 reset='\033[0m'
 
 # helpers
-ECHOE="false"
-
 cecho () {
-    if [ "${ECHOE}" = "false" ]; then
-        echo "${2}${1}${reset}"
-    else
-        echo -e "${2}${1}${reset}"
-    fi
-    return
-}
-
-
-note () {
-    cecho " * $1" ${green}
+    ${PRINTF_BIN} "${2}${1}${reset}\n"
 }
 
 
 debug () {
     if [ "${DEBUG}" = "true" ]; then
         cecho " ~ $1" ${magenta}
+    else
+        cecho " ~ $1" ${magenta} >> ${LOG}
     fi
+}
+
+
+warn () {
+    cecho " ! $1" ${yellow}
+}
+
+
+note () {
+    cecho " * $1" ${green}
 }
 
 
@@ -79,11 +80,7 @@ check_command_result () {
     if [ "$1" = "0" ]; then
         debug "CORRECT"
     else
-        error
-        error
-        error "FAILED. Last log below:"
-        error
-        ${TAIL_BIN} -n 50 "${LOG}"
+        error "FAILED"
         exit 1
     fi
 }

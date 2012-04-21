@@ -4,13 +4,14 @@
 
 # config settings
 DEBUG="false"
-VERSION="0.10.6"
+VERSION="0.11.0"
 
 # global script settings
 HEADER="Sofin v${VERSION}"
 SCRIPT_NAME="$0"
 MAIN_SOURCE_REPOSITORY="http://software.verknowsys.com/source/"
 SOFTWARE_DIR="/Software/"
+LOCK_FILE="${SOFTWARE_DIR}.sofin.lock"
 HOME_DIR="/Users/"
 HOME_APPS_DIR="Apps/"
 CACHE_DIR="${SOFTWARE_DIR}.cache/"
@@ -20,12 +21,14 @@ LISTS_DIR="${CACHE_DIR}lists/"
 DEFAULTS="${DEFINITIONS_DIR}defaults.def"
 DEFINITION_SNAPSHOT_FILE="defs.tar.gz"
 DEFAULT_PATH="/bin:/usr/bin:/sbin:/usr/sbin"
+DEFAULT_MANPATH="/usr/share/man:/usr/share/openssl/man"
 SOFIN_PROFILE="/etc/profile_sofin"
 DEPENDENCIES_FILE=".dependencies"
 INSTALLED_MARK=".installed"
-ECHOE="true"
+LOG_LINES_AMOUNT="150"
 
 # config binary requirements definitions
+PRINTF_BIN="/usr/bin/printf"
 KLDLOAD_BIN="/sbin/kldload"
 KILL_BIN="/bin/kill"
 PWD_BIN="/bin/pwd"
@@ -86,22 +89,7 @@ set_default_compiler () {
 
 
 cecho () {
-    if [ "${ECHOE}" = "false" ]; then
-        echo "${2}${1}${reset}"
-    else
-        echo -e "${2}${1}${reset}"
-    fi
-    return
-}
-
-
-warn () {
-    cecho " * $1" ${yellow}
-}
-
-
-note () {
-    cecho " * $1" ${green}
+    ${PRINTF_BIN} "${2}${1}${reset}\n"
 }
 
 
@@ -114,6 +102,16 @@ debug () {
 }
 
 
+warn () {
+    cecho " ! $1" ${yellow}
+}
+
+
+note () {
+    cecho " * $1" ${green}
+}
+
+
 error () {
     cecho " # $1" ${red}
 }
@@ -122,17 +120,14 @@ error () {
 check_command_result () {
     if [ -z "$1" ]; then
         error "No param given for check_command_result()!"
-        exit 1
+        exit_locked 1
     fi
     if [ "$1" = "0" ]; then
         debug "CORRECT"
     else
         error
-        error
-        error "FAILED. Last log below:"
-        error
-        ${TAIL_BIN} -n 50 "${LOG}"
-        exit 1
+        error "FAILURE. Run $(${BASENAME_BIN} ${SCRIPT_NAME}) log to see what went wrong."
+        exit_locked 1
     fi
 }
 
@@ -152,13 +147,12 @@ check_definition_dir () {
 check_requirements () {
     if [ "${APPLICATIONS}" = "" ]; then
         error "Empty applications list!"
-        exit 1
+        exit_locked 1
     fi
 }
 
 
 update_definitions () { # accepts optional user uid param
-    note "${HEADER}"
     tar_options="xf"
     rm_options="-rf"
     if [ "${DEBUG}" = "true" ]; then
@@ -195,20 +189,19 @@ update_definitions () { # accepts optional user uid param
 
 
 usage_howto () {
-    note "${HEADER}"
-    note
     note "Built in tasks:"
     note
-    note "install                              - installs software from list (example: ${SCRIPT_NAME} install languages)"
-    note "upgrade                              - upgrades one of dependencies of installed definition (example: ${SCRIPT_NAME} upgrade iconv ruby - to upgrade iconv in Ruby bundle)"
+    note "install | add                        - installs software from list (example: $(${BASENAME_BIN} ${SCRIPT_NAME}) install languages)"
+    note "upgrade                              - upgrades one of dependencies of installed definition (example: $(${BASENAME_BIN} ${SCRIPT_NAME}) upgrade iconv ruby - to upgrade iconv in Ruby bundle)"
     note "dependencies | deps | local          - installs software from list defined in '${DEPENDENCIES_FILE}' file in current directory"
-    note "one | cherrypick | get               - installs one application from definition (example: ${SCRIPT_NAME} get ruby)"
-    note "uninstall | remove | delete          - removes one application (example: ${SCRIPT_NAME} uninstall ruby)"
+    note "one | cherrypick | get               - installs one application from definition (example: $(${BASENAME_BIN} ${SCRIPT_NAME}) get ruby)"
+    note "uninstall | remove | delete          - removes one application (example: $(${BASENAME_BIN} ${SCRIPT_NAME}) uninstall ruby)"
     note "list | installed                     - lists installed software"
     note "available                            - lists available software"
-    note "export | exp | exportapp             - adds given command to application exports (example: ${SCRIPT_NAME} export rails ruby)"
+    note "export | exp | exportapp             - adds given command to application exports (example: $(${BASENAME_BIN} ${SCRIPT_NAME}) export rails ruby)"
     note "getshellvars | shellvars | vars      - returns shell variables for installed software"
     note "log                                  - shows and watches log file (for debug messages and verbose info)"
+    note "ver | version                        - shows $(${BASENAME_BIN} ${SCRIPT_NAME}) script version"
     exit
 }
 
@@ -226,6 +219,41 @@ check_os () {
         error "Currently only FreeBSD host is supported."
         exit
     fi
+}
+
+
+check_lock () {
+    UID="$1"
+    if [ -z "${UID}" ]; then
+        UID="0"
+    fi
+    if [ ! "${UID}" = "0" ]; then
+        export LOCK_FILE="${HOME_DIR}${UID}/.sofin.lock"
+    fi
+    if [ -e "${LOCK_FILE}" ]; then
+        error "Lock file exists in ${LOCK_FILE}. Another process of $(${BASENAME_BIN} ${SCRIPT_NAME}) is running?"
+        exit 1
+    else
+        debug "Creating lock file ${LOCK_FILE}"
+        ${TOUCH_BIN} ${LOCK_FILE}
+    fi
+    trap "exit_locked 2" INT
+}
+
+
+exit_locked () {
+    ERRCODE="$1"
+    if [ -z ${ERRCODE} ]; then
+        ERRCODE="0"
+    fi
+    if [ "${ERRCODE}" = "2" ]; then
+        warn "Interrupted by user."
+    fi
+    if [ -e "${LOCK_FILE}" ]; then
+        debug "Removing lock file: ${LOCK_FILE}"
+        ${RM_BIN} -f ${LOCK_FILE}
+    fi
+    exit ${ERRCODE}
 }
 
 
@@ -248,6 +276,12 @@ if [ ! "$1" = "" ]; then
     case $1 in
 
 
+    ver|version)
+        note "${HEADER}"
+        exit
+        ;;
+    
+    
     log)
         if [ -z "${2}" ]; then
             export LOG="${HOME_DIR}$(${ID_BIN} -u)/install.log"
@@ -261,7 +295,7 @@ if [ ! "$1" = "" ]; then
                 check_root
             fi
         fi
-        ${TAIL_BIN} -F ${LOG}
+        ${TAIL_BIN} -n ${LOG_LINES_AMOUNT} -F ${LOG}
         ;;
 
 
@@ -309,7 +343,8 @@ if [ ! "$1" = "" ]; then
         if [ ! -z "$2" ]; then
             process ${HOME_DIR}${2}/${HOME_APPS_DIR}
         fi
-        echo "export PATH=${result}"
+        ${PRINTF_BIN} "# PATH:\n"
+        ${PRINTF_BIN} "export PATH=${result}\n\n"
 
         # LD_LIBRARY_PATH, LDFLAGS:
         ldresult="/lib:/usr/lib"
@@ -330,8 +365,10 @@ if [ ! "$1" = "" ]; then
         if [ ! -z "$2" ]; then
             process ${HOME_DIR}$2/${HOME_APPS_DIR}
         fi
-        echo "export LD_LIBRARY_PATH='${ldresult}'"
-        echo "export LDFLAGS='${ldflags}'"
+        ${PRINTF_BIN} "# LD_LIBRARY_PATH:\n"
+        ${PRINTF_BIN} "export LD_LIBRARY_PATH='${ldresult}'\n\n"
+        ${PRINTF_BIN} "# LDFLAGS:\n"
+        ${PRINTF_BIN} "export LDFLAGS='${ldflags}'\n\n"
 
         # CFLAGS, CXXFLAGS:
         cflags="${CFLAGS}"
@@ -348,11 +385,13 @@ if [ ! "$1" = "" ]; then
             process ${HOME_DIR}${2}/${HOME_APPS_DIR}
         fi
         cxxflags="${cflags}"
-        echo "export CFLAGS='${cflags}'"
-        echo "export CXXFLAGS='${cxxflags}'"
+        ${PRINTF_BIN} "# CFLAGS:\n"
+        ${PRINTF_BIN} "export CFLAGS='${cflags}'\n\n"
+        ${PRINTF_BIN} "# CXXFLAGS:\n"
+        ${PRINTF_BIN} "export CXXFLAGS='${cxxflags}'\n\n"
 
         # MANPATH
-        manpath="${MANPATH}"
+        manpath="${DEFAULT_MANPATH}"
         process () {
             for app in ${1}*; do # SOFT_DIR
                 exp="${app}/man"
@@ -365,8 +404,8 @@ if [ ! "$1" = "" ]; then
         if [ ! -z "$2" ]; then
             process ${HOME_DIR}${2}/${HOME_APPS_DIR}
         fi
-        echo "export MANPATH='${manpath}'"
-
+        ${PRINTF_BIN} "# MANPATH:\n"
+        ${PRINTF_BIN} "export MANPATH='${manpath}'\n\n"
         exit
         ;;
 
@@ -392,9 +431,17 @@ if [ ! "$1" = "" ]; then
             export LOG="${HOME_DIR}${USER_UID}/install.log"
         fi
         REQ="${2}"
-        APP="$(echo "${3}" | ${CUT_BIN} -c1 | ${TR_BIN} '[a-z]' '[A-Z]')$(echo "${3}" | ${SED_BIN} 's/^[a-zA-Z]//')"
+        APP="$(${PRINTF_BIN} "${3}" | ${CUT_BIN} -c1 | ${TR_BIN} '[a-z]' '[A-Z]')$(${PRINTF_BIN} "${3}" | ${SED_BIN} 's/^[a-zA-Z]//')"
+        if [ ! -e "${SOFT_DIR}${APP}" ]; then
+            error "Bundle not found: ${APP}"
+            exit 1
+        fi
         note "Performing upgrade of requirement: ${REQ} in application bundle: ${APP}"
         REM="${SOFT_DIR}${APP}/${REQ}${INSTALLED_MARK}"
+        if [ ! -e "${REM}" ]; then
+            error "No requirement: ${REM} found of bundle: ${APP}"
+            exit 1
+        fi
         debug "Removing file: ${REM}"
         ${RM_BIN} -fv ${REM} >> ${LOG}
         ${SCRIPT_NAME} one ${3} ${USER_UID}
@@ -407,7 +454,6 @@ if [ ! "$1" = "" ]; then
             error "For \"$1\" application installation mode, second argument with application definition name is required!"
             exit 1
         fi
-        export APPLICATIONS="$2"
         if [ -z "${3}" ]; then
             export USER_UID="$(${ID_BIN} -u)"
         else
@@ -425,7 +471,14 @@ if [ ! "$1" = "" ]; then
             export LISTS_DIR="${CACHE_DIR}lists/"
             export DEFAULTS="${DEFINITIONS_DIR}defaults.def"
         fi
+        check_lock ${USER_UID}
         update_definitions ${USER_UID}
+        APP="$(${PRINTF_BIN} "${2}" | ${CUT_BIN} -c1 | ${TR_BIN} '[A-Z]' '[a-z]')$(${PRINTF_BIN} "${2}" | ${SED_BIN} 's/^[A-Za-z]//')"
+        if [ ! -e "${DEFINITIONS_DIR}${APP}.def" ]; then
+            error "Definition file not found: ${DEFINITIONS_DIR}${APP}.def !"
+            exit_locked 1
+        fi
+        export APPLICATIONS="${APP}"
         note "Installing software: ${APPLICATIONS}"
         ;;
 
@@ -446,15 +499,16 @@ if [ ! "$1" = "" ]; then
             export LISTS_DIR="${CACHE_DIR}lists/"
             export DEFAULTS="${DEFINITIONS_DIR}defaults.def"
         fi
+        check_lock ${USER_UID}
         update_definitions ${USER_UID}
         cd ${LOCAL_DIR}
-        note "Looking for ${DEPENDENCIES_FILE} file in current directory: $(${PWD_BIN})/"
+        note "Looking for $(${PWD_BIN})/${DEPENDENCIES_FILE} file…"
         if [ ! -e "$(${PWD_BIN})/${DEPENDENCIES_FILE}" ]; then
-            error "Local dependencies file not found!"
-            exit 1
+            error "Dependencies file not found!"
+            exit_locked 1
         fi
         export APPLICATIONS="$(${CAT_BIN} ${LOCAL_DIR}${DEPENDENCIES_FILE} | ${TR_BIN} '\n' ' ')"
-        note "Installing dependencies: ${APPLICATIONS}"        
+        note "Installing dependencies: ${APPLICATIONS}"
         ;;
 
 
@@ -480,7 +534,12 @@ if [ ! "$1" = "" ]; then
             export LISTS_DIR="${CACHE_DIR}lists/"
             export DEFAULTS="${DEFINITIONS_DIR}defaults.def"
         fi
+        check_lock ${USER_UID}
         update_definitions ${USER_UID}
+        if [ ! -e "${LISTS_DIR}$2" ]; then
+            error "List not found: ${2}!"
+            exit_locked 1
+        fi
         export APPLICATIONS="$(${CAT_BIN} ${LISTS_DIR}$2 | ${TR_BIN} '\n' ' ')"
         note "Installing software: ${APPLICATIONS}"
         ;;
@@ -509,14 +568,19 @@ if [ ! "$1" = "" ]; then
                 export SOFT_DIR="${HOME_DIR}${3}/${HOME_APPS_DIR}"
             fi
         fi
-        APP_NAME="$(echo "${2}" | ${CUT_BIN} -c1 | ${TR_BIN} '[a-z]' '[A-Z]')$(echo "${2}" | ${SED_BIN} 's/^[a-zA-Z]//')"
-        note "Removing application: ${APP_NAME}"
-        if [ "${APP_NAME}" = "/" ]; then
-            error "Czy Ty orzeszki?"
+        APP_NAME="$(${PRINTF_BIN} "${2}" | ${CUT_BIN} -c1 | ${TR_BIN} '[a-z]' '[A-Z]')$(${PRINTF_BIN} "${2}" | ${SED_BIN} 's/^[a-zA-Z]//')"
+        if [ -d "${SOFT_DIR}${APP_NAME}" ]; then
+            note "Removing application: ${APP_NAME}"
+            if [ "${APP_NAME}" = "/" ]; then
+                error "Czy Ty orzeszki?"
+                exit 1
+            fi
+            debug "Removing software from: ${SOFT_DIR}${APP_NAME}"
+            ${RM_BIN} -rfv "${SOFT_DIR}${APP_NAME}" >> ${LOG}
+        else
+            error "Application: ${APP_NAME} not installed."
             exit 1
         fi
-        debug "Removing software from: ${SOFT_DIR}${APP_NAME}"
-        ${RM_BIN} -rfv "${SOFT_DIR}${APP_NAME}" >> ${LOG}
         exit
         ;;
 
@@ -530,7 +594,7 @@ if [ ! "$1" = "" ]; then
         exit
         ;;
 
-        
+
     exportapp|export|exp)
         if [ "$2" = "" ]; then
             error "Missing second argument with export app is required!"
@@ -541,7 +605,7 @@ if [ ! "$1" = "" ]; then
             exit 1
         fi
         EXPORT="$2"
-        APP="$(echo "${3}" | ${CUT_BIN} -c1 | ${TR_BIN} '[a-z]' '[A-Z]')$(echo "${3}" | ${SED_BIN} 's/^[a-zA-Z]//')"
+        APP="$(${PRINTF_BIN} "${3}" | ${CUT_BIN} -c1 | ${TR_BIN} '[a-z]' '[A-Z]')$(${PRINTF_BIN} "${3}" | ${SED_BIN} 's/^[a-zA-Z]//')"
         UID="$4"
         export SOFT_DIR="${SOFTWARE_DIR}"
         if [ -z "${UID}" ]; then
@@ -595,7 +659,7 @@ for application in ${APPLICATIONS}; do
         . ${definition}
 
         # fancy old style Capitalize
-        APP_NAME="$(echo "${APP_NAME}" | ${CUT_BIN} -c1 | ${TR_BIN} '[a-z]' '[A-Z]')$(echo "${APP_NAME}" | ${SED_BIN} 's/^[a-zA-Z]//')"
+        APP_NAME="$(${PRINTF_BIN} "${APP_NAME}" | ${CUT_BIN} -c1 | ${TR_BIN} '[a-z]' '[A-Z]')$(${PRINTF_BIN} "${APP_NAME}" | ${SED_BIN} 's/^[a-zA-Z]//')"
         note
         note "Preparing application: ${APP_NAME}${APP_POSTFIX} (${APP_FULL_NAME} v${APP_VERSION})"
         if [ "${USER_UID}" = "" ]; then
@@ -643,13 +707,13 @@ for application in ${APPLICATIONS}; do
         execute_process () {
             if [ -z "$1" ]; then
                 error "No param given for execute_process()!"
-                exit 1
+                exit_locked 1
             fi
             req_definition_file="${DEFINITIONS_DIR}${1}.def"
             debug "Checking requirement: $1 file: $req_definition_file"
             if [ ! -e "${req_definition_file}" ]; then
                 error "Cannot fetch definition ${req_definition_file}! Aborting!"
-                exit 1
+                exit_locked 1
             fi
 
             . $DEFAULTS
@@ -758,7 +822,7 @@ for application in ${APPLICATIONS}; do
                         debug "Marking as installed '$1' in: ${PREFIX}"
                         ${TOUCH_BIN} "${PREFIX}/$1${INSTALLED_MARK}"
                         debug "Writing version: ${APP_VERSION} of app: '${APP_NAME}' installed in: ${PREFIX}"
-                        echo "${APP_VERSION}" > "${PREFIX}/$1${INSTALLED_MARK}"
+                        ${PRINTF_BIN} "${APP_VERSION}" > "${PREFIX}/$1${INSTALLED_MARK}"
                     done
                     cd "${CUR_DIR}"
                 fi
@@ -787,7 +851,7 @@ for application in ${APPLICATIONS}; do
             debug "Marking definition: ${application} installed"
             ${TOUCH_BIN} "${PREFIX}/${application}${INSTALLED_MARK}"
             debug "Writing version: ${APP_VERSION} of app: '${application}' installed in: ${PREFIX}"
-            echo "${APP_VERSION}" > "${PREFIX}/${application}${INSTALLED_MARK}"
+            ${PRINTF_BIN} "${APP_VERSION}" > "${PREFIX}/${application}${INSTALLED_MARK}"
         }
         
         if [ -e "${PREFIX}/${application}${INSTALLED_MARK}" ]; then
@@ -846,10 +910,10 @@ done
 
 if [ "${USER_UID}" = "" ]; then
     note "Updating ${SOFIN_PROFILE} settings…"
-    echo $(${SCRIPT_NAME} getshellvars) > ${SOFIN_PROFILE}
+    ${PRINTF_BIN} "$(${SCRIPT_NAME} getshellvars)" > ${SOFIN_PROFILE}
 else
     note "Updating ${HOME_DIR}${USER_UID}/.profile settings…"
-    echo $(${SCRIPT_NAME} getshellvars ${USER_UID}) > ${HOME_DIR}${USER_UID}/.profile
+    ${PRINTF_BIN} "$(${SCRIPT_NAME} getshellvars ${USER_UID})" > ${HOME_DIR}${USER_UID}/.profile
 fi
 
 if [ ! -z "${SHELL_PID}" ]; then
@@ -859,10 +923,12 @@ else
     note
     warn "You'll need to restart Your shell before using installed software in order to update environment variables."
     warn "To get this done automatically, put these lines to Your /etc/zshrc :"
-    echo
-    echo "if [ -e \$HOME/.profile ]; then"
-    echo "  . \$HOME/.profile"
-    echo "  trap \"source \$HOME/.profile\" USR2"
-    echo "fi"
-    echo "export SHELL_PID="\$\$""
+    printf
+    ${PRINTF_BIN} "if [ -e \$HOME/.profile ]; then"
+    ${PRINTF_BIN} "  . \$HOME/.profile"
+    ${PRINTF_BIN} "  trap \"source \$HOME/.profile\" USR2"
+    ${PRINTF_BIN} "fi"
+    ${PRINTF_BIN} "export SHELL_PID="\$\$""
 fi
+
+exit_locked
