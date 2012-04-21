@@ -26,9 +26,11 @@ INSTALLED_MARK=".installed"
 ECHOE="true"
 
 # config binary requirements definitions
+KLDLOAD_BIN="/sbin/kldload"
 KILL_BIN="/bin/kill"
 PWD_BIN="/bin/pwd"
 MV_BIN="/bin/mv"
+CP_BIN="/bin/cp"
 LN_BIN="/bin/ln"
 WHICH_BIN="/usr/bin/which"
 TAIL_BIN="/usr/bin/tail"
@@ -831,8 +833,8 @@ for application in ${APPLICATIONS}; do
         done
         
         if [ ! -z "${USER_UID}" ]; then
-            debug "Setting owner of ${PREFIX} recursively to user: ${USER_UID}"
             if [ "$(${ID_BIN} -u)" = "0" ]; then
+                debug "Setting owner of ${PREFIX} recursively to user: ${USER_UID}"
                 ${CHOWN_BIN} -R ${USER_UID} "${HOME_DIR}${USER_UID}" # NOTE: sanity check.
             fi
         fi
