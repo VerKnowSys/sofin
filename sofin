@@ -4,7 +4,7 @@
 
 # config settings
 DEBUG="false"
-VERSION="0.11.0"
+VERSION="0.11.1"
 
 # global script settings
 HEADER="Sofin v${VERSION}"
@@ -657,6 +657,7 @@ for application in ${APPLICATIONS}; do
         debug "Reading definition: ${definition}"
         . ${DEFAULTS}
         . ${definition}
+        note " -> Requirements for this definition: ${APP_REQUIREMENTS}"
 
         # fancy old style Capitalize
         APP_NAME="$(${PRINTF_BIN} "${APP_NAME}" | ${CUT_BIN} -c1 | ${TR_BIN} '[a-z]' '[A-Z]')$(${PRINTF_BIN} "${APP_NAME}" | ${SED_BIN} 's/^[a-zA-Z]//')"
@@ -840,7 +841,7 @@ for application in ${APPLICATIONS}; do
             else
                 note "Processing requirement: $req"
                 if [ -e "${PREFIX}/${req}${INSTALLED_MARK}" ]; then
-                    note "-> Requirement: ${req} marked as installed. Skipping…"
+                    note "-> ${req} marked as installed. Skipped…"
                 else
                     export CHANGED="true"
                     execute_process "${req}"
@@ -862,7 +863,7 @@ for application in ${APPLICATIONS}; do
                 unset CHANGED
                 mark
             else
-                note "-> Requirement: ${application} marked as installed. Skipping…"
+                note "-> ${application} marked as installed. Skipping…"
             fi
         else
             execute_process "${application}"
@@ -871,22 +872,25 @@ for application in ${APPLICATIONS}; do
         
         . ${DEFINITIONS_DIR}${application}.def
         ${MKDIR_BIN} -p "${PREFIX}/exports"
+        EXPORT_LIST=""
         for exp in ${APP_EXPORTS}; do
             for dir in "/bin/" "/sbin/" "/libexec/"; do
                 debug "Testing ${dir} looking into: ${PREFIX}${dir}${exp}"
                 if [ -e "${PREFIX}${dir}${exp}" ]; then
-                    note "Exporting binary: ${PREFIX}${dir}${exp}"
                     ${LN_BIN} -vfs "${PREFIX}${dir}${exp}" "${PREFIX}/exports/${exp}" >> $LOG
+                    exp_elem="$(${BASENAME_BIN} ${PREFIX}${dir}${exp})"
+                    EXPORT_LIST="${EXPORT_LIST} ${exp_elem}"
                 fi
             done
         done
+        note "Exporting binaries:${EXPORT_LIST}"
         
-        note "Stripping all libraries…"
+        note "-> Stripping all libraries…"
         for elem in $(${FIND_BIN} ${PREFIX} -name '*.so'); do
             debug "Stripping: ${elem}"
             "${STRIP_BIN}" -sv "${elem}" >> ${LOG} 2>> ${LOG}
         done
-        note "Stripping all binaries…"
+        note "-> Stripping all binaries…"
         for elem in "/bin/" "/sbin/" "/libexec/"; do
             if [ -d "${PREFIX}${elem}" ]; then
                 for e in $(${FIND_BIN} ${PREFIX}${elem}); do
