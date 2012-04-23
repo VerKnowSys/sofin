@@ -928,12 +928,16 @@ else
     note
     warn "You'll need to restart Your shell before using installed software in order to update environment variables."
     warn "To get this done automatically, put these lines to Your /etc/zshrc :"
-    printf
-    ${PRINTF_BIN} "if [ -e \$HOME/.profile ]; then"
-    ${PRINTF_BIN} "  . \$HOME/.profile"
-    ${PRINTF_BIN} "  trap \"source \$HOME/.profile\" USR2"
-    ${PRINTF_BIN} "fi"
-    ${PRINTF_BIN} "export SHELL_PID="\$\$""
+    ${PRINTF_BIN} "if [ \"\$\(/usr/bin/id -u\)\" = \"0\" ]; then\n"
+    ${PRINTF_BIN} "    trap \"source /etc/profile_sofin\" USR2\n"
+    ${PRINTF_BIN} "else\n"
+    ${PRINTF_BIN} "    if [ -e \$HOME/.profile ]; then\n"
+    ${PRINTF_BIN} "        . \$HOME/.profile\n"
+    ${PRINTF_BIN} "    fi\n"
+    ${PRINTF_BIN} "    trap \"source \$HOME/.profile\" USR2\n"
+    ${PRINTF_BIN} "fi\n"
+    ${PRINTF_BIN} "export SHELL_PID=\"\$\$\"\n"
 fi
+
 
 exit_locked
