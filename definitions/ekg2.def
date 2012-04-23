@@ -1,0 +1,7 @@
+APP_FULL_NAME="EKG2 - Multiplatform, multiprotocol, plugin-based instant messanger"
+APP_NAME="ekg2"
+APP_VERSION="0.3.1"
+APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
+APP_REQUIREMENTS="make ncurses iconv python-legacy scons perl libxml2 expat"
+APP_CONFIGURE_ARGS="--enable-unicode"
+APP_EXPORTS="ekg2"
