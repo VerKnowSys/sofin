@@ -4,7 +4,7 @@
 
 # config settings
 DEBUG="false"
-VERSION="0.11.1"
+VERSION="0.11.2"
 
 # global script settings
 HEADER="Sofin v${VERSION}"
@@ -153,6 +153,10 @@ check_requirements () {
 
 
 update_definitions () { # accepts optional user uid param
+    if [ "${DEVEL}" != "" ]; then
+        warn "Devel mode enabled. Not updating definitions from repository: ${MAIN_SOURCE_REPOSITORY}"
+        return
+    fi
     tar_options="xf"
     rm_options="-rf"
     if [ "${DEBUG}" = "true" ]; then
