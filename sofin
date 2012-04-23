@@ -833,7 +833,7 @@ for application in ${APPLICATIONS}; do
                     cd "${CUR_DIR}"
                 fi
             else
-                note "This bundle is disabled on current architecture ($(${UNAME_BIN})). Skipped…"
+                warn "This bundle is disabled on current architecture ($(${UNAME_BIN})). Skipped…"
             fi
         }
         
@@ -845,7 +845,7 @@ for application in ${APPLICATIONS}; do
             else
                 note "Processing requirement: $req"
                 if [ -e "${PREFIX}/${req}${INSTALLED_MARK}" ]; then
-                    note "-> ${req} marked as installed. Skipped…"
+                    note "-> ${req} marked as already installed…"
                 else
                     export CHANGED="true"
                     execute_process "${req}"
@@ -867,7 +867,7 @@ for application in ${APPLICATIONS}; do
                 unset CHANGED
                 mark
             else
-                note "-> ${application} marked as installed. Skipping…"
+                note "-> ${application} marked as already installed…"
             fi
         else
             execute_process "${application}"
