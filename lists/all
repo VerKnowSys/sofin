@@ -4,6 +4,7 @@ ruby-legacy
 postgresql
 mysql
 redis
+mongodb
 zsh
 git
 mercurial
@@ -19,3 +20,4 @@ imagemagick
 curl
 gd
 mosh
+mc
