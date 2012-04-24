@@ -4,7 +4,7 @@
 
 # config settings
 DEBUG="false"
-VERSION="0.11.3"
+VERSION="0.11.4"
 
 # global script settings
 HEADER="Sofin v${VERSION}"
@@ -688,19 +688,20 @@ for application in ${APPLICATIONS}; do
             if [ ! -z "$1" ]; then
                 export PATH="${PREFIX}/bin:${PREFIX}/sbin:${DEFAULT_PATH}"
                 export LD_LIBRARY_PATH="${PREFIX}/lib:${PREFIX}/libexec"
-                debug "PATH: ${PATH}" >> "${LOG}"
-                debug "CC: ${CC}" >> "${LOG}"
-                debug "CXX: ${CXX}" >> "${LOG}"
-                debug "CPP: ${CPP}" >> "${LOG}"
-                debug "CXXFLAGS: ${CXXFLAGS}" >> "${LOG}"
-                debug "CFLAGS: ${CFLAGS}" >> "${LOG}"
-                debug "LDFLAGS: ${LDFLAGS}" >> "${LOG}"
-                debug "LD_LIBRARY_PATH: ${LD_LIBRARY_PATH}" >> "${LOG}"
-                debug "Current DIR: ${BUILD_DIR}${dir}" >> "${LOG}"
+                debug "PREFIX: ${PREFIX}"
+                debug "PATH: ${PATH}"
+                debug "CC: ${CC}"
+                debug "CXX: ${CXX}"
+                debug "CPP: ${CPP}"
+                debug "CXXFLAGS: ${CXXFLAGS}"
+                debug "CFLAGS: ${CFLAGS}"
+                debug "LDFLAGS: ${LDFLAGS}"
+                debug "LD_LIBRARY_PATH: ${LD_LIBRARY_PATH}"
+                debug "Current DIR: ${BUILD_DIR}${dir}"
                 if [ ! -e "${LOG}" ]; then
                     ${TOUCH_BIN} "${LOG}"
                 fi
-                debug "Running '$@' @ $(${DATE_BIN})" >> "${LOG}"
+                debug "Running '$@' @ $(${DATE_BIN})"
                 eval PATH=${PATH} time "$@" 1>> "${LOG}" 2>> "${LOG}"
                 check_command_result $?
             else
@@ -880,10 +881,12 @@ for application in ${APPLICATIONS}; do
         for exp in ${APP_EXPORTS}; do
             for dir in "/bin/" "/sbin/" "/libexec/"; do
                 debug "Testing ${dir} looking into: ${PREFIX}${dir}${exp}"
-                if [ -e "${PREFIX}${dir}${exp}" ]; then
-                    ${LN_BIN} -vfs "${PREFIX}${dir}${exp}" "${PREFIX}/exports/${exp}" >> $LOG
-                    exp_elem="$(${BASENAME_BIN} ${PREFIX}${dir}${exp})"
-                    EXPORT_LIST="${EXPORT_LIST} ${exp_elem}"
+                if [ -f "${PREFIX}${dir}${exp}" ]; then # a file
+                    if [ -x "${PREFIX}${dir}${exp}" ]; then # and it's executable'
+                        ${LN_BIN} -vfs "${PREFIX}${dir}${exp}" "${PREFIX}/exports/${exp}" >> $LOG
+                        exp_elem="$(${BASENAME_BIN} ${PREFIX}${dir}${exp})"
+                        EXPORT_LIST="${EXPORT_LIST} ${exp_elem}"
+                    fi
                 fi
             done
         done
