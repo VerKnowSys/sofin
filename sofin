@@ -4,7 +4,7 @@
 
 # config settings
 DEBUG="false"
-VERSION="0.11.2"
+VERSION="0.11.3"
 
 # global script settings
 HEADER="Sofin v${VERSION}"
@@ -780,7 +780,7 @@ for application in ${APPLICATIONS}; do
                         LIST_DIR="${DEFINITIONS_DIR}patches/$1"
                         if [ -d "${LIST_DIR}" ]; then
                             if [ "$1" = "${APP_NAME}" ]; then # apply patch only when application/requirement for which patch is designed for
-                                note "-> Applying patches for application: ${application}"
+                                note "-> Applying patches for application: ${APP_NAME}"
                                 for patch in ${LIST_DIR}/*; do
                                     debug "Patching source code with patch: ${patch}"
                                     run "${PATCH_BIN} -i ${patch}"
