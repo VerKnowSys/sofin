@@ -711,8 +711,8 @@ for application in ${APPLICATIONS}; do
 
             if [ "$ALLOW" = "1" ]; then
                 if [ -z "$APP_HTTP_PATH" ]; then
-                    debug "After install callback: ${APP_AFTER_INSTALL_CALLBACK}"
-                    run "${APP_AFTER_INSTALL_CALLBACK}"
+                    error "No source given for definition! Aborting"
+                    exit_locked 1
                 else
                     BUILD_DIR="${CACHE_DIR}cache/${APP_NAME}${APP_POSTFIX}-${APP_VERSION}/"
                     ${MKDIR_BIN} -p "${BUILD_DIR}"
