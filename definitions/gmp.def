@@ -1,0 +1,4 @@
+APP_FULL_NAME="Arithmetic without limitations"
+APP_NAME="gmp"
+APP_VERSION="5.0.4"
+APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
