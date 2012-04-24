@@ -1,0 +1,6 @@
+APP_FULL_NAME="GNU Automake"
+APP_NAME="automake"
+APP_VERSION="1.11.1"
+APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
+APP_REQUIREMENTS="m4 make perl"
+APP_EXPORTS="automake aclocal"
