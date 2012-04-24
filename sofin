@@ -4,7 +4,7 @@
 
 # config settings
 DEBUG="false"
-VERSION="0.12.0"
+VERSION="0.12.1"
 
 # global script settings
 HEADER="Sofin v${VERSION}"
@@ -696,21 +696,38 @@ for application in ${APPLICATIONS}; do
                 exit_locked 1
             fi
 
-            . $DEFAULTS
-            . $req_definition_file
+            . ${DEFAULTS}
+            # force GNU compiler usage on definition side:
+            if [ ! -z "${FORCE_GNU_COMPILER}" ]; then
+                warn "Forcing use of GNU compiler for application: ${APP_NAME}"
+                export CC="/usr/bin/gcc ${APP_COMPILER_ARGS}"
+                export CXX="/usr/bin/g++ ${APP_COMPILER_ARGS}"
+                export CPP="/usr/bin/cpp"
+            else
+                export CC="/usr/bin/clang ${APP_COMPILER_ARGS}"
+                export CXX="/usr/bin/clang++ ${APP_COMPILER_ARGS}"
+                export CPP="/usr/bin/clang -E"
+            fi
+            export PATH="${PREFIX}/bin:${PREFIX}/sbin:${DEFAULT_PATH}"
+            export LD_LIBRARY_PATH="${PREFIX}/lib:${PREFIX}/libexec"
+            export CFLAGS="-I${PREFIX}/include ${APP_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
+            export CXXFLAGS="-I${PREFIX}/include ${APP_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
+            export LDFLAGS="-L${PREFIX}/lib ${APP_LINKER_ARGS} ${DEFAULT_LDFLAGS}"
+            . ${req_definition_file}
+
             export ALLOW=1
             if [ ! "$DISABLE_ON" = "" ]; then
                 for disabled in ${DISABLE_ON}; do
-                    debug "Running system: $SYSTEM_NAME"
-                    debug "DisableOn element: $disabled"
-                    if [ "$SYSTEM_NAME" = "$disabled" ]; then
+                    debug "Running system: ${SYSTEM_NAME}"
+                    debug "DisableOn element: ${disabled}"
+                    if [ "$SYSTEM_NAME" = "${disabled}" ]; then
                         export ALLOW=0
                     fi
                 done
             fi
 
-            if [ "$ALLOW" = "1" ]; then
-                if [ -z "$APP_HTTP_PATH" ]; then
+            if [ "${ALLOW}" = "1" ]; then
+                if [ -z "${APP_HTTP_PATH}" ]; then
                     error "No source given for definition! Aborting"
                     exit_locked 1
                 else
@@ -752,22 +769,8 @@ for application in ${APPLICATIONS}; do
                             fi
                         fi
                         
-                        # force GNU compiler usage on definition side:
-                        if [ ! -z "${FORCE_GNU_COMPILER}" ]; then
-                            warn "Forcing use of GNU compiler for application: ${APP_NAME}"
-                            export CC="/usr/bin/gcc ${APP_COMPILER_ARGS}"
-                            export CXX="/usr/bin/g++ ${APP_COMPILER_ARGS}"
-                            export CPP="/usr/bin/cpp"
-                        else
-                            export CC="/usr/bin/clang ${APP_COMPILER_ARGS}"
-                            export CXX="/usr/bin/clang++ ${APP_COMPILER_ARGS}"
-                            export CPP="/usr/bin/clang -E"
-                        fi
-                        export PATH="${PREFIX}/bin:${PREFIX}/sbin:${DEFAULT_PATH}"
-                        export LD_LIBRARY_PATH="${PREFIX}/lib:${PREFIX}/libexec"
-                        export CFLAGS="-I${PREFIX}/include ${APP_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
-                        export CXXFLAGS="-I${PREFIX}/include ${APP_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
-                        export LDFLAGS="-L${PREFIX}/lib ${APP_LINKER_ARGS} ${DEFAULT_LDFLAGS}"
+                        debug "-------------- PRE CONFIGURE SETTINGS DUMP --------------"
+                        debug "Current DIR: $(${PWD_BIN})"
                         debug "PREFIX: ${PREFIX}"
                         debug "PATH: ${PATH}"
                         debug "CC: ${CC}"
@@ -777,7 +780,6 @@ for application in ${APPLICATIONS}; do
                         debug "CFLAGS: ${CFLAGS}"
                         debug "LDFLAGS: ${LDFLAGS}"
                         debug "LD_LIBRARY_PATH: ${LD_LIBRARY_PATH}"
-                        debug "Current DIR: $(${PWD_BIN})"
                         
                         note "-> Configuring requirement: $1"
                         case ${APP_CONFIGURE_SCRIPT} in
