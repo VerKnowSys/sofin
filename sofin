@@ -4,7 +4,7 @@
 
 # config settings
 DEBUG="false"
-VERSION="0.12.1"
+VERSION="0.12.2"
 
 # global script settings
 HEADER="Sofin v${VERSION}"
@@ -757,6 +757,10 @@ for application in ${APPLICATIONS}; do
                     for dir in $(${LS_BIN} -F ${BUILD_DIR} | ${GREP_BIN} \/$); do
                         debug "Changing dir to: ${dir}${APP_SOURCE_DIR_POSTFIX}"
                         cd "${dir}${APP_SOURCE_DIR_POSTFIX}"
+                        if [ ! -z "${APP_AFTER_UNPACK_CALLBACK}" ]; then
+                            debug "Running after unpack callback"
+                            run "${APP_AFTER_UNPACK_CALLBACK}"
+                        fi
 
                         LIST_DIR="${DEFINITIONS_DIR}patches/$1"
                         if [ -d "${LIST_DIR}" ]; then
@@ -808,9 +812,19 @@ for application in ${APPLICATIONS}; do
                                 ;;
 
                         esac
+                        
+                        if [ ! -z "${APP_AFTER_CONFIGURE_CALLBACK}" ]; then
+                            debug "Running after configure callback"
+                            run "${APP_AFTER_CONFIGURE_CALLBACK}"
+                        fi
 
                         note "-> Building requirement: $1"
                         run "${APP_MAKE_METHOD}"
+                        if [ ! -z "${APP_AFTER_MAKE_CALLBACK}" ]; then
+                            debug "Running after make callback"
+                            run "${APP_AFTER_MAKE_CALLBACK}"
+                        fi
+                        
                         note "-> Installing requirement: $1"
                         run "${APP_INSTALL_METHOD}"
                         if [ ! "${APP_AFTER_INSTALL_CALLBACK}" = "" ]; then
