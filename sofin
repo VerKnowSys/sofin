@@ -772,7 +772,7 @@ for application in ${APPLICATIONS}; do
                     debug "Entrering ${APP_LOC}" >> "${LOG}"
                     run "${TAR_BIN} xf ${APP_LOC}*"
                     for dir in $(${LS_BIN} -F ${BUILD_DIR} | ${GREP_BIN} \/$); do
-                        debug "Changing dir to: $dir" >> "${LOG}"
+                        debug "Changing dir to: ${dir}${APP_SOURCE_DIR_POSTFIX}"
                         cd "${dir}${APP_SOURCE_DIR_POSTFIX}"
                         export CXXFLAGS="-I${PREFIX}/include ${APP_COMPILER_ARGS}"
                         export CFLAGS="-I${PREFIX}/include ${APP_COMPILER_ARGS}"
