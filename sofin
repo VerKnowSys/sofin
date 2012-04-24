@@ -752,7 +752,7 @@ for application in ${APPLICATIONS}; do
                     note "-> Unpacking source code of: ${APP_NAME}"
                     debug "Build dir: ${BUILD_DIR}"
                     APP_LOC=${BUILD_DIR}${APP_NAME}
-                    debug "Entrering ${APP_LOC}" >> "${LOG}"
+                    debug "Entrering ${APP_LOC}"
                     run "${TAR_BIN} xf ${APP_LOC}*"
                     for dir in $(${LS_BIN} -F ${BUILD_DIR} | ${GREP_BIN} \/$); do
                         debug "Changing dir to: ${dir}${APP_SOURCE_DIR_POSTFIX}"
