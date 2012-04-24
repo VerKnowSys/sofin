@@ -1,0 +1,7 @@
+APP_FULL_NAME="Netscape Portable Runtime (NSPR)"
+APP_NAME="nspr"
+APP_VERSION="4.9"
+APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
+APP_CONFIGURE_ARGS="--disable-debug --with-pthreads"
+APP_CONFIGURE_SCRIPT="../configure"
+APP_SOURCE_DIR_POSTFIX="mozilla/nsprpub/build"
