@@ -1,0 +1,6 @@
+APP_FULL_NAME="S-Lang Library"
+APP_NAME="slang"
+APP_VERSION="2.2.4"
+APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
+APP_REQUIREMENTS="libiconv pcre png"
+APP_CONFIGURE_ARGS="--without-onig"
