@@ -1,0 +1,6 @@
+APP_FULL_NAME="GNU Libtool - The GNU Portable Library Tool"
+APP_NAME="libtool"
+APP_VERSION="2.4.2"
+APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
+APP_CONFIGURE_ARGS="--disable-ltdl-install"
+FORCE_GNU_COMPILER="true"
