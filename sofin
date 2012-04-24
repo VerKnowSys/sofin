@@ -697,6 +697,7 @@ for application in ${APPLICATIONS}; do
             fi
 
             . ${DEFAULTS}
+            . ${req_definition_file}
             # force GNU compiler usage on definition side:
             if [ ! -z "${FORCE_GNU_COMPILER}" ]; then
                 warn "Forcing use of GNU compiler for application: ${APP_NAME}"
@@ -713,7 +714,6 @@ for application in ${APPLICATIONS}; do
             export CFLAGS="-I${PREFIX}/include ${APP_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
             export CXXFLAGS="-I${PREFIX}/include ${APP_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
             export LDFLAGS="-L${PREFIX}/lib ${APP_LINKER_ARGS} ${DEFAULT_LDFLAGS}"
-            . ${req_definition_file}
 
             export ALLOW=1
             if [ ! "$DISABLE_ON" = "" ]; then
