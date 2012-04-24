@@ -6,7 +6,7 @@ fontconfig
 freetype
 gettext
 gd
-iconv
+libiconv
 jpeg
 m4
 magick
