@@ -4,7 +4,7 @@
 
 # config settings
 DEBUG="false"
-VERSION="0.11.4"
+VERSION="0.12.0"
 
 # global script settings
 HEADER="Sofin v${VERSION}"
@@ -21,6 +21,8 @@ LISTS_DIR="${CACHE_DIR}lists/"
 DEFAULTS="${DEFINITIONS_DIR}defaults.def"
 DEFINITION_SNAPSHOT_FILE="defs.tar.gz"
 DEFAULT_PATH="/bin:/usr/bin:/sbin:/usr/sbin"
+DEFAULT_LDFLAGS="-L/lib -L/libexec -L/usr/lib -L/usr/libexec"
+DEFAULT_COMPILER_FLAGS="-Os -fPIC"
 DEFAULT_MANPATH="/usr/share/man:/usr/share/openssl/man"
 SOFIN_PROFILE="/etc/profile_sofin"
 DEPENDENCIES_FILE=".dependencies"
@@ -72,21 +74,6 @@ reset='\033[0m'
 
 
 # helpers
-
-set_default_compiler () {
-    #compiler settings
-    $(${WHICH_BIN} clang > /dev/null) 
-    if [ "$?" = "0" ]; then
-        export CC="clang"
-        export CXX="clang++"
-        export CPP="clang -E"
-    else
-        unset CC
-        unset CXX
-        unset CPP
-    fi
-}
-
 
 cecho () {
     ${PRINTF_BIN} "${2}${1}${reset}\n"
@@ -264,7 +251,6 @@ exit_locked () {
 # first part of checks
 check_os
 check_definition_dir
-set_default_compiler
 
 
 # unset conflicting environment variables
@@ -686,18 +672,6 @@ for application in ${APPLICATIONS}; do
 
         run () {
             if [ ! -z "$1" ]; then
-                export PATH="${PREFIX}/bin:${PREFIX}/sbin:${DEFAULT_PATH}"
-                export LD_LIBRARY_PATH="${PREFIX}/lib:${PREFIX}/libexec"
-                debug "PREFIX: ${PREFIX}"
-                debug "PATH: ${PATH}"
-                debug "CC: ${CC}"
-                debug "CXX: ${CXX}"
-                debug "CPP: ${CPP}"
-                debug "CXXFLAGS: ${CXXFLAGS}"
-                debug "CFLAGS: ${CFLAGS}"
-                debug "LDFLAGS: ${LDFLAGS}"
-                debug "LD_LIBRARY_PATH: ${LD_LIBRARY_PATH}"
-                debug "Current DIR: ${BUILD_DIR}${dir}"
                 if [ ! -e "${LOG}" ]; then
                     ${TOUCH_BIN} "${LOG}"
                 fi
@@ -724,15 +698,6 @@ for application in ${APPLICATIONS}; do
 
             . $DEFAULTS
             . $req_definition_file
-            # force GNU compiler usage on definition side:
-            if [ ! -z "${FORCE_GNU_COMPILER}" ]; then
-                debug "Forcing use of GNU compiler for application: ${APP_NAME}"
-                export CC="gcc"
-                export CXX="g++"
-                export CPP="cpp"
-            else
-                set_default_compiler
-            fi
             export ALLOW=1
             if [ ! "$DISABLE_ON" = "" ]; then
                 for disabled in ${DISABLE_ON}; do
@@ -775,9 +740,7 @@ for application in ${APPLICATIONS}; do
                     for dir in $(${LS_BIN} -F ${BUILD_DIR} | ${GREP_BIN} \/$); do
                         debug "Changing dir to: ${dir}${APP_SOURCE_DIR_POSTFIX}"
                         cd "${dir}${APP_SOURCE_DIR_POSTFIX}"
-                        export CXXFLAGS="-I${PREFIX}/include ${APP_COMPILER_ARGS}"
-                        export CFLAGS="-I${PREFIX}/include ${APP_COMPILER_ARGS}"
-                        export LDFLAGS="-L${PREFIX}/lib ${APP_LINKER_ARGS}"
+
                         LIST_DIR="${DEFINITIONS_DIR}patches/$1"
                         if [ -d "${LIST_DIR}" ]; then
                             if [ "$1" = "${APP_NAME}" ]; then # apply patch only when application/requirement for which patch is designed for
@@ -788,7 +751,34 @@ for application in ${APPLICATIONS}; do
                                 done
                             fi
                         fi
-
+                        
+                        # force GNU compiler usage on definition side:
+                        if [ ! -z "${FORCE_GNU_COMPILER}" ]; then
+                            warn "Forcing use of GNU compiler for application: ${APP_NAME}"
+                            export CC="/usr/bin/gcc ${APP_COMPILER_ARGS}"
+                            export CXX="/usr/bin/g++ ${APP_COMPILER_ARGS}"
+                            export CPP="/usr/bin/cpp"
+                        else
+                            export CC="/usr/bin/clang ${APP_COMPILER_ARGS}"
+                            export CXX="/usr/bin/clang++ ${APP_COMPILER_ARGS}"
+                            export CPP="/usr/bin/clang -E"
+                        fi
+                        export PATH="${PREFIX}/bin:${PREFIX}/sbin:${DEFAULT_PATH}"
+                        export LD_LIBRARY_PATH="${PREFIX}/lib:${PREFIX}/libexec"
+                        export CFLAGS="-I${PREFIX}/include ${APP_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
+                        export CXXFLAGS="-I${PREFIX}/include ${APP_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
+                        export LDFLAGS="-L${PREFIX}/lib ${APP_LINKER_ARGS} ${DEFAULT_LDFLAGS}"
+                        debug "PREFIX: ${PREFIX}"
+                        debug "PATH: ${PATH}"
+                        debug "CC: ${CC}"
+                        debug "CXX: ${CXX}"
+                        debug "CPP: ${CPP}"
+                        debug "CXXFLAGS: ${CXXFLAGS}"
+                        debug "CFLAGS: ${CFLAGS}"
+                        debug "LDFLAGS: ${LDFLAGS}"
+                        debug "LD_LIBRARY_PATH: ${LD_LIBRARY_PATH}"
+                        debug "Current DIR: $(${PWD_BIN})"
+                        
                         note "-> Configuring requirement: $1"
                         case ${APP_CONFIGURE_SCRIPT} in
                             ignore)
