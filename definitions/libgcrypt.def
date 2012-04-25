@@ -1,0 +1,7 @@
+APP_FULL_NAME="GCrypt library"
+APP_NAME="libgcrypt"
+APP_VERSION="1.5.0"
+APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
+APP_REQUIREMENTS="bzip2 libiconv make libtool"
+APP_CONFIGURE_ARGS="--disable-nls"
+FORCE_GNU_COMPILER="true"
