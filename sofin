@@ -4,7 +4,7 @@
 
 # config settings
 DEBUG="false"
-VERSION="0.12.3"
+VERSION="0.12.4"
 
 # global script settings
 HEADER="Sofin v${VERSION}"
@@ -432,8 +432,19 @@ if [ ! "$1" = "" ]; then
             error "No requirement: ${REM} found of bundle: ${APP}"
             exit 1
         fi
-        debug "Removing file: ${REM}"
-        ${RM_BIN} -fv ${REM} >> ${LOG}
+        
+        # getting list of file/ folders matching definition name
+        files=""
+        debug "Performing find in ${SOFT_DIR}${APP}"
+        for old in $(${FIND_BIN} "${SOFT_DIR}${APP}" -name "*${REQ}*" -regex '.*\.[o\$\|so\|a\$\|la\$\|h\$\|hpp\$].*' -type f); do
+            files="${files}${old} "
+            ${RM_BIN} -f "${old}"
+        done
+        debug "Old files removed before doing upgrade: ${files}"
+        debug "Removing install marker: ${REM}"
+        ${RM_BIN} -f "${REM}"
+        
+        debug "Relaunching installation script once again…"
         ${SCRIPT_NAME} one ${3} ${USER_UID}
         exit
         ;;
