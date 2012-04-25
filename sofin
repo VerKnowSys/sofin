@@ -576,6 +576,11 @@ if [ ! "$1" = "" ]; then
 
 
     available)
+        export USER_UID="$(${ID_BIN} -u)"
+        if [ ${USER_UID} != "0" ]; then
+            export CACHE_DIR="${HOME_DIR}${USER_UID}/.cache/"
+            export DEFINITIONS_DIR="${CACHE_DIR}definitions/"
+        fi
         cd "${DEFINITIONS_DIR}"
         note "Available definitions:"
         ${LS_BIN} -m *def | ${SED_BIN} 's/\.def//g'
