@@ -2,6 +2,17 @@ APP_FULL_NAME="EKG2 - Multiplatform, multiprotocol, plugin-based instant messang
 APP_NAME="ekg2"
 APP_VERSION="0.3.1"
 APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
-APP_REQUIREMENTS="make ncurses libiconv python-legacy perl libxml2 expat"
+APP_REQUIREMENTS="make ncurses libiconv python perl expat libgpg-error libgcrypt libassuan libksba pth gnupg gpgme"
 APP_CONFIGURE_ARGS="--enable-unicode"
 APP_EXPORTS="ekg2"
+
+# latest version (broken):
+# APP_FULL_NAME="EKG2 - Multiplatform, multiprotocol, plugin-based instant messanger (wiechu fork)"
+# APP_NAME="ekg2"
+# APP_VERSION="e128132"
+# APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
+# APP_REQUIREMENTS="zlib bzip2 make ncurses libiconv python perl expat m4 autoconf automake libtool gettext pcre pkg-config libffi icu glib libgpg-error libgcrypt libassuan libksba pth gmp nettle p11-kit gnutls openssl curl gnupg gpgme"
+# APP_CONFIGURE_ARGS="--enable-unicode --disable-nls"
+# APP_CONFIGURE_SCRIPT="./autogen.sh"
+# APP_EXPORTS="ekg2"
+# FORCE_GNU_COMPILER="true"
