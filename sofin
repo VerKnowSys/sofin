@@ -4,7 +4,7 @@
 
 # config settings
 DEBUG="false"
-VERSION="0.12.2"
+VERSION="0.12.3"
 
 # global script settings
 HEADER="Sofin v${VERSION}"
@@ -903,22 +903,26 @@ for application in ${APPLICATIONS}; do
         done
         note "Exporting binaries:${EXPORT_LIST}"
         
-        note "-> Stripping all libraries…"
-        for elem in $(${FIND_BIN} ${PREFIX} -name '*.so'); do
-            debug "Stripping: ${elem}"
-            "${STRIP_BIN}" -sv "${elem}" >> ${LOG} 2>> ${LOG}
-        done
-        note "-> Stripping all binaries…"
-        for elem in "/bin/" "/sbin/" "/libexec/"; do
-            if [ -d "${PREFIX}${elem}" ]; then
-                for e in $(${FIND_BIN} ${PREFIX}${elem}); do
-                    if [ -f "${e}" ]; then
-                        debug "Stripping: ${e}"
-                        "${STRIP_BIN}" -sv "${e}" >> ${LOG} 2>> ${LOG}
-                    fi
-                done
-            fi
-        done
+        if [ -z "${DEVEL}" ]; then
+            note "-> Stripping all libraries…"
+            for elem in $(${FIND_BIN} ${PREFIX} -name '*.so'); do
+                debug "Stripping: ${elem}"
+                "${STRIP_BIN}" -sv "${elem}" >> ${LOG} 2>> ${LOG}
+            done
+            note "-> Stripping all binaries…"
+            for elem in "/bin/" "/sbin/" "/libexec/"; do
+                if [ -d "${PREFIX}${elem}" ]; then
+                    for e in $(${FIND_BIN} ${PREFIX}${elem}); do
+                        if [ -f "${e}" ]; then
+                            debug "Stripping: ${e}"
+                            "${STRIP_BIN}" -sv "${e}" >> ${LOG} 2>> ${LOG}
+                        fi
+                    done
+                fi
+            done
+        else
+            warn "Debug mode enabled. Omitting binary/library strip…"
+        fi
         
         if [ ! -z "${USER_UID}" ]; then
             if [ "$(${ID_BIN} -u)" = "0" ]; then
