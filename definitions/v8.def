@@ -3,6 +3,6 @@ APP_NAME="v8"
 APP_VERSION="3.9.24"
 APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
 APP_CONFIGURE_SCRIPT="ignore"
-APP_REQUIREMENTS="libiconv python-legacy scons libexecinfo"
-APP_MAKE_METHOD="scons -j4 arch=x64 mode=release snapshot=off library=static debuggersupport=off werror=no strictaliasing=off"
+APP_REQUIREMENTS="libiconv python-legacy scons" # libexecinfo is part of ServeD base system hence it's excluded from requirements
+APP_MAKE_METHOD="scons -j4 arch=x64 mode=release snapshot=on library=static debuggersupport=off werror=no strictaliasing=off liveobjectlist=off"
 APP_INSTALL_METHOD="${MV_BIN} lib* ${PREFIX}/lib/ && ${MV_BIN} include/* ${PREFIX}/include/"
