@@ -4,7 +4,7 @@
 
 # config settings
 DEBUG="false"
-VERSION="0.12.4"
+VERSION="0.12.5"
 
 # global script settings
 HEADER="Sofin v${VERSION}"
@@ -22,7 +22,7 @@ DEFAULTS="${DEFINITIONS_DIR}defaults.def"
 DEFINITION_SNAPSHOT_FILE="defs.tar.gz"
 DEFAULT_PATH="/bin:/usr/bin:/sbin:/usr/sbin"
 DEFAULT_LDFLAGS=""
-DEFAULT_COMPILER_FLAGS="-Os -fPIC"
+DEFAULT_COMPILER_FLAGS="-Os -fPIC -fPIE -fno-strict-overflow -fstack-protector-all"
 DEFAULT_MANPATH="/usr/share/man:/usr/share/openssl/man"
 SOFIN_PROFILE="/etc/profile_sofin"
 DEPENDENCIES_FILE=".dependencies"
@@ -270,8 +270,8 @@ if [ ! "$1" = "" ]; then
         note "${HEADER}"
         exit
         ;;
-    
-    
+
+
     log)
         if [ -z "${2}" ]; then
             export LOG="${HOME_DIR}$(${ID_BIN} -u)/install.log"
@@ -318,7 +318,7 @@ if [ ! "$1" = "" ]; then
 
 
     getshellvars|shellvars|vars)
-        
+
         # PATH:
         result="${DEFAULT_PATH}"
         process () {
@@ -432,7 +432,7 @@ if [ ! "$1" = "" ]; then
             error "No requirement: ${REM} found of bundle: ${APP}"
             exit 1
         fi
-        
+
         # getting list of file/ folders matching definition name
         files=""
         debug "Performing find in ${SOFT_DIR}${APP}"
@@ -443,12 +443,12 @@ if [ ! "$1" = "" ]; then
         debug "Old files removed before doing upgrade: ${files}"
         debug "Removing install marker: ${REM}"
         ${RM_BIN} -f "${REM}"
-        
+
         debug "Relaunching installation script once again…"
         ${SCRIPT_NAME} one ${3} ${USER_UID}
         exit
         ;;
-        
+
 
     cherrypick|one|getone|get)
         if [ "$2" = "" ]; then
@@ -679,7 +679,7 @@ for application in ${APPLICATIONS}; do
                 ${MKDIR_BIN} -p "${HOME_DIR}${USER_UID}/${HOME_APPS_DIR}"
             fi
         fi
-        
+
         # append app postfix
         if [ ! -z "$APP_POSTFIX" ]; then
             export PREFIX="${PREFIX}${APP_POSTFIX}"
@@ -788,7 +788,7 @@ for application in ${APPLICATIONS}; do
                                 done
                             fi
                         fi
-                        
+
                         debug "-------------- PRE CONFIGURE SETTINGS DUMP --------------"
                         debug "Current DIR: $(${PWD_BIN})"
                         debug "PREFIX: ${PREFIX}"
@@ -800,13 +800,13 @@ for application in ${APPLICATIONS}; do
                         debug "CFLAGS: ${CFLAGS}"
                         debug "LDFLAGS: ${LDFLAGS}"
                         debug "LD_LIBRARY_PATH: ${LD_LIBRARY_PATH}"
-                        
+
                         note "-> Configuring requirement: $1"
                         case ${APP_CONFIGURE_SCRIPT} in
                             ignore)
                                 note "-> Ignored configuration part $1"
                                 ;;
-                                    
+
                             no-conf)
                                 note "-> Skipped configuration for $1"
                                 export APP_MAKE_METHOD="${APP_MAKE_METHOD} PREFIX=${PREFIX}"
@@ -828,7 +828,7 @@ for application in ${APPLICATIONS}; do
                                 ;;
 
                         esac
-                        
+
                         if [ ! -z "${APP_AFTER_CONFIGURE_CALLBACK}" ]; then
                             debug "Running after configure callback"
                             run "${APP_AFTER_CONFIGURE_CALLBACK}"
@@ -840,14 +840,14 @@ for application in ${APPLICATIONS}; do
                             debug "Running after make callback"
                             run "${APP_AFTER_MAKE_CALLBACK}"
                         fi
-                        
+
                         note "-> Installing requirement: $1"
                         run "${APP_INSTALL_METHOD}"
                         if [ ! "${APP_AFTER_INSTALL_CALLBACK}" = "" ]; then
                             debug "After install callback: ${APP_AFTER_INSTALL_CALLBACK}"
                             run "${APP_AFTER_INSTALL_CALLBACK}"
                         fi
-                        
+
                         debug "Marking as installed '$1' in: ${PREFIX}"
                         ${TOUCH_BIN} "${PREFIX}/$1${INSTALLED_MARK}"
                         debug "Writing version: ${APP_VERSION} of app: '${APP_NAME}' installed in: ${PREFIX}"
@@ -859,7 +859,7 @@ for application in ${APPLICATIONS}; do
                 warn "This bundle is disabled on current architecture ($(${UNAME_BIN})). Skipped…"
             fi
         }
-        
+
         debug "Installing app requirements: ${APP_REQUIREMENTS}"
         for req in ${APP_REQUIREMENTS}; do
             if [ -z "${req}" ]; then
@@ -875,14 +875,14 @@ for application in ${APPLICATIONS}; do
                 fi
             fi
         done
-        
+
         mark () {
             debug "Marking definition: ${application} installed"
             ${TOUCH_BIN} "${PREFIX}/${application}${INSTALLED_MARK}"
             debug "Writing version: ${APP_VERSION} of app: '${application}' installed in: ${PREFIX}"
             ${PRINTF_BIN} "${APP_VERSION}" > "${PREFIX}/${application}${INSTALLED_MARK}"
         }
-        
+
         if [ -e "${PREFIX}/${application}${INSTALLED_MARK}" ]; then
             if [ "${CHANGED}" = "true" ]; then
                 note "-> At least one of app dependencies has been changed. Forced rebuild of application…"
@@ -896,7 +896,7 @@ for application in ${APPLICATIONS}; do
             execute_process "${application}"
             mark
         fi
-        
+
         . ${DEFINITIONS_DIR}${application}.def
         ${MKDIR_BIN} -p "${PREFIX}/exports"
         EXPORT_LIST=""
@@ -913,7 +913,7 @@ for application in ${APPLICATIONS}; do
             done
         done
         note "Exporting binaries:${EXPORT_LIST}"
-        
+
         if [ -z "${DEVEL}" ]; then
             note "-> Stripping all libraries…"
             for elem in $(${FIND_BIN} ${PREFIX} -name '*.so'); do
@@ -934,7 +934,7 @@ for application in ${APPLICATIONS}; do
         else
             warn "Debug mode enabled. Omitting binary/library strip…"
         fi
-        
+
         if [ ! -z "${USER_UID}" ]; then
             if [ "$(${ID_BIN} -u)" = "0" ]; then
                 debug "Setting owner of ${PREFIX} recursively to user: ${USER_UID}"
