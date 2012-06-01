@@ -10,15 +10,3 @@
  else
    CFLAGS?=-std=c99 -pedantic $(OPTIMIZATION) -Wall -W $(ARCH) $(PROF)
    CCLINK?=-lm -pthread
-@@ -52,9 +55,9 @@
-   ALLOC_FLAGS=-DUSE_JEMALLOC -I../deps/jemalloc/include
- endif
- 
--CCOPT= $(CFLAGS) $(ARCH) $(PROF)
-+CCOPT= $(CFLAGS) $(PROF)
- 
--PREFIX= /usr/local
-+PREFIX:= ${PREFIX}
- INSTALL_BIN= $(PREFIX)/bin
- INSTALL= cp -p
- 
