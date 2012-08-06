@@ -1,0 +1,7 @@
+APP_FULL_NAME="Zabbix monitoring system"
+APP_NAME="zabbix"
+APP_VERSION="2.0.2"
+APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
+APP_CONFIGURE_ARGS="--enable-proxy --enable-server --enable-agent --disable-largefile --with-jabber --with-libcurl --with-sqlite3"
+APP_REQUIREMENTS="curl pkg-config iksemel sqlite"
+APP_EXPORTS="zabbix_get zabbix_sender zabbix_agent zabbix_agentd zabbix_proxy zabbix_server"
