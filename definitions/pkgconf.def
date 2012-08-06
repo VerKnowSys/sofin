@@ -1,0 +1,5 @@
+APP_FULL_NAME="pkgconf replacement for pkg-config"
+APP_NAME="pkgconf"
+APP_VERSION="0.8.5"
+APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
+APP_EXPORTS="pkgconf"
