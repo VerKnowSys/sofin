@@ -1,0 +1,7 @@
+APP_FULL_NAME="Cairo graphics library (with PDF, PNG, JPEG support)"
+APP_NAME="cairo"
+APP_VERSION="1.12.2"
+APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
+APP_REQUIREMENTS="make libiconv jpeg pkg-config perl libpng pixman zlib pcre libffi gettext python-legacy libtool icu glib" # ghostscript libspectre
+APP_EXPORTS="cairo-trace pkg-config" # XXX: pkg-config is required to let 3rd party apps know about library location
+# FORCE_GNU_COMPILER="true"
