@@ -1,0 +1,5 @@
+APP_FULL_NAME="Pixman low level pixel manipulation library"
+APP_NAME="pixman"
+APP_VERSION="0.26.2"
+APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
+FORCE_GNU_COMPILER="true"
