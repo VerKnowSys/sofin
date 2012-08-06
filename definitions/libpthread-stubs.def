@@ -1,0 +1,4 @@
+APP_FULL_NAME="libpthread-stubs"
+APP_NAME="libpthread-stubs"
+APP_VERSION="0.3"
+APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"

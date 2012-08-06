@@ -1,0 +1,5 @@
+APP_FULL_NAME="xextproto"
+APP_NAME="xextproto"
+APP_VERSION="7.2.0"
+APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
+APP_CONFIGURE_ARGS="--disable-specs"
