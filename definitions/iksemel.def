@@ -1,0 +1,5 @@
+APP_FULL_NAME="Iksemel library for XMPP protocol"
+APP_NAME="iksemel"
+APP_VERSION="1.4"
+APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
+APP_EXPORTS="ikslint iksperf iksroster"
