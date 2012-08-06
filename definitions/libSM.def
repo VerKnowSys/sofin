@@ -1,0 +1,5 @@
+APP_FULL_NAME="LibSM for Xorg"
+APP_NAME="libSM"
+APP_VERSION="1.2.0"
+APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
+APP_CONFIGURE_ARGS="--disable-docs --without-xmlto"

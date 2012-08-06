@@ -1,0 +1,6 @@
+APP_FULL_NAME="Lib Xt for Xorg"
+APP_NAME="libXt"
+APP_VERSION="1.1.1"
+APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
+APP_REQUIREMENTS="libSM libICE kbproto libXext"
+APP_CONFIGURE_ARGS="--disable-xkb"
