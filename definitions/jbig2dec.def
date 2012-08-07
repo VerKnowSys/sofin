@@ -1,0 +1,4 @@
+APP_FULL_NAME="jbig2dec - decoder implementation of the JBIG2 image compression format"
+APP_NAME="jbig2dec"
+APP_VERSION="0.11"
+APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
