@@ -1,0 +1,5 @@
+APP_FULL_NAME="Spectre library for rendering Postscript documents"
+APP_NAME="libspectre"
+APP_VERSION="0.2.6"
+APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
+APP_REQUIREMENTS="make jpeg libiconv ghostscript"
