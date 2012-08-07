@@ -1,0 +1,7 @@
+APP_FULL_NAME="Ghostscript"
+APP_NAME="ghostscript"
+APP_VERSION="9.05"
+APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
+APP_CONFIGURE_ARGS="--with-libiconv=native --enable-contrib --with-system-libtiff --enable-dynamic --disable-dbus --disable-compile-inits --without-jasper --with-drivers='' --with-ijs --with-libidn"
+APP_REQUIREMENTS="zlib make pkg-config jbig2dec libidn libiconv tiff libpng jpeg freetype libxml2 fontconfig libpaper m4 bison perl autoconf automake libtool util-macros python-legacy libxslt xcb-proto libpthread-stubs xproto libXau libxcb xtrans xextproto libX11 libICE libSM kbproto libXt libXext"
+APP_EXPORTS="gs"
