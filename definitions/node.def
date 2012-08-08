@@ -1,8 +1,8 @@
 APP_FULL_NAME="Nodejs"
 APP_NAME="node"
-APP_VERSION="0.8.3"
-APP_HTTP_PATH="http://nodejs.org/dist/v${APP_VERSION}/${APP_NAME}-v${APP_VERSION}.tar.gz"
-APP_HTTP_PATH2="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-v${APP_VERSION}.tar.gz" # backup path
+APP_VERSION="0.8.6"
+APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-v${APP_VERSION}.tar.gz" # backup path
+# APP_HTTP_PATH="http://nodejs.org/dist/v${APP_VERSION}/${APP_NAME}-v${APP_VERSION}.tar.gz"
 APP_REQUIREMENTS="zlib make python-legacy"
 APP_AFTER_INSTALL_CALLBACK="npm install -g coffee-script less run uglify-js"
 APP_EXPORTS="node npm node-waf coffee lessc runjs uglifyjs"
