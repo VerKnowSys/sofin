@@ -64,7 +64,7 @@ customizable software for FreeBSD servers.
 * Show list of installed software:
     `sofin installed`
 
-* Add "ruby" to exports of application "Passenger": `sofin exportapp ruby Passenger`
+* Export "ruby" binary from "Passenger" bundle: `sofin export ruby Passenger`
 
 * Uninstall installed software "SomeApp"?
     `sofin uninstall SomeApp`
