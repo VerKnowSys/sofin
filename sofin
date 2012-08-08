@@ -4,9 +4,12 @@
 
 # config settings
 DEBUG="false"
-VERSION="0.12.5"
+VERSION="0.13.0"
+# DEVEL="true"
 
 # global script settings
+ID_SVD="-u" # NOTE: use "-c" for standard FreeBSD systems with users defined in /etc/passwd
+
 HEADER="Sofin v${VERSION}"
 SCRIPT_NAME="$0"
 MAIN_SOURCE_REPOSITORY="http://software.verknowsys.com/source/"
@@ -274,14 +277,14 @@ if [ ! "$1" = "" ]; then
 
     log)
         if [ -z "${2}" ]; then
-            export LOG="${HOME_DIR}$(${ID_BIN} -u)/install.log"
+            export LOG="${HOME_DIR}$(${ID_BIN} ${ID_SVD})/install.log"
             if [ "$(${ID_BIN} -u)" = "0" ]; then
                 check_root
                 export LOG="${CACHE_DIR}install.log"
             fi
         else
             export LOG="${HOME_DIR}${2}/install.log"
-            if [ ! "$(${ID_BIN} -u)" = "${2}" ]; then
+            if [ ! "$(${ID_BIN} ${ID_SVD})" = "${2}" ]; then
                 check_root
             fi
         fi
@@ -291,14 +294,14 @@ if [ ! "$1" = "" ]; then
 
     installed|list)
         if [ -z "${2}" ]; then
-            export SOFT_DIR="${HOME_DIR}$(${ID_BIN} -u)/${HOME_APPS_DIR}"
+            export SOFT_DIR="${HOME_DIR}$(${ID_BIN} ${ID_SVD})/${HOME_APPS_DIR}"
             if [ "$(${ID_BIN} -u)" = "0" ]; then
                 check_root
                 export SOFT_DIR="${SOFTWARE_DIR}"
             fi
         else
             export SOFT_DIR="${HOME_DIR}$2/${HOME_APPS_DIR}"
-            if [ ! "$(${ID_BIN} -u)" = "${2}" ]; then
+            if [ ! "$(${ID_BIN} ${ID_SVD})" = "${2}" ]; then
                 check_root
             fi
         fi
@@ -410,11 +413,11 @@ if [ ! "$1" = "" ]; then
             exit 1
         fi
         if [ -z "${4}" ]; then
-            export USER_UID="$(${ID_BIN} -u)"
+            export USER_UID="$(${ID_BIN} ${ID_SVD})"
         else
             export USER_UID="$4"
         fi
-        if [ "${USER_UID}" = "0" ]; then
+        if [ "$(${ID_BIN} -u)" = "0" ]; then
             export SOFT_DIR="${SOFTWARE_DIR}"
         else
             export SOFT_DIR="${HOME_DIR}${USER_UID}/${HOME_APPS_DIR}"
@@ -456,14 +459,14 @@ if [ ! "$1" = "" ]; then
             exit 1
         fi
         if [ -z "${3}" ]; then
-            export USER_UID="$(${ID_BIN} -u)"
+            export USER_UID="$(${ID_BIN} ${ID_SVD})"
         else
             export USER_UID="$3"
         fi
-        if [ ! "$(${ID_BIN} -u)" = "${USER_UID}" ]; then
+        if [ ! "$(${ID_BIN} ${ID_SVD})" = "${USER_UID}" ]; then
             check_root
         fi
-        if [ "${USER_UID}" = "0" ]; then
+        if [ "$(${ID_BIN} -u)" = "0" ]; then
             unset USER_UID
         else
             export LOG="${HOME_DIR}${USER_UID}/install.log"
@@ -486,11 +489,8 @@ if [ ! "$1" = "" ]; then
 
     deps|dependencies|local)
         LOCAL_DIR="$(${PWD_BIN})/"
-        export USER_UID="$(${ID_BIN} -u)"
-        if [ ! "$(${ID_BIN} -u)" = "${USER_UID}" ]; then
-            check_root
-        fi
-        if [ "${USER_UID}" = "0" ]; then
+        export USER_UID="$(${ID_BIN} ${ID_SVD})"
+        if [ "$(${ID_BIN} -u)" = "0" ]; then
             error "Installation of project dependencies cannot be run as root!"
             exit 1
         else
@@ -502,7 +502,7 @@ if [ ! "$1" = "" ]; then
         fi
         check_lock ${USER_UID}
         update_definitions ${USER_UID}
-        cd ${LOCAL_DIR}
+        cd "${LOCAL_DIR}"
         note "Looking for $(${PWD_BIN})/${DEPENDENCIES_FILE} file…"
         if [ ! -e "$(${PWD_BIN})/${DEPENDENCIES_FILE}" ]; then
             error "Dependencies file not found!"
@@ -519,14 +519,14 @@ if [ ! "$1" = "" ]; then
             exit 1
         fi
         if [ -z "${3}" ]; then
-            export USER_UID="$(${ID_BIN} -u)"
+            export USER_UID="$(${ID_BIN} ${ID_SVD})"
         else
             export USER_UID="$3"
         fi
-        if [ ! "$(${ID_BIN} -u)" = "${USER_UID}" ]; then
+        if [ ! "$(${ID_BIN} ${ID_SVD})" = "${USER_UID}" ]; then
             check_root
         fi
-        if [ "${USER_UID}" = "0" ]; then
+        if [ "$(${ID_BIN} -u)" = "0" ]; then
             unset USER_UID
         else
             export LOG="${HOME_DIR}${USER_UID}/install.log"
@@ -553,14 +553,13 @@ if [ ! "$1" = "" ]; then
         fi
         if [ -z "${3}" ]; then # uid/user name not given
             if [ "$(${ID_BIN} -u)" = "0" ]; then
-                check_root
                 export SOFT_DIR="${SOFTWARE_DIR}"
             else
-                export LOG="${HOME_DIR}$(${ID_BIN} -u)/install.log"
-                export SOFT_DIR="${HOME_DIR}$(${ID_BIN} -u)/${HOME_APPS_DIR}"
+                export LOG="${HOME_DIR}$(${ID_BIN} ${ID_SVD})/install.log"
+                export SOFT_DIR="${HOME_DIR}$(${ID_BIN} ${ID_SVD})/${HOME_APPS_DIR}"
             fi
         else
-            if [ ! "$(${ID_BIN} -u)" = "${3}" ]; then
+            if [ ! "$(${ID_BIN} ${ID_SVD})" = "${3}" ]; then
                 check_root
                 export LOG="${HOME_DIR}${3}/install.log"
                 export SOFT_DIR="${HOME_DIR}${3}/${HOME_APPS_DIR}"
@@ -587,8 +586,8 @@ if [ ! "$1" = "" ]; then
 
 
     available)
-        export USER_UID="$(${ID_BIN} -u)"
-        if [ ${USER_UID} != "0" ]; then
+        export USER_UID="$(${ID_BIN} ${ID_SVD})"
+        if [ ! "$(${ID_BIN} -u)" = "0" ]; then
             export CACHE_DIR="${HOME_DIR}${USER_UID}/.cache/"
             export DEFINITIONS_DIR="${CACHE_DIR}definitions/"
         fi
@@ -615,16 +614,16 @@ if [ ! "$1" = "" ]; then
         UID="$4"
         export SOFT_DIR="${SOFTWARE_DIR}"
         if [ -z "${UID}" ]; then
-            export UID="$(${ID_BIN} -u)"
-            if [ ! "${UID}" = "0" ]; then
+            export UID="$(${ID_BIN} ${ID_SVD})"
+            if [ ! "$(${ID_BIN} -u)" = "0" ]; then
                 export SOFT_DIR="${HOME_DIR}${UID}/${HOME_APPS_DIR}"
                 export LOG="${HOME_DIR}${UID}/install.log"
             fi
         else # uid given?
-            if [ ! "${UID}" = "0" ]; then
+            if [ ! "$(${ID_BIN} -u)" = "0" ]; then
                 export SOFT_DIR="${HOME_DIR}${UID}/${HOME_APPS_DIR}"
                 export LOG="${HOME_DIR}${UID}/install.log"
-                if [ ! "${UID}" = "$(${ID_BIN} -u)" ]; then
+                if [ ! "${UID}" = "$(${ID_BIN} ${ID_SVD})" ]; then
                     check_root
                 fi
             fi
