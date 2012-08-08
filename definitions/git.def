@@ -1,6 +1,6 @@
 APP_FULL_NAME="Git SCM"
 APP_NAME="git"
-APP_VERSION="1.7.10.2"
+APP_VERSION="1.7.10.3"
 APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
 APP_CONFIGURE_ARGS="--without-tcltk --with-zlib --without-python --with-perl=${PREFIX}/bin/perl"
 APP_REQUIREMENTS="make zlib libiconv expat perl"
