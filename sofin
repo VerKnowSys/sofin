@@ -150,6 +150,8 @@ usage_howto () {
     note "export | exp | exportapp             - adds given command to application exports (example: $(${BASENAME_BIN} ${SCRIPT_NAME}) export rails ruby)"
     note "getshellvars | shellvars | vars      - returns shell variables for installed software"
     note "log                                  - shows and watches log file (for debug messages and verbose info)"
+    note "reload | rehash                      - recreate shell vars and reload current shell"
+    note "update                               - only update definitions from remote repository and exit"
     note "ver | version                        - shows $(${BASENAME_BIN} ${SCRIPT_NAME}) script version"
     exit
 }
