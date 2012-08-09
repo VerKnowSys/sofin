@@ -1,0 +1,7 @@
+APP_FULL_NAME="Hub software for Direct Connect"
+APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
+APP_NAME="dbhub"
+APP_VERSION="0.452"
+APP_EXPORTS="dbhub"
+APP_CONFIGURE_ARGS="--enable-perl --disable-debug"
+APP_REQUIREMENTS="perl"
