@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-VERSION="0.14.0"
+VERSION="0.14.1"
 
 
 # load configuration from sofin.conf
@@ -560,6 +560,18 @@ if [ ! "$1" = "" ]; then
         else
             write_info_about_shell_configuration
         fi
+        exit
+        ;;
+
+
+    update|updatedefs)
+        export USER_UID="$(${ID_BIN} ${ID_SVD})"
+        export LOG="${HOME_DIR}${USER_UID}/install.log"
+        export CACHE_DIR="${HOME_DIR}${USER_UID}/.cache/"
+        export DEFINITIONS_DIR="${CACHE_DIR}definitions/"
+        export LISTS_DIR="${CACHE_DIR}lists/"
+        export DEFAULTS="${DEFINITIONS_DIR}defaults.def"
+        update_definitions "${USER_UID}"
         exit
         ;;
 
