@@ -4,7 +4,7 @@
 
 # config settings
 DEBUG="false"
-VERSION="0.13.1"
+VERSION="0.13.2"
 # DEVEL="true"
 
 # global script settings
@@ -786,6 +786,11 @@ for application in ${APPLICATIONS}; do
                                     run "${PATCH_BIN} -i ${patch}"
                                 done
                             fi
+                        fi
+
+                        if [ ! -z "${APP_AFTER_PATCH_CALLBACK}" ]; then
+                            debug "Running after patch callback"
+                            run "${APP_AFTER_PATCH_CALLBACK}"
                         fi
 
                         debug "-------------- PRE CONFIGURE SETTINGS DUMP --------------"
