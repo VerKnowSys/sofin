@@ -4,11 +4,11 @@
 
 # config settings
 DEBUG="false"
-VERSION="0.13.0"
+VERSION="0.13.1"
 # DEVEL="true"
 
 # global script settings
-ID_SVD="-u" # NOTE: use "-c" for standard FreeBSD systems with users defined in /etc/passwd
+ID_SVD="-u" # NOTE: use "-un" for standard FreeBSD systems with users defined in /etc/passwd
 
 HEADER="Sofin v${VERSION}"
 SCRIPT_NAME="$0"
