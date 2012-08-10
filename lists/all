@@ -2,7 +2,6 @@ ghostscript
 cairo
 openssh
 ruby
-ruby-legacy
 postgresql
 mysql
 redis
