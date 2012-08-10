@@ -1,0 +1,7 @@
+APP_FULL_NAME="Xorg Server"
+APP_NAME="xorg-server"
+APP_VERSION="1.10.6"
+APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
+APP_CONFIGURE_ARGS="--disable-dmx --disable-xvfb --disable-xnest --without-xmlto --disable-docs --disable-devel-docs --localstatedir=/var --without-dtrace --disable-xephyr --enable-record=yes --enable-aiglx=no --enable-config-hal=no --enable-install-setuid=no"
+APP_REQUIREMENTS="zlib make perl python-legacy pkgconf pixman m4 autoconf automake util-macros bison libtool util-macros libxml2 libxslt xcb-proto libpthread-stubs xproto libXau libxcb xtrans xextproto libX11 libICE libSM kbproto libXext libXt"
+# APP_EXPORTS="X"
