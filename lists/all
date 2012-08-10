@@ -1,12 +1,14 @@
 ghostscript
 cairo
 openssh
+openssl
 ruby
 postgresql
 mysql
 redis
 mongodb
 zsh
+bash
 git
 mercurial
 passenger
@@ -24,6 +26,11 @@ mosh
 mc
 weechat
 cmake
+make
+scons
 qt
 transmission
 rtorrent
+valgrind
+zabbix
+tmux
