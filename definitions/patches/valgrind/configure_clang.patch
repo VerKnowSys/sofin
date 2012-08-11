@@ -1,0 +1,10 @@
+--- configure.orig	2012-08-10 21:10:48.908944897 +0200
++++ configure	2012-08-10 21:11:20.476945195 +0200
+@@ -5347,7 +5347,6 @@
+      *)
+ 	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no (${gcc_version})" >&5
+ $as_echo "no (${gcc_version})" >&6; }
+-	as_fn_error $? "please use gcc >= 3.0 or clang >= 2.9" "$LINENO" 5
+ 	;;
+ esac
+ 
