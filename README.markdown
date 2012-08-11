@@ -7,7 +7,7 @@ I'm also on #freebsd and #scala.pl @ freenode IRC.
 This software is my way of how to get reliable, updatable, bundled, closed-dependency and fully
 customizable software for FreeBSD servers.
 
-    
+
 ## Features:
 * User friendly, clean and clear colorful information. No magic. KISS and DRY driven development.
 * Simple, <1k LOC solution, based on legacy /bin/sh shell scripting language.
@@ -45,10 +45,10 @@ customizable software for FreeBSD servers.
 
 * Install one software from definition called "ruby.def" for already logged in user:
     `sofin one ruby`
-        
+
 * Install one software from definition called "ruby.def" for user "dmilith" (by default it will point to /Users/dmilith/Apps/Ruby/):
     `sofin one ruby dmilith`
-        
+
 * Install software list called "databases" for user "dmilith" (by default it will point to /Users/dmilith/Apps/):
     `sofin install databases dmilith`
 
@@ -89,8 +89,6 @@ customizable software for FreeBSD servers.
 * Sofin requires to be installed or symlinked to system default PATH location (/bin:/usr/bin or similar)
 * Each software bundle includes all dependencies of given software, hence each application requires more disk
   space than it does with "old fasioned, system wide, shared software".
-* Currently only "tar.gz" archives files are cached and supported. In case of using different archive
-  type a failure will happen.
 * Currently all software used by current definitions is mirrored on software.verknowsys.com/source
 * Currently software.verknowsys.com repository is hardcoded into script. To maintain own definitions You may just
   fork and create own defs which I just merge into this repository or create own one somewhere.
