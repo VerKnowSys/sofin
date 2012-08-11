@@ -37,6 +37,7 @@ customizable software for FreeBSD servers.
   (located in /Software/.cache/install.log by default or /Users/USER_NAME/.cache/install.log)
 * Exports. Each app has own ROOT_DIR/exports/ with symlinks to exported software. Exported software are just simple symlinks,
   used to generate PATH environment variable.
+* Sofin has own configuration file located in /etc/sofin.conf which is SH script itself.
 
 
 ## Examples:
@@ -90,8 +91,6 @@ customizable software for FreeBSD servers.
 * Each software bundle includes all dependencies of given software, hence each application requires more disk
   space than it does with "old fasioned, system wide, shared software".
 * Currently all software used by current definitions is mirrored on software.verknowsys.com/source
-* Currently software.verknowsys.com repository is hardcoded into script. To maintain own definitions You may just
-  fork and create own defs which I just merge into this repository or create own one somewhere.
 * Currently any kind of sha/md5 checksumming isn't supported at all.
 * Currently some definitions provided by Sofin include a couple of custom patches on software required
   by VerKnowSys ServeD © System. It *shouldn't* but **may** break the way how software works on different systems.
