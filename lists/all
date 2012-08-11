@@ -31,6 +31,6 @@ scons
 qt
 transmission
 rtorrent
-valgrind
 zabbix
 tmux
+dhcpd
