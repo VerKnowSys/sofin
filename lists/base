@@ -1,7 +1,7 @@
-zsh
+bash
 git
-openssh
-mercurial
+openafs
 openjdk
 openjdk64
-openafs
+openssh
+zsh
