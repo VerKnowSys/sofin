@@ -3,5 +3,6 @@ APP_NAME="ekg2"
 APP_VERSION="0.3.1"
 APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
 APP_REQUIREMENTS="make ncurses libiconv perl expat libgpg-error libgcrypt libassuan libksba pth gnupg gpgme"
-APP_CONFIGURE_ARGS="--enable-unicode --without-readline --without-gtk"
+APP_CONFIGURE_ARGS="--disable-nls --disable-dependency-tracking --enable-unicode --without-readline --without-gtk"
+APP_AFTER_CONFIGURE_CALLBACK="${BIN_RM} -f ${PREFIX}/lib/libncursesw.a" # ncurses is compiled by gcc
 APP_EXPORTS="ekg2"
