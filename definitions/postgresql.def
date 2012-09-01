@@ -1,6 +1,6 @@
 APP_FULL_NAME="PostgreSQL 9"
 APP_NAME="postgresql"
-APP_VERSION="9.0.8"
+APP_VERSION="9.0.9"
 APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
 APP_CONFIGURE_ARGS="--without-ldap --with-zlib --without-openssl --disable-debug --disable-nls --without-perl --without-python --without-libxml"
 APP_REQUIREMENTS="make zlib libiconv"
