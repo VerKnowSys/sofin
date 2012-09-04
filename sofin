@@ -715,7 +715,7 @@ for application in ${APPLICATIONS}; do
             else
                 export CC="/usr/bin/clang ${APP_COMPILER_ARGS}"
                 export CXX="/usr/bin/clang++ ${APP_COMPILER_ARGS}"
-                export CPP="/usr/bin/clang -E"
+                export CPP="/usr/bin/clang-cpp"
             fi
             export PATH="${PREFIX}/bin:${PREFIX}/sbin:${DEFAULT_PATH}"
             export LD_LIBRARY_PATH="${PREFIX}/lib:${PREFIX}/libexec"
