@@ -15,6 +15,7 @@ mosh
 mysql
 nginx
 node
+node-legacy
 openssh
 openssl
 passenger
