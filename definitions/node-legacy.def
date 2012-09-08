@@ -1,6 +1,7 @@
 APP_FULL_NAME="Nodejs"
 APP_NAME="node"
-APP_VERSION="0.8.8"
+APP_POSTFIX="-legacy"
+APP_VERSION="0.6.21"
 APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-v${APP_VERSION}.tar.gz"
 APP_REQUIREMENTS="zlib make python-legacy"
 APP_AFTER_INSTALL_CALLBACK="npm install -g coffee-script less uglify-js nodemon"
