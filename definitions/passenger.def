@@ -2,9 +2,11 @@ APP_FULL_NAME="Passenger on Nginx"
 APP_NAME="passenger"
 APP_VERSION="3.0.17"
 APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
-APP_REQUIREMENTS="zlib libxml2 yaml libiconv curl libffi python-legacy scons ruby" # # libexecinfo is part of ServeD base system hence it's excluded from requirements
+APP_REQUIREMENTS="zlib bzip2 libxml2 libiconv make libtool libgpg-error libgcrypt libxslt yaml libiconv curl libffi python-legacy scons ruby" # # libexecinfo is part of ServeD base system hence it's excluded from requirements
 APP_CONFIGURE_SCRIPT="ignore"
 APP_MAKE_METHOD="${PRINTF_BIN} 'gem: --no-ri --no-rdoc' > ${HOME}/.gemrc; ${PREFIX}/bin/gem install rake rack bundler"
+APP_COMPILER_ARGS="-pthread"
+APP_LINKER_ARGS="-pthread -lyaml -lz -lssl -lcrypt"
 APP_AFTER_PATCH_CALLBACK="${CP_BIN} -r ${CACHE_DIR}cache/${APP_NAME}-${APP_VERSION}/${APP_NAME}-${APP_VERSION} ${PREFIX}/lib/${APP_NAME}"
 APP_INSTALL_METHOD="${PREFIX}/bin/ruby ${PREFIX}/lib/${APP_NAME}/bin/passenger-install-nginx-module --auto --auto-download --prefix=${PREFIX}"
 APP_EXPORTS="passenger nginx bundle rack rake gem irb ruby ri rdoc erb"
