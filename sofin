@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-VERSION="0.14.4"
+VERSION="0.14.5"
 
 
 # load configuration from sofin.conf
@@ -331,6 +331,25 @@ if [ ! "$1" = "" ]; then
         ${PRINTF_BIN} "export LD_LIBRARY_PATH='${ldresult}'\n\n"
         ${PRINTF_BIN} "# LDFLAGS:\n"
         ${PRINTF_BIN} "export LDFLAGS='${ldflags}'\n\n"
+
+        # LD_PRELOAD_BACKUP:
+        ld_preload=""
+        process () {
+            for lib in ${1}*; do # LIB_DIR
+                if [ -d "${lib}/lib" ]; then
+                    libs=$(${FIND_BIN} ${lib}/lib -name '*.so')
+                    for shared in ${libs}; do
+                        ld_preload="${shared}:${ld_preload}"
+                    done
+                fi
+            done
+        }
+        process ${SOFTWARE_DIR}
+        if [ ! -z "$2" ]; then
+            process ${HOME_DIR}$2/${HOME_APPS_DIR}
+        fi
+        ${PRINTF_BIN} "# LD_PRELOAD_BACKUP:\n"
+        ${PRINTF_BIN} "export LD_PRELOAD_BACKUP='${ld_preload}'\n\n"
 
         # CFLAGS, CXXFLAGS:
         cflags="${CFLAGS}"
