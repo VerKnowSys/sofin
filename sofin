@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-VERSION="0.14.5"
+VERSION="0.14.6"
 
 
 # load configuration from sofin.conf
@@ -737,10 +737,10 @@ for application in ${APPLICATIONS}; do
                 export CPP="/usr/bin/clang-cpp"
             fi
             export PATH="${PREFIX}/bin:${PREFIX}/sbin:${DEFAULT_PATH}"
-            export LD_LIBRARY_PATH="${PREFIX}/lib:${PREFIX}/libexec"
+            export LD_LIBRARY_PATH="${PREFIX}/lib:${PREFIX}/libexec:/usr/lib:/lib"
             export CFLAGS="-I${PREFIX}/include ${APP_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
             export CXXFLAGS="-I${PREFIX}/include ${APP_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
-            export LDFLAGS="-R${PREFIX}/lib -L${PREFIX}/lib ${APP_LINKER_ARGS} ${DEFAULT_LDFLAGS}"
+            export LDFLAGS="-L${PREFIX}/lib ${APP_LINKER_ARGS} ${DEFAULT_LDFLAGS}"
 
             export ALLOW=1
             if [ ! "$DISABLE_ON" = "" ]; then
