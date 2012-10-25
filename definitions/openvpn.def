@@ -1,0 +1,7 @@
+APP_FULL_NAME="OpenVPN"
+APP_NAME="openvpn"
+APP_VERSION="2.2.2"
+APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
+APP_CONFIGURE_ARGS="--enable-password-save"
+APP_REQUIREMENTS="lzo bzip2 perl openssl make pkgconf libtool libgpg-error gmp nettle p11-kit gnutls pkcs11-helper"
+APP_EXPORTS="openvpn"
