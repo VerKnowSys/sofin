@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-VERSION="0.14.7"
+VERSION="0.14.8"
 
 
 # load configuration from sofin.conf
@@ -368,6 +368,11 @@ if [ ! "$1" = "" ]; then
         fi
         ${PRINTF_BIN} "# MANPATH:\n"
         ${PRINTF_BIN} "export MANPATH='${manpath}'\n\n"
+
+        ${PRINTF_BIN} "# CC:\n"
+        ${PRINTF_BIN} "export CC='/usr/bin/clang'\n\n"
+        ${PRINTF_BIN} "# CXX:\n"
+        ${PRINTF_BIN} "export CXX='/usr/bin/clang++'\n\n"
         exit
         ;;
 
