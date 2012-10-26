@@ -1,3 +1,4 @@
+ant
 bash
 cairo
 cmake
@@ -7,7 +8,9 @@ gd
 ghostscript
 git
 imagemagick
+jruby
 make
+maven
 mc
 mercurial
 mongodb
@@ -18,6 +21,7 @@ node
 node-legacy
 openssh
 openssl
+openvpn
 passenger
 perl
 php
@@ -29,6 +33,7 @@ redis
 rsync
 rtorrent
 ruby
+scala
 scons
 tmux
 transmission
