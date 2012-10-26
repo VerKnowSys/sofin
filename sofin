@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-VERSION="0.14.11"
+VERSION="0.14.12"
 
 
 # load configuration from sofin.conf
@@ -854,35 +854,6 @@ for application in ${APPLICATIONS}; do
                             run "${APP_AFTER_INSTALL_CALLBACK}"
                         fi
 
-                        if [ ! "${APP_JAVA_ANCESTOR}" = "" ]; then
-                            note "-> Setting up Java ancestor: ${APP_JAVA_ANCESTOR}"
-                            case ${APP_JAVA_ANCESTOR} in
-                                JDK6_32)
-                                    note "   32bit JDK 1.6 ancestor"
-                                    ${PRINTF_BIN} "\nexport PATH='${JDK6_32}/bin:\$PATH'\n" >> $HOME/.profile
-                                    ;;
-
-                                JDK6_64)
-                                    note "   64bit JDK 1.6 ancestor"
-                                    ${PRINTF_BIN} "\nexport PATH='${JDK6_64}/bin:\$PATH'\n" >> $HOME/.profile
-                                    ;;
-
-                                JDK7_32)
-                                    note "   32bit JDK 1.7 ancestor"
-                                    ${PRINTF_BIN} "\nexport PATH='${JDK7_32}/bin:\$PATH'\n" >> $HOME/.profile
-                                    ;;
-
-                                JDK7_64)
-                                    note "   64bit JDK 1.7 ancestor"
-                                    ${PRINTF_BIN} "\nexport PATH='${JDK7_64}/bin:\$PATH'\n" >> $HOME/.profile
-                                    ;;
-
-                                *)
-                                    note "Wrong JDK ancestor"
-                                    ;;
-                            esac
-                        fi
-
                         debug "Marking as installed '$1' in: ${PREFIX}"
                         ${TOUCH_BIN} "${PREFIX}/$1${INSTALLED_MARK}"
                         debug "Writing version: ${APP_VERSION} of app: '${APP_NAME}' installed in: ${PREFIX}"
@@ -982,6 +953,34 @@ done
 
 
 update_shell_vars
+if [ ! "${APP_JAVA_ANCESTOR}" = "" ]; then
+    note "-> Setting up Java ancestor: ${APP_JAVA_ANCESTOR}"
+    case ${APP_JAVA_ANCESTOR} in
+        JDK6_32)
+            ${PRINTF_BIN} "\nexport PATH=\"${JDK6_32}/bin:\$PATH\"\n" >> $HOME/.profile
+            ;;
+
+        JDK6_64)
+            note "   64bit JDK 1.6 ancestor"
+            ${PRINTF_BIN} "\nexport PATH=\"${JDK6_64}/bin:\$PATH\"\n" >> $HOME/.profile
+            ;;
+
+        JDK7_32)
+            note "   32bit JDK 1.7 ancestor"
+            ${PRINTF_BIN} "\nexport PATH=\"${JDK7_32}/bin:\$PATH\"\n" >> $HOME/.profile
+            ;;
+
+        JDK7_64)
+            note "   64bit JDK 1.7 ancestor"
+            ${PRINTF_BIN} "\nexport PATH=\"${JDK7_64}/bin:\$PATH\"\n" >> $HOME/.profile
+            ;;
+
+        *)
+            note "Wrong JDK ancestor"
+            ;;
+    esac
+fi
+
 if [ ! -z "${SHELL_PID}" ]; then
     note "All done. Reloading configuration of $(${BASENAME_BIN} ${SHELL}) with pid: ${SHELL_PID}…"
     ${KILL_BIN} -SIGUSR2 ${SHELL_PID}
