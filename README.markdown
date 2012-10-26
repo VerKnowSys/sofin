@@ -44,7 +44,7 @@ customizable software for FreeBSD servers.
 * Install software defined in a list called "http" (by default it will install definitions from list into /Software/):
     `sofin install http`
 
-* Install one software from definition called "ruby.def" for already logged in user:
+* Install one software from definition called "ruby.def" for current user:
     `sofin one ruby`
 
 * Install one software from definition called "ruby.def" for user "dmilith" (by default it will point to /Users/dmilith/Apps/Ruby/):
@@ -94,12 +94,6 @@ customizable software for FreeBSD servers.
 * Currently any kind of sha/md5 checksumming isn't supported at all.
 * Currently some definitions provided by Sofin include a couple of custom patches on software required
   by VerKnowSys ServeD © System. It *shouldn't* but **may** break the way how software works on different systems.
-
-
-## We don't want to support broken technologies:
-* Like.. for example: Subversion. Don't even try to create definition for this monster. It's not worth it. We support git and mercurial.
-  That's enough for Your beautiful life. Believe me.
-* TODO: fill this list with more GNU-ish software.
 
 
 ## License:
