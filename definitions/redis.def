@@ -1,8 +1,9 @@
 APP_FULL_NAME="Redis database"
 APP_NAME="redis"
-APP_VERSION="2.4.17"
+APP_VERSION="2.6.2"
 APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
 APP_REQUIREMENTS="make" # libexecinfo is part of ServeD base system hence it's excluded from requirements
 APP_CONFIGURE_SCRIPT="ignore"
+APP_LINKER_ARGS="-L/usr/lib -lexecinfo" # ServeD systems has libexecinfo library in /usr/bin
 APP_INSTALL_METHOD="make install"
 APP_EXPORTS="redis-cli redis-server redis-benchmark redis-check-dump redis-check-aof"
