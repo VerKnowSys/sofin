@@ -1,3 +1,4 @@
+DISABLE_ON="Darwin"
 APP_FULL_NAME="Python 2"
 APP_NAME="Python"
 APP_POSTFIX="-legacy"
