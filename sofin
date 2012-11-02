@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-VERSION="0.14.12"
+VERSION="0.14.13"
 
 
 # load configuration from sofin.conf
@@ -170,20 +170,31 @@ check_root () {
 
 
 check_os () {
-    if [ "$(${UNAME_BIN})" != "FreeBSD" ]; then
-        error "Currently only FreeBSD host is supported."
-        exit
-    fi
+    case "$(${UNAME_BIN})" in
+        FreeBSD)
+            # note "Running on FreeBSD host"
+            ;;
+
+        Darwin)
+            # note "Running on OSX/Darwin host"
+            ;;
+
+        *)
+            error "Currently only FreeBSD and Darwin hosts are supported."
+            exit
+            ;;
+
+    esac
 }
 
 
 check_lock () {
-    UID="$1"
-    if [ -z "${UID}" ]; then
-        UID="0"
+    userUID="$1"
+    if [ -z "${userUID}" ]; then
+        userUID="0"
     fi
-    if [ ! "${UID}" = "0" ]; then
-        export LOCK_FILE="${HOME_DIR}${UID}/.sofin.lock"
+    if [ ! "${userUID}" = "0" ]; then
+        export LOCK_FILE="${HOME_DIR}${userUID}/.sofin.lock"
     fi
     if [ -e "${LOCK_FILE}" ]; then
         error "Lock file exists in ${LOCK_FILE}. Another process of $(${BASENAME_BIN} ${SCRIPT_NAME}) is running?"
@@ -237,6 +248,8 @@ unset CPPFLAGS
 unset PATH
 unset LD_LIBRARY_PATH
 unset LD_PRELOAD
+unset DYLD_LIBRARY_PATH
+
 
 if [ ! "$1" = "" ]; then
     case $1 in
@@ -613,19 +626,19 @@ if [ ! "$1" = "" ]; then
         fi
         EXPORT="$2"
         APP="$(${PRINTF_BIN} "${3}" | ${CUT_BIN} -c1 | ${TR_BIN} '[a-z]' '[A-Z]')$(${PRINTF_BIN} "${3}" | ${SED_BIN} 's/^[a-zA-Z]//')"
-        UID="$4"
+        userUID="$4"
         export SOFT_DIR="${SOFTWARE_DIR}"
-        if [ -z "${UID}" ]; then
-            export UID="$(${ID_BIN} ${ID_SVD})"
+        if [ -z "${userUID}" ]; then
+            export userUID="$(${ID_BIN} ${ID_SVD})"
             if [ ! "$(${ID_BIN} -u)" = "0" ]; then
-                export SOFT_DIR="${HOME_DIR}${UID}/${HOME_APPS_DIR}"
-                export LOG="${HOME_DIR}${UID}/install.log"
+                export SOFT_DIR="${HOME_DIR}${userUID}/${HOME_APPS_DIR}"
+                export LOG="${HOME_DIR}${userUID}/install.log"
             fi
         else # uid given?
             if [ ! "$(${ID_BIN} -u)" = "0" ]; then
-                export SOFT_DIR="${HOME_DIR}${UID}/${HOME_APPS_DIR}"
-                export LOG="${HOME_DIR}${UID}/install.log"
-                if [ ! "${UID}" = "$(${ID_BIN} ${ID_SVD})" ]; then
+                export SOFT_DIR="${HOME_DIR}${userUID}/${HOME_APPS_DIR}"
+                export LOG="${HOME_DIR}${userUID}/install.log"
+                if [ ! "${userUID}" = "$(${ID_BIN} ${ID_SVD})" ]; then
                     check_root
                 fi
             fi
@@ -725,9 +738,15 @@ for application in ${APPLICATIONS}; do
                 export CC="/usr/bin/clang ${APP_COMPILER_ARGS}"
                 export CXX="/usr/bin/clang++ ${APP_COMPILER_ARGS}"
                 export CPP="/usr/bin/clang-cpp"
+                if [ "$($UNAME_BIN)" = "Darwin" ]; then
+                    export CPP="/usr/bin/clang -E"
+                fi
             fi
             export PATH="${PREFIX}/bin:${PREFIX}/sbin:${DEFAULT_PATH}"
             export LD_LIBRARY_PATH="${PREFIX}/lib:${PREFIX}/libexec:/usr/lib:/lib"
+            if [ "$($UNAME_BIN)" = "Darwin" ]; then
+                export DYLD_LIBRARY_PATH=${LD_LIBRARY_PATH}
+            fi
             export CFLAGS="-I${PREFIX}/include ${APP_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
             export CXXFLAGS="-I${PREFIX}/include ${APP_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
             export LDFLAGS="-L${PREFIX}/lib ${APP_LINKER_ARGS} ${DEFAULT_LDFLAGS}"
@@ -932,7 +951,7 @@ for application in ${APPLICATIONS}; do
                     for e in $(${FIND_BIN} ${PREFIX}${elem}); do
                         if [ -f "${e}" ]; then
                             debug "Stripping: ${e}"
-                            "${STRIP_BIN}" -sv "${e}" >> ${LOG} 2>> ${LOG}
+                            "${STRIP_BIN}" -s "${e}" >> ${LOG} 2>> ${LOG}
                         fi
                     done
                 fi
