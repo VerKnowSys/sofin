@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-VERSION="0.14.13"
+VERSION="0.14.14"
 
 
 # load configuration from sofin.conf
@@ -346,6 +346,9 @@ if [ ! "$1" = "" ]; then
         fi
         ${PRINTF_BIN} "# LD_LIBRARY_PATH:\n"
         ${PRINTF_BIN} "export LD_LIBRARY_PATH='${ldresult}'\n\n"
+        if [ "$($UNAME_BIN)" = "Darwin" ]; then
+            ${PRINTF_BIN} "export DYLD_LIBRARY_PATH='${ldresult}'\n\n"
+        fi
         ${PRINTF_BIN} "# LDFLAGS:\n"
         ${PRINTF_BIN} "export LDFLAGS='${ldflags}'\n\n"
 
