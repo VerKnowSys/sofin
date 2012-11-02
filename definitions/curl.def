@@ -1,3 +1,4 @@
+DISABLE_ON="Darwin"
 APP_FULL_NAME="cURL"
 APP_NAME="curl"
 APP_VERSION="7.21.7"
