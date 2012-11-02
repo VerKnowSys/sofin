@@ -1,8 +1,5 @@
 #!/bin/sh
 
-if [ ! -d "/usr/local/bin" ]; then
-  mkdir -p /usr/local/bin
-fi
 sudo ln -s $(pwd)/sofin /usr/bin/sofin
 sudo ln -s $(pwd)/sofin.conf /etc/sofin.conf
 ln -s /Users/501/.profile ${HOME}/.profile
