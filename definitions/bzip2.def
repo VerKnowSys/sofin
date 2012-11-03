@@ -1,3 +1,4 @@
+DISABLE_ON="Darwin"
 APP_FULL_NAME="Bzip2 Library"
 APP_NAME="bzip2"
 APP_VERSION="1.0.6"

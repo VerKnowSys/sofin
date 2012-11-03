@@ -1,3 +1,4 @@
+DISABLE_ON="Darwin"
 APP_FULL_NAME="Expat Library"
 APP_NAME="expat"
 APP_VERSION="2.0.1"

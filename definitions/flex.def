@@ -1,3 +1,4 @@
+DISABLE_ON="Darwin"
 APP_FULL_NAME="Fast Lexical Analyzer"
 APP_NAME="flex"
 APP_VERSION="2.5.35"

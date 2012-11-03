@@ -1,3 +1,4 @@
+DISABLE_ON="Darwin"
 APP_FULL_NAME="GNU Libtool - The GNU Portable Library Tool"
 APP_NAME="libtool"
 APP_VERSION="2.4.2"

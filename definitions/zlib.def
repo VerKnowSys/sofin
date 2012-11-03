@@ -1,3 +1,4 @@
+DISABLE_ON="Darwin"
 APP_FULL_NAME="Z Library"
 APP_NAME="zlib"
 APP_VERSION="1.2.5"

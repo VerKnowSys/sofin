@@ -1,3 +1,4 @@
+DISABLE_ON="Darwin"
 APP_FULL_NAME="GNU M4 Library"
 APP_NAME="m4"
 APP_VERSION="1.4.16"

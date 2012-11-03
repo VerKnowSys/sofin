@@ -1,3 +1,4 @@
+DISABLE_ON="Darwin"
 APP_FULL_NAME="GNU Bison Library"
 APP_NAME="bison"
 APP_VERSION="2.4.3"

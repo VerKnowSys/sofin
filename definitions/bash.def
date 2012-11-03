@@ -1,3 +1,4 @@
+DISABLE_ON="Darwin"
 APP_FULL_NAME="GNU Bash"
 APP_NAME="bash"
 APP_VERSION="4.2"

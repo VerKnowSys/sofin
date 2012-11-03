@@ -1,3 +1,4 @@
+DISABLE_ON="Darwin"
 APP_FULL_NAME="GNU Make"
 APP_NAME="make"
 APP_VERSION="3.81.91"
