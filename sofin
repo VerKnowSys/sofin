@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-VERSION="0.14.15"
+VERSION="0.14.16"
 
 
 # load configuration from sofin.conf
@@ -884,7 +884,9 @@ for application in ${APPLICATIONS}; do
                     cd "${CUR_DIR}"
                 fi
             else
-                warn "This bundle is disabled on current architecture ($(${UNAME_BIN})). Skipped…"
+                warn "Requirement disabled on architecture: ${SYSTEM_NAME}. Marking dependency as already installed cause it's still required to build."
+                ${TOUCH_BIN} "${PREFIX}/${req}${INSTALLED_MARK}"
+                ${PRINTF_BIN} "provided-by-system" > "${PREFIX}/${req}${INSTALLED_MARK}"
             fi
         }
 
@@ -896,7 +898,7 @@ for application in ${APPLICATIONS}; do
             else
                 note "Processing requirement: $req"
                 if [ -e "${PREFIX}/${req}${INSTALLED_MARK}" ]; then
-                    note "-> ${req} marked as already installed…"
+                    note "-> ${req} is marked as installed/provided."
                 else
                     export CHANGED="true"
                     execute_process "${req}"
@@ -918,7 +920,7 @@ for application in ${APPLICATIONS}; do
                 unset CHANGED
                 mark
             else
-                note "-> ${application} marked as already installed…"
+                note "-> ${application} is marked as already installed."
             fi
         else
             execute_process "${application}"
