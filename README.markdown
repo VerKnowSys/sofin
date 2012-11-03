@@ -5,12 +5,12 @@ I'm also on #freebsd and #scala.pl @ freenode IRC.
 
 ## About:
 This software is my way of how to get reliable, updatable, bundled, closed-dependency and fully
-customizable software for FreeBSD servers.
+customizable software for FreeBSD servers. Darwin (Mac OS X) support started with version >=0.14.10
 
 
 ## Features:
 * User friendly, clean and clear colorful information. No magic. KISS and DRY driven development.
-* Simple, <1k LOC solution, based on legacy /bin/sh shell scripting language.
+* Simple, ~1k LOC solution, based on legacy /bin/sh shell scripting language.
 * Designed to work on all *BSD, but currently maintained and tested on FreeBSD only (>= 9.0-STABLE).
 * Every "software" has own definition ("def" file) with defined flat dependency list and basic data.
   Every definition is sh script itself (More in definitions/skeleton.def and definitions/defaults.def)
@@ -87,6 +87,7 @@ customizable software for FreeBSD servers.
 
 
 ## Pitfalls/ Limitations:
+* Some definitions on Darwin might require XQuartz installation.
 * Sofin requires to be installed or symlinked to system default PATH location (/bin:/usr/bin or similar)
 * Each software bundle includes all dependencies of given software, hence each application requires more disk
   space than it does with "old fasioned, system wide, shared software".
