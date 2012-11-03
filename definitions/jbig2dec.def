@@ -1,3 +1,4 @@
+DISABLE_ON="Darwin"
 APP_FULL_NAME="jbig2dec - decoder implementation of the JBIG2 image compression format"
 APP_NAME="jbig2dec"
 APP_VERSION="0.11"
