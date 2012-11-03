@@ -1,3 +1,4 @@
+DISABLE_ON="Darwin"
 APP_FULL_NAME="xcb-proto"
 APP_NAME="xcb-proto"
 APP_VERSION="1.7.1"

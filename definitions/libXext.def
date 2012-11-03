@@ -1,3 +1,4 @@
+DISABLE_ON="Darwin"
 APP_FULL_NAME="LibXext for Xorg"
 APP_NAME="libXext"
 APP_VERSION="1.3.0"

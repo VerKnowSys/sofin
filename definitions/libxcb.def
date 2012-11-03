@@ -1,3 +1,4 @@
+DISABLE_ON="Darwin"
 APP_FULL_NAME="Libxcb"
 APP_NAME="libxcb"
 APP_VERSION="1.7"

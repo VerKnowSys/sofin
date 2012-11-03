@@ -1,3 +1,4 @@
+DISABLE_ON="Darwin"
 APP_FULL_NAME="Lib Xt for Xorg"
 APP_NAME="libXt"
 APP_VERSION="1.1.1"
