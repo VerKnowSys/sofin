@@ -1,3 +1,4 @@
+DISABLE_ON="Darwin"
 APP_FULL_NAME="xproto"
 APP_NAME="xproto"
 APP_VERSION="7.0.22"

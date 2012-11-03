@@ -1,3 +1,4 @@
+DISABLE_ON="Darwin"
 APP_FULL_NAME="Cairo graphics library (with PDF, PNG, JPEG support)"
 APP_NAME="cairo"
 APP_VERSION="1.12.2"

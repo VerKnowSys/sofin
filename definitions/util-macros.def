@@ -1,3 +1,4 @@
+DISABLE_ON="Darwin"
 APP_FULL_NAME="Xorg util-macros"
 APP_NAME="util-macros"
 APP_VERSION="1.16.1"

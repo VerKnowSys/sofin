@@ -1,3 +1,4 @@
+DISABLE_ON="Darwin"
 APP_FULL_NAME="LibICE for Xorg"
 APP_NAME="libICE"
 APP_VERSION="1.0.7"

@@ -1,3 +1,4 @@
+DISABLE_ON="Darwin"
 APP_FULL_NAME="LibSM for Xorg"
 APP_NAME="libSM"
 APP_VERSION="1.2.0"
