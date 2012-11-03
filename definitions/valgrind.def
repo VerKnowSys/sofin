@@ -1,3 +1,4 @@
+DISABLE_ON="Darwin"
 APP_FULL_NAME="Valgrind for BSD"
 APP_NAME="valgrind"
 APP_VERSION="3.6.1-2"
