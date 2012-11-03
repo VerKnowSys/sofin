@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-VERSION="0.14.16"
+VERSION="0.14.17"
 
 
 # load configuration from sofin.conf
@@ -249,6 +249,7 @@ unset PATH
 unset LD_LIBRARY_PATH
 unset LD_PRELOAD
 unset DYLD_LIBRARY_PATH
+unset PKG_CONFIG_PATH
 
 
 if [ ! "$1" = "" ]; then
@@ -257,6 +258,7 @@ if [ ! "$1" = "" ]; then
 
     ver|version)
         note "${HEADER}"
+        note "2o11-2o12 by Daniel (dmilith) Dettlaff - dmililth [at] me.com"
         exit
         ;;
 
@@ -325,8 +327,9 @@ if [ ! "$1" = "" ]; then
         ${PRINTF_BIN} "# PATH:\n"
         ${PRINTF_BIN} "export PATH=${result}\n\n"
 
-        # LD_LIBRARY_PATH, LDFLAGS:
+        # LD_LIBRARY_PATH, LDFLAGS, PKG_CONFIG_PATH:
         ldresult="/lib:/usr/lib"
+        pkg_config_path="."
         ldflags="${LDFLAGS} ${DEFAULT_LDFLAGS}"
         process () {
             for lib in ${1}*; do # LIB_DIR
@@ -338,6 +341,9 @@ if [ ! "$1" = "" ]; then
                     ldresult="${lib}/libexec:${ldresult}"
                     ldflags="-R${lib}/libexec -L${lib}/libexec ${ldflags}"
                 fi
+                if [ -e "${lib}/pkgconfig" ]; then
+                    pkg_config_path="${lib}/pkgconfig:${pkg_config_path}"
+                fi
             done
         }
         process ${SOFTWARE_DIR}
@@ -346,11 +352,15 @@ if [ ! "$1" = "" ]; then
         fi
         ${PRINTF_BIN} "# LD_LIBRARY_PATH:\n"
         ${PRINTF_BIN} "export LD_LIBRARY_PATH='${ldresult}'\n\n"
-        if [ "$($UNAME_BIN)" = "Darwin" ]; then
-            ${PRINTF_BIN} "export DYLD_LIBRARY_PATH='${ldresult}'\n\n"
-        fi
         ${PRINTF_BIN} "# LDFLAGS:\n"
         ${PRINTF_BIN} "export LDFLAGS='${ldflags}'\n\n"
+        ${PRINTF_BIN} "# PKG_CONFIG_PATH:\n"
+        if [ "$($UNAME_BIN)" = "Darwin" ]; then
+            ${PRINTF_BIN} "export PKG_CONFIG_PATH='${pkg_config_path}:/opt/X11/lib/pkgconfig'\n\n"
+            ${PRINTF_BIN} "export DYLD_LIBRARY_PATH='${ldresult}:/opt/X11/lib'\n\n"
+        else
+            ${PRINTF_BIN} "export PKG_CONFIG_PATH='${pkg_config_path}'\n\n"
+        fi
 
         # CFLAGS, CXXFLAGS:
         cflags="${CFLAGS} -fPIC ${DEFAULT_COMPILER_FLAGS}"
@@ -686,6 +696,7 @@ for application in ${APPLICATIONS}; do
         APP_NAME="$(${PRINTF_BIN} "${APP_NAME}" | ${CUT_BIN} -c1 | ${TR_BIN} '[a-z]' '[A-Z]')$(${PRINTF_BIN} "${APP_NAME}" | ${SED_BIN} 's/^[a-zA-Z]//')"
         note
         note "Preparing application: ${APP_NAME}${APP_POSTFIX} (${APP_FULL_NAME} v${APP_VERSION})"
+        note
         if [ "${USER_UID}" = "" ]; then
             debug "Normal build"
             export PREFIX="${SOFTWARE_DIR}${APP_NAME}"
@@ -747,12 +758,17 @@ for application in ${APPLICATIONS}; do
             fi
             export PATH="${PREFIX}/bin:${PREFIX}/sbin:${DEFAULT_PATH}"
             export LD_LIBRARY_PATH="${PREFIX}/lib:${PREFIX}/libexec:/usr/lib:/lib"
-            if [ "$($UNAME_BIN)" = "Darwin" ]; then
-                export DYLD_LIBRARY_PATH=${LD_LIBRARY_PATH}
-            fi
             export CFLAGS="-I${PREFIX}/include ${APP_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
             export CXXFLAGS="-I${PREFIX}/include ${APP_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
             export LDFLAGS="-L${PREFIX}/lib ${APP_LINKER_ARGS} ${DEFAULT_LDFLAGS}"
+            if [ "$($UNAME_BIN)" = "Darwin" ]; then
+                # NOTE: XXX: requires XQuartz installed!
+                export PATH="$PATH:/opt/X11/bin"
+                export DYLD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/opt/X11/lib"
+                export CFLAGS="$CFLAGS -I/opt/X11/include"
+                export CXXFLAGS="$CXXFLAGS -I/opt/X11/include"
+                export LDFLAGS="${LDFLAGS} -L/opt/X11/lib"
+            fi
 
             export ALLOW=1
             if [ ! "$DISABLE_ON" = "" ]; then
@@ -828,8 +844,11 @@ for application in ${APPLICATIONS}; do
                         debug "CFLAGS: ${CFLAGS}"
                         debug "LDFLAGS: ${LDFLAGS}"
                         debug "LD_LIBRARY_PATH: ${LD_LIBRARY_PATH}"
+                        if [ "${SYSTEM_NAME}" = "Darwin" ]; then
+                            debug "DYLD_LIBRARY_PATH: ${DYLD_LIBRARY_PATH}"
+                        fi
 
-                        note "-> Configuring requirement: $1"
+                        note "-> Configuring requirement: $1 with version: ${APP_VERSION}"
                         case ${APP_CONFIGURE_SCRIPT} in
                             ignore)
                                 note "-> Ignored configuration part $1"
@@ -885,6 +904,10 @@ for application in ${APPLICATIONS}; do
                 fi
             else
                 warn "Requirement disabled on architecture: ${SYSTEM_NAME}. Marking dependency as already installed cause it's still required to build."
+                if [ ! -d "${PREFIX}" ]; then
+                    # case when disabled requirement is first on list of dependencies
+                    ${MKDIR_BIN} -p ${PREFIX}
+                fi
                 ${TOUCH_BIN} "${PREFIX}/${req}${INSTALLED_MARK}"
                 ${PRINTF_BIN} "provided-by-system" > "${PREFIX}/${req}${INSTALLED_MARK}"
             fi
