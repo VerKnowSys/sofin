@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-VERSION="0.18.2"
+VERSION="0.18.3"
 
 
 # load configuration from sofin.conf
@@ -832,7 +832,14 @@ for application in ${APPLICATIONS}; do
                     APP_LOC=${BUILD_DIR}${APP_NAME}
                     debug "Entrering ${APP_LOC}"
                     run "${TAR_BIN} xf ${APP_LOC}*"
-                    for dir in $(${FIND_BIN} ${BUILD_DIR} -name "*${APP_VERSION}*" -type d -depth 1); do
+
+                    buildDirCore=$(${FIND_BIN} ${BUILD_DIR} -name "*${APP_VERSION}*" -type d -depth 1)
+                    debug "Build Dir Core before: '${buildDirCore}'"
+                    if [ "${buildDirCore}" = "" ]; then
+                        export buildDirCore=$(${FIND_BIN} ${BUILD_DIR} -type d -depth 1) # try any dir instead
+                    fi
+                    debug "Build Dir Core after: '${buildDirCore}'"
+                    for dir in ${buildDirCore}; do
                         debug "Changing dir to: ${dir}/${APP_SOURCE_DIR_POSTFIX}"
                         cd "${dir}/${APP_SOURCE_DIR_POSTFIX}"
                         if [ ! -z "${APP_AFTER_UNPACK_CALLBACK}" ]; then
