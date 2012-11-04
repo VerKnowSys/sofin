@@ -1,5 +1,5 @@
 APP_FULL_NAME="TIFF Library"
 APP_NAME="tiff"
-APP_VERSION="3.8.2" 
+APP_VERSION="4.0.3"
 APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
 APP_EXPORTS="bmp2tiff fax2tiff pal2rgb ras2tiff rgb2ycbcr tiff2bw tiff2ps tiffcmp tiffdither tiffinfo tiffset fax2ps gif2tiff ppm2tiff raw2tiff thumbnail tiff2pdf tiff2rgba tiffcp tiffdump tiffmedian tiffsplit"
