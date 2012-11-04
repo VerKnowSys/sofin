@@ -1,5 +1,6 @@
 APP_FULL_NAME="GD Graphics Library"
 APP_NAME="gd"
+APP_SHA="ef7fbb250f416bab70cfda6f77283624b83c01d5"
 APP_VERSION="2.0.35"
 APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
 APP_REQUIREMENTS="make zlib bzip2 expat freetype fontconfig libiconv jpeg libpng"
