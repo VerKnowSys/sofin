@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-VERSION="0.18"
+VERSION="0.18.1"
 
 
 # load configuration from sofin.conf
@@ -113,6 +113,7 @@ update_definitions () { # accepts optional user uid param
     done
     cd "${CACHE_DIR}"
     debug "Working in cache dir: ${CACHE_DIR}"
+    note "${HEADER}"
     note "Updating definitions snapshot from: ${MAIN_SOURCE_REPOSITORY}definitions/${DEFINITION_SNAPSHOT_FILE}"
     ${FETCH_BIN} "${MAIN_SOURCE_REPOSITORY}definitions/${DEFINITION_SNAPSHOT_FILE}" >> "${LOG}" 2>> "${LOG}"
     ${TAR_BIN} ${tar_options} "${DEFINITION_SNAPSHOT_FILE}" >> "${LOG}" 2>> "${LOG}"
@@ -258,7 +259,6 @@ if [ ! "$1" = "" ]; then
 
     ver|version)
         note "${HEADER}"
-        note "2o11-2o12 by Daniel (dmilith) Dettlaff - dmililth [at] me.com"
         exit
         ;;
 
@@ -809,7 +809,6 @@ for application in ${APPLICATIONS}; do
                     if [ "${APP_SHA}" = "" ]; then
                         error "-> Missing SHA sum for source: ${file}. Check skipped."
                     else
-                        note "-> Verifying source SHA of definition: ${APP_NAME} with file: ${file}"
                         if [ "${SYSTEM_NAME}" = "Darwin" ]; then
                             export cur="$(${SHA_BIN} ${file} | ${AWK_BIN} '{print $1}')"
                         fi
@@ -817,8 +816,9 @@ for application in ${APPLICATIONS}; do
                             export cur="$(${SHA_BIN} -q ${file})"
                         fi
                         if [ "${cur}" = "${APP_SHA}" ]; then
-                            note "-> SHA sum match."
+                            debug "-> SHA sum match in file: ${file}"
                         else
+                            error "-> ${cur} vs ${APP_SHA}"
                             error "-> SHA sum mismatch. Removing corrupted file from cache: ${file}"
                             $($FIND_BIN ${BUILD_DIR} -depth 1 -type f -name \'${file}\' | ${XARGS_BIN} ${RM_BIN})
                             exit_locked
@@ -830,7 +830,7 @@ for application in ${APPLICATIONS}; do
                     APP_LOC=${BUILD_DIR}${APP_NAME}
                     debug "Entrering ${APP_LOC}"
                     run "${TAR_BIN} xf ${APP_LOC}*"
-                    for dir in $(${FIND_BIN} ${BUILD_DIR} -type d -depth 1); do
+                    for dir in $(${FIND_BIN} ${BUILD_DIR} -name "*${APP_VERSION}*" -type d -depth 1); do
                         debug "Changing dir to: ${dir}${APP_SOURCE_DIR_POSTFIX}"
                         cd "${dir}${APP_SOURCE_DIR_POSTFIX}"
                         if [ ! -z "${APP_AFTER_UNPACK_CALLBACK}" ]; then
