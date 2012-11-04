@@ -692,7 +692,7 @@ for application in ${APPLICATIONS}; do
         debug "Reading definition: ${definition}"
         . ${DEFAULTS}
         . ${definition}
-        note " -> Requirements for this definition: ${APP_REQUIREMENTS}"
+        note "-> Requirements for this definition: ${APP_REQUIREMENTS}"
 
         # fancy old style Capitalize
         APP_NAME="$(${PRINTF_BIN} "${APP_NAME}" | ${CUT_BIN} -c1 | ${TR_BIN} '[a-z]' '[A-Z]')$(${PRINTF_BIN} "${APP_NAME}" | ${SED_BIN} 's/^[a-zA-Z]//')"
