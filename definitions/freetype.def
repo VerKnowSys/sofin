@@ -4,4 +4,4 @@ APP_NAME="freetype"
 APP_VERSION="2.4.9"
 APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.bz2"
 APP_REQUIREMENTS="make zlib"
-APP_AFTER_UNPACK_CALLBACK="${FIND_BIN} ${PREFIX} -type f -name '*.a' | ${XARGS_BIN} rm" # remove static archive to prevent fPIC failures in freetype > 2.4.4
+APP_AFTER_UNPACK_CALLBACK="${FIND_BIN} ${PREFIX} -type f -name 'libbz2.a' | ${XARGS_BIN} ${RM_BIN}" # remove static archive to prevent fPIC failures in freetype > 2.4.4
