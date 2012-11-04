@@ -5,6 +5,7 @@ APP_VERSION="0.18.1.1"
 APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
 APP_REQUIREMENTS="expat libiconv"
 if [ "${SYSTEM_NAME}" = "Darwin" ]; then
+export APP_SHA="d1ad5ad15bfe8fe813ee37e5d6b514fc79924b9a"
 export APP_CONFIGURE_SCRIPT="binary"
 export APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.mountainlion.bottle.tar.gz"
 export APP_AFTER_UNPACK_CALLBACK="${CP_BIN} -r ${CACHE_DIR}cache/${APP_NAME}-${APP_VERSION}/${APP_NAME}/${APP_VERSION}/* ${PREFIX}"
