@@ -1,4 +1,5 @@
 APP_FULL_NAME="Nodejs"
+APP_SHA="31f564bf34c64b07cae3b9a88a87b4a08bab4dc5"
 APP_NAME="node"
 APP_POSTFIX="-legacy"
 APP_VERSION="0.6.21"
