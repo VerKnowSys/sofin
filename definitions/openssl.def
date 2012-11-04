@@ -4,7 +4,7 @@ APP_VERSION="1.0.1c"
 APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
 APP_CONFIGURE_SCRIPT="./config"
 APP_CONFIGURE_ARGS="--shared"
-if [ "$($UNAME_BIN)" = "Darwin" ]; then
+if [ "${SYSTEM_NAME}" = "Darwin" ]; then
 export APP_CONFIGURE_SCRIPT="./Configure"
 export APP_CONFIGURE_ARGS="darwin64-x86_64-cc"
 fi

@@ -5,7 +5,7 @@ APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
 APP_CONFIGURE_ARGS="--no-qt-gui --parallel=2"
 APP_REQUIREMENTS="expat zlib bzip2"
 APP_EXPORTS="cmake"
-if [ "$($UNAME_BIN)" = "Darwin" ]; then
+if [ "${SYSTEM_NAME}" = "Darwin" ]; then
 export APP_CONFIGURE_SCRIPT="binary"
 export APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}-Darwin64-universal.tar.gz"
 export APP_AFTER_UNPACK_CALLBACK="${CP_BIN} -r '${CACHE_DIR}cache/${APP_NAME}-${APP_VERSION}/${APP_NAME}-${APP_VERSION}-Darwin64-universal/CMake 2.8-10.app/Contents/' ${PREFIX}"
