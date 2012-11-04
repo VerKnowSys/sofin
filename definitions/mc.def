@@ -1,5 +1,6 @@
 APP_FULL_NAME="GNU Midnight Commander File Manager"
 APP_NAME="mc"
+APP_SHA="8398f26d4dd50117b2fc473476a1f9400495525b"
 APP_VERSION="4.8.4"
 APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
 APP_REQUIREMENTS="make zlib bzip2 pcre perl libiconv pkgconf libffi gettext python-legacy libtool icu glib slang"
