@@ -1,4 +1,5 @@
 APP_FULL_NAME="C Make"
+APP_SHA="6384f2295d01f04d017e2701447378598b4c7223"
 APP_NAME="cmake"
 APP_VERSION="2.8.10"
 APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
@@ -6,6 +7,7 @@ APP_CONFIGURE_ARGS="--no-qt-gui --parallel=2"
 APP_REQUIREMENTS="expat zlib bzip2"
 APP_EXPORTS="cmake"
 if [ "${SYSTEM_NAME}" = "Darwin" ]; then
+export APP_SHA="64b8b8817a7446791ce45f76b2f4234f58af3939"
 export APP_CONFIGURE_SCRIPT="binary"
 export APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}-Darwin64-universal.tar.gz"
 export APP_AFTER_UNPACK_CALLBACK="${CP_BIN} -r '${CACHE_DIR}cache/${APP_NAME}-${APP_VERSION}/${APP_NAME}-${APP_VERSION}-Darwin64-universal/CMake 2.8-10.app/Contents/' ${PREFIX}"

@@ -1,4 +1,5 @@
 DISABLE_ON="Darwin"
+SHA_SUM="663548c37b996082db1f2f2c32af060d7aa15c2d"
 APP_FULL_NAME="Expat Library"
 APP_NAME="expat"
 APP_VERSION="2.0.1"
