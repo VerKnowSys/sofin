@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-VERSION="0.16"
+VERSION="0.18"
 
 
 # load configuration from sofin.conf
@@ -807,7 +807,7 @@ for application in ${APPLICATIONS}; do
 
                     file="$(${BASENAME_BIN} $($FIND_BIN ${BUILD_DIR} -depth 1 -type f))"
                     if [ "${APP_SHA}" = "" ]; then
-                        warn "-> Missing SHA sum for source: ${file}. Check skipped."
+                        error "-> Missing SHA sum for source: ${file}. Check skipped."
                     else
                         note "-> Verifying source SHA of definition: ${APP_NAME} with file: ${file}"
                         if [ "${SYSTEM_NAME}" = "Darwin" ]; then
@@ -819,16 +819,18 @@ for application in ${APPLICATIONS}; do
                         if [ "${cur}" = "${APP_SHA}" ]; then
                             note "-> SHA sum match."
                         else
-                            error "-> SHA sum mismatch."
+                            error "-> SHA sum mismatch. Removing corrupted file from cache: ${file}"
+                            $($FIND_BIN ${BUILD_DIR} -depth 1 -type f -name \'${file}\' | ${XARGS_BIN} ${RM_BIN})
+                            exit_locked
                         fi
                     fi
 
-                    note "-> Unpacking source code of: ${APP_NAME}"
+                    debug "-> Unpacking source code of: ${APP_NAME}"
                     debug "Build dir: ${BUILD_DIR}"
                     APP_LOC=${BUILD_DIR}${APP_NAME}
                     debug "Entrering ${APP_LOC}"
                     run "${TAR_BIN} xf ${APP_LOC}*"
-                    for dir in $(${LS_BIN} -F ${BUILD_DIR} | ${GREP_BIN} \/$); do
+                    for dir in $(${FIND_BIN} ${BUILD_DIR} -type d -depth 1); do
                         debug "Changing dir to: ${dir}${APP_SOURCE_DIR_POSTFIX}"
                         cd "${dir}${APP_SOURCE_DIR_POSTFIX}"
                         if [ ! -z "${APP_AFTER_UNPACK_CALLBACK}" ]; then
