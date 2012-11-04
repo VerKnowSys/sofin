@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-VERSION="0.18.1"
+VERSION="0.18.2"
 
 
 # load configuration from sofin.conf
@@ -833,8 +833,8 @@ for application in ${APPLICATIONS}; do
                     debug "Entrering ${APP_LOC}"
                     run "${TAR_BIN} xf ${APP_LOC}*"
                     for dir in $(${FIND_BIN} ${BUILD_DIR} -name "*${APP_VERSION}*" -type d -depth 1); do
-                        debug "Changing dir to: ${dir}${APP_SOURCE_DIR_POSTFIX}"
-                        cd "${dir}${APP_SOURCE_DIR_POSTFIX}"
+                        debug "Changing dir to: ${dir}/${APP_SOURCE_DIR_POSTFIX}"
+                        cd "${dir}/${APP_SOURCE_DIR_POSTFIX}"
                         if [ ! -z "${APP_AFTER_UNPACK_CALLBACK}" ]; then
                             debug "Running after unpack callback"
                             run "${APP_AFTER_UNPACK_CALLBACK}"
