@@ -1,5 +1,6 @@
 APP_FULL_NAME="Qt4 Library"
 APP_NAME="qt"
+APP_SHA="e1e2edef1d63ed677d6534d32800c2e1f7ad0e73"
 APP_VERSION="4.8.2"
 APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-everywhere-opensource-src-${APP_VERSION}.tar.gz"
 APP_CONFIGURE_ARGS="-prefix ${PREFIX} -release -opensource -confirm-license -shared -no-largefile -no-accessibility -stl -no-qt3support -no-xmlpatterns -no-multimedia -no-audio-backend -no-phonon -no-phonon-backend -webkit -no-script -no-javascript-jit -no-scripttools -no-declarative -qt-zlib -no-libtiff -no-libpng -no-libmng -no-libjpeg -openssl -silent -optimized-qmake -no-cups -no-iconv -no-pch -no-dbus -no-nas-sound -no-gtkstyle -no-opengl -no-openvg -no-sm -no-xsync -no-xshape -no-xinerama -no-xcursor -no-xfixes -no-xrandr -no-xrender -no-mitshm -no-fontconfig -no-xinput -no-xkb -exceptions -no-gui -fast -verbose -no-silent -nomake examples -nomake demos -nomake docs -nomake translations"

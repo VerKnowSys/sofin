@@ -1,5 +1,6 @@
 APP_FULL_NAME="A Fast, Easy and Free BitTorrent client"
 APP_NAME="transmission"
+APP_SHA="a5be44bfe5c6ba2f39603e246a77bfe835278a09"
 APP_VERSION="2.61"
 APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.xz"
 APP_REQUIREMENTS="pkgconf curl libevent"

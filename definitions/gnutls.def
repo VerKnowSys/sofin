@@ -1,5 +1,6 @@
 APP_FULL_NAME="GNU TLS Library"
 APP_NAME="gnutls"
+APP_SHA="8066eb0d175fac1165093e329441a47197e146bc"
 APP_VERSION="3.0.19"
 APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
 APP_REQUIREMENTS="make perl pkgconf libtool libgpg-error gmp nettle p11-kit"
