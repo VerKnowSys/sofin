@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-VERSION="0.14.17"
+VERSION="0.16"
 
 
 # load configuration from sofin.conf
@@ -804,6 +804,25 @@ for application in ${APPLICATIONS}; do
                     else
                         debug "Already fetched. Using tarball from cache"
                     fi
+
+                    file="$(${BASENAME_BIN} $($FIND_BIN ${BUILD_DIR} -depth 1 -type f))"
+                    if [ "${APP_SHA}" = "" ]; then
+                        warn "-> Missing SHA sum for source: ${file}. Check skipped."
+                    else
+                        note "-> Verifying source SHA of definition: ${APP_NAME} with file: ${file}"
+                        if [ "${SYSTEM_NAME}" = "Darwin" ]; then
+                            export cur="$(${SHA_BIN} ${file} | ${AWK_BIN} '{print $1}')"
+                        fi
+                        if [ "${SYSTEM_NAME}" = "FreeBSD" ]; then
+                            export cur="$(${SHA_BIN} -q ${file})"
+                        fi
+                        if [ "${cur}" = "${APP_SHA}" ]; then
+                            note "-> SHA sum matche."
+                        else
+                            error "-> SHA sum mismatch."
+                        fi
+                    fi
+
                     note "-> Unpacking source code of: ${APP_NAME}"
                     debug "Build dir: ${BUILD_DIR}"
                     APP_LOC=${BUILD_DIR}${APP_NAME}
