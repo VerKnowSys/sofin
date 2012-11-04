@@ -817,7 +817,7 @@ for application in ${APPLICATIONS}; do
                             export cur="$(${SHA_BIN} -q ${file})"
                         fi
                         if [ "${cur}" = "${APP_SHA}" ]; then
-                            note "-> SHA sum matche."
+                            note "-> SHA sum match."
                         else
                             error "-> SHA sum mismatch."
                         fi
