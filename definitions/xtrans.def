@@ -1,3 +1,4 @@
+DISABLE_ON="Darwin"
 APP_FULL_NAME="xtrans"
 APP_NAME="xtrans"
 APP_VERSION="1.2.6"
