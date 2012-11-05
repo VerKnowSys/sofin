@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-VERSION="0.18.3"
+VERSION="0.18.4"
 
 
 # load configuration from sofin.conf
@@ -809,7 +809,8 @@ for application in ${APPLICATIONS}; do
 
                     file="$(${BASENAME_BIN} $($FIND_BIN ${BUILD_DIR} -depth 1 -type f))"
                     if [ "${APP_SHA}" = "" ]; then
-                        error "-> Missing SHA sum for source: ${file}. Check skipped."
+                        error "-> Missing SHA sum for source: ${file}."
+                        exit_locked
                     else
                         if [ "${SYSTEM_NAME}" = "Darwin" ]; then
                             export cur="$(${SHA_BIN} ${file} | ${AWK_BIN} '{print $1}')"
