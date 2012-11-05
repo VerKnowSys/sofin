@@ -1,5 +1,6 @@
 APP_FULL_NAME="EKG2 - Multiplatform, multiprotocol, plugin-based instant messanger"
 APP_NAME="ekg2"
+APP_SHA="8b6f53086e8e1d2890fdc1ec274a7b1615da0fa1"
 APP_VERSION="0.3.1"
 APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
 APP_REQUIREMENTS="make ncurses libiconv perl expat libgpg-error libgcrypt libassuan libksba pth gnupg gpgme"

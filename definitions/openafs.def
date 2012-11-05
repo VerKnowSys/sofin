@@ -1,6 +1,7 @@
 DISABLE_ON="Darwin"
 APP_FULL_NAME="Open Andrew File System"
 APP_NAME="openafs"
+APP_SHA="f378a1584ec7186f87998669ef802ba1e64c2752"
 APP_VERSION="1.6.1"
 APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}-src.tar.gz"
 APP_CONFIGURE_ARGS="--disable-fuse-client --with-bsd-kernel-build=/usr/obj/usr/src/sys/GENERIC/"

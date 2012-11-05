@@ -1,5 +1,6 @@
 APP_FULL_NAME="Assuan library"
 APP_NAME="libassuan"
+APP_SHA="2bf4eba3b588758e349976a7eb9e8a509960c3b5"
 APP_VERSION="2.0.3"
 APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
 APP_REQUIREMENTS="bzip2 libiconv make libtool"
