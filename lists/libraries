@@ -6,12 +6,14 @@ freetype
 gd
 gettext
 imagemagick
+jasper
 jpeg
 libexif
 libiconv
 libpng
 libxml2
 m4
+tiff
 ncurses
 openssl
 pcre
