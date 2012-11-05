@@ -1,5 +1,6 @@
 APP_FULL_NAME="RTorrent"
 APP_NAME="rtorrent"
+APP_SHA="0ac51c185e98b5a386e5f1a07bca9a9963e2d6ce"
 APP_VERSION="0.8.9"
 APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
 APP_REQUIREMENTS="make perl pkgconf openssl curl libsigc++ libtorrent"

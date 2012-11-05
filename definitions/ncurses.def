@@ -1,5 +1,6 @@
 APP_FULL_NAME="NCurses Library"
 APP_NAME="ncurses"
+APP_SHA="3e042e5f2c7223bffdaac9646a533b8c758b65b5"
 APP_VERSION="5.9"
 APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
 APP_CONFIGURE_ARGS="--enable-widec --without-debug"

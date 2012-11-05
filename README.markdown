@@ -87,12 +87,11 @@ customizable software for FreeBSD servers. Darwin (Mac OS X) support started wit
 
 
 ## Pitfalls/ Limitations:
-* Some definitions on Darwin might require XQuartz installation.
+* Some definitions requiring X11 related software might require XQuartz installation on Darwin hosts.
 * Sofin requires to be installed or symlinked to system default PATH location (/bin:/usr/bin or similar)
 * Each software bundle includes all dependencies of given software, hence each application requires more disk
   space than it does with "old fasioned, system wide, shared software".
-* Currently all software used by current definitions is mirrored on software.verknowsys.com/source
-* Currently any kind of sha/md5 checksumming isn't supported at all.
+* Currently all software used by current definitions is mirrored on software.verknowsys.com/source and software.verknowsys.com/binary
 * Currently some definitions provided by Sofin include a couple of custom patches on software required
   by VerKnowSys ServeD © System. It *shouldn't* but **may** break the way how software works on different systems.
 

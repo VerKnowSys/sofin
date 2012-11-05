@@ -1,5 +1,6 @@
 APP_FULL_NAME="Nginx Standalone"
 APP_NAME="nginx"
+APP_SHA="e3de0b2b82095f26e96bdb461ba36472d3e7cdda"
 APP_VERSION="1.2.4"
 APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
 APP_REQUIREMENTS="libiconv zlib pcre"

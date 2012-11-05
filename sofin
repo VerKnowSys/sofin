@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-VERSION="0.16"
+VERSION="0.18.3"
 
 
 # load configuration from sofin.conf
@@ -78,9 +78,11 @@ check_requirements () {
         error "Empty applications list!"
         exit_locked 1
     fi
-    files="$(${FIND_BIN} /usr/local -type f | ${WC_BIN} -l | ${SED_BIN} -e 's/^ *//g;s/ *$//g' )"
-    if [ "${files}" != "0" ]; then
-        warn "/usr/local has been found, and contains ${files} file(s)"
+    if [ "${SYSTEM_NAME}" != "Darwin" ]; then
+        files="$(${FIND_BIN} /usr/local -type f | ${WC_BIN} -l | ${SED_BIN} -e 's/^ *//g;s/ *$//g' )"
+        if [ "${files}" != "0" ]; then
+            warn "/usr/local has been found, and contains ${files} file(s)"
+        fi
     fi
 }
 
@@ -113,6 +115,8 @@ update_definitions () { # accepts optional user uid param
     done
     cd "${CACHE_DIR}"
     debug "Working in cache dir: ${CACHE_DIR}"
+    note "${HEADER}"
+    note
     note "Updating definitions snapshot from: ${MAIN_SOURCE_REPOSITORY}definitions/${DEFINITION_SNAPSHOT_FILE}"
     ${FETCH_BIN} "${MAIN_SOURCE_REPOSITORY}definitions/${DEFINITION_SNAPSHOT_FILE}" >> "${LOG}" 2>> "${LOG}"
     ${TAR_BIN} ${tar_options} "${DEFINITION_SNAPSHOT_FILE}" >> "${LOG}" 2>> "${LOG}"
@@ -258,7 +262,6 @@ if [ ! "$1" = "" ]; then
 
     ver|version)
         note "${HEADER}"
-        note "2o11-2o12 by Daniel (dmilith) Dettlaff - dmililth [at] me.com"
         exit
         ;;
 
@@ -690,13 +693,12 @@ for application in ${APPLICATIONS}; do
         debug "Reading definition: ${definition}"
         . ${DEFAULTS}
         . ${definition}
-        note " -> Requirements for this definition: ${APP_REQUIREMENTS}"
+        note "-> Requirements for this definition: ${APP_REQUIREMENTS}"
 
         # fancy old style Capitalize
         APP_NAME="$(${PRINTF_BIN} "${APP_NAME}" | ${CUT_BIN} -c1 | ${TR_BIN} '[a-z]' '[A-Z]')$(${PRINTF_BIN} "${APP_NAME}" | ${SED_BIN} 's/^[a-zA-Z]//')"
         note
         note "Preparing application: ${APP_NAME}${APP_POSTFIX} (${APP_FULL_NAME} v${APP_VERSION})"
-        note
         if [ "${USER_UID}" = "" ]; then
             debug "Normal build"
             export PREFIX="${SOFTWARE_DIR}${APP_NAME}"
@@ -807,9 +809,8 @@ for application in ${APPLICATIONS}; do
 
                     file="$(${BASENAME_BIN} $($FIND_BIN ${BUILD_DIR} -depth 1 -type f))"
                     if [ "${APP_SHA}" = "" ]; then
-                        warn "-> Missing SHA sum for source: ${file}. Check skipped."
+                        error "-> Missing SHA sum for source: ${file}. Check skipped."
                     else
-                        note "-> Verifying source SHA of definition: ${APP_NAME} with file: ${file}"
                         if [ "${SYSTEM_NAME}" = "Darwin" ]; then
                             export cur="$(${SHA_BIN} ${file} | ${AWK_BIN} '{print $1}')"
                         fi
@@ -817,20 +818,30 @@ for application in ${APPLICATIONS}; do
                             export cur="$(${SHA_BIN} -q ${file})"
                         fi
                         if [ "${cur}" = "${APP_SHA}" ]; then
-                            note "-> SHA sum match."
+                            debug "-> SHA sum match in file: ${file}"
                         else
-                            error "-> SHA sum mismatch."
+                            error "-> ${cur} vs ${APP_SHA}"
+                            error "-> SHA sum mismatch. Removing corrupted file from cache: ${file}"
+                            $($FIND_BIN ${BUILD_DIR} -depth 1 -type f -name \'${file}\' | ${XARGS_BIN} ${RM_BIN})
+                            exit_locked
                         fi
                     fi
 
-                    note "-> Unpacking source code of: ${APP_NAME}"
+                    debug "-> Unpacking source code of: ${APP_NAME}"
                     debug "Build dir: ${BUILD_DIR}"
                     APP_LOC=${BUILD_DIR}${APP_NAME}
                     debug "Entrering ${APP_LOC}"
                     run "${TAR_BIN} xf ${APP_LOC}*"
-                    for dir in $(${LS_BIN} -F ${BUILD_DIR} | ${GREP_BIN} \/$); do
-                        debug "Changing dir to: ${dir}${APP_SOURCE_DIR_POSTFIX}"
-                        cd "${dir}${APP_SOURCE_DIR_POSTFIX}"
+
+                    buildDirCore=$(${FIND_BIN} ${BUILD_DIR} -name "*${APP_VERSION}*" -type d -depth 1)
+                    debug "Build Dir Core before: '${buildDirCore}'"
+                    if [ "${buildDirCore}" = "" ]; then
+                        export buildDirCore=$(${FIND_BIN} ${BUILD_DIR} -type d -depth 1) # try any dir instead
+                    fi
+                    debug "Build Dir Core after: '${buildDirCore}'"
+                    for dir in ${buildDirCore}; do
+                        debug "Changing dir to: ${dir}/${APP_SOURCE_DIR_POSTFIX}"
+                        cd "${dir}/${APP_SOURCE_DIR_POSTFIX}"
                         if [ ! -z "${APP_AFTER_UNPACK_CALLBACK}" ]; then
                             debug "Running after unpack callback"
                             run "${APP_AFTER_UNPACK_CALLBACK}"

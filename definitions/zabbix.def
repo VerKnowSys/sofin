@@ -1,5 +1,6 @@
 APP_FULL_NAME="Zabbix monitoring system"
 APP_NAME="zabbix"
+APP_SHA="aaa678bc6abc6cb2b174e599108ad19f187047c9"
 APP_VERSION="2.0.2"
 APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
 APP_CONFIGURE_ARGS="--enable-proxy --enable-server --enable-agent --disable-largefile --with-jabber --with-libcurl --with-sqlite3 --disable-dependency-tracking"
