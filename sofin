@@ -116,6 +116,7 @@ update_definitions () { # accepts optional user uid param
     cd "${CACHE_DIR}"
     debug "Working in cache dir: ${CACHE_DIR}"
     note "${HEADER}"
+    note
     note "Updating definitions snapshot from: ${MAIN_SOURCE_REPOSITORY}definitions/${DEFINITION_SNAPSHOT_FILE}"
     ${FETCH_BIN} "${MAIN_SOURCE_REPOSITORY}definitions/${DEFINITION_SNAPSHOT_FILE}" >> "${LOG}" 2>> "${LOG}"
     ${TAR_BIN} ${tar_options} "${DEFINITION_SNAPSHOT_FILE}" >> "${LOG}" 2>> "${LOG}"
@@ -698,7 +699,6 @@ for application in ${APPLICATIONS}; do
         APP_NAME="$(${PRINTF_BIN} "${APP_NAME}" | ${CUT_BIN} -c1 | ${TR_BIN} '[a-z]' '[A-Z]')$(${PRINTF_BIN} "${APP_NAME}" | ${SED_BIN} 's/^[a-zA-Z]//')"
         note
         note "Preparing application: ${APP_NAME}${APP_POSTFIX} (${APP_FULL_NAME} v${APP_VERSION})"
-        note
         if [ "${USER_UID}" = "" ]; then
             debug "Normal build"
             export PREFIX="${SOFTWARE_DIR}${APP_NAME}"
