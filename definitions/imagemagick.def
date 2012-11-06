@@ -1,15 +1,9 @@
+DISABLE_ON="Darwin"
 APP_FULL_NAME="ImageMagick Graphics Library"
 APP_SHA="6bb78f9b3c0437629c015e8a2bc4b34f5a9f5898"
 APP_NAME="ImageMagick"
-APP_VERSION_PREFIX="6.8.0"
-APP_VERSION="${APP_VERSION_PREFIX}-4"
+APP_VERSION="6.8.0-4"
 APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.bz2"
-APP_REQUIREMENTS="make pkgconf zlib libxml2 freetype fontconfig libiconv jpeg libpng tiff libidn python-legacy libpaper m4 bison perl autoconf automake libtool util-macros libxslt xcb-proto libpthread-stubs xproto libXau xtrans xextproto libxcb libX11 libICE libSM kbproto libXt libXext ghostscript"
-if [ "${SYSTEM_NAME}" = "Darwin" ]; then
-  export APP_REQUIREMENTS="pkgconf zlib libxml2 freetype fontconfig libiconv jpeg libpng tiff libidn"
-  export APP_CONFIGURE_SCRIPT="binary"
-  export APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-x86_64-apple-darwin12.2.0.tar.gz"
-  export APP_AFTER_UNPACK_CALLBACK="${MKDIR_BIN} ${PREFIX}; ${CP_BIN} -r ${CACHE_DIR}cache/${APP_NAME}-${APP_VERSION}/${APP_NAME}-${APP_VERSION_PREFIX}/* ${PREFIX}"
-fi
+APP_REQUIREMENTS="make pkgconf zlib libxml2 freetype fontconfig libiconv jpeg libpng tiff libidn python-legacy libpaper jasper" #  m4 bison perl autoconf automake libtool util-macros libxslt xcb-proto libpthread-stubs xproto libXau xtrans xextproto libxcb libX11 libICE libSM kbproto libXt libXext ghostscript
 APP_EXPORTS="convert display identify animate compare composite conjure mogrify montage thumbnail stream Magick++-config Magick-config MagickWand-config Wand-config MagickCore-config"
 APP_AFTER_INSTALL_CALLBACK="${SED_BIN} -i '' 's@pkg-config@\$HOME/Apps/ImageMagick/bin/pkgconf@' ${PREFIX}/bin/Magick*config ${PREFIX}/bin/Wand-config"
