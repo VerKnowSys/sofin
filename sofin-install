@@ -26,6 +26,7 @@ case "${SYSTEM_NAME}" in
       ${LN_BIN} -vs "/Users/$(${ID_BIN} -u)/.profile" "${HOME}/.profile"
       check_command_result $?
     fi
+    sudo ${MKDIR_BIN} -p /Software/.cache
     note "Done"
     ;;
 
@@ -40,6 +41,7 @@ case "${SYSTEM_NAME}" in
       ${LN_BIN} -vs "$($PWD_BIN)/sofin.conf" /etc/sofin.conf
       check_command_result $?
     fi
+    ${MKDIR_BIN} -p /Software/.cache
     note "Done"
     ;;
 
