@@ -2,10 +2,10 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-VERSION="0.20"
-
+VERSION="0.20.2"
 
 # load configuration from sofin.conf
+
 CONF_FILE="/etc/sofin.conf"
 if [ -e "${CONF_FILE}" ]; then
     . "${CONF_FILE}"
@@ -129,8 +129,10 @@ check_lock () {
         export LOCK_FILE="${HOME_DIR}${userUID}/.sofin.lock"
     fi
     if [ -e "${LOCK_FILE}" ]; then
-        error "Lock file exists in ${LOCK_FILE}. Another process of $(${BASENAME_BIN} ${SCRIPT_NAME}) is running?"
-        exit 1
+        warn "Lock file exists in ${LOCK_FILE}. Another process of $(${BASENAME_BIN} ${SCRIPT_NAME}) already running"
+        note "Waiting ${DEFAULT_PAUSE_WHEN_LOCKED} seconds to retry of command: ${SCRIPT_NAME} $*"
+        ${SLEEP_BIN} ${DEFAULT_PAUSE_WHEN_LOCKED}
+        ${SCRIPT_NAME} ${SCRIPT_ARGS}
     else
         debug "Creating lock file ${LOCK_FILE}"
         ${TOUCH_BIN} ${LOCK_FILE}
@@ -772,9 +774,16 @@ for application in ${APPLICATIONS}; do
                             debug "-> SHA sum match in file: ${file}"
                         else
                             error "-> ${cur} vs ${APP_SHA}"
-                            error "-> SHA sum mismatch. Removing corrupted file from cache: ${file}"
-                            $($FIND_BIN ${BUILD_DIR} -depth 1 -type f -name \'${file}\' | ${XARGS_BIN} ${RM_BIN})
-                            exit_locked
+                            error "-> SHA sum mismatch. Removing corrupted file from cache: ${file}, and retrying."
+                            # remove corrupted file
+                            $($FIND_BIN ${BUILD_DIR} -depth 1 -type f -name ${file} | ${XARGS_BIN} ${RM_BIN})
+                            # remove lock
+                            if [ -e "${LOCK_FILE}" ]; then
+                                debug "Removing lock file: ${LOCK_FILE}"
+                                ${RM_BIN} -f ${LOCK_FILE}
+                            fi
+                            # and restart script with same arguments:
+                            ${SCRIPT_NAME} ${SCRIPT_ARGS}
                         fi
                     fi
 
