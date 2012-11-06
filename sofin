@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-VERSION="0.18.4"
+VERSION="0.20"
 
 
 # load configuration from sofin.conf
@@ -13,52 +13,6 @@ else
     echo "FATAL: No configuration file found: ${CONF_FILE}"
     exit 1
 fi
-
-
-# helpers
-
-cecho () {
-    ${PRINTF_BIN} "${2}${1}${reset}\n"
-}
-
-
-debug () {
-    if [ "${DEBUG}" = "true" ]; then
-        cecho " ~ $1" ${magenta}
-    else
-        cecho " ~ $1" ${magenta} >> ${LOG}
-    fi
-}
-
-
-warn () {
-    cecho " ! $1" ${yellow}
-}
-
-
-note () {
-    cecho " * $1" ${green}
-}
-
-
-error () {
-    cecho " # $1" ${red}
-}
-
-
-check_command_result () {
-    if [ -z "$1" ]; then
-        error "No param given for check_command_result()!"
-        exit_locked 1
-    fi
-    if [ "$1" = "0" ]; then
-        debug "CORRECT"
-    else
-        error
-        error "FAILURE. Run $(${BASENAME_BIN} ${SCRIPT_NAME}) log to see what went wrong."
-        exit_locked 1
-    fi
-}
 
 
 check_definition_dir () {
@@ -153,7 +107,8 @@ usage_howto () {
     note "dependencies | deps | local          - installs software from list defined in '${DEPENDENCIES_FILE}' file in current directory"
     note "one | cherrypick | get               - installs one application from definition (example: $(${BASENAME_BIN} ${SCRIPT_NAME}) get ruby)"
     note "uninstall | remove | delete          - removes one application (example: $(${BASENAME_BIN} ${SCRIPT_NAME}) uninstall ruby)"
-    note "list | installed                     - lists installed software"
+    note "list | installed                     - short list of installed software"
+    note "fulllist | fullinstalled             - detailed lists with installed software including requirements"
     note "available                            - lists available software"
     note "export | exp | exportapp             - adds given command to application exports (example: $(${BASENAME_BIN} ${SCRIPT_NAME}) export rails ruby)"
     note "getshellvars | shellvars | vars      - returns shell variables for installed software"
@@ -162,33 +117,6 @@ usage_howto () {
     note "update                               - only update definitions from remote repository and exit"
     note "ver | version                        - shows $(${BASENAME_BIN} ${SCRIPT_NAME}) script version"
     exit
-}
-
-
-check_root () {
-    if [ ! "$(${ID_BIN} -u)" = "0" ]; then
-        error "This command should be run as root."
-        exit
-    fi
-}
-
-
-check_os () {
-    case "$(${UNAME_BIN})" in
-        FreeBSD)
-            # note "Running on FreeBSD host"
-            ;;
-
-        Darwin)
-            # note "Running on OSX/Darwin host"
-            ;;
-
-        *)
-            error "Currently only FreeBSD and Darwin hosts are supported."
-            exit
-            ;;
-
-    esac
 }
 
 
@@ -284,6 +212,28 @@ if [ ! "$1" = "" ]; then
 
 
     installed|list)
+        if [ -z "${2}" ]; then
+            export SOFT_DIR="${HOME_DIR}$(${ID_BIN} ${ID_SVD})/${HOME_APPS_DIR}"
+            if [ "$(${ID_BIN} -u)" = "0" ]; then
+                check_root
+                export SOFT_DIR="${SOFTWARE_DIR}"
+            fi
+        else
+            export SOFT_DIR="${HOME_DIR}$2/${HOME_APPS_DIR}"
+            if [ ! "$(${ID_BIN} ${ID_SVD})" = "${2}" ]; then
+                check_root
+            fi
+        fi
+        if [ -d ${SOFT_DIR} ]; then
+            for app in ${SOFT_DIR}*; do
+                echo $(${BASENAME_BIN} ${app})
+            done
+        fi
+        exit_locked
+        ;;
+
+
+    fullinstalled|fulllist)
         if [ -z "${2}" ]; then
             export SOFT_DIR="${HOME_DIR}$(${ID_BIN} ${ID_SVD})/${HOME_APPS_DIR}"
             if [ "$(${ID_BIN} -u)" = "0" ]; then

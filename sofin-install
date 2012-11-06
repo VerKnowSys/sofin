@@ -1,0 +1,50 @@
+#!/bin/sh
+# @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
+
+
+# load configuration from sofin.conf
+CONF_FILE="./sofin.conf"
+if [ -e "${CONF_FILE}" ]; then
+    . "${CONF_FILE}"
+else
+    echo "FATAL: No configuration file found: ${CONF_FILE}"
+    exit 1
+fi
+
+case "${SYSTEM_NAME}" in
+  Darwin)
+    note "Darwin installation"
+    if [ ! -e "/usr/bin/sofin" ]; then
+      sudo ${LN_BIN} -vs "$($PWD_BIN)/sofin" /usr/bin/sofin 2> /dev/null
+      check_command_result $?
+    fi
+    if [ ! -e "/etc/sofin.conf" ]; then
+      sudo ${LN_BIN} -vs "$($PWD_BIN)/sofin.conf" /etc/sofin.conf 2> /dev/null
+      check_command_result $?
+    fi
+    if [ ! -e "${HOME}/.profile" ]; then
+      ${LN_BIN} -vs "/Users/$(${ID_BIN} -u)/.profile" "${HOME}/.profile"
+      check_command_result $?
+    fi
+    note "Done"
+    ;;
+
+  FreeBSD)
+    check_root
+    note "FreeBSD installation"
+    if [ ! -e "/usr/bin/sofin" ]; then
+      ${LN_BIN} -vs "$($PWD_BIN)/sofin" /usr/bin/sofin
+      check_command_result $?
+    fi
+    if [ ! -e "/etc/sofin.conf" ]; then
+      ${LN_BIN} -vs "$($PWD_BIN)/sofin.conf" /etc/sofin.conf
+      check_command_result $?
+    fi
+    note "Done"
+    ;;
+
+  *)
+    echo "No supported architecture found"
+    ;;
+
+esac
