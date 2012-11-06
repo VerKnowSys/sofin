@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-VERSION="0.20.2"
+VERSION="0.20.3"
 
 # load configuration from sofin.conf
 
@@ -133,6 +133,7 @@ check_lock () {
         note "Waiting ${DEFAULT_PAUSE_WHEN_LOCKED} seconds to retry of command: ${SCRIPT_NAME} $*"
         ${SLEEP_BIN} ${DEFAULT_PAUSE_WHEN_LOCKED}
         ${SCRIPT_NAME} ${SCRIPT_ARGS}
+        exit
     else
         debug "Creating lock file ${LOCK_FILE}"
         ${TOUCH_BIN} ${LOCK_FILE}
@@ -784,6 +785,7 @@ for application in ${APPLICATIONS}; do
                             fi
                             # and restart script with same arguments:
                             ${SCRIPT_NAME} ${SCRIPT_ARGS}
+                            exit
                         fi
                     fi
 
