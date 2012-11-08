@@ -13,7 +13,7 @@ customizable software for FreeBSD servers. Darwin (Mac OS X) support started wit
 * User friendly, clean and clear colorful information. No magic. KISS, DRY, BDD driven development.
 * Simple, ~1k LOC solution, written in legacy /bin/sh shell scripting language.
 * Every "software" has own definition ("def" file) with defined flat dependency list and basic information.
-  Every definition is sh script itself (More in definitions/skeleton.def and definitions/defaults.def)
+  Every definition is sh script itself (More in [skeleton.def](https://github.com/VerKnowSys/sofin/blob/master/definitions/skeleton.def.sample) and [defaults.def](https://github.com/VerKnowSys/sofin/blob/master/definitions/defaults.def))
 * Supports selective application installation. (By "one" param. More in examples).
 * Supports installation of user and system wide applications (more in examples).
 * Has simple flat dependency managment. Sofin architecture is flexible enough to bundle almost any mix of requirements in application bundle, if only it's supported by given software. No need to install tons of useless/ not needed dependencies just because software supports it.
@@ -26,7 +26,7 @@ customizable software for FreeBSD servers. Darwin (Mac OS X) support started wit
 * Sofin is designed to not touch any part of system. The only exception is /etc/profile_sofin created after system wide software installation (/Software/) in ServeD system.
 * By default Sofin verbosity is limited to minimum. More detailed information is written to LOG file (located in /Software/.cache/install.log by default or /Users/USER_NAME/.cache/install.log)
 * Exports. Each app has own ROOT_DIR/exports/ with symlinks to exported software. Exported software are just simple symlinks used to generate PATH environment variable.
-* Sofin has own configuration file located in /etc/sofin.conf which is SH script itself.
+* Sofin has own configuration file: [sofin.conf](https://github.com/VerKnowSys/sofin/blob/master/sofin.conf) which is SH script itself.
 
 
 ## Examples:
@@ -87,10 +87,10 @@ space than it does with "old fasioned, system wide, shared software".
 * Linux/ Windows aren't supported, but Sofin will run just fine everywhere after a couple of configuration fights.
 * Sofin is designed, tested and supported under both 64bit: Darwin 12.2.0 and FreeBSD 9.0/9.1, but it should also work on any compliant architectures as well.
 * Sofin requires to be installed or symlinked to system default PATH location (/bin or /usr/bin but not /usr/local). By default Sofin includes installation script: "sofin-install".
-* Currently all official Sofin software used by current definitions is mirrored only on software.verknowsys.com/source and software.verknowsys.com/binary.
-* Currently some definitions provided by Sofin include a couple of custom patches on software required by VerKnowSys ServeD © System. Patches usually comes from current FreeBSD ports.
-* Some definitions with X11 requirement will need XQuartz installation. (Darwin hosts only).
+* Currently all official Sofin software used by current definitions is mirrored only on [software.verknowsys.com](http://software.verknowsys.com/source) and [software.verknowsys.com](http://software.verknowsys.com/binary).
+* Currently some definitions provided by Sofin include a couple of custom patches on software required by VerKnowSys ServeD © System. Patches usually comes from current [FreeBSD ports](http://www.freebsd.org/ports/index.html).
+* Some definitions with X11 requirement will need [XQuartz](http://xquartz.macosforge.org/landing/) installation. (Darwin hosts only).
 
 
 ## License:
-  Released under the [BSD](https://en.wikipedia.org/wiki/BSD_License) license.
+* Released under the [BSD](http://opensource.org/licenses/BSD-2-Clause) license.
