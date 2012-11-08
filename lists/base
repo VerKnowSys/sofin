@@ -1,8 +1,7 @@
 bash
 git
+mercurial
 openafs
-openjdk
-openjdk64
 openssh
 zsh
 vim
