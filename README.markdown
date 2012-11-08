@@ -30,14 +30,14 @@ customizable software for FreeBSD servers. Darwin (Mac OS X) support started wit
 
 
 ## Examples:
-* Install software defined in a list called "http" (by default it will install definitions from list into /Software/):
+* Install software defined in a list called "http":
     `sofin install http`
 
 * Install one software from definition called "ruby.def" for current user:
-    `sofin one ruby`
+    `sofin get ruby`
 
 * Install one software from definition called "ruby.def" for user "dmilith" (by default it will point to /Users/dmilith/Apps/Ruby/):
-    `sofin one ruby dmilith`
+    `sofin get ruby dmilith`
 
 * Install software list called "databases" for user "dmilith" (by default it will point to /Users/dmilith/Apps/):
     `sofin install databases dmilith`
@@ -52,12 +52,12 @@ customizable software for FreeBSD servers. Darwin (Mac OS X) support started wit
     `sofin available`
 
 * Show list of installed software:
-    `sofin installed`
+    `sofin fullinstalled` or `sofin installed`
 
 * Export "ruby" binary from "Passenger" bundle: `sofin export ruby Passenger`
 
 * Uninstall installed software "SomeApp"?
-    `sofin uninstall SomeApp`
+    `sofin uninstall someApp`
 
 * Give me "PATH" for all applications installed system wide (explained in pitfalls):
     `sofin getshellpath`
@@ -75,7 +75,7 @@ customizable software for FreeBSD servers. Darwin (Mac OS X) support started wit
     run `sofin install databases`
 
 
-## Differences from POSIX and FHS standards:
+## Differences from POSIX <https://en.wikipedia.org/wiki/POSIX> and FHS <https://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard> standards:
 * Sofin provides a slightly different approach to shell PATH variable. By default user PATH variable is overriden to include APP-PREFIX/exports instead of default APP-PREFIX/(s)bin. After each successful software installation sofin will populate APP-PREFIX/exports with relative symlinks to existing binaries of bundle. Application exports are defined in "APP_EXPORTS" variable (available for any definition).
 * Sofin suggests empty /usr/local folder. It's caused by POSIX "shared nature" of /usr/local. Sofin was built against this rule to prevent cross requirements between prefixes (/opt/X11 is an exception on Darwin), and to make sure that each software is easily movable between machines with same architecture.
 * Each application has own "root" directory (Similar to Mac OS X software in *.app folders).
