@@ -75,7 +75,7 @@ customizable software for FreeBSD servers. Darwin (Mac OS X) support started wit
     run `sofin install databases`
 
 
-## Differences from ([POSIX](https://en.wikipedia.org/wiki/POSIX)) and [FHS](https://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard) standards:
+## Differences from [POSIX](https://en.wikipedia.org/wiki/POSIX) and [FHS](https://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard) standards:
 * Sofin provides a slightly different approach to shell PATH variable. By default user PATH variable is overriden to include APP-PREFIX/exports instead of default APP-PREFIX/(s)bin. After each successful software installation sofin will populate APP-PREFIX/exports with relative symlinks to existing binaries of bundle. Application exports are defined in "APP_EXPORTS" variable (available for any definition).
 * Sofin suggests empty /usr/local folder. It's caused by POSIX "shared nature" of /usr/local. Sofin was built against this rule to prevent cross requirements between prefixes (/opt/X11 is an exception on Darwin), and to make sure that each software is easily movable between machines with same architecture.
 * Each application has own "root" directory (Similar to Mac OS X software in *.app folders).
@@ -93,4 +93,4 @@ space than it does with "old fasioned, system wide, shared software".
 
 
 ## License:
-  Released under the [BSD][https://en.wikipedia.org/wiki/BSD_License] license.
+  Released under the [BSD](https://en.wikipedia.org/wiki/BSD_License) license.
