@@ -6,5 +6,9 @@ APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
 APP_REQUIREMENTS="python-legacy"
 APP_CONFIGURE_SCRIPT="ignore"
 APP_MAKE_METHOD="true"
-APP_INSTALL_METHOD="${PREFIX}/bin/python setup.py install --prefix=${PREFIX}"
+if [ "${SYSTEM_NAME}" = "Darwin" ]; then
+  export APP_INSTALL_METHOD="/usr/bin/python setup.py install --prefix=${PREFIX}"
+else
+  export APP_INSTALL_METHOD="${PREFIX}/bin/python setup.py install --prefix=${PREFIX}"
+fi
 APP_EXPORTS="hg"
