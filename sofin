@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-VERSION="0.20.3"
+VERSION="0.20.4"
 
 # load configuration from sofin.conf
 
@@ -128,16 +128,10 @@ check_lock () {
     if [ ! "${userUID}" = "0" ]; then
         export LOCK_FILE="${HOME_DIR}${userUID}/.sofin.lock"
     fi
-    if [ -e "${LOCK_FILE}" ]; then
-        warn "Lock file exists in ${LOCK_FILE}. Another process of $(${BASENAME_BIN} ${SCRIPT_NAME}) already running"
-        note "Waiting ${DEFAULT_PAUSE_WHEN_LOCKED} seconds to retry of command: ${SCRIPT_NAME} $*"
-        ${SLEEP_BIN} ${DEFAULT_PAUSE_WHEN_LOCKED}
-        ${SCRIPT_NAME} ${SCRIPT_ARGS}
-        exit
-    else
-        debug "Creating lock file ${LOCK_FILE}"
-        ${TOUCH_BIN} ${LOCK_FILE}
-    fi
+    note "Waiting for lock…"
+    debug "Trying to occupy the lock file: ${LOCK_FILE}"
+    ${LOCKFILE_BIN} ${LOCK_FILE}
+
     trap "exit_locked 2" INT
 }
 
