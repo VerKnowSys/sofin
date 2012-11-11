@@ -1,3 +1,4 @@
+DISABLE_ON="Darwin"
 APP_FULL_NAME="libexecinfo" # NOTE: this library is now part of ServeD base system
 APP_NAME="libexecinfo"
 APP_SHA="64134ae780c029712862aa4e12f0566e14c65c55"
