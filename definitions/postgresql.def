@@ -7,3 +7,4 @@ APP_CONFIGURE_ARGS="--without-ldap --with-zlib --disable-debug --disable-nls --w
 APP_REQUIREMENTS="make zlib libiconv"
 APP_AFTER_INSTALL_CALLBACK="cd ${CACHE_DIR}cache/${APP_NAME}-${APP_VERSION}/${APP_NAME}-${APP_VERSION}/contrib/pg_archivecleanup && make install"
 APP_EXPORTS="postgres pg_ctl initdb pg_dump pg_dumpall pg_config psql createdb createuser dropdb pg_controldata pg_restore pg_resetxlog reindexdb vacuumdb"
+APP_NO_CCACHE="YES"
