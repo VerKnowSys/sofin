@@ -1,6 +1,7 @@
 ant
 bash
 cairo
+ccache
 cmake
 curl
 dhcpd

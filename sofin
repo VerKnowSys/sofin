@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-VERSION="0.20.4"
+VERSION="0.22.0"
 
 # load configuration from sofin.conf
 
@@ -705,6 +705,13 @@ for application in ${APPLICATIONS}; do
                     export CPP="/usr/bin/clang -E"
                 fi
             fi
+            # check for CCACHE availability
+            if [ -x "${CCACHE_BIN}" ]; then
+                export CC="${CCACHE_BIN} ${CC}"
+                export CXX="${CCACHE_BIN} ${CXX}"
+                export CPP="${CCACHE_BIN} ${CPP}"
+            fi
+            # set rest of compiler/linker variables
             export PATH="${PREFIX}/bin:${PREFIX}/sbin:${DEFAULT_PATH}"
             export LD_LIBRARY_PATH="${PREFIX}/lib:${PREFIX}/libexec:/usr/lib:/lib"
             export CFLAGS="-I${PREFIX}/include ${APP_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
