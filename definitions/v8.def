@@ -7,3 +7,4 @@ APP_CONFIGURE_SCRIPT="ignore"
 APP_REQUIREMENTS="libiconv python-legacy scons" # libexecinfo is part of ServeD base system hence it's excluded from requirements
 APP_MAKE_METHOD="scons -j4 arch=x64 mode=release snapshot=on library=static debuggersupport=off werror=no strictaliasing=off liveobjectlist=off I_know_I_should_build_with_GYP=yes"
 APP_INSTALL_METHOD="${CP_BIN} libv8.a ${PREFIX}/lib/ && ${CP_BIN} libv8preparser.a ${PREFIX}/lib/ && ${CP_BIN} -r include/ ${PREFIX}/include"
+APP_NO_CCACHE="YES"
