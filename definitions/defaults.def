@@ -22,3 +22,4 @@ APP_AFTER_INSTALL_CALLBACK=""
 APP_AFTER_PATCH_CALLBACK=""
 APP_JAVA_ANCESTOR="" # jdk ancestors currently supported: JDK6_32, JDK6_64, JDK7_32, JDK7_64
 APP_SHA="" # sha1 of archive source
+APP_NO_CCACHE=""
