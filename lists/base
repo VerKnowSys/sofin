@@ -4,5 +4,6 @@ git
 mercurial
 openafs
 openssh
+subversion
 zsh
 vim
