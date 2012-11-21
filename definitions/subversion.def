@@ -4,5 +4,8 @@ APP_NAME="subversion"
 APP_VERSION="1.7.7"
 APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.bz2"
 APP_CONFIGURE_ARGS="--disable-nls --with-sqlite=${PREFIX}"
+if [ "${SYSTEM_NAME}" = "Darwin" ]; then
+  export APP_CONFIGURE_ARGS="--disable-nls"
+fi
 APP_REQUIREMENTS="make zlib expat apr apr-util sqlite"
 APP_EXPORTS="svn"
