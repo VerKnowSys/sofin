@@ -865,7 +865,7 @@ for application in ${APPLICATIONS}; do
                                 ;;
 
                             alternate)
-                                run "${APP_CONFIGURE_SCRIPT} -prefix ${PREFIX} -cc ${CC} ${APP_CONFIGURE_ARGS}"
+                                run "./configure -prefix ${PREFIX} -cc ${CC} ${APP_CONFIGURE_ARGS}"
                                 ;;
 
                             cmake)
