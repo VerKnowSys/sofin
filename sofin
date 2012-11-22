@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-VERSION="0.22.2"
+VERSION="0.22.3"
 
 # load configuration from sofin.conf
 
@@ -847,6 +847,7 @@ for application in ${APPLICATIONS}; do
 
                         note "-> Configuring requirement: $1 with version: ${APP_VERSION}"
                         case ${APP_CONFIGURE_SCRIPT} in
+
                             ignore)
                                 note "-> Ignored configuration part $1"
                                 ;;
@@ -861,6 +862,10 @@ for application in ${APPLICATIONS}; do
                                 note "-> Binary definition: $1"
                                 export APP_MAKE_METHOD="true"
                                 export APP_INSTALL_METHOD="true"
+                                ;;
+
+                            alternate)
+                                run "${APP_CONFIGURE_SCRIPT} -prefix ${PREFIX} -cc ${CC} ${APP_CONFIGURE_ARGS}"
                                 ;;
 
                             cmake)
