@@ -1,9 +1,8 @@
+DISABLE_ON="Darwin"
 APP_FULL_NAME="Flac lossless audio codec"
 APP_SHA="bd54354900181b59db3089347cc84ad81e410b38"
 APP_NAME="flac"
 APP_VERSION="1.2.1"
 APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
-if [ "${SYSTEM_NAME}" = "Darwin" ]; then
-  export APP_CONFIGURE_ARGS="--disable-static"
-fi
+APP_CONFIGURE_ARGS="--disable-xmms-plugin --with-ogg=${PREFIX} --with-libiconv-prefix=${PREFIX} --disable-rpath --disable-doxygen-docs --disable-thorough-tests --disable-largefile"
 APP_EXPORTS="flac"
