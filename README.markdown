@@ -5,11 +5,11 @@ I'm also on #freebsd and #scala.pl @ freenode IRC.
 
 ## About:
 This software is my way of how to get reliable, updatable, bundled, closed-dependency, secure and fully
-customizable software for FreeBSD servers. Darwin (Mac OS X) support started with version >=0.14.10.
+customizable software for FreeBSD servers. Darwin (Mac OS X) support started with version >=0.14.10. Linux support started with version >=0.24.4.
 
 
 ## Features:
-* Designed to work on all *BSD and *Darwin.
+* Designed to work on all *BSD, *Darwin, *Linux
 * User friendly, clean and clear colorful information. No magic. KISS, DRY, BDD driven development.
 * Simple, ~1k LOC solution, written in legacy /bin/sh shell scripting language.
 * Every "software" has own definition ("def" file) with defined flat dependency list and basic information.
@@ -90,6 +90,27 @@ space than it does with "old fasioned, system wide, shared software".
 * Currently all official Sofin software used by current definitions is mirrored only on [software.verknowsys.com](http://software.verknowsys.com/source) and [software.verknowsys.com](http://software.verknowsys.com/binary).
 * Currently some definitions provided by Sofin include a couple of custom patches on software required by VerKnowSys ServeD © System. Patches usually comes from current [FreeBSD ports](http://www.freebsd.org/ports/index.html).
 * Some definitions with X11 requirement will need [XQuartz](http://xquartz.macosforge.org/landing/) installation. (Darwin hosts only).
+
+
+## Platform specific installation info:
+* FreeBSD specific:
+        1. Install base 64bit system - I used 64bit FreeBSD 9.1 bootonly iso here.
+        2. Run as root: "fetch -o - https://github.com/VerKnowSys/sofin/archive/master.tar.gz | tar xf - && cd ./sofin-master && ./sofin-install". It will put "sofin" into /usr/bin/ and sofin.conf.sh into /etc/.
+        3. Build core software. Run "sofin install base" as root.
+        4. Start using sofin as regular user. Set your environment to source "/etc/profile_sofin" for your user environments.
+
+* Darwin/ Mac OS X specific:
+        1. Install Mac OS X 10.8.
+        2. Run "cd /var && git pull git://github.com/VerKnowSys/sofin.git && cd ./sofin && ./sofin-install" as root. It will put "sofin" in /usr/bin/ and sofin.conf.sh in /etc/.
+        3. Build core software. Run "sudo sofin install base".
+        4. Start using sofin as regular user. Set your environment to source "/etc/profile_sofin" for your user environments.
+
+* Linux specific:
+        1. Install base 64bit system - I used 64bit Debian "wheezy" netinstall iso here.
+        2. apt-get install time clang make bzip2 curl - They're required only to compile base software. The most important thing is to have clang with version at least 3.0 already installed in system.
+        3. Run as root: "curl https://github.com/VerKnowSys/sofin/archive/master.tar.gz | tar xf - && cd ./sofin-master && ./sofin-install". It will put "sofin" into /usr/bin/ and sofin.conf.sh into /etc/.
+        4. Build core software. Run "sofin install base" as root.
+        5. Start using sofin as regular user. Set your environment to source "/etc/profile_sofin" for your user environments.
 
 
 ## License:
