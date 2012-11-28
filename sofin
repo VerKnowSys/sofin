@@ -702,11 +702,11 @@ for application in ${APPLICATIONS}; do
                         BASE_COMPILER="/usr/bin"
                         export CC="${BASE_COMPILER}/gcc ${APP_COMPILER_ARGS}"
                         export CXX="${BASE_COMPILER}/g++ ${APP_COMPILER_ARGS}"
-                        export CPP="${BASE_COMPILER}/cpp ${APP_COMPILER_ARGS}"
+                        export CPP="${BASE_COMPILER}/cpp"
                         ;;
 
                     CLANG)
-                        BASE_COMPILER="${SOFTWARE_DIR}/Clang/exports"
+                        BASE_COMPILER="${SOFTWARE_DIR}Clang/exports"
                         if [ ! -f "${BASE_COMPILER}/clang" ]; then
                             export BASE_COMPILER="/usr/bin"
                             if [ ! -f "${BASE_COMPILER}/clang" ]; then
@@ -715,9 +715,9 @@ for application in ${APPLICATIONS}; do
                         fi
                         export CC="${BASE_COMPILER}/clang ${APP_COMPILER_ARGS}"
                         export CXX="${BASE_COMPILER}/clang++ ${APP_COMPILER_ARGS}"
-                        export CPP="${BASE_COMPILER}/clang-cpp ${APP_COMPILER_ARGS}"
+                        export CPP="${BASE_COMPILER}/clang-cpp"
                         if [ ! -f "${BASE_COMPILER}/clang-cpp" ]; then # fallback for systems with old clang:
-                            export CPP="${BASE_COMPILER}/clang -E ${APP_COMPILER_ARGS}"
+                            export CPP="${BASE_COMPILER}/clang -E"
                         fi
                         ;;
 
