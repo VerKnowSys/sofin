@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-VERSION="0.24.0"
+VERSION="0.24.1"
 
 # load configuration from sofin.conf
 
@@ -12,6 +12,10 @@ if [ -e "${CONF_FILE}" ]; then
 else
     echo "FATAL: No configuration file found: ${CONF_FILE}"
     exit 1
+fi
+
+if [ "${VERBOSE}" = "true" ]; then
+    set -x
 fi
 
 
@@ -696,16 +700,19 @@ for application in ${APPLICATIONS}; do
                 warn "Forcing use of GNU compiler for application: ${APP_NAME}"
                 export CC="/usr/bin/gcc ${APP_COMPILER_ARGS}"
                 export CXX="/usr/bin/g++ ${APP_COMPILER_ARGS}"
-                export CPP="/usr/bin/cpp"
+                export CPP="/usr/bin/cpp ${APP_COMPILER_ARGS}"
             else
-                export CC="/usr/bin/clang ${APP_COMPILER_ARGS}"
-                export CXX="/usr/bin/clang++ ${APP_COMPILER_ARGS}"
-                export CPP="/usr/bin/clang-cpp"
-                case "${SYSTEM_NAME}" in
-                    Darwin|Linux)
-                        export CPP="/usr/bin/clang -E"
-                        ;;
-                esac
+                # look for bundled compiler:
+                BASE_COMPILER="${SOFTWARE_DIR}/Clang/exports"
+                if [ ! -f "${BASE_COMPILER}/clang" ]; then
+                    export BASE_COMPILER="/usr/bin"
+                fi
+                export CC="${BASE_COMPILER}/clang ${APP_COMPILER_ARGS}"
+                export CXX="${BASE_COMPILER}/clang++ ${APP_COMPILER_ARGS}"
+                export CPP="${BASE_COMPILER}/clang-cpp ${APP_COMPILER_ARGS}"
+                if [ ! -f "${BASE_COMPILER}/clang-cpp" ]; then # fallback for systems with old clang:
+                    export CPP="${BASE_COMPILER}/clang -E ${APP_COMPILER_ARGS}"
+                fi
             fi
 
             # if it's supported by definition (it is by default)
