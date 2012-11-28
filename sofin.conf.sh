@@ -73,11 +73,11 @@ SLEEP_BIN="/bin/sleep"
 LOCKFILE_BIN="/usr/bin/lockfile"
 
 
-SYSTEM_NAME="$($($WHICH_BIN) uname)"
+SYSTEM_NAME="$(uname)"
 
 
 # System specific configuration
-case ${SYSTEM_NAME} in
+case "${SYSTEM_NAME}" in
 
     FreeBSD)
         # Default
