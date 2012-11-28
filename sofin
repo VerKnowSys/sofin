@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-VERSION="0.24.2"
+VERSION="0.24.3"
 
 # load configuration from sofin.conf
 
@@ -42,6 +42,36 @@ check_requirements () {
             warn "/usr/local has been found, and contains ${files} file(s)"
         fi
     fi
+}
+
+
+set_c_compiler () {
+    case $1 in
+        GNU)
+            BASE_COMPILER="/usr/bin"
+            export CC="${BASE_COMPILER}/gcc ${APP_COMPILER_ARGS}"
+            export CXX="${BASE_COMPILER}/g++ ${APP_COMPILER_ARGS}"
+            export CPP="${BASE_COMPILER}/cpp"
+            ;;
+
+        CLANG)
+            BASE_COMPILER="${SOFTWARE_DIR}Clang/exports"
+            if [ ! -f "${BASE_COMPILER}/clang" ]; then
+                export BASE_COMPILER="/usr/bin"
+                if [ ! -f "${BASE_COMPILER}/clang" ]; then
+                    set_c_compiler GNU # fallback to gcc on system without any clang version
+                fi
+            fi
+            export CC="${BASE_COMPILER}/clang ${APP_COMPILER_ARGS}"
+            export CXX="${BASE_COMPILER}/clang++ ${APP_COMPILER_ARGS}"
+            export CPP="${BASE_COMPILER}/clang-cpp"
+            if [ ! -f "${BASE_COMPILER}/clang-cpp" ]; then # fallback for systems with old clang:
+                export CPP="${BASE_COMPILER}/clang -E"
+            fi
+            ;;
+
+    esac
+
 }
 
 
@@ -353,10 +383,13 @@ if [ ! "$1" = "" ]; then
         ${PRINTF_BIN} "# MANPATH:\n"
         ${PRINTF_BIN} "export MANPATH='${manpath}'\n\n"
 
+        set_c_compiler CLANG
         ${PRINTF_BIN} "# CC:\n"
-        ${PRINTF_BIN} "export CC='/usr/bin/clang'\n\n"
+        ${PRINTF_BIN} "export CC='${CC}'\n\n"
         ${PRINTF_BIN} "# CXX:\n"
-        ${PRINTF_BIN} "export CXX='/usr/bin/clang++'\n\n"
+        ${PRINTF_BIN} "export CXX='${CXX}'\n\n"
+        ${PRINTF_BIN} "# CPP:\n"
+        ${PRINTF_BIN} "export CPP='${CPP}'\n\n"
         exit
         ;;
 
@@ -696,34 +729,6 @@ for application in ${APPLICATIONS}; do
             . ${DEFAULTS}
             . ${req_definition_file}
 
-            set_c_compiler () {
-                case $1 in
-                    GNU)
-                        BASE_COMPILER="/usr/bin"
-                        export CC="${BASE_COMPILER}/gcc ${APP_COMPILER_ARGS}"
-                        export CXX="${BASE_COMPILER}/g++ ${APP_COMPILER_ARGS}"
-                        export CPP="${BASE_COMPILER}/cpp"
-                        ;;
-
-                    CLANG)
-                        BASE_COMPILER="${SOFTWARE_DIR}Clang/exports"
-                        if [ ! -f "${BASE_COMPILER}/clang" ]; then
-                            export BASE_COMPILER="/usr/bin"
-                            if [ ! -f "${BASE_COMPILER}/clang" ]; then
-                                set_c_compiler GNU # fallback to gcc on system without any clang version
-                            fi
-                        fi
-                        export CC="${BASE_COMPILER}/clang ${APP_COMPILER_ARGS}"
-                        export CXX="${BASE_COMPILER}/clang++ ${APP_COMPILER_ARGS}"
-                        export CPP="${BASE_COMPILER}/clang-cpp"
-                        if [ ! -f "${BASE_COMPILER}/clang-cpp" ]; then # fallback for systems with old clang:
-                            export CPP="${BASE_COMPILER}/clang -E"
-                        fi
-                        ;;
-
-                esac
-
-            }
             # force GNU compiler usage on definition side:
             if [ ! -z "${FORCE_GNU_COMPILER}" ]; then
                 warn "Forcing use of GNU compiler for application: ${APP_NAME}"
