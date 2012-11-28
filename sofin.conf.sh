@@ -92,7 +92,7 @@ case ${SYSTEM_NAME} in
         ;;
 
     Linux)
-        export FETCH_BIN="/usr/bin/curl"
+        export FETCH_BIN="/usr/bin/curl -O"
         export UNAME_BIN="/bin/uname"
         export SHA_BIN="/usr/bin/shasum"
         export SED_BIN="/bin/sed"
