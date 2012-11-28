@@ -2,11 +2,11 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-VERSION="0.22.3"
+VERSION="0.24.0"
 
 # load configuration from sofin.conf
 
-CONF_FILE="/etc/sofin.conf"
+CONF_FILE="/etc/sofin.conf.sh"
 if [ -e "${CONF_FILE}" ]; then
     . "${CONF_FILE}"
 else
@@ -701,9 +701,11 @@ for application in ${APPLICATIONS}; do
                 export CC="/usr/bin/clang ${APP_COMPILER_ARGS}"
                 export CXX="/usr/bin/clang++ ${APP_COMPILER_ARGS}"
                 export CPP="/usr/bin/clang-cpp"
-                if [ "${SYSTEM_NAME}" = "Darwin" ]; then
-                    export CPP="/usr/bin/clang -E"
-                fi
+                case "${SYSTEM_NAME}" in
+                    Darwin|Linux)
+                        export CPP="/usr/bin/clang -E"
+                        ;;
+                esac
             fi
 
             # if it's supported by definition (it is by default)
@@ -765,24 +767,29 @@ for application in ${APPLICATIONS}; do
                         debug "Already fetched. Using tarball from cache"
                     fi
 
-                    file="$(${BASENAME_BIN} $($FIND_BIN ${BUILD_DIR} -depth 1 -type f))"
+                    FIND_RESULT="${FIND_BIN} ${BUILD_DIR} -maxdepth 1 -type f"
+                    debug "Build dir: ${BUILD_DIR}, find result: ${FIND_RESULT}"
+                    file="$(${BASENAME_BIN} $(${FIND_RESULT}))"
                     if [ "${APP_SHA}" = "" ]; then
                         error "-> Missing SHA sum for source: ${file}."
                         exit_locked
                     else
-                        if [ "${SYSTEM_NAME}" = "Darwin" ]; then
-                            export cur="$(${SHA_BIN} ${file} | ${AWK_BIN} '{print $1}')"
-                        fi
-                        if [ "${SYSTEM_NAME}" = "FreeBSD" ]; then
-                            export cur="$(${SHA_BIN} -q ${file})"
-                        fi
+                        case "${SYSTEM_NAME}" in
+                            Darwin|Linux)
+                                export cur="$(${SHA_BIN} ${file} | ${AWK_BIN} '{print $1}')"
+                                ;;
+
+                            FreeBSD)
+                                export cur="$(${SHA_BIN} -q ${file})"
+                                ;;
+                        esac
                         if [ "${cur}" = "${APP_SHA}" ]; then
                             debug "-> SHA sum match in file: ${file}"
                         else
                             error "-> ${cur} vs ${APP_SHA}"
                             error "-> SHA sum mismatch. Removing corrupted file from cache: ${file}, and retrying."
                             # remove corrupted file
-                            $($FIND_BIN ${BUILD_DIR} -depth 1 -type f -name ${file} | ${XARGS_BIN} ${RM_BIN})
+                            $($FIND_BIN ${BUILD_DIR} -maxdepth 1 -type f -name ${file} | ${XARGS_BIN} ${RM_BIN})
                             # remove lock
                             if [ -e "${LOCK_FILE}" ]; then
                                 debug "Removing lock file: ${LOCK_FILE}"
@@ -800,10 +807,11 @@ for application in ${APPLICATIONS}; do
                     debug "Entrering ${APP_LOC}"
                     run "${TAR_BIN} xf ${APP_LOC}*"
 
-                    buildDirCore=$(${FIND_BIN} ${BUILD_DIR} -name "*${APP_VERSION}*" -type d -depth 1)
+                    buildDirCore="$(${FIND_BIN} ${BUILD_DIR}/* -maxdepth 0 -type d -name "*${APP_VERSION}*")"
+                    debug "BuildDirCore: ${buildDirCore}"
                     debug "Build Dir Core before: '${buildDirCore}'"
                     if [ "${buildDirCore}" = "" ]; then
-                        export buildDirCore=$(${FIND_BIN} ${BUILD_DIR} -type d -depth 1) # try any dir instead
+                        export buildDirCore=$(${FIND_BIN} ${BUILD_DIR} -maxdepth 1 -type d) # try any dir instead
                     fi
                     debug "Build Dir Core after: '${buildDirCore}'"
                     for dir in ${buildDirCore}; do
