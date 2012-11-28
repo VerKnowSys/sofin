@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 # global Sofin settings:
 
-DEBUG="false"
+DEBUG="true"
 # DEVEL="true"
 
 ID_SVD="-u" # NOTE: use "-un" for standard FreeBSD systems with users defined in /etc/passwd
@@ -71,10 +71,42 @@ AWK_BIN="/usr/bin/awk"
 SLEEP_BIN="/bin/sleep"
 LOCKFILE_BIN="/usr/bin/lockfile"
 
+
+SYSTEM_NAME="$($($WHICH_BIN) uname)"
+
+
+# System specific configuration
+case ${SYSTEM_NAME} in
+
+    FreeBSD)
+        # Default
+        ;;
+
+    Darwin)
+        # OSX specific configuration
+        export FETCH_BIN="/usr/bin/curl -O"
+        export PATCH_BIN="/usr/bin/patch -p0 "
+        export DEFAULT_LDFLAGS="-fPIC -arch x86_64" # fPIE isn't well supported on OSX, but it's not production anyway
+        export DEFAULT_COMPILER_FLAGS="-Os -fPIC -fno-strict-overflow -fstack-protector-all -arch x86_64"
+        export SHA_BIN="/usr/bin/shasum"
+        ;;
+
+    Linux)
+        export FETCH_BIN="/usr/bin/curl"
+        export UNAME_BIN="/bin/uname"
+        export SHA_BIN="/usr/bin/shasum"
+        export SED_BIN="/bin/sed"
+        export TAR_BIN="/bin/tar"
+        export LOCKFILE_BIN="true"
+        ;;
+
+
+esac
+
+
 DEFAULT_PAUSE_WHEN_LOCKED="30" # seconds
 MAIN_SOURCE_REPOSITORY="http://software.verknowsys.com/source/"
 MAIN_BINARY_REPOSITORY="http://software.verknowsys.com/binary/$(${UNAME_BIN})/common/"
-SYSTEM_NAME="$($UNAME_BIN)"
 
 CCACHE_BIN="/Software/Ccache/exports/ccache"
 
@@ -88,16 +120,6 @@ cyan='\033[36;40m'
 gray='\033[37;40m'
 white='\033[38;40m'
 reset='\033[0m'
-
-
-# OSX specific configuration
-if [ "$(uname)" = "Darwin" ]; then
-export FETCH_BIN="/usr/bin/curl -O"
-export PATCH_BIN="/usr/bin/patch -p0 "
-export DEFAULT_LDFLAGS="-fPIC -arch x86_64" # fPIE isn't well supported on OSX, but it's not production anyway
-export DEFAULT_COMPILER_FLAGS="-Os -fPIC -fno-strict-overflow -fstack-protector-all -arch x86_64"
-export SHA_BIN="/usr/bin/shasum"
-fi
 
 
 # common functions
@@ -156,13 +178,16 @@ check_root () {
 
 
 check_os () {
-    case "$(${UNAME_BIN})" in
+    case "${SYSTEM_NAME}" in
         FreeBSD)
             # note "Running on FreeBSD host"
             ;;
 
         Darwin)
             # note "Running on OSX/Darwin host"
+            ;;
+
+        Linux)
             ;;
 
         *)
