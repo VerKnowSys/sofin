@@ -1,3 +1,4 @@
+DISABLE_ON="Darwin"
 APP_FULL_NAME="Clang LLVM Compiler"
 APP_SHA="0c6a114bc73321d718f11b17f1823d38f5fa91b6"
 APP_NAME="clang"
