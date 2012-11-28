@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-VERSION="0.24.3"
+VERSION="0.24.4"
 
 # load configuration from sofin.conf
 
@@ -65,7 +65,7 @@ set_c_compiler () {
             export CC="${BASE_COMPILER}/clang ${APP_COMPILER_ARGS}"
             export CXX="${BASE_COMPILER}/clang++ ${APP_COMPILER_ARGS}"
             export CPP="${BASE_COMPILER}/clang-cpp"
-            if [ ! -f "${BASE_COMPILER}/clang-cpp" ]; then # fallback for systems with old clang:
+            if [ ! -x "${CPP}" ]; then # fallback for systems with old clang:
                 export CPP="${BASE_COMPILER}/clang -E"
             fi
             ;;
@@ -838,10 +838,9 @@ for application in ${APPLICATIONS}; do
                     run "${TAR_BIN} xf ${APP_LOC}*"
 
                     buildDirCore="$(${FIND_BIN} ${BUILD_DIR}/* -maxdepth 0 -type d -name "*${APP_VERSION}*")"
-                    debug "BuildDirCore: ${buildDirCore}"
                     debug "Build Dir Core before: '${buildDirCore}'"
                     if [ "${buildDirCore}" = "" ]; then
-                        export buildDirCore=$(${FIND_BIN} ${BUILD_DIR} -maxdepth 1 -type d) # try any dir instead
+                        export buildDirCore=$(${FIND_BIN} ${BUILD_DIR}/* -maxdepth 0 -type d) # try any dir instead
                     fi
                     debug "Build Dir Core after: '${buildDirCore}'"
                     for dir in ${buildDirCore}; do
