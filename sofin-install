@@ -3,7 +3,7 @@
 
 
 # load configuration from sofin.conf
-CONF_FILE="./sofin.conf"
+CONF_FILE="./sofin.conf.sh"
 if [ -e "${CONF_FILE}" ]; then
     . "${CONF_FILE}"
 else
@@ -11,38 +11,37 @@ else
     exit 1
 fi
 
+
+install_base () {
+    ${RM_BIN} -rf "/usr/bin/sofin"
+    ${LN_BIN} -vs "$($PWD_BIN)/sofin" /usr/bin/sofin
+    check_command_result $?
+
+    ${RM_BIN} -rf "/etc/${CONF_FILE}"
+    ${LN_BIN} -vs "$($PWD_BIN)/${CONF_FILE}" "/etc/${CONF_FILE}"
+    check_command_result $?
+
+    ${MKDIR_BIN} -p /Software/.cache
+    note "Installation succeeded."
+}
+
+
+note "${SYSTEM_NAME} installation"
 case "${SYSTEM_NAME}" in
+
   Darwin)
-    note "Darwin installation"
-    if [ ! -e "/usr/bin/sofin" ]; then
-      sudo ${LN_BIN} -vs "$($PWD_BIN)/sofin" /usr/bin/sofin 2> /dev/null
-      check_command_result $?
-    fi
-    if [ ! -e "/etc/sofin.conf" ]; then
-      sudo ${LN_BIN} -vs "$($PWD_BIN)/sofin.conf" /etc/sofin.conf 2> /dev/null
-      check_command_result $?
-    fi
+
     if [ ! -e "${HOME}/.profile" ]; then
       ${LN_BIN} -vs "/Users/$(${ID_BIN} -u)/.profile" "${HOME}/.profile"
       check_command_result $?
     fi
-    sudo ${MKDIR_BIN} -p /Software/.cache
-    note "Done"
+    install_base
     ;;
 
-  FreeBSD)
+  FreeBSD|Linux)
+
     check_root
-    note "FreeBSD installation"
-    if [ ! -e "/usr/bin/sofin" ]; then
-      ${LN_BIN} -vs "$($PWD_BIN)/sofin" /usr/bin/sofin
-      check_command_result $?
-    fi
-    if [ ! -e "/etc/sofin.conf" ]; then
-      ${LN_BIN} -vs "$($PWD_BIN)/sofin.conf" /etc/sofin.conf
-      check_command_result $?
-    fi
-    ${MKDIR_BIN} -p /Software/.cache
-    note "Done"
+    install_base
     ;;
 
   *)
