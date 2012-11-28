@@ -26,7 +26,7 @@ customizable software for FreeBSD servers. Darwin (Mac OS X) support started wit
 * Sofin is designed to not touch any part of system. The only exception is /etc/profile_sofin created after system wide software installation (/Software/) in ServeD system.
 * By default Sofin verbosity is limited to minimum. More detailed information is written to LOG file (located in /Software/.cache/install.log by default or /Users/USER_NAME/.cache/install.log)
 * Exports. Each app has own ROOT_DIR/exports/ with symlinks to exported software. Exported software are just simple symlinks used to generate PATH environment variable.
-* Sofin has own configuration file: [sofin.conf](https://github.com/VerKnowSys/sofin/blob/master/sofin.conf) which is SH script itself.
+* Sofin has own configuration file: [sofin.conf.sh](https://github.com/VerKnowSys/sofin/blob/master/sofin.conf.sh) which is SH script itself.
 
 
 ## Examples:
@@ -101,9 +101,10 @@ space than it does with "old fasioned, system wide, shared software".
 
 * Darwin/ Mac OS X specific:
         1. Install Mac OS X 10.8.
-        2. Run "cd /var && git pull git://github.com/VerKnowSys/sofin.git && cd ./sofin && ./sofin-install" as root. It will put "sofin" in /usr/bin/ and sofin.conf.sh in /etc/.
-        3. Build core software. Run "sudo sofin install base".
-        4. Start using sofin as regular user. Set your environment to source "/etc/profile_sofin" for your user environments.
+        2. Install [XQuartz](http://xquartz.macosforge.org/landing/)
+        3. Run "git pull git://github.com/VerKnowSys/sofin.git && cd ./sofin && sudo ./sofin-install". It will put "sofin" in /usr/bin/ and sofin.conf.sh in /etc/.
+        4. Build core software. Run "sudo sofin install base".
+        5. Start using sofin as regular user. Set your environment to source "/etc/profile_sofin" for your user environments.
 
 * Linux specific:
         1. Install base 64bit system - I used 64bit Debian "wheezy" netinstall iso here.
