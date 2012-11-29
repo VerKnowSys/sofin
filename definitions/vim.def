@@ -8,3 +8,5 @@ APP_CONFIGURE_ARGS="--enable-gui=no --without-x --enable-multibyte --disable-per
 APP_REQUIREMENTS="libiconv"
 APP_AFTER_INSTALL_CALLBACK="${PRINTF_BIN} \"set nocompatible\n\" >> $HOME/.vimrc"
 APP_EXPORTS="vim"
+APP_MAKE_METHOD="make -s"
+APP_INSTALL_METHOD="make -s install"
