@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 # global Sofin settings:
 
-DEBUG="true"
+DEBUG="false"
 VERBOSE="false"
 # DEVEL="true"
 
