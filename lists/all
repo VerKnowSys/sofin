@@ -8,6 +8,8 @@ dhcpd
 gd
 ghostscript
 git
+gpgme
+gnupg
 graphicsmagick
 imagemagick
 jruby
