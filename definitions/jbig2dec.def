@@ -1,4 +1,3 @@
-DISABLE_ON="Darwin"
 APP_FULL_NAME="jbig2dec - decoder implementation of the JBIG2 image compression format"
 APP_SHA="349cd765616db7aac1f4dd1d45957d1da65ea925"
 APP_NAME="jbig2dec"
