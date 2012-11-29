@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-VERSION="0.26.1"
+VERSION="0.26.2"
 
 # load configuration from sofin.conf
 
@@ -985,18 +985,43 @@ for application in ${APPLICATIONS}; do
             ${PRINTF_BIN} "${APP_VERSION}" > "${PREFIX}/${application}${INSTALLED_MARK}"
         }
 
+        strip_lib_bin () {
+            if [ -z "${DEVEL}" ]; then
+                note "-> Stripping all libraries…"
+                for elem in $(${FIND_BIN} ${PREFIX} -name '*.so'); do
+                    debug "Stripping: ${elem}"
+                    "${STRIP_BIN}" -sv "${elem}" >> ${LOG} 2>> ${LOG}
+                done
+                note "-> Stripping all binaries…"
+                for elem in "/bin/" "/sbin/" "/libexec/"; do
+                    if [ -d "${PREFIX}${elem}" ]; then
+                        for e in $(${FIND_BIN} ${PREFIX}${elem}); do
+                            if [ -f "${e}" ]; then
+                                debug "Stripping: ${e}"
+                                "${STRIP_BIN}" -s "${e}" >> ${LOG} 2>> ${LOG}
+                            fi
+                        done
+                    fi
+                done
+            else
+                warn "Debug mode enabled. Omitting binary/library strip…"
+            fi
+        }
+
         if [ -e "${PREFIX}/${application}${INSTALLED_MARK}" ]; then
             if [ "${CHANGED}" = "true" ]; then
                 note "-> At least one of app dependencies has been changed. Forced rebuild of application…"
                 execute_process "${application}"
                 unset CHANGED
                 mark
+                strip_lib_bin
             else
                 note "-> ${application} is marked as already installed."
             fi
         else
             execute_process "${application}"
             mark
+            strip_lib_bin
         fi
 
         . ${DEFINITIONS_DIR}${application}.def
@@ -1015,27 +1040,6 @@ for application in ${APPLICATIONS}; do
             done
         done
         note "Exporting binaries:${EXPORT_LIST}"
-
-        if [ -z "${DEVEL}" ]; then
-            note "-> Stripping all libraries…"
-            for elem in $(${FIND_BIN} ${PREFIX} -name '*.so'); do
-                debug "Stripping: ${elem}"
-                "${STRIP_BIN}" -sv "${elem}" >> ${LOG} 2>> ${LOG}
-            done
-            note "-> Stripping all binaries…"
-            for elem in "/bin/" "/sbin/" "/libexec/"; do
-                if [ -d "${PREFIX}${elem}" ]; then
-                    for e in $(${FIND_BIN} ${PREFIX}${elem}); do
-                        if [ -f "${e}" ]; then
-                            debug "Stripping: ${e}"
-                            "${STRIP_BIN}" -s "${e}" >> ${LOG} 2>> ${LOG}
-                        fi
-                    done
-                fi
-            done
-        else
-            warn "Debug mode enabled. Omitting binary/library strip…"
-        fi
 
         if [ ! -z "${USER_UID}" ]; then
             if [ "$(${ID_BIN} -u)" = "0" ]; then
