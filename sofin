@@ -963,6 +963,8 @@ for application in ${APPLICATIONS}; do
         }
 
         debug "Installing app requirements: ${APP_REQUIREMENTS}"
+        req_amount="$(${PRINTF_BIN} "${APP_REQUIREMENTS}" | ${WC_BIN} -w | ${AWK_BIN} '{print $1+1}')"
+        note "Starting process step 1 of ${req_amount}"
         for req in ${APP_REQUIREMENTS}; do
             if [ -z "${req}" ]; then
                 note "No requirements required. Skipping…"
