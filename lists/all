@@ -13,6 +13,7 @@ imagemagick
 jruby
 make
 maven
+memcached
 mc
 mercurial
 mongodb
