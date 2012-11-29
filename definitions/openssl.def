@@ -11,3 +11,4 @@ export APP_CONFIGURE_ARGS="darwin64-x86_64-cc"
 fi
 APP_REQUIREMENTS="bzip2 perl"
 APP_EXPORTS="openssl"
+APP_MAKE_METHOD="make -s"
