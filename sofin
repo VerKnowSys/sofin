@@ -988,7 +988,7 @@ for application in ${APPLICATIONS}; do
         strip_lib_bin () {
             if [ -z "${DEVEL}" ]; then
                 note "-> Stripping all libraries…"
-                for elem in $(${FIND_BIN} ${PREFIX} -name '*.so'); do
+                for elem in $(${FIND_BIN} ${PREFIX} -name '*.so' -o -name '*.dylib'); do
                     debug "Stripping: ${elem}"
                     "${STRIP_BIN}" -sv "${elem}" >> ${LOG} 2>> ${LOG}
                 done
