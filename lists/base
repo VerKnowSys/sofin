@@ -8,3 +8,10 @@ openssh
 subversion
 zsh
 vim
+openjdk7_amd64
+openjdk7_i386
+openjdk6_amd64
+openjdk6_i386
+pstree
+tig
+tmux
