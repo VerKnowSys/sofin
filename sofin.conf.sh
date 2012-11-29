@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 # global Sofin settings:
 
-DEBUG="false"
+DEBUG="true"
 VERBOSE="false"
 # DEVEL="true"
 
@@ -32,7 +32,8 @@ SOFIN_PROFILE="/etc/profile_sofin"
 DEPENDENCIES_FILE=".dependencies"
 INSTALLED_MARK=".installed"
 LOG_LINES_AMOUNT="150"
-MAKE_OPTS=""
+
+MAKE_OPTS="-j4"
 
 # config binary requirements definitions
 XARGS_BIN="/usr/bin/xargs"
@@ -71,6 +72,7 @@ SHA_BIN="/sbin/sha1"
 AWK_BIN="/usr/bin/awk"
 SLEEP_BIN="/bin/sleep"
 LOCKFILE_BIN="/usr/bin/lockfile"
+SYSCTL_BIN="/sbin/sysctl"
 
 
 SYSTEM_NAME="$(uname)"
@@ -81,6 +83,8 @@ case "${SYSTEM_NAME}" in
 
     FreeBSD)
         # Default
+        cpus="$(${SYSCTL_BIN} -a | ${GREP_BIN} kern.smp.cpus: | ${AWK_BIN} '{printf $2}')"
+        export MAKE_OPTS="-j${cpus}"
         ;;
 
     Darwin)
@@ -90,6 +94,9 @@ case "${SYSTEM_NAME}" in
         export DEFAULT_LDFLAGS="-fPIC -arch x86_64" # fPIE isn't well supported on OSX, but it's not production anyway
         export DEFAULT_COMPILER_FLAGS="-Os -fPIC -fno-strict-overflow -fstack-protector-all -arch x86_64"
         export SHA_BIN="/usr/bin/shasum"
+        export SYSCTL_BIN="/usr/sbin/sysctl"
+        cpus=$(${SYSCTL_BIN} -a | ${GREP_BIN} cpu.core_count: | ${AWK_BIN} '{printf $2}')
+        export MAKE_OPTS="-j${cpus}"
         ;;
 
     Linux)
