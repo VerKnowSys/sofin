@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-VERSION="0.24.5"
+VERSION="0.26.0"
 
 # load configuration from sofin.conf
 
@@ -855,9 +855,19 @@ for application in ${APPLICATIONS}; do
                         if [ -d "${LIST_DIR}" ]; then
                             if [ "$1" = "${APP_NAME}" ]; then # apply patch only when application/requirement for which patch is designed for
                                 note "-> Applying patches for application: ${APP_NAME}"
+
                                 for patch in ${LIST_DIR}/*; do
-                                    debug "Patching source code with patch: ${patch}"
-                                    run "${PATCH_BIN} -i ${patch}"
+                                    pspatch_dir="${patch}/${SYSTEM_NAME}"
+                                    if [ -d ${pspatch_dir} ]; then
+                                        debug "Proceeding with Platform Specific Patches"
+                                        for platform_specific_patch in ${pspatch_dir}/*; do
+                                            debug "Patching source code with pspatch: ${platform_specific_patch}"
+                                            run "${PATCH_BIN} -i ${platform_specific_patch}"
+                                        done
+                                    elif [ -f ${patch} ]; then
+                                        debug "Patching source code with patch: ${patch}"
+                                        run "${PATCH_BIN} -i ${patch}"
+                                    fi
                                 done
                             fi
                         fi
