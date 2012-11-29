@@ -109,7 +109,7 @@ space than it does with "old fasioned, system wide, shared software".
 * Linux specific:
         1. Install base 64bit system - I used 64bit Debian "wheezy" netinstall iso here.
         2. Run as root: apt-get install time clang gcc g++ make bzip2 curl - They're required only to compile base software. The most important thing is to have clang with version at least 3.0 already installed in system.
-        3. Run as root: "curl https://github.com/VerKnowSys/sofin/archive/master.tar.gz | tar xf - && cd ./sofin-master && ./sofin-install". It will put "sofin" into /usr/bin/ and sofin.conf.sh into /etc/.
+        3. Run as root: "curl -L https://github.com/VerKnowSys/sofin/archive/master.tar.gz | tar xf - && cd ./sofin-master && ./sofin-install". It will put "sofin" into /usr/bin/ and sofin.conf.sh into /etc/.
         4. Build core software. Run as root: "sofin install base".
         5. Start using sofin as regular user. Set your environment to source "/etc/profile_sofin" for your user environments.
 
