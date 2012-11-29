@@ -1,3 +1,4 @@
+DISABLE_ON="Darwin Linux"
 APP_FULL_NAME="OpenJDK 1.7 64bit"
 APP_SHA="773cadc9c97c0545f26b849a69f18fe72f49b78c"
 APP_NAME="Openjdk7-amd64"

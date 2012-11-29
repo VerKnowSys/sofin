@@ -1,3 +1,4 @@
+DISABLE_ON="Darwin Linux"
 APP_FULL_NAME="OpenJDK 1.6 32bit"
 APP_SHA="9bcf53e1cf2d55876b7edf1bbf51e972d7f4a770"
 APP_NAME="Openjdk6-i386"
