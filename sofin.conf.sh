@@ -101,6 +101,7 @@ case "${SYSTEM_NAME}" in
 
     Linux)
         export FETCH_BIN="/usr/bin/curl -O"
+        export PATCH_BIN="/usr/bin/patch -p0 "
         export UNAME_BIN="/bin/uname"
         export SHA_BIN="/usr/bin/shasum"
         export SED_BIN="/bin/sed"
