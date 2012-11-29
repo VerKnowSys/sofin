@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-VERSION="0.24.4"
+VERSION="0.24.5"
 
 # load configuration from sofin.conf
 

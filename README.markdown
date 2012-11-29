@@ -27,6 +27,7 @@ customizable software for FreeBSD servers. Darwin (Mac OS X) support started wit
 * By default Sofin verbosity is limited to minimum. More detailed information is written to LOG file (located in /Software/.cache/install.log by default or /Users/USER_NAME/.cache/install.log)
 * Exports. Each app has own ROOT_DIR/exports/ with symlinks to exported software. Exported software are just simple symlinks used to generate PATH environment variable.
 * Sofin has own configuration file: [sofin.conf.sh](https://github.com/VerKnowSys/sofin/blob/master/sofin.conf.sh) which is SH script itself.
+* Supports parallel builds by default (from version 0.24.5)
 
 
 ## Examples:
