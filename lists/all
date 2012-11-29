@@ -37,6 +37,7 @@ rtorrent
 ruby
 scala
 scons
+sox
 tmux
 transmission
 weechat
