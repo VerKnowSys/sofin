@@ -967,7 +967,7 @@ for application in ${APPLICATIONS}; do
         export req_all="$(${PRINTF_BIN} "${req_amount} - 1\n" | ${BC_BIN})"
         debug "Starting process step 1 of ${req_amount}"
         for req in ${APP_REQUIREMENTS}; do
-            export req_amount="$(${PRINTF_BIN} "${req_amount} - 1\n" | ${BC_BIN} -s)"
+            export req_amount="$(${PRINTF_BIN} "${req_amount} - 1\n" | ${BC_BIN})"
             if [ -z "${req}" ]; then
                 note "No requirements required. Skipping…"
                 break
