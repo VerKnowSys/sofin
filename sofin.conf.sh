@@ -154,12 +154,12 @@ debug () {
 
 
 warn () {
-    cecho " ! $1" ${yellow}
+    cecho " » $1" ${yellow}
 }
 
 
 note () {
-    cecho " * $1" ${green}
+    cecho " • $1" ${green}
 }
 
 
