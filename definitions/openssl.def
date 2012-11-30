@@ -12,3 +12,4 @@ fi
 APP_REQUIREMENTS="bzip2 perl"
 APP_EXPORTS="openssl"
 APP_MAKE_METHOD="make -s"
+APP_INSTALL_METHOD="make -s install"
