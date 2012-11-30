@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-VERSION="0.26.8"
+VERSION="0.26.9"
 
 # load configuration from sofin.conf
 
@@ -977,6 +977,9 @@ for application in ${APPLICATIONS}; do
         export req_all="${req_amount}"
         export req_amount="$(${PRINTF_BIN} "${req_amount} + 1\n" | ${BC_BIN})"
         for req in ${APP_REQUIREMENTS}; do
+            if [ ! "${APP_USER_INFO}" = "" ]; then
+                warn "${APP_USER_INFO}"
+            fi
             export req_amount="$(${PRINTF_BIN} "${req_amount} - 1\n" | ${BC_BIN})"
             if [ -z "${req}" ]; then
                 note "  No requirements required."
