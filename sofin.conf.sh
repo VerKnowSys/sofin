@@ -215,14 +215,12 @@ check_os () {
 
 # validate environment availability or crash
 validate_env () {
-    debug "Checking availability of all binaries"
     list="$(set | ${GREP_BIN} '_BIN=/')"
     for envvar in ${list}; do
         var_name="$(${PRINTF_BIN} "${envvar}" | ${SED_BIN} -e 's/=.*//g')"
         var_value="$(${PRINTF_BIN} "${envvar}" | ${SED_BIN} -e 's/.*=//g')"
-        debug "Checking variable: ${var_name} with value: ${var_value}"
         if [ ! -x "${var_value}" ]; then
-            warn "Unavailable binary required by ${SCRIPT_NAME}: ${envvar}"
+            error "Unavailable binary required by ${SCRIPT_NAME}: ${envvar}"
         fi
     done
 }
