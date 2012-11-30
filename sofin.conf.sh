@@ -224,6 +224,3 @@ validate_env () {
         fi
     done
 }
-
-
-validate_env

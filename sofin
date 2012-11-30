@@ -9,6 +9,7 @@ VERSION="0.26.6"
 CONF_FILE="/etc/sofin.conf.sh"
 if [ -e "${CONF_FILE}" ]; then
     . "${CONF_FILE}"
+    validate_env
 else
     echo "FATAL: No configuration file found: ${CONF_FILE}"
     exit 1
@@ -104,7 +105,7 @@ update_definitions () { # accepts optional user uid param
     cd "${CACHE_DIR}"
     debug "Working in cache dir: ${CACHE_DIR}"
     note "${HEADER}"
-    ${PRINTF_BIN} "\n"
+    ${PRINTF_BIN} "${reset}\n"
     debug "Updating definitions snapshot from: ${MAIN_SOURCE_REPOSITORY}definitions/${DEFINITION_SNAPSHOT_FILE}"
     ${FETCH_BIN} "${MAIN_SOURCE_REPOSITORY}definitions/${DEFINITION_SNAPSHOT_FILE}" >> "${LOG}" 2>> "${LOG}"
     ${TAR_BIN} ${tar_options} "${DEFINITION_SNAPSHOT_FILE}" >> "${LOG}" 2>> "${LOG}"
@@ -963,12 +964,11 @@ for application in ${APPLICATIONS}; do
             fi
         }
 
-        debug "Installing app requirements: ${APP_REQUIREMENTS}"
+        note "Installing ${application} requirements: ${APP_REQUIREMENTS}"
         export req_amount="$(${PRINTF_BIN} "${APP_REQUIREMENTS}" | ${WC_BIN} -w | ${AWK_BIN} '{print $1}')"
         # export req_all="${req_amount}"
         export req_all="${req_amount}"
         export req_amount="$(${PRINTF_BIN} "${req_amount} + 1\n" | ${BC_BIN})"
-        debug "Starting process step 1 of ${req_amount}"
         for req in ${APP_REQUIREMENTS}; do
             export req_amount="$(${PRINTF_BIN} "${req_amount} - 1\n" | ${BC_BIN})"
             if [ -z "${req}" ]; then
