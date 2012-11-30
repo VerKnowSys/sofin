@@ -892,7 +892,7 @@ for application in ${APPLICATIONS}; do
                             debug "DYLD_LIBRARY_PATH: ${DYLD_LIBRARY_PATH}"
                         fi
 
-                        note "   → Configuring requirement: $1 with version: ${APP_VERSION}"
+                        note "   → Configuring: $1, version: ${APP_VERSION}"
                         case ${APP_CONFIGURE_SCRIPT} in
 
                             ignore)
