@@ -793,7 +793,7 @@ for application in ${APPLICATIONS}; do
                         fi
                     done
                     if [ ! -e ${BUILD_DIR}${APP_NAME}*${APP_HTTP_PATH##*.} ]; then
-                        note "→ Fetching requirement source from: ${APP_HTTP_PATH}"
+                        note "   → Fetching requirement source from: ${APP_HTTP_PATH}"
                         run "${FETCH_BIN} ${APP_HTTP_PATH}"
                     else
                         debug "Already fetched. Using tarball from cache"
