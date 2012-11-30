@@ -1,3 +1,4 @@
+DISABLE_ON="Linux"
 APP_FULL_NAME="MongoDB - NoSQL database"
 APP_NAME="mongodb"
 APP_SHA="0e2e042b6adf813733894b02ea8610e91ffa484f"
