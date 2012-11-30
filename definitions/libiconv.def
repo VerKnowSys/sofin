@@ -1,4 +1,4 @@
-# DISABLE_ON="Darwin"
+DISABLE_ON="Linux"
 APP_FULL_NAME="Iconv Library"
 APP_SHA="be7d67e50d72ff067b2c0291311bc283add36965"
 APP_NAME="libiconv"
