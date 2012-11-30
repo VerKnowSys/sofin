@@ -102,7 +102,7 @@ case "${SYSTEM_NAME}" in
         ;;
 
     Linux)
-        export FETCH_BIN="/usr/bin/wget"
+        export FETCH_BIN="/usr/bin/wget -N"
         export PATCH_BIN="/usr/bin/patch -p0 "
         export UNAME_BIN="/bin/uname"
         export KLDLOAD_BIN="/sbin/modprobe"
