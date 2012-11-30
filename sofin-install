@@ -14,11 +14,11 @@ fi
 
 install_base () {
     ${RM_BIN} -rf "/usr/bin/sofin"
-    ${LN_BIN} -vs "$($PWD_BIN)/sofin" /usr/bin/sofin
+    ${LN_BIN} -s "$($PWD_BIN)/sofin" /usr/bin/sofin
     check_command_result $?
 
     ${RM_BIN} -rf "/etc/${CONF_FILE}"
-    ${LN_BIN} -vs "$($PWD_BIN)/${CONF_FILE}" "/etc/${CONF_FILE}"
+    ${LN_BIN} -s "$($PWD_BIN)/${CONF_FILE}" "/etc/${CONF_FILE}"
     check_command_result $?
 
     ${MKDIR_BIN} -p /Software/.cache
@@ -30,16 +30,14 @@ note "${SYSTEM_NAME} installation"
 case "${SYSTEM_NAME}" in
 
   Darwin)
-
     if [ ! -e "${HOME}/.profile" ]; then
-      ${LN_BIN} -vs "/Users/$(${ID_BIN} -u)/.profile" "${HOME}/.profile"
+      ${LN_BIN} -s "/Users/$(${ID_BIN} -u)/.profile" "${HOME}/.profile"
       check_command_result $?
     fi
     install_base
     ;;
 
   FreeBSD|Linux)
-
     check_root
     install_base
     ;;
