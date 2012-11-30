@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-VERSION="0.26.2"
+VERSION="0.26.4"
 
 # load configuration from sofin.conf
 
@@ -105,7 +105,7 @@ update_definitions () { # accepts optional user uid param
     debug "Working in cache dir: ${CACHE_DIR}"
     note "${HEADER}"
     note
-    note "Updating definitions snapshot from: ${MAIN_SOURCE_REPOSITORY}definitions/${DEFINITION_SNAPSHOT_FILE}"
+    debug "Updating definitions snapshot from: ${MAIN_SOURCE_REPOSITORY}definitions/${DEFINITION_SNAPSHOT_FILE}"
     ${FETCH_BIN} "${MAIN_SOURCE_REPOSITORY}definitions/${DEFINITION_SNAPSHOT_FILE}" >> "${LOG}" 2>> "${LOG}"
     ${TAR_BIN} ${tar_options} "${DEFINITION_SNAPSHOT_FILE}" >> "${LOG}" 2>> "${LOG}"
     if [ "$(${ID_BIN} -u)" = "0" ]; then
@@ -189,10 +189,10 @@ exit_locked () {
 update_shell_vars () {
     USER_UID="$(${ID_BIN} ${ID_SVD})"
     if [ "$(${ID_BIN} -u)" = "0" ]; then
-        note "Updating ${SOFIN_PROFILE} settings…"
+        debug "Updating ${SOFIN_PROFILE} settings…"
         ${PRINTF_BIN} "$(${SCRIPT_NAME} getshellvars)" > ${SOFIN_PROFILE}
     else
-        note "Updating ${HOME_DIR}${USER_UID}/.profile settings…"
+        debug "Updating ${HOME_DIR}${USER_UID}/.profile settings…"
         ${PRINTF_BIN} "$(${SCRIPT_NAME} getshellvars ${USER_UID})" > ${HOME_DIR}${USER_UID}/.profile
     fi
 }
@@ -677,12 +677,12 @@ for application in ${APPLICATIONS}; do
         debug "Reading definition: ${definition}"
         . ${DEFAULTS}
         . ${definition}
-        note "-> Requirements for this definition: ${APP_REQUIREMENTS}"
+        debug "-> Requirements for this definition: ${APP_REQUIREMENTS}"
 
         # fancy old style Capitalize
         APP_NAME="$(${PRINTF_BIN} "${APP_NAME}" | ${CUT_BIN} -c1 | ${TR_BIN} '[a-z]' '[A-Z]')$(${PRINTF_BIN} "${APP_NAME}" | ${SED_BIN} 's/^[a-zA-Z]//')"
-        note
-        note "Preparing application: ${APP_NAME}${APP_POSTFIX} (${APP_FULL_NAME} v${APP_VERSION})"
+
+        # note "Preparing application: ${APP_NAME}${APP_POSTFIX} (${APP_FULL_NAME} v${APP_VERSION})"
         if [ "${USER_UID}" = "" ]; then
             debug "Normal build"
             export PREFIX="${SOFTWARE_DIR}${APP_NAME}"
@@ -963,17 +963,17 @@ for application in ${APPLICATIONS}; do
         }
 
         debug "Installing app requirements: ${APP_REQUIREMENTS}"
-        req_amount="$(${PRINTF_BIN} "${APP_REQUIREMENTS}" | ${WC_BIN} -w | ${AWK_BIN} '{print $1+1}')"
-        note "Starting process step 1 of ${req_amount}"
+        export req_amount="$(${PRINTF_BIN} "${APP_REQUIREMENTS}" | ${WC_BIN} -w | ${AWK_BIN} '{print $1}')"
+        export req_all="$(${PRINTF_BIN} "${req_amount} - 1\n" | ${BC_BIN})"
+        debug "Starting process step 1 of ${req_amount}"
         for req in ${APP_REQUIREMENTS}; do
+            export req_amount="$(${PRINTF_BIN} "${req_amount} - 1\n" | ${BC_BIN} -s)"
             if [ -z "${req}" ]; then
                 note "No requirements required. Skipping…"
                 break
             else
-                note "Processing requirement: $req"
-                if [ -e "${PREFIX}/${req}${INSTALLED_MARK}" ]; then
-                    note "-> ${req} is marked as installed/provided."
-                else
+                note "-> Building: $req - (${req_amount} of ${req_all} left)"
+                if [ ! -e "${PREFIX}/${req}${INSTALLED_MARK}" ]; then
                     export CHANGED="true"
                     execute_process "${req}"
                 fi
@@ -1018,7 +1018,7 @@ for application in ${APPLICATIONS}; do
                 mark
                 strip_lib_bin
             else
-                note "-> ${application} is marked as already installed."
+                debug "-> ${application} Ok."
             fi
         else
             execute_process "${application}"
@@ -1041,7 +1041,7 @@ for application in ${APPLICATIONS}; do
                 fi
             done
         done
-        note "Exporting binaries:${EXPORT_LIST}"
+        debug "Exporting binaries:${EXPORT_LIST}"
 
         if [ ! -z "${USER_UID}" ]; then
             if [ "$(${ID_BIN} -u)" = "0" ]; then
