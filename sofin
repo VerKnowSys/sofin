@@ -964,7 +964,11 @@ for application in ${APPLICATIONS}; do
             fi
         }
 
-        note "Installing ${application} requirements: ${APP_REQUIREMENTS}"
+        if [ "${APP_REQUIREMENTS}" = "" ]; then
+            note "Installing ${application}"
+        else
+            note "Installing ${application} requirements: ${APP_REQUIREMENTS}"
+        fi
         export req_amount="$(${PRINTF_BIN} "${APP_REQUIREMENTS}" | ${WC_BIN} -w | ${AWK_BIN} '{print $1}')"
         # export req_all="${req_amount}"
         export req_all="${req_amount}"
