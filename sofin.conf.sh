@@ -109,6 +109,7 @@ case "${SYSTEM_NAME}" in
         export SHA_BIN="/usr/bin/shasum"
         export SED_BIN="/bin/sed"
         export TAR_BIN="/bin/tar"
+        export GREP_BIN="/bin/grep"
         export LOCKFILE_BIN="true"
         ;;
 
