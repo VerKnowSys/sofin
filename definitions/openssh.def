@@ -1,4 +1,4 @@
-DISABLE_ON="Darwin"
+DISABLE_ON="Darwin Linux"
 APP_FULL_NAME="OpenSSH Library"
 APP_NAME="openssh"
 APP_SHA="64798328d310e4f06c9f01228107520adbc8b3e5"
