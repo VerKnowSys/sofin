@@ -1018,6 +1018,7 @@ for application in ${APPLICATIONS}; do
                 mark
                 strip_lib_bin
             else
+                note "-> Built successfully: ${application}"
                 debug "-> ${application} Ok."
             fi
         else
