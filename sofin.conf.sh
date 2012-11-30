@@ -73,6 +73,7 @@ AWK_BIN="/usr/bin/awk"
 SLEEP_BIN="/bin/sleep"
 LOCKFILE_BIN="/usr/bin/lockfile"
 SYSCTL_BIN="/sbin/sysctl"
+BC_BIN="/usr/bin/bc"
 
 
 SYSTEM_NAME="$(uname)"
@@ -108,7 +109,6 @@ case "${SYSTEM_NAME}" in
         export TAR_BIN="/bin/tar"
         export LOCKFILE_BIN="true"
         ;;
-
 
 esac
 
@@ -207,3 +207,18 @@ check_os () {
     esac
 }
 
+
+# validate environment availability or crash
+validate_env () {
+    debug "Checking availability of all binaries"
+    for envvar in $(set | ${GREP_BIN} '_BIN='); do
+        debug "Check of ENV var: ${envvar}"
+        # TODO: implement binary checks
+        # if [ "${envvar}" = "" ]; then
+        #     error "Unavailable binary required by ${SCRIPT_NAME}: ${envvar}"
+        # fi
+    done
+}
+
+
+validate_env
