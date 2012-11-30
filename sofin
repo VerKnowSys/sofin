@@ -969,10 +969,11 @@ for application in ${APPLICATIONS}; do
         if [ "${APP_REQUIREMENTS}" = "" ]; then
             note "Installing ${application}"
         else
-            note "Installing ${application} requirements: ${APP_REQUIREMENTS}"
+            note "Installing ${application} and its requirements: ${APP_REQUIREMENTS}"
         fi
         export req_amount="$(${PRINTF_BIN} "${APP_REQUIREMENTS}" | ${WC_BIN} -w | ${AWK_BIN} '{print $1}')"
         # export req_all="${req_amount}"
+        export req_amount="$(${PRINTF_BIN} "${req_amount} + 1\n" | ${BC_BIN})"
         export req_all="${req_amount}"
         export req_amount="$(${PRINTF_BIN} "${req_amount} + 1\n" | ${BC_BIN})"
         for req in ${APP_REQUIREMENTS}; do
@@ -1027,11 +1028,12 @@ for application in ${APPLICATIONS}; do
                 mark
                 strip_lib_bin
             else
+                note "  ${application} (1 of ${req_all})"
                 note "√ ${application}\n"
                 debug "√ ${application} Ok."
             fi
         else
-            note "  ${application}"
+            note "  ${application} (1 of ${req_all})"
             execute_process "${application}"
             mark
             strip_lib_bin
