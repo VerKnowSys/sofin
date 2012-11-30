@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-VERSION="0.26.6"
+VERSION="0.26.7"
 
 # load configuration from sofin.conf
 
@@ -1069,22 +1069,22 @@ if [ ! "${APP_JAVA_ANCESTOR}" = "" ]; then
     note "→ Setting up Java ancestor: ${APP_JAVA_ANCESTOR}"
     case ${APP_JAVA_ANCESTOR} in
         JDK6_32)
-            ${PRINTF_BIN} "\nexport PATH=\"${JDK6_32}/bin:\$PATH\"\n" >> $HOME/.profile
+            ${PRINTF_BIN} "\nexport PATH=\"${JDK6_32}/bin:\$PATH\"\n" >> $HOME/.zshrc
             ;;
 
         JDK6_64)
             note "   64bit JDK 1.6 ancestor"
-            ${PRINTF_BIN} "\nexport PATH=\"${JDK6_64}/bin:\$PATH\"\n" >> $HOME/.profile
+            ${PRINTF_BIN} "\nexport PATH=\"${JDK6_64}/bin:\$PATH\"\n" >> $HOME/.zshrc
             ;;
 
         JDK7_32)
             note "   32bit JDK 1.7 ancestor"
-            ${PRINTF_BIN} "\nexport PATH=\"${JDK7_32}/bin:\$PATH\"\n" >> $HOME/.profile
+            ${PRINTF_BIN} "\nexport PATH=\"${JDK7_32}/bin:\$PATH\"\n" >> $HOME/.zshrc
             ;;
 
         JDK7_64)
             note "   64bit JDK 1.7 ancestor"
-            ${PRINTF_BIN} "\nexport PATH=\"${JDK7_64}/bin:\$PATH\"\n" >> $HOME/.profile
+            ${PRINTF_BIN} "\nexport PATH=\"${JDK7_64}/bin:\$PATH\"\n" >> $HOME/.zshrc
             ;;
 
         *)
