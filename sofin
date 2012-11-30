@@ -543,8 +543,9 @@ if [ ! "$1" = "" ]; then
             error "For \"$1\" task, second argument with application name is required!"
             exit 1
         fi
+        USER_UID="$(${ID_BIN} -u)"
         if [ -z "${3}" ]; then # uid/user name not given
-            if [ "$(${ID_BIN} -u)" = "0" ]; then
+            if [ "${USER_UID}" = "0" ]; then
                 export SOFT_DIR="${SOFTWARE_DIR}"
             else
                 export LOG="${HOME_DIR}$(${ID_BIN} ${ID_SVD})/install.log"
@@ -569,6 +570,7 @@ if [ ! "$1" = "" ]; then
             fi
             debug "Removing software from: ${SOFT_DIR}${APP_NAME}"
             ${RM_BIN} -rfv "${SOFT_DIR}${APP_NAME}" >> ${LOG}
+            update_shell_vars ${USER_UID}
         else
             error "Application: ${APP_NAME} not installed."
             exit 1
