@@ -1,4 +1,4 @@
-DISABLE_ON="Darwin"
+# DISABLE_ON="Darwin"
 APP_FULL_NAME="cURL"
 APP_SHA="8c19e4aaeac9c81cdbc441274818831b8edbb0d4"
 APP_NAME="curl"
