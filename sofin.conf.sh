@@ -96,6 +96,7 @@ case "${SYSTEM_NAME}" in
         export DEFAULT_COMPILER_FLAGS="-Os -fPIC -fno-strict-overflow -fstack-protector-all -arch x86_64"
         export SHA_BIN="/usr/bin/shasum"
         export SYSCTL_BIN="/usr/sbin/sysctl"
+        export KLDLOAD_BIN="/sbin/kextload"
         cpus=$(${SYSCTL_BIN} -a | ${GREP_BIN} cpu.core_count: | ${AWK_BIN} '{printf $2}')
         export MAKE_OPTS="-j${cpus}"
         ;;
@@ -104,6 +105,7 @@ case "${SYSTEM_NAME}" in
         export FETCH_BIN="/usr/bin/curl -O"
         export PATCH_BIN="/usr/bin/patch -p0 "
         export UNAME_BIN="/bin/uname"
+        export KLDLOAD_BIN="/sbin/modprobe"
         export SHA_BIN="/usr/bin/shasum"
         export SED_BIN="/bin/sed"
         export TAR_BIN="/bin/tar"
@@ -211,12 +213,14 @@ check_os () {
 # validate environment availability or crash
 validate_env () {
     debug "Checking availability of all binaries"
-    for envvar in $(set | ${GREP_BIN} '_BIN='); do
-        debug "Check of ENV var: ${envvar}"
-        # TODO: implement binary checks
-        # if [ "${envvar}" = "" ]; then
-        #     error "Unavailable binary required by ${SCRIPT_NAME}: ${envvar}"
-        # fi
+    list="$(set | ${GREP_BIN} '_BIN=/')"
+    for envvar in ${list}; do
+        var_name="$(${PRINTF_BIN} "${envvar}" | ${SED_BIN} -e 's/=.*//g')"
+        var_value="$(${PRINTF_BIN} "${envvar}" | ${SED_BIN} -e 's/.*=//g')"
+        debug "Checking variable: ${var_name} with value: ${var_value}"
+        if [ ! -x "${var_value}" ]; then
+            warn "Unavailable binary required by ${SCRIPT_NAME}: ${envvar}"
+        fi
     done
 }
 
