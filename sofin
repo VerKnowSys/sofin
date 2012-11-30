@@ -589,10 +589,11 @@ if [ ! "$1" = "" ]; then
 
 
     update|updatedefs)
-        export USER_UID="$(${ID_BIN} ${ID_SVD})"
-        export LOG="${HOME_DIR}${USER_UID}/install.log"
-        export CACHE_DIR="${HOME_DIR}${USER_UID}/.cache/"
-        export DEFINITIONS_DIR="${CACHE_DIR}definitions/"
+        if [ ! "$(${ID_BIN} -u)" = "0" ]; then
+            export CACHE_DIR="${HOME_DIR}${USER_UID}/.cache/"
+            export DEFINITIONS_DIR="${CACHE_DIR}definitions/"
+            export LOG="${HOME_DIR}${USER_UID}/install.log"
+        fi
         export LISTS_DIR="${CACHE_DIR}lists/"
         export DEFAULTS="${DEFINITIONS_DIR}defaults.def"
         update_definitions "${USER_UID}"
