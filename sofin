@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-VERSION="0.26.4"
+VERSION="0.26.5"
 
 # load configuration from sofin.conf
 
@@ -283,7 +283,7 @@ if [ ! "$1" = "" ]; then
             for app in ${SOFT_DIR}*; do
                 note "$(${BASENAME_BIN} ${app}):"
                 for req in $(${FIND_BIN} ${app} -maxdepth 1 -name *${INSTALLED_MARK} | ${SORT_BIN}); do
-                    note "-> $(${BASENAME_BIN} ${req}) version: $(${CAT_BIN} ${req})"
+                    note "⇒ $(${BASENAME_BIN} ${req}) version: $(${CAT_BIN} ${req})"
                 done
                 note
             done
@@ -677,7 +677,7 @@ for application in ${APPLICATIONS}; do
         debug "Reading definition: ${definition}"
         . ${DEFAULTS}
         . ${definition}
-        debug "-> Requirements for this definition: ${APP_REQUIREMENTS}"
+        debug "⇒ Requirements for this definition: ${APP_REQUIREMENTS}"
 
         # fancy old style Capitalize
         APP_NAME="$(${PRINTF_BIN} "${APP_NAME}" | ${CUT_BIN} -c1 | ${TR_BIN} '[a-z]' '[A-Z]')$(${PRINTF_BIN} "${APP_NAME}" | ${SED_BIN} 's/^[a-zA-Z]//')"
@@ -791,7 +791,7 @@ for application in ${APPLICATIONS}; do
                         fi
                     done
                     if [ ! -e ${BUILD_DIR}${APP_NAME}*${APP_HTTP_PATH##*.} ]; then
-                        note "-> Fetching requirement source from: ${APP_HTTP_PATH}"
+                        note "⇒ Fetching requirement source from: ${APP_HTTP_PATH}"
                         run "${FETCH_BIN} ${APP_HTTP_PATH}"
                     else
                         debug "Already fetched. Using tarball from cache"
@@ -801,7 +801,7 @@ for application in ${APPLICATIONS}; do
                     debug "Build dir: ${BUILD_DIR}, find result: ${FIND_RESULT}"
                     file="$(${BASENAME_BIN} $(${FIND_RESULT}))"
                     if [ "${APP_SHA}" = "" ]; then
-                        error "-> Missing SHA sum for source: ${file}."
+                        error "⇒ Missing SHA sum for source: ${file}."
                         exit_locked
                     else
                         case "${SYSTEM_NAME}" in
@@ -814,10 +814,10 @@ for application in ${APPLICATIONS}; do
                                 ;;
                         esac
                         if [ "${cur}" = "${APP_SHA}" ]; then
-                            debug "-> SHA sum match in file: ${file}"
+                            debug "⇒ SHA sum match in file: ${file}"
                         else
-                            error "-> ${cur} vs ${APP_SHA}"
-                            error "-> SHA sum mismatch. Removing corrupted file from cache: ${file}, and retrying."
+                            error "⇒ ${cur} vs ${APP_SHA}"
+                            error "⇒ SHA sum mismatch. Removing corrupted file from cache: ${file}, and retrying."
                             # remove corrupted file
                             $($FIND_BIN ${BUILD_DIR} -maxdepth 1 -type f -name ${file} | ${XARGS_BIN} ${RM_BIN})
                             # remove lock
@@ -831,7 +831,7 @@ for application in ${APPLICATIONS}; do
                         fi
                     fi
 
-                    debug "-> Unpacking source code of: ${APP_NAME}"
+                    debug "⇒ Unpacking source code of: ${APP_NAME}"
                     debug "Build dir: ${BUILD_DIR}"
                     APP_LOC=${BUILD_DIR}${APP_NAME}
                     debug "Entrering ${APP_LOC}"
@@ -854,7 +854,7 @@ for application in ${APPLICATIONS}; do
                         LIST_DIR="${DEFINITIONS_DIR}patches/$1"
                         if [ -d "${LIST_DIR}" ]; then
                             if [ "$1" = "${APP_NAME}" ]; then # apply patch only when application/requirement for which patch is designed for
-                                note "-> Applying patches for application: ${APP_NAME}"
+                                note "⇒ Applying patches for application: ${APP_NAME}"
                                 patches_files="$(${FIND_BIN} ${LIST_DIR}/* -maxdepth 0 -type f)"
                                 for patch in ${patches_files}; do
                                     debug "Patching source code with patch: ${patch}"
@@ -892,21 +892,21 @@ for application in ${APPLICATIONS}; do
                             debug "DYLD_LIBRARY_PATH: ${DYLD_LIBRARY_PATH}"
                         fi
 
-                        note "-> Configuring requirement: $1 with version: ${APP_VERSION}"
+                        note "⇒ Configuring requirement: $1 with version: ${APP_VERSION}"
                         case ${APP_CONFIGURE_SCRIPT} in
 
                             ignore)
-                                note "-> Ignored configuration part $1"
+                                note "⇒ Ignored configuration part $1"
                                 ;;
 
                             no-conf)
-                                note "-> Skipped configuration for $1"
+                                note "⇒ Skipped configuration for $1"
                                 export APP_MAKE_METHOD="${APP_MAKE_METHOD} PREFIX=${PREFIX}"
                                 export APP_INSTALL_METHOD="${APP_INSTALL_METHOD} PREFIX=${PREFIX}"
                                 ;;
 
                             binary)
-                                note "-> Binary definition: $1"
+                                note "⇒ Binary definition: $1"
                                 export APP_MAKE_METHOD="true"
                                 export APP_INSTALL_METHOD="true"
                                 ;;
@@ -930,14 +930,14 @@ for application in ${APPLICATIONS}; do
                             run "${APP_AFTER_CONFIGURE_CALLBACK}"
                         fi
 
-                        note "-> Building requirement: $1"
+                        note "⇒ Building requirement: $1"
                         run "${APP_MAKE_METHOD}"
                         if [ ! -z "${APP_AFTER_MAKE_CALLBACK}" ]; then
                             debug "Running after make callback"
                             run "${APP_AFTER_MAKE_CALLBACK}"
                         fi
 
-                        note "-> Installing requirement: $1"
+                        note "⇒ Installing requirement: $1"
                         run "${APP_INSTALL_METHOD}"
                         if [ ! "${APP_AFTER_INSTALL_CALLBACK}" = "" ]; then
                             debug "After install callback: ${APP_AFTER_INSTALL_CALLBACK}"
@@ -972,7 +972,7 @@ for application in ${APPLICATIONS}; do
                 note "No requirements required. Skipping…"
                 break
             else
-                note "-> Building: $req - (${req_amount} of ${req_all} left)"
+                note "$req - (${req_amount} of ${req_all} left)"
                 if [ ! -e "${PREFIX}/${req}${INSTALLED_MARK}" ]; then
                     export CHANGED="true"
                     execute_process "${req}"
@@ -989,12 +989,12 @@ for application in ${APPLICATIONS}; do
 
         strip_lib_bin () {
             if [ -z "${DEVEL}" ]; then
-                note "-> Stripping all libraries…"
+                note "⇒ Stripping all libraries…"
                 for elem in $(${FIND_BIN} ${PREFIX} -name '*.so' -o -name '*.dylib'); do
                     debug "Stripping: ${elem}"
                     "${STRIP_BIN}" -sv "${elem}" >> ${LOG} 2>> ${LOG}
                 done
-                note "-> Stripping all binaries…"
+                note "⇒ Stripping all binaries…"
                 for elem in "/bin/" "/sbin/" "/libexec/"; do
                     if [ -d "${PREFIX}${elem}" ]; then
                         for e in $(${FIND_BIN} ${PREFIX}${elem}); do
@@ -1012,14 +1012,14 @@ for application in ${APPLICATIONS}; do
 
         if [ -e "${PREFIX}/${application}${INSTALLED_MARK}" ]; then
             if [ "${CHANGED}" = "true" ]; then
-                note "-> At least one of app dependencies has been changed. Forced rebuild of application…"
+                note "⇒ At least one of app dependencies has been changed. Forced rebuild of application…"
                 execute_process "${application}"
                 unset CHANGED
                 mark
                 strip_lib_bin
             else
-                note "-> Installed successfully: ${application}"
-                debug "-> ${application} Ok."
+                note "√ ${application}\n"
+                debug "√ ${application} Ok."
             fi
         else
             execute_process "${application}"
@@ -1057,7 +1057,7 @@ done
 
 update_shell_vars
 if [ ! "${APP_JAVA_ANCESTOR}" = "" ]; then
-    note "-> Setting up Java ancestor: ${APP_JAVA_ANCESTOR}"
+    note "⇒ Setting up Java ancestor: ${APP_JAVA_ANCESTOR}"
     case ${APP_JAVA_ANCESTOR} in
         JDK6_32)
             ${PRINTF_BIN} "\nexport PATH=\"${JDK6_32}/bin:\$PATH\"\n" >> $HOME/.profile
