@@ -110,6 +110,8 @@ case "${SYSTEM_NAME}" in
         export SED_BIN="/bin/sed"
         export TAR_BIN="/bin/tar"
         export GREP_BIN="/bin/grep"
+        export BC_BIN="/usr/bin/bc"
+        export CHOWN_BIN="/bin/chown"
         export LOCKFILE_BIN="true"
         ;;
 
