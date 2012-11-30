@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-VERSION="0.26.5"
+VERSION="0.26.6"
 
 # load configuration from sofin.conf
 
@@ -1024,6 +1024,7 @@ for application in ${APPLICATIONS}; do
                 debug "√ ${application} Ok."
             fi
         else
+            note "  ${application}"
             execute_process "${application}"
             mark
             strip_lib_bin
