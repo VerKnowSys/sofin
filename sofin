@@ -854,7 +854,7 @@ for application in ${APPLICATIONS}; do
                         LIST_DIR="${DEFINITIONS_DIR}patches/$1"
                         if [ -d "${LIST_DIR}" ]; then
                             if [ "$1" = "${APP_NAME}" ]; then # apply patch only when application/requirement for which patch is designed for
-                                note "⇒ Applying patches for application: ${APP_NAME}"
+                                note " → Applying patches for: ${APP_NAME}"
                                 patches_files="$(${FIND_BIN} ${LIST_DIR}/* -maxdepth 0 -type f)"
                                 for patch in ${patches_files}; do
                                     debug "Patching source code with patch: ${patch}"
@@ -892,21 +892,21 @@ for application in ${APPLICATIONS}; do
                             debug "DYLD_LIBRARY_PATH: ${DYLD_LIBRARY_PATH}"
                         fi
 
-                        note "⇒ Configuring requirement: $1 with version: ${APP_VERSION}"
+                        note " → Configuring requirement: $1 with version: ${APP_VERSION}"
                         case ${APP_CONFIGURE_SCRIPT} in
 
                             ignore)
-                                note "⇒ Ignored configuration part $1"
+                                note " → Ignored configuration part $1"
                                 ;;
 
                             no-conf)
-                                note "⇒ Skipped configuration for $1"
+                                note " → Skipped configuration for $1"
                                 export APP_MAKE_METHOD="${APP_MAKE_METHOD} PREFIX=${PREFIX}"
                                 export APP_INSTALL_METHOD="${APP_INSTALL_METHOD} PREFIX=${PREFIX}"
                                 ;;
 
                             binary)
-                                note "⇒ Binary definition: $1"
+                                note " → Binary definition: $1"
                                 export APP_MAKE_METHOD="true"
                                 export APP_INSTALL_METHOD="true"
                                 ;;
@@ -930,14 +930,14 @@ for application in ${APPLICATIONS}; do
                             run "${APP_AFTER_CONFIGURE_CALLBACK}"
                         fi
 
-                        note "⇒ Building requirement: $1"
+                        note " → Building requirement: $1"
                         run "${APP_MAKE_METHOD}"
                         if [ ! -z "${APP_AFTER_MAKE_CALLBACK}" ]; then
                             debug "Running after make callback"
                             run "${APP_AFTER_MAKE_CALLBACK}"
                         fi
 
-                        note "⇒ Installing requirement: $1"
+                        note " → Installing requirement: $1"
                         run "${APP_INSTALL_METHOD}"
                         if [ ! "${APP_AFTER_INSTALL_CALLBACK}" = "" ]; then
                             debug "After install callback: ${APP_AFTER_INSTALL_CALLBACK}"
@@ -952,7 +952,7 @@ for application in ${APPLICATIONS}; do
                     cd "${CUR_DIR}"
                 fi
             else
-                warn "Requirement disabled on architecture: ${SYSTEM_NAME}. Marking dependency as already installed cause it's still required to build."
+                warn " Requirement disabled on architecture: ${SYSTEM_NAME}."
                 if [ ! -d "${PREFIX}" ]; then
                     # case when disabled requirement is first on list of dependencies
                     ${MKDIR_BIN} -p ${PREFIX}
@@ -969,10 +969,10 @@ for application in ${APPLICATIONS}; do
         for req in ${APP_REQUIREMENTS}; do
             export req_amount="$(${PRINTF_BIN} "${req_amount} - 1\n" | ${BC_BIN})"
             if [ -z "${req}" ]; then
-                note "No requirements required. Skipping…"
+                note "⇒ No requirements required."
                 break
             else
-                note "$req - (${req_amount} of ${req_all} left)"
+                note "⇒ ${req} (${req_amount} of ${req_all} left)"
                 if [ ! -e "${PREFIX}/${req}${INSTALLED_MARK}" ]; then
                     export CHANGED="true"
                     execute_process "${req}"
