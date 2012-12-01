@@ -1,13 +1,9 @@
 APP_FULL_NAME="Ruby YARV 1.9"
-APP_SHA="095c783c88965c6e72b1f3484c50c60207b60bfa"
+APP_SHA="a4075e5126278b5cba982d8c832dc03114e7a02a"
 APP_NAME="ruby"
-APP_VERSION="1.9.3-p286"
-APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.bz2"
+APP_VERSION="1.9.3-p327"
+APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
 APP_CONFIGURE_ARGS="--enable-pthread --with-opt-dir=${PREFIX} --without-gcc --disable-install-doc --disable-install-rdoc"
 APP_REQUIREMENTS="zlib bzip2 libxml2 libiconv make libtool libgpg-error libgcrypt libxslt yaml libffi sqlite"
-APP_LINKER_ARGS="-lc -lyaml -lz -lcrypt -lssl -lcurses -lreadline"
-if [ "${SYSTEM_NAME}" = "Darwin" ]; then
-  unset APP_LINKER_ARGS
-fi
 APP_AFTER_INSTALL_CALLBACK="${PRINTF_BIN} 'gem: --no-ri --no-rdoc' > ${HOME}/.gemrc ; ${PREFIX}/bin/gem install bundler rails"
 APP_EXPORTS="ruby gem irb ri rdoc erb rake rails bundle"
