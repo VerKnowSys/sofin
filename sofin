@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-VERSION="0.26.9"
+VERSION="0.26.10"
 
 # load configuration from sofin.conf
 
@@ -962,7 +962,7 @@ for application in ${APPLICATIONS}; do
                     ${MKDIR_BIN} -p ${PREFIX}
                 fi
                 ${TOUCH_BIN} "${PREFIX}/${req}${INSTALLED_MARK}"
-                ${PRINTF_BIN} "provided-by-system" > "${PREFIX}/${req}${INSTALLED_MARK}"
+                ${PRINTF_BIN} "system-version" > "${PREFIX}/${req}${INSTALLED_MARK}"
             fi
         }
 
@@ -1030,8 +1030,8 @@ for application in ${APPLICATIONS}; do
                 strip_lib_bin
             else
                 note "  ${application} (1 of ${req_all})"
-                note "√ ${application}\n"
-                debug "√ ${application} Ok."
+                note "√ ${application} [${APP_VERSION}]\n"
+                debug "√ ${application} [${APP_VERSION}] Ok."
             fi
         else
             note "  ${application} (1 of ${req_all})"
