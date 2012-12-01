@@ -66,7 +66,7 @@ set_c_compiler () {
             export CC="${BASE_COMPILER}/clang ${APP_COMPILER_ARGS}"
             export CXX="${BASE_COMPILER}/clang++ ${APP_COMPILER_ARGS}"
             export CPP="${BASE_COMPILER}/clang-cpp"
-            if [ ! -x "${CPP}" ]; then # fallback for systems with old clang:
+            if [ ! -x "${CPP}" ]; then # fallback for systems with clang without standalone preprocessor binary:
                 export CPP="${BASE_COMPILER}/clang -E"
             fi
             ;;
