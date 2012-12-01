@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-VERSION="0.26.10"
+VERSION="0.26.11"
 
 # load configuration from sofin.conf
 
@@ -195,6 +195,21 @@ update_shell_vars () {
     else
         debug "Updating ${HOME_DIR}${USER_UID}/.profile settings…"
         ${PRINTF_BIN} "$(${SCRIPT_NAME} getshellvars ${USER_UID})" > ${HOME_DIR}${USER_UID}/.profile
+    fi
+}
+
+
+check_disabled () {
+    if [ ! "$DISABLE_ON" = "" ]; then
+        for disabled in ${DISABLE_ON}; do
+            debug "Running system: ${SYSTEM_NAME}"
+            debug "DisableOn element: ${disabled}"
+            if [ "$SYSTEM_NAME" = "${disabled}" ]; then
+                export ALLOW="0"
+            fi
+        done
+    else
+        export ALLOW="1"
     fi
 }
 
@@ -681,6 +696,9 @@ for application in ${APPLICATIONS}; do
         debug "Reading definition: ${definition}"
         . ${DEFAULTS}
         . ${definition}
+
+        # export ALLOW=1 # allow definition to be built by default
+        check_disabled # after which just check if it's not disabled
         debug "→ Requirements for this definition: ${APP_REQUIREMENTS}"
 
         # fancy old style Capitalize
@@ -766,17 +784,7 @@ for application in ${APPLICATIONS}; do
                 export LDFLAGS="${LDFLAGS} -L/opt/X11/lib"
             fi
 
-            export ALLOW=1
-            if [ ! "$DISABLE_ON" = "" ]; then
-                for disabled in ${DISABLE_ON}; do
-                    debug "Running system: ${SYSTEM_NAME}"
-                    debug "DisableOn element: ${disabled}"
-                    if [ "$SYSTEM_NAME" = "${disabled}" ]; then
-                        export ALLOW=0
-                    fi
-                done
-            fi
-
+            check_disabled
             if [ "${ALLOW}" = "1" ]; then
                 if [ -z "${APP_HTTP_PATH}" ]; then
                     error "No source given for definition! Aborting"
