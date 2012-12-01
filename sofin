@@ -972,15 +972,12 @@ for application in ${APPLICATIONS}; do
             note "Installing ${application} and its requirements: ${APP_REQUIREMENTS}"
         fi
         export req_amount="$(${PRINTF_BIN} "${APP_REQUIREMENTS}" | ${WC_BIN} -w | ${AWK_BIN} '{print $1}')"
-        # export req_all="${req_amount}"
         export req_amount="$(${PRINTF_BIN} "${req_amount} + 1\n" | ${BC_BIN})"
         export req_all="${req_amount}"
-        export req_amount="$(${PRINTF_BIN} "${req_amount} + 1\n" | ${BC_BIN})"
         for req in ${APP_REQUIREMENTS}; do
             if [ ! "${APP_USER_INFO}" = "" ]; then
                 warn "${APP_USER_INFO}"
             fi
-            export req_amount="$(${PRINTF_BIN} "${req_amount} - 1\n" | ${BC_BIN})"
             if [ -z "${req}" ]; then
                 note "  No requirements required."
                 break
@@ -991,6 +988,7 @@ for application in ${APPLICATIONS}; do
                     execute_process "${req}"
                 fi
             fi
+            export req_amount="$(${PRINTF_BIN} "${req_amount} - 1\n" | ${BC_BIN})"
         done
 
         mark () {
