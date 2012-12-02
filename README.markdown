@@ -103,24 +103,24 @@ space than it does with "old fasioned, system wide, shared software".
 
 ## Platform specific installation info:
 * FreeBSD specific:
-        `1. Install base 64bit system - I used 64bit FreeBSD 9.1 bootonly iso here.`
-        `2. Run as root: "fetch -o - https://github.com/VerKnowSys/sofin/archive/master.tar.gz | tar xf - && cd ./sofin-master && ./sofin-install". It will put "sofin" into /usr/bin/ and sofin.conf.sh into /etc/.`
-        `3. Build core software. Run "sofin install base" as root.`
-        `4. Start using sofin as regular user. Set your environment to source "/etc/profile_sofin" for your user environments.`
+1.  Install base 64bit system - I used 64bit FreeBSD 9.1 bootonly iso here.
+2.  Run as root: "fetch -o - https://github.com/VerKnowSys/sofin/archive/master.tar.gz | tar xf - && cd ./sofin-master && ./sofin-install". It will put "sofin" into /usr/bin/ and sofin.conf.sh into /etc/.
+3.  Build core software. Run "sofin install base" as root.
+4.  Start using sofin as regular user. Set your environment to source "/etc/profile_sofin" for your user environments.
 
 * Darwin/ Mac OS X specific:
-        `1. Install Mac OS X 10.8.`
-        `2. Install [XQuartz](http://xquartz.macosforge.org/landing/)`
-        `3. Run "git pull git://github.com/VerKnowSys/sofin.git && cd ./sofin && sudo ./sofin-install". It will put "sofin" in /usr/bin/ and sofin.conf.sh in /etc/.`
-        `4. Build core software. Run "sudo sofin install base".`
-        `5. Start using sofin as regular user. Set your environment to source "/etc/profile_sofin" for your user environments.`
+1.  Install Mac OS X 10.8.
+2.  Install [XQuartz](http://xquartz.macosforge.org/landing/)
+3.  Run "git pull git://github.com/VerKnowSys/sofin.git && cd ./sofin && sudo ./sofin-install". It will put "sofin" in /usr/bin/ and sofin.conf.sh in /etc/.
+4.  Build core software. Run "sudo sofin install base".
+5.  Start using sofin as regular user. Set your environment to source "/etc/profile_sofin" for your user environments.
 
 * Linux specific:
-        `1. Install base 64bit system - I used 64bit Debian "wheezy" netinstall iso here.`
-        `2. Run as root: apt-get install time clang gcc g++ make bzip2 bc - They're required only to compile base software. The most important thing is to have clang with version at least 3.0 already installed in system.`
-        `3. Run as root: "wget -qO- https://github.com/VerKnowSys/sofin/archive/master.tar.gz | tar zxf - && cd ./sofin-master && ./sofin-install". It will put "sofin" into /usr/bin/ and sofin.conf.sh into /etc/.`
-        `4. Build core software. Run as root: "sofin install base".`
-        `5. Start using sofin as regular user. Set your environment to source "/etc/profile_sofin" for your user environments.`
+1.  Install base 64bit system - I used 64bit Debian "wheezy" netinstall iso here.
+2.  Run as root: apt-get install time clang gcc g++ make bzip2 bc - They're required only to compile base software. The most important thing is to have clang with version at least 3.0 already installed in system.
+3.  Run as root: "wget -qO- https://github.com/VerKnowSys/sofin/archive/master.tar.gz | tar zxf - && cd ./sofin-master && ./sofin-install". It will put "sofin" into /usr/bin/ and sofin.conf.sh into /etc/.
+4.  Build core software. Run as root: "sofin install base".
+5.  Start using sofin as regular user. Set your environment to source "/etc/profile_sofin" for your user environments.
 
 
 ## License:
