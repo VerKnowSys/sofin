@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-VERSION="0.26.12"
+VERSION="0.26.13"
 
 # load configuration from sofin.conf
 
@@ -200,16 +200,14 @@ update_shell_vars () {
 
 
 check_disabled () {
-    if [ ! "$DISABLE_ON" = "" ]; then
-        for disabled in ${DISABLE_ON}; do
+    if [ ! "$1" = "" ]; then
+        for disabled in ${1}; do
             debug "Running system: ${SYSTEM_NAME}"
             debug "DisableOn element: ${disabled}"
             if [ "$SYSTEM_NAME" = "${disabled}" ]; then
                 export ALLOW="0"
             fi
         done
-    else
-        export ALLOW="1"
     fi
 }
 
@@ -697,8 +695,8 @@ for application in ${APPLICATIONS}; do
         . ${DEFAULTS}
         . ${definition}
 
-        # export ALLOW=1 # allow definition to be built by default
-        check_disabled # after which just check if it's not disabled
+        export ALLOW=1 # allow definition to be built by default
+        check_disabled "${DISABLE_ON}" # after which just check if it's not disabled
         debug "→ Requirements for this definition: ${APP_REQUIREMENTS}"
 
         # fancy old style Capitalize
@@ -784,7 +782,8 @@ for application in ${APPLICATIONS}; do
                 export LDFLAGS="${LDFLAGS} -L/opt/X11/lib"
             fi
 
-            check_disabled
+            export ALLOW="1"
+            check_disabled "${DISABLE_ON}"
             if [ "${ALLOW}" = "1" ]; then
                 if [ -z "${APP_HTTP_PATH}" ]; then
                     error "No source given for definition! Aborting"
