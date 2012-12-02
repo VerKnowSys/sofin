@@ -22,7 +22,7 @@ install_base () {
     ${LN_BIN} -s "$($PWD_BIN)/sofin" /usr/bin/sofin
     check_command_result $?
     SHC_BIN="$(which shc)"
-    if [ ${SHC_BIN} = "" ]; then
+    if [ "${SHC_BIN}" = "" ]; then
         note "SHC compiler unavailable"
         ${LN_BIN} -s "$($PWD_BIN)/sofin.sh" /usr/bin/sofin.sh
         check_command_result $?
