@@ -8,6 +8,9 @@
 #include <string>
 #include <fstream>
 #include <sstream>
+#ifdef __FreeBSD__
+#include <sys/wait.h>
+#endif
 
 
 using namespace std;
