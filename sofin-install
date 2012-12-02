@@ -6,34 +6,54 @@
 CONF_FILE="./sofin.conf.sh"
 if [ -e "${CONF_FILE}" ]; then
     . "${CONF_FILE}"
+    note "Validating environment"
+    validate_env
 else
     echo "FATAL: No configuration file found: ${CONF_FILE}"
     exit 1
 fi
 
-export CXX="clang++"
+# choose C compiler, if any
+export CXX="/usr/bin/g++"
+if [ -x "/usr/bin/clang++" ]; then
+    export CXX="/usr/bin/clang++"
+fi
+if [ ! -x "${CXX}" ]; then
+    warn "C++ compiler unavailable. Wrapper wont be built"
+fi
 
 
 install_base () {
+    ${RM_BIN} -rf "./sofin"
+    ${RM_BIN} -rf "./sofin.sh.x"
     ${RM_BIN} -rf "/usr/bin/sofin"
     ${RM_BIN} -rf "/usr/bin/sofin.sh"
     ${RM_BIN} -rf "/etc/${CONF_FILE}"
 
-    ${LN_BIN} -s "$($PWD_BIN)/sofin" /usr/bin/sofin
-    check_command_result $?
-    SHC_BIN="$(which shc)"
-    if [ "${SHC_BIN}" = "" ]; then
-        note "SHC compiler unavailable"
-        ${LN_BIN} -s "$($PWD_BIN)/sofin.sh" /usr/bin/sofin.sh
+    build_launcher
+
+    if [ ! -x "$($PWD_BIN)/sofin" ]; then
+        # no compiler available in system, using plain script
+        ${LN_BIN} -s "$($PWD_BIN)/sofin.sh" /usr/bin/sofin
         check_command_result $?
     else
-        note "SHC compiler available"
-        ${SHC_BIN} -T -f "$($PWD_BIN)/sofin.sh"
-        check_command_result $?
-        chmod 755 "$($PWD_BIN)/sofin.sh.x"
-        ${LN_BIN} -s "$($PWD_BIN)/sofin.sh.x" /usr/bin/sofin.sh
-        check_command_result $?
+        # compiler available, build was done
+        ${LN_BIN} -s "$($PWD_BIN)/sofin" /usr/bin/sofin
+        SHC_BIN="$(which shc)"
+        if [ "${SHC_BIN}" = "" ]; then
+            note "SHC compiler unavailable"
+            ${LN_BIN} -s "$($PWD_BIN)/sofin.sh" /usr/bin/sofin.sh
+            check_command_result $?
+        else
+            note "SHC compiler available"
+            ${SHC_BIN} -T -f "$($PWD_BIN)/sofin.sh"
+            check_command_result $?
+            chmod 755 "$($PWD_BIN)/sofin.sh.x"
+            ${LN_BIN} -s "$($PWD_BIN)/sofin.sh.x" /usr/bin/sofin.sh
+            check_command_result $?
+        fi
     fi
+
     ${LN_BIN} -s "$($PWD_BIN)/${CONF_FILE}" "/etc/${CONF_FILE}"
     check_command_result $?
 
@@ -43,7 +63,9 @@ install_base () {
 
 
 build_launcher () {
-    ${CXX} -Os -fPIC ./launcher.cc -o sofin
+    if [ -x "${CXX}" ]; then
+        ${CXX} -Os -fPIC ./launcher.cc -o sofin
+    fi
 }
 
 
@@ -55,15 +77,11 @@ case "${SYSTEM_NAME}" in
       ${LN_BIN} -s "/Users/$(${ID_BIN} -u)/.profile" "${HOME}/.profile"
       check_command_result $?
     fi
-
-    build_launcher
     install_base
     ;;
 
   FreeBSD|Linux)
     check_root
-
-    build_launcher
     install_base
     ;;
 
