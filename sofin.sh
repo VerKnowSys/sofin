@@ -15,7 +15,7 @@ else
     exit 1
 fi
 
-if [ "${VERBOSE}" = "true" ]; then
+if [ "${TRACE}" = "true" ]; then
     set -x
 fi
 

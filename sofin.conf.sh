@@ -3,7 +3,7 @@
 # global Sofin settings:
 
 DEBUG="false"
-VERBOSE="false"
+TRACE="false"
 # DEVEL="true"
 
 ID_SVD="-u" # NOTE: use "-un" for standard FreeBSD systems with users defined in /etc/passwd
