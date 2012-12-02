@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-VERSION="0.26.11"
+VERSION="0.26.12"
 
 # load configuration from sofin.conf
 
@@ -1038,15 +1038,16 @@ for application in ${APPLICATIONS}; do
                 strip_lib_bin
             else
                 note "  ${application} (1 of ${req_all})"
-                note "√ ${application} [${APP_VERSION}]\n"
-                debug "√ ${application} [${APP_VERSION}] Ok."
+                ver="$(${CAT_BIN} "${PREFIX}/${application}${INSTALLED_MARK}")"
+                note "√ ${application} [${ver}]\n"
+                debug "√ ${application} current: ${ver}, definition: [${APP_VERSION}] Ok."
             fi
         else
             note "  ${application} (1 of ${req_all})"
             execute_process "${application}"
             mark
             strip_lib_bin
-            note "√ ${application}\n"
+            note "√ ${application} [${APP_VERSION}]\n"
         fi
 
         . ${DEFINITIONS_DIR}${application}.def
