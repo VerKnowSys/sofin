@@ -101,7 +101,7 @@ space than it does with "old fasioned, system wide, shared software".
 * Some definitions with X11 requirement will need [XQuartz](http://xquartz.macosforge.org/landing/) installation. (Darwin hosts only).
 
 
-## Platform specific installation info:
+## Installation info (platform specific):
 * FreeBSD specific:
 > 1.  Install base 64bit system - I used 64bit FreeBSD 9.1 bootonly iso here.
 > 2.  Run as root: "fetch -o - https://github.com/VerKnowSys/sofin/archive/master.tar.gz | tar xf - && cd ./sofin-master && ./sofin-install". It will put "sofin" into /usr/bin/ and sofin.conf.sh into /etc/.
@@ -115,7 +115,7 @@ space than it does with "old fasioned, system wide, shared software".
 > 4.  Build core software. Run "sudo sofin install base".
 > 5.  Start using sofin as regular user. Set your environment to source "/etc/profile_sofin" for your user environments.
 
-* Linux specific:
+* Debian specific: (Yes it's NOT Linux specific at all, cause every distro is a different monster with own set of additional hands and legs)
 > 1.  Install base 64bit system - I used 64bit Debian "wheezy" netinstall iso here.
 > 2.  Run as root: apt-get install time clang gcc g++ make bzip2 bc - They're required only to compile base software. The most important thing is to have clang with version at least 3.0 already installed in system.
 > 3.  Run as root: "wget -qO- https://github.com/VerKnowSys/sofin/archive/master.tar.gz | tar zxf - && cd ./sofin-master && ./sofin-install". It will put "sofin" into /usr/bin/ and sofin.conf.sh into /etc/.
