@@ -111,7 +111,7 @@ space than it does with "old fasioned, system wide, shared software".
 * Darwin/ Mac OS X specific:
 > 1.  Install Mac OS X 10.8.
 > 2.  Install [XQuartz](http://xquartz.macosforge.org/landing/)
-> 3.  Run "git pull git://github.com/VerKnowSys/sofin.git && cd ./sofin && sudo ./sofin-install". It will put "sofin" in /usr/bin/ and sofin.conf.sh in /etc/.
+> 3.  Run "git clone git://github.com/VerKnowSys/sofin.git && cd ./sofin && sudo ./sofin-install". It will put "sofin" in /usr/bin/ and sofin.conf.sh in /etc/.
 > 4.  Build core software. Run "sudo sofin install base".
 > 5.  Start using sofin as regular user. Set your environment to source "/etc/profile_sofin" for your user environments.
 
