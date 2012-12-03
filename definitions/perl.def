@@ -1,4 +1,4 @@
-DISABLE_ON="Darwin"
+DISABLE_ON="Darwin Linux"
 APP_FULL_NAME="Perl"
 APP_SHA="9e20e38e3460ebbac895341fd70a02189d03a490"
 APP_NAME="perl"
