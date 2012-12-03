@@ -9,7 +9,7 @@ APP_MAKE_METHOD="${PREFIX}/bin/python setup.py install --prefix=${PREFIX}"
 APP_INSTALL_METHOD="true"
 APP_EXPORTS="hg"
 case "${SYSTEM_NAME}" in
-  Darwin|Linux)
+  Darwin)
     export APP_MAKE_METHOD="/usr/bin/python setup.py install --prefix=${PREFIX}"
     ;;
 esac
