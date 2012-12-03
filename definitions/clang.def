@@ -5,11 +5,6 @@ APP_NAME="clang"
 APP_VERSION="3.1"
 APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.with-llvm.tar.bz2"
 APP_REQUIREMENTS="make python-legacy"
-APP_CONFIGURE_ARGS="--disable-docs --disable-doxygen --enable-static --disable-assertions --enable-optimized --enable-targets=x86_64,cpp,x86 --without-gcc-toolchain"
+APP_CONFIGURE_ARGS="--disable-docs --disable-doxygen --enable-static --disable-assertions --enable-optimized --enable-targets=x86_64,cpp,x86" # --without-gcc-toolchain"
 APP_EXPORTS="bugpoint c-index-test clang clang++ clang-cpp clang-tblgen idle llc lli llvm-ar llvm-as llvm-bcanalyzer llvm-config llvm-cov llvm-diff llvm-dis llvm-dwarfdump llvm-extract llvm-ld llvm-link llvm-mc llvm-nm
 llvm-objdump llvm-prof llvm-ranlib llvm-readobj llvm-rtdyld llvm-size llvm-stress llvm-stub llvm-tblgen macho-dump opt smtpd.py"
-case "${SYSTEM_NAME}" in
-  Linux)
-    export FORCE_GNU_COMPILER="true"
-    ;;
-esac
