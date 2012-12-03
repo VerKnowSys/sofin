@@ -1,4 +1,4 @@
-DISABLE_ON="Darwin"
+DISABLE_ON="Darwin Linux"
 APP_FULL_NAME="GNU Make"
 APP_SHA="edd3bcf8ed2ba21970dcc89c6be4d132f4915572"
 APP_NAME="make"
