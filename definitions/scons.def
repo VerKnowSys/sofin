@@ -5,10 +5,11 @@ APP_VERSION="2.1.0"
 APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
 APP_REQUIREMENTS="python-legacy"
 APP_CONFIGURE_SCRIPT="ignore"
-APP_MAKE_METHOD="true"
-if [ "$SYSTEM_NAME" = "Darwin" ]; then
-  export APP_INSTALL_METHOD="/usr/bin/python setup.py install --prefix=${PREFIX} --standalone-lib --no-version-script --no-install-man"
-else
-  export APP_INSTALL_METHOD="${PREFIX}/bin/python setup.py install --prefix=${PREFIX} --standalone-lib --no-version-script --no-install-man"
-fi
+APP_MAKE_METHOD="${PREFIX}/bin/python setup.py install --prefix=${PREFIX} --standalone-lib --no-version-script --no-install-man"
+APP_INSTALL_METHOD="true"
+case "${SYSTEM_NAME}" in
+  Darwin)
+    export APP_MAKE_METHOD="/usr/bin/python setup.py install --prefix=${PREFIX} --standalone-lib --no-version-script --no-install-man"
+    ;;
+esac
 APP_EXPORTS="scons"
