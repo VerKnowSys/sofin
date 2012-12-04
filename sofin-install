@@ -64,7 +64,10 @@ install_base () {
 
 build_launcher () {
     if [ -x "${CXX}" ]; then
+        note "C++ compiler available. Using: ${CXX}"
         ${CXX} -Os -fPIC ./launcher.cc -o sofin
+    else
+        note "No C++ compiler available"
     fi
 }
 
