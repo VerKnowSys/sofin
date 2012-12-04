@@ -7,3 +7,4 @@ APP_CONFIGURE_ARGS="--enable-pthread --with-opt-dir=${PREFIX} --without-gcc --di
 APP_REQUIREMENTS="zlib bzip2 libxml2 libiconv make libtool libgpg-error libgcrypt libxslt yaml libffi sqlite"
 APP_AFTER_INSTALL_CALLBACK="${PRINTF_BIN} 'gem: --no-ri --no-rdoc' > ${HOME}/.gemrc ; ${PREFIX}/bin/gem install bundler rails"
 APP_EXPORTS="ruby gem irb ri rdoc erb rake rails bundle"
+APP_CURRENT_VERSION="$(${CURL_BIN} http://www.ruby-lang.org/en/downloads/ 2>/dev/null | ${AWK_BIN} '/(\>Ruby\ )(.*\<)/' | ${HEAD_BIN} -n 1 | ${AWK_BIN} '{sub(/\<\/.*/,""); print $3}')"
