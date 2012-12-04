@@ -74,6 +74,7 @@ SLEEP_BIN="/bin/sleep"
 LOCKFILE_BIN="/usr/bin/lockfile"
 SYSCTL_BIN="/sbin/sysctl"
 BC_BIN="/usr/bin/bc"
+HEAD_BIN="/usr/bin/head"
 
 
 SYSTEM_NAME="$(uname)"
