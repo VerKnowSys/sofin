@@ -86,11 +86,13 @@ case "${SYSTEM_NAME}" in
     FreeBSD)
         # Default
         cpus="$(${SYSCTL_BIN} -a | ${GREP_BIN} kern.smp.cpus: | ${AWK_BIN} '{printf $2}')"
+        export CURL_BIN="/usr/bin/fetch -o -"
         export MAKE_OPTS="-j${cpus}"
         ;;
 
     Darwin)
         # OSX specific configuration
+        export CURL_BIN="/usr/bin/curl"
         export FETCH_BIN="/usr/bin/curl -O"
         export PATCH_BIN="/usr/bin/patch -p0 "
         export DEFAULT_LDFLAGS="-fPIC -arch x86_64" # fPIE isn't well supported on OSX, but it's not production anyway
@@ -103,6 +105,7 @@ case "${SYSTEM_NAME}" in
         ;;
 
     Linux)
+        export CURL_BIN="/usr/bin/wget -qO -"
         export FETCH_BIN="/usr/bin/wget -N"
         export PATCH_BIN="/usr/bin/patch -p0 "
         export UNAME_BIN="/bin/uname"
