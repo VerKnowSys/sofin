@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-VERSION="0.26.13"
+VERSION="0.28.0"
 
 # load configuration from sofin.conf
 
@@ -726,12 +726,31 @@ for application in ${APPLICATIONS}; do
                     ${TOUCH_BIN} "${LOG}"
                 fi
                 debug "Running '$@' @ $(${DATE_BIN})"
-                eval PATH=${PATH} time "$@" 1>> "${LOG}" 2>> "${LOG}"
+                eval PATH=${PATH} "$@" 1>> "${LOG}" 2>> "${LOG}"
                 check_command_result $?
             else
                 error "Empty command to run?"
                 exit
             fi
+        }
+
+        check_current () { # $1 => version, $2 => current version
+            if [ ! "${1}" = "" ]; then
+                if [ ! "${2}" = "" ]; then
+                    if [ ! "${1}" = "${2}" ]; then
+                        warn "   → Found newer remote version: ${2} vs ${1}."
+                    else
+                        note "   → Definition version is up to date: ${1}"
+                    fi
+                fi
+            fi
+        }
+
+        check_current_by_definition () {
+            req_definition_file="${DEFINITIONS_DIR}${1}.def"
+            . ${DEFAULTS}
+            . "${req_definition_file}"
+            check_current "${APP_VERSION}" "${APP_CURRENT_VERSION}"
         }
 
         execute_process () {
@@ -748,6 +767,7 @@ for application in ${APPLICATIONS}; do
 
             . ${DEFAULTS}
             . ${req_definition_file}
+            check_current "${APP_VERSION}" "${APP_CURRENT_VERSION}"
 
             # force GNU compiler usage on definition side:
             if [ ! -z "${FORCE_GNU_COMPILER}" ]; then
@@ -995,6 +1015,7 @@ for application in ${APPLICATIONS}; do
                     execute_process "${req}"
                 fi
             fi
+            check_current_by_definition "${req}"
             export req_amount="$(${PRINTF_BIN} "${req_amount} - 1\n" | ${BC_BIN})"
         done
 
@@ -1037,6 +1058,7 @@ for application in ${APPLICATIONS}; do
                 strip_lib_bin
             else
                 note "  ${application} (1 of ${req_all})"
+                check_current_by_definition "${application}"
                 ver="$(${CAT_BIN} "${PREFIX}/${application}${INSTALLED_MARK}")"
                 note "√ ${application} [${ver}]\n"
                 debug "√ ${application} current: ${ver}, definition: [${APP_VERSION}] Ok."
