@@ -117,6 +117,7 @@ case "${SYSTEM_NAME}" in
         export BC_BIN="/usr/bin/bc"
         export CHOWN_BIN="/bin/chown"
         export LOCKFILE_BIN="true"
+        export AWK_BIN="/usr/bin/awk -c"
         ;;
 
 esac
