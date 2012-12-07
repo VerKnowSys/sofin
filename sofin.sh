@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-VERSION="0.30.1"
+VERSION="0.30.2"
 
 # load configuration from sofin.conf
 
@@ -662,9 +662,8 @@ for application in ${APPLICATIONS}; do
     . ${DEFINITIONS_DIR}${application}.def
     check_disabled "${DISABLE_ON}" # after which just check if it's not disabled
     if [ ! "${ALLOW}" = "1" ]; then
-        warn "   → Requirement: ${APP_NAME} disabled on architecture: ${SYSTEM_NAME}."
-        break
-    fi
+        warn "Requirement: ${APP_NAME} disabled on architecture: ${SYSTEM_NAME}."
+    else
 
     for definition in ${DEFINITIONS_DIR}${application}.def; do
         debug "Reading definition: ${definition}"
@@ -1081,6 +1080,7 @@ for application in ${APPLICATIONS}; do
         fi
 
     done
+    fi
 done
 
 
