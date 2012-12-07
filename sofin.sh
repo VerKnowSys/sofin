@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-VERSION="0.28.2"
+VERSION="0.30.0"
 
 # load configuration from sofin.conf
 
@@ -35,7 +35,7 @@ check_definition_dir () {
 check_requirements () {
     if [ "${APPLICATIONS}" = "" ]; then
         error "Empty applications list!"
-        exit_locked 1
+        exit 1
     fi
     if [ "${SYSTEM_NAME}" != "Darwin" ]; then
         files="$(${FIND_BIN} /usr/local -type f | ${WC_BIN} -l | ${SED_BIN} -e 's/^ *//g;s/ *$//g' )"
@@ -155,38 +155,6 @@ usage_howto () {
 }
 
 
-check_lock () {
-    userUID="$1"
-    if [ -z "${userUID}" ]; then
-        userUID="0"
-    fi
-    if [ ! "${userUID}" = "0" ]; then
-        export LOCK_FILE="${HOME_DIR}${userUID}/.sofin.lock"
-    fi
-    note "Waiting for lock…"
-    debug "Trying to occupy the lock file: ${LOCK_FILE}"
-    ${LOCKFILE_BIN} ${LOCK_FILE}
-
-    trap "exit_locked 2" INT
-}
-
-
-exit_locked () {
-    ERRCODE="$1"
-    if [ -z ${ERRCODE} ]; then
-        ERRCODE="0"
-    fi
-    if [ "${ERRCODE}" = "2" ]; then
-        warn "Interrupted by user."
-    fi
-    if [ -e "${LOCK_FILE}" ]; then
-        debug "Removing lock file: ${LOCK_FILE}"
-        ${RM_BIN} -f ${LOCK_FILE}
-    fi
-    exit ${ERRCODE}
-}
-
-
 update_shell_vars () {
     USER_UID="$(${ID_BIN} ${ID_SVD})"
     if [ "$(${ID_BIN} -u)" = "0" ]; then
@@ -274,7 +242,7 @@ if [ ! "$1" = "" ]; then
                 echo $(${BASENAME_BIN} ${app})
             done
         fi
-        exit_locked
+        exit
         ;;
 
 
@@ -480,12 +448,11 @@ if [ ! "$1" = "" ]; then
             export LISTS_DIR="${CACHE_DIR}lists/"
             export DEFAULTS="${DEFINITIONS_DIR}defaults.def"
         fi
-        check_lock ${USER_UID}
         update_definitions ${USER_UID}
         APP="$(${PRINTF_BIN} "${2}" | ${CUT_BIN} -c1 | ${TR_BIN} '[A-Z]' '[a-z]')$(${PRINTF_BIN} "${2}" | ${SED_BIN} 's/^[A-Za-z]//')"
         if [ ! -e "${DEFINITIONS_DIR}${APP}.def" ]; then
             error "Definition file not found: ${DEFINITIONS_DIR}${APP}.def !"
-            exit_locked 1
+            exit 1
         fi
         export APPLICATIONS="${APP}"
         debug "Installing software: ${APPLICATIONS}"
@@ -505,13 +472,12 @@ if [ ! "$1" = "" ]; then
             export LISTS_DIR="${CACHE_DIR}lists/"
             export DEFAULTS="${DEFINITIONS_DIR}defaults.def"
         fi
-        check_lock ${USER_UID}
         update_definitions ${USER_UID}
         cd "${LOCAL_DIR}"
         note "Looking for $(${PWD_BIN})/${DEPENDENCIES_FILE} file…"
         if [ ! -e "$(${PWD_BIN})/${DEPENDENCIES_FILE}" ]; then
             error "Dependencies file not found!"
-            exit_locked 1
+            exit 1
         fi
         export APPLICATIONS="$(${CAT_BIN} ${LOCAL_DIR}${DEPENDENCIES_FILE} | ${TR_BIN} '\n' ' ')"
         note "Installing dependencies: ${APPLICATIONS}\n"
@@ -540,11 +506,10 @@ if [ ! "$1" = "" ]; then
             export LISTS_DIR="${CACHE_DIR}lists/"
             export DEFAULTS="${DEFINITIONS_DIR}defaults.def"
         fi
-        check_lock ${USER_UID}
         update_definitions ${USER_UID}
         if [ ! -e "${LISTS_DIR}$2" ]; then
             error "List not found: ${2}!"
-            exit_locked 1
+            exit 1
         fi
         export APPLICATIONS="$(${CAT_BIN} ${LISTS_DIR}$2 | ${TR_BIN} '\n' ' ')"
         note "Installing software: ${APPLICATIONS}"
@@ -765,13 +730,13 @@ for application in ${APPLICATIONS}; do
         execute_process () {
             if [ -z "$1" ]; then
                 error "No param given for execute_process()!"
-                exit_locked 1
+                exit 1
             fi
             req_definition_file="${DEFINITIONS_DIR}${1}.def"
             debug "Checking requirement: $1 file: $req_definition_file"
             if [ ! -e "${req_definition_file}" ]; then
                 error "Cannot fetch definition ${req_definition_file}! Aborting!"
-                exit_locked 1
+                exit 1
             fi
 
             # load definition and check for current version
@@ -819,7 +784,7 @@ for application in ${APPLICATIONS}; do
             if [ "${ALLOW}" = "1" ]; then
                 if [ -z "${APP_HTTP_PATH}" ]; then
                     error "No source given for definition! Aborting"
-                    exit_locked 1
+                    exit 1
                 else
                     BUILD_DIR="${CACHE_DIR}cache/${APP_NAME}${APP_POSTFIX}-${APP_VERSION}/"
                     ${MKDIR_BIN} -p "${BUILD_DIR}"
@@ -845,7 +810,7 @@ for application in ${APPLICATIONS}; do
                     file="$(${BASENAME_BIN} $(${FIND_RESULT}))"
                     if [ "${APP_SHA}" = "" ]; then
                         error "→ Missing SHA sum for source: ${file}."
-                        exit_locked
+                        exit
                     else
                         case "${SYSTEM_NAME}" in
                             Darwin|Linux)
@@ -1165,4 +1130,4 @@ else
 fi
 
 
-exit_locked
+exit
