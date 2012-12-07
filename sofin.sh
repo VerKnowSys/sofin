@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-VERSION="0.28.1"
+VERSION="0.28.2"
 
 # load configuration from sofin.conf
 
@@ -1008,7 +1008,7 @@ for application in ${APPLICATIONS}; do
         if [ "${APP_REQUIREMENTS}" = "" ]; then
             note "Installing ${application}"
         else
-            note "Installing ${application} and its requirements: ${APP_REQUIREMENTS}"
+            note "Installing ${application} with requirements: ${APP_REQUIREMENTS}"
         fi
         export req_amount="$(${PRINTF_BIN} "${APP_REQUIREMENTS}" | ${WC_BIN} -w | ${AWK_BIN} '{print $1}')"
         export req_amount="$(${PRINTF_BIN} "${req_amount} + 1\n" | ${BC_BIN})"
@@ -1061,18 +1061,24 @@ for application in ${APPLICATIONS}; do
             fi
         }
 
+        show_done () {
+            ver="$(${CAT_BIN} "${PREFIX}/${application}${INSTALLED_MARK}")"
+            note "√ ${application} [${ver}]\n"
+        }
+
         if [ -e "${PREFIX}/${application}${INSTALLED_MARK}" ]; then
             if [ "${CHANGED}" = "true" ]; then
-                note "   → At least one of app dependencies has been changed. Forced rebuild of application…"
+                note "  ${application} (1 of ${req_all})"
+                note "   → App dependencies changed. Rebuilding ${application}"
                 execute_process "${application}"
                 unset CHANGED
                 mark
                 strip_lib_bin
+                show_done
             else
                 note "  ${application} (1 of ${req_all})"
                 check_current_by_definition "${application}"
-                ver="$(${CAT_BIN} "${PREFIX}/${application}${INSTALLED_MARK}")"
-                note "√ ${application} [${ver}]\n"
+                show_done
                 debug "√ ${application} current: ${ver}, definition: [${APP_VERSION}] Ok."
             fi
         else
