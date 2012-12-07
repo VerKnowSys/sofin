@@ -9,24 +9,14 @@
 #include <fstream>
 #include <sstream>
 #include <sys/stat.h>
+#include <sys/fcntl.h>
+#include <errno.h>
 #if defined(__FreeBSD__) || defined(__linux__)
     #include <cstdlib>
     #include <sys/wait.h>
 #endif
 #include <sys/user.h>
-#ifdef __APPLE__
-    #include <mach/clock.h>
-    #include <mach/clock_priv.h>
-    #include <mach/clock_types.h>
-    #include <sys/fcntl.h>
-    #include <assert.h>
-    #include <errno.h>
-    #include <stdbool.h>
-    #include <stdlib.h>
-    #include <stdio.h>
-    #include <sys/sysctl.h>
 
-#endif
 
 using namespace std;
 
