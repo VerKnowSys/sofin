@@ -8,9 +8,24 @@
 #include <string>
 #include <fstream>
 #include <sstream>
+#include <sys/stat.h>
 #if defined(__FreeBSD__) || defined(__linux__)
     #include <cstdlib>
     #include <sys/wait.h>
+#endif
+#include <sys/user.h>
+#ifdef __APPLE__
+    #include <mach/clock.h>
+    #include <mach/clock_priv.h>
+    #include <mach/clock_types.h>
+    #include <sys/fcntl.h>
+    #include <assert.h>
+    #include <errno.h>
+    #include <stdbool.h>
+    #include <stdlib.h>
+    #include <stdio.h>
+    #include <sys/sysctl.h>
+
 #endif
 
 using namespace std;
@@ -47,16 +62,62 @@ void execute(char **argv, int uid) {
 
 int main(int argc, char const *argv[]) {
 
+    char str[32];
     char *arguments[argc];
-    stringstream cmd;
+    stringstream cmd, lockfile;
+
+    lockfile << "/Users/" << getuid() << "/.sofin-lock-" << getuid() << endl;
     cmd << string(DEFAULT_SOFIN_SCRIPTNAME);
     if (argc > 1) {
         for (int i = 1; i < argc; ++i) {
-            cmd << " " + string(argv[i]);
+            cmd << " " << argv[i];
         }
     }
-    parse((char*)(cmd.str().c_str()), arguments);
-    execute(arguments, getuid());
+    cmd << "\0";
 
+    if ( // hacky but working way of dealing with tasks without need of locking:
+        (strcmp(argv[1], "ver") == 0) ||
+        (strcmp(argv[1], "version") == 0) ||
+        (strcmp(argv[1], "list") == 0) ||
+        (strcmp(argv[1], "installed") == 0) ||
+        (strcmp(argv[1], "fulllist") == 0) ||
+        (strcmp(argv[1], "fullinstalled") == 0) ||
+        (strcmp(argv[1], "export") == 0) ||
+        (strcmp(argv[1], "exp") == 0) ||
+        (strcmp(argv[1], "exportapp") == 0) ||
+        (strcmp(argv[1], "getshellvars") == 0) ||
+        (strcmp(argv[1], "log") == 0) ||
+        (strcmp(argv[1], "available") == 0)
+    ) { // just execute without locking:
+        parse((char*)cmd.str().c_str(), arguments);
+        execute(arguments, getuid());
+        return 0;
+    }
+
+    while (true) {
+        const char* lockff = lockfile.str().c_str();
+        const int lfp = open(lockff, O_RDWR | O_CREAT, 0600);
+        if (lfp < 0) {
+            cerr << "Lock file occupied: " << lockff << ". Error: " << strerror(errno) << endl;
+            exit(1); /* can not open */
+        }
+        if (lockf(lfp, F_TLOCK, 0) < 0) {
+            cerr << ".";
+            sleep(3);
+        }
+
+        if (lockf(lfp, F_TLOCK, 0) == 0) {
+            sprintf(str, "%d\n", getpid());
+            write(lfp, str, strlen(str)); /* record pid to lockfile */
+
+            signal(SIGTSTP, SIG_IGN); /* ignore tty signals */
+            signal(SIGTTOU, SIG_IGN);
+            signal(SIGTTIN, SIG_IGN);
+
+            parse((char*)cmd.str().c_str(), arguments);
+            execute(arguments, getuid());
+            break;
+        }
+    }
     return 0;
 }

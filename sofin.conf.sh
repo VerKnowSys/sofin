@@ -71,7 +71,6 @@ WC_BIN="/usr/bin/wc"
 SHA_BIN="/sbin/sha1"
 AWK_BIN="/usr/bin/awk"
 SLEEP_BIN="/bin/sleep"
-LOCKFILE_BIN="/usr/bin/lockfile"
 SYSCTL_BIN="/sbin/sysctl"
 BC_BIN="/usr/bin/bc"
 HEAD_BIN="/usr/bin/head"
@@ -116,7 +115,6 @@ case "${SYSTEM_NAME}" in
         export GREP_BIN="/bin/grep"
         export BC_BIN="/usr/bin/bc"
         export CHOWN_BIN="/bin/chown"
-        export LOCKFILE_BIN="true"
         export AWK_BIN="/usr/bin/awk -c"
         ;;
 
@@ -176,14 +174,14 @@ error () {
 check_command_result () {
     if [ -z "$1" ]; then
         error "No param given for check_command_result()!"
-        exit_locked 1
+        exit 1
     fi
     if [ "$1" = "0" ]; then
         debug "CORRECT"
     else
         error
         error "FAILURE. Run $(${BASENAME_BIN} ${SCRIPT_NAME}) log to see what went wrong."
-        exit_locked 1
+        exit 1
     fi
 }
 
