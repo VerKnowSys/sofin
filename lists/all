@@ -24,6 +24,7 @@ mysql
 nginx
 node
 node-legacy
+oidentd
 openssh
 openssl
 openvpn
@@ -31,6 +32,8 @@ passenger
 perl
 php
 postgresql
+pure-ftpd
+procmail
 python
 python-legacy
 qt
@@ -40,11 +43,14 @@ rtorrent
 ruby
 scala
 scons
-sox
 shc
+sox
+subversion
+tig
 tmux
 transmission
 weechat
 zabbix
+znc
 zsh
 vim
