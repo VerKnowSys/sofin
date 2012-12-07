@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-VERSION="0.28.0"
+VERSION="0.28.1"
 
 # load configuration from sofin.conf
 
@@ -690,6 +690,15 @@ PATH=${DEFAULT_PATH}
 
 for application in ${APPLICATIONS}; do
 
+    # prevent installation of requirements of disabled application:
+    export ALLOW=1
+    . ${DEFINITIONS_DIR}${application}.def
+    check_disabled "${DISABLE_ON}" # after which just check if it's not disabled
+    if [ ! "${ALLOW}" = "1" ]; then
+        warn "   → Requirement: ${APP_NAME} disabled on architecture: ${SYSTEM_NAME}."
+        break
+    fi
+
     for definition in ${DEFINITIONS_DIR}${application}.def; do
         debug "Reading definition: ${definition}"
         . ${DEFAULTS}
@@ -765,9 +774,14 @@ for application in ${APPLICATIONS}; do
                 exit_locked 1
             fi
 
+            # load definition and check for current version
             . ${DEFAULTS}
             . ${req_definition_file}
             check_current "${APP_VERSION}" "${APP_CURRENT_VERSION}"
+
+            # check requirement for disabled state:
+            export ALLOW="1"
+            check_disabled "${DISABLE_ON}"
 
             # force GNU compiler usage on definition side:
             if [ ! -z "${FORCE_GNU_COMPILER}" ]; then
@@ -802,8 +816,6 @@ for application in ${APPLICATIONS}; do
                 export LDFLAGS="${LDFLAGS} -L/opt/X11/lib"
             fi
 
-            export ALLOW="1"
-            check_disabled "${DISABLE_ON}"
             if [ "${ALLOW}" = "1" ]; then
                 if [ -z "${APP_HTTP_PATH}" ]; then
                     error "No source given for definition! Aborting"
@@ -1051,7 +1063,7 @@ for application in ${APPLICATIONS}; do
 
         if [ -e "${PREFIX}/${application}${INSTALLED_MARK}" ]; then
             if [ "${CHANGED}" = "true" ]; then
-                note " → At least one of app dependencies has been changed. Forced rebuild of application…"
+                note "   → At least one of app dependencies has been changed. Forced rebuild of application…"
                 execute_process "${application}"
                 unset CHANGED
                 mark
