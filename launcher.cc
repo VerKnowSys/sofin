@@ -5,7 +5,7 @@
 
 
 #include <iostream>
-#include <string>
+#include <string.h>
 #include <fstream>
 #include <sstream>
 #include <sys/stat.h>
@@ -62,26 +62,24 @@ int main(int argc, char const *argv[]) {
         for (int i = 1; i < argc; ++i) {
             cmd << " " << argv[i];
         }
-    }
-    cmd << "\0";
-
-    if ( // hacky but working way of dealing with tasks without need of locking:
-        (strcmp(argv[1], "ver") == 0) ||
-        (strcmp(argv[1], "version") == 0) ||
-        (strcmp(argv[1], "list") == 0) ||
-        (strcmp(argv[1], "installed") == 0) ||
-        (strcmp(argv[1], "fulllist") == 0) ||
-        (strcmp(argv[1], "fullinstalled") == 0) ||
-        (strcmp(argv[1], "export") == 0) ||
-        (strcmp(argv[1], "exp") == 0) ||
-        (strcmp(argv[1], "exportapp") == 0) ||
-        (strcmp(argv[1], "getshellvars") == 0) ||
-        (strcmp(argv[1], "log") == 0) ||
-        (strcmp(argv[1], "available") == 0)
-    ) { // just execute without locking:
-        parse((char*)cmd.str().c_str(), arguments);
-        execute(arguments, getuid());
-        return 0;
+        if ( // hacky but working way of dealing with tasks without need of locking:
+            (strcmp(argv[1], "ver") == 0) ||
+            (strcmp(argv[1], "version") == 0) ||
+            (strcmp(argv[1], "list") == 0) ||
+            (strcmp(argv[1], "installed") == 0) ||
+            (strcmp(argv[1], "fulllist") == 0) ||
+            (strcmp(argv[1], "fullinstalled") == 0) ||
+            (strcmp(argv[1], "export") == 0) ||
+            (strcmp(argv[1], "exp") == 0) ||
+            (strcmp(argv[1], "exportapp") == 0) ||
+            (strcmp(argv[1], "getshellvars") == 0) ||
+            (strcmp(argv[1], "log") == 0) ||
+            (strcmp(argv[1], "available") == 0)
+        ) { // just execute without locking:
+            parse((char*)cmd.str().c_str(), arguments);
+            execute(arguments, getuid());
+            return 0;
+        }
     }
 
     while (true) {
