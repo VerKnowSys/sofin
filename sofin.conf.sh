@@ -199,11 +199,9 @@ check_root () {
 check_os () {
     case "${SYSTEM_NAME}" in
         FreeBSD)
-            # note "Running on FreeBSD host"
             ;;
 
         Darwin)
-            # note "Running on OSX/Darwin host"
             ;;
 
         Linux)
@@ -226,6 +224,7 @@ validate_env () {
         var_value="$(${PRINTF_BIN} "${envvar}" | ${SED_BIN} -e 's/.*=//g')"
         if [ ! -x "${var_value}" ]; then
             error "Unavailable binary required by ${SCRIPT_NAME}: ${envvar}"
+            exit 1
         fi
     done
 }
