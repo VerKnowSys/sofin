@@ -265,7 +265,8 @@ if [ ! "$1" = "" ]; then
             for app in ${SOFT_DIR}*; do
                 note "$(${BASENAME_BIN} ${app}):"
                 for req in $(${FIND_BIN} ${app} -maxdepth 1 -name *${INSTALLED_MARK} | ${SORT_BIN}); do
-                    note "→ $(${BASENAME_BIN} ${req}) version: $(${CAT_BIN} ${req})"
+                    pp="$(${PRINTF_BIN} "$(${BASENAME_BIN} ${req})" | ${TR_BIN} '.' ' ')"
+                    note "  → ${pp} [$(${CAT_BIN} ${req})]"
                 done
                 note
             done
