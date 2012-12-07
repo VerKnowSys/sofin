@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-VERSION="0.30.2"
+VERSION="0.30.3"
 
 # load configuration from sofin.conf
 
@@ -659,6 +659,7 @@ for application in ${APPLICATIONS}; do
 
     # prevent installation of requirements of disabled application:
     export ALLOW=1
+    application="$(${PRINTF_BIN} "${application}" | ${TR_BIN} '[A-Z]' '[a-z]')" # lowercase necessary for case sensitive filesystems
     . ${DEFINITIONS_DIR}${application}.def
     check_disabled "${DISABLE_ON}" # after which just check if it's not disabled
     if [ ! "${ALLOW}" = "1" ]; then
