@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-VERSION="0.30.4"
+VERSION="0.30.5"
 
 # load configuration from sofin.conf
 
@@ -652,16 +652,16 @@ fi
 check_requirements
 
 
-# . ${DEFAULTS}
 PATH=${DEFAULT_PATH}
-ALLOW=1
 
 for application in ${APPLICATIONS}; do
 
     # prevent installation of requirements of disabled application:
     application="$(${PRINTF_BIN} "${application}" | ${TR_BIN} '[A-Z]' '[a-z]')" # lowercase necessary for case sensitive filesystems
+    export ALLOW=1
     . ${DEFAULTS}
     . ${DEFINITIONS_DIR}${application}.def
+    debug "DEF: ${application} == ${DISABLE_ON}"
     check_disabled "${DISABLE_ON}" # after which just check if it's not disabled
     if [ ! "${ALLOW}" = "1" ]; then
         warn "Requirement: ${APP_NAME} disabled on architecture: ${SYSTEM_NAME}."
