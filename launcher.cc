@@ -95,9 +95,7 @@ int main(int argc, char const *argv[]) {
         if (lockf(lfp, F_TLOCK, 0) < 0) {
             cerr << ".";
             sleep(3);
-        }
-
-        if (lockf(lfp, F_TLOCK, 0) == 0) {
+        } else {
             sprintf(str, "%d\n", getpid());
             write(lfp, str, strlen(str)); /* record pid to lockfile */
 
