@@ -15,6 +15,7 @@
     #include <cstdlib>
     #include <sys/wait.h>
 #endif
+#include <sys/user.h>
 
 
 using namespace std;
