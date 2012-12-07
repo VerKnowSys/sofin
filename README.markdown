@@ -117,7 +117,7 @@ space than it does with "old fasioned, system wide, shared software".
 
 * Debian specific: (Yes it's NOT Linux specific at all, cause every distro is a different monster with own set of additional hands and legs)
 > 1.  Install base 64bit system - I used 64bit Debian "wheezy" netinstall iso here. You need to know that Debian is a bit messy distro anyway. We need to do some bad things to make it work like we want.
-> 2.  Run as root: "aptitude install time clang gcc g++ make libncurses5-dev zlib1g-dev bc". The most important thing is to have clang with version at least 3.0 already installed in system. It's required to build Sofin's Clang.
+> 2.  Run as root: "aptitude install time clang gcc g++ make libncurses5-dev zlib1g-dev libbz2-dev bc". The most important thing is to have clang with version at least 3.0 already installed in system. It's required to build Sofin's Clang.
 > 3.  Run as root: "wget -qO- https://github.com/VerKnowSys/sofin/archive/master.tar.gz | tar zxf - && cd ./sofin-master && ./sofin-install". It will put "sofin" into /usr/bin/ and sofin.conf.sh into /etc/.
 > 4.  Build core software. Run as root: "sofin install base".
 > 5.  Start using sofin as regular user. Set your environment to source "/etc/profile_sofin" for your user environments.
