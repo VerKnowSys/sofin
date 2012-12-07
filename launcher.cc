@@ -55,8 +55,11 @@ int main(int argc, char const *argv[]) {
     char str[32];
     char *arguments[argc];
     stringstream cmd, lockfile;
+    if (getuid() == 0)
+        lockfile << "/var/run/.sofin-lock-" << getuid() << endl;
+    else
+        lockfile << "/Users/" << getuid() << "/.sofin-lock-" << getuid() << endl;
 
-    lockfile << "/Users/" << getuid() << "/.sofin-lock-" << getuid() << endl;
     cmd << string(DEFAULT_SOFIN_SCRIPTNAME);
     if (argc > 1) {
         for (int i = 1; i < argc; ++i) {
