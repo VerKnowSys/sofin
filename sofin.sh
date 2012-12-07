@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-VERSION="0.30.0"
+VERSION="0.30.1"
 
 # load configuration from sofin.conf
 
@@ -263,12 +263,13 @@ if [ ! "$1" = "" ]; then
         note
         if [ -d ${SOFT_DIR} ]; then
             for app in ${SOFT_DIR}*; do
-                note "$(${BASENAME_BIN} ${app}):"
+                app_name="$(${BASENAME_BIN} ${app})"
+                note "Checking ${app_name}"
                 for req in $(${FIND_BIN} ${app} -maxdepth 1 -name *${INSTALLED_MARK} | ${SORT_BIN}); do
-                    pp="$(${PRINTF_BIN} "$(${BASENAME_BIN} ${req})" | ${TR_BIN} '.' ' ')"
-                    note "  → ${pp} [$(${CAT_BIN} ${req})]"
+                    pp="$(${PRINTF_BIN} "$(${BASENAME_BIN} ${req})" | ${SED_BIN} 's/\.installed//')"
+                    note "  ${pp} [$(${CAT_BIN} ${req})]"
                 done
-                note
+                note "√ ${app_name}\n"
             done
         fi
         exit
