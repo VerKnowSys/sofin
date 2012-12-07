@@ -208,7 +208,7 @@ check_os () {
             ;;
 
         *)
-            error "Currently only FreeBSD and Darwin hosts are supported."
+            error "Currently only FreeBSD, Darwin and Linux hosts are supported."
             exit
             ;;
 
