@@ -125,7 +125,7 @@ DEFAULT_PAUSE_WHEN_LOCKED="30" # seconds
 MAIN_SOURCE_REPOSITORY="http://software.verknowsys.com/source/"
 MAIN_BINARY_REPOSITORY="http://software.verknowsys.com/binary/$(${UNAME_BIN})/common/"
 
-CCACHE_BIN="${SOFTWARE_DIR}Ccache/exports/ccache"
+CCACHE_BIN_OPTIONAL="${SOFTWARE_DIR}Ccache/exports/ccache"
 
 # ANSI color definitions
 red='\033[31;40m'

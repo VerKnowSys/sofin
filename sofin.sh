@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-VERSION="0.30.6"
+VERSION="0.30.7"
 
 # load configuration from sofin.conf
 
@@ -765,10 +765,10 @@ for application in ${APPLICATIONS}; do
             # if it's supported by definition (it is by default)
             if [ "${APP_NO_CCACHE}" = "" ]; then
                 # check for CCACHE availability
-                if [ -x "${CCACHE_BIN}" ]; then
-                    export CC="${CCACHE_BIN} ${CC}"
-                    export CXX="${CCACHE_BIN} ${CXX}"
-                    export CPP="${CCACHE_BIN} ${CPP}"
+                if [ -x "${CCACHE_BIN_OPTIONAL}" ]; then
+                    export CC="${CCACHE_BIN_OPTIONAL} ${CC}"
+                    export CXX="${CCACHE_BIN_OPTIONAL} ${CXX}"
+                    export CPP="${CCACHE_BIN_OPTIONAL} ${CPP}"
                 fi
             fi
             # set rest of compiler/linker variables
