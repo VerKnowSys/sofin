@@ -8,7 +8,7 @@ TRACE="false"
 
 ID_SVD="-u" # NOTE: use "-un" for standard FreeBSD systems with users defined in /etc/passwd
 HEADER="Sofin v${VERSION} - © 2o12 - Versatile Knowledge Systems - VerKnowSys.com"
-SCRIPT_NAME="$0"
+SCRIPT_NAME="/usr/bin/sofin.sh"
 SCRIPT_ARGS="$*"
 SOFTWARE_DIR="/Software/"
 JDK6_32="${SOFTWARE_DIR}Openjdk6-i386"
