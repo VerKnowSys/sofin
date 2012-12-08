@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-VERSION="0.30.7"
+VERSION="0.30.8"
 
 # load configuration from sofin.conf
 
@@ -168,6 +168,8 @@ update_shell_vars () {
 
 
 check_disabled () {
+    # check requirement for disabled state:
+    export ALLOW="1"
     if [ ! "$1" = "" ]; then
         for disabled in ${1}; do
             debug "Running system: ${SYSTEM_NAME}"
@@ -658,12 +660,9 @@ PATH=${DEFAULT_PATH}
 
 for application in ${APPLICATIONS}; do
 
-    # prevent installation of requirements of disabled application:
-    application="$(${PRINTF_BIN} "${application}" | ${TR_BIN} '[A-Z]' '[a-z]')" # lowercase necessary for case sensitive filesystems
-    export ALLOW=1
+    application="$(${PRINTF_BIN} "${application}" | ${TR_BIN} '[A-Z]' '[a-z]')" # lowercase for case sensitive fs
     . ${DEFAULTS}
-    . ${DEFINITIONS_DIR}${application}.def
-    debug "DEF: ${application} == ${DISABLE_ON}"
+    . ${DEFINITIONS_DIR}${application}.def # prevent installation of requirements of disabled application:
     check_disabled "${DISABLE_ON}" # after which just check if it's not disabled
     if [ ! "${ALLOW}" = "1" ]; then
         warn "Requirement: ${APP_NAME} disabled on architecture: ${SYSTEM_NAME}.\n"
@@ -673,10 +672,7 @@ for application in ${APPLICATIONS}; do
         debug "Reading definition: ${definition}"
         . ${DEFAULTS}
         . ${definition}
-
-        export ALLOW=1 # allow definition to be built by default
         check_disabled "${DISABLE_ON}" # after which just check if it's not disabled
-        debug "→ Requirements for this definition: ${APP_REQUIREMENTS}"
 
         # fancy old style Capitalize
         APP_NAME="$(${PRINTF_BIN} "${APP_NAME}" | ${CUT_BIN} -c1 | ${TR_BIN} '[a-z]' '[A-Z]')$(${PRINTF_BIN} "${APP_NAME}" | ${SED_BIN} 's/^[a-zA-Z]//')"
@@ -717,7 +713,7 @@ for application in ${APPLICATIONS}; do
             if [ ! "${1}" = "" ]; then
                 if [ ! "${2}" = "" ]; then
                     if [ ! "${1}" = "${2}" ]; then
-                        warn "   → Found newer remote version: ${2} vs ${1}."
+                        warn "   → Found different remote version: ${2} vs ${1}."
                     else
                         note "   → Definition version is up to date: ${1}"
                     fi
@@ -750,7 +746,6 @@ for application in ${APPLICATIONS}; do
             check_current "${APP_VERSION}" "${APP_CURRENT_VERSION}"
 
             # check requirement for disabled state:
-            export ALLOW="1"
             check_disabled "${DISABLE_ON}"
 
             # force GNU compiler usage on definition side:
