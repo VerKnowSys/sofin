@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-VERSION="0.30.5"
+VERSION="0.30.6"
 
 # load configuration from sofin.conf
 
@@ -572,7 +572,8 @@ if [ ! "$1" = "" ]; then
 
 
     update|updatedefs)
-        if [ ! "$(${ID_BIN} -u)" = "0" ]; then
+        USER_UID="$(${ID_BIN} -u)"
+        if [ ! "${USER_UID}" = "0" ]; then
             export CACHE_DIR="${HOME_DIR}${USER_UID}/.cache/"
             export DEFINITIONS_DIR="${CACHE_DIR}definitions/"
             export LOG="${HOME_DIR}${USER_UID}/install.log"
@@ -580,6 +581,7 @@ if [ ! "$1" = "" ]; then
         export LISTS_DIR="${CACHE_DIR}lists/"
         export DEFAULTS="${DEFINITIONS_DIR}defaults.def"
         update_definitions "${USER_UID}"
+        note "Definitions were updated to latest version."
         exit
         ;;
 
@@ -664,7 +666,7 @@ for application in ${APPLICATIONS}; do
     debug "DEF: ${application} == ${DISABLE_ON}"
     check_disabled "${DISABLE_ON}" # after which just check if it's not disabled
     if [ ! "${ALLOW}" = "1" ]; then
-        warn "Requirement: ${APP_NAME} disabled on architecture: ${SYSTEM_NAME}."
+        warn "Requirement: ${APP_NAME} disabled on architecture: ${SYSTEM_NAME}.\n"
     else
 
     for definition in ${DEFINITIONS_DIR}${application}.def; do
