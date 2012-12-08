@@ -661,8 +661,8 @@ PATH=${DEFAULT_PATH}
 for application in ${APPLICATIONS}; do
 
     application="$(${PRINTF_BIN} "${application}" | ${TR_BIN} '[A-Z]' '[a-z]')" # lowercase for case sensitive fs
-    . ${DEFAULTS}
-    . ${DEFINITIONS_DIR}${application}.def # prevent installation of requirements of disabled application:
+    . "${DEFAULTS}"
+    . "${DEFINITIONS_DIR}${application}.def" # prevent installation of requirements of disabled application:
     check_disabled "${DISABLE_ON}" # after which just check if it's not disabled
     if [ ! "${ALLOW}" = "1" ]; then
         warn "Requirement: ${APP_NAME} disabled on architecture: ${SYSTEM_NAME}.\n"
@@ -670,8 +670,8 @@ for application in ${APPLICATIONS}; do
 
     for definition in ${DEFINITIONS_DIR}${application}.def; do
         debug "Reading definition: ${definition}"
-        . ${DEFAULTS}
-        . ${definition}
+        . "${DEFAULTS}"
+        . "${definition}"
         check_disabled "${DISABLE_ON}" # after which just check if it's not disabled
 
         # fancy old style Capitalize
@@ -723,7 +723,7 @@ for application in ${APPLICATIONS}; do
 
         check_current_by_definition () {
             req_definition_file="${DEFINITIONS_DIR}${1}.def"
-            . ${DEFAULTS}
+            . "${DEFAULTS}"
             . "${req_definition_file}"
             check_current "${APP_VERSION}" "${APP_CURRENT_VERSION}"
         }
@@ -741,8 +741,8 @@ for application in ${APPLICATIONS}; do
             fi
 
             # load definition and check for current version
-            . ${DEFAULTS}
-            . ${req_definition_file}
+            . "${DEFAULTS}"
+            . "${req_definition_file}"
             check_current "${APP_VERSION}" "${APP_CURRENT_VERSION}"
 
             # check requirement for disabled state:
