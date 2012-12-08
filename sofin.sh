@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-VERSION="0.30.8"
+VERSION="0.30.9"
 
 # load configuration from sofin.conf
 
@@ -389,11 +389,7 @@ if [ ! "$1" = "" ]; then
             error "For application \"$1\", third argument with application name is required!"
             exit 1
         fi
-        if [ -z "${4}" ]; then
-            export USER_UID="$(${ID_BIN} ${ID_SVD})"
-        else
-            export USER_UID="$4"
-        fi
+        export USER_UID="$(${ID_BIN} ${ID_SVD})"
         if [ "$(${ID_BIN} -u)" = "0" ]; then
             export SOFT_DIR="${SOFTWARE_DIR}"
         else
@@ -435,14 +431,7 @@ if [ ! "$1" = "" ]; then
             error "For \"$1\" application installation mode, second argument with application definition name is required!"
             exit 1
         fi
-        if [ -z "${3}" ]; then
-            export USER_UID="$(${ID_BIN} ${ID_SVD})"
-        else
-            export USER_UID="$3"
-        fi
-        if [ ! "$(${ID_BIN} ${ID_SVD})" = "${USER_UID}" ]; then
-            check_root
-        fi
+        export USER_UID="$(${ID_BIN} ${ID_SVD})"
         if [ "$(${ID_BIN} -u)" = "0" ]; then
             unset USER_UID
         else
@@ -467,7 +456,7 @@ if [ ! "$1" = "" ]; then
         LOCAL_DIR="$(${PWD_BIN})/"
         export USER_UID="$(${ID_BIN} ${ID_SVD})"
         if [ "$(${ID_BIN} -u)" = "0" ]; then
-            error "Installation of project dependencies cannot be run as root!"
+            error "Installation of project dependencies as root is immoral."
             exit 1
         else
             export LOG="${HOME_DIR}${USER_UID}/install.log"
@@ -493,14 +482,7 @@ if [ ! "$1" = "" ]; then
             error "For \"$1\" application installation mode, second argument with application list is required!"
             exit 1
         fi
-        if [ -z "${3}" ]; then
-            export USER_UID="$(${ID_BIN} ${ID_SVD})"
-        else
-            export USER_UID="$3"
-        fi
-        if [ ! "$(${ID_BIN} ${ID_SVD})" = "${USER_UID}" ]; then
-            check_root
-        fi
+        export USER_UID="$(${ID_BIN} ${ID_SVD})"
         if [ "$(${ID_BIN} -u)" = "0" ]; then
             unset USER_UID
         else
@@ -526,22 +508,11 @@ if [ ! "$1" = "" ]; then
             exit 1
         fi
         USER_UID="$(${ID_BIN} -u)"
-        if [ -z "${3}" ]; then # uid/user name not given
-            if [ "${USER_UID}" = "0" ]; then
-                export SOFT_DIR="${SOFTWARE_DIR}"
-            else
-                export LOG="${HOME_DIR}$(${ID_BIN} ${ID_SVD})/install.log"
-                export SOFT_DIR="${HOME_DIR}$(${ID_BIN} ${ID_SVD})/${HOME_APPS_DIR}"
-            fi
+        if [ "${USER_UID}" = "0" ]; then
+            export SOFT_DIR="${SOFTWARE_DIR}"
         else
-            if [ ! "$(${ID_BIN} ${ID_SVD})" = "${3}" ]; then
-                check_root
-                export LOG="${HOME_DIR}${3}/install.log"
-                export SOFT_DIR="${HOME_DIR}${3}/${HOME_APPS_DIR}"
-            else
-                export LOG="${HOME_DIR}${3}/install.log"
-                export SOFT_DIR="${HOME_DIR}${3}/${HOME_APPS_DIR}"
-            fi
+            export LOG="${HOME_DIR}$(${ID_BIN} ${ID_SVD})/install.log"
+            export SOFT_DIR="${HOME_DIR}$(${ID_BIN} ${ID_SVD})/${HOME_APPS_DIR}"
         fi
         APP_NAME="$(${PRINTF_BIN} "${2}" | ${CUT_BIN} -c1 | ${TR_BIN} '[a-z]' '[A-Z]')$(${PRINTF_BIN} "${2}" | ${SED_BIN} 's/^[a-zA-Z]//')"
         if [ -d "${SOFT_DIR}${APP_NAME}" ]; then
@@ -614,23 +585,13 @@ if [ ! "$1" = "" ]; then
         fi
         EXPORT="$2"
         APP="$(${PRINTF_BIN} "${3}" | ${CUT_BIN} -c1 | ${TR_BIN} '[a-z]' '[A-Z]')$(${PRINTF_BIN} "${3}" | ${SED_BIN} 's/^[a-zA-Z]//')"
-        userUID="$4"
         export SOFT_DIR="${SOFTWARE_DIR}"
-        if [ -z "${userUID}" ]; then
-            export userUID="$(${ID_BIN} ${ID_SVD})"
-            if [ ! "$(${ID_BIN} -u)" = "0" ]; then
-                export SOFT_DIR="${HOME_DIR}${userUID}/${HOME_APPS_DIR}"
-                export LOG="${HOME_DIR}${userUID}/install.log"
-            fi
-        else # uid given?
-            if [ ! "$(${ID_BIN} -u)" = "0" ]; then
-                export SOFT_DIR="${HOME_DIR}${userUID}/${HOME_APPS_DIR}"
-                export LOG="${HOME_DIR}${userUID}/install.log"
-                if [ ! "${userUID}" = "$(${ID_BIN} ${ID_SVD})" ]; then
-                    check_root
-                fi
-            fi
+        export userUID="$(${ID_BIN} ${ID_SVD})"
+        if [ ! "$(${ID_BIN} -u)" = "0" ]; then
+            export SOFT_DIR="${HOME_DIR}${userUID}/${HOME_APPS_DIR}"
+            export LOG="${HOME_DIR}${userUID}/install.log"
         fi
+
         for dir in "/bin/" "/sbin/" "/libexec/"; do
             debug "Testing ${dir} looking into: ${SOFT_DIR}${APP}${dir}"
             if [ -e "${SOFT_DIR}${APP}${dir}${EXPORT}" ]; then
