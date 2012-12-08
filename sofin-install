@@ -34,27 +34,27 @@ install_base () {
 
     if [ ! -x "$($PWD_BIN)/sofin" ]; then
         # no compiler available in system, using plain script
-        ${LN_BIN} -s "$($PWD_BIN)/sofin.sh" /usr/bin/sofin
+        ${CP_BIN} "$($PWD_BIN)/sofin.sh" /usr/bin/sofin
         check_command_result $?
     else
         # compiler available, build was done
-        ${LN_BIN} -s "$($PWD_BIN)/sofin" /usr/bin/sofin
+        ${CP_BIN} "$($PWD_BIN)/sofin" /usr/bin/sofin
         SHC_BIN="$(which shc)"
         if [ "${SHC_BIN}" = "" ]; then
             note "SHC compiler unavailable"
-            ${LN_BIN} -s "$($PWD_BIN)/sofin.sh" /usr/bin/sofin.sh
+            ${CP_BIN} "$($PWD_BIN)/sofin.sh" /usr/bin/sofin.sh
             check_command_result $?
         else
             note "SHC compiler available"
             ${SHC_BIN} -T -f "$($PWD_BIN)/sofin.sh"
             check_command_result $?
             chmod 755 "$($PWD_BIN)/sofin.sh.x"
-            ${LN_BIN} -s "$($PWD_BIN)/sofin.sh.x" /usr/bin/sofin.sh
+            ${CP_BIN} "$($PWD_BIN)/sofin.sh.x" /usr/bin/sofin.sh
             check_command_result $?
         fi
     fi
 
-    ${LN_BIN} -s "$($PWD_BIN)/${CONF_FILE}" "/etc/${CONF_FILE}"
+    ${CP_BIN} "$($PWD_BIN)/${CONF_FILE}" "/etc/${CONF_FILE}"
     check_command_result $?
 
     ${MKDIR_BIN} -p /Software/.cache
