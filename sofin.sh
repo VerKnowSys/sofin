@@ -59,7 +59,7 @@ set_c_compiler () {
             BASE_COMPILER="${SOFTWARE_DIR}Clang/exports"
             if [ ! -f "${BASE_COMPILER}/clang" ]; then
                 export BASE_COMPILER="/usr/bin"
-                if [ ! -f "${BASE_COMPILER}/clang" ]; then
+                if [ ! -x "${BASE_COMPILER}/clang" ]; then
                     set_c_compiler GNU # fallback to gcc on system without any clang version
                 fi
             fi
