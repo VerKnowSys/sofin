@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-VERSION="0.30.9"
+VERSION="0.30.10"
 
 # load configuration from sofin.conf
 
@@ -91,16 +91,16 @@ update_definitions () { # accepts optional user uid param
     for element in "${LISTS_DIR}" "${DEFINITIONS_DIR}"; do
         ${MKDIR_BIN} -p "${element}" > /dev/null
         if [ ! -z "${1}" ]; then # param with uid not given
-            ${TOUCH_BIN} ${LOG}
+            ${TOUCH_BIN} "${LOG}"
             if [ "$(${ID_BIN} -u)" = "0" ]; then
                 if [ ! -z "${1}" ]; then
                     debug "Chowning ${element} for user: ${1}"
-                    ${CHOWN_BIN} -R ${1} "${element}" >> ${LOG}
+                    ${CHOWN_BIN} -R ${1} "${element}" >> "${LOG}"
                 fi
             fi
         fi
         debug "Removing old definitions: ${element}"
-        ${RM_BIN} ${rm_options} ${element} >> ${LOG}
+        ${RM_BIN} ${rm_options} ${element} >> "${LOG}"
     done
     cd "${CACHE_DIR}"
     debug "Working in cache dir: ${CACHE_DIR}"
@@ -112,7 +112,7 @@ update_definitions () { # accepts optional user uid param
     if [ "$(${ID_BIN} -u)" = "0" ]; then
         if [ ! -z "${1}" ]; then
             debug "Chowning definitions for user: ${1}"
-            ${CHOWN_BIN} -R ${1} "${CACHE_DIR}" >> ${LOG}
+            ${CHOWN_BIN} -R ${1} "${CACHE_DIR}" >> "${LOG}"
         fi
     fi
 }
@@ -159,10 +159,10 @@ update_shell_vars () {
     USER_UID="$(${ID_BIN} ${ID_SVD})"
     if [ "$(${ID_BIN} -u)" = "0" ]; then
         debug "Updating ${SOFIN_PROFILE} settings…"
-        ${PRINTF_BIN} "$(${SCRIPT_NAME} getshellvars)" > ${SOFIN_PROFILE}
+        ${PRINTF_BIN} "$(${SCRIPT_NAME} getshellvars)" > "${SOFIN_PROFILE}"
     else
         debug "Updating ${HOME_DIR}${USER_UID}/.profile settings…"
-        ${PRINTF_BIN} "$(${SCRIPT_NAME} getshellvars ${USER_UID})" > ${HOME_DIR}${USER_UID}/.profile
+        ${PRINTF_BIN} "$(${SCRIPT_NAME} getshellvars ${USER_UID})" > "${HOME_DIR}${USER_UID}/.profile"
     fi
 }
 
@@ -222,7 +222,7 @@ if [ ! "$1" = "" ]; then
                 check_root
             fi
         fi
-        ${TAIL_BIN} -n ${LOG_LINES_AMOUNT} -F ${LOG}
+        ${TAIL_BIN} -n "${LOG_LINES_AMOUNT}" -F "${LOG}"
         ;;
 
 
@@ -241,7 +241,7 @@ if [ ! "$1" = "" ]; then
         fi
         if [ -d ${SOFT_DIR} ]; then
             for app in $(${FIND_BIN} ${SOFT_DIR}/* -maxdepth 0 -type d); do
-                echo $(${BASENAME_BIN} ${app})
+                echo "$(${BASENAME_BIN} ${app})"
             done
         fi
         exit
@@ -342,9 +342,9 @@ if [ ! "$1" = "" ]; then
                 fi
             done
         }
-        process ${SOFTWARE_DIR}
+        process "${SOFTWARE_DIR}"
         if [ ! -z "$2" ]; then
-            process ${HOME_DIR}${2}/${HOME_APPS_DIR}
+            process "${HOME_DIR}${2}/${HOME_APPS_DIR}"
         fi
         cxxflags="${cflags}"
         ${PRINTF_BIN} "# CFLAGS:\n"
@@ -362,9 +362,9 @@ if [ ! "$1" = "" ]; then
                 fi
             done
         }
-        process ${SOFTWARE_DIR}
+        process "${SOFTWARE_DIR}"
         if [ ! -z "$2" ]; then
-            process ${HOME_DIR}${2}/${HOME_APPS_DIR}
+            process "${HOME_DIR}${2}/${HOME_APPS_DIR}"
         fi
         ${PRINTF_BIN} "# MANPATH:\n"
         ${PRINTF_BIN} "export MANPATH='${manpath}'\n\n"
@@ -522,7 +522,7 @@ if [ ! "$1" = "" ]; then
                 exit 1
             fi
             debug "Removing software from: ${SOFT_DIR}${APP_NAME}"
-            ${RM_BIN} -rfv "${SOFT_DIR}${APP_NAME}" >> ${LOG}
+            ${RM_BIN} -rfv "${SOFT_DIR}${APP_NAME}" >> "${LOG}"
             update_shell_vars ${USER_UID}
         else
             error "Application: ${APP_NAME} not installed."
@@ -596,7 +596,7 @@ if [ ! "$1" = "" ]; then
             debug "Testing ${dir} looking into: ${SOFT_DIR}${APP}${dir}"
             if [ -e "${SOFT_DIR}${APP}${dir}${EXPORT}" ]; then
                 note "Exporting binary: ${SOFT_DIR}${APP}${dir}${EXPORT}"
-                ${LN_BIN} -vfs "${SOFT_DIR}${APP}${dir}${EXPORT}" "${SOFT_DIR}${APP}/exports/${EXPORT}" >> $LOG
+                ${LN_BIN} -vfs "${SOFT_DIR}${APP}${dir}${EXPORT}" "${SOFT_DIR}${APP}/exports/${EXPORT}" >> "$LOG"
             fi
         done
         exit
@@ -628,418 +628,405 @@ for application in ${APPLICATIONS}; do
     if [ ! "${ALLOW}" = "1" ]; then
         warn "Requirement: ${APP_NAME} disabled on architecture: ${SYSTEM_NAME}.\n"
     else
+        for definition in ${DEFINITIONS_DIR}${application}.def; do
+            debug "Reading definition: ${definition}"
+            . "${DEFAULTS}"
+            . "${definition}"
+            check_disabled "${DISABLE_ON}" # after which just check if it's not disabled
 
-    for definition in ${DEFINITIONS_DIR}${application}.def; do
-        debug "Reading definition: ${definition}"
-        . "${DEFAULTS}"
-        . "${definition}"
-        check_disabled "${DISABLE_ON}" # after which just check if it's not disabled
+            # fancy old style Capitalize
+            APP_NAME="$(${PRINTF_BIN} "${APP_NAME}" | ${CUT_BIN} -c1 | ${TR_BIN} '[a-z]' '[A-Z]')$(${PRINTF_BIN} "${APP_NAME}" | ${SED_BIN} 's/^[a-zA-Z]//')"
 
-        # fancy old style Capitalize
-        APP_NAME="$(${PRINTF_BIN} "${APP_NAME}" | ${CUT_BIN} -c1 | ${TR_BIN} '[a-z]' '[A-Z]')$(${PRINTF_BIN} "${APP_NAME}" | ${SED_BIN} 's/^[a-zA-Z]//')"
-
-        # note "Preparing application: ${APP_NAME}${APP_POSTFIX} (${APP_FULL_NAME} v${APP_VERSION})"
-        if [ "${USER_UID}" = "" ]; then
-            debug "Normal build"
-            export PREFIX="${SOFTWARE_DIR}${APP_NAME}"
-        else
-            debug "User build: ${USER_UID}"
-            export PREFIX="${HOME_DIR}${USER_UID}/${HOME_APPS_DIR}${APP_NAME}"
-            if [ ! -d "${HOME_DIR}${USER_UID}/${HOME_APPS_DIR}" ]; then
-                ${MKDIR_BIN} -p "${HOME_DIR}${USER_UID}/${HOME_APPS_DIR}"
-            fi
-        fi
-
-        # append app postfix
-        if [ ! -z "$APP_POSTFIX" ]; then
-            export PREFIX="${PREFIX}${APP_POSTFIX}"
-        fi
-
-
-        run () {
-            if [ ! -z "$1" ]; then
-                if [ ! -e "${LOG}" ]; then
-                    ${TOUCH_BIN} "${LOG}"
-                fi
-                debug "Running '$@' @ $(${DATE_BIN})"
-                eval PATH=${PATH} "$@" 1>> "${LOG}" 2>> "${LOG}"
-                check_command_result $?
+            # note "Preparing application: ${APP_NAME}${APP_POSTFIX} (${APP_FULL_NAME} v${APP_VERSION})"
+            if [ "${USER_UID}" = "" ]; then
+                debug "Normal build"
+                export PREFIX="${SOFTWARE_DIR}${APP_NAME}"
             else
-                error "Empty command to run?"
-                exit
+                debug "User build: ${USER_UID}"
+                export PREFIX="${HOME_DIR}${USER_UID}/${HOME_APPS_DIR}${APP_NAME}"
+                if [ ! -d "${HOME_DIR}${USER_UID}/${HOME_APPS_DIR}" ]; then
+                    ${MKDIR_BIN} -p "${HOME_DIR}${USER_UID}/${HOME_APPS_DIR}"
+                fi
             fi
-        }
 
-        check_current () { # $1 => version, $2 => current version
-            if [ ! "${1}" = "" ]; then
-                if [ ! "${2}" = "" ]; then
-                    if [ ! "${1}" = "${2}" ]; then
-                        warn "   → Found different remote version: ${2} vs ${1}."
-                    else
-                        note "   → Definition version is up to date: ${1}"
+            # append app postfix
+            if [ ! -z "$APP_POSTFIX" ]; then
+                export PREFIX="${PREFIX}${APP_POSTFIX}"
+            fi
+
+
+            run () {
+                if [ ! -z "$1" ]; then
+                    if [ ! -e "${LOG}" ]; then
+                        ${TOUCH_BIN} "${LOG}"
                     fi
-                fi
-            fi
-        }
-
-        check_current_by_definition () {
-            req_definition_file="${DEFINITIONS_DIR}${1}.def"
-            . "${DEFAULTS}"
-            . "${req_definition_file}"
-            check_current "${APP_VERSION}" "${APP_CURRENT_VERSION}"
-        }
-
-        execute_process () {
-            if [ -z "$1" ]; then
-                error "No param given for execute_process()!"
-                exit 1
-            fi
-            req_definition_file="${DEFINITIONS_DIR}${1}.def"
-            debug "Checking requirement: $1 file: $req_definition_file"
-            if [ ! -e "${req_definition_file}" ]; then
-                error "Cannot fetch definition ${req_definition_file}! Aborting!"
-                exit 1
-            fi
-
-            # load definition and check for current version
-            . "${DEFAULTS}"
-            . "${req_definition_file}"
-            check_current "${APP_VERSION}" "${APP_CURRENT_VERSION}"
-
-            # check requirement for disabled state:
-            check_disabled "${DISABLE_ON}"
-
-            # force GNU compiler usage on definition side:
-            if [ ! -z "${FORCE_GNU_COMPILER}" ]; then
-                warn "   → GNU compiler set for: ${APP_NAME}"
-                set_c_compiler GNU
-            else
-                # look for bundled compiler:
-                set_c_compiler CLANG
-            fi
-
-            # if it's supported by definition (it is by default)
-            if [ "${APP_NO_CCACHE}" = "" ]; then
-                # check for CCACHE availability
-                if [ -x "${CCACHE_BIN_OPTIONAL}" ]; then
-                    export CC="${CCACHE_BIN_OPTIONAL} ${CC}"
-                    export CXX="${CCACHE_BIN_OPTIONAL} ${CXX}"
-                    export CPP="${CCACHE_BIN_OPTIONAL} ${CPP}"
-                fi
-            fi
-            # set rest of compiler/linker variables
-            export PATH="${PREFIX}/bin:${PREFIX}/sbin:${DEFAULT_PATH}"
-            export LD_LIBRARY_PATH="${PREFIX}/lib:${PREFIX}/libexec:/usr/lib:/lib"
-            export CFLAGS="-I${PREFIX}/include ${APP_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
-            export CXXFLAGS="-I${PREFIX}/include ${APP_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
-            export LDFLAGS="-L${PREFIX}/lib ${APP_LINKER_ARGS} ${DEFAULT_LDFLAGS}"
-            if [ "${SYSTEM_NAME}" = "Darwin" ]; then
-                # NOTE: XXX: requires XQuartz installed!
-                export PATH="$PATH:/opt/X11/bin"
-                # export DYLD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/opt/X11/lib"
-                export CFLAGS="$CFLAGS -I/opt/X11/include"
-                export CXXFLAGS="$CXXFLAGS -I/opt/X11/include"
-                export LDFLAGS="${LDFLAGS} -L/opt/X11/lib"
-            fi
-
-            if [ "${ALLOW}" = "1" ]; then
-                if [ -z "${APP_HTTP_PATH}" ]; then
-                    error "No source given for definition! Aborting"
-                    exit 1
+                    debug "Running '$@' @ $(${DATE_BIN})"
+                    eval PATH="${PATH}" "$@" 1>> "${LOG}" 2>> "${LOG}"
+                    check_command_result $?
                 else
-                    BUILD_DIR="${CACHE_DIR}cache/${APP_NAME}${APP_POSTFIX}-${APP_VERSION}/"
-                    ${MKDIR_BIN} -p "${BUILD_DIR}"
-                    CUR_DIR="$(${PWD_BIN})"
-                    cd "${BUILD_DIR}"
-                    for bd in ${BUILD_DIR}/*; do
-                        if [ -d ${bd} ]; then
-                            debug "Unpacked source code found in build dir. Removing: ${bd}"
-                            if [ "${bd}" != "/" ]; then # it's better to be safe than sorry
-                                ${RM_BIN} -rf "${bd}"
-                            fi
-                        fi
-                    done
-                    if [ ! -e ${BUILD_DIR}${APP_NAME}*${APP_HTTP_PATH##*.} ]; then
-                        note "   → Fetching requirement source from: ${APP_HTTP_PATH}"
-                        run "${FETCH_BIN} ${APP_HTTP_PATH}"
-                    else
-                        debug "Already fetched. Using tarball from cache"
-                    fi
+                    error "Empty command to run?"
+                    exit
+                fi
+            }
 
-                    FIND_RESULT="${FIND_BIN} ${BUILD_DIR} -maxdepth 1 -type f"
-                    debug "Build dir: ${BUILD_DIR}, find result: ${FIND_RESULT}"
-                    file="$(${BASENAME_BIN} $(${FIND_RESULT}))"
-                    if [ "${APP_SHA}" = "" ]; then
-                        error "→ Missing SHA sum for source: ${file}."
-                        exit
-                    else
-                        case "${SYSTEM_NAME}" in
-                            Darwin|Linux)
-                                export cur="$(${SHA_BIN} ${file} | ${AWK_BIN} '{print $1}')"
-                                ;;
-
-                            FreeBSD)
-                                export cur="$(${SHA_BIN} -q ${file})"
-                                ;;
-                        esac
-                        if [ "${cur}" = "${APP_SHA}" ]; then
-                            debug "→ SHA sum match in file: ${file}"
+            check_current () { # $1 => version, $2 => current version
+                if [ ! "${1}" = "" ]; then
+                    if [ ! "${2}" = "" ]; then
+                        if [ ! "${1}" = "${2}" ]; then
+                            warn "   → Found different remote version: ${2} vs ${1}."
                         else
-                            error "→ ${cur} vs ${APP_SHA}"
-                            error "→ SHA sum mismatch. Removing corrupted file from cache: ${file}, and retrying."
-                            # remove corrupted file
-                            $($FIND_BIN ${BUILD_DIR} -maxdepth 1 -type f -name ${file} | ${XARGS_BIN} ${RM_BIN})
-                            # remove lock
-                            if [ -e "${LOCK_FILE}" ]; then
-                                debug "Removing lock file: ${LOCK_FILE}"
-                                ${RM_BIN} -f ${LOCK_FILE}
-                            fi
-                            # and restart script with same arguments:
-                            ${SCRIPT_NAME} ${SCRIPT_ARGS}
-                            exit
+                            note "   → Definition version is up to date: ${1}"
                         fi
                     fi
+                fi
+            }
 
-                    debug "→ Unpacking source code of: ${APP_NAME}"
-                    debug "Build dir: ${BUILD_DIR}"
-                    APP_LOC=${BUILD_DIR}${APP_NAME}
-                    debug "Entrering ${APP_LOC}"
-                    run "${TAR_BIN} xf ${APP_LOC}*"
+            check_current_by_definition () {
+                req_definition_file="${DEFINITIONS_DIR}${1}.def"
+                . "${DEFAULTS}"
+                . "${req_definition_file}"
+                check_current "${APP_VERSION}" "${APP_CURRENT_VERSION}"
+            }
 
-                    buildDirCore="$(${FIND_BIN} ${BUILD_DIR}/* -maxdepth 0 -type d -name "*${APP_VERSION}*")"
-                    debug "Build Dir Core before: '${buildDirCore}'"
-                    if [ "${buildDirCore}" = "" ]; then
-                        export buildDirCore=$(${FIND_BIN} ${BUILD_DIR}/* -maxdepth 0 -type d) # try any dir instead
+            execute_process () {
+                if [ -z "$1" ]; then
+                    error "No param given for execute_process()!"
+                    exit 1
+                fi
+                req_definition_file="${DEFINITIONS_DIR}${1}.def"
+                debug "Checking requirement: $1 file: $req_definition_file"
+                if [ ! -e "${req_definition_file}" ]; then
+                    error "Cannot fetch definition ${req_definition_file}! Aborting!"
+                    exit 1
+                fi
+
+                . "${DEFAULTS}" # load definition and check for current version
+                . "${req_definition_file}"
+                check_current "${APP_VERSION}" "${APP_CURRENT_VERSION}"
+                check_disabled "${DISABLE_ON}" # check requirement for disabled state:
+
+                if [ ! -z "${FORCE_GNU_COMPILER}" ]; then # force GNU compiler usage on definition side:
+                    warn "   → GNU compiler set for: ${APP_NAME}"
+                    set_c_compiler GNU
+                else
+                    set_c_compiler CLANG # look for bundled compiler:
+                fi
+
+                if [ "${APP_NO_CCACHE}" = "" ]; then # ccache is supported by default but it's optional
+                    if [ -x "${CCACHE_BIN_OPTIONAL}" ]; then # check for CCACHE availability
+                        export CC="${CCACHE_BIN_OPTIONAL} ${CC}"
+                        export CXX="${CCACHE_BIN_OPTIONAL} ${CXX}"
+                        export CPP="${CCACHE_BIN_OPTIONAL} ${CPP}"
                     fi
-                    debug "Build Dir Core after: '${buildDirCore}'"
-                    for dir in ${buildDirCore}; do
-                        debug "Changing dir to: ${dir}/${APP_SOURCE_DIR_POSTFIX}"
-                        cd "${dir}/${APP_SOURCE_DIR_POSTFIX}"
-                        if [ ! -z "${APP_AFTER_UNPACK_CALLBACK}" ]; then
-                            debug "Running after unpack callback"
-                            run "${APP_AFTER_UNPACK_CALLBACK}"
-                        fi
+                fi
+                # set rest of compiler/linker variables
+                export PATH="${PREFIX}/bin:${PREFIX}/sbin:${DEFAULT_PATH}"
+                export LD_LIBRARY_PATH="${PREFIX}/lib:${PREFIX}/libexec:/usr/lib:/lib"
+                export CFLAGS="-I${PREFIX}/include ${APP_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
+                export CXXFLAGS="-I${PREFIX}/include ${APP_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
+                export LDFLAGS="-L${PREFIX}/lib ${APP_LINKER_ARGS} ${DEFAULT_LDFLAGS}"
 
-                        LIST_DIR="${DEFINITIONS_DIR}patches/$1"
-                        if [ -d "${LIST_DIR}" ]; then
-                            if [ "$1" = "${APP_NAME}" ]; then # apply patch only when application/requirement for which patch is designed for
-                                note "   → Applying patches for: ${APP_NAME}"
-                                patches_files="$(${FIND_BIN} ${LIST_DIR}/* -maxdepth 0 -type f)"
-                                for patch in ${patches_files}; do
-                                    debug "Patching source code with patch: ${patch}"
-                                    run "${PATCH_BIN} -i ${patch}"
-                                done
-                                pspatch_dir="${LIST_DIR}/${SYSTEM_NAME}"
-                                debug "Checking psp dir: ${pspatch_dir}"
-                                if [ -d ${pspatch_dir} ]; then
-                                    debug "Proceeding with Platform Specific Patches"
-                                    for platform_specific_patch in ${pspatch_dir}/*; do
-                                        debug "Patching source code with pspatch: ${platform_specific_patch}"
-                                        run "${PATCH_BIN} -i ${platform_specific_patch}"
-                                    done
+                if [ "${SYSTEM_NAME}" = "Darwin" ]; then
+                    export PATH="${PATH}:/opt/X11/bin" # NOTE: requires XQuartz installed!
+                    export CFLAGS="${CFLAGS} -I/opt/X11/include" # NOTE: requires XQuartz installed!
+                    export CXXFLAGS="${CXXFLAGS} -I/opt/X11/include" # NOTE: requires XQuartz installed!
+                    export LDFLAGS="${LDFLAGS} -L/opt/X11/lib" # NOTE: requires XQuartz installed!
+                fi
+
+                if [ "${ALLOW}" = "1" ]; then
+                    if [ -z "${APP_HTTP_PATH}" ]; then
+                        error "No source given for definition! Aborting"
+                        exit 1
+                    else
+                        BUILD_DIR="${CACHE_DIR}cache/${APP_NAME}${APP_POSTFIX}-${APP_VERSION}/"
+                        ${MKDIR_BIN} -p "${BUILD_DIR}"
+                        CUR_DIR="$(${PWD_BIN})"
+                        cd "${BUILD_DIR}"
+                        for bd in ${BUILD_DIR}/*; do
+                            if [ -d "${bd}" ]; then
+                                debug "Unpacked source code found in build dir. Removing: ${bd}"
+                                if [ "${bd}" != "/" ]; then # it's better to be safe than sorry
+                                    ${RM_BIN} -rf "${bd}"
                                 fi
                             fi
-                        fi
-
-                        if [ ! -z "${APP_AFTER_PATCH_CALLBACK}" ]; then
-                            debug "Running after patch callback"
-                            run "${APP_AFTER_PATCH_CALLBACK}"
-                        fi
-
-                        debug "-------------- PRE CONFIGURE SETTINGS DUMP --------------"
-                        debug "Current DIR: $(${PWD_BIN})"
-                        debug "PREFIX: ${PREFIX}"
-                        debug "PATH: ${PATH}"
-                        debug "CC: ${CC}"
-                        debug "CXX: ${CXX}"
-                        debug "CPP: ${CPP}"
-                        debug "CXXFLAGS: ${CXXFLAGS}"
-                        debug "CFLAGS: ${CFLAGS}"
-                        debug "LDFLAGS: ${LDFLAGS}"
-                        debug "LD_LIBRARY_PATH: ${LD_LIBRARY_PATH}"
-                        if [ "${SYSTEM_NAME}" = "Darwin" ]; then
-                            debug "DYLD_LIBRARY_PATH: ${DYLD_LIBRARY_PATH}"
-                        fi
-
-                        note "   → Configuring: $1, version: ${APP_VERSION}"
-                        case ${APP_CONFIGURE_SCRIPT} in
-
-                            ignore)
-                                note "   → Ignored configuration part $1"
-                                ;;
-
-                            no-conf)
-                                note "   → Skipped configuration for $1"
-                                export APP_MAKE_METHOD="${APP_MAKE_METHOD} PREFIX=${PREFIX}"
-                                export APP_INSTALL_METHOD="${APP_INSTALL_METHOD} PREFIX=${PREFIX}"
-                                ;;
-
-                            binary)
-                                note "   → Binary definition: $1"
-                                export APP_MAKE_METHOD="true"
-                                export APP_INSTALL_METHOD="true"
-                                ;;
-
-                            alternate)
-                                run "./configure -prefix ${PREFIX} -cc $(${BASENAME_BIN} ${CC}) ${APP_CONFIGURE_ARGS}"
-                                ;;
-
-                            cmake)
-                                run "${APP_CONFIGURE_SCRIPT} . -LH -DCMAKE_INSTALL_PREFIX=${PREFIX}"
-                                ;;
-
-                            *)
-                                run "${APP_CONFIGURE_SCRIPT} ${APP_CONFIGURE_ARGS} --prefix=${PREFIX}"
-                                ;;
-
-                        esac
-
-                        if [ ! -z "${APP_AFTER_CONFIGURE_CALLBACK}" ]; then
-                            debug "Running after configure callback"
-                            run "${APP_AFTER_CONFIGURE_CALLBACK}"
-                        fi
-
-                        note "   → Building requirement: $1"
-                        run "${APP_MAKE_METHOD}"
-                        if [ ! -z "${APP_AFTER_MAKE_CALLBACK}" ]; then
-                            debug "Running after make callback"
-                            run "${APP_AFTER_MAKE_CALLBACK}"
-                        fi
-
-                        note "   → Installing requirement: $1"
-                        run "${APP_INSTALL_METHOD}"
-                        if [ ! "${APP_AFTER_INSTALL_CALLBACK}" = "" ]; then
-                            debug "After install callback: ${APP_AFTER_INSTALL_CALLBACK}"
-                            run "${APP_AFTER_INSTALL_CALLBACK}"
-                        fi
-
-                        debug "Marking as installed '$1' in: ${PREFIX}"
-                        ${TOUCH_BIN} "${PREFIX}/$1${INSTALLED_MARK}"
-                        debug "Writing version: ${APP_VERSION} of app: '${APP_NAME}' installed in: ${PREFIX}"
-                        ${PRINTF_BIN} "${APP_VERSION}" > "${PREFIX}/$1${INSTALLED_MARK}"
-                    done
-                    cd "${CUR_DIR}"
-                fi
-            else
-                warn "   → Requirement: ${APP_NAME} disabled on architecture: ${SYSTEM_NAME}."
-                if [ ! -d "${PREFIX}" ]; then
-                    # case when disabled requirement is first on list of dependencies
-                    ${MKDIR_BIN} -p ${PREFIX}
-                fi
-                ${TOUCH_BIN} "${PREFIX}/${req}${INSTALLED_MARK}"
-                ${PRINTF_BIN} "system-version" > "${PREFIX}/${req}${INSTALLED_MARK}"
-            fi
-        }
-
-        if [ "${APP_REQUIREMENTS}" = "" ]; then
-            note "Installing ${application}"
-        else
-            note "Installing ${application} with requirements: ${APP_REQUIREMENTS}"
-        fi
-        export req_amount="$(${PRINTF_BIN} "${APP_REQUIREMENTS}" | ${WC_BIN} -w | ${AWK_BIN} '{print $1}')"
-        export req_amount="$(${PRINTF_BIN} "${req_amount} + 1\n" | ${BC_BIN})"
-        export req_all="${req_amount}"
-        for req in ${APP_REQUIREMENTS}; do
-            if [ ! "${APP_USER_INFO}" = "" ]; then
-                warn "${APP_USER_INFO}"
-            fi
-            if [ -z "${req}" ]; then
-                note "  No requirements required."
-                break
-            else
-                note "  ${req} (${req_amount} of ${req_all})"
-                if [ ! -e "${PREFIX}/${req}${INSTALLED_MARK}" ]; then
-                    export CHANGED="true"
-                    execute_process "${req}"
-                fi
-            fi
-            check_current_by_definition "${req}"
-            export req_amount="$(${PRINTF_BIN} "${req_amount} - 1\n" | ${BC_BIN})"
-        done
-
-        mark () {
-            debug "Marking definition: ${application} installed"
-            ${TOUCH_BIN} "${PREFIX}/${application}${INSTALLED_MARK}"
-            debug "Writing version: ${APP_VERSION} of app: '${application}' installed in: ${PREFIX}"
-            ${PRINTF_BIN} "${APP_VERSION}" > "${PREFIX}/${application}${INSTALLED_MARK}"
-        }
-
-        strip_lib_bin () {
-            if [ -z "${DEVEL}" ]; then
-                debug "→ Stripping all libraries…"
-                for elem in $(${FIND_BIN} ${PREFIX} -name '*.so' -o -name '*.dylib'); do
-                    debug "Stripping: ${elem}"
-                    "${STRIP_BIN}" -sv "${elem}" >> ${LOG} 2>> ${LOG}
-                done
-                debug "→ Stripping all binaries…"
-                for elem in "/bin/" "/sbin/" "/libexec/"; do
-                    if [ -d "${PREFIX}${elem}" ]; then
-                        for e in $(${FIND_BIN} ${PREFIX}${elem}); do
-                            if [ -f "${e}" ]; then
-                                debug "Stripping: ${e}"
-                                "${STRIP_BIN}" -s "${e}" >> ${LOG} 2>> ${LOG}
-                            fi
                         done
+                        if [ ! -e ${BUILD_DIR}${APP_NAME}*${APP_HTTP_PATH##*.} ]; then
+                            note "   → Fetching requirement source from: ${APP_HTTP_PATH}"
+                            run "${FETCH_BIN} ${APP_HTTP_PATH}"
+                        else
+                            debug "Already fetched. Using tarball from cache"
+                        fi
+
+                        FIND_RESULT="${FIND_BIN} ${BUILD_DIR} -maxdepth 1 -type f"
+                        debug "Build dir: ${BUILD_DIR}, find result: ${FIND_RESULT}"
+                        file="$(${BASENAME_BIN} $(${FIND_RESULT}))"
+                        if [ "${APP_SHA}" = "" ]; then
+                            error "→ Missing SHA sum for source: ${file}."
+                            exit
+                        else
+                            case "${SYSTEM_NAME}" in
+                                Darwin|Linux)
+                                    export cur="$(${SHA_BIN} ${file} | ${AWK_BIN} '{print $1}')"
+                                    ;;
+
+                                FreeBSD)
+                                    export cur="$(${SHA_BIN} -q ${file})"
+                                    ;;
+                            esac
+                            if [ "${cur}" = "${APP_SHA}" ]; then
+                                debug "→ SHA sum match in file: ${file}"
+                            else
+                                error "→ ${cur} vs ${APP_SHA}"
+                                error "→ SHA sum mismatch. Removing corrupted file from cache: ${file}, and retrying."
+                                # remove corrupted file
+                                $($FIND_BIN "${BUILD_DIR}" -maxdepth 1 -type f -name "${file}" | ${XARGS_BIN} ${RM_BIN})
+                                # remove lock
+                                if [ -e "${LOCK_FILE}" ]; then
+                                    debug "Removing lock file: ${LOCK_FILE}"
+                                    ${RM_BIN} -f "${LOCK_FILE}"
+                                fi
+                                # and restart script with same arguments:
+                                ${SCRIPT_NAME} "${SCRIPT_ARGS}"
+                                exit
+                            fi
+                        fi
+
+                        debug "→ Unpacking source code of: ${APP_NAME}"
+                        debug "Build dir: ${BUILD_DIR}"
+                        APP_LOC="${BUILD_DIR}${APP_NAME}"
+                        debug "Entrering ${APP_LOC}"
+                        run "${TAR_BIN} xf ${APP_LOC}*"
+
+                        buildDirCore="$(${FIND_BIN} ${BUILD_DIR}/* -maxdepth 0 -type d -name "*${APP_VERSION}*")"
+                        debug "Build Dir Core before: '${buildDirCore}'"
+                        if [ "${buildDirCore}" = "" ]; then
+                            export buildDirCore=$(${FIND_BIN} ${BUILD_DIR}/* -maxdepth 0 -type d) # try any dir instead
+                        fi
+                        debug "Build Dir Core after: '${buildDirCore}'"
+                        for dir in ${buildDirCore}; do
+                            debug "Changing dir to: ${dir}/${APP_SOURCE_DIR_POSTFIX}"
+                            cd "${dir}/${APP_SOURCE_DIR_POSTFIX}"
+                            if [ ! -z "${APP_AFTER_UNPACK_CALLBACK}" ]; then
+                                debug "Running after unpack callback"
+                                run "${APP_AFTER_UNPACK_CALLBACK}"
+                            fi
+
+                            LIST_DIR="${DEFINITIONS_DIR}patches/$1"
+                            if [ -d "${LIST_DIR}" ]; then
+                                if [ "$1" = "${APP_NAME}" ]; then # apply patch only when application/requirement for which patch is designed for
+                                    note "   → Applying patches for: ${APP_NAME}"
+                                    patches_files="$(${FIND_BIN} ${LIST_DIR}/* -maxdepth 0 -type f)"
+                                    for patch in ${patches_files}; do
+                                        debug "Patching source code with patch: ${patch}"
+                                        run "${PATCH_BIN} -i ${patch}"
+                                    done
+                                    pspatch_dir="${LIST_DIR}/${SYSTEM_NAME}"
+                                    debug "Checking psp dir: ${pspatch_dir}"
+                                    if [ -d "${pspatch_dir}" ]; then
+                                        debug "Proceeding with Platform Specific Patches"
+                                        for platform_specific_patch in ${pspatch_dir}/*; do
+                                            debug "Patching source code with pspatch: ${platform_specific_patch}"
+                                            run "${PATCH_BIN} -i ${platform_specific_patch}"
+                                        done
+                                    fi
+                                fi
+                            fi
+
+                            if [ ! -z "${APP_AFTER_PATCH_CALLBACK}" ]; then
+                                debug "Running after patch callback"
+                                run "${APP_AFTER_PATCH_CALLBACK}"
+                            fi
+
+                            debug "-------------- PRE CONFIGURE SETTINGS DUMP --------------"
+                            debug "Current DIR: $(${PWD_BIN})"
+                            debug "PREFIX: ${PREFIX}"
+                            debug "PATH: ${PATH}"
+                            debug "CC: ${CC}"
+                            debug "CXX: ${CXX}"
+                            debug "CPP: ${CPP}"
+                            debug "CXXFLAGS: ${CXXFLAGS}"
+                            debug "CFLAGS: ${CFLAGS}"
+                            debug "LDFLAGS: ${LDFLAGS}"
+                            debug "LD_LIBRARY_PATH: ${LD_LIBRARY_PATH}"
+
+                            note "   → Configuring: $1, version: ${APP_VERSION}"
+                            case "${APP_CONFIGURE_SCRIPT}" in
+
+                                ignore)
+                                    note "   → Ignored configuration part $1"
+                                    ;;
+
+                                no-conf)
+                                    note "   → Skipped configuration for $1"
+                                    export APP_MAKE_METHOD="${APP_MAKE_METHOD} PREFIX=${PREFIX}"
+                                    export APP_INSTALL_METHOD="${APP_INSTALL_METHOD} PREFIX=${PREFIX}"
+                                    ;;
+
+                                binary)
+                                    note "   → Binary definition: $1"
+                                    export APP_MAKE_METHOD="true"
+                                    export APP_INSTALL_METHOD="true"
+                                    ;;
+
+                                alternate)
+                                    run "./configure -prefix ${PREFIX} -cc $(${BASENAME_BIN} ${CC}) ${APP_CONFIGURE_ARGS}"
+                                    ;;
+
+                                cmake)
+                                    run "${APP_CONFIGURE_SCRIPT} . -LH -DCMAKE_INSTALL_PREFIX=${PREFIX}"
+                                    ;;
+
+                                *)
+                                    run "${APP_CONFIGURE_SCRIPT} ${APP_CONFIGURE_ARGS} --prefix=${PREFIX}"
+                                    ;;
+
+                            esac
+
+                            if [ ! -z "${APP_AFTER_CONFIGURE_CALLBACK}" ]; then
+                                debug "Running after configure callback"
+                                run "${APP_AFTER_CONFIGURE_CALLBACK}"
+                            fi
+
+                            note "   → Building requirement: $1"
+                            run "${APP_MAKE_METHOD}"
+                            if [ ! -z "${APP_AFTER_MAKE_CALLBACK}" ]; then
+                                debug "Running after make callback"
+                                run "${APP_AFTER_MAKE_CALLBACK}"
+                            fi
+
+                            note "   → Installing requirement: $1"
+                            run "${APP_INSTALL_METHOD}"
+                            if [ ! "${APP_AFTER_INSTALL_CALLBACK}" = "" ]; then
+                                debug "After install callback: ${APP_AFTER_INSTALL_CALLBACK}"
+                                run "${APP_AFTER_INSTALL_CALLBACK}"
+                            fi
+
+                            debug "Marking as installed '$1' in: ${PREFIX}"
+                            ${TOUCH_BIN} "${PREFIX}/$1${INSTALLED_MARK}"
+                            debug "Writing version: ${APP_VERSION} of app: '${APP_NAME}' installed in: ${PREFIX}"
+                            ${PRINTF_BIN} "${APP_VERSION}" > "${PREFIX}/$1${INSTALLED_MARK}"
+                        done
+                        cd "${CUR_DIR}"
                     fi
-                done
+                else
+                    warn "   → Requirement: ${APP_NAME} disabled on architecture: ${SYSTEM_NAME}."
+                    if [ ! -d "${PREFIX}" ]; then # case when disabled requirement is first on list of dependencies
+                        ${MKDIR_BIN} -p "${PREFIX}"
+                    fi
+                    ${TOUCH_BIN} "${PREFIX}/${req}${INSTALLED_MARK}"
+                    ${PRINTF_BIN} "system-version" > "${PREFIX}/${req}${INSTALLED_MARK}"
+                fi
+            }
+
+            if [ "${APP_REQUIREMENTS}" = "" ]; then
+                note "Installing ${application}"
             else
-                warn "Debug mode enabled. Omitting binary/library strip…"
+                note "Installing ${application} with requirements: ${APP_REQUIREMENTS}"
             fi
-        }
+            export req_amount="$(${PRINTF_BIN} "${APP_REQUIREMENTS}" | ${WC_BIN} -w | ${AWK_BIN} '{print $1}')"
+            export req_amount="$(${PRINTF_BIN} "${req_amount} + 1\n" | ${BC_BIN})"
+            export req_all="${req_amount}"
+            for req in ${APP_REQUIREMENTS}; do
+                if [ ! "${APP_USER_INFO}" = "" ]; then
+                    warn "${APP_USER_INFO}"
+                fi
+                if [ -z "${req}" ]; then
+                    note "  No requirements required."
+                    break
+                else
+                    note "  ${req} (${req_amount} of ${req_all})"
+                    if [ ! -e "${PREFIX}/${req}${INSTALLED_MARK}" ]; then
+                        export CHANGED="true"
+                        execute_process "${req}"
+                    fi
+                fi
+                check_current_by_definition "${req}"
+                export req_amount="$(${PRINTF_BIN} "${req_amount} - 1\n" | ${BC_BIN})"
+            done
 
-        show_done () {
-            ver="$(${CAT_BIN} "${PREFIX}/${application}${INSTALLED_MARK}")"
-            note "√ ${application} [${ver}]\n"
-        }
+            mark () {
+                debug "Marking definition: ${application} installed"
+                ${TOUCH_BIN} "${PREFIX}/${application}${INSTALLED_MARK}"
+                debug "Writing version: ${APP_VERSION} of app: '${application}' installed in: ${PREFIX}"
+                ${PRINTF_BIN} "${APP_VERSION}" > "${PREFIX}/${application}${INSTALLED_MARK}"
+            }
 
-        if [ -e "${PREFIX}/${application}${INSTALLED_MARK}" ]; then
-            if [ "${CHANGED}" = "true" ]; then
+            strip_lib_bin () {
+                if [ -z "${DEVEL}" ]; then
+                    debug "→ Stripping all libraries…"
+                    for elem in $(${FIND_BIN} ${PREFIX} -name '*.so' -o -name '*.dylib'); do
+                        debug "Stripping: ${elem}"
+                        "${STRIP_BIN}" -sv "${elem}" >> "${LOG}" 2>> "${LOG}"
+                    done
+                    debug "→ Stripping all binaries…"
+                    for elem in "/bin/" "/sbin/" "/libexec/"; do
+                        if [ -d "${PREFIX}${elem}" ]; then
+                            for e in $(${FIND_BIN} ${PREFIX}${elem}); do
+                                if [ -f "${e}" ]; then
+                                    debug "Stripping: ${e}"
+                                    "${STRIP_BIN}" -s "${e}" >> "${LOG}" 2>> "${LOG}"
+                                fi
+                            done
+                        fi
+                    done
+                else
+                    warn "Debug mode enabled. Omitting binary/library strip…"
+                fi
+            }
+
+            show_done () {
+                ver="$(${CAT_BIN} "${PREFIX}/${application}${INSTALLED_MARK}")"
+                note "√ ${application} [${ver}]\n"
+            }
+
+            if [ -e "${PREFIX}/${application}${INSTALLED_MARK}" ]; then
+                if [ "${CHANGED}" = "true" ]; then
+                    note "  ${application} (1 of ${req_all})"
+                    note "   → App dependencies changed. Rebuilding ${application}"
+                    execute_process "${application}"
+                    unset CHANGED
+                    mark
+                    strip_lib_bin
+                    show_done
+                else
+                    note "  ${application} (1 of ${req_all})"
+                    check_current_by_definition "${application}"
+                    show_done
+                    debug "√ ${application} current: ${ver}, definition: [${APP_VERSION}] Ok."
+                fi
+            else
                 note "  ${application} (1 of ${req_all})"
-                note "   → App dependencies changed. Rebuilding ${application}"
                 execute_process "${application}"
-                unset CHANGED
                 mark
                 strip_lib_bin
-                show_done
-            else
-                note "  ${application} (1 of ${req_all})"
-                check_current_by_definition "${application}"
-                show_done
-                debug "√ ${application} current: ${ver}, definition: [${APP_VERSION}] Ok."
+                note "√ ${application} [${APP_VERSION}]\n"
             fi
-        else
-            note "  ${application} (1 of ${req_all})"
-            execute_process "${application}"
-            mark
-            strip_lib_bin
-            note "√ ${application} [${APP_VERSION}]\n"
-        fi
 
-        . ${DEFINITIONS_DIR}${application}.def
-        ${MKDIR_BIN} -p "${PREFIX}/exports"
-        EXPORT_LIST=""
-        for exp in ${APP_EXPORTS}; do
-            for dir in "/bin/" "/sbin/" "/libexec/"; do
-                debug "Testing ${dir} looking into: ${PREFIX}${dir}${exp}"
-                if [ -f "${PREFIX}${dir}${exp}" ]; then # a file
-                    if [ -x "${PREFIX}${dir}${exp}" ]; then # and it's executable'
-                        ${LN_BIN} -vfs "${PREFIX}${dir}${exp}" "${PREFIX}/exports/${exp}" >> $LOG
-                        exp_elem="$(${BASENAME_BIN} ${PREFIX}${dir}${exp})"
-                        EXPORT_LIST="${EXPORT_LIST} ${exp_elem}"
+            . "${DEFINITIONS_DIR}${application}.def"
+            ${MKDIR_BIN} -p "${PREFIX}/exports"
+            EXPORT_LIST=""
+            for exp in ${APP_EXPORTS}; do
+                for dir in "/bin/" "/sbin/" "/libexec/"; do
+                    debug "Testing ${dir} looking into: ${PREFIX}${dir}${exp}"
+                    if [ -f "${PREFIX}${dir}${exp}" ]; then # a file
+                        if [ -x "${PREFIX}${dir}${exp}" ]; then # and it's executable'
+                            ${LN_BIN} -vfs "${PREFIX}${dir}${exp}" "${PREFIX}/exports/${exp}" >> "$LOG"
+                            exp_elem="$(${BASENAME_BIN} ${PREFIX}${dir}${exp})"
+                            EXPORT_LIST="${EXPORT_LIST} ${exp_elem}"
+                        fi
                     fi
-                fi
+                done
             done
-        done
-        debug "Exporting binaries:${EXPORT_LIST}"
+            debug "Exporting binaries:${EXPORT_LIST}"
 
-        if [ ! -z "${USER_UID}" ]; then
-            if [ "$(${ID_BIN} -u)" = "0" ]; then
-                debug "Setting owner of ${PREFIX} recursively to user: ${USER_UID}"
-                ${CHOWN_BIN} -R ${USER_UID} "${HOME_DIR}${USER_UID}" # NOTE: sanity check.
+            if [ ! -z "${USER_UID}" ]; then
+                if [ "$(${ID_BIN} -u)" = "0" ]; then
+                    debug "Setting owner of ${PREFIX} recursively to user: ${USER_UID}"
+                    ${CHOWN_BIN} -R ${USER_UID} "${HOME_DIR}${USER_UID}" # NOTE: sanity check.
+                fi
             fi
-        fi
 
-    done
+        done
     fi
 done
 
@@ -1050,7 +1037,7 @@ if [ ! "${APP_JAVA_ANCESTOR}" = "" ]; then
         # if not root - cause no java ancestor required for root
         note "→ Setting up Java ancestor: ${APP_JAVA_ANCESTOR}"
         export JAVA_HOME_PROFILE="${HOME}/.profile_java" # profile with additional info about java
-        case ${APP_JAVA_ANCESTOR} in
+        case "${APP_JAVA_ANCESTOR}" in
             JDK6_32)
                 ${PRINTF_BIN} "\nexport JAVA_HOME=\"${JDK6_32}\"\n" > "${JAVA_HOME_PROFILE}"
                 ${PRINTF_BIN} "\nexport PATH=\"${JDK6_32}/exports:\$PATH\"\n" >> "${JAVA_HOME_PROFILE}"
