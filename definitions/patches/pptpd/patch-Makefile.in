@@ -1,0 +1,30 @@
+--- Makefile.in.orig	Mon Apr 16 03:10:27 2007
++++ Makefile.in	Sat Jun 16 11:21:50 2007
+@@ -35,7 +35,7 @@
+ PRE_UNINSTALL = :
+ POST_UNINSTALL = :
+ EXTRA_PROGRAMS =
+-sbin_PROGRAMS = pptpd$(EXEEXT) pptpctrl$(EXEEXT) bcrelay$(EXEEXT)
++sbin_PROGRAMS = pptpd$(EXEEXT) pptpctrl$(EXEEXT)
+ subdir = .
+ DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
+ 	$(srcdir)/Makefile.in $(srcdir)/config.h.in \
+@@ -75,8 +75,8 @@
+ 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+ CCLD = $(CC)
+ LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
+-SOURCES = $(bcrelay_SOURCES) $(pptpctrl_SOURCES) $(pptpd_SOURCES)
+-DIST_SOURCES = $(bcrelay_SOURCES) $(pptpctrl_SOURCES) $(pptpd_SOURCES)
++SOURCES = $(pptpctrl_SOURCES) $(pptpd_SOURCES)
++DIST_SOURCES = $(pptpctrl_SOURCES) $(pptpd_SOURCES)
+ man5dir = $(mandir)/man5
+ man8dir = $(mandir)/man8
+ NROFF = nroff
+@@ -182,6 +182,7 @@
+ # We have our own, simpler dependencies stuff in 'reconf'
+ AUTOMAKE_OPTIONS = no-dependencies foreign
+ INCLUDES = -I.
++CFLAGS= @CFLAGS@ -fno-builtin -DSBINDIR='"$(sbindir)"' -DETCDIR='"$(sysconfdir)"'
+ #CFLAGS = -O2 -fno-builtin -Wall -ansi -DSBINDIR='"$(sbindir)"'
+ #CFLAGS = -O2 -fno-builtin -Wall -ansi -pedantic -Wmissing-prototypes -Werror -DSBINDIR='"$(sbindir)"'
+ man_MANS = pptpctrl.8 pptpd.8 pptpd.conf.5
