@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-VERSION="0.30.10"
+VERSION="0.32.0"
 
 # load configuration from sofin.conf
 
@@ -724,13 +724,13 @@ for application in ${APPLICATIONS}; do
                 export LD_LIBRARY_PATH="${PREFIX}/lib:${PREFIX}/libexec:/usr/lib:/lib"
                 export CFLAGS="-I${PREFIX}/include ${APP_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
                 export CXXFLAGS="-I${PREFIX}/include ${APP_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
-                export LDFLAGS="-L${PREFIX}/lib ${APP_LINKER_ARGS} ${DEFAULT_LDFLAGS}"
+                export LDFLAGS="-L${PREFIX}/lib ${APP_LINKER_ARGS} ${DEFAULT_LDFLAGS} -Wl,-rpath=${PREFIX}/lib,--enable-new-dtags"
 
                 if [ "${SYSTEM_NAME}" = "Darwin" ]; then
                     export PATH="${PATH}:/opt/X11/bin" # NOTE: requires XQuartz installed!
                     export CFLAGS="${CFLAGS} -I/opt/X11/include" # NOTE: requires XQuartz installed!
                     export CXXFLAGS="${CXXFLAGS} -I/opt/X11/include" # NOTE: requires XQuartz installed!
-                    export LDFLAGS="${LDFLAGS} -L/opt/X11/lib" # NOTE: requires XQuartz installed!
+                    export LDFLAGS="-L${PREFIX}/lib ${APP_LINKER_ARGS} ${DEFAULT_LDFLAGS} -L/opt/X11/lib" # NOTE: requires XQuartz installed!
                 fi
 
                 if [ "${ALLOW}" = "1" ]; then
