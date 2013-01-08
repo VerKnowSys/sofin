@@ -298,9 +298,9 @@ if [ ! "$1" = "" ]; then
         ${PRINTF_BIN} "export PATH=${result}\n\n"
 
         # LD_LIBRARY_PATH, LDFLAGS, PKG_CONFIG_PATH:
-        ldresult="/lib:/usr/lib"
-        pkg_config_path="."
-        ldflags="${LDFLAGS} ${DEFAULT_LDFLAGS}"
+        # ldresult="/lib:/usr/lib"
+        # pkg_config_path="."
+        export ldflags="${LDFLAGS} ${DEFAULT_LDFLAGS}"
         process () {
             for lib in ${1}*; do # LIB_DIR
                 if [ -e "${lib}/lib" ]; then
@@ -320,15 +320,17 @@ if [ ! "$1" = "" ]; then
         if [ ! -z "$2" ]; then
             process ${HOME_DIR}$2/${HOME_APPS_DIR}
         fi
-        ${PRINTF_BIN} "# LD_LIBRARY_PATH:\n"
-        ${PRINTF_BIN} "export LD_LIBRARY_PATH='${ldresult}'\n\n"
+        # ${PRINTF_BIN} "# LD_LIBRARY_PATH:\n"
+        # ${PRINTF_BIN} "export LD_LIBRARY_PATH='${ldresult}'\n\n"
         ${PRINTF_BIN} "# LDFLAGS:\n"
-        ${PRINTF_BIN} "export LDFLAGS='${ldflags}'\n\n"
-        ${PRINTF_BIN} "# PKG_CONFIG_PATH:\n"
         if [ "${SYSTEM_NAME}" = "Darwin" ]; then
+            ${PRINTF_BIN} "export LDFLAGS='${ldflags}'\n\n"
+            ${PRINTF_BIN} "# PKG_CONFIG_PATH:\n"
             ${PRINTF_BIN} "export PKG_CONFIG_PATH='${pkg_config_path}:/opt/X11/lib/pkgconfig'\n\n"
             # ${PRINTF_BIN} "export DYLD_LIBRARY_PATH='${ldresult}:/opt/X11/lib'\n\n"
         else
+            ${PRINTF_BIN} "export LDFLAGS='${ldflags} -Wl,--enable-new-dtags'\n\n"
+            ${PRINTF_BIN} "# PKG_CONFIG_PATH:\n"
             ${PRINTF_BIN} "export PKG_CONFIG_PATH='${pkg_config_path}'\n\n"
         fi
 
