@@ -7,7 +7,7 @@ TRACE="false"
 # DEVEL="true"
 
 ID_SVD="-u" # NOTE: use "-un" for standard FreeBSD systems with users defined in /etc/passwd
-HEADER="Sofin v${VERSION} - © 2o12 - Versatile Knowledge Systems - VerKnowSys.com"
+HEADER="Sofin v${VERSION} - © 2o12-2o13 - Versatile Knowledge Systems - VerKnowSys.com"
 SCRIPT_NAME="/usr/bin/sofin.sh"
 SCRIPT_ARGS="$*"
 SOFTWARE_DIR="/Software/"
