@@ -40,19 +40,16 @@ customizable software for FreeBSD servers. Darwin (Mac OS X) support started wit
 
 
 ## Examples:
-* Install software defined in a list called "http":
-    `sofin install http`
+* Install all available software defined in a list called "all":
+    `sofin install all`
 
 * Install one software from definition called "ruby.def" for current user:
     `sofin get ruby`
 
-* Install one software from definition called "ruby.def" for user "dmilith" (by default it will point to /Users/dmilith/Apps/Ruby/):
-    `sofin get ruby dmilith`
+* Install software list called "databases" for current user:
+    `sofin install databases`
 
-* Install software list called "databases" for user "dmilith" (by default it will point to /Users/dmilith/Apps/):
-    `sofin install databases dmilith`
-
-* Upgrade application requirement: Xml in bundle Ruby as logged in user:
+* Upgrade application requirement: Xml in bundle Ruby as current user:
     `sofin upgrade libxml2 ruby`
 
 * Upgrade Ruby in Ruby bundle without recompiling all requirements (already compiled requirements will be reused):
@@ -68,15 +65,6 @@ customizable software for FreeBSD servers. Darwin (Mac OS X) support started wit
 
 * Uninstall installed software "SomeApp"?
     `sofin uninstall someApp`
-
-* Give me "PATH" for all applications installed system wide (explained in pitfalls):
-    `sofin getshellpath`
-
-* Give me "PATH" for all applications of user "dmilith" (explained in pitfalls):
-    `sofin getshellpath dmilith`
-
-* Give me "LD_LIBRARY_PATH" for all applications of user "dmilith" (explained in pitfalls):
-    `sofin getshellld dmilith`
 
 * Create a list called "databases", with definitions: "postgresql" and "mysql", and install it with Sofin:
     `cd Sofin`
