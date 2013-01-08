@@ -110,7 +110,7 @@ check_required_dirs_and_create_snapshot
 
 if [ ! -z "${DESTINATION_REPOSITORY_SERVER}" ]; then
     note "Sending definitions to repository…"
-    ${SCP_BIN} ${DEFINITION_SNAPSHOT_FILE} ${DESTINATION_REPOSITORY_SERVER} >> ${LOG}
+    ${SCP_BIN} "${DEFINITION_SNAPSHOT_FILE}" "${DESTINATION_REPOSITORY_SERVER}" >> "${LOG}"
     check_command_result $?
 fi
 
