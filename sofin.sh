@@ -458,8 +458,8 @@ if [ ! "$1" = "" ]; then
         LOCAL_DIR="$(${PWD_BIN})/"
         export USER_UID="$(${ID_BIN} ${ID_SVD})"
         if [ "$(${ID_BIN} -u)" = "0" ]; then
-            error "Installation of project dependencies as root is immoral."
-            exit 1
+            warn "Installation of project dependencies as root is immoral."
+            # exit 1
         else
             export LOG="${HOME_DIR}${USER_UID}/install.log"
             export CACHE_DIR="${HOME_DIR}${USER_UID}/.cache/"
