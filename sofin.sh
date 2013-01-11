@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-VERSION="0.32.0"
+VERSION="0.32.1"
 
 # load configuration from sofin.conf
 
@@ -460,6 +460,7 @@ if [ ! "$1" = "" ]; then
         if [ "$(${ID_BIN} -u)" = "0" ]; then
             warn "Installation of project dependencies as root is immoral."
             # exit 1
+            unset USER_UID
         else
             export LOG="${HOME_DIR}${USER_UID}/install.log"
             export CACHE_DIR="${HOME_DIR}${USER_UID}/.cache/"
