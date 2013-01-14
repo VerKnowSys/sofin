@@ -2,8 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-VERSION="0.32.2"
-
+VERSION="0.34.0"
 # load configuration from sofin.conf
 
 CONF_FILE="/etc/sofin.conf.sh"
@@ -19,6 +18,8 @@ if [ "${TRACE}" = "true" ]; then
     set -x
 fi
 
+# create runtime sha
+RUNTIME_SHA="$(${DATE_BIN} | ${SHA_BIN})"
 
 check_definition_dir () {
     if [ ! -d "${SOFTWARE_DIR}" ]; then
@@ -741,7 +742,8 @@ for application in ${APPLICATIONS}; do
                         error "No source given for definition! Aborting"
                         exit 1
                     else
-                        BUILD_DIR="${CACHE_DIR}cache/${APP_NAME}${APP_POSTFIX}-${APP_VERSION}/"
+                        debug "Runtime SHA1: ${RUNTIME_SHA}"
+                        export BUILD_DIR="${CACHE_DIR}cache/${APP_NAME}${APP_POSTFIX}-${APP_VERSION}-${RUNTIME_SHA}"
                         ${MKDIR_BIN} -p "${BUILD_DIR}"
                         CUR_DIR="$(${PWD_BIN})"
                         cd "${BUILD_DIR}"
@@ -909,6 +911,12 @@ for application in ${APPLICATIONS}; do
                             debug "Writing version: ${APP_VERSION} of app: '${APP_NAME}' installed in: ${PREFIX}"
                             ${PRINTF_BIN} "${APP_VERSION}" > "${PREFIX}/$1${INSTALLED_MARK}"
                         done
+                        if [ -z "${DEVEL}" ]; then # if devel mode not set
+                            debug "Removing build dir: ${BUILD_DIR}"
+                            ${RM_BIN} -r "${BUILD_DIR}"
+                        else
+                            debug "Leaving build dir cause in devel mode: ${BUILD_DIR}"
+                        fi
                         cd "${CUR_DIR}"
                     fi
                 else
