@@ -77,7 +77,7 @@ HEAD_BIN="/usr/bin/head"
 
 
 SYSTEM_NAME="$(uname)"
-
+SYSTEM_ARCH="$(uname -p)"
 
 # System specific configuration
 case "${SYSTEM_NAME}" in
