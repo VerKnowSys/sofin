@@ -93,6 +93,9 @@ doAfterPatch() {
   # ${RM_BIN} -rf jdk/make/tools/freetypecheck
   # ${RM_BIN} -rf jdk/make/tools/fontchecker
 
+  ${SED_BIN} -i '' '/policytool/d' jdk/make/launchers/Makefile
+  ${SED_BIN} -i '' '/appletviewer/d' jdk/make/launchers/Makefile
+
   ${RM_BIN} -rf jdk/src/solaris/native/sun/awt
   ${RM_BIN} -rf jdk/src/solaris/native/sun/xawt
   ${RM_BIN} -rf jdk/src/solaris/native/sun/jdga
