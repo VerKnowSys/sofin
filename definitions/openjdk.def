@@ -91,6 +91,8 @@ doAfterPatch() {
   ${SED_BIN} -i '' 's/BEANMANIFEST\ .*/ABS_TEMPDIR\ =\ \$(TEMPDIR)/' jdk/make/common/Release.gmk
   ${SED_BIN} -i '' 's/\$(MKDIR)\ -p\ \$(JARFILELISTS_TEMPDIR)/\$(MKDIR) -p \$(JARFILELISTS_TEMPDIR) \
 	\$(TOUCH)\ \$(JARFILELISTS_TEMPDIR)\/resources_jar_list.temp/' jdk/make/common/Release.gmk # VERY IMPORTANT IT'S TAB at beginning
+  ${SED_BIN} -i '' '/\$(CP)\ -r\ -f\ \$(DEMODIR)\ \$(JDK_IMAGE_DIR)/d' jdk/make/common/Release.gmk
+  ${SED_BIN} -i '' '/swing-1.2-beans/d' jdk/make/common/Release.gmk
 
   # ${SED_BIN} -i '' 's/@\$(RM)\ \$(RT_JAR_FILELIST)\ \$(RES_JAR_FILELIST)/@\$(RM)\ -rf\ \$(RT_JAR_FILELIST)\ \$(RES_JAR_FILELIST)/' jdk/make/common/Release.gmk
   # ${SED_BIN} -i '' '614,618 d' jdk/make/common/Release.gmk
