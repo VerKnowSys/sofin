@@ -1,0 +1,7 @@
+DISABLE_ON="Darwin"
+APP_FULL_NAME="Lib Xtst for Xorg"
+APP_NAME="libXtst"
+APP_SHA="9fb06ed599caf7f9e7115cbbfadf02b47c17aa72"
+APP_VERSION="1.2.0"
+APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.bz2"
+APP_CONFIGURE_ARGS="--disable-specs --without-xmlto"
