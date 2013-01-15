@@ -49,8 +49,10 @@ doAfterPatch() {
   ${RM_BIN} -rf jdk/make/sun/image
   ${RM_BIN} -rf jdk/make/sun/pisces
   ${RM_BIN} -rf jdk/make/sun/security/jgss
+  # ${RM_BIN} -rf jdk/make/sun/security/action
   ${RM_BIN} -rf jdk/make/sun/jdga
   ${RM_BIN} -rf jdk/make/sun/jpeg
+  ${RM_BIN} -rf jdk/make/sun/dcpr
 
   ${SED_BIN} -i '' '54,56 d' jdk/make/tools/Makefile
   ${SED_BIN} -i '' '41 d' jdk/make/tools/Makefile
@@ -60,7 +62,10 @@ doAfterPatch() {
   ${SED_BIN} -i '' '/swing\ \\/d' jdk/make/javax/Makefile
 
   ${SED_BIN} -i '' '65,69 d' jdk/make/sun/Makefile
-  ${SED_BIN} -i '' 's/SUBDIRS\ \=.*/SUBDIRS = jar security javazic misc net audio $(RENDER_SUBDIR) $(HEADLESS_SUBDIR) cmm rmi $(JDBC_SUBDIR) text nio launcher management $(ORG_SUBDIR) native2ascii serialver tools jconsole/'
+  ${SED_BIN} -i '' 's/SUBDIRS\ \=.*/SUBDIRS = jar security javazic misc net audio $(HEADLESS_SUBDIR) cmm rmi $(JDBC_SUBDIR) text nio launcher management $(ORG_SUBDIR) native2ascii serialver tools jconsole/' jdk/make/sun/Makefile
+
+  ${SED_BIN} -i '' '64 d' jdk/make/sun/security/Makefile
+  ${SED_BIN} -i '' 's/SUBDIRS\ \=.*/SUBDIRS = other action util tools krb5 smartcardio $(PKCS11)/' jdk/make/sun/security/Makefile
   # ${SED_BIN} -i '' '/awt/d' jdk/make/sun/Makefile
   # ${SED_BIN} -i '' '/xawt/d' jdk/make/sun/Makefile
   # ${SED_BIN} -i '' '/jawt/d' jdk/make/sun/Makefile
