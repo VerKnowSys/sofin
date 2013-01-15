@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-VERSION="0.34.0"
+VERSION="0.34.1"
 # load configuration from sofin.conf
 
 CONF_FILE="/etc/sofin.conf.sh"
@@ -743,11 +743,11 @@ for application in ${APPLICATIONS}; do
                         exit 1
                     else
                         debug "Runtime SHA1: ${RUNTIME_SHA}"
-                        export BUILD_DIR="${CACHE_DIR}cache/${APP_NAME}${APP_POSTFIX}-${APP_VERSION}-${RUNTIME_SHA}"
-                        ${MKDIR_BIN} -p "${BUILD_DIR}"
+                        export BUILD_DIR_ROOT="${CACHE_DIR}cache/${APP_NAME}${APP_POSTFIX}-${APP_VERSION}/"
+                        ${MKDIR_BIN} -p "${BUILD_DIR_ROOT}"
                         CUR_DIR="$(${PWD_BIN})"
-                        cd "${BUILD_DIR}"
-                        for bd in ${BUILD_DIR}/*; do
+                        cd "${BUILD_DIR_ROOT}"
+                        for bd in ${BUILD_DIR_ROOT}/*; do
                             if [ -d "${bd}" ]; then
                                 debug "Unpacked source code found in build dir. Removing: ${bd}"
                                 if [ "${bd}" != "/" ]; then # it's better to be safe than sorry
@@ -755,15 +755,15 @@ for application in ${APPLICATIONS}; do
                                 fi
                             fi
                         done
-                        if [ ! -e ${BUILD_DIR}${APP_NAME}*${APP_HTTP_PATH##*.} ]; then
+                        if [ ! -e ${BUILD_DIR_ROOT}${APP_NAME}*${APP_HTTP_PATH##*.} ]; then
                             note "   → Fetching requirement source from: ${APP_HTTP_PATH}"
                             run "${FETCH_BIN} ${APP_HTTP_PATH}"
                         else
                             debug "Already fetched. Using tarball from cache"
                         fi
 
-                        FIND_RESULT="${FIND_BIN} ${BUILD_DIR} -maxdepth 1 -type f"
-                        debug "Build dir: ${BUILD_DIR}, find result: ${FIND_RESULT}"
+                        FIND_RESULT="${FIND_BIN} ${BUILD_DIR_ROOT} -maxdepth 1 -type f"
+                        debug "Build dir: ${BUILD_DIR_ROOT}, find result: ${FIND_RESULT}"
                         file="$(${BASENAME_BIN} $(${FIND_RESULT}))"
                         if [ "${APP_SHA}" = "" ]; then
                             error "→ Missing SHA sum for source: ${file}."
@@ -784,7 +784,7 @@ for application in ${APPLICATIONS}; do
                                 error "→ ${cur} vs ${APP_SHA}"
                                 error "→ SHA sum mismatch. Removing corrupted file from cache: ${file}, and retrying."
                                 # remove corrupted file
-                                $($FIND_BIN "${BUILD_DIR}" -maxdepth 1 -type f -name "${file}" | ${XARGS_BIN} ${RM_BIN})
+                                $($FIND_BIN "${BUILD_DIR_ROOT}" -maxdepth 1 -type f -name "${file}" | ${XARGS_BIN} ${RM_BIN})
                                 # remove lock
                                 if [ -e "${LOCK_FILE}" ]; then
                                     debug "Removing lock file: ${LOCK_FILE}"
@@ -797,18 +797,21 @@ for application in ${APPLICATIONS}; do
                         fi
 
                         debug "→ Unpacking source code of: ${APP_NAME}"
-                        debug "Build dir: ${BUILD_DIR}"
-                        APP_LOC="${BUILD_DIR}${APP_NAME}"
-                        debug "Entrering ${APP_LOC}"
+                        debug "Build dir root: ${BUILD_DIR_ROOT}"
+
+                        # export BUILD_DIRECTORY="${BUILD_DIR}/${RUNTIME_SHA}"
+                        # ${MKDIR_BIN} -p "${BUILD_DIRECTORY}"
+
+                        APP_LOC="${BUILD_DIR_ROOT}${APP_NAME}"
                         run "${TAR_BIN} xf ${APP_LOC}*"
 
-                        buildDirCore="$(${FIND_BIN} ${BUILD_DIR}/* -maxdepth 0 -type d -name "*${APP_VERSION}*")"
-                        debug "Build Dir Core before: '${buildDirCore}'"
-                        if [ "${buildDirCore}" = "" ]; then
-                            export buildDirCore=$(${FIND_BIN} ${BUILD_DIR}/* -maxdepth 0 -type d) # try any dir instead
+                        export BUILD_DIR="$(${FIND_BIN} ${BUILD_DIR_ROOT}/* -maxdepth 0 -type d -name "*${APP_VERSION}*")"
+                        debug "Build Dir Core before: '${BUILD_DIR}'"
+                        if [ "${BUILD_DIR}" = "" ]; then
+                            export BUILD_DIR=$(${FIND_BIN} ${BUILD_DIR_ROOT}/* -maxdepth 0 -type d) # try any dir instead
                         fi
-                        debug "Build Dir Core after: '${buildDirCore}'"
-                        for dir in ${buildDirCore}; do
+                        debug "Build Dir Core after: '${BUILD_DIR}'"
+                        for dir in ${BUILD_DIR}; do
                             debug "Changing dir to: ${dir}/${APP_SOURCE_DIR_POSTFIX}"
                             cd "${dir}/${APP_SOURCE_DIR_POSTFIX}"
                             if [ ! -z "${APP_AFTER_UNPACK_CALLBACK}" ]; then
@@ -823,7 +826,7 @@ for application in ${APPLICATIONS}; do
                                     patches_files="$(${FIND_BIN} ${LIST_DIR}/* -maxdepth 0 -type f)"
                                     for patch in ${patches_files}; do
                                         debug "Patching source code with patch: ${patch}"
-                                        run "${PATCH_BIN} -i ${patch}"
+                                        ${PATCH_BIN} -N -f -i "${patch}" >> "${LOG}" 2>> "${LOG}" # don't use run.. it may fail - we don't care
                                     done
                                     pspatch_dir="${LIST_DIR}/${SYSTEM_NAME}"
                                     debug "Checking psp dir: ${pspatch_dir}"
@@ -913,9 +916,9 @@ for application in ${APPLICATIONS}; do
                         done
                         if [ -z "${DEVEL}" ]; then # if devel mode not set
                             debug "Removing build dir: ${BUILD_DIR}"
-                            ${RM_BIN} -r "${BUILD_DIR}"
+                            ${RM_BIN} -rf "${BUILD_DIR}"
                         else
-                            debug "Leaving build dir cause in devel mode: ${BUILD_DIR}"
+                            debug "Leaving build dir cause in devel mode: ${BUILD_DIR_ROOT}"
                         fi
                         cd "${CUR_DIR}"
                     fi
