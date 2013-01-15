@@ -46,80 +46,89 @@ doAfterPatch() {
   ${RM_BIN} -rf jdk/make/javax/swing
   ${RM_BIN} -rf jdk/make/netbeans
   ${RM_BIN} -rf jdk/make/tools/generate_nimbus
+  ${RM_BIN} -rf jdk/make/sun/image
+  ${RM_BIN} -rf jdk/make/sun/pisces
+  ${RM_BIN} -rf jdk/make/sun/security/jgss
+  ${RM_BIN} -rf jdk/make/sun/jdga
+  ${RM_BIN} -rf jdk/make/sun/jpeg
 
   ${SED_BIN} -i '' '54,56 d' jdk/make/tools/Makefile
   ${SED_BIN} -i '' '41 d' jdk/make/tools/Makefile
   ${SED_BIN} -i '' '37 d' jdk/make/tools/Makefile
 
-  ${MV_BIN} jdk/make/java/Makefile jdk/make/java/Makefile2
-  ${SED_BIN} '/awt/d' jdk/make/java/Makefile2 > jdk/make/java/Makefile
+  ${SED_BIN} -i '' '/awt/d' jdk/make/java/Makefile
+  ${SED_BIN} -i '' '/swing\ \\/d' jdk/make/javax/Makefile
 
-  ${MV_BIN} jdk/make/javax/Makefile jdk/make/javax/Makefile2
-  ${SED_BIN} '/swing\ \\/d' jdk/make/javax/Makefile2 > jdk/make/javax/Makefile
+  ${SED_BIN} -i '' '65,69 d' jdk/make/sun/Makefile
+  ${SED_BIN} -i '' 's/SUBDIRS\ \=.*/SUBDIRS = jar security javazic misc net audio $(RENDER_SUBDIR) $(HEADLESS_SUBDIR) cmm rmi $(JDBC_SUBDIR) text nio launcher management $(ORG_SUBDIR) native2ascii serialver tools jconsole/'
+  # ${SED_BIN} -i '' '/awt/d' jdk/make/sun/Makefile
+  # ${SED_BIN} -i '' '/xawt/d' jdk/make/sun/Makefile
+  # ${SED_BIN} -i '' '/jawt/d' jdk/make/sun/Makefile
 
-  ${MV_BIN} jdk/make/sun/Makefile jdk/make/sun/Makefile2
-  ${SED_BIN} '/awt/d' jdk/make/sun/Makefile2 > jdk/make/sun/Makefile
+  ${SED_BIN} -i '' '/mawt.gmk/d' jdk/make/sun/headless/Makefile
 
-  ${MV_BIN} jdk/make/sun/Makefile jdk/make/sun/Makefile2
-  ${SED_BIN} '/xawt/d' jdk/make/sun/Makefile2 > jdk/make/sun/Makefile
+  # ${SED_BIN} -i '' '/AWTPermission/d' jdk/src/share/classes/sun/security/util/SecurityConstants.java
+  # ${SED_BIN} -i '' '/AWTPermission/d' jdk/src/share/classes/java/lang/SecurityManager.java
 
-  ${MV_BIN} jdk/make/sun/Makefile jdk/make/sun/Makefile2
-  ${SED_BIN} '/jawt/d' jdk/make/sun/Makefile2 > jdk/make/sun/Makefile
-  ${MV_BIN} jdk/make/sun/headless/Makefile jdk/make/sun/headless/Makefile2
-  ${SED_BIN} '/include $(BUILDDIR)/sun/awt/mawt.gmk/d' jdk/make/sun/headless/Makefile2 > jdk/make/sun/headless/Makefile
+  # # WARNING: order matters
+  # ${SED_BIN} -i '' '/else if (claz.equals(AWTPermission.class)) {/}/' jdk/src/share/classes/sun/security/provider/PolicyFile.java
+  # ${SED_BIN} -i '' '/AWTPermission/d' jdk/src/share/classes/sun/security/provider/PolicyFile.java
 
-  ${SED_BIN} -i '' '/AWTPermission/d' jdk/src/share/classes/sun/security/util/SecurityConstants.java
-  ${SED_BIN} -i '' '/AWTPermission/d' jdk/src/share/classes/java/lang/SecurityManager.java
+  # ${SED_BIN} -i '' '/TOPLEVEL_WINDOW_PERMISSION/d' jdk/src/share/classes/java/lang/SecurityManager.java
+  # ${SED_BIN} -i '' '/ACCESS_CLIPBOARD_PERMISSION/d' jdk/src/share/classes/java/lang/SecurityManager.java
+  # ${SED_BIN} -i '' '/CHECK_AWT_EVENTQUEUE_PERMISSION/d' jdk/src/share/classes/java/lang/SecurityManager.java
 
-  # WARNING: order matters
-  ${SED_BIN} -i '' '/else if (claz.equals(AWTPermission.class)) {/}/' jdk/src/share/classes/sun/security/provider/PolicyFile.java
-  ${SED_BIN} -i '' '/AWTPermission/d' jdk/src/share/classes/sun/security/provider/PolicyFile.java
+  # # WARNING: order matters
+  # ${SED_BIN} -i '' '291,328 d' jdk/src/share/classes/java/util/logging/LogManager.java
+  # ${SED_BIN} -i '' '/beans.PropertyChangeListener/d' jdk/src/share/classes/java/util/logging/LogManager.java
+  # ${SED_BIN} -i '' '/beans.PropertyChangeSupport/d' jdk/src/share/classes/java/util/logging/LogManager.java
+  # ${SED_BIN} -i '' '/new PropertyChangeSupport/d' jdk/src/share/classes/java/util/logging/LogManager.java
+  # ${SED_BIN} -i '' '/changes/d' jdk/src/share/classes/java/util/logging/LogManager.java
 
-  ${SED_BIN} -i '' '/TOPLEVEL_WINDOW_PERMISSION/d' jdk/src/share/classes/java/lang/SecurityManager.java
-  ${SED_BIN} -i '' '/ACCESS_CLIPBOARD_PERMISSION/d' jdk/src/share/classes/java/lang/SecurityManager.java
-  ${SED_BIN} -i '' '/CHECK_AWT_EVENTQUEUE_PERMISSION/d' jdk/src/share/classes/java/lang/SecurityManager.java
+  # ${SED_BIN} -i '' '/PropertyChangeListener/d' jdk/src/share/classes/java/util/jar/Pack200.java
+  # ${SED_BIN} -i '' '/PropertyChangeEvent/d' jdk/src/share/classes/java/util/jar/Pack200.java
 
-  # WARNING: order matters
-  ${SED_BIN} -i '' '291,328 d' jdk/src/share/classes/java/util/logging/LogManager.java
-  ${SED_BIN} -i '' '/beans.PropertyChangeListener/d' jdk/src/share/classes/java/util/logging/LogManager.java
-  ${SED_BIN} -i '' '/beans.PropertyChangeSupport/d' jdk/src/share/classes/java/util/logging/LogManager.java
-  ${SED_BIN} -i '' '/new PropertyChangeSupport/d' jdk/src/share/classes/java/util/logging/LogManager.java
-  ${SED_BIN} -i '' '/changes/d' jdk/src/share/classes/java/util/logging/LogManager.java
+  # ${SED_BIN} -i '' '132,147 d' jdk/src/share/classes/com/sun/java/util/jar/pack/PackerImpl.java
+  # ${SED_BIN} -i '' '/PropertyChangeListener/d' jdk/src/share/classes/com/sun/java/util/jar/pack/PackerImpl.java
+  # ${SED_BIN} -i '' '/PropertyChangeEvent/d' jdk/src/share/classes/com/sun/java/util/jar/pack/PackerImpl.java
 
-  ${SED_BIN} -i '' '/PropertyChangeListener/d' jdk/src/share/classes/java/util/jar/Pack200.java
-  ${SED_BIN} -i '' '/PropertyChangeEvent/d' jdk/src/share/classes/java/util/jar/Pack200.java
+  # ${SED_BIN} -i '' '62,69 d' jdk/src/share/classes/com/sun/java/util/jar/pack/PropMap.java
+  # ${SED_BIN} -i '' '41,47 d' jdk/src/share/classes/com/sun/java/util/jar/pack/PropMap.java
+  # ${SED_BIN} -i '' '/PropertyChangeListener/d' jdk/src/share/classes/com/sun/java/util/jar/pack/PropMap.java
+  # ${SED_BIN} -i '' '/PropertyChangeEvent/d' jdk/src/share/classes/com/sun/java/util/jar/pack/PropMap.java
 
-  ${SED_BIN} -i '' '132,147 d' jdk/src/share/classes/com/sun/java/util/jar/pack/PackerImpl.java
-  ${SED_BIN} -i '' '/PropertyChangeListener/d' jdk/src/share/classes/com/sun/java/util/jar/pack/PackerImpl.java
-  ${SED_BIN} -i '' '/PropertyChangeEvent/d' jdk/src/share/classes/com/sun/java/util/jar/pack/PackerImpl.java
+  # ${SED_BIN} -i '' '45,62 d' jdk/src/share/classes/com/sun/java/util/jar/pack/UnpackerImpl.java
+  # ${SED_BIN} -i '' '/PropertyChangeListener/d' jdk/src/share/classes/com/sun/java/util/jar/pack/UnpackerImpl.java
+  # ${SED_BIN} -i '' '/PropertyChangeEvent/d' jdk/src/share/classes/com/sun/java/util/jar/pack/UnpackerImpl.java
 
-  ${SED_BIN} -i '' '65,69 d' jdk/src/share/classes/com/sun/java/util/jar/pack/PropMap.java
-  ${SED_BIN} -i '' '41,47 d' jdk/src/share/classes/com/sun/java/util/jar/pack/PropMap.java
-  ${SED_BIN} -i '' '/PropertyChangeListener/d' jdk/src/share/classes/com/sun/java/util/jar/pack/PropMap.java
-  ${SED_BIN} -i '' '/PropertyChangeEvent/d' jdk/src/share/classes/com/sun/java/util/jar/pack/PropMap.java
+  # ${SED_BIN} -i '' '/ConstructorProperties/d' jdk/src/share/classes/java/lang/management/LockInfo.java
 
-  ${SED_BIN} -i '' '45,62 d' jdk/src/share/classes/com/sun/java/util/jar/pack/UnpackerImpl.java
-  ${SED_BIN} -i '' '/PropertyChangeListener/d' jdk/src/share/classes/com/sun/java/util/jar/pack/UnpackerImpl.java
-  ${SED_BIN} -i '' '/PropertyChangeEvent/d' jdk/src/share/classes/com/sun/java/util/jar/pack/UnpackerImpl.java
+  # /opt/software/openjdk-b27/jdk/src/share/classes/sun/management/ConnectorAddressLink.java
 
 
-  ${RM_BIN} -rf jdk/src/solaris/classes/sun/awt
-  ${RM_BIN} -rf jdk/src/solaris/classes/sun/font
-  ${RM_BIN} -rf jdk/src/solaris/classes/sun/java2d
+  # ${RM_BIN} -rf jdk/src/share/classes/com/sun/jmx/mbeanserver
+  # ${RM_BIN} -rf jdk/src/share/classes/javax/management/modelmbean
+  # ${RM_BIN} -rf jdk/src/share/classes/javax/management/openmbean
+  # ${RM_BIN} -rf jdk/src/share/classes/java/applet
 
-  ${RM_BIN} -rf jdk/src/share/classes/sun/awt
-  ${RM_BIN} -rf jdk/src/share/classes/java/awt
-  ${RM_BIN} -rf jdk/src/share/classes/sun/font
-  ${RM_BIN} -rf jdk/src/share/classes/sun/java2d
-  ${RM_BIN} -rf jdk/src/share/classes/sun/swing
-  ${RM_BIN} -rf jdk/src/share/classes/com/sun/beans
-  ${RM_BIN} -rf jdk/src/share/classes/com/sun/swing
-  ${RM_BIN} -rf jdk/src/share/classes/com/sun/java/swing
+  # ${RM_BIN} -rf jdk/src/solaris/classes/sun/awt
+  # ${RM_BIN} -rf jdk/src/solaris/classes/sun/font
+  # ${RM_BIN} -rf jdk/src/solaris/classes/sun/java2d
 
-  ${RM_BIN} -rf jdk/src/share/native/awt
-  ${RM_BIN} -rf jdk/src/share/native/font
-  ${RM_BIN} -rf jdk/src/share/native/java2d
-  ${RM_BIN} -rf jdk/src/share/classes/java/beans
+  # ${RM_BIN} -rf jdk/src/share/classes/sun/awt
+  # ${RM_BIN} -rf jdk/src/share/classes/java/awt
+  # ${RM_BIN} -rf jdk/src/share/classes/sun/font
+  # ${RM_BIN} -rf jdk/src/share/classes/sun/java2d
+  # ${RM_BIN} -rf jdk/src/share/classes/sun/swing
+  # ${RM_BIN} -rf jdk/src/share/classes/javax/swing
+  # ${RM_BIN} -rf jdk/src/share/classes/com/sun/beans
+  # ${RM_BIN} -rf jdk/src/share/classes/com/sun/swing
+  # ${RM_BIN} -rf jdk/src/share/classes/com/sun/java/swing
+
+  # ${RM_BIN} -rf jdk/src/share/native/awt
+  # ${RM_BIN} -rf jdk/src/share/native/font
+  # ${RM_BIN} -rf jdk/src/share/native/java2d
+  # ${RM_BIN} -rf jdk/src/share/classes/java/beans
 
 }
 
