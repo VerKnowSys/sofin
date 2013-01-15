@@ -3,7 +3,7 @@ APP_FULL_NAME="OpenJDK 1.6 64-bit Source for BSD"
 APP_SHA="f83dd07f2a4b9dac43391c28c31ab6830e261eb5"
 APP_NAME="openjdk"
 APP_VERSION="b27"
-APP_REQUIREMENTS="openjdk-bootstrap zlib libiconv cups ant zip make" # libXpm libXaw libXft motif
+APP_REQUIREMENTS="openjdk-bootstrap zlib libiconv cups ant zip make" # freetype libXpm libXaw libXft motif
 APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.bz2"
 APP_REQ1_PATH="${MAIN_SOURCE_REPOSITORY}jdk6-jaf-b20.zip"
 APP_REQ2_PATH="${MAIN_SOURCE_REPOSITORY}jdk6-jaxws-b20.zip"
@@ -80,9 +80,18 @@ doAfterPatch() {
 
   ${SED_BIN} -i '' '42,43 d' jdk/make/java/Makefile
   ${SED_BIN} -i '' 's/SUBDIRS\ \+\= security.*/SUBDIRS += security npt math util text applet net nio sql rmi jar beans logging management instrument/' jdk/make/java/Makefile
-  ${SED_BIN} -i '' 's/SUBDIRS.*/SUBDIRS    = tools java javax org sun sunw com jpda mksample launchers/' jdk/make/Makefile
+  ${SED_BIN} -i '' 's/SUBDIRS\ .*/SUBDIRS    = tools java javax org sun sunw com jpda mksample launchers/' jdk/make/Makefile
 
 
+  ${SED_BIN} -i '' '774,801 d' jdk/make/common/shared/Sanity.gmk
+  ${SED_BIN} -i '' 's/sane-msvcrt_path \/sane-msvcrt_path/' jdk/make/common/shared/Sanity.gmk
+  ${SED_BIN} -i '' '170 d' jdk/make/common/shared/Sanity.gmk
+
+  ${SED_BIN} -i '' '/fontchecker/d' jdk/make/tools/Makefile
+  ${SED_BIN} -i '' '/compile_font_config/d' jdk/make/tools/Makefile
+
+  # ${RM_BIN} -rf jdk/make/tools/freetypecheck
+  # ${RM_BIN} -rf jdk/make/tools/fontchecker
 
   ${RM_BIN} -rf jdk/src/solaris/native/sun/awt
   ${RM_BIN} -rf jdk/src/solaris/native/sun/xawt
