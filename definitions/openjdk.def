@@ -67,9 +67,23 @@ doAfterPatch() {
 
   ${SED_BIN} -i '' '64 d' jdk/make/sun/security/Makefile
   ${SED_BIN} -i '' 's/SUBDIRS\ \=.*/SUBDIRS = other action util tools krb5 smartcardio $(PKCS11)/' jdk/make/sun/security/Makefile
-  # ${SED_BIN} -i '' '/awt/d' jdk/make/sun/Makefile
-  # ${SED_BIN} -i '' '/xawt/d' jdk/make/sun/Makefile
-  # ${SED_BIN} -i '' '/jawt/d' jdk/make/sun/Makefile
+
+  # ${SED_BIN} -i '' '674,702 d' jdk/make/common/Release.gmk # remove windows release
+  # ${SED_BIN} -i '' '644,663 d' jdk/make/common/Release.gmk
+
+  ${SED_BIN} -i '' 's/ABS_TEMPDIR/TEMPDIR/g' jdk/make/common/Release.gmk # fixes beans swing manifest
+  # ${SED_BIN} -i '' '979 s/ABS_TEMPDIR/TEMPDIR/' jdk/make/common/Release.gmk # fixes beans swing manifest
+  # ${SED_BIN} -i '' '704 s/ABS_TEMPDIR/TEMPDIR/' jdk/make/common/Release.gmk # fixes beans swing manifest
+  # ${SED_BIN} -i '' '606 s/ABS_TEMPDIR/TEMPDIR/' jdk/make/common/Release.gmk # fixes beans swing manifest
+  # ${SED_BIN} -i '' '535 s/ABS_TEMPDIR/TEMPDIR/' jdk/make/common/Release.gmk # fixes beans swing manifest
+  ${SED_BIN} -i '' '642 d' jdk/make/common/Release.gmk # fixes beans swing manifest
+  ${SED_BIN} -i '' '618 d' jdk/make/common/Release.gmk # remove unnecessary mv
+  ${SED_BIN} -i '' '130 s/BEANMANIFEST.*/ABS_TEMPDIR = $(TEMPDIR)/' jdk/make/common/Release.gmk
+  # ${SED_BIN} -i '' '614,618 d' jdk/make/common/Release.gmk
+
+  # ${SED_BIN} -i '' '617 s/\$\@.temp/$@/' jdk/make/common/Release.gmk
+  # ${SED_BIN} -i '' '614 d' jdk/make/common/Release.gmk
+
 
   ${SED_BIN} -i '' '/mawt.gmk/d' jdk/make/sun/headless/Makefile
 
@@ -242,6 +256,6 @@ UPDATE_VERSION="32"
 ANT_VERSION="1.8.4"
 
 export BOOT_JAVA="/Software/Openjdk6-amd64/openjdk6"
-APP_MAKE_METHOD="gmake ALT_BUILD_WIN_SA=0 BUILD_MOTIF=0 BUILD_HOTSPOT=1 DEV_ONLY=0 CC_VERSION=gcc CCC=/usr/bin/g++ GCC=/usr/bin/gcc ALT_PARALLEL_COMPILE_JOBS=1 SKIP_DEBUG_BUILD=1 SKIP_FASTDEBUG_BUILD=1 HOTSPOT_BUILD_JOBS=1 JOBS=1 LANG=C LC_ALL=C ALT_JDK_IMPORT_PATH=${BOOT_JAVA} BOOTDIR=${BOOT_JAVA} ALT_BOOTDIR=${BOOT_JAVA} ALT_CACERTS_FILE=/tmp/cacerts CUPS_HEADERS_PATH=${PREFIX}/include ALT_CUPS_LIB_PATH=${PREFIX}/lib ALT_PACKAGE_PATH=${PREFIX} ALT_DROPS_DIR=/tmp ANT_HOME=${PREFIX}/apache-ant-${ANT_VERSION} BUILD_NUMBER=${APP_VERSION} NO_DOCS=1 JDK_UPDATE_VERSION=${UPDATE_VERSION} JAVACMD=${BOOT_JAVA}/bin/java WARNINGS_ARE_ERRORS=-w MILESTONE=fcs product_build" #  OS=FreeBSD AGENT_DIR= DONT_ENABLE_IPV6=YES RELEASE=false
+APP_MAKE_METHOD="gmake COMPANY_NAME=VerKnowSys ALT_BUILD_WIN_SA=0 BUILD_MOTIF=0 BUILD_HOTSPOT=1 DEV_ONLY=0 CC_VERSION=gcc CCC=/usr/bin/g++ GCC=/usr/bin/gcc ALT_PARALLEL_COMPILE_JOBS=1 SKIP_DEBUG_BUILD=1 SKIP_FASTDEBUG_BUILD=1 HOTSPOT_BUILD_JOBS=1 JOBS=1 LANG=C LC_ALL=C ALT_JDK_IMPORT_PATH=${BOOT_JAVA} BOOTDIR=${BOOT_JAVA} ALT_BOOTDIR=${BOOT_JAVA} ALT_CACERTS_FILE=/tmp/cacerts CUPS_HEADERS_PATH=${PREFIX}/include ALT_CUPS_LIB_PATH=${PREFIX}/lib ALT_PACKAGE_PATH=${PREFIX} ALT_DROPS_DIR=/tmp ANT_HOME=${PREFIX}/apache-ant-${ANT_VERSION} BUILD_NUMBER=${APP_VERSION} NO_DOCS=1 JDK_UPDATE_VERSION=${UPDATE_VERSION} JAVACMD=${BOOT_JAVA}/bin/java WARNINGS_ARE_ERRORS=-w MILESTONE=fcs all" # product_build  OS=FreeBSD AGENT_DIR= DONT_ENABLE_IPV6=YES RELEASE=false
 
 APP_EXPORTS="java javac javap javah rmic idlj native2ascii"
