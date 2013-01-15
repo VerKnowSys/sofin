@@ -1,0 +1,9 @@
+DISABLE_ON="Darwin Linux"
+APP_FULL_NAME="OpenJDK 1.6-bootstrap"
+APP_SHA="7c357283fdbfb864cba22d93dfe699b5c436f275"
+APP_NAME="openjdk6"
+APP_VERSION="$(uname -p)-r306764" # XXX: SYSTEM_ARCH is in config. reinstall sofin!
+APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.xz"
+APP_CONFIGURE_SCRIPT="binary"
+APP_AFTER_INSTALL_CALLBACK="${MV_BIN} ${CACHE_DIR}cache/${APP_NAME}-${APP_VERSION}/bootstrap-openjdk/ ${PREFIX}"
+# APP_EXPORTS="java javac javap javah rmic idlj native2ascii"
