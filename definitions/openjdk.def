@@ -86,6 +86,7 @@ doAfterPatch() {
 
   # ${SED_BIN} -i '' '/\$(MV)\ \$@.temp\ \$@/d' jdk/make/common/Release.gmk # remove unnecessary mv
   # ${SED_BIN} -i '' 's/RES_JAR_FILELIST=.*/\RES_JAR_FILELIST=$(TEMPDIR)\/not_rt_jar.list/' jdk/make/common/Release.gmk # fixes beans swing manifest
+  ${SED_BIN} -i '' '/\$(CAT)\ \$(BEANMANIFEST)\ >>\ \$@/d' jdk/make/common/Release.gmk
   ${SED_BIN} -i '' 's/ABS_TEMPDIR/TEMPDIR/g' jdk/make/common/Release.gmk # fixes beans swing manifest
   ${SED_BIN} -i '' 's/BEANMANIFEST\ .*/ABS_TEMPDIR\ =\ \$(TEMPDIR)/' jdk/make/common/Release.gmk
   ${SED_BIN} -i '' 's/\$(MKDIR)\ -p\ \$(JARFILELISTS_TEMPDIR)/\$(MKDIR) -p \$(JARFILELISTS_TEMPDIR) \
