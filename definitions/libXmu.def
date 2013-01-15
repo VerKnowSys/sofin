@@ -1,0 +1,7 @@
+DISABLE_ON="Darwin"
+APP_FULL_NAME="Lib Xmu for Xorg"
+APP_NAME="libXmu"
+APP_SHA="81876a0848070bfc4476a2538fc16898eb6d96cd"
+APP_VERSION="1.1.0"
+APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.bz2"
+# APP_CONFIGURE_ARGS="--disable-specs --without-xmlto"

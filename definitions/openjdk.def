@@ -1,0 +1,193 @@
+DISABLE_ON="Darwin Linux"
+APP_FULL_NAME="OpenJDK 1.6 64-bit Source for BSD"
+APP_SHA="f83dd07f2a4b9dac43391c28c31ab6830e261eb5"
+APP_NAME="openjdk"
+APP_VERSION="b27"
+APP_REQUIREMENTS="openjdk-bootstrap zlib libiconv cups ant zip make" # freetype libXpm libXaw libXft motif
+APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.bz2"
+APP_REQ1_PATH="${MAIN_SOURCE_REPOSITORY}jdk6-jaf-b20.zip"
+APP_REQ2_PATH="${MAIN_SOURCE_REPOSITORY}jdk6-jaxws-b20.zip"
+APP_REQ3_PATH="${MAIN_SOURCE_REPOSITORY}jdk6-jaxws2_1_6-2011_06_13.zip"
+APP_REQ4_PATH="${MAIN_SOURCE_REPOSITORY}jaxp144_04.zip"
+APP_REQ5_PATH="${MAIN_SOURCE_REPOSITORY}jtreg-4.1-bin-b05_29_nov_2012.zip"
+APP_CONFIGURE_SCRIPT="no-conf"
+FORCE_GNU_COMPILER="true"
+
+
+doAfterPatch() {
+  # symlink to unzip in PREFIX:
+  ${LN_BIN} -s /usr/bin/unzip ${PREFIX}/bin/unzip
+
+  ${SED_BIN} "s|/usr/local|${PREFIX}|" < ${BUILD_DIR}/jdk/src/solaris/classes/sun/awt/fontconfigs/linux.fontconfig.properties > ${BUILD_DIR}/jdk/src/solaris/classes/sun/awt/fontconfigs/bsd.fontconfig.properties
+
+  ${CP_BIN} "${BUILD_DIR}jdk/make/common/shared/Defs-linux.gmk" "${BUILD_DIR}jdk/make/common/shared/Defs-bsd.gmk"
+
+  ${SED_BIN} "s|/lib:/usr/lib|/lib:/usr/lib:${BUILD_DIR}/lib|" ${BUILD_DIR}/hotspot/src/os/bsd/vm/os_bsd.cpp
+  ${SED_BIN} 's|build-policy install-limited|build-policy install-unlimited|' ${BUILD_DIR}/jdk/make/javax/crypto/Makefile
+
+  cd /tmp
+  ${FETCH_BIN} ${APP_REQ1_PATH}
+  ${FETCH_BIN} ${APP_REQ2_PATH}
+  ${FETCH_BIN} ${APP_REQ3_PATH}
+  ${FETCH_BIN} ${APP_REQ4_PATH}
+  ${FETCH_BIN} ${APP_REQ5_PATH}
+  ${CP_BIN} ${BUILD_DIR}/cacerts /tmp/cacerts
+
+  cd ${BUILD_DIR}
+
+  # prevent from making useless CRAP like swing, awt and so:
+  ${RM_BIN} -rf jdk/make/sun/awt
+  ${RM_BIN} -rf jdk/make/sun/xawt
+  ${RM_BIN} -rf jdk/make/sun/jawt
+  ${RM_BIN} -rf jdk/make/sun/font
+  ${RM_BIN} -rf jdk/make/sun/motif12
+  ${RM_BIN} -rf jdk/make/sun/motif21
+  ${RM_BIN} -rf jdk/make/java/awt
+  ${RM_BIN} -rf jdk/make/javax/swing
+  ${RM_BIN} -rf jdk/make/netbeans
+  ${RM_BIN} -rf jdk/make/tools/generate_nimbus
+  ${RM_BIN} -rf jdk/make/sun/image
+  ${RM_BIN} -rf jdk/make/sun/pisces
+  ${RM_BIN} -rf jdk/make/sun/security/jgss
+  # ${RM_BIN} -rf jdk/make/sun/security/action
+  ${RM_BIN} -rf jdk/make/sun/jdga
+  ${RM_BIN} -rf jdk/make/sun/cmm
+  ${RM_BIN} -rf jdk/make/sun/jpeg
+  ${RM_BIN} -rf jdk/make/sun/dcpr
+
+  ${SED_BIN} -i '' '54,56 d' jdk/make/tools/Makefile
+  ${SED_BIN} -i '' '41 d' jdk/make/tools/Makefile
+  ${SED_BIN} -i '' '37 d' jdk/make/tools/Makefile
+
+  ${SED_BIN} -i '' '/awt/d' jdk/make/java/Makefile
+  ${SED_BIN} -i '' '/swing\ \\/d' jdk/make/javax/Makefile
+
+  ${SED_BIN} -i '' '65,69 d' jdk/make/sun/Makefile
+  ${SED_BIN} -i '' 's/SUBDIRS\ \=.*/SUBDIRS = jar security javazic misc net audio $(HEADLESS_SUBDIR) rmi $(JDBC_SUBDIR) text nio launcher management $(ORG_SUBDIR) native2ascii serialver tools jconsole/' jdk/make/sun/Makefile
+
+  ${SED_BIN} -i '' '64 d' jdk/make/sun/security/Makefile
+  ${SED_BIN} -i '' 's/SUBDIRS\ \=.*/SUBDIRS = other action util tools krb5 smartcardio $(PKCS11)/' jdk/make/sun/security/Makefile
+
+  ${SED_BIN} -i '' '642 d' jdk/make/common/Release.gmk # fixes beans swing manifest
+  ${SED_BIN} -i '' '/\$(CAT)\ \$(BEANMANIFEST)\ >>\ \$@/d' jdk/make/common/Release.gmk
+  ${SED_BIN} -i '' 's/ABS_TEMPDIR/TEMPDIR/g' jdk/make/common/Release.gmk # fixes beans swing manifest
+  ${SED_BIN} -i '' 's/BEANMANIFEST\ .*/ABS_TEMPDIR\ =\ \$(TEMPDIR)/' jdk/make/common/Release.gmk
+  ${SED_BIN} -i '' 's/\$(MKDIR)\ -p\ \$(JARFILELISTS_TEMPDIR)/\$(MKDIR) -p \$(JARFILELISTS_TEMPDIR) \
+	\$(TOUCH)\ \$(JARFILELISTS_TEMPDIR)\/resources_jar_list.temp/' jdk/make/common/Release.gmk # VERY IMPORTANT IT'S TAB at beginning
+  ${SED_BIN} -i '' '/\$(CP)\ -r\ -f\ \$(DEMODIR)\ \$(JDK_IMAGE_DIR)/d' jdk/make/common/Release.gmk
+  ${SED_BIN} -i '' '/swing-1.2-beans/d' jdk/make/common/Release.gmk
+
+  ${SED_BIN} -i '' '/mawt.gmk/d' jdk/make/sun/headless/Makefile
+
+  ${RM_BIN} -rf jdk/make/java/java_crw_demo
+  ${RM_BIN} -rf jdk/make/java/java_hprof_demo
+  ${RM_BIN} -rf jdk/make/mkdemo
+
+  ${SED_BIN} -i '' '42,43 d' jdk/make/java/Makefile
+  ${SED_BIN} -i '' 's/SUBDIRS\ \+\= security.*/SUBDIRS += security npt math util text applet net nio sql rmi jar beans logging management instrument/' jdk/make/java/Makefile
+  ${SED_BIN} -i '' 's/SUBDIRS\ .*/SUBDIRS    = tools java javax org sun sunw com jpda mksample launchers/' jdk/make/Makefile
+
+  ${SED_BIN} -i '' '774,801 d' jdk/make/common/shared/Sanity.gmk
+  ${SED_BIN} -i '' 's/sane-msvcrt_path \/sane-msvcrt_path/' jdk/make/common/shared/Sanity.gmk
+  ${SED_BIN} -i '' '170 d' jdk/make/common/shared/Sanity.gmk
+
+  ${SED_BIN} -i '' '/fontchecker/d' jdk/make/tools/Makefile
+  ${SED_BIN} -i '' '/compile_font_config/d' jdk/make/tools/Makefile
+
+  ${SED_BIN} -i '' '/policytool/d' jdk/make/launchers/Makefile
+  ${SED_BIN} -i '' '/appletviewer/d' jdk/make/launchers/Makefile
+
+  ${RM_BIN} -rf jdk/src/solaris/native/sun/awt
+  ${RM_BIN} -rf jdk/src/solaris/native/sun/xawt
+  ${RM_BIN} -rf jdk/src/solaris/native/sun/jdga
+  ${RM_BIN} -rf jdk/src/solaris/native/sun/java2d
+  ${RM_BIN} -rf jdk/src/solaris/native/sun/font
+  ${RM_BIN} -rf jdk/src/share/demo
+  ${RM_BIN} -rf jdk/src/windows
+
+}
+
+
+doAfterInstall() {
+  ${RM_BIN} -rvf /tmp/cacerts
+  ${RM_BIN} -rvf "/tmp/$(${BASENAME_BIN} ${APP_REQ1_PATH})"
+  ${RM_BIN} -rvf "/tmp/$(${BASENAME_BIN} ${APP_REQ2_PATH})"
+  ${RM_BIN} -rvf "/tmp/$(${BASENAME_BIN} ${APP_REQ3_PATH})"
+  ${RM_BIN} -rvf "/tmp/$(${BASENAME_BIN} ${APP_REQ4_PATH})"
+  ${RM_BIN} -rvf "/tmp/$(${BASENAME_BIN} ${APP_REQ5_PATH})"
+}
+
+
+doAfterUnpack() {
+  echo "Invoking doAfterUnpack callback"
+  __CURR_DIR="$(${PWD_BIN})"
+  export COPYDIRS="hotspot/src/os/linux/vm
+    hotspot/src/os_cpu/linux_x86/vm
+    hotspot/agent/src/os/linux
+    hotspot/make/linux
+    hotspot/make/linux/makefiles
+    hotspot/agent/src/share/classes/sun/jvm/hotspot/debugger/linux
+    hotspot/agent/src/share/classes/sun/jvm/hotspot/debugger/linux/amd64
+    hotspot/agent/src/share/classes/sun/jvm/hotspot/debugger/linux/x86
+    hotspot/agent/src/share/classes/sun/jvm/hotspot/runtime/linux
+    hotspot/agent/src/share/classes/sun/jvm/hotspot/runtime/linux_amd64
+    hotspot/agent/src/share/classes/sun/jvm/hotspot/runtime/linux_x86
+    jdk/src/linux/doc/man"
+
+  export COPYFILES="corba/make/common/Defs-linux.gmk
+    corba/make/common/shared/Defs-linux.gmk
+    hotspot/agent/src/share/classes/sun/jvm/hotspot/LinuxVtblAccess.java
+    jdk/make/com/sun/tools/attach/mapfile-linux
+    jdk/make/common/Defs-linux.gmk
+    jdk/make/common/shared/Defs-linux.gmk
+    jdk/make/java/nio/mapfile-linux
+    jdk/make/netbeans/common/architectures/name-Linux.properties
+    jdk/make/sun/awt/mapfile-vers-linux
+    jdk/make/tools/sharing/classlist.linux
+    jdk/src/solaris/classes/java/lang/UNIXProcess.java.linux
+    jdk/src/solaris/classes/sun/tools/attach/LinuxAttachProvider.java
+    jdk/src/solaris/classes/sun/tools/attach/LinuxVirtualMachine.java
+    jdk/src/solaris/hpi/include/largefile_linux.h
+    jdk/src/solaris/native/java/net/linux_close.c
+    jdk/src/solaris/native/sun/tools/attach/LinuxVirtualMachine.c"
+
+  for d in ${COPYDIRS}; do
+    ${MKDIR_BIN} -p $(echo ${BUILD_DIR}/$d | ${SED_BIN} 's/linux/bsd/g;')
+    cd ${BUILD_DIR}/$d
+    for f in *; do
+      if [ -f $f ]; then
+        t=$(echo ${BUILD_DIR}/$d/$f | ${SED_BIN} 's/linux/bsd/g; s/Linux/Bsd/g')
+        ${SED_BIN} 's/linux/bsd/g; s/Linux/Bsd/g; s/LINUX/BSD/g' < $f > $t
+      fi
+    done
+  done
+  for f in ${COPYFILES}; do
+    t=$(echo $f | ${SED_BIN} 's/linux/bsd/g; s/Linux/Bsd/g')
+    ${SED_BIN} 's/linux/bsd/g; s/Linux/Bsd/g' < ${BUILD_DIR}/$f > ${BUILD_DIR}/$t
+  done
+  ${SED_BIN} 's/solaris/bsd/g; s/Solaris/Bsd/g' < ${BUILD_DIR}/jdk/src/solaris/hpi/native_threads/src/threads_solaris.c > ${BUILD_DIR}/jdk/src/solaris/hpi/native_threads/src/threads_bsd.c
+
+  ${FIND_BIN} ${BUILD_DIR}/jdk/test -type f -name \*.sh -exec ${SED_BIN} -i "" -e s/Linux/FreeBSD/g {} \;
+  cd ${__CURR_DIR}
+  echo "Done doAfterUnpack"
+}
+
+
+doInstall() {
+  # ${MV_BIN} ${PREFIX} ${PREFIX}-afterbuild-to-be-removed
+  ${RM_BIN} -fr ${PREFIX}/jre
+  ${CP_BIN} -fR ${BUILD_DIR}/build/bsd-amd64/j2sdk-image/ ${PREFIX}
+}
+
+
+APP_AFTER_UNPACK_CALLBACK="doAfterUnpack" # execute function
+APP_AFTER_PATCH_CALLBACK="doAfterPatch"
+APP_AFTER_INSTALL_CALLBACK="doAfterInstall"
+UPDATE_VERSION="32"
+
+export BOOT_JAVA="/Software/Openjdk6-amd64/openjdk6"
+# LDFLAGS='-Wl,--enable-new-dtags,--export-dynamic'
+APP_MAKE_METHOD="gmake COMPANY_NAME=VerKnowSys ALT_BUILD_WIN_SA=0 BUILD_MOTIF=0 BUILD_HOTSPOT=1 DEV_ONLY=0 CC_VERSION=gcc CCC=/usr/bin/g++ GCC=/usr/bin/gcc ALT_PARALLEL_COMPILE_JOBS=1 SKIP_DEBUG_BUILD=1 SKIP_FASTDEBUG_BUILD=1 HOTSPOT_BUILD_JOBS=1 JOBS=1 LANG=C LC_ALL=C ALT_JDK_IMPORT_PATH=${BOOT_JAVA} BOOTDIR=${BOOT_JAVA} ALT_BOOTDIR=${BOOT_JAVA} ALT_CACERTS_FILE=/tmp/cacerts CUPS_HEADERS_PATH=${PREFIX}/include ALT_CUPS_LIB_PATH=${PREFIX}/lib ALT_PACKAGE_PATH=${PREFIX} ALT_DROPS_DIR=/tmp ANT_HOME=${PREFIX} BUILD_NUMBER=${APP_VERSION} NO_DOCS=1 JDK_UPDATE_VERSION=${UPDATE_VERSION} JAVACMD=${BOOT_JAVA}/bin/java WARNINGS_ARE_ERRORS=-w MILESTONE=fcs RELEASE=0 product_build" #   OS=FreeBSD AGENT_DIR= DONT_ENABLE_IPV6=YES RELEASE=false
+
+APP_INSTALL_METHOD="doInstall"
+APP_EXPORTS="java javac javap javah rmic idlj native2ascii"
