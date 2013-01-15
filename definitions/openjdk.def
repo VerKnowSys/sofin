@@ -51,6 +51,7 @@ doAfterPatch() {
   ${RM_BIN} -rf jdk/make/sun/security/jgss
   # ${RM_BIN} -rf jdk/make/sun/security/action
   ${RM_BIN} -rf jdk/make/sun/jdga
+  ${RM_BIN} -rf jdk/make/sun/cmm
   ${RM_BIN} -rf jdk/make/sun/jpeg
   ${RM_BIN} -rf jdk/make/sun/dcpr
 
@@ -62,7 +63,7 @@ doAfterPatch() {
   ${SED_BIN} -i '' '/swing\ \\/d' jdk/make/javax/Makefile
 
   ${SED_BIN} -i '' '65,69 d' jdk/make/sun/Makefile
-  ${SED_BIN} -i '' 's/SUBDIRS\ \=.*/SUBDIRS = jar security javazic misc net audio $(HEADLESS_SUBDIR) cmm rmi $(JDBC_SUBDIR) text nio launcher management $(ORG_SUBDIR) native2ascii serialver tools jconsole/' jdk/make/sun/Makefile
+  ${SED_BIN} -i '' 's/SUBDIRS\ \=.*/SUBDIRS = jar security javazic misc net audio $(HEADLESS_SUBDIR) rmi $(JDBC_SUBDIR) text nio launcher management $(ORG_SUBDIR) native2ascii serialver tools jconsole/' jdk/make/sun/Makefile
 
   ${SED_BIN} -i '' '64 d' jdk/make/sun/security/Makefile
   ${SED_BIN} -i '' 's/SUBDIRS\ \=.*/SUBDIRS = other action util tools krb5 smartcardio $(PKCS11)/' jdk/make/sun/security/Makefile
@@ -71,6 +72,25 @@ doAfterPatch() {
   # ${SED_BIN} -i '' '/jawt/d' jdk/make/sun/Makefile
 
   ${SED_BIN} -i '' '/mawt.gmk/d' jdk/make/sun/headless/Makefile
+
+
+  ${RM_BIN} -rf jdk/make/java/java_crw_demo
+  ${RM_BIN} -rf jdk/make/java/java_hprof_demo
+  ${RM_BIN} -rf jdk/make/mkdemo
+
+  ${SED_BIN} -i '' '42,43 d' jdk/make/java/Makefile
+  ${SED_BIN} -i '' 's/SUBDIRS\ \+\= security.*/SUBDIRS += security npt math util text applet net nio sql rmi jar beans logging management instrument/' jdk/make/java/Makefile
+  ${SED_BIN} -i '' 's/SUBDIRS.*/SUBDIRS    = tools java javax org sun sunw com jpda mksample launchers/' jdk/make/Makefile
+
+
+
+  ${RM_BIN} -rf jdk/src/solaris/native/sun/awt
+  ${RM_BIN} -rf jdk/src/solaris/native/sun/xawt
+  ${RM_BIN} -rf jdk/src/solaris/native/sun/jdga
+  ${RM_BIN} -rf jdk/src/solaris/native/sun/java2d
+  ${RM_BIN} -rf jdk/src/solaris/native/sun/font
+  ${RM_BIN} -rf jdk/src/share/demo
+  ${RM_BIN} -rf jdk/src/windows
 
   # ${SED_BIN} -i '' '/AWTPermission/d' jdk/src/share/classes/sun/security/util/SecurityConstants.java
   # ${SED_BIN} -i '' '/AWTPermission/d' jdk/src/share/classes/java/lang/SecurityManager.java
