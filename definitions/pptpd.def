@@ -1,3 +1,4 @@
+DISABLE_ON="Darwin"
 APP_FULL_NAME="PPTPD VPN implementation"
 APP_NAME="pptpd"
 APP_SHA="3d1faf99055e420bafa96c96e8871a888c50b4e8"
