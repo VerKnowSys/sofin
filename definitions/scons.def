@@ -7,9 +7,4 @@ APP_REQUIREMENTS="python-legacy"
 APP_CONFIGURE_SCRIPT="ignore"
 APP_MAKE_METHOD="${PREFIX}/bin/python setup.py install --prefix=${PREFIX} --standalone-lib --no-version-script --no-install-man"
 APP_INSTALL_METHOD="true"
-case "${SYSTEM_NAME}" in
-  Darwin)
-    export APP_MAKE_METHOD="/usr/bin/python setup.py install --prefix=${PREFIX} --standalone-lib --no-version-script --no-install-man"
-    ;;
-esac
 APP_EXPORTS="scons"
