@@ -1,3 +1,4 @@
+DISABLE_ON="Darwin"
 APP_FULL_NAME="GNU Guile library"
 APP_NAME="guile"
 APP_SHA="4425cc1a60ffe5637972a328880f98746c2a0f5b"
