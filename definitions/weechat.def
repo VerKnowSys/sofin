@@ -5,6 +5,9 @@ APP_VERSION="0.3.8"
 APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
 APP_REQUIREMENTS="zlib libxml2 yaml libiconv libffi ncurses gmake curl pkgconf perl python-legacy libtool gmp libunistring gc guile"
 APP_EXPORTS="weechat-curses"
-APP_CONFIGURE_ARGS="--disable-static --disable-guile"
+APP_CONFIGURE_ARGS="--disable-static"
+if [ "${SYSTEM_NAME}" = "Darwin" ]; then
+  export APP_CONFIGURE_ARGS="${APP_CONFIGURE_ARGS} --disable-guile"
+fi
 APP_MAKE_METHOD="gmake -s ${MAKE_OPTS}"
 APP_INSTALL_METHOD="gmake install -s ${MAKE_OPTS}"
