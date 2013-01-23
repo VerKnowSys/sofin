@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-VERSION="0.34.1"
+VERSION="0.34.2"
 # load configuration from sofin.conf
 
 CONF_FILE="/etc/sofin.conf.sh"
@@ -1046,44 +1046,44 @@ done
 
 
 update_shell_vars
-if [ ! "${APP_JAVA_ANCESTOR}" = "" ]; then
-    if [ ! "$(${ID_BIN} -u)" = "0" ]; then
-        # if not root - cause no java ancestor required for root
-        note "→ Setting up Java ancestor: ${APP_JAVA_ANCESTOR}"
-        export JAVA_HOME_PROFILE="${HOME}/.profile_java" # profile with additional info about java
-        case "${APP_JAVA_ANCESTOR}" in
-            JDK6_32)
-                ${PRINTF_BIN} "\nexport JAVA_HOME=\"${JDK6_32}\"\n" > "${JAVA_HOME_PROFILE}"
-                ${PRINTF_BIN} "\nexport PATH=\"${JDK6_32}/exports:\$PATH\"\n" >> "${JAVA_HOME_PROFILE}"
-                ;;
+# if [ ! "${APP_JAVA_ANCESTOR}" = "" ]; then
+#     if [ ! "$(${ID_BIN} -u)" = "0" ]; then
+#         # if not root - cause no java ancestor required for root
+#         note "→ Setting up Java ancestor: ${APP_JAVA_ANCESTOR}"
+#         export JAVA_HOME_PROFILE="${HOME}/.profile_java" # profile with additional info about java
+#         case "${APP_JAVA_ANCESTOR}" in
+#             JDK6_32)
+#                 ${PRINTF_BIN} "\nexport JAVA_HOME=\"${JDK6_32}\"\n" > "${JAVA_HOME_PROFILE}"
+#                 ${PRINTF_BIN} "\nexport PATH=\"${JDK6_32}/exports:\$PATH\"\n" >> "${JAVA_HOME_PROFILE}"
+#                 ;;
 
-            JDK6_64)
-                note "   64bit JDK 1.6 ancestor"
-                ${PRINTF_BIN} "\nexport JAVA_HOME=\"${JDK6_64}\"\n" > "${JAVA_HOME_PROFILE}"
-                ${PRINTF_BIN} "\nexport PATH=\"${JDK6_64}/exports:\$PATH\"\n" >> "${JAVA_HOME_PROFILE}"
-                ;;
+#             JDK6_64)
+#                 note "   64bit JDK 1.6 ancestor"
+#                 ${PRINTF_BIN} "\nexport JAVA_HOME=\"${JDK6_64}\"\n" > "${JAVA_HOME_PROFILE}"
+#                 ${PRINTF_BIN} "\nexport PATH=\"${JDK6_64}/exports:\$PATH\"\n" >> "${JAVA_HOME_PROFILE}"
+#                 ;;
 
-            JDK7_32)
-                note "   32bit JDK 1.7 ancestor"
-                ${PRINTF_BIN} "\nexport JAVA_HOME=\"${JDK7_32}\"\n" > "${JAVA_HOME_PROFILE}"
-                ${PRINTF_BIN} "\nexport PATH=\"${JDK7_32}/exports:\$PATH\"\n" >> "${JAVA_HOME_PROFILE}"
-                ;;
+#             JDK7_32)
+#                 note "   32bit JDK 1.7 ancestor"
+#                 ${PRINTF_BIN} "\nexport JAVA_HOME=\"${JDK7_32}\"\n" > "${JAVA_HOME_PROFILE}"
+#                 ${PRINTF_BIN} "\nexport PATH=\"${JDK7_32}/exports:\$PATH\"\n" >> "${JAVA_HOME_PROFILE}"
+#                 ;;
 
-            JDK7_64)
-                note "   64bit JDK 1.7 ancestor"
-                ${PRINTF_BIN} "\nexport JAVA_HOME=\"${JDK7_64}\"\n" > "${JAVA_HOME_PROFILE}"
-                ${PRINTF_BIN} "\nexport PATH=\"${JDK7_64}/exports:\$PATH\"\n" >> "${JAVA_HOME_PROFILE}"
-                ;;
+#             JDK7_64)
+#                 note "   64bit JDK 1.7 ancestor"
+#                 ${PRINTF_BIN} "\nexport JAVA_HOME=\"${JDK7_64}\"\n" > "${JAVA_HOME_PROFILE}"
+#                 ${PRINTF_BIN} "\nexport PATH=\"${JDK7_64}/exports:\$PATH\"\n" >> "${JAVA_HOME_PROFILE}"
+#                 ;;
 
-            *)
-                note "Wrong JDK ancestor"
-                ;;
-        esac
+#             *)
+#                 note "Wrong JDK ancestor"
+#                 ;;
+#         esac
 
-        debug "Adding entry to $HOME/.profile to read from $HOME/.profile_java"
-        ${CAT_BIN} "${HOME}/.profile_java" >> "${HOME}/.profile"
-    fi
-fi
+#         debug "Adding entry to $HOME/.profile to read from $HOME/.profile_java"
+#         ${CAT_BIN} "${HOME}/.profile_java" >> "${HOME}/.profile"
+#     fi
+# fi
 
 if [ ! -z "${SHELL_PID}" ]; then
     note "All done. Reloading configuration of $(${BASENAME_BIN} ${SHELL}) with pid: ${SHELL_PID}…"

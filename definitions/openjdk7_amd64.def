@@ -6,7 +6,7 @@ APP_VERSION="1.7.0_06"
 APP_HTTP_PATH="${MAIN_BINARY_REPOSITORY}${APP_NAME}_${APP_VERSION}.tar.gz"
 APP_CONFIGURE_SCRIPT="binary"
 APP_AFTER_INSTALL_CALLBACK="${MV_BIN} ${CACHE_DIR}cache/${APP_NAME}-${APP_VERSION}/${APP_NAME} ${PREFIX}; ${RM_BIN} -f ${PREFIX}/lib/libiconv.so.3 ; ${RM_BIN} -f ${PREFIX}/lib/libcharset.so.1 ; ${RM_BIN} -f ${PREFIX}/lib/libintl.so.9"
-APP_JAVA_ANCESTOR="JDK7_64"
+# APP_JAVA_ANCESTOR="JDK7_64"
 APP_USER_INFO="OpenJDK notes:
   1. This is FreeBSD binary build.
   2. This definition also sets JAVA_HOME to /Software/YOUR-VERSION.
