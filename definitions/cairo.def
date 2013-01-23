@@ -5,5 +5,5 @@ APP_NAME="cairo"
 APP_VERSION="1.12.2"
 APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
 APP_CONFIGURE_ARGS="--disable-directfb --disable-largefile --disable-valgrind --enable-full-testing=no --enable-trace=no --enable-interpreter=yes --enable-gobject --disable-gl --disable-xlib --enable-symbol-lookup=no"
-APP_REQUIREMENTS="make libiconv jpeg pkgconf perl libpng pixman zlib pcre libffi gettext python-legacy libtool icu glib zlib jbig2dec libidn tiff freetype libxml2 fontconfig libpaper m4 bison autoconf automake util-macros libxslt xcb-proto libpthread-stubs xproto libXau libxcb xtrans xextproto libX11 libICE libSM kbproto libXt libXext libgs libspectre"
+APP_REQUIREMENTS="gmake libiconv jpeg pkgconf perl libpng pixman zlib pcre libffi gettext python-legacy libtool icu glib zlib jbig2dec libidn tiff freetype libxml2 fontconfig libpaper m4 bison autoconf automake util-macros libxslt xcb-proto libpthread-stubs xproto libXau libxcb xtrans xextproto libX11 libICE libSM kbproto libXt libXext libgs libspectre"
 APP_EXPORTS="pkg-config" # XXX: pkg-config is required to let 3rd party apps know about library location

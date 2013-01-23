@@ -13,7 +13,7 @@ gnupg
 graphicsmagick
 imagemagick
 jruby
-make
+gmake
 maven
 memcached
 mc

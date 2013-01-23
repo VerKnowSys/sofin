@@ -1,4 +1,4 @@
-DISABLE_ON="Linux"
+DISABLE_ON="Linux FreeBSD"
 APP_FULL_NAME="Google V8 JavaScript Virtual Machine"
 APP_NAME="v8"
 APP_SHA="595492842ff86eaa7e8cf5cf88b2dd9a000e357f"

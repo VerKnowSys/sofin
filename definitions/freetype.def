@@ -3,5 +3,8 @@ APP_SHA="5cb80ab9d369c4e81a2221bcf45adcea2c996b9b"
 APP_NAME="freetype"
 APP_VERSION="2.4.9"
 APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.bz2"
-APP_REQUIREMENTS="make zlib"
+APP_REQUIREMENTS="gmake zlib"
 APP_AFTER_UNPACK_CALLBACK="${FIND_BIN} ${PREFIX} -type f -name 'libbz2.a' | ${XARGS_BIN} ${RM_BIN} -f" # remove static archive to prevent fPIC failures in freetype > 2.4.4
+APP_CONFIGURE_SCRIPT="GNUMAKE=${PREFIX}/bin/gmake ./configure" # yea, that kind of shit makes me sad
+APP_MAKE_METHOD="gmake -s ${MAKE_OPTS}"
+APP_INSTALL_METHOD="gmake install -s ${MAKE_OPTS}"
