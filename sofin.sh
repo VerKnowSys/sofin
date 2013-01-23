@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-VERSION="0.34.2"
+VERSION="0.36.0"
 # load configuration from sofin.conf
 
 CONF_FILE="/etc/sofin.conf.sh"
@@ -784,14 +784,14 @@ for application in ${APPLICATIONS}; do
                                 error "→ ${cur} vs ${APP_SHA}"
                                 error "→ SHA sum mismatch. Removing corrupted file from cache: ${file}, and retrying."
                                 # remove corrupted file
-                                $($FIND_BIN "${BUILD_DIR_ROOT}" -maxdepth 1 -type f -name "${file}" | ${XARGS_BIN} ${RM_BIN})
+                                $($FIND_BIN "${BUILD_DIR_ROOT}" -maxdepth 1 -type f -name "${file}" | ${XARGS_BIN} ${RM_BIN} -f)
                                 # remove lock
                                 if [ -e "${LOCK_FILE}" ]; then
                                     debug "Removing lock file: ${LOCK_FILE}"
                                     ${RM_BIN} -f "${LOCK_FILE}"
                                 fi
                                 # and restart script with same arguments:
-                                ${SCRIPT_NAME} "${SCRIPT_ARGS}"
+                                run "${SCRIPT_NAME} ${SCRIPT_ARGS}"
                                 exit
                             fi
                         fi
