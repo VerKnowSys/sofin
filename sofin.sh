@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-VERSION="0.36.0"
+VERSION="0.36.1"
 # load configuration from sofin.conf
 
 CONF_FILE="/etc/sofin.conf.sh"
@@ -600,7 +600,10 @@ if [ ! "$1" = "" ]; then
             debug "Testing ${dir} looking into: ${SOFT_DIR}${APP}${dir}"
             if [ -e "${SOFT_DIR}${APP}${dir}${EXPORT}" ]; then
                 note "Exporting binary: ${SOFT_DIR}${APP}${dir}${EXPORT}"
-                ${LN_BIN} -vfs "${SOFT_DIR}${APP}${dir}${EXPORT}" "${SOFT_DIR}${APP}/exports/${EXPORT}" >> "$LOG"
+                curr_dir="$(${PWD_BIN})"
+                cd "${SOFT_DIR}${APP}${dir}"
+                ${LN_BIN} -vfs "..${dir}/${EXPORT}" "../exports/${EXPORT}" >> "$LOG"
+                cd "${curr_dir}"
             fi
         done
         exit
@@ -1024,7 +1027,10 @@ for application in ${APPLICATIONS}; do
                     debug "Testing ${dir} looking into: ${PREFIX}${dir}${exp}"
                     if [ -f "${PREFIX}${dir}${exp}" ]; then # a file
                         if [ -x "${PREFIX}${dir}${exp}" ]; then # and it's executable'
-                            ${LN_BIN} -vfs "${PREFIX}${dir}${exp}" "${PREFIX}/exports/${exp}" >> "$LOG"
+                            curr_dir="$(${PWD_BIN})"
+                            cd "${PREFIX}${dir}"
+                            ${LN_BIN} -vfs "..${dir}${exp}" "../exports/${exp}" >> "$LOG"
+                            cd "${curr_dir}"
                             exp_elem="$(${BASENAME_BIN} ${PREFIX}${dir}${exp})"
                             EXPORT_LIST="${EXPORT_LIST} ${exp_elem}"
                         fi
