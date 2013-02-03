@@ -74,7 +74,8 @@ SLEEP_BIN="/bin/sleep"
 SYSCTL_BIN="/sbin/sysctl"
 BC_BIN="/usr/bin/bc"
 HEAD_BIN="/usr/bin/head"
-
+SERVICE_BIN="/usr/sbin/service"
+TEST_BIN="/bin/test"
 
 SYSTEM_NAME="$(uname)"
 SYSTEM_ARCH="$(uname -p)"
