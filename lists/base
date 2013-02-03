@@ -8,8 +8,7 @@ openssh
 subversion
 zsh
 vim
-openjdk6_amd64
-openjdk6_i386
+openjdk
 pptpd
 pstree
 tig
