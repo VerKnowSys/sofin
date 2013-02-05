@@ -102,6 +102,7 @@ case "${SYSTEM_NAME}" in
         export KLDLOAD_BIN="/sbin/kextload"
         cpus=$(${SYSCTL_BIN} -a | ${GREP_BIN} cpu.core_count: | ${AWK_BIN} '{printf $2}')
         export MAKE_OPTS="-j${cpus}"
+        unset SERVICE_BIN # not necessary
         ;;
 
     Linux)
