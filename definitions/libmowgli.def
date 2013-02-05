@@ -1,0 +1,8 @@
+APP_FULL_NAME="Libmowgli-2 development framework"
+APP_NAME="libmowgli"
+APP_SHA="b322e4d121d3832a67cbef45c653e62cec16d157"
+APP_VERSION="git8f54785"
+APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
+APP_REQUIREMENTS="m4 gmake perl"
+APP_MAKE_METHOD="gmake -s ${MAKE_OPTS}"
+APP_INSTALL_METHOD="gmake install -s ${MAKE_OPTS}"
