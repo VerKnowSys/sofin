@@ -1,0 +1,13 @@
+DISABLE_ON="FreeBSD"
+APP_FULL_NAME="BSD Make"
+APP_SHA="9ce3c3fc01e0eb47d82827b1eb227eb371fefd5c"
+APP_NAME="bsdmake"
+APP_VERSION="24"
+APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
+APP_CONFIGURE_SCRIPT="ignore"
+PPREFIX="$(echo $PREFIX | ${SED_BIN} -e 's/\//\\\//g')" # escape / in path
+BUILD_DIR="${CACHE_DIR}cache/${APP_NAME}-${APP_VERSION}/${APP_NAME}-${APP_VERSION}"
+APP_AFTER_PATCH_CALLBACK="${GREP_BIN} -rl '@PREFIX@' . | ${XARGS_BIN} ${SED_BIN} -i -e 's/@PREFIX@/${PPREFIX}/'"
+APP_MAKE_METHOD="make -f Makefile.dist"
+APP_INSTALL_METHOD="${MKDIR_BIN} -p ${PREFIX}/bin ${PREFIX}/share/mk/bsdmake ; ${CP_BIN} -fR ${BUILD_DIR}/mk/ ${PREFIX}/share/mk/bsdmake ; ${CP_BIN} ${BUILD_DIR}/pmake ${PREFIX}/bin/bsdmake"
+APP_EXPORTS="bsdmake"
