@@ -76,6 +76,7 @@ BC_BIN="/usr/bin/bc"
 HEAD_BIN="/usr/bin/head"
 SERVICE_BIN="/usr/sbin/service"
 TEST_BIN="/bin/test"
+CHMOD_BIN="/bin/chmod"
 
 SYSTEM_NAME="$(uname)"
 SYSTEM_ARCH="$(uname -p)"
