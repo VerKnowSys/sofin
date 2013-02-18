@@ -38,11 +38,11 @@ customizable software for FreeBSD servers. Darwin (Mac OS X) support started wit
 * Sofin has own configuration file: [sofin.conf.sh](https://github.com/VerKnowSys/sofin/blob/master/sofin.conf.sh) which is SH script itself.
 * Supports parallel builds by default (from version 0.24.5)
 * Supports custom callbacks executed in order as follows:
-        APP_AFTER_UNPACK_CALLBACK (executed after software unpack process)
-        APP_AFTER_PATCH_CALLBACK (executed after software patch process)
-        APP_AFTER_CONFIGURE_CALLBACK (executed after software configuration process)
-        APP_AFTER_MAKE_CALLBACK (executed after software compilation process)
-        APP_AFTER_INSTALL_CALLBACK (executed after software installation process)
+    `APP_AFTER_UNPACK_CALLBACK (executed after software unpack process)`
+    `APP_AFTER_PATCH_CALLBACK (executed after software patch process)`
+    `APP_AFTER_CONFIGURE_CALLBACK (executed after software configuration process)`
+    `APP_AFTER_MAKE_CALLBACK (executed after software compilation process)`
+    `APP_AFTER_INSTALL_CALLBACK (executed after software installation process)`
   Each callback can be sh function itself and to be called by name. Look into [sbt.def](https://github.com/VerKnowSys/sofin/blob/master/definitions/sbt.def) for an example createLaunchScript().
 
 
