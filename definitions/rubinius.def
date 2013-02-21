@@ -3,10 +3,10 @@ APP_SHA="38eb2ea71a2c3b89c660472eeb8c7ea3c38e8a3f"
 APP_NAME="rubinius"
 APP_VERSION="2.0-64949fcef9943e81b7c607144d9044ee4bd79056"
 APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.bz2"
-APP_AFTER_INSTALL_CALLBACK="${PRINTF_BIN} 'gem: --no-ri --no-rdoc' > ${HOME}/.gemrc ; ${PREFIX}/bin/gem install rack rake"
+APP_AFTER_INSTALL_CALLBACK="${PRINTF_BIN} 'gem: --no-ri --no-rdoc' > ${HOME}/.gemrc ; ${PREFIX}/bin/gem install rack rake rails"
 APP_REQUIREMENTS="zlib bzip2 libxml2 libiconv gmake libtool libgpg-error libgcrypt libxslt yaml sqlite ruby m4 bison perl"
 APP_EXPORTS="ruby rbx gem irb ri rdoc erb rake rails bundle"
-APP_MAKE_METHOD="rake --trace install"
+APP_MAKE_METHOD="rake install"
 APP_INSTALL_METHOD="true"
 APP_NO_CCACHE="YES"
 case "${SYSTEM_NAME}" in
@@ -14,7 +14,7 @@ case "${SYSTEM_NAME}" in
     APP_CONFIGURE_ARGS="--enable-version=1.9 --enable-llvm --preserve-prefix"
     ;;
   *)
-    APP_CONFIGURE_ARGS="--enable-version=1.9 --llvm-config=/Software/Clang/exports/llvm-config --enable-llvm --preserve-prefix"
+    APP_CONFIGURE_ARGS="--enable-version=1.9 --llvm-config=${SOFTWARE_DIR}Clang/exports/llvm-config --enable-llvm --preserve-prefix"
     ;;
 esac
 
