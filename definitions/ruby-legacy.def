@@ -1,6 +1,7 @@
 APP_FULL_NAME="Ruby YARV 1.9"
 APP_SHA="54e8d08103e915e2b07dcfcea88ab7fc42d40b0a"
 APP_NAME="ruby"
+APP_POSTFIX="-legacy"
 APP_VERSION="1.9.3-p385"
 APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.bz2"
 APP_CONFIGURE_ARGS="--enable-pthread --with-opt-dir=${PREFIX} --without-gcc --disable-install-doc --disable-install-rdoc"
