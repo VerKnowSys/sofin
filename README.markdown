@@ -101,21 +101,21 @@ space than it does with "old fasioned, system wide, shared software".
 > 1.  Install base 64bit system - I used 64bit FreeBSD 9.1 bootonly iso here.
 > 2.  Run as root: "fetch -o - https://github.com/VerKnowSys/sofin/archive/master.tar.gz | tar xf - && cd ./sofin-master && ./sofin-install". It will put "sofin" into /usr/bin/ and sofin.conf.sh into /etc/.
 > 3.  Build core software. Run "sofin install base" as root.
-> 4.  Start using sofin as regular user. Set your environment to source "/etc/profile_sofin" for your user environments.
+> 4.  Start using sofin as regular user.
 
 * Darwin/ Mac OS X specific:
 > 1.  Install Mac OS X 10.8.
 > 2.  Install [XQuartz](http://xquartz.macosforge.org/landing/) (if you want to build definitions that require X11)
 > 3.  Run "git clone git://github.com/VerKnowSys/sofin.git && cd ./sofin && sudo ./sofin-install". It will put "sofin" in /usr/bin/ and sofin.conf.sh in /etc/.
 > 4.  Build core software. Run "sudo sofin install base".
-> 5.  Start using sofin as regular user. Set your environment to source "/etc/profile_sofin" for your user environments.
+> 5.  Start using sofin as regular user.
 
 * Debian specific: (Yes it's NOT Linux specific at all, cause every distro is a different monster with own set of additional hands and legs)
 > 1.  Install base 64bit system - I used 64bit Debian "wheezy" netinstall iso here. You need to know that Debian is a bit messy distro anyway. We need to do some bad things to make it work like we want.
 > 2.  Run as root: "aptitude install time gcc g++ libncurses5-dev zlib1g-dev libbz2-dev bc".
 > 3.  Run as root: "wget -qO- https://github.com/VerKnowSys/sofin/archive/master.tar.gz | tar zxf - && cd ./sofin-master && ./sofin-install". It will put "sofin" into /usr/bin/ and sofin.conf.sh into /etc/.
 > 4.  Build core software. Run as root: "sofin install base".
-> 5.  Start using sofin as regular user. Set your environment to source "/etc/profile_sofin" for your user environments.
+> 5.  Start using sofin as regular user.
 
 
 ## License:
