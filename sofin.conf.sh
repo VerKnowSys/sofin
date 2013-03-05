@@ -114,7 +114,11 @@ case "${SYSTEM_NAME}" in
         export GREP_BIN="/bin/grep"
         export BC_BIN="/usr/bin/bc"
         export CHOWN_BIN="/bin/chown"
-        export AWK_BIN="/usr/bin/awk -c"
+        if [ -e "/etc/debian_version" ]; then # we're dealing with debian or ubuntu.
+            export AWK_BIN="/usr/bin/awk"
+        else
+            export AWK_BIN="/usr/bin/awk -c"
+        fi
         ;;
 
 esac
