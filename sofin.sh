@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-VERSION="0.38.0"
+VERSION="0.38.1"
 
 # load configuration from sofin.conf
 CONF_FILE="/etc/sofin.conf.sh"
@@ -899,11 +899,13 @@ for application in ${APPLICATIONS}; do
                                 run "${APP_AFTER_CONFIGURE_CALLBACK}"
                             fi
 
-                            note "   → Building requirement: $1"
-                            run "${APP_MAKE_METHOD}"
-                            if [ ! -z "${APP_AFTER_MAKE_CALLBACK}" ]; then
-                                debug "Running after make callback"
-                                run "${APP_AFTER_MAKE_CALLBACK}"
+                            if [ "${APP_MAKE_METHOD}" != "true" ]; then
+                                note "   → Building requirement: $1"
+                                run "${APP_MAKE_METHOD}"
+                                if [ ! -z "${APP_AFTER_MAKE_CALLBACK}" ]; then
+                                    debug "Running after make callback"
+                                    run "${APP_AFTER_MAKE_CALLBACK}"
+                                fi
                             fi
 
                             note "   → Installing requirement: $1"
