@@ -23,6 +23,29 @@ if [ ! -x "${CXX}" ]; then
 fi
 
 
+create_user_symlinks () {
+    if [ ! -d "${HOME_DIR}" ]; then
+        note "Creating ${HOME_DIR} directory."
+        ${MKDIR_BIN} "${HOME_DIR}"
+        check_command_result $?
+    fi
+
+    cd /home
+
+    for i in *; do
+        uid=$(id -u $i)
+        if [ ! $uid > 0 ]; then
+            continue
+        fi
+        if [ ! -L "${HOME_DIR}${uid}" ]; then
+            note "Creating symlink ${HOME_DIR}${uid} -> /home/${i}."
+            ${LN_BIN} -s "/home/${i}" "${HOME_DIR}${uid}"
+            check_command_result $?
+        fi
+    done
+}
+
+
 install_base () {
     ${RM_BIN} -rf "./sofin"
     ${RM_BIN} -rf "./sofin.sh.x"
@@ -85,6 +108,7 @@ case "${SYSTEM_NAME}" in
 
   FreeBSD|Linux)
     check_root
+    create_user_symlinks
     install_base
     ;;
 
