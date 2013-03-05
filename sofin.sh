@@ -2,9 +2,9 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-VERSION="0.37.1"
-# load configuration from sofin.conf
+VERSION="0.38.0"
 
+# load configuration from sofin.conf
 CONF_FILE="/etc/sofin.conf.sh"
 if [ -e "${CONF_FILE}" ]; then
     . "${CONF_FILE}"
@@ -1045,6 +1045,23 @@ for application in ${APPLICATIONS}; do
                     debug "Setting owner of ${PREFIX} recursively to user: ${USER_UID}"
                     ${CHOWN_BIN} -R ${USER_UID} "${HOME_DIR}${USER_UID}" # NOTE: sanity check.
                 fi
+            fi
+
+            debug "Doing app conflict resolve"
+            if [ ! -z "${APP_CONFLICTS_WITH}" ]; then
+                note "Resolving conflicts."
+                for app in ${APP_CONFLICTS_WITH}; do
+                    if [ "$(${ID_BIN} -u)" != "0" ]; then
+                        export apphome="${HOME_DIR}$(${ID_BIN} ${ID_SVD})/${HOME_APPS_DIR}"
+                    else
+                        export apphome="${SOFTWARE_DIR}${apps}"
+                    fi
+                    an_app="${apphome}${app}"
+                    if [ -d "${an_app}" ]; then
+                        debug "Found app dir: ${an_app}"
+                        ${RM_BIN} -rf "${an_app}/exports"
+                    fi
+                done
             fi
 
         done

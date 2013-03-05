@@ -25,3 +25,4 @@ APP_SHA="" # sha1 of archive source, used to check file checksum after archive d
 APP_NO_CCACHE="" # use only for software that doesn't support ccache
 APP_USER_INFO="" # additional optional information from definition to user displayed after installation
 APP_CURRENT_VERSION="" # sh callback to check availability of newer version of software (usually from software home site)
+APP_CONFLICTS_WITH="" # defines list of definitions which are in conflict with software.
