@@ -31,7 +31,7 @@ DEPENDENCIES_FILE=".dependencies"
 INSTALLED_MARK=".installed"
 LOG_LINES_AMOUNT="150"
 
-MAKE_OPTS="-j8"
+MAKE_OPTS="-j4"
 
 # config binary requirements definitions
 XARGS_BIN="/usr/bin/xargs"
