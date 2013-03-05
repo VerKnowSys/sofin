@@ -8,3 +8,4 @@ APP_AFTER_UNPACK_CALLBACK="${CP_BIN} -fR ${CACHE_DIR}cache/${APP_NAME}-${APP_VER
 APP_AFTER_INSTALL_CALLBACK="${FIND_BIN} ${PREFIX} -type f -name '*.dll' -o -name '*.exe' -o -name '*.bat' | ${XARGS_BIN} rm"
 APP_EXPORTS="ast gem jgem irb jirb jruby jrubyc ri rdoc rake"
 APP_CURRENT_VERSION="$(${CURL_BIN} http://jruby.org/download 2>/dev/null | ${AWK_BIN} '/Current\ Release/ {gsub(/ *<[^>]+> */, ""); print $4}')"
+APP_CONFLICTS_WITH="Rubinius Ruby Ruby-legacy"
