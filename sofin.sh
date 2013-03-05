@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-VERSION="0.39.0"
+VERSION="0.39.1"
 
 # load configuration from sofin.conf
 CONF_FILE="/etc/sofin.conf.sh"

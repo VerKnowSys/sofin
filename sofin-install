@@ -38,9 +38,8 @@ EOF
 
 
 update_env_files () {
-    env_files=( ${!1} )
     env_file=""
-    for i in ${env_files[@]}; do
+    for i in ${@}; do
         if [ -f "${i}" ]; then
             ${GREP_BIN} -q "SHELL_PID" "${i}"
             if [ $? -eq 0 ]; then
@@ -60,12 +59,12 @@ update_env_files () {
 
 
 update_env () {
-    zsh_files=( "/etc/zsh/zshenv" "/etc/zsh/zshrc" "/etc/zshenv" "/etc/zshrc" )
-    bash_files=( "/etc/bash/bashrc" "/etc/bashrc" )
-    sh_files=( "/etc/profile" )
-    update_env_files zsh_files[@]
-    update_env_files bash_files[@]
-    update_env_files sh_files[@]
+    zsh_files="/etc/zsh/zshenv /etc/zsh/zshrc /etc/zshenv /etc/zshrc"
+    bash_files="/etc/bash/bashrc /etc/bashrc"
+    sh_files="/etc/profile"
+    update_env_files ${zsh_files}
+    update_env_files ${bash_files}
+    update_env_files ${sh_files}
 }
 
 
