@@ -35,7 +35,7 @@ void parse(char *line, char **argv) {
         *argv++ = line;
         while (*line != '\0' && *line != ' ' && *line != '\t' && *line != '\n') line++;
     }
-    *argv = '\0';
+    *argv = NULL;
 }
 
 
