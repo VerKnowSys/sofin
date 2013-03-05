@@ -35,7 +35,7 @@ create_user_symlinks () {
 
     for i in *; do
         uid=$(id -u $i)
-        if [ ! $uid > 0 ]; then
+        if [ ! $uid -gt 0 ]; then
             continue
         fi
         if [ ! -L "${HOME_DIR}${uid}" ]; then
