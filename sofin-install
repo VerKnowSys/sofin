@@ -23,6 +23,52 @@ if [ ! -x "${CXX}" ]; then
 fi
 
 
+shell_configuration=$(${CAT_BIN} <<EOF
+if [ "\$(${ID_BIN} -u)" = "0" ]; then
+    trap "source /etc/profile_sofin" USR2
+else
+    if [ -e \$HOME/.profile ]; then
+        . \$HOME/.profile
+    fi
+    trap "source \$HOME/.profile" USR2
+fi
+export SHELL_PID="\$\$"
+EOF
+)
+
+
+update_env_files () {
+    env_files=( ${!1} )
+    env_file=""
+    for i in ${env_files[@]}; do
+        if [ -f "${i}" ]; then
+            ${GREP_BIN} -q "SHELL_PID" "${i}"
+            if [ $? -eq 0 ]; then
+                export env_file=""
+                break
+            elif [ "${env_file}" = "" ]; then
+                export env_file="${i}"
+            fi
+        fi
+    done
+    if [ -f "${env_file}" ]; then
+        note "Updating environment file: ${env_file}"
+        echo "${shell_configuration}" >> "${env_file}"
+        check_command_result $?
+    fi
+}
+
+
+update_env () {
+    zsh_files=( "/etc/zsh/zshenv" "/etc/zsh/zshrc" "/etc/zshenv" "/etc/zshrc" )
+    bash_files=( "/etc/bash/bashrc" "/etc/bashrc" )
+    sh_files=( "/etc/profile" )
+    update_env_files zsh_files[@]
+    update_env_files bash_files[@]
+    update_env_files sh_files[@]
+}
+
+
 create_user_symlinks () {
     if [ ! -d "${HOME_DIR}" ]; then
         note "Creating ${HOME_DIR} directory."
@@ -106,12 +152,14 @@ case "${SYSTEM_NAME}" in
       ${LN_BIN} -s "/Users/$(${ID_BIN} -u)/.profile" "${HOME}/.profile"
       check_command_result $?
     fi
+    update_env
     install_base
     ;;
 
   FreeBSD|Linux)
     check_root
     create_user_symlinks
+    update_env
     install_base
     ;;
 
