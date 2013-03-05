@@ -1,13 +1,9 @@
+. ${DEFINITIONS_DIR}ruby.def
+
 APP_FULL_NAME="Ruby YARV 1.9"
 APP_SHA="de73455ff6500372d647fb49d24cc130fbd5815e"
-APP_NAME="ruby"
 APP_POSTFIX="-legacy"
 APP_VERSION="1.9.3-p392"
 APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.bz2"
-APP_CONFIGURE_ARGS="--enable-pthread --with-opt-dir=${PREFIX} --without-gcc --disable-install-doc --disable-install-rdoc"
-APP_REQUIREMENTS="zlib bzip2 libxml2 libiconv gmake libtool libgpg-error libgcrypt libxslt yaml libffi sqlite"
-APP_AFTER_INSTALL_CALLBACK="${PRINTF_BIN} 'gem: --no-ri --no-rdoc' > ${HOME}/.gemrc ; ${PREFIX}/bin/gem install bundler rails"
-APP_EXPORTS="ruby gem irb ri rdoc erb rake rails bundle"
 APP_CURRENT_VERSION="$(${CURL_BIN} http://www.ruby-lang.org/en/downloads/ 2>/dev/null | ${AWK_BIN} '/pub\/ruby\/1.9/ {gsub(/ *<[^>]+> */, ""); print $2}')"
-APP_MAKE_METHOD="gmake -s ${MAKE_OPTS}"
-APP_INSTALL_METHOD="gmake install -s ${MAKE_OPTS}"
+APP_REQUIREMENTS="zlib bzip2 libxml2 libiconv gmake libtool libgpg-error libgcrypt libxslt yaml libffi sqlite"
