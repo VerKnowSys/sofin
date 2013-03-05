@@ -34,7 +34,7 @@ create_user_symlinks () {
     cd /home
 
     for i in *; do
-        uid=$(id -u $i)
+        uid="$(id -u $i 2>/dev/null)"
         if [ ! $uid ]; then
             continue
         fi
