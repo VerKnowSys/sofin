@@ -6,6 +6,8 @@ DEBUG="false"
 TRACE="false"
 # DEVEL="true"
 
+DEBIAN="$(test -e /etc/debian_version && echo true)"
+
 ID_SVD="-u" # NOTE: use "-un" for standard FreeBSD systems with users defined in /etc/passwd
 HEADER="Sofin v${VERSION} - © 2o12-2o13 - Versatile Knowledge Systems - VerKnowSys.com"
 SCRIPT_NAME="/usr/bin/sofin.sh"
@@ -114,7 +116,9 @@ case "${SYSTEM_NAME}" in
         export GREP_BIN="/bin/grep"
         export BC_BIN="/usr/bin/bc"
         export CHOWN_BIN="/bin/chown"
-        if [ -e "/etc/debian_version" ]; then # we're dealing with debian or ubuntu.
+        export DEFAULT_COMPILER_FLAGS="-Os -fPIC -fno-strict-overflow -fstack-protector-all"
+        export DEFAULT_LDFLAGS="-fPIC "
+        if [ "${DEBIAN}" = "true" ]; then # we're dealing with debian or ubuntu.
             export AWK_BIN="/usr/bin/awk"
         else
             export AWK_BIN="/usr/bin/awk -c"
