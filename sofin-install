@@ -30,6 +30,7 @@ create_user_symlinks () {
         check_command_result $?
     fi
 
+    CWD="$(pwd)"
     cd /home
 
     for i in *; do
@@ -43,6 +44,8 @@ create_user_symlinks () {
             check_command_result $?
         fi
     done
+
+    cd "${CWD}"
 }
 
 
