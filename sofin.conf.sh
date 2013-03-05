@@ -150,7 +150,11 @@ reset='\033[0m'
 # helpers
 
 cecho () {
-    ${PRINTF_BIN} "${2}${1}${reset}\n"
+    if [ "${DEBIAN}" = "true" ]; then
+        ${PRINTF_BIN} "${1}\n"
+    else
+        ${PRINTF_BIN} "${2}${1}${reset}\n"
+    fi
 }
 
 
