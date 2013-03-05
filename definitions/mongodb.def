@@ -5,6 +5,6 @@ APP_VERSION="2.2.1"
 APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-src-r${APP_VERSION}.tar.gz"
 APP_REQUIREMENTS="libiconv python-legacy scons libexecinfo gmake nspr" # v8
 APP_CONFIGURE_SCRIPT="ignore"
-APP_MAKE_METHOD="scons ${MAKE_OPTS} --extrapath=${PREFIX} --64 --release --prefix=${PREFIX} --clang install" # --usev8
-APP_INSTALL_METHOD="true"
+APP_MAKE_METHOD="true"
+APP_INSTALL_METHOD="scons ${MAKE_OPTS} --extrapath=${PREFIX} --64 --release --prefix=${PREFIX} --clang install" # --usev8"
 APP_EXPORTS="mongod mongostat"
