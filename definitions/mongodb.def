@@ -1,10 +1,14 @@
 APP_FULL_NAME="MongoDB - NoSQL database"
 APP_NAME="mongodb"
-APP_SHA="0e2e042b6adf813733894b02ea8610e91ffa484f"
-APP_VERSION="2.2.1"
+APP_SHA="c85c721cc61bbb1bc86cecc58c8eb29906335816"
+APP_VERSION="2.2.3"
 APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-src-r${APP_VERSION}.tar.gz"
 APP_REQUIREMENTS="libiconv python-legacy scons libexecinfo gmake nspr" # v8
 APP_CONFIGURE_SCRIPT="ignore"
 APP_MAKE_METHOD="true"
-APP_INSTALL_METHOD="scons ${MAKE_OPTS} --extrapath=${PREFIX} --64 --release --prefix=${PREFIX} --clang install" # --usev8"
+if [ "${SYSTEM_NAME}" = "Linux" ]; then
+  export APP_INSTALL_METHOD="scons ${MAKE_OPTS} --extrapath=${PREFIX} --64 --release --prefix=${PREFIX} install"
+else
+  export APP_INSTALL_METHOD="scons ${MAKE_OPTS} --clang --extrapath=${PREFIX} --64 --release --prefix=${PREFIX} install"
+fi
 APP_EXPORTS="mongod mongostat"
