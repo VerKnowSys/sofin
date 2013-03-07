@@ -3,5 +3,8 @@ APP_NAME="mosh"
 APP_SHA="3bbcc560a5968806681465d83758d5c3abee9607"
 APP_VERSION="1.2.3"
 APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
-APP_REQUIREMENTS="libiconv zlib protobuf pkgconf bzip2 perl openssl"
+APP_REQUIREMENTS="pkgconf libiconv zlib protobuf bzip2 perl openssl ncurses"
 APP_EXPORTS="mosh-client mosh-server mosh"
+if [ "${SYSTEM_NAME}" = "Linux" ]; then
+  export APP_CONFIGURE_ARGS="--disable-silent-rules TINFO_CFLAGS='-I${PREFIX}/include -I${PREFIX}/include/ncursesw' TINFO_CPPFLAGS='-I${PREFIX}/include/ncursesw -I${PREFIX}/include' TINFO_LIBS='-L${PREFIX}/lib/ncursesw -L${PREFIX}/lib/ -L${PREFIX}/lib/engines -lncursesw' NCURSES_LDFLAGS='-L${PREFIX}/lib/ncursesw -L${PREFIX}/lib -L${PREFIX}/lib/engines -lncursesw'"
+fi
