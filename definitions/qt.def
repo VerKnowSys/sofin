@@ -4,16 +4,7 @@ APP_NAME="qt"
 APP_SHA="f5880f11c139d7d8d01ecb8d874535f7d9553198"
 APP_VERSION="4.8.4"
 APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-everywhere-opensource-src-${APP_VERSION}.tar.gz"
-case "${SYSTEM_NAME}" in
-  # Darwin)
-  #   APP_CONFIGURE_ARGS="-prefix ${PREFIX} -arch x86_64 -release -opensource -confirm-license -shared -no-largefile -no-dbus -no-multimedia -no-audio-backend -no-phonon -no-phonon-backend -no-nas-sound -no-gtkstyle -fast -no-pch -nomake examples -nomake demos -nomake docs -nomake translations"
-  #   ;;
-
-  *)
-    APP_CONFIGURE_ARGS="-prefix ${PREFIX} -release -opensource -confirm-license -shared -no-largefile -no-accessibility -stl -no-qt3support -no-xmlpatterns -no-multimedia -no-audio-backend -no-phonon -no-phonon-backend -webkit -no-script -no-javascript-jit -no-scripttools -no-declarative -qt-zlib -no-libtiff -no-libpng -no-libmng -no-libjpeg -openssl -silent -optimized-qmake -no-cups -no-iconv -no-pch -no-dbus -no-nas-sound -no-gtkstyle -no-opengl -no-openvg -no-sm -no-xsync -no-xshape -no-xinerama -no-xcursor -no-xfixes -no-xrandr -no-xrender -no-mitshm -no-fontconfig -no-xinput -no-xkb -exceptions -no-gui -fast -verbose -no-silent -nomake examples -nomake demos -nomake docs -nomake translations"
-    ;;
-
-esac
+APP_CONFIGURE_ARGS="-prefix ${PREFIX} -release -opensource -confirm-license -shared -no-largefile -no-accessibility -stl -no-qt3support -no-xmlpatterns -no-multimedia -no-audio-backend -no-phonon -no-phonon-backend -webkit -no-script -no-javascript-jit -no-scripttools -no-declarative -qt-zlib -no-libtiff -no-libpng -no-libmng -no-libjpeg -openssl -silent -optimized-qmake -no-cups -no-iconv -no-pch -no-dbus -no-nas-sound -no-gtkstyle -no-opengl -no-openvg -no-sm -no-xsync -no-xshape -no-xinerama -no-xcursor -no-xfixes -no-xrandr -no-xrender -no-mitshm -no-fontconfig -no-xinput -no-xkb -exceptions -no-gui -fast -verbose -no-silent -nomake examples -nomake demos -nomake docs -nomake translations -continue"
 APP_EXPORTS="moc lconvert lrelease lupdate qdoc3 qmake rcc"
 APP_REQUIREMENTS="gmake"
 APP_MAKE_METHOD="gmake -s ${MAKE_OPTS}"
