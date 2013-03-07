@@ -6,5 +6,9 @@ APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-src-r${APP_VERSION}.tar.gz"
 APP_REQUIREMENTS="libiconv python-legacy scons libexecinfo gmake nspr" # v8
 APP_CONFIGURE_SCRIPT="ignore"
 APP_MAKE_METHOD="true"
-APP_INSTALL_METHOD="scons ${MAKE_OPTS} --extrapath=${PREFIX} --64 --release --prefix=${PREFIX} install" # --usev8 --clang
+if [ "${SYSTEM_NAME}" = "Linux" ]; then
+  export APP_INSTALL_METHOD="scons ${MAKE_OPTS} --extrapath=${PREFIX} --64 --release --prefix=${PREFIX} install"
+else
+  export APP_INSTALL_METHOD="scons ${MAKE_OPTS} --clang --extrapath=${PREFIX} --64 --release --prefix=${PREFIX} install"
+fi
 APP_EXPORTS="mongod mongostat"
