@@ -5,7 +5,7 @@ APP_SHA="5a74c1dae6c2a4c23d0f9aeab34f6cb24774dcf3"
 APP_POSTFIX="-legacy"
 APP_VERSION="2.7.2"
 APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
-if [ "${SYSTEM_NAME}" != "Linux" ]; then
-  export APP_AFTER_INSTALL_CALLBACK="${CURL_BIN} ${MAIN_SOURCE_REPOSITORY}python_distribute_setup.py 2>/dev/null | ${PREFIX}/bin/python && ${CURL_BIN} ${MAIN_SOURCE_REPOSITORY}python_get_pip.py 2>/dev/null | ${PREFIX}/bin/python"
+if [ "${SYSTEM_NAME}" = "Linux" ]; then
+  unset APP_AFTER_INSTALL_CALLBACK
 fi
 APP_EXPORTS="python python-config easy_install pip"
