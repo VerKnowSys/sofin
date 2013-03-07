@@ -232,8 +232,8 @@ validate_env () {
     do
         var_value="$(${PRINTF_BIN} "${envvar}" | ${AWK_BIN} '{sub(/^[A-Z_]*=/, ""); print $1}')"
         if [ ! -x "${var_value}" ]; then
-            error "Unavailable binary required by ${SCRIPT_NAME}: ${envvar}"
+            error "Required binary is unavailable: ${envvar}"
             exit 1
         fi
-    done
+    done || exit 1
 }
