@@ -10,7 +10,6 @@ case "${SYSTEM_NAME}" in
     export APP_CONFIGURE_ARGS="--without-tcltk --with-zlib --without-python --with-perl=/usr/bin/perl"
     ;;
   Linux)
-    export APP_CONFIGURE_ARGS="--without-tcltk --with-zlib --without-python --with-perl=/usr/bin/perl"
     export APP_REQUIREMENTS="${APP_REQUIREMENTS} gettext" # not my fault, blame git creators
     ;;
 esac
