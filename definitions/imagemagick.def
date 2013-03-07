@@ -10,3 +10,4 @@ APP_AFTER_INSTALL_CALLBACK="${SED_BIN} -i '' 's@pkg-config@${PREFIX}/bin/pkgconf
 if [ "${SYSTEM_NAME}" = "Linux" ]; then
   export APP_AFTER_INSTALL_CALLBACK="${SED_BIN} -i 's@pkg-config@${PREFIX}/bin/pkgconf@' ${PREFIX}/bin/Magick*config ${PREFIX}/bin/Wand-config"
 fi
+APP_CONFLICTS_WITH="GraphicsMagick"
