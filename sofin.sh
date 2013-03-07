@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-VERSION="0.39.3"
+VERSION="0.39.4"
 
 # load configuration from sofin.conf
 CONF_FILE="/etc/sofin.conf.sh"
@@ -885,7 +885,7 @@ for application in ${APPLICATIONS}; do
                                     ;;
 
                                 cmake)
-                                    run "${APP_CONFIGURE_SCRIPT} . -LH -DCMAKE_INSTALL_PREFIX=${PREFIX}"
+                                    run "${APP_CONFIGURE_SCRIPT} . -LH -DCMAKE_INSTALL_PREFIX=${PREFIX} ${APP_CONFIGURE_ARGS}"
                                     ;;
 
                                 *)
