@@ -119,6 +119,7 @@ case "${SYSTEM_NAME}" in
         export CHOWN_BIN="/bin/chown"
         export DEFAULT_COMPILER_FLAGS="-Os -fPIC -fno-strict-overflow -fstack-protector-all"
         export DEFAULT_LDFLAGS="-fPIC "
+        export TEST_BIN="/usr/bin/test"
         if [ "${DEBIAN}" = "true" ]; then # we're dealing with debian or ubuntu.
             export AWK_BIN="/usr/bin/awk"
             export SHA_BIN="/usr/bin/sha1sum"
@@ -126,7 +127,6 @@ case "${SYSTEM_NAME}" in
             export AWK_BIN="/usr/bin/awk -c"
         fi
         if [ "${GENTOO}" = "true" ]; then # Gentoo Linux
-            export TEST_BIN="/usr/bin/test"
             export SERVICE_BIN="/sbin/rc-service"
         fi
         ;;
