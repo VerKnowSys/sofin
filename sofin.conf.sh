@@ -120,6 +120,7 @@ case "${SYSTEM_NAME}" in
         export DEFAULT_LDFLAGS="-fPIC "
         if [ "${DEBIAN}" = "true" ]; then # we're dealing with debian or ubuntu.
             export AWK_BIN="/usr/bin/awk"
+            export SHA_BIN="/usr/bin/sha1sum"
         else
             export AWK_BIN="/usr/bin/awk -c"
         fi
