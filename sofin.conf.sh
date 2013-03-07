@@ -7,6 +7,7 @@ TRACE="false"
 # DEVEL="true"
 
 DEBIAN="$(test -e /etc/debian_version && echo true)"
+GENTOO="$(test -e /etc/gentoo-release && echo true)"
 
 ID_SVD="-u" # NOTE: use "-un" for standard FreeBSD systems with users defined in /etc/passwd
 HEADER="Sofin v${VERSION} - © 2o12-2o13 - Versatile Knowledge Systems - VerKnowSys.com"
@@ -123,6 +124,10 @@ case "${SYSTEM_NAME}" in
             export SHA_BIN="/usr/bin/sha1sum"
         else
             export AWK_BIN="/usr/bin/awk -c"
+        fi
+        if [ "${GENTOO}" = "true" ]; then # Gentoo Linux
+            export TEST_BIN="/usr/bin/test"
+            export SERVICE_BIN="/sbin/rc-service"
         fi
         ;;
 
