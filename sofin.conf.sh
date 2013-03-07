@@ -228,10 +228,9 @@ check_os () {
 
 # validate environment availability or crash
 validate_env () {
-    list="$(set | ${GREP_BIN} '_BIN=/')"
-    for envvar in ${list}; do
-        var_name="$(${PRINTF_BIN} "${envvar}" | ${SED_BIN} -e 's/=.*//g')"
-        var_value="$(${PRINTF_BIN} "${envvar}" | ${SED_BIN} -e 's/.*=//g')"
+    env | ${GREP_BIN} '_BIN=/' | while IFS= read -r envvar
+    do
+        var_value="$(${PRINTF_BIN} "${envvar}" | ${AWK_BIN} '{sub(/.*=/, ""); print $1}')"
         if [ ! -x "${var_value}" ]; then
             error "Unavailable binary required by ${SCRIPT_NAME}: ${envvar}"
             exit 1
