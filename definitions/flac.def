@@ -1,4 +1,4 @@
-DISABLE_ON="Darwin FreeBSD"
+DISABLE_ON="Darwin FreeBSD Linux"
 APP_FULL_NAME="Flac lossless audio codec"
 APP_SHA="bd54354900181b59db3089347cc84ad81e410b38"
 APP_NAME="flac"
