@@ -5,5 +5,9 @@ APP_VERSION="2.33"
 APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
 APP_CONFIGURE_SCRIPT="ignore"
 APP_MAKE_METHOD="true"
-APP_INSTALL_METHOD="${MKDIR_BIN} -p ${PREFIX}/bin; ${SOFTWARE_DIR}Clang/exports/clang ${CACHE_DIR}cache/${APP_NAME}-${APP_VERSION}/${APP_NAME}-${APP_VERSION}/pstree.c -o ${PREFIX}/bin/pstree"
+if [ "${SYSTEM_NAME}" = "Darwin" ]; then
+  export APP_INSTALL_METHOD="${MKDIR_BIN} -p ${PREFIX}/bin; /usr/bin/clang ${CACHE_DIR}cache/${APP_NAME}-${APP_VERSION}/${APP_NAME}-${APP_VERSION}/pstree.c -o ${PREFIX}/bin/pstree"
+else
+  export APP_INSTALL_METHOD="${MKDIR_BIN} -p ${PREFIX}/bin; ${SOFTWARE_DIR}Clang/exports/clang ${CACHE_DIR}cache/${APP_NAME}-${APP_VERSION}/${APP_NAME}-${APP_VERSION}/pstree.c -o ${PREFIX}/bin/pstree"
+fi
 APP_EXPORTS="pstree"

@@ -3,7 +3,12 @@ APP_SHA="bd61b731d12ff4fd9d57f5d47bd2f9a2c4c007bf"
 APP_NAME="ruby"
 APP_VERSION="2.0.0-p0"
 APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.bz2"
-APP_CONFIGURE_ARGS="--enable-pthread --with-opt-dir=${PREFIX} --with-gcc=clang --disable-install-doc --disable-install-rdoc"
+APP_CONFIGURE_ARGS="--enable-pthread --with-opt-dir=${PREFIX} --disable-install-doc --disable-install-rdoc"
+if [ "${SYSTEM_NAME}" = "Darwin" ]; then
+  export APP_CONFIGURE_ARGS="${APP_CONFIGURE_ARGS} --with-gcc=/usr/bin/clang"
+else
+  export APP_CONFIGURE_ARGS="${APP_CONFIGURE_ARGS} --with-gcc=${SOFTWARE_DIR}Clang/exports/clang"
+fi
 APP_REQUIREMENTS="zlib bzip2 libxml2 gmake libtool libgpg-error libgcrypt libxslt yaml libffi sqlite perl openssl"
 APP_AFTER_INSTALL_CALLBACK="${PRINTF_BIN} 'gem: --no-ri --no-rdoc' > ${HOME}/.gemrc ; ${PREFIX}/bin/gem install bundler rails --force"
 APP_EXPORTS="ruby gem irb ri rdoc erb rake rails bundle"
