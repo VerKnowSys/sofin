@@ -58,16 +58,14 @@ update_env_files () {
     done
     if [ "${found}" = "" ]; then # Environment file needs updating
         if [ "${env_file}" = "" ]; then
-            env_file="${fallback}"
+            export env_file="${fallback}"
             note "Creating environment file: ${env_file}"
             ${MKDIR_BIN} -p "$(${DIRNAME_BIN} ${env_file})"
-            echo "${shell_configuration}" >> "${env_file}"
-            check_command_result $?
         elif [ -f "${env_file}" ]; then
             note "Updating environment file: ${env_file}"
-            echo "${shell_configuration}" >> "${env_file}"
-            check_command_result $?
         fi
+        echo "${shell_configuration}" >> "${env_file}"
+        check_command_result $?
     fi
 }
 
