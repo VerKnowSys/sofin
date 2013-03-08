@@ -41,55 +41,23 @@ EOF
 
 
 update_env_files () {
-    env_file=""
-    found=""
-    list="${1}"
-    fallback="${2}"
-    for i in ${list}; do
+    env_files="/etc/zshenv /etc/bashrc /etc/profile"
+    for i in ${env_files}; do
         if [ -f "${i}" ]; then
             ${GREP_BIN} -q "SHELL_PID" "${i}"
             if [ $? -eq 0 ]; then
-                export found=true
-                break
-            elif [ "${env_file}" = "" ]; then
-                export env_file="${i}"
+                continue
+            else
+                note "Updating environment file: ${i}"
+                echo "${shell_configuration}" >> "${i}"
+                check_command_result $?
             fi
+        else
+            note "Creating environment file: ${i}"
+            echo "${shell_configuration}" >> "${i}"
+            check_command_result $?
         fi
     done
-    if [ "${found}" = "" ]; then # Environment file needs updating
-        if [ "${env_file}" = "" ]; then
-            export env_file="${fallback}"
-            note "Creating environment file: ${env_file}"
-            ${MKDIR_BIN} -p "$(${DIRNAME_BIN} ${env_file})"
-        elif [ -f "${env_file}" ]; then
-            note "Updating environment file: ${env_file}"
-        fi
-        echo "${shell_configuration}" >> "${env_file}"
-        check_command_result $?
-    fi
-}
-
-
-update_env () {
-    zsh_files="/etc/zsh/zshenv /etc/zsh/zshrc /etc/zshenv /etc/zshrc"
-    bash_files="/etc/bash/bashrc /etc/bashrc"
-    sh_files="/etc/profile"
-    zsh_fallback="/etc/zshenv"
-    bash_fallback="/etc/bashrc"
-    sh_fallback="/etc/profile"
-
-    case "${SYSTEM_NAME}" in
-
-      Linux)
-        export zsh_fallback="/etc/zsh/zshrc"
-        export bash_fallback="/etc/bash/bashrc"
-        ;;
-
-    esac
-
-    update_env_files "${zsh_files}" "${zsh_fallback}"
-    update_env_files "${bash_files}" "${bash_fallback}"
-    update_env_files "${sh_files}" "${sh_fallback}"
 }
 
 
@@ -176,14 +144,14 @@ case "${SYSTEM_NAME}" in
       ${LN_BIN} -s "/Users/$(${ID_BIN} -u)/.profile" "${HOME}/.profile"
       check_command_result $?
     fi
-    update_env
+    update_env_files
     install_base
     ;;
 
   FreeBSD|Linux)
     check_root
     create_user_symlinks
-    update_env
+    update_env_files
     install_base
     ;;
 

@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-VERSION="0.39.5"
+VERSION="0.39.6"
 
 # load configuration from sofin.conf
 CONF_FILE="/etc/sofin.conf.sh"
@@ -122,17 +122,7 @@ update_definitions () { # accepts optional user uid param
 
 write_info_about_shell_configuration () {
     note
-    warn "You'll need to restart Your shell before using installed software in order to update environment variables."
-    warn "To get this done automatically, put these lines to Your /etc/zshrc :"
-    ${PRINTF_BIN} "if [ \"\$\(/usr/bin/id -u\)\" = \"0\" ]; then\n"
-    ${PRINTF_BIN} "    trap \"source /etc/profile_sofin\" USR2\n"
-    ${PRINTF_BIN} "else\n"
-    ${PRINTF_BIN} "    if [ -e \$HOME/.profile ]; then\n"
-    ${PRINTF_BIN} "        . \$HOME/.profile\n"
-    ${PRINTF_BIN} "    fi\n"
-    ${PRINTF_BIN} "    trap \"source \$HOME/.profile\" USR2\n"
-    ${PRINTF_BIN} "fi\n"
-    ${PRINTF_BIN} "export SHELL_PID=\"\$\$\"\n"
+    warn "SHELL_PID is not set. It means that Sofin isn't properly configured."
 }
 
 
