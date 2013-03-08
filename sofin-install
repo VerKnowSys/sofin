@@ -42,21 +42,32 @@ EOF
 
 update_env_files () {
     env_file=""
-    for i in ${@}; do
+    found=""
+    list="${1}"
+    fallback="${2}"
+    for i in ${list}; do
         if [ -f "${i}" ]; then
             ${GREP_BIN} -q "SHELL_PID" "${i}"
             if [ $? -eq 0 ]; then
-                export env_file=""
+                export found=true
                 break
             elif [ "${env_file}" = "" ]; then
                 export env_file="${i}"
             fi
         fi
     done
-    if [ -f "${env_file}" ]; then
-        note "Updating environment file: ${env_file}"
-        echo "${shell_configuration}" >> "${env_file}"
-        check_command_result $?
+    if [ "${found}" = "" ]; then # Environment file needs updating
+        if [ "${env_file}" = "" ]; then
+            env_file="${fallback}"
+            note "Creating environment file: ${env_file}"
+            ${MKDIR_BIN} -p "$(${DIRNAME_BIN} ${env_file})"
+            echo "${shell_configuration}" >> "${env_file}"
+            check_command_result $?
+        elif [ -f "${env_file}" ]; then
+            note "Updating environment file: ${env_file}"
+            echo "${shell_configuration}" >> "${env_file}"
+            check_command_result $?
+        fi
     fi
 }
 
@@ -65,9 +76,22 @@ update_env () {
     zsh_files="/etc/zsh/zshenv /etc/zsh/zshrc /etc/zshenv /etc/zshrc"
     bash_files="/etc/bash/bashrc /etc/bashrc"
     sh_files="/etc/profile"
-    update_env_files ${zsh_files}
-    update_env_files ${bash_files}
-    update_env_files ${sh_files}
+    zsh_fallback="/etc/zshenv"
+    bash_fallback="/etc/bashrc"
+    sh_fallback="/etc/profile"
+
+    case "${SYSTEM_NAME}" in
+
+      Linux)
+        export zsh_fallback="/etc/zsh/zshrc"
+        export bash_fallback="/etc/bash/bashrc"
+        ;;
+
+    esac
+
+    update_env_files "${zsh_files}" "${zsh_fallback}"
+    update_env_files "${bash_files}" "${bash_fallback}"
+    update_env_files "${sh_files}" "${sh_fallback}"
 }
 
 
