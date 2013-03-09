@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-VERSION="0.39.6"
+VERSION="0.39.7"
 
 # load configuration from sofin.conf
 CONF_FILE="/etc/sofin.conf.sh"
@@ -351,6 +351,10 @@ if [ ! "$1" = "" ]; then
         process () {
             for app in ${1}*; do # SOFT_DIR
                 exp="${app}/man"
+                if [ -e "${exp}" ]; then
+                    manpath="${exp}:${manpath}"
+                fi
+                exp="${app}/share/man"
                 if [ -e "${exp}" ]; then
                     manpath="${exp}:${manpath}"
                 fi
