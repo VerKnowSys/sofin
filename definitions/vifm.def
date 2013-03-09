@@ -4,7 +4,7 @@ APP_VERSION="0.7.4b+gh_fix"
 APP_SHA="28a01db0648cf1811ef6325cb622f0aa70384d49"
 APP_REQUIREMENTS="gmake ncurses"
 APP_CONFIGURE_ARGS="--disable-desktop-files --without-X11 --without-gtk --enable-extended-keys --with-curses=${PREFIX} CFLAGS=-I${PREFIX}/include/ncursesw LDFLAGS='-L${PREFIX}/lib'"
-APP_EXPORTS="vifm vifm-pause"
+APP_EXPORTS="vifm vifm-pause vifmrc-converter"
 APP_MAKE_METHOD="gmake -s"
 APP_INSTALL_METHOD="gmake -s install"
 
