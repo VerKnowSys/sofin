@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-VERSION="0.39.7"
+VERSION="0.40.0"
 
 # load configuration from sofin.conf
 CONF_FILE="/etc/sofin.conf.sh"
@@ -143,6 +143,7 @@ usage_howto () {
     note "reload | rehash                      - recreate shell vars and reload current shell"
     note "update                               - only update definitions from remote repository and exit"
     note "ver | version                        - shows $(${BASENAME_BIN} ${SCRIPT_NAME}) script version"
+    note "clean                                - cleans install cache, downloaded content and logs"
     exit
 }
 
@@ -215,6 +216,25 @@ if [ ! "$1" = "" ]; then
             fi
         fi
         ${TAIL_BIN} -n "${LOG_LINES_AMOUNT}" -F "${LOG}"
+        ;;
+
+
+    clean)
+        export USER_UID="$(${ID_BIN} ${ID_SVD})"
+        if [ "$(${ID_BIN} -u)" = "0" ]; then
+            note "Performing cleanup of ${CACHE_DIR}cache"
+            ${RM_BIN} -rf "${CACHE_DIR}cache"
+            note "Removing ${LOG}"
+            ${RM_BIN} -rf "${LOG}"
+        else
+            export LOG="${HOME_DIR}${USER_UID}/install.log"
+            export CACHE_DIR="${HOME_DIR}${USER_UID}/.cache/"
+            note "Performing cleanup of ${CACHE_DIR}cache"
+            ${RM_BIN} -rf "${CACHE_DIR}cache"
+            note "Removing ${LOG}"
+            ${RM_BIN} -rf "${LOG}"
+        fi
+        exit
         ;;
 
 
