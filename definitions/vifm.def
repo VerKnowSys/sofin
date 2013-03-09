@@ -1,8 +1,7 @@
 APP_FULL_NAME="VI File Manager"
 APP_NAME="vifm"
-APP_VERSION="0.7.3a"
-APP_SHA="4056b5bdc496f81225ddc7ee796380beb72a43da"
-APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.bz2"
+APP_VERSION="0.7.4b+gh_fix"
+APP_SHA="28a01db0648cf1811ef6325cb622f0aa70384d49"
 APP_REQUIREMENTS="gmake ncurses"
 APP_CONFIGURE_ARGS="--disable-desktop-files --without-X11 --without-gtk --enable-extended-keys --with-curses=${PREFIX} CFLAGS=-I${PREFIX}/include/ncursesw LDFLAGS='-L${PREFIX}/lib'"
 APP_EXPORTS="vifm vifm-pause"
@@ -11,14 +10,11 @@ APP_INSTALL_METHOD="gmake -s install"
 
 case "${SYSTEM_NAME}" in
 
-  Linux)
-    export APP_SHA="7a943b8f265e092597654c6039220e7131466e7a"
-    export APP_VERSION="0.7.4b"
-    ;;
-
-  FreeBSD)
-    export APP_SHA="a53b1db2c4d50ec180777a98d004ccdf96f38e38"
-    export APP_VERSION="0.6.3"
+  Darwin)
+    export APP_SHA="4056b5bdc496f81225ddc7ee796380beb72a43da"
+    export APP_VERSION="0.7.3a"
     ;;
 
 esac
+
+APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.bz2"
