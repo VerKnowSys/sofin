@@ -38,6 +38,7 @@ set smartcase
 set hlsearch
 set incsearch
 
+nmap <f2> :chmod<cr>
 nmap <f3> :!less %%f<cr>
 nmap <f4> :edit<cr>
 nmap <f5> :!cp %%f %%D<cr>
@@ -49,7 +50,7 @@ nmap s :sh<cr>
 nmap S :sort<cr>
 nmap w :view<cr>
 nmap h :cd ~<cr>
-nmap c :chmod<cr>
+nmap C :chmod<cr>
 nmap r :!./%%c<space>
 
 windo normal zo
