@@ -1,7 +1,7 @@
 APP_FULL_NAME="VI File Manager"
 APP_NAME="vifm"
-APP_VERSION="0.7.4b+gh_fix"
-APP_SHA="e6d31946fa5baa652e59e959d6973646097184cc"
+APP_VERSION="0.7.4b+gh_master"
+APP_SHA="9d2c0272c78154eae43a895094a8e392d1d0f083"
 APP_REQUIREMENTS="gmake ncurses"
 APP_CONFIGURE_ARGS="--disable-desktop-files --without-X11 --without-gtk --enable-extended-keys --with-curses=${PREFIX} CFLAGS=-I${PREFIX}/include/ncursesw LDFLAGS='-L${PREFIX}/lib'"
 APP_EXPORTS="vifm vifm-pause vifmrc-converter"
@@ -57,7 +57,12 @@ windo normal zo
 
 set vifminfo=dhistory,savedirs,chistory,state,tui,shistory,phistory,dirstack,registers,bookmarks
 
-windo set viewcolumns=-{name}..,7{uname},7{gname},7{mtime},9{}
+execute 'set statusline=\"  %%t%%= %%A %%10u:%%-7g %%15s %%20d     logged as: '.\$USER.'  \"'
+
+windo set viewcolumns=-{name}..,7{uname},7{gname},7{mtime},11{perms},9{}
+
+colorscheme dmilith-user
+
 " > $HOME/.vifm/vifmrc
 
 }
