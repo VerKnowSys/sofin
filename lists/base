@@ -2,6 +2,7 @@ clang
 ccache
 bash
 git
+nginx
 mercurial
 openafs
 openssh
