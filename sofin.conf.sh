@@ -157,10 +157,10 @@ reset='\033[0m'
 # helpers
 
 cecho () {
-    if [ "${DEBIAN}" = "true" ]; then
-        ${PRINTF_BIN} "${1}\n"
-    else
+    if [ -t 1 ]; then # if it's terminal then use colors
         ${PRINTF_BIN} "${2}${1}${reset}\n"
+    else
+        ${PRINTF_BIN} "${1}\n"
     fi
 }
 
