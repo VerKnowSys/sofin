@@ -20,6 +20,7 @@ APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.bz2"
 APP_AFTER_INSTALL_CALLBACK="update_vifm_default_config"
 
 update_vifm_default_config () {
+  ${MKDIR_BIN} $HOME/.vifm
   ${MV_BIN} $HOME/.vifm/vifmrc $HOME/.vifm/vifmrc.old
   ${PRINTF_BIN} "
 set vicmd=vim
