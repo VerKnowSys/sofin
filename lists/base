@@ -1,5 +1,6 @@
 clang
 ccache
+courier
 bash
 git
 nginx

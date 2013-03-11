@@ -3,6 +3,7 @@ bash
 cairo
 ccache
 cmake
+courier
 curl
 dhcpd
 gd
