@@ -23,7 +23,7 @@ update_vifm_default_config () {
   ${MKDIR_BIN} "$HOME/.vifm"
   ${MV_BIN} "$HOME/.vifm/vifmrc" "$HOME/.vifm/vifmrc.old-$(${DATE_BIN} +%Y-%m-%d-%H-%M-%S)"
   ${PRINTF_BIN} "
-set vicmd=vim
+set vicmd=vi
 set history=100
 set followlinks
 set sortnumbers
@@ -61,12 +61,33 @@ execute 'set statusline=\"  %%t%%= %%A %%10u:%%-7g %%15s %%20d     logged as: '.
 
 windo set viewcolumns=-{name}..,7{uname},7{gname},7{mtime},11{perms},9{}
 
-colorscheme dmilith-user
-
 " > "$HOME/.vifm/vifmrc"
   ${MKDIR_BIN} "$HOME/.vifm/colors"
-  ${MV_BIN} "$HOME/.vifm/colors/dmilith-user" "$HOME/.vifm/colors/dmilith-user-$(${DATE_BIN} +%Y-%m-%d-%H-%M-%S)"
-  ${PRINTF_BIN} "
+  if [ "$(id -u)" = "0" ]; then
+    ${MV_BIN} "$HOME/.vifm/colors/dmilith-root" "$HOME/.vifm/colors/dmilith-root-$(${DATE_BIN} +%Y-%m-%d-%H-%M-%S)"
+    ${PRINTF_BIN} "
+highlight Win cterm=none ctermfg=white ctermbg=black
+highlight Directory cterm=bold ctermfg=cyan ctermbg=black
+highlight Link cterm=bold ctermfg=yellow ctermbg=black
+highlight BrokenLink cterm=bold ctermfg=red ctermbg=none
+highlight Socket cterm=bold ctermfg=magenta ctermbg=black
+highlight Device cterm=bold ctermfg=red ctermbg=black
+highlight Fifo cterm=bold ctermfg=cyan ctermbg=none
+highlight Executable cterm=bold ctermfg=green ctermbg=black
+highlight Selected cterm=bold ctermfg=magenta ctermbg=black
+highlight CurrLine cterm=bold ctermfg=white ctermbg=30
+highlight TopLine cterm=bold ctermfg=white ctermbg=red
+highlight TopLineSel cterm=bold ctermfg=yellow ctermbg=red
+highlight StatusLine cterm=bold ctermfg=white ctermbg=red
+highlight WildMenu cterm=underline,reverse ctermfg=white ctermbg=black
+highlight CmdLine cterm=none ctermfg=white ctermbg=black
+highlight ErrorMsg cterm=none ctermfg=red ctermbg=black
+highlight Border cterm=none ctermfg=black ctermbg=red
+" > "$HOME/.vifm/colors/dmilith-root"
+    ${PRINTF_BIN} "colorscheme dmilith-root" >> "$HOME/.vifm/vifmrc"
+  else
+    ${MV_BIN} "$HOME/.vifm/colors/dmilith-user" "$HOME/.vifm/colors/dmilith-user-$(${DATE_BIN} +%Y-%m-%d-%H-%M-%S)"
+    ${PRINTF_BIN} "
 highlight Win cterm=none ctermfg=white ctermbg=black
 highlight Directory cterm=bold ctermfg=cyan ctermbg=black
 highlight Link cterm=bold ctermfg=yellow ctermbg=black
@@ -85,5 +106,7 @@ highlight CmdLine cterm=none ctermfg=white ctermbg=black
 highlight ErrorMsg cterm=none ctermfg=red ctermbg=black
 highlight Border cterm=none ctermfg=black ctermbg=blue
 " > "$HOME/.vifm/colors/dmilith-user"
+    ${PRINTF_BIN} "colorscheme dmilith-user" >> "$HOME/.vifm/vifmrc"
+  fi
 
 }
