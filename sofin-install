@@ -160,3 +160,6 @@ case "${SYSTEM_NAME}" in
     ;;
 
 esac
+
+echo "Performing initial definitions update."
+/usr/bin/sofin update
