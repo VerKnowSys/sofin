@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-VERSION="0.40.1"
+VERSION="0.41.0"
 
 # load configuration from sofin.conf
 CONF_FILE="/etc/sofin.conf.sh"
@@ -122,18 +122,17 @@ update_definitions () { # accepts optional user uid param
 
 write_info_about_shell_configuration () {
     note
-    warn "SHELL_PID is not set. It means that Sofin isn't properly configured."
+    warn "SHELL_PID is not set. It means that Sofin isn't properly configured or wasn't installed."
 }
 
 
 usage_howto () {
     note "Built in tasks:"
     note
-    note "install | add                        - installs software from list (example: $(${BASENAME_BIN} ${SCRIPT_NAME}) install languages)"
+    note "install | get                        - installs software from list or from definition (example: $(${BASENAME_BIN} ${SCRIPT_NAME}) install ruby)"
     note "upgrade                              - upgrades one of dependencies of installed definition (example: $(${BASENAME_BIN} ${SCRIPT_NAME}) upgrade iconv ruby - to upgrade iconv in Ruby bundle)"
     note "dependencies | deps | local          - installs software from list defined in '${DEPENDENCIES_FILE}' file in current directory"
-    note "one | cherrypick | get               - installs one application from definition (example: $(${BASENAME_BIN} ${SCRIPT_NAME}) get ruby)"
-    note "uninstall | remove | delete          - removes one application (example: $(${BASENAME_BIN} ${SCRIPT_NAME}) uninstall ruby)"
+    note "uninstall | remove | delete          - removes an application or list (example: $(${BASENAME_BIN} ${SCRIPT_NAME}) uninstall ruby)"
     note "list | installed                     - short list of installed software"
     note "fulllist | fullinstalled             - detailed lists with installed software including requirements"
     note "available                            - lists available software"
@@ -444,9 +443,10 @@ if [ ! "$1" = "" ]; then
         ;;
 
 
-    cherrypick|one|getone|get)
+    install|get)
+
         if [ "$2" = "" ]; then
-            error "For \"$1\" application installation mode, second argument with application definition name is required!"
+            error "For \"$1\" application installation mode, second argument with application name or list is required!"
             exit 1
         fi
         export USER_UID="$(${ID_BIN} ${ID_SVD})"
@@ -460,13 +460,20 @@ if [ ! "$1" = "" ]; then
             export DEFAULTS="${DEFINITIONS_DIR}defaults.def"
         fi
         update_definitions ${USER_UID}
-        APP="$(${PRINTF_BIN} "${2}" | ${CUT_BIN} -c1 | ${TR_BIN} '[A-Z]' '[a-z]')$(${PRINTF_BIN} "${2}" | ${SED_BIN} 's/^[A-Za-z]//')"
-        if [ ! -e "${DEFINITIONS_DIR}${APP}.def" ]; then
-            error "Definition file not found: ${DEFINITIONS_DIR}${APP}.def !"
-            exit 1
+
+        # first of all, try using a list if exists:
+        if [ -f "${LISTS_DIR}$2" ]; then
+            export APPLICATIONS="$(${CAT_BIN} ${LISTS_DIR}$2 | ${TR_BIN} '\n' ' ')"
+            note "Installing software: ${APPLICATIONS}"
+        else
+            APP="$(${PRINTF_BIN} "${2}" | ${CUT_BIN} -c1 | ${TR_BIN} '[A-Z]' '[a-z]')$(${PRINTF_BIN} "${2}" | ${SED_BIN} 's/^[A-Za-z]//')"
+            if [ ! -e "${DEFINITIONS_DIR}${APP}.def" ]; then
+                error "Definition file not found: ${DEFINITIONS_DIR}${APP}.def !"
+                exit 1
+            fi
+            export APPLICATIONS="${APP}"
+            debug "Installing software: ${APPLICATIONS}"
         fi
-        export APPLICATIONS="${APP}"
-        debug "Installing software: ${APPLICATIONS}"
         ;;
 
 
@@ -496,32 +503,7 @@ if [ ! "$1" = "" ]; then
         ;;
 
 
-    install|add)
-        if [ "$2" = "" ]; then
-            error "For \"$1\" application installation mode, second argument with application list is required!"
-            exit 1
-        fi
-        export USER_UID="$(${ID_BIN} ${ID_SVD})"
-        if [ "$(${ID_BIN} -u)" = "0" ]; then
-            unset USER_UID
-        else
-            export LOG="${HOME_DIR}${USER_UID}/install.log"
-            export CACHE_DIR="${HOME_DIR}${USER_UID}/.cache/"
-            export DEFINITIONS_DIR="${CACHE_DIR}definitions/"
-            export LISTS_DIR="${CACHE_DIR}lists/"
-            export DEFAULTS="${DEFINITIONS_DIR}defaults.def"
-        fi
-        update_definitions ${USER_UID}
-        if [ ! -e "${LISTS_DIR}$2" ]; then
-            error "List not found: ${2}!"
-            exit 1
-        fi
-        export APPLICATIONS="$(${CAT_BIN} ${LISTS_DIR}$2 | ${TR_BIN} '\n' ' ')"
-        note "Installing software: ${APPLICATIONS}"
-        ;;
-
-
-    delete|remove|uninstall)
+    delete|remove|uninstall|rm)
         if [ "$2" = "" ]; then
             error "For \"$1\" task, second argument with application name is required!"
             exit 1
@@ -532,20 +514,41 @@ if [ ! "$1" = "" ]; then
         else
             export LOG="${HOME_DIR}$(${ID_BIN} ${ID_SVD})/install.log"
             export SOFT_DIR="${HOME_DIR}$(${ID_BIN} ${ID_SVD})/${HOME_APPS_DIR}"
+            export LISTS_DIR="${CACHE_DIR}lists/"
         fi
-        APP_NAME="$(${PRINTF_BIN} "${2}" | ${CUT_BIN} -c1 | ${TR_BIN} '[a-z]' '[A-Z]')$(${PRINTF_BIN} "${2}" | ${SED_BIN} 's/^[a-zA-Z]//')"
-        if [ -d "${SOFT_DIR}${APP_NAME}" ]; then
-            note "Removing application: ${APP_NAME}"
-            if [ "${APP_NAME}" = "/" ]; then
-                error "Czy Ty orzeszki?"
+
+        # first look for a list with that name:
+        if [ -e "${LISTS_DIR}${2}" ]; then
+            export APPLICATIONS="$(${CAT_BIN} ${LISTS_DIR}$2 | ${TR_BIN} '\n' ' ')"
+            note "Remove of list of software requested: ${APPLICATIONS}"
+            for app in $APPLICATIONS; do
+                APP_NAME="$(${PRINTF_BIN} "${app}" | ${CUT_BIN} -c1 | ${TR_BIN} '[a-z]' '[A-Z]')$(${PRINTF_BIN} "${app}" | ${SED_BIN} 's/^[a-zA-Z]//')"
+                if [ -d "${SOFT_DIR}${APP_NAME}" ]; then
+                    note "Removing ${APP_NAME}"
+                    if [ "${APP_NAME}" = "/" ]; then
+                        error "Czy Ty orzeszki?"
+                        exit 1
+                    fi
+                    debug "Removing software from: ${SOFT_DIR}${APP_NAME}"
+                    ${RM_BIN} -rfv "${SOFT_DIR}${APP_NAME}" >> "${LOG}"
+                fi
+                update_shell_vars ${USER_UID}
+            done
+        else
+            APP_NAME="$(${PRINTF_BIN} "${2}" | ${CUT_BIN} -c1 | ${TR_BIN} '[a-z]' '[A-Z]')$(${PRINTF_BIN} "${2}" | ${SED_BIN} 's/^[a-zA-Z]//')"
+            if [ -d "${SOFT_DIR}${APP_NAME}" ]; then
+                note "Removing application: ${APP_NAME}"
+                if [ "${APP_NAME}" = "/" ]; then
+                    error "Czy Ty orzeszki?"
+                    exit 1
+                fi
+                debug "Removing software from: ${SOFT_DIR}${APP_NAME}"
+                ${RM_BIN} -rfv "${SOFT_DIR}${APP_NAME}" >> "${LOG}"
+                update_shell_vars ${USER_UID}
+            else
+                error "Application: ${APP_NAME} not installed."
                 exit 1
             fi
-            debug "Removing software from: ${SOFT_DIR}${APP_NAME}"
-            ${RM_BIN} -rfv "${SOFT_DIR}${APP_NAME}" >> "${LOG}"
-            update_shell_vars ${USER_UID}
-        else
-            error "Application: ${APP_NAME} not installed."
-            exit 1
         fi
         exit
         ;;
@@ -583,12 +586,16 @@ if [ ! "$1" = "" ]; then
         if [ ! "$(${ID_BIN} -u)" = "0" ]; then
             export CACHE_DIR="${HOME_DIR}${USER_UID}/.cache/"
             export DEFINITIONS_DIR="${CACHE_DIR}definitions/"
+            export LISTS_DIR="${CACHE_DIR}lists/"
         fi
         cd "${DEFINITIONS_DIR}"
         note "Available definitions:"
         ${LS_BIN} -m *def | ${SED_BIN} 's/\.def//g'
         note "Definitions count:"
         ${LS_BIN} -a *def | ${WC_BIN} -l
+        cd "${LISTS_DIR}"
+        note "Available lists:"
+        ${LS_BIN} -m * | ${SED_BIN} 's/\.def//g'
         exit
         ;;
 
