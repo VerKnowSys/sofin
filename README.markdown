@@ -23,7 +23,7 @@ customizable software for FreeBSD servers. Darwin (Mac OS X) support started wit
 * Simple, ~1k LOC solution, written in legacy /bin/sh shell scripting language.
 * Every "software" has own definition ("def" file) with defined flat dependency list and basic information.
   Every definition is sh script itself (More in [skeleton.def](https://github.com/VerKnowSys/sofin/blob/master/definitions/skeleton.def.sample) and [defaults.def](https://github.com/VerKnowSys/sofin/blob/master/definitions/defaults.def))
-* Supports selective application installation. (By "one" param. More in examples).
+* Supports selective application installation or from list. (By "install" param. More in examples).
 * Supports installation of user and system wide applications (more in examples).
 * Has simple flat dependency managment. Sofin architecture is flexible enough to bundle almost any mix of requirements in application bundle, if only it's supported by given software. No need to install tons of useless/ not needed dependencies just because software supports it.
 * Has simple way of creating "lists" of definitions to build. Just create a text file with your definitions in "lists/" directory, create/update definitions snapshot (using sofin-make-defs) and give that list filename to sofin as parameter (more in examples).
@@ -52,7 +52,7 @@ customizable software for FreeBSD servers. Darwin (Mac OS X) support started wit
     `sofin install all`
 
 * Install one software from definition called "ruby.def" for current user:
-    `sofin get ruby`
+    `sofin install ruby`
 
 * Install software list called "databases" for current user:
     `sofin install databases`
@@ -77,7 +77,7 @@ customizable software for FreeBSD servers. Darwin (Mac OS X) support started wit
 * Create a list called "databases", with definitions: "postgresql" and "mysql", and install it with Sofin:
     `cd Sofin`
     `echo "postgresql\nmysql" > lists/databases`
-    run `./sofin-make-defs` to create a snapshot and upload it to Your remote respository.
+    run `./push-definitions` to create a snapshot and upload it to Your remote respository.
     run `sofin install databases`
 
 
