@@ -975,7 +975,7 @@ for application in ${APPLICATIONS}; do
                     note "  No requirements required."
                     break
                 else
-                    note "  ${req} (${req_amount} of ${req_all})"
+                    note "  ${req} (${req_amount} of ${req_all} remaining)"
                     if [ ! -e "${PREFIX}/${req}${INSTALLED_MARK}" ]; then
                         export CHANGED="true"
                         execute_process "${req}"
