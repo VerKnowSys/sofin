@@ -5,7 +5,8 @@ APP_NAME="courier"
 APP_VERSION="0.70"
 APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.bz2"
 APP_REQUIREMENTS="pkgconf libiconv perl pcre libtool openssl db gmake courier-authlib courier-imap"
-APP_CONFIGURE_ARGS="--enable-mimetypes=/etc/mime.types --disable-root-check --enable-syslog=1 --enable-use-flock --enable-unicode --enable-workarounds-for-imap-client-bugs --enable-mimecharset=UTF-8 --without-ipv6 --without-ispell --with-db=db" # NOTE: this mime.types file exists in ServeD system by default.
+DATA_DIR="/SystemUsers/SoftwareData/Courier/"
+APP_CONFIGURE_ARGS="--enable-mimetypes=/etc/mime.types --disable-root-check --enable-syslog=1 --enable-use-flock --enable-unicode --enable-workarounds-for-imap-client-bugs --enable-mimecharset=UTF-8 --without-ipv6 --without-ispell --with-db=db --sysconfdir=${DATA_DIR}etc --localstatedir=${DATA_DIR}var" # NOTE: this mime.types file exists in ServeD system by default.
 APP_MAKE_METHOD="gmake"
 APP_INSTALL_METHOD="gmake install && gmake install-configure"
 APP_NO_CCACHE="true"
@@ -19,10 +20,10 @@ authmodulelist=\"authuserdb\"
 authmodulelistorig=\"authuserdb authcustom authpipe\"
 DEBUG_LOGIN=0
 daemons=5
-authdaemonvar=${PREFIX}/var/spool/authdaemon
+authdaemonvar=${DATA_DIR}var/spool/authdaemon
 DEFAULTOPTIONS=\"\"
 LOGGEROPTS=\"\"
-" > "${PREFIX}/etc/authlib/authdaemonrc"
+" > "${DATA_DIR}etc/authlib/authdaemonrc"
 }
 
 install_courier_admin () {
