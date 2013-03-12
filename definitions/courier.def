@@ -1,11 +1,11 @@
 APP_DISABLE_ON="Linux Darwin"
+DATA_DIR="/SystemUsers/SoftwareData/Courier/"
 APP_FULL_NAME="Courier Mail Server"
 APP_SHA="119c83e0f9b3d85b17e10f766c14bee059e1dc82"
 APP_NAME="courier"
 APP_VERSION="0.70"
 APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.bz2"
 APP_REQUIREMENTS="pkgconf libiconv perl pcre libtool openssl db gmake courier-authlib courier-imap"
-export DATA_DIR="/SystemUsers/SoftwareData/Courier/"
 APP_CONFIGURE_ARGS="--enable-mimetypes=/etc/mime.types --disable-root-check --enable-syslog=1 --enable-use-flock --enable-unicode --enable-workarounds-for-imap-client-bugs --enable-mimecharset=UTF-8 --without-ipv6 --without-ispell --with-db=db --sysconfdir=${DATA_DIR}etc --localstatedir=${DATA_DIR}var" # NOTE: this mime.types file exists in ServeD system by default.
 APP_MAKE_METHOD="gmake"
 APP_INSTALL_METHOD="gmake install && gmake install-configure"
@@ -15,9 +15,7 @@ APP_EXPORTS="courier-config courierauthconfig couriermlm couriertls deliverquota
 APP_AFTER_INSTALL_CALLBACK="create_authfile ; install_courier_admin"
 
 create_authfile () {
-  if [ ! -d "${DATA_DIR}etc" ]; then
-    ${MV_BIN} "${PREFIX}/etc" "${DATA_DIR}etc"
-    ${PRINTF_BIN} "
+  ${PRINTF_BIN} "
 authmodulelist=\"authuserdb\"
 authmodulelistorig=\"authuserdb authcustom authpipe\"
 DEBUG_LOGIN=0
@@ -26,11 +24,6 @@ authdaemonvar=${DATA_DIR}var/spool/authdaemon
 DEFAULTOPTIONS=\"\"
 LOGGEROPTS=\"\"
 " > "${DATA_DIR}etc/authlib/authdaemonrc"
-  fi
-
-  if [ ! -d "${DATA_DIR}var" ]; then
-    ${MV_BIN} "${PREFIX}/var" "${DATA_DIR}var"
-  fi
 }
 
 install_courier_admin () {

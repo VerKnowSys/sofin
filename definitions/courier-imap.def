@@ -1,6 +1,7 @@
 APP_FULL_NAME="Courier Mail IMAP Server"
+DATA_DIR="/SystemUsers/SoftwareData/Courier/"
 APP_SHA="7423bb50634e5a7f2aa5dbe5c208b6432075de99"
 APP_NAME="courier-imap"
 APP_VERSION="4.12.0"
 APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.bz2"
-APP_CONFIGURE_ARGS="--disable-root-check"
+APP_CONFIGURE_ARGS="--disable-root-check --sysconfdir=${DATA_DIR}etc --localstatedir=${DATA_DIR}var"
