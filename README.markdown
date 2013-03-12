@@ -12,6 +12,10 @@ I'm also on #freebsd and #scala.pl @ freenode IRC.
 * Michał (tallica) Lipski
 
 
+## Thanks:
+* Tymon (teamon) Tobolski (ideas of improvments)
+
+
 ## About:
 This software is my way of how to get reliable, updatable, bundled, closed-dependency, secure and fully
 customizable software for FreeBSD servers. Darwin (Mac OS X) support started with version >=0.14.10. Linux support started with version >=0.24.4.
