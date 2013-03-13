@@ -822,7 +822,7 @@ for application in ${APPLICATIONS}; do
                                     ${RM_BIN} -f "${LOCK_FILE}"
                                 fi
                                 # and restart script with same arguments:
-                                run "${SCRIPT_NAME} ${SCRIPT_ARGS}"
+                                eval "${SCRIPT_NAME} ${SCRIPT_ARGS}"
                                 exit
                             fi
                         fi
