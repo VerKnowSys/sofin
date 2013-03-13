@@ -1,3 +1,4 @@
+REQUIRE_ROOT_ACCESS="true"
 APP_DISABLE_ON="Linux Darwin"
 DATA_DIR="/SystemUsers/SoftwareData/Courier/"
 APP_FULL_NAME="Courier Mail Server"

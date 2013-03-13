@@ -1,3 +1,4 @@
+REQUIRE_ROOT_ACCESS="true"
 APP_FULL_NAME="Courier Mail Server Auth Lib"
 DATA_DIR="/SystemUsers/SoftwareData/Courier/"
 APP_SHA="5318bbe653df18ca3c44ec60556f4dea945897b2"

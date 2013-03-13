@@ -1,3 +1,4 @@
+REQUIRE_ROOT_ACCESS="true"
 DISABLE_ON="Darwin FreeBSD Linux" # temporary
 APP_FULL_NAME="Open Andrew File System"
 APP_NAME="openafs"

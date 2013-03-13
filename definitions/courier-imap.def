@@ -1,3 +1,4 @@
+REQUIRE_ROOT_ACCESS="true"
 APP_FULL_NAME="Courier Mail IMAP Server"
 DATA_DIR="/SystemUsers/SoftwareData/Courier/"
 APP_SHA="7423bb50634e5a7f2aa5dbe5c208b6432075de99"
