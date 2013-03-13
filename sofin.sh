@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-VERSION="0.41.1"
+VERSION="0.42.0"
 
 # load configuration from sofin.conf
 CONF_FILE="/etc/sofin.conf.sh"
@@ -665,6 +665,12 @@ for application in ${APPLICATIONS}; do
 
             # fancy old style Capitalize
             APP_NAME="$(${PRINTF_BIN} "${APP_NAME}" | ${CUT_BIN} -c1 | ${TR_BIN} '[a-z]' '[A-Z]')$(${PRINTF_BIN} "${APP_NAME}" | ${SED_BIN} 's/^[a-zA-Z]//')"
+            if [ "${REQUIRE_ROOT_ACCESS}" = "true" ]; then
+                if [ "${USER_UID}" != "" ]; then
+                    warn "Definition requires root priviledges to install: ${APP_NAME}. Wont install."
+                    break
+                fi
+            fi
 
             # note "Preparing application: ${APP_NAME}${APP_POSTFIX} (${APP_FULL_NAME} v${APP_VERSION})"
             if [ "${USER_UID}" = "" ]; then

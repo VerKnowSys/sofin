@@ -26,3 +26,4 @@ APP_NO_CCACHE="" # use only for software that doesn't support ccache
 APP_USER_INFO="" # additional optional information from definition to user displayed after installation
 APP_CURRENT_VERSION="" # sh callback to check availability of newer version of software (usually from software home site)
 APP_CONFLICTS_WITH="" # defines list of definitions which are in conflict with software.
+REQUIRE_ROOT_ACCESS="" # set to true, to disallow definition to be built as non root users.
