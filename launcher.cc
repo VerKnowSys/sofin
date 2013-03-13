@@ -48,8 +48,10 @@ void execute(char **argv, int uid) {
         if (execvp(*argv, argv) < 0) {
             exit(EXECVP_EXIT);
         }
-    } else
+    } else {
         while (wait(&status) != pid);
+        if (status != 0) exit(1);
+    }
 }
 
 
