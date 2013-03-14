@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-VERSION="0.42.0"
+VERSION="0.42.1"
 
 # load configuration from sofin.conf
 CONF_FILE="/etc/sofin.conf.sh"
@@ -438,7 +438,7 @@ if [ ! "$1" = "" ]; then
         ${RM_BIN} -f "${REM}"
 
         debug "Relaunching installation script once again…"
-        ${SCRIPT_NAME} one ${3} ${USER_UID}
+        ${SCRIPT_NAME} install ${3} ${USER_UID}
         exit
         ;;
 
