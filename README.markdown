@@ -117,7 +117,7 @@ space than it does with "old fasioned, system wide, shared software".
 
 * Debian specific: (Yes it's NOT Linux specific at all, cause every distro is a different monster with own set of additional hands and legs)
 > 1.  Install base 64bit system - I used 64bit Debian 6.0.x netinstall iso here.
-> 2.  To make base system "complete", run as root: "aptitude install gcc g++ bc patch make file libssl-dev build-essential kernel-package libmagic-dev".
+> 2.  To make base system "complete", run as root: "aptitude install gcc g++ bc patch make file libssl-dev build-essential kernel-package libmagic-dev unzip".
 > 3.  Run as root: "wget -qO- https://github.com/VerKnowSys/sofin/archive/master.tar.gz | tar zxf - && cd ./sofin-master && ./sofin-install". It will put "sofin" into /usr/bin/ and sofin.conf.sh into /etc/.
 > 4.  Build core software. Run as root: "sofin install base".
 > 5.  Start using sofin as regular user.
