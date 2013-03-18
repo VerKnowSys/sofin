@@ -42,47 +42,72 @@ customizable software for FreeBSD servers. Darwin (Mac OS X) support started wit
 * Sofin has own configuration file: [sofin.conf.sh](https://github.com/VerKnowSys/sofin/blob/master/sofin.conf.sh) which is SH script itself.
 * Supports parallel builds by default (from version 0.24.5)
 * Supports custom callbacks executed in order as follows:
-    `APP_AFTER_UNPACK_CALLBACK (executed after software unpack process)`
-    `APP_AFTER_PATCH_CALLBACK (executed after software patch process)`
-    `APP_AFTER_CONFIGURE_CALLBACK (executed after software configuration process)`
-    `APP_AFTER_MAKE_CALLBACK (executed after software compilation process)`
-    `APP_AFTER_INSTALL_CALLBACK (executed after software installation process)`
+  - APP_AFTER_UNPACK_CALLBACK (executed after software unpack process)
+  - APP_AFTER_PATCH_CALLBACK (executed after software patch process)
+  - APP_AFTER_CONFIGURE_CALLBACK (executed after software configuration process)
+  - APP_AFTER_MAKE_CALLBACK (executed after software compilation process)
+  - APP_AFTER_INSTALL_CALLBACK (executed after software installation process)
   Each callback can be sh function itself and to be called by name. Look into [sbt.def](https://github.com/VerKnowSys/sofin/blob/master/definitions/sbt.def) for an example createLaunchScript().
 * Supports collisions between definitions through APP_CONFLICTS_WITH option since version 0.38.0. An example in [ruby.def](https://github.com/VerKnowSys/sofin/blob/master/definitions/ruby.def)
 
 
 ## Examples:
 * Install all available software defined in a list called "all":
-    `sofin install all`
+```bash
+sofin install all
+```
 
 * Install one software from definition called "ruby.def" for current user:
-    `sofin install ruby`
+```bash
+sofin install ruby
+```
 
 * Install software list called "databases" for current user:
-    `sofin install databases`
+```bash
+sofin install databases
+```
 
 * Upgrade application requirement: Xml in bundle Ruby as current user:
-    `sofin upgrade libxml2 ruby`
+```bash
+sofin upgrade libxml2 ruby
+```
 
 * Upgrade Ruby in Ruby bundle without recompiling all requirements (already compiled requirements will be reused):
-    `sofin upgrade ruby ruby`
+```bash
+sofin upgrade ruby ruby
+```
 
 * Show list of available software:
-    `sofin available`
+```bash
+sofin available
+```
 
 * Show list of installed software:
-    `sofin fullinstalled` or `sofin installed`
+```bash
+sofin fullinstalled
+```
+or
+```bash
+sofin installed
+```
 
-* Export "ruby" binary from "Passenger" bundle: `sofin export ruby Passenger`
+* Export "ruby" binary from "Passenger" bundle:
+```bash
+sofin export ruby Passenger
+```
 
 * Uninstall installed software "SomeApp"?
-    `sofin uninstall someApp`
+```bash
+sofin uninstall someApp
+```
 
 * Create a list called "databases", with definitions: "postgresql" and "mysql", and install it with Sofin:
-    `cd Sofin`
-    `echo "postgresql\nmysql" > lists/databases`
-    run `./push-definitions` to create a snapshot and upload it to Your remote respository.
-    run `sofin install databases`
+```bash
+cd Sofin
+echo "postgresql\nmysql" > lists/databases
+./push-definitions # to create a snapshot and upload it to Your remote respository.
+sofin install databases
+```
 
 
 ## Differences from [POSIX](https://en.wikipedia.org/wiki/POSIX) and [FHS](https://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard) standards:
@@ -102,25 +127,26 @@ space than it does with "old fasioned, system wide, shared software".
 
 
 ## Installation info (platform specific):
-* FreeBSD specific:
-> 1.  Install base 64bit system - I used 64bit FreeBSD 9.1 bootonly iso here.
-> 2.  Run as root: "fetch -o - https://github.com/VerKnowSys/sofin/archive/master.tar.gz | tar xf - && cd ./sofin-master && ./sofin-install". It will put "sofin" into /usr/bin/ and sofin.conf.sh into /etc/.
-> 3.  Build core software. Run "sofin install base" as root.
-> 4.  Start using sofin as regular user.
 
-* Darwin/ Mac OS X specific:
-> 1.  Install Mac OS X 10.8.
-> 2.  Install [XQuartz](http://xquartz.macosforge.org/landing/) (if you want to build definitions that require X11)
-> 3.  Run "git clone git://github.com/VerKnowSys/sofin.git && cd ./sofin && sudo ./sofin-install". It will put "sofin" in /usr/bin/ and sofin.conf.sh in /etc/.
-> 4.  Build core software. Run "sudo sofin install base".
-> 5.  Start using sofin as regular user.
+### FreeBSD specific:
+  - Install base 64bit system - I used 64bit FreeBSD 9.1 bootonly iso here.
+  - Run as root: "fetch -o - https://github.com/VerKnowSys/sofin/archive/master.tar.gz | tar xf - && cd ./sofin-master && ./sofin-install". It will put "sofin" into /usr/bin/ and sofin.conf.sh into /etc/.
+  - Build core software. Run "sofin install base" as root.
+  - Start using sofin as regular user.
 
-* Debian specific: (Yes it's NOT Linux specific at all, cause every distro is a different monster with own set of additional hands and legs)
-> 1.  Install base 64bit system - I used 64bit Debian 6.0.x netinstall iso here.
-> 2.  To make base system "complete", run as root: "aptitude install gcc g++ bc patch make file libssl-dev build-essential kernel-package libmagic-dev unzip".
-> 3.  Run as root: "wget -qO- https://github.com/VerKnowSys/sofin/archive/master.tar.gz | tar zxf - && cd ./sofin-master && ./sofin-install". It will put "sofin" into /usr/bin/ and sofin.conf.sh into /etc/.
-> 4.  Build core software. Run as root: "sofin install base".
-> 5.  Start using sofin as regular user.
+### Darwin/ Mac OS X specific:
+  - Install Mac OS X 10.8.
+  - Install [XQuartz](http://xquartz.macosforge.org/landing/) (if you want to build definitions that require X11)
+  - Run "git clone git://github.com/VerKnowSys/sofin.git && cd ./sofin && sudo ./sofin-install". It will put "sofin" in /usr/bin/ and sofin.conf.sh in /etc/.
+  - Build core software. Run "sudo sofin install base".
+  - Start using sofin as regular user.
+
+### Debian specific: (Yes - Linux is NOT a system)
+  - Install base 64bit system - I used 64bit Debian 6.0.x netinstall iso here.
+  - To make base system "complete", run as root: "aptitude install gcc g++ bc patch make file libssl-dev build-essential kernel-package libmagic-dev unzip".
+  - Run as root: "wget -qO- https://github.com/VerKnowSys/sofin/archive/master.tar.gz | tar zxf - && cd ./sofin-master && ./sofin-install". It will put "sofin" into /usr/bin/ and sofin.conf.sh into /etc/.
+  - Build core software. Run as root: "sofin install base".
+  - Start using sofin as regular user.
 
 
 ## License:
