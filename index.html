@@ -1,36 +1,44 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-
   <head>
-    <meta charset='utf-8' />
-    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
-    <meta name="description" content="Sofin : SOftware INstaller. Designed for BSD, DARWIN and LINUX." />
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>SofIn by VerKnowSys</title>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="javascripts/main.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
 
-    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
-
-    <title>Sofin</title>
   </head>
-
   <body>
 
-    <!-- HEADER -->
-    <div id="header_wrap" class="outer">
-        <header class="inner">
-          <a id="forkme_banner" href="https://github.com/VerKnowSys/sofin">View on GitHub</a>
+      <header>
+        <h1>SofIn</h1>
+        <p>SOftware INstaller. Designed for BSD, DARWIN and LINUX.</p>
+      </header>
 
-          <h1 id="project_title">Sofin</h1>
-          <h2 id="project_tagline">SOftware INstaller. Designed for BSD, DARWIN and LINUX.</h2>
+      <div id="banner">
+        <span id="logo"></span>
 
-            <section id="downloads">
-              <a class="zip_download_link" href="https://github.com/VerKnowSys/sofin/zipball/master">Download this project as a .zip file</a>
-              <a class="tar_download_link" href="https://github.com/VerKnowSys/sofin/tarball/master">Download this project as a tar.gz file</a>
-            </section>
-        </header>
-    </div>
+        <a href="https://github.com/VerKnowSys/sofin" class="button fork"><strong>View On GitHub</strong></a>
+        <div class="downloads">
+          <span>Downloads:</span>
+          <ul>
+            <li><a href="https://github.com/VerKnowSys/sofin/zipball/master" class="button">ZIP</a></li>
+            <li><a href="https://github.com/VerKnowSys/sofin/tarball/master" class="button">TAR</a></li>
+          </ul>
+        </div>
+      </div><!-- end banner -->
 
-    <!-- MAIN CONTENT -->
-    <div id="main_content_wrap" class="outer">
-      <section id="main_content" class="inner">
+    <div class="wrapper">
+      <nav>
+        <ul></ul>
+      </nav>
+      <section>
         <h2>Author:</h2>
 
 <p>Daniel (dmilith) Dettlaff (dmilith [at] verknowsys.com)
@@ -77,39 +85,89 @@ Every definition is sh script itself (More in <a href="https://github.com/VerKno
 <li>Sofin has own configuration file: <a href="https://github.com/VerKnowSys/sofin/blob/master/sofin.conf.sh">sofin.conf.sh</a> which is SH script itself.</li>
 <li>Supports parallel builds by default (from version 0.24.5)</li>
 <li>Supports custom callbacks executed in order as follows:
-<code>APP_AFTER_UNPACK_CALLBACK (executed after software unpack process)</code>
-<code>APP_AFTER_PATCH_CALLBACK (executed after software patch process)</code>
-<code>APP_AFTER_CONFIGURE_CALLBACK (executed after software configuration process)</code>
-<code>APP_AFTER_MAKE_CALLBACK (executed after software compilation process)</code>
-<code>APP_AFTER_INSTALL_CALLBACK (executed after software installation process)</code>
+
+<ul>
+<li>APP_AFTER_UNPACK_CALLBACK (executed after software unpack process)</li>
+<li>APP_AFTER_PATCH_CALLBACK (executed after software patch process)</li>
+<li>APP_AFTER_CONFIGURE_CALLBACK (executed after software configuration process)</li>
+<li>APP_AFTER_MAKE_CALLBACK (executed after software compilation process)</li>
+<li>APP_AFTER_INSTALL_CALLBACK (executed after software installation process)
 Each callback can be sh function itself and to be called by name. Look into <a href="https://github.com/VerKnowSys/sofin/blob/master/definitions/sbt.def">sbt.def</a> for an example createLaunchScript().</li>
+</ul>
+</li>
 <li>Supports collisions between definitions through APP_CONFLICTS_WITH option since version 0.38.0. An example in <a href="https://github.com/VerKnowSys/sofin/blob/master/definitions/ruby.def">ruby.def</a>
 </li>
 </ul><h2>Examples:</h2>
 
 <ul>
-<li><p>Install all available software defined in a list called "all":
-<code>sofin install all</code></p></li>
-<li><p>Install one software from definition called "ruby.def" for current user:
-<code>sofin install ruby</code></p></li>
-<li><p>Install software list called "databases" for current user:
-<code>sofin install databases</code></p></li>
-<li><p>Upgrade application requirement: Xml in bundle Ruby as current user:
-<code>sofin upgrade libxml2 ruby</code></p></li>
-<li><p>Upgrade Ruby in Ruby bundle without recompiling all requirements (already compiled requirements will be reused):
-<code>sofin upgrade ruby ruby</code></p></li>
-<li><p>Show list of available software:
-<code>sofin available</code></p></li>
-<li><p>Show list of installed software:
-<code>sofin fullinstalled</code> or <code>sofin installed</code></p></li>
-<li><p>Export "ruby" binary from "Passenger" bundle: <code>sofin export ruby Passenger</code></p></li>
-<li><p>Uninstall installed software "SomeApp"?
-<code>sofin uninstall someApp</code></p></li>
-<li><p>Create a list called "databases", with definitions: "postgresql" and "mysql", and install it with Sofin:
-<code>cd Sofin</code>
-<code>echo "postgresql\nmysql" &gt; lists/databases</code>
-run <code>./push-definitions</code> to create a snapshot and upload it to Your remote respository.
-run <code>sofin install databases</code></p></li>
+<li>
+<p>Install all available software defined in a list called "all":</p>
+
+<div class="highlight"><pre>sofin install all
+</pre></div>
+</li>
+<li>
+<p>Install one software from definition called "ruby.def" for current user:</p>
+
+<div class="highlight"><pre>sofin install ruby
+</pre></div>
+</li>
+<li>
+<p>Install software list called "databases" for current user:</p>
+
+<div class="highlight"><pre>sofin install databases
+</pre></div>
+</li>
+<li>
+<p>Upgrade application requirement: Xml in bundle Ruby as current user:</p>
+
+<div class="highlight"><pre>sofin upgrade libxml2 ruby
+</pre></div>
+</li>
+<li>
+<p>Upgrade Ruby in Ruby bundle without recompiling all requirements (already compiled requirements will be reused):</p>
+
+<div class="highlight"><pre>sofin upgrade ruby ruby
+</pre></div>
+</li>
+<li>
+<p>Show list of available software:</p>
+
+<div class="highlight"><pre>sofin available
+</pre></div>
+</li>
+<li>
+<p>Show list of installed software:</p>
+
+<div class="highlight"><pre>sofin fullinstalled
+</pre></div>
+
+<p>or</p>
+
+<div class="highlight"><pre>sofin installed
+</pre></div>
+</li>
+<li>
+<p>Export "ruby" binary from "Passenger" bundle:</p>
+
+<div class="highlight"><pre>sofin <span class="nb">export </span>ruby Passenger
+</pre></div>
+</li>
+<li>
+<p>Uninstall installed software "SomeApp"?</p>
+
+<div class="highlight"><pre>sofin uninstall someApp
+</pre></div>
+</li>
+<li>
+<p>Create a list called "databases", with definitions: "postgresql" and "mysql", and install it with Sofin:</p>
+
+<div class="highlight"><pre><span class="nb">cd </span>Sofin
+<span class="nb">echo</span> <span class="s2">"postgresql\nmysql"</span> &gt; lists/databases
+./push-definitions <span class="c"># to create a snapshot and upload it to Your remote respository.</span>
+sofin install databases
+</pre></div>
+</li>
 </ul><h2>Differences from <a href="https://en.wikipedia.org/wiki/POSIX">POSIX</a> and <a href="https://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard">FHS</a> standards:</h2>
 
 <ul>
@@ -128,62 +186,41 @@ space than it does with "old fasioned, system wide, shared software".</li>
 <li>Some definitions with X11 requirement will need <a href="http://xquartz.macosforge.org/landing/">XQuartz</a> installation. (Darwin hosts only).</li>
 </ul><h2>Installation info (platform specific):</h2>
 
+<h3>FreeBSD specific:</h3>
+
 <ul>
-<li>
-<p>FreeBSD specific:</p>
+<li>Install base 64bit system - I used 64bit FreeBSD 9.1 bootonly iso here.</li>
+<li>Run as root: "fetch -o - <a href="https://github.com/VerKnowSys/sofin/archive/master.tar.gz">https://github.com/VerKnowSys/sofin/archive/master.tar.gz</a> | tar xf - &amp;&amp; cd ./sofin-master &amp;&amp; ./sofin-install". It will put "sofin" into /usr/bin/ and sofin.conf.sh into /etc/.</li>
+<li>Build core software. Run "sofin install base" as root.</li>
+<li>Start using sofin as regular user.</li>
+</ul><h3>Darwin/ Mac OS X specific:</h3>
 
-<blockquote>
-<ol>
-<li> Install base 64bit system - I used 64bit FreeBSD 9.1 bootonly iso here.</li>
-<li> Run as root: "fetch -o - <a href="https://github.com/VerKnowSys/sofin/archive/master.tar.gz">https://github.com/VerKnowSys/sofin/archive/master.tar.gz</a> | tar xf - &amp;&amp; cd ./sofin-master &amp;&amp; ./sofin-install". It will put "sofin" into /usr/bin/ and sofin.conf.sh into /etc/.</li>
-<li> Build core software. Run "sofin install base" as root.</li>
-<li> Start using sofin as regular user.</li>
-</ol>
-</blockquote>
-</li>
-<li>
-<p>Darwin/ Mac OS X specific:</p>
+<ul>
+<li>Install Mac OS X 10.8.</li>
+<li>Install <a href="http://xquartz.macosforge.org/landing/">XQuartz</a> (if you want to build definitions that require X11)</li>
+<li>Run "git clone git://github.com/VerKnowSys/sofin.git &amp;&amp; cd ./sofin &amp;&amp; sudo ./sofin-install". It will put "sofin" in /usr/bin/ and sofin.conf.sh in /etc/.</li>
+<li>Build core software. Run "sudo sofin install base".</li>
+<li>Start using sofin as regular user.</li>
+</ul><h3>Debian specific: (Yes - Linux is NOT a system)</h3>
 
-<blockquote>
-<ol>
-<li> Install Mac OS X 10.8.</li>
-<li> Install <a href="http://xquartz.macosforge.org/landing/">XQuartz</a> (if you want to build definitions that require X11)</li>
-<li> Run "git clone git://github.com/VerKnowSys/sofin.git &amp;&amp; cd ./sofin &amp;&amp; sudo ./sofin-install". It will put "sofin" in /usr/bin/ and sofin.conf.sh in /etc/.</li>
-<li> Build core software. Run "sudo sofin install base".</li>
-<li> Start using sofin as regular user.</li>
-</ol>
-</blockquote>
-</li>
-<li>
-<p>Debian specific: (Yes it's NOT Linux specific at all, cause every distro is a different monster with own set of additional hands and legs)</p>
-
-<blockquote>
-<ol>
-<li> Install base 64bit system - I used 64bit Debian 6.0.x netinstall iso here.</li>
-<li> To make base system "complete", run as root: "aptitude install gcc g++ bc patch make file libssl-dev build-essential kernel-package libmagic-dev unzip".</li>
-<li> Run as root: "wget -qO- <a href="https://github.com/VerKnowSys/sofin/archive/master.tar.gz">https://github.com/VerKnowSys/sofin/archive/master.tar.gz</a> | tar zxf - &amp;&amp; cd ./sofin-master &amp;&amp; ./sofin-install". It will put "sofin" into /usr/bin/ and sofin.conf.sh into /etc/.</li>
-<li> Build core software. Run as root: "sofin install base".</li>
-<li> Start using sofin as regular user.</li>
-</ol>
-</blockquote>
-</li>
+<ul>
+<li>Install base 64bit system - I used 64bit Debian 6.0.x netinstall iso here.</li>
+<li>To make base system "complete", run as root: "aptitude install gcc g++ bc patch make file libssl-dev build-essential kernel-package libmagic-dev unzip".</li>
+<li>Run as root: "wget -qO- <a href="https://github.com/VerKnowSys/sofin/archive/master.tar.gz">https://github.com/VerKnowSys/sofin/archive/master.tar.gz</a> | tar zxf - &amp;&amp; cd ./sofin-master &amp;&amp; ./sofin-install". It will put "sofin" into /usr/bin/ and sofin.conf.sh into /etc/.</li>
+<li>Build core software. Run as root: "sofin install base".</li>
+<li>Start using sofin as regular user.</li>
 </ul><h2>License:</h2>
 
 <ul>
 <li>Released under the <a href="http://opensource.org/licenses/BSD-2-Clause">BSD</a> license.</li>
 </ul>
       </section>
-    </div>
-
-    <!-- FOOTER  -->
-    <div id="footer_wrap" class="outer">
-      <footer class="inner">
-        <p class="copyright">Sofin maintained by <a href="https://github.com/VerKnowSys">VerKnowSys</a></p>
-        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      <footer>
+        <p>Project maintained by <a href="https://github.com/VerKnowSys">VerKnowSys</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="http://twitter.com/#!/michigangraham">mattgraham</a></small></p>
       </footer>
     </div>
-
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
     
-
   </body>
 </html>
