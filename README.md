@@ -138,7 +138,8 @@ It will put "sofin" into /usr/bin/ and sofin.conf.sh into /etc/.
   - Build core software. Run:
 ```bash
 sofin install base
-``` as root.
+```
+as root.
   - Start using sofin as regular user.
 
 ### Darwin/ Mac OS X specific:
