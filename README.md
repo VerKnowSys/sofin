@@ -159,7 +159,7 @@ sudo sofin install base
   - Install base 64bit system - I used 64bit Debian 6.0.x netinstall iso here.
   - To make base system "complete", run as root:
 ```
-aptitude install gcc g++ bc patch make file libssl-dev build-essential kernel-package libmagic-dev libncurses5-dev unzip
+aptitude install gcc g++ bc patch make file libssl-dev build-essential kernel-package libmagic-dev libncurses5-dev libncursesw5-dev unzip
 ```
   - Run as root:
 ```
