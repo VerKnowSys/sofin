@@ -16,6 +16,10 @@ SCRIPT_ARGS="$*"
 SOFTWARE_DIR="/Software/"
 LOCK_FILE="${SOFTWARE_DIR}.sofin.lock"
 HOME_DIR="/Users/"
+if [ ! -d "${HOME_DIR}" ]; then # fallback to FHS /home
+    HOME_DIR="/home/"
+    ID_SVD="-un"
+fi
 HOME_APPS_DIR="Apps/"
 CACHE_DIR="${SOFTWARE_DIR}.cache/"
 LOG="${CACHE_DIR}install.log"
