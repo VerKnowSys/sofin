@@ -19,7 +19,7 @@ if [ "${TRACE}" = "true" ]; then
 fi
 
 # create runtime sha
-RUNTIME_SHA="$(${DATE_BIN} | ${SHA_BIN})"
+RUNTIME_SHA="$(${DATE_BIN} | ${SHA_BIN})" # TODO: NYI
 
 check_definition_dir () {
     if [ ! -d "${SOFTWARE_DIR}" ]; then
