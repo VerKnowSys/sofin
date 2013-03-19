@@ -1,4 +1,4 @@
-DISABLE_ON="Darwin FreeBSD"
+DISABLE_ON="Darwin FreeBSD Linux"
 APP_FULL_NAME="NCurses Library"
 APP_NAME="ncurses"
 APP_SHA="3e042e5f2c7223bffdaac9646a533b8c758b65b5"
