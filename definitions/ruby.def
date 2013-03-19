@@ -9,7 +9,7 @@ if [ "${SYSTEM_NAME}" = "Darwin" ]; then
 else
   export APP_CONFIGURE_ARGS="${APP_CONFIGURE_ARGS} --with-gcc=${SOFTWARE_DIR}Clang/exports/clang"
 fi
-APP_REQUIREMENTS="zlib bzip2 libxml2 gmake libtool libgpg-error libgcrypt libxslt yaml libffi sqlite perl openssl"
+APP_REQUIREMENTS="zlib bzip2 libxml2 gmake libtool libgpg-error libgcrypt libxslt yaml libffi sqlite perl openssl readline"
 APP_AFTER_INSTALL_CALLBACK="${PRINTF_BIN} 'gem: --no-ri --no-rdoc' > ${HOME}/.gemrc ; ${PREFIX}/bin/gem install bundler rails --force"
 APP_EXPORTS="ruby gem irb ri rdoc erb rake rails bundle"
 APP_CURRENT_VERSION="$(${CURL_BIN} http://www.ruby-lang.org/en/downloads/ 2>/dev/null | ${AWK_BIN} '/pub\/ruby/ {gsub(/ *<[^>]+> */, ""); print $2; exit}')"
