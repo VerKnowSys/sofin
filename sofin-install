@@ -61,30 +61,30 @@ update_env_files () {
 }
 
 
-create_user_symlinks () {
-    if [ ! -d "${HOME_DIR}" ]; then
-        note "Creating ${HOME_DIR} directory."
-        ${MKDIR_BIN} "${HOME_DIR}"
-        check_command_result $?
-    fi
+# create_user_symlinks () {
+#     if [ ! -d "${HOME_DIR}" ]; then
+#         note "Creating ${HOME_DIR} directory."
+#         ${MKDIR_BIN} "${HOME_DIR}"
+#         check_command_result $?
+#     fi
 
-    CWD="$(pwd)"
-    cd /home
+#     CWD="$(pwd)"
+#     cd /home
 
-    for i in *; do
-        uid="$(id -u $i 2>/dev/null)"
-        if [ ! $uid ]; then
-            continue
-        fi
-        if [ ! -L "${HOME_DIR}${uid}" ]; then
-            note "Creating symlink ${HOME_DIR}${uid} -> /home/${i}."
-            ${LN_BIN} -s "/home/${i}" "${HOME_DIR}${uid}"
-            check_command_result $?
-        fi
-    done
+#     for i in *; do
+#         uid="$(id -u $i 2>/dev/null)"
+#         if [ ! $uid ]; then
+#             continue
+#         fi
+#         if [ ! -L "${HOME_DIR}${uid}" ]; then
+#             note "Creating symlink ${HOME_DIR}${uid} -> /home/${i}."
+#             ${LN_BIN} -s "/home/${i}" "${HOME_DIR}${uid}"
+#             check_command_result $?
+#         fi
+#     done
 
-    cd "${CWD}"
-}
+#     cd "${CWD}"
+# }
 
 
 install_base () {
@@ -150,7 +150,7 @@ case "${SYSTEM_NAME}" in
 
   FreeBSD|Linux)
     check_root
-    create_user_symlinks
+    # create_user_symlinks
     update_env_files
     install_base
     ;;

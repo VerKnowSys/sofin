@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-VERSION="0.42.1"
+VERSION="0.43.0"
 
 # load configuration from sofin.conf
 CONF_FILE="/etc/sofin.conf.sh"
@@ -19,7 +19,7 @@ if [ "${TRACE}" = "true" ]; then
 fi
 
 # create runtime sha
-RUNTIME_SHA="$(${DATE_BIN} | ${SHA_BIN})"
+RUNTIME_SHA="$(${DATE_BIN} | ${SHA_BIN})" # TODO: NYI
 
 check_definition_dir () {
     if [ ! -d "${SOFTWARE_DIR}" ]; then
