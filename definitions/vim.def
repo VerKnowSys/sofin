@@ -1,4 +1,4 @@
-DISABLE_ON="Darwin Linux"
+DISABLE_ON="Darwin"
 APP_FULL_NAME="Vim editor"
 APP_NAME="vim"
 APP_SHA="edb21e87efff373f10399c1b3f37795e9798679f"
