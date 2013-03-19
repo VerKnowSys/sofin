@@ -3,11 +3,6 @@ APP_SHA="f37979eafc241a0ebeac9548cb3f4113074271b7"
 APP_NAME="mysql"
 APP_VERSION="5.6.10"
 APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
-APP_REQUIREMENTS="zlib bzip2 expat libiconv cmake ncurses gmake"
+APP_REQUIREMENTS="zlib bzip2 expat libiconv cmake ncurses"
 APP_CONFIGURE_SCRIPT="cmake"
-if [ "${SYSTEM_NAME}" = "Linux" ]; then
-  export APP_CONFIGURE_SCRIPT="true"
-  export APP_MAKE_METHOD="${PREFIX}/bin/cmake . -DCMAKE_INSTALL_PREFIX=${PREFIX} -DCURSES_LIBRARY=${PREFIX}/lib/libncursesw.so -DCURSES_INCLUDE_PATH=${PREFIX}/include/ncursesw/"
-  export APP_INSTALL_METHOD="${PREFIX}/bin/gmake install"
-fi
 APP_EXPORTS="mysql mysql_config mysqld mysqld_multi mysqld_safe mysqladmin mysqlshow mysqlimport mysqlbinlog mysqldump mysqlaccess mysqlcheck mysqlhotcopy mysql_upgrade"
