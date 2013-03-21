@@ -258,6 +258,10 @@ else # if /Users/ exists, and it's not OSX, check for svd metadata
     if [ "${SYSTEM_NAME}" != "Darwin" ]; then # if it's Darwin, then just skip this part. We already have username set
         CURRENT_USER_UID="$(${ID_BIN} -u)"
         if [ "${CURRENT_USER_UID}" != "0" ]; then
+            if [ "$(${FIND_BIN} ${HOME_DIR} -depth 1 2>/dev/null | ${WC_BIN} -l | ${TR_BIN} -d ' ')" = "0" ]; then
+                error "No user home dir found? Critial error. No entries in ${HOME_DIR}? Fix it and retry."
+                exit 1
+            fi
             USER_DIRNAME="$(${FIND_BIN} ${HOME_DIR} -depth 1 -uid "${CURRENT_USER_UID}" 2> /dev/null)" # get user dir by uid and ignore access errors
 
             # additional check for multiple dirs with same UID (illegal)
