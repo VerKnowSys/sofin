@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-VERSION="0.43.0"
+VERSION="0.44.0"
 
 # load configuration from sofin.conf
 CONF_FILE="/etc/sofin.conf.sh"
@@ -94,7 +94,7 @@ update_definitions () { # accepts optional user uid param
         ${MKDIR_BIN} -p "${element}" > /dev/null
         if [ ! -z "${1}" ]; then # param with uid not given
             ${TOUCH_BIN} "${LOG}"
-            if [ "$(${ID_BIN} -u)" = "0" ]; then
+            if [ "${USERNAME}" = "root" ]; then
                 if [ ! -z "${1}" ]; then
                     debug "Chowning ${element} for user: ${1}"
                     ${CHOWN_BIN} -R ${1} "${element}" >> "${LOG}"
@@ -111,7 +111,7 @@ update_definitions () { # accepts optional user uid param
     debug "Updating definitions snapshot from: ${MAIN_SOURCE_REPOSITORY}definitions/${DEFINITION_SNAPSHOT_FILE}"
     ${FETCH_BIN} "${MAIN_SOURCE_REPOSITORY}definitions/${DEFINITION_SNAPSHOT_FILE}" >> "${LOG}" 2>> "${LOG}"
     ${TAR_BIN} ${tar_options} "${DEFINITION_SNAPSHOT_FILE}" >> "${LOG}" 2>> "${LOG}"
-    if [ "$(${ID_BIN} -u)" = "0" ]; then
+    if [ "${USERNAME}" = "root" ]; then
         if [ ! -z "${1}" ]; then
             debug "Chowning definitions for user: ${1}"
             ${CHOWN_BIN} -R ${1} "${CACHE_DIR}" >> "${LOG}"
@@ -148,13 +148,12 @@ usage_howto () {
 
 
 update_shell_vars () {
-    USER_UID="$(${ID_BIN} ${ID_SVD})"
-    if [ "$(${ID_BIN} -u)" = "0" ]; then
+    if [ "${USERNAME}" = "root" ]; then
         debug "Updating ${SOFIN_PROFILE} settings…"
         ${PRINTF_BIN} "$(${SCRIPT_NAME} getshellvars)" > "${SOFIN_PROFILE}"
     else
-        debug "Updating ${HOME_DIR}${USER_UID}/.profile settings…"
-        ${PRINTF_BIN} "$(${SCRIPT_NAME} getshellvars ${USER_UID})" > "${HOME_DIR}${USER_UID}/.profile"
+        debug "Updating ${HOME_DIR}${USERNAME}/.profile settings…"
+        ${PRINTF_BIN} "$(${SCRIPT_NAME} getshellvars ${USERNAME})" > "${HOME_DIR}${USERNAME}/.profile"
     fi
 }
 
@@ -203,14 +202,14 @@ if [ ! "$1" = "" ]; then
 
     log)
         if [ -z "${2}" ]; then
-            export LOG="${HOME_DIR}$(${ID_BIN} ${ID_SVD})/install.log"
-            if [ "$(${ID_BIN} -u)" = "0" ]; then
+            export LOG="${HOME_DIR}${USERNAME}/install.log"
+            if [ "${USERNAME}" = "root" ]; then
                 check_root
                 export LOG="${CACHE_DIR}install.log"
             fi
         else
             export LOG="${HOME_DIR}${2}/install.log"
-            if [ ! "$(${ID_BIN} ${ID_SVD})" = "${2}" ]; then
+            if [ ! "${USERNAME}" = "${2}" ]; then
                 check_root
             fi
         fi
@@ -219,15 +218,14 @@ if [ ! "$1" = "" ]; then
 
 
     clean)
-        export USER_UID="$(${ID_BIN} ${ID_SVD})"
-        if [ "$(${ID_BIN} -u)" = "0" ]; then
+        if [ "${USERNAME}" = "root" ]; then
             note "Performing cleanup of ${CACHE_DIR}cache"
             ${RM_BIN} -rf "${CACHE_DIR}cache"
             note "Removing ${LOG}"
             ${RM_BIN} -rf "${LOG}"
         else
-            export LOG="${HOME_DIR}${USER_UID}/install.log"
-            export CACHE_DIR="${HOME_DIR}${USER_UID}/.cache/"
+            export LOG="${HOME_DIR}${USERNAME}/install.log"
+            export CACHE_DIR="${HOME_DIR}${USERNAME}/.cache/"
             note "Performing cleanup of ${CACHE_DIR}cache"
             ${RM_BIN} -rf "${CACHE_DIR}cache"
             note "Removing ${LOG}"
@@ -239,14 +237,14 @@ if [ ! "$1" = "" ]; then
 
     installed|list)
         if [ -z "${2}" ]; then
-            export SOFT_DIR="${HOME_DIR}$(${ID_BIN} ${ID_SVD})/${HOME_APPS_DIR}"
-            if [ "$(${ID_BIN} -u)" = "0" ]; then
+            export SOFT_DIR="${HOME_DIR}${USERNAME}/${HOME_APPS_DIR}"
+            if [ "${USERNAME}" = "root" ]; then
                 check_root
                 export SOFT_DIR="${SOFTWARE_DIR}"
             fi
         else
             export SOFT_DIR="${HOME_DIR}$2/${HOME_APPS_DIR}"
-            if [ ! "$(${ID_BIN} ${ID_SVD})" = "${2}" ]; then
+            if [ ! "${USERNAME}" = "${2}" ]; then
                 check_root
             fi
         fi
@@ -261,14 +259,14 @@ if [ ! "$1" = "" ]; then
 
     fullinstalled|fulllist)
         if [ -z "${2}" ]; then
-            export SOFT_DIR="${HOME_DIR}$(${ID_BIN} ${ID_SVD})/${HOME_APPS_DIR}"
-            if [ "$(${ID_BIN} -u)" = "0" ]; then
+            export SOFT_DIR="${HOME_DIR}${USERNAME}/${HOME_APPS_DIR}"
+            if [ "${USERNAME}" = "root" ]; then
                 check_root
                 export SOFT_DIR="${SOFTWARE_DIR}"
             fi
         else
             export SOFT_DIR="${HOME_DIR}$2/${HOME_APPS_DIR}"
-            if [ ! "$(${ID_BIN} ${ID_SVD})" = "${2}" ]; then
+            if [ ! "${USERNAME}" = "${2}" ]; then
                 check_root
             fi
         fi
@@ -406,12 +404,11 @@ if [ ! "$1" = "" ]; then
             error "For application \"$1\", third argument with application name is required!"
             exit 1
         fi
-        export USER_UID="$(${ID_BIN} ${ID_SVD})"
-        if [ "$(${ID_BIN} -u)" = "0" ]; then
+        if [ "${USERNAME}" = "root" ]; then
             export SOFT_DIR="${SOFTWARE_DIR}"
         else
-            export SOFT_DIR="${HOME_DIR}${USER_UID}/${HOME_APPS_DIR}"
-            export LOG="${HOME_DIR}${USER_UID}/install.log"
+            export SOFT_DIR="${HOME_DIR}${USERNAME}/${HOME_APPS_DIR}"
+            export LOG="${HOME_DIR}${USERNAME}/install.log"
         fi
         REQ="${2}"
         APP="$(${PRINTF_BIN} "${3}" | ${CUT_BIN} -c1 | ${TR_BIN} '[a-z]' '[A-Z]')$(${PRINTF_BIN} "${3}" | ${SED_BIN} 's/^[a-zA-Z]//')"
@@ -438,7 +435,7 @@ if [ ! "$1" = "" ]; then
         ${RM_BIN} -f "${REM}"
 
         debug "Relaunching installation script once again…"
-        ${SCRIPT_NAME} install ${3} ${USER_UID}
+        ${SCRIPT_NAME} install ${3} ${USERNAME}
         exit
         ;;
 
@@ -449,17 +446,14 @@ if [ ! "$1" = "" ]; then
             error "For \"$1\" application installation mode, second argument with application name or list is required!"
             exit 1
         fi
-        export USER_UID="$(${ID_BIN} ${ID_SVD})"
-        if [ "$(${ID_BIN} -u)" = "0" ]; then
-            unset USER_UID
-        else
-            export LOG="${HOME_DIR}${USER_UID}/install.log"
-            export CACHE_DIR="${HOME_DIR}${USER_UID}/.cache/"
+        if [ "${USERNAME}" != "root" ]; then
+            export LOG="${HOME_DIR}${USERNAME}/install.log"
+            export CACHE_DIR="${HOME_DIR}${USERNAME}/.cache/"
             export DEFINITIONS_DIR="${CACHE_DIR}definitions/"
             export LISTS_DIR="${CACHE_DIR}lists/"
             export DEFAULTS="${DEFINITIONS_DIR}defaults.def"
         fi
-        update_definitions ${USER_UID}
+        update_definitions ${USERNAME}
 
         # first of all, try using a list if exists:
         if [ -f "${LISTS_DIR}$2" ]; then
@@ -479,19 +473,18 @@ if [ ! "$1" = "" ]; then
 
     deps|dependencies|local)
         LOCAL_DIR="$(${PWD_BIN})/"
-        export USER_UID="$(${ID_BIN} ${ID_SVD})"
-        if [ "$(${ID_BIN} -u)" = "0" ]; then
+        if [ "${USERNAME}" = "root" ]; then
             warn "Installation of project dependencies as root is immoral."
             # exit 1
-            unset USER_UID
+            # unset USERNAME
         else
-            export LOG="${HOME_DIR}${USER_UID}/install.log"
-            export CACHE_DIR="${HOME_DIR}${USER_UID}/.cache/"
+            export LOG="${HOME_DIR}${USERNAME}/install.log"
+            export CACHE_DIR="${HOME_DIR}${USERNAME}/.cache/"
             export DEFINITIONS_DIR="${CACHE_DIR}definitions/"
             export LISTS_DIR="${CACHE_DIR}lists/"
             export DEFAULTS="${DEFINITIONS_DIR}defaults.def"
         fi
-        update_definitions ${USER_UID}
+        update_definitions ${USERNAME}
         cd "${LOCAL_DIR}"
         note "Looking for $(${PWD_BIN})/${DEPENDENCIES_FILE} file…"
         if [ ! -e "$(${PWD_BIN})/${DEPENDENCIES_FILE}" ]; then
@@ -508,12 +501,11 @@ if [ ! "$1" = "" ]; then
             error "For \"$1\" task, second argument with application name is required!"
             exit 1
         fi
-        USER_UID="$(${ID_BIN} -u)"
-        if [ "${USER_UID}" = "0" ]; then
+        if [ "${USERNAME}" = "root" ]; then
             export SOFT_DIR="${SOFTWARE_DIR}"
         else
-            export LOG="${HOME_DIR}$(${ID_BIN} ${ID_SVD})/install.log"
-            export SOFT_DIR="${HOME_DIR}$(${ID_BIN} ${ID_SVD})/${HOME_APPS_DIR}"
+            export LOG="${HOME_DIR}${USERNAME}/install.log"
+            export SOFT_DIR="${HOME_DIR}${USERNAME}/${HOME_APPS_DIR}"
             export LISTS_DIR="${CACHE_DIR}lists/"
         fi
 
@@ -532,7 +524,7 @@ if [ ! "$1" = "" ]; then
                     debug "Removing software from: ${SOFT_DIR}${APP_NAME}"
                     ${RM_BIN} -rfv "${SOFT_DIR}${APP_NAME}" >> "${LOG}"
                 fi
-                update_shell_vars ${USER_UID}
+                update_shell_vars ${USERNAME}
             done
         else
             APP_NAME="$(${PRINTF_BIN} "${2}" | ${CUT_BIN} -c1 | ${TR_BIN} '[a-z]' '[A-Z]')$(${PRINTF_BIN} "${2}" | ${SED_BIN} 's/^[a-zA-Z]//')"
@@ -544,7 +536,7 @@ if [ ! "$1" = "" ]; then
                 fi
                 debug "Removing software from: ${SOFT_DIR}${APP_NAME}"
                 ${RM_BIN} -rfv "${SOFT_DIR}${APP_NAME}" >> "${LOG}"
-                update_shell_vars ${USER_UID}
+                update_shell_vars ${USERNAME}
             else
                 error "Application: ${APP_NAME} not installed."
                 exit 1
@@ -567,24 +559,22 @@ if [ ! "$1" = "" ]; then
 
 
     update|updatedefs)
-        USER_UID="$(${ID_BIN} -u)"
-        if [ ! "${USER_UID}" = "0" ]; then
-            export CACHE_DIR="${HOME_DIR}${USER_UID}/.cache/"
+        if [ ! "${USERNAME}" = "root" ]; then
+            export CACHE_DIR="${HOME_DIR}${USERNAME}/.cache/"
             export DEFINITIONS_DIR="${CACHE_DIR}definitions/"
-            export LOG="${HOME_DIR}${USER_UID}/install.log"
+            export LOG="${HOME_DIR}${USERNAME}/install.log"
         fi
         export LISTS_DIR="${CACHE_DIR}lists/"
         export DEFAULTS="${DEFINITIONS_DIR}defaults.def"
-        update_definitions "${USER_UID}"
+        update_definitions "${USERNAME}"
         note "Definitions were updated to latest version."
         exit
         ;;
 
 
     available)
-        export USER_UID="$(${ID_BIN} ${ID_SVD})"
-        if [ ! "$(${ID_BIN} -u)" = "0" ]; then
-            export CACHE_DIR="${HOME_DIR}${USER_UID}/.cache/"
+        if [ ! "${USERNAME}" = "root" ]; then
+            export CACHE_DIR="${HOME_DIR}${USERNAME}/.cache/"
             export DEFINITIONS_DIR="${CACHE_DIR}definitions/"
             export LISTS_DIR="${CACHE_DIR}lists/"
         fi
@@ -612,10 +602,9 @@ if [ ! "$1" = "" ]; then
         EXPORT="$2"
         APP="$(${PRINTF_BIN} "${3}" | ${CUT_BIN} -c1 | ${TR_BIN} '[a-z]' '[A-Z]')$(${PRINTF_BIN} "${3}" | ${SED_BIN} 's/^[a-zA-Z]//')"
         export SOFT_DIR="${SOFTWARE_DIR}"
-        export userUID="$(${ID_BIN} ${ID_SVD})"
-        if [ ! "$(${ID_BIN} -u)" = "0" ]; then
-            export SOFT_DIR="${HOME_DIR}${userUID}/${HOME_APPS_DIR}"
-            export LOG="${HOME_DIR}${userUID}/install.log"
+        if [ "${USERNAME}" != "root" ]; then
+            export SOFT_DIR="${HOME_DIR}${USERNAME}/${HOME_APPS_DIR}"
+            export LOG="${HOME_DIR}${USERNAME}/install.log"
         fi
 
         for dir in "/bin/" "/sbin/" "/libexec/"; do
@@ -666,21 +655,21 @@ for application in ${APPLICATIONS}; do
             # fancy old style Capitalize
             APP_NAME="$(${PRINTF_BIN} "${APP_NAME}" | ${CUT_BIN} -c1 | ${TR_BIN} '[a-z]' '[A-Z]')$(${PRINTF_BIN} "${APP_NAME}" | ${SED_BIN} 's/^[a-zA-Z]//')"
             if [ "${REQUIRE_ROOT_ACCESS}" = "true" ]; then
-                if [ "${USER_UID}" != "" ]; then
+                if [ "${USERNAME}" != "root" ]; then
                     warn "Definition requires root priviledges to install: ${APP_NAME}. Wont install."
                     break
                 fi
             fi
 
             # note "Preparing application: ${APP_NAME}${APP_POSTFIX} (${APP_FULL_NAME} v${APP_VERSION})"
-            if [ "${USER_UID}" = "" ]; then
+            if [ "${USERNAME}" = "root" ]; then
                 debug "Normal build"
                 export PREFIX="${SOFTWARE_DIR}${APP_NAME}"
             else
-                debug "User build: ${USER_UID}"
-                export PREFIX="${HOME_DIR}${USER_UID}/${HOME_APPS_DIR}${APP_NAME}"
-                if [ ! -d "${HOME_DIR}${USER_UID}/${HOME_APPS_DIR}" ]; then
-                    ${MKDIR_BIN} -p "${HOME_DIR}${USER_UID}/${HOME_APPS_DIR}"
+                debug "User build: ${USERNAME}"
+                export PREFIX="${HOME_DIR}${USERNAME}/${HOME_APPS_DIR}${APP_NAME}"
+                if [ ! -d "${HOME_DIR}${USERNAME}/${HOME_APPS_DIR}" ]; then
+                    ${MKDIR_BIN} -p "${HOME_DIR}${USERNAME}/${HOME_APPS_DIR}"
                 fi
             fi
 
@@ -1050,6 +1039,7 @@ for application in ${APPLICATIONS}; do
             fi
 
             . "${DEFINITIONS_DIR}${application}.def"
+            debug "Exporting binaries:${EXPORT_LIST}"
             ${MKDIR_BIN} -p "${PREFIX}/exports"
             EXPORT_LIST=""
             for exp in ${APP_EXPORTS}; do
@@ -1067,21 +1057,12 @@ for application in ${APPLICATIONS}; do
                     fi
                 done
             done
-            debug "Exporting binaries:${EXPORT_LIST}"
-
-            if [ ! -z "${USER_UID}" ]; then
-                if [ "$(${ID_BIN} -u)" = "0" ]; then
-                    debug "Setting owner of ${PREFIX} recursively to user: ${USER_UID}"
-                    ${CHOWN_BIN} -R ${USER_UID} "${HOME_DIR}${USER_UID}" # NOTE: sanity check.
-                fi
-            fi
-
             debug "Doing app conflict resolve"
             if [ ! -z "${APP_CONFLICTS_WITH}" ]; then
                 note "Resolving conflicts."
                 for app in ${APP_CONFLICTS_WITH}; do
-                    if [ "$(${ID_BIN} -u)" != "0" ]; then
-                        export apphome="${HOME_DIR}$(${ID_BIN} ${ID_SVD})/${HOME_APPS_DIR}"
+                    if [ "${USERNAME}" != "root" ]; then
+                        export apphome="${HOME_DIR}${USERNAME}/${HOME_APPS_DIR}"
                     else
                         export apphome="${SOFTWARE_DIR}${apps}"
                     fi
