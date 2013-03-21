@@ -13,6 +13,8 @@ ID_SVD="-un"
 HEADER="Sofin v${VERSION} - © 2o12-2o13 - Versatile Knowledge Systems - VerKnowSys.com"
 SCRIPT_NAME="/usr/bin/sofin.sh"
 SCRIPT_ARGS="$*"
+PRIVATE_METADATA_DIR="/Private/"
+PRIVATE_METADATA_FILE="Metadata"
 SOFTWARE_DIR="/Software/"
 LOCK_FILE="${SOFTWARE_DIR}.sofin.lock"
 HOME_DIR="/Users/"
@@ -254,14 +256,29 @@ if [ ! -d "${HOME_DIR}" ]; then # fallback to FHS /home
     HOME_DIR="/home/"
 else # if /Users/ exists, and it's not OSX, check for svd metadata
     if [ "${SYSTEM_NAME}" != "Darwin" ]; then # if it's Darwin, then just skip this part. We already have username set
-        error "ServeD users not yet supported"
-        exit 1
-        # METADATA_FILE="${HOME_DIR}${USERNAME}${PRIVATE_METADATA_DIR}${PRIVATE_METADATA_FILE}"
-        # if [ -f "${METADATA_FILE}" ]; then
-        #     . "${METADATA_FILE}"
-        #     export USERNAME="${META_USERNAME}"
-        #     # TODO: FIXME: 2013-03-19 15:34:07 - dmilith - fill metadata and define values of it...
-        # fi
+        CURRENT_USER_UID="$(${ID_BIN} -u)"
+        if [ "${CURRENT_USER_UID}" != "0" ]; then
+            USER_DIRNAME="$(${FIND_BIN} ${HOME_DIR} -depth 1 -uid "${CURRENT_USER_UID}" 2> /dev/null)" # get user dir by uid and ignore access errors
+            debug "User dirname: ${USER_DIRNAME}"
+            export USERNAME="$(${BASENAME_BIN} ${USER_DIRNAME})"
+            if [ "${USERNAME}" != "" ]; then
+                note "ServeD System found. Username set to: ${USERNAME}"
+                METADATA_FILE="${HOME_DIR}${USERNAME}${PRIVATE_METADATA_DIR}${PRIVATE_METADATA_FILE}"
+                if [ -f "${METADATA_FILE}" ]; then
+                    note "Loading user metdata from ${METADATA_FILE}"
+                    . "${METADATA_FILE}"
+                    export SVD_FULL_NAME="${SVD_FULL_NAME}"
+                    #
+                    # TODO: FIXME: 2013-03-19 15:34:07 - dmilith - fill metadata and define values of it...
+                    # ...
+                    #
+                else
+                    warn "No metadata found in: ${METADATA_FILE} for user: ${USERNAME}. No additional user data accessible."
+                fi
+            else
+                error "No ServeD System found, but /Users is present. Please consider do a cleanup."
+            fi
+        fi
     fi
 fi
 
