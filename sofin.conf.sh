@@ -9,17 +9,13 @@ TRACE="false"
 DEBIAN="$(test -e /etc/debian_version && echo true)"
 GENTOO="$(test -e /etc/gentoo-release && echo true)"
 
-ID_SVD="-u" # NOTE: use "-un" for standard FreeBSD systems with users defined in /etc/passwd
+ID_SVD="-un"
 HEADER="Sofin v${VERSION} - © 2o12-2o13 - Versatile Knowledge Systems - VerKnowSys.com"
 SCRIPT_NAME="/usr/bin/sofin.sh"
 SCRIPT_ARGS="$*"
 SOFTWARE_DIR="/Software/"
 LOCK_FILE="${SOFTWARE_DIR}.sofin.lock"
 HOME_DIR="/Users/"
-if [ ! -d "${HOME_DIR}" ]; then # fallback to FHS /home
-    HOME_DIR="/home/"
-    ID_SVD="-un"
-fi
 HOME_APPS_DIR="Apps/"
 CACHE_DIR="${SOFTWARE_DIR}.cache/"
 LOG="${CACHE_DIR}install.log"
@@ -82,8 +78,10 @@ export SERVICE_BIN="/usr/sbin/service"
 export TEST_BIN="/bin/test"
 export CHMOD_BIN="/bin/chmod"
 
-SYSTEM_NAME="$(uname)"
-SYSTEM_ARCH="$(uname -p)"
+export USERNAME="$(${ID_BIN} ${ID_SVD})"
+export SYSTEM_NAME="$(uname)"
+export SYSTEM_ARCH="$(uname -p)"
+
 
 # System specific configuration
 case "${SYSTEM_NAME}" in
@@ -209,9 +207,9 @@ check_command_result () {
 
 
 check_root () {
-    if [ ! "$(${ID_BIN} -u)" = "0" ]; then
+    if [ ! "${USERNAME}" = "root" ]; then
         error "This command should be run as root."
-        exit
+        exit 1
     fi
 }
 
@@ -247,3 +245,21 @@ validate_env () {
         fi
     done || exit 1
 }
+
+
+# fallback
+if [ ! -d "${HOME_DIR}" ]; then # fallback to FHS /home
+    HOME_DIR="/home/"
+else # if /Users/ exists, and it's not OSX, check for svd metadata
+    if [ "${SYSTEM_NAME}" != "Darwin" ]; then # if it's Darwin, then just skip this part. We already have username set
+        error "ServeD users not yet supported"
+        exit 1
+        # METADATA_FILE="${HOME_DIR}${USERNAME}${PRIVATE_METADATA_DIR}${PRIVATE_METADATA_FILE}"
+        # if [ -f "${METADATA_FILE}" ]; then
+        #     . "${METADATA_FILE}"
+        #     export USERNAME="${META_USERNAME}"
+        #     # TODO: FIXME: 2013-03-19 15:34:07 - dmilith - fill metadata and define values of it...
+        # fi
+    fi
+fi
+
