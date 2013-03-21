@@ -259,6 +259,15 @@ else # if /Users/ exists, and it's not OSX, check for svd metadata
         CURRENT_USER_UID="$(${ID_BIN} -u)"
         if [ "${CURRENT_USER_UID}" != "0" ]; then
             USER_DIRNAME="$(${FIND_BIN} ${HOME_DIR} -depth 1 -uid "${CURRENT_USER_UID}" 2> /dev/null)" # get user dir by uid and ignore access errors
+
+            # additional check for multiple dirs with same UID (illegal)
+            USER_DIR_AMOUNT="$(echo "${USER_DIRNAME}" | ${WC_BIN} -l | ${TR_BIN} -d ' ')"
+            debug "User dirs amount: ${USER_DIR_AMOUNT}"
+            if [ "${USER_DIR_AMOUNT}" != "1" ]; then
+                error "Found more than one user with same uid in ${HOME_DIR}! That's illegal. Fix it an retry."
+                error "Conflicting users: $(echo "${USER_DIRNAME}" | ${TR_BIN} '\n' ' ')"
+                exit 1
+            fi
             debug "User dirname: ${USER_DIRNAME}"
             export USERNAME="$(${BASENAME_BIN} ${USER_DIRNAME})"
             if [ "${USERNAME}" != "" ]; then
