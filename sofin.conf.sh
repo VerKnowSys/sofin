@@ -274,22 +274,18 @@ else # if /Users/ exists, and it's not OSX, check for svd metadata
             fi
             debug "User dirname: ${USER_DIRNAME}"
             export USERNAME="$(${BASENAME_BIN} ${USER_DIRNAME})"
-            if [ "${USERNAME}" != "" ]; then
-                note "ServeD System found. Username set to: ${USERNAME}"
-                METADATA_FILE="${HOME_DIR}${USERNAME}${PRIVATE_METADATA_DIR}${PRIVATE_METADATA_FILE}"
-                if [ -f "${METADATA_FILE}" ]; then
-                    note "Loading user metdata from ${METADATA_FILE}"
-                    . "${METADATA_FILE}"
-                    export SVD_FULL_NAME="${SVD_FULL_NAME}"
-                    #
-                    # TODO: FIXME: 2013-03-19 15:34:07 - dmilith - fill metadata and define values of it...
-                    # ...
-                    #
-                else
-                    warn "No metadata found in: ${METADATA_FILE} for user: ${USERNAME}. No additional user data accessible."
-                fi
+            METADATA_FILE="${HOME_DIR}${USERNAME}${PRIVATE_METADATA_DIR}${PRIVATE_METADATA_FILE}"
+            if [ -f "${METADATA_FILE}" ]; then
+                debug "ServeD System found. Username set to: ${USERNAME}. Home directory: ${HOME_DIR}${USERNAME}"
+                debug "Loading user metdata from ${METADATA_FILE}"
+                . "${METADATA_FILE}"
+                export SVD_FULL_NAME="${SVD_FULL_NAME}"
+                #
+                # TODO: FIXME: 2013-03-19 15:34:07 - dmilith - fill metadata and define values of it...
+                # ...
+                #
             else
-                error "No ServeD System found, but /Users is present. Please consider do a cleanup."
+                debug "No metadata found in: ${METADATA_FILE} for user: ${USERNAME}. No additional user data accessible."
             fi
         fi
     fi
