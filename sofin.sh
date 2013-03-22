@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-VERSION="0.45.1"
+VERSION="0.45.2"
 
 # load configuration from sofin.conf
 CONF_FILE="/etc/sofin.conf.sh"
@@ -10,7 +10,7 @@ if [ -e "${CONF_FILE}" ]; then
     . "${CONF_FILE}"
     validate_env
 else
-    echo "FATAL: No configuration file found: ${CONF_FILE}"
+    echo "FATAL: No configuration file found: ${CONF_FILE}. Sofin isn't installed properly."
     exit 1
 fi
 
@@ -25,13 +25,19 @@ SOFIN_ARGS=$(echo ${SOFIN_ARGS} | ${CUT_BIN} -d' ' -f2-)
 # RUNTIME_SHA="$(${DATE_BIN} | ${SHA_BIN})" # TODO: NYI
 
 check_definition_dir () {
-    if [ ! -d "${SOFTWARE_DIR}" ]; then
-        note "No ${SOFTWARE_DIR} found. Creating one."
-        "${MKDIR_BIN}" -p "${SOFTWARE_DIR}"
+    SOFT_DIR="${SOFTWARE_DIR}"
+    CACH_DIR="${CACHE_DIR}"
+    if [ "${USERNAME}" != "root" ]; then
+        export SOFT_DIR="${HOME_DIR}${USERNAME}/${HOME_APPS_DIR}"
+        export CACH_DIR="${HOME_DIR}${USERNAME}/.cache/"
     fi
-    if [ ! -d "${CACHE_DIR}" ]; then
-        note "No cache folder found. Creating one at: ${CACHE_DIR}"
-        "${MKDIR_BIN}" -p "${CACHE_DIR}"
+    if [ ! -d "${SOFT_DIR}" ]; then
+        note "No ${SOFT_DIR} found. Creating one."
+        "${MKDIR_BIN}" -p "${SOFT_DIR}"
+    fi
+    if [ ! -d "${CACH_DIR}" ]; then
+        note "No cache folder found. Creating one at: ${CACH_DIR}"
+        "${MKDIR_BIN}" -p "${CACH_DIR}"
     fi
 }
 
@@ -193,19 +199,11 @@ if [ ! "$1" = "" ]; then
 
 
     log)
-        if [ -z "${2}" ]; then
-            export LOG="${HOME_DIR}${USERNAME}/install.log"
-            if [ "${USERNAME}" = "root" ]; then
-                check_root
-                export LOG="${CACHE_DIR}install.log"
-            fi
-        else
-            export LOG="${HOME_DIR}${2}/install.log"
-            if [ ! "${USERNAME}" = "${2}" ]; then
-                check_root
-            fi
+        CURR_LOG="${LOG}"
+        if [ "${USERNAME}" != "root" ]; then
+            export CURR_LOG="${HOME_DIR}${USERNAME}/install.log"
         fi
-        ${TAIL_BIN} -n "${LOG_LINES_AMOUNT}" -F "${LOG}"
+        ${TAIL_BIN} -n "${LOG_LINES_AMOUNT}" -F "${CURR_LOG}"
         ;;
 
 
@@ -635,6 +633,10 @@ for application in ${APPLICATIONS}; do
 
     application="$(${PRINTF_BIN} "${application}" | ${TR_BIN} '[A-Z]' '[a-z]')" # lowercase for case sensitive fs
     . "${DEFAULTS}"
+    if [ ! -f "${DEFINITIONS_DIR}${application}.def" ]; then
+        error "No such definition found: ${application}"
+        continue
+    fi
     . "${DEFINITIONS_DIR}${application}.def" # prevent installation of requirements of disabled application:
     check_disabled "${DISABLE_ON}" # after which just check if it's not disabled
     if [ ! "${ALLOW}" = "1" ]; then
@@ -1016,7 +1018,7 @@ for application in ${APPLICATIONS}; do
                     execute_process "${application}"
                     unset CHANGED
                     mark
-                    strip_lib_bin
+                    # strip_lib_bin
                     show_done
                 else
                     note "  ${application} (1 of ${req_all})"
@@ -1028,7 +1030,7 @@ for application in ${APPLICATIONS}; do
                 note "  ${application} (1 of ${req_all})"
                 execute_process "${application}"
                 mark
-                strip_lib_bin
+                # strip_lib_bin
                 note "√ ${application} [${APP_VERSION}]\n"
             fi
 

@@ -1,92 +1,81 @@
 # NOTE: this file is SH shell script
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
-# global Sofin settings:
+#
+# global Sofin values:
+readonly DEBUG="false"
+readonly TRACE="false"
+readonly DEBIAN="$(test -e /etc/debian_version && echo true)"
+readonly GENTOO="$(test -e /etc/gentoo-release && echo true)"
+readonly ID_SVD="-un"
+readonly HEADER="Sofin v${VERSION} - © 2o12-2o13 - Versatile Knowledge Systems - VerKnowSys.com"
+readonly SCRIPT_NAME="/usr/bin/sofin.sh"
+readonly SCRIPT_ARGS="$*"
+readonly PRIVATE_METADATA_DIR="/Private/"
+readonly PRIVATE_METADATA_FILE="Metadata"
+readonly SOFTWARE_DIR="/Software/"
+readonly LOCK_FILE="${SOFTWARE_DIR}.sofin.lock"
+readonly HOME_APPS_DIR="Apps/"
+readonly DEFINITION_SNAPSHOT_FILE="defs.tar.bz2"
+readonly DEFAULT_PATH="/bin:/usr/bin:/sbin:/usr/sbin"
+readonly DEFAULT_MANPATH="/usr/share/man:/usr/share/openssl/man"
+readonly SOFIN_PROFILE="/etc/profile_sofin"
+readonly DEPENDENCIES_FILE=".dependencies"
+readonly INSTALLED_MARK=".installed"
+readonly LOG_LINES_AMOUNT="250"
 
-DEBUG="false"
-TRACE="false"
-# DEVEL="true"
+# utils software from POSIX base system variables:
+PRINTF_BIN="/usr/bin/printf"
+KLDLOAD_BIN="/sbin/kldload"
+KILL_BIN="/bin/kill"
+PWD_BIN="/bin/pwd"
+MV_BIN="/bin/mv"
+CP_BIN="/bin/cp"
+LN_BIN="/bin/ln"
+WHICH_BIN="/usr/bin/which"
+TAIL_BIN="/usr/bin/tail"
+CUT_BIN="/usr/bin/cut"
+LS_BIN="/bin/ls"
+ID_BIN="/usr/bin/id"
+MKDIR_BIN="/bin/mkdir"
+MAKE_BIN="/usr/bin/make"
+TAR_BIN="/usr/bin/tar"
+CAT_BIN="/bin/cat"
+TR_BIN="/usr/bin/tr"
+TOUCH_BIN="/usr/bin/touch"
+RM_BIN="/bin/rm"
+DATE_BIN="/bin/date"
+PATCH_BIN="/usr/bin/patch"
+SED_BIN="/usr/bin/sed"
+CHOWN_BIN="/usr/sbin/chown"
+GREP_BIN="/usr/bin/grep"
+EGREP_BIN="/usr/bin/egrep"
+FETCH_BIN="/usr/bin/fetch"
+UNAME_BIN="/usr/bin/uname"
+FIND_BIN="/usr/bin/find"
+STRIP_BIN="/usr/bin/strip"
+BASENAME_BIN="/usr/bin/basename"
+DIRNAME_BIN="/usr/bin/dirname"
+SORT_BIN="/usr/bin/sort"
+WC_BIN="/usr/bin/wc"
+SHA_BIN="/sbin/sha1"
+AWK_BIN="/usr/bin/awk"
+SLEEP_BIN="/bin/sleep"
+SYSCTL_BIN="/sbin/sysctl"
+BC_BIN="/usr/bin/bc"
+HEAD_BIN="/usr/bin/head"
+SERVICE_BIN="/usr/sbin/service"
+TEST_BIN="/bin/test"
+CHMOD_BIN="/bin/chmod"
+XARGS_BIN="/usr/bin/xargs"
 
-DEBIAN="$(test -e /etc/debian_version && echo true)"
-GENTOO="$(test -e /etc/gentoo-release && echo true)"
-
-ID_SVD="-un"
-HEADER="Sofin v${VERSION} - © 2o12-2o13 - Versatile Knowledge Systems - VerKnowSys.com"
-SCRIPT_NAME="/usr/bin/sofin.sh"
-SCRIPT_ARGS="$*"
-PRIVATE_METADATA_DIR="/Private/"
-PRIVATE_METADATA_FILE="Metadata"
-SOFTWARE_DIR="/Software/"
-LOCK_FILE="${SOFTWARE_DIR}.sofin.lock"
-HOME_DIR="/Users/"
-HOME_APPS_DIR="Apps/"
-CACHE_DIR="${SOFTWARE_DIR}.cache/"
-LOG="${CACHE_DIR}install.log"
-DEFINITIONS_DIR="${CACHE_DIR}definitions/"
-LISTS_DIR="${CACHE_DIR}lists/"
-DEFAULTS="${DEFINITIONS_DIR}defaults.def"
-DEFINITION_SNAPSHOT_FILE="defs.tar.bz2"
-DEFAULT_PATH="/bin:/usr/bin:/sbin:/usr/sbin"
-DEFAULT_LDFLAGS="-fPIC -fPIE"
-DEFAULT_COMPILER_FLAGS="-Os -fPIC -fPIE -fno-strict-overflow -fstack-protector-all"
-DEFAULT_MANPATH="/usr/share/man:/usr/share/openssl/man"
-SOFIN_PROFILE="/etc/profile_sofin"
-DEPENDENCIES_FILE=".dependencies"
-INSTALLED_MARK=".installed"
-LOG_LINES_AMOUNT="150"
-
-MAKE_OPTS="-j4"
-
-# config binary requirements definitions
-export XARGS_BIN="/usr/bin/xargs"
-export PRINTF_BIN="/usr/bin/printf"
-export KLDLOAD_BIN="/sbin/kldload"
-export KILL_BIN="/bin/kill"
-export PWD_BIN="/bin/pwd"
-export MV_BIN="/bin/mv"
-export CP_BIN="/bin/cp"
-export LN_BIN="/bin/ln"
-export WHICH_BIN="/usr/bin/which"
-export TAIL_BIN="/usr/bin/tail"
-export CUT_BIN="/usr/bin/cut"
-export LS_BIN="/bin/ls"
-export ID_BIN="/usr/bin/id"
-export MKDIR_BIN="/bin/mkdir"
-export MAKE_BIN="/usr/bin/make"
-export TAR_BIN="/usr/bin/tar"
-export CAT_BIN="/bin/cat"
-export TR_BIN="/usr/bin/tr"
-export TOUCH_BIN="/usr/bin/touch"
-export RM_BIN="/bin/rm"
-export DATE_BIN="/bin/date"
-export PATCH_BIN="/usr/bin/patch"
-export SED_BIN="/usr/bin/sed"
-export CHOWN_BIN="/usr/sbin/chown"
-export GREP_BIN="/usr/bin/grep"
-export EGREP_BIN="/usr/bin/egrep"
-export FETCH_BIN="/usr/bin/fetch"
-export UNAME_BIN="/usr/bin/uname"
-export FIND_BIN="/usr/bin/find"
-export STRIP_BIN="/usr/bin/strip"
-export BASENAME_BIN="/usr/bin/basename"
-export DIRNAME_BIN="/usr/bin/dirname"
-export SORT_BIN="/usr/bin/sort"
-export WC_BIN="/usr/bin/wc"
-export SHA_BIN="/sbin/sha1"
-export AWK_BIN="/usr/bin/awk"
-export SLEEP_BIN="/bin/sleep"
-export SYSCTL_BIN="/sbin/sysctl"
-export BC_BIN="/usr/bin/bc"
-export HEAD_BIN="/usr/bin/head"
-export SERVICE_BIN="/usr/sbin/service"
-export TEST_BIN="/bin/test"
-export CHMOD_BIN="/bin/chmod"
-
-export USERNAME="$(${ID_BIN} ${ID_SVD})"
-export SYSTEM_NAME="$(uname)"
-export SYSTEM_ARCH="$(uname -p)"
+# probably the most crucial value in whole code. by design immutable
+USERNAME="$(${ID_BIN} ${ID_SVD})"
 
 
 # System specific configuration
+readonly SYSTEM_NAME="$(uname)"
+readonly SYSTEM_ARCH="$(uname -p)"
+
 case "${SYSTEM_NAME}" in
 
     FreeBSD)
@@ -140,23 +129,33 @@ case "${SYSTEM_NAME}" in
 
 esac
 
+# global variables:
+CACHE_DIR="${SOFTWARE_DIR}.cache/"
+DEFINITIONS_DIR="${CACHE_DIR}definitions/"
+HOME_DIR="/Users/"
+LOG="${CACHE_DIR}install.log"
+LISTS_DIR="${CACHE_DIR}lists/"
+DEFAULTS="${DEFINITIONS_DIR}defaults.def"
+DEFAULT_LDFLAGS="-fPIC -fPIE"
+DEFAULT_COMPILER_FLAGS="-Os -fPIC -fPIE -fno-strict-overflow -fstack-protector-all"
+MAKE_OPTS="-j5"
 
-DEFAULT_PAUSE_WHEN_LOCKED="30" # seconds
-MAIN_SOURCE_REPOSITORY="http://software.verknowsys.com/source/"
-MAIN_BINARY_REPOSITORY="http://software.verknowsys.com/binary/$(${UNAME_BIN})/common/"
-
-CCACHE_BIN_OPTIONAL="${SOFTWARE_DIR}Ccache/exports/ccache"
+# more values
+readonly DEFAULT_PAUSE_WHEN_LOCKED="30" # seconds
+readonly MAIN_SOURCE_REPOSITORY="http://software.verknowsys.com/source/"
+readonly MAIN_BINARY_REPOSITORY="http://software.verknowsys.com/binary/$(${UNAME_BIN})/common/"
+readonly CCACHE_BIN_OPTIONAL="${SOFTWARE_DIR}Ccache/exports/ccache"
 
 # ANSI color definitions
-red='\033[31;40m'
-green='\033[32;40m'
-yellow='\033[33;40m'
-blue='\033[34;40m'
-magenta='\033[35;40m'
-cyan='\033[36;40m'
-gray='\033[37;40m'
-white='\033[38;40m'
-reset='\033[0m'
+readonly red='\033[31;40m'
+readonly green='\033[32;40m'
+readonly yellow='\033[33;40m'
+readonly blue='\033[34;40m'
+readonly magenta='\033[35;40m'
+readonly cyan='\033[36;40m'
+readonly gray='\033[37;40m'
+readonly white='\033[38;40m'
+readonly reset='\033[0m'
 
 
 # common functions
@@ -255,16 +254,16 @@ validate_env () {
 if [ ! -d "${HOME_DIR}" ]; then # fallback to FHS /home
     HOME_DIR="/home/"
 else # if /Users/ exists, and it's not OSX, check for svd metadata
-    CURRENT_USER_UID="$(${ID_BIN} -u)"
+    readonly CURRENT_USER_UID="$(${ID_BIN} -u)"
     if [ "${CURRENT_USER_UID}" != "0" ]; then
         if [ "$(${FIND_BIN} ${HOME_DIR} -maxdepth 1 2>/dev/null | ${WC_BIN} -l | ${TR_BIN} -d ' ')" = "0" ]; then
             error "No user home dir found? Critial error. No entries in ${HOME_DIR}? Fix it and retry."
             exit 1
         fi
-        USER_DIRNAME="$(${FIND_BIN} ${HOME_DIR} -maxdepth 1 -uid "${CURRENT_USER_UID}" 2> /dev/null)" # get user dir by uid and ignore access errors
+        readonly USER_DIRNAME="$(${FIND_BIN} ${HOME_DIR} -maxdepth 1 -uid "${CURRENT_USER_UID}" 2> /dev/null)" # get user dir by uid and ignore access errors
 
         # additional check for multiple dirs with same UID (illegal)
-        USER_DIR_AMOUNT="$(echo "${USER_DIRNAME}" | ${WC_BIN} -l | ${TR_BIN} -d ' ')"
+        readonly USER_DIR_AMOUNT="$(echo "${USER_DIRNAME}" | ${WC_BIN} -l | ${TR_BIN} -d ' ')"
         debug "User dirs amount: ${USER_DIR_AMOUNT}"
         if [ "${USER_DIR_AMOUNT}" != "1" ]; then
             error "Found more than one user with same uid in ${HOME_DIR}! That's illegal. Fix it an retry."
@@ -273,12 +272,12 @@ else # if /Users/ exists, and it's not OSX, check for svd metadata
         fi
         debug "User dirname: ${USER_DIRNAME}"
         export USERNAME="$(${BASENAME_BIN} ${USER_DIRNAME})"
-        METADATA_FILE="${HOME_DIR}${USERNAME}${PRIVATE_METADATA_DIR}${PRIVATE_METADATA_FILE}"
+        readonly METADATA_FILE="${HOME_DIR}${USERNAME}${PRIVATE_METADATA_DIR}${PRIVATE_METADATA_FILE}"
         if [ -f "${METADATA_FILE}" ]; then
             debug "ServeD System found. Username set to: ${USERNAME}. Home directory: ${HOME_DIR}${USERNAME}"
             debug "Loading user metdata from ${METADATA_FILE}"
             . "${METADATA_FILE}"
-            export SVD_FULL_NAME="${SVD_FULL_NAME}"
+            readonly export SVD_FULL_NAME="${SVD_FULL_NAME}"
             #
             # TODO: FIXME: 2013-03-19 15:34:07 - dmilith - fill metadata and define values of it...
             # ...
@@ -289,3 +288,5 @@ else # if /Users/ exists, and it's not OSX, check for svd metadata
     fi
 fi
 
+# at this stage we want to keep this value immutable:
+export readonly USERNAME
