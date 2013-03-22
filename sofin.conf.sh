@@ -255,6 +255,7 @@ validate_env () {
 if [ ! -d "${HOME_DIR}" ]; then # fallback to FHS /home
     HOME_DIR="/home/"
 else # if /Users/ exists, and it's not OSX, check for svd metadata
+if [ "${SYSTEM_NAME}" != "Darwin" ]; then
     CURRENT_USER_UID="$(${ID_BIN} -u)"
     if [ "${CURRENT_USER_UID}" != "0" ]; then
         if [ "$(${FIND_BIN} ${HOME_DIR} -depth 1 2>/dev/null | ${WC_BIN} -l | ${TR_BIN} -d ' ')" = "0" ]; then
@@ -287,5 +288,6 @@ else # if /Users/ exists, and it's not OSX, check for svd metadata
             debug "No metadata found in: ${METADATA_FILE} for user: ${USERNAME}. No additional user data accessible."
         fi
     fi
+fi
 fi
 
