@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-VERSION="0.44.1"
+VERSION="0.44.2"
 
 # load configuration from sofin.conf
 CONF_FILE="/etc/sofin.conf.sh"
@@ -89,18 +89,13 @@ update_definitions () { # accepts optional user uid param
         tar_options="${tar_options}v"
         rm_options="${rm_options}v"
     fi
+    if [ "${USERNAME}" != "root" ]; then
+        export LOG="${HOME_DIR}${USERNAME}/install.log" # set log for definitions update
+    fi
+
     debug "Checking for destination directories existance…"
     for element in "${LISTS_DIR}" "${DEFINITIONS_DIR}"; do
-        ${MKDIR_BIN} -p "${element}" > /dev/null
-        if [ ! -z "${1}" ]; then # param with uid not given
-            ${TOUCH_BIN} "${LOG}"
-            if [ "${USERNAME}" = "root" ]; then
-                if [ ! -z "${1}" ]; then
-                    debug "Chowning ${element} for user: ${1}"
-                    ${CHOWN_BIN} -R ${1} "${element}" >> "${LOG}"
-                fi
-            fi
-        fi
+        ${MKDIR_BIN} -p "${element}" > "${LOG}"
         debug "Removing old definitions: ${element}"
         ${RM_BIN} ${rm_options} ${element} >> "${LOG}"
     done
