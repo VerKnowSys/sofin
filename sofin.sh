@@ -22,7 +22,7 @@ SOFIN_ARGS=$*
 SOFIN_ARGS=$(echo ${SOFIN_ARGS} | ${CUT_BIN} -d' ' -f2-)
 
 # create runtime sha
-RUNTIME_SHA="$(${DATE_BIN} | ${SHA_BIN})" # TODO: NYI
+# RUNTIME_SHA="$(${DATE_BIN} | ${SHA_BIN})" # TODO: NYI
 
 check_definition_dir () {
     if [ ! -d "${SOFTWARE_DIR}" ]; then
@@ -756,7 +756,7 @@ for application in ${APPLICATIONS}; do
                         error "No source given for definition! Aborting"
                         exit 1
                     else
-                        debug "Runtime SHA1: ${RUNTIME_SHA}"
+                        # debug "Runtime SHA1: ${RUNTIME_SHA}"
                         export BUILD_DIR_ROOT="${CACHE_DIR}cache/${APP_NAME}${APP_POSTFIX}-${APP_VERSION}/"
                         ${MKDIR_BIN} -p "${BUILD_DIR_ROOT}"
                         CUR_DIR="$(${PWD_BIN})"
