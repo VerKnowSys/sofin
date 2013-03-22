@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-VERSION="0.44.2"
+VERSION="0.45.0"
 
 # load configuration from sofin.conf
 CONF_FILE="/etc/sofin.conf.sh"
@@ -448,7 +448,11 @@ if [ ! "$1" = "" ]; then
             export LISTS_DIR="${CACHE_DIR}lists/"
             export DEFAULTS="${DEFINITIONS_DIR}defaults.def"
         fi
-        update_definitions ${USERNAME}
+
+        if [ ! -f "${CACHE_DIR}definitions/defaults.def" ]; then
+            note "No definitions found in ${CACHE_DIR}definitions/defaults.def. Updating…"
+            update_definitions
+        fi
 
         # first of all, try using a list if exists:
         if [ -f "${LISTS_DIR}$2" ]; then
@@ -479,7 +483,10 @@ if [ ! "$1" = "" ]; then
             export LISTS_DIR="${CACHE_DIR}lists/"
             export DEFAULTS="${DEFINITIONS_DIR}defaults.def"
         fi
-        update_definitions ${USERNAME}
+        if [ ! -f "${CACHE_DIR}definitions/defaults.def" ]; then
+            note "No definitions found in ${CACHE_DIR}definitions/defaults.def. Updating…"
+            update_definitions
+        fi
         cd "${LOCAL_DIR}"
         note "Looking for $(${PWD_BIN})/${DEPENDENCIES_FILE} file…"
         if [ ! -e "$(${PWD_BIN})/${DEPENDENCIES_FILE}" ]; then
@@ -561,7 +568,7 @@ if [ ! "$1" = "" ]; then
         fi
         export LISTS_DIR="${CACHE_DIR}lists/"
         export DEFAULTS="${DEFINITIONS_DIR}defaults.def"
-        update_definitions "${USERNAME}"
+        update_definitions
         note "Definitions were updated to latest version."
         exit
         ;;
