@@ -2,10 +2,10 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-VERSION="0.45.2"
+readonly VERSION="0.45.2"
 
 # load configuration from sofin.conf
-CONF_FILE="/etc/sofin.conf.sh"
+readonly CONF_FILE="/etc/sofin.conf.sh"
 if [ -e "${CONF_FILE}" ]; then
     . "${CONF_FILE}"
     validate_env
@@ -19,7 +19,7 @@ if [ "${TRACE}" = "true" ]; then
 fi
 
 SOFIN_ARGS=$*
-SOFIN_ARGS=$(echo ${SOFIN_ARGS} | ${CUT_BIN} -d' ' -f2-)
+readonly SOFIN_ARGS=$(echo ${SOFIN_ARGS} | ${CUT_BIN} -d' ' -f2-)
 
 # create runtime sha
 # RUNTIME_SHA="$(${DATE_BIN} | ${SHA_BIN})" # TODO: NYI
@@ -248,17 +248,9 @@ if [ ! "$1" = "" ]; then
 
 
     fullinstalled|fulllist)
-        if [ -z "${2}" ]; then
+        SOFT_DIR="${SOFTWARE_DIR}"
+        if [ "${USERNAME}" != "root" ]; then
             export SOFT_DIR="${HOME_DIR}${USERNAME}/${HOME_APPS_DIR}"
-            if [ "${USERNAME}" = "root" ]; then
-                check_root
-                export SOFT_DIR="${SOFTWARE_DIR}"
-            fi
-        else
-            export SOFT_DIR="${HOME_DIR}$2/${HOME_APPS_DIR}"
-            if [ ! "${USERNAME}" = "${2}" ]; then
-                check_root
-            fi
         fi
         note "Installed applications:"
         note
@@ -394,9 +386,8 @@ if [ ! "$1" = "" ]; then
             error "For application \"$1\", third argument with application name is required!"
             exit 1
         fi
-        if [ "${USERNAME}" = "root" ]; then
-            export SOFT_DIR="${SOFTWARE_DIR}"
-        else
+        SOFT_DIR="${SOFTWARE_DIR}"
+        if [ "${USERNAME}" != "root" ]; then
             export SOFT_DIR="${HOME_DIR}${USERNAME}/${HOME_APPS_DIR}"
             export LOG="${HOME_DIR}${USERNAME}/install.log"
         fi
