@@ -18,6 +18,9 @@ if [ "${TRACE}" = "true" ]; then
     set -x
 fi
 
+SOFIN_ARGS=$*
+SOFIN_ARGS=$(echo ${SOFIN_ARGS} | ${CUT_BIN} -d' ' -f2-)
+
 # create runtime sha
 RUNTIME_SHA="$(${DATE_BIN} | ${SHA_BIN})" # TODO: NYI
 
@@ -438,7 +441,7 @@ if [ ! "$1" = "" ]; then
     install|get)
 
         if [ "$2" = "" ]; then
-            error "For \"$1\" application installation mode, second argument with application name or list is required!"
+            error "For \"$1\" application installation mode, second argument with at least one application name or list is required!"
             exit 1
         fi
         if [ "${USERNAME}" != "root" ]; then
@@ -459,13 +462,8 @@ if [ ! "$1" = "" ]; then
             export APPLICATIONS="$(${CAT_BIN} ${LISTS_DIR}$2 | ${TR_BIN} '\n' ' ')"
             note "Installing software: ${APPLICATIONS}"
         else
-            APP="$(${PRINTF_BIN} "${2}" | ${CUT_BIN} -c1 | ${TR_BIN} '[A-Z]' '[a-z]')$(${PRINTF_BIN} "${2}" | ${SED_BIN} 's/^[A-Za-z]//')"
-            if [ ! -e "${DEFINITIONS_DIR}${APP}.def" ]; then
-                error "Definition file not found: ${DEFINITIONS_DIR}${APP}.def !"
-                exit 1
-            fi
-            export APPLICATIONS="${APP}"
-            debug "Installing software: ${APPLICATIONS}"
+            export APPLICATIONS="$(echo ${SOFIN_ARGS})"
+            note "Installing software: ${SOFIN_ARGS}"
         fi
         ;;
 
