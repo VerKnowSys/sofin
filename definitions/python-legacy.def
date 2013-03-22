@@ -1,11 +1,11 @@
 . ${DEFINITIONS_DIR}python.def
 
 APP_FULL_NAME="Python 2"
-APP_SHA="5a74c1dae6c2a4c23d0f9aeab34f6cb24774dcf3"
+APP_SHA="842c4e2aff3f016feea3c6e992c7fa96e49c9aa0"
 APP_POSTFIX="-legacy"
-APP_VERSION="2.7.2"
-APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
-# if [ "${SYSTEM_NAME}" = "Linux" ]; then
-#   unset APP_AFTER_INSTALL_CALLBACK
-# fi
+APP_VERSION="2.7.3"
+APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.bz2"
 APP_EXPORTS="python python-config easy_install pip"
+if [ "${SYSTEM_NAME}" = "Darwin" ]; then
+  export APP_CONFIGURE_ARGS="${APP_CONFIGURE_ARGS} --enable-universalsdk --with-universal-archs=intel"
+fi
