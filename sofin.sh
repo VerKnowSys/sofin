@@ -109,12 +109,6 @@ update_definitions () { # accepts optional user uid param
     debug "Updating definitions snapshot from: ${MAIN_SOURCE_REPOSITORY}definitions/${DEFINITION_SNAPSHOT_FILE}"
     ${FETCH_BIN} "${MAIN_SOURCE_REPOSITORY}definitions/${DEFINITION_SNAPSHOT_FILE}" >> "${LOG}" 2>> "${LOG}"
     ${TAR_BIN} ${tar_options} "${DEFINITION_SNAPSHOT_FILE}" >> "${LOG}" 2>> "${LOG}"
-    if [ "${USERNAME}" = "root" ]; then
-        if [ ! -z "${1}" ]; then
-            debug "Chowning definitions for user: ${1}"
-            ${CHOWN_BIN} -R ${1} "${CACHE_DIR}" >> "${LOG}"
-        fi
-    fi
 }
 
 
