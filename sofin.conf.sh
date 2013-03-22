@@ -255,14 +255,13 @@ validate_env () {
 if [ ! -d "${HOME_DIR}" ]; then # fallback to FHS /home
     HOME_DIR="/home/"
 else # if /Users/ exists, and it's not OSX, check for svd metadata
-if [ "${SYSTEM_NAME}" != "Darwin" ]; then
     CURRENT_USER_UID="$(${ID_BIN} -u)"
     if [ "${CURRENT_USER_UID}" != "0" ]; then
-        if [ "$(${FIND_BIN} ${HOME_DIR} -depth 1 2>/dev/null | ${WC_BIN} -l | ${TR_BIN} -d ' ')" = "0" ]; then
+        if [ "$(${FIND_BIN} ${HOME_DIR} -maxdepth 1 2>/dev/null | ${WC_BIN} -l | ${TR_BIN} -d ' ')" = "0" ]; then
             error "No user home dir found? Critial error. No entries in ${HOME_DIR}? Fix it and retry."
             exit 1
         fi
-        USER_DIRNAME="$(${FIND_BIN} ${HOME_DIR} -depth 1 -uid "${CURRENT_USER_UID}" 2> /dev/null)" # get user dir by uid and ignore access errors
+        USER_DIRNAME="$(${FIND_BIN} ${HOME_DIR} -maxdepth 1 -uid "${CURRENT_USER_UID}" 2> /dev/null)" # get user dir by uid and ignore access errors
 
         # additional check for multiple dirs with same UID (illegal)
         USER_DIR_AMOUNT="$(echo "${USER_DIRNAME}" | ${WC_BIN} -l | ${TR_BIN} -d ' ')"
@@ -288,6 +287,5 @@ if [ "${SYSTEM_NAME}" != "Darwin" ]; then
             debug "No metadata found in: ${METADATA_FILE} for user: ${USERNAME}. No additional user data accessible."
         fi
     fi
-fi
 fi
 
