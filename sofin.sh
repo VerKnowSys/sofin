@@ -199,19 +199,10 @@ if [ ! "$1" = "" ]; then
 
 
     clean)
-        if [ "${USERNAME}" = "root" ]; then
-            note "Performing cleanup of ${CACHE_DIR}cache"
-            ${RM_BIN} -rf "${CACHE_DIR}cache"
-            note "Removing ${LOG}"
-            ${RM_BIN} -rf "${LOG}"
-        else
-            export LOG="${HOME_DIR}${USERNAME}/install.log"
-            export CACHE_DIR="${HOME_DIR}${USERNAME}/.cache/"
-            note "Performing cleanup of ${CACHE_DIR}cache"
-            ${RM_BIN} -rf "${CACHE_DIR}cache"
-            note "Removing ${LOG}"
-            ${RM_BIN} -rf "${LOG}"
-        fi
+        note "Performing cleanup of ${CACHE_DIR}cache"
+        ${RM_BIN} -rf "${CACHE_DIR}cache"
+        note "Removing ${LOG}"
+        ${RM_BIN} -rf "${LOG}"
         exit
         ;;
 
