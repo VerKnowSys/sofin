@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.45.3"
+readonly VERSION="0.45.4"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -25,19 +25,13 @@ readonly SOFIN_ARGS=$(echo ${SOFIN_ARGS} | ${CUT_BIN} -d' ' -f2-)
 # RUNTIME_SHA="$(${DATE_BIN} | ${SHA_BIN})" # TODO: NYI
 
 check_definition_dir () {
-    SOFT_DIR="${SOFTWARE_DIR}"
-    CACH_DIR="${CACHE_DIR}"
-    if [ "${USERNAME}" != "root" ]; then
-        export SOFT_DIR="${HOME_DIR}${USERNAME}/${HOME_APPS_DIR}"
-        export CACH_DIR="${HOME_DIR}${USERNAME}/.cache/"
+    if [ ! -d "${SOFTWARE_DIR}" ]; then
+        note "No ${SOFTWARE_DIR} found. Creating one."
+        "${MKDIR_BIN}" -p "${SOFTWARE_DIR}"
     fi
-    if [ ! -d "${SOFT_DIR}" ]; then
-        note "No ${SOFT_DIR} found. Creating one."
-        "${MKDIR_BIN}" -p "${SOFT_DIR}"
-    fi
-    if [ ! -d "${CACH_DIR}" ]; then
-        note "No cache folder found. Creating one at: ${CACH_DIR}"
-        "${MKDIR_BIN}" -p "${CACH_DIR}"
+    if [ ! -d "${CACHE_DIR}" ]; then
+        note "No cache folder found. Creating one at: ${CACHE_DIR}"
+        "${MKDIR_BIN}" -p "${CACHE_DIR}"
     fi
 }
 
@@ -226,27 +220,19 @@ if [ ! "$1" = "" ]; then
 
 
     installed|list)
-        SOFT_DIR="${SOFTWARE_DIR}"
-        if [ "${USERNAME}" != "root" ]; then
-            SOFT_DIR="${HOME_DIR}${USERNAME}/${HOME_APPS_DIR}"
-        fi
-        debug "Listing software from ${SOFT_DIR}"
-        if [ -d ${SOFT_DIR} ]; then
-            ${FIND_BIN} ${SOFT_DIR} -maxdepth 1 -mindepth 1 -type d  -not -name ".*" -exec ${BASENAME_BIN} {} \;
+        debug "Listing software from ${SOFTWARE_DIR}"
+        if [ -d ${SOFTWARE_DIR} ]; then
+            ${FIND_BIN} ${SOFTWARE_DIR} -maxdepth 1 -mindepth 1 -type d  -not -name ".*" -exec ${BASENAME_BIN} {} \;
         fi
         exit
         ;;
 
 
     fullinstalled|fulllist)
-        SOFT_DIR="${SOFTWARE_DIR}"
-        if [ "${USERNAME}" != "root" ]; then
-            export SOFT_DIR="${HOME_DIR}${USERNAME}/${HOME_APPS_DIR}"
-        fi
         note "Installed applications:"
         note
-        if [ -d ${SOFT_DIR} ]; then
-            for app in ${SOFT_DIR}*; do
+        if [ -d ${SOFTWARE_DIR} ]; then
+            for app in ${SOFTWARE_DIR}*; do
                 app_name="$(${BASENAME_BIN} ${app})"
                 note "Checking ${app_name}"
                 for req in $(${FIND_BIN} ${app} -maxdepth 1 -name *${INSTALLED_MARK} | ${SORT_BIN}); do
@@ -265,7 +251,7 @@ if [ ! "$1" = "" ]; then
         # PATH:
         result="${DEFAULT_PATH}"
         process () {
-            for app in ${1}*; do # SOFT_DIR
+            for app in ${1}*; do
                 exp="${app}/exports"
                 if [ -e "${exp}" ]; then
                     result="${exp}:${result}"
@@ -319,7 +305,7 @@ if [ ! "$1" = "" ]; then
         # CFLAGS, CXXFLAGS:
         cflags="${CFLAGS} -fPIC ${DEFAULT_COMPILER_FLAGS}"
         process () {
-            for app in ${1}*; do # SOFT_DIR
+            for app in ${1}*; do
                 exp="${app}/include"
                 if [ -e "${exp}" ]; then
                     cflags="-I${exp} ${cflags}"
@@ -339,7 +325,7 @@ if [ ! "$1" = "" ]; then
         # MANPATH
         manpath="${DEFAULT_MANPATH}"
         process () {
-            for app in ${1}*; do # SOFT_DIR
+            for app in ${1}*; do
                 exp="${app}/man"
                 if [ -e "${exp}" ]; then
                     manpath="${exp}:${manpath}"
@@ -377,19 +363,14 @@ if [ ! "$1" = "" ]; then
             error "For application \"$1\", third argument with application name is required!"
             exit 1
         fi
-        SOFT_DIR="${SOFTWARE_DIR}"
-        if [ "${USERNAME}" != "root" ]; then
-            export SOFT_DIR="${HOME_DIR}${USERNAME}/${HOME_APPS_DIR}"
-            export LOG="${HOME_DIR}${USERNAME}/install.log"
-        fi
         REQ="${2}"
         APP="$(${PRINTF_BIN} "${3}" | ${CUT_BIN} -c1 | ${TR_BIN} '[a-z]' '[A-Z]')$(${PRINTF_BIN} "${3}" | ${SED_BIN} 's/^[a-zA-Z]//')"
-        if [ ! -e "${SOFT_DIR}${APP}" ]; then
+        if [ ! -e "${SOFTWARE_DIR}${APP}" ]; then
             error "Bundle not found: ${APP}"
             exit 1
         fi
         note "Performing upgrade of requirement: ${REQ} in application bundle: ${APP}"
-        REM="${SOFT_DIR}${APP}/${REQ}${INSTALLED_MARK}"
+        REM="${SOFTWARE_DIR}${APP}/${REQ}${INSTALLED_MARK}"
         if [ ! -e "${REM}" ]; then
             error "No requirement: ${REM} found of bundle: ${APP}"
             exit 1
@@ -397,8 +378,8 @@ if [ ! "$1" = "" ]; then
 
         # getting list of file/ folders matching definition name
         files=""
-        debug "Performing find in ${SOFT_DIR}${APP}"
-        for old in $(${FIND_BIN} "${SOFT_DIR}${APP}" -name "*${REQ}*" -regex '.*\.[o\$\|so\|a\$\|la\$\|h\$\|hpp\$].*' -type f); do
+        debug "Performing find in ${SOFTWARE_DIR}${APP}"
+        for old in $(${FIND_BIN} "${SOFTWARE_DIR}${APP}" -name "*${REQ}*" -regex '.*\.[o\$\|so\|a\$\|la\$\|h\$\|hpp\$].*' -type f); do
             files="${files}${old} "
             ${RM_BIN} -f "${old}"
         done
@@ -417,13 +398,6 @@ if [ ! "$1" = "" ]; then
         if [ "$2" = "" ]; then
             error "For \"$1\" application installation mode, second argument with at least one application name or list is required!"
             exit 1
-        fi
-        if [ "${USERNAME}" != "root" ]; then
-            export LOG="${HOME_DIR}${USERNAME}/install.log"
-            export CACHE_DIR="${HOME_DIR}${USERNAME}/.cache/"
-            export DEFINITIONS_DIR="${CACHE_DIR}definitions/"
-            export LISTS_DIR="${CACHE_DIR}lists/"
-            export DEFAULTS="${DEFINITIONS_DIR}defaults.def"
         fi
 
         if [ ! -f "${CACHE_DIR}definitions/defaults.def" ]; then
@@ -448,12 +422,6 @@ if [ ! "$1" = "" ]; then
             warn "Installation of project dependencies as root is immoral."
             # exit 1
             # unset USERNAME
-        else
-            export LOG="${HOME_DIR}${USERNAME}/install.log"
-            export CACHE_DIR="${HOME_DIR}${USERNAME}/.cache/"
-            export DEFINITIONS_DIR="${CACHE_DIR}definitions/"
-            export LISTS_DIR="${CACHE_DIR}lists/"
-            export DEFAULTS="${DEFINITIONS_DIR}defaults.def"
         fi
         if [ ! -f "${CACHE_DIR}definitions/defaults.def" ]; then
             note "No definitions found in ${CACHE_DIR}definitions/defaults.def. Updating…"
@@ -475,13 +443,6 @@ if [ ! "$1" = "" ]; then
             error "For \"$1\" task, second argument with application name is required!"
             exit 1
         fi
-        if [ "${USERNAME}" = "root" ]; then
-            export SOFT_DIR="${SOFTWARE_DIR}"
-        else
-            export LOG="${HOME_DIR}${USERNAME}/install.log"
-            export SOFT_DIR="${HOME_DIR}${USERNAME}/${HOME_APPS_DIR}"
-            export LISTS_DIR="${CACHE_DIR}lists/"
-        fi
 
         # first look for a list with that name:
         if [ -e "${LISTS_DIR}${2}" ]; then
@@ -489,27 +450,27 @@ if [ ! "$1" = "" ]; then
             note "Remove of list of software requested: ${APPLICATIONS}"
             for app in $APPLICATIONS; do
                 APP_NAME="$(${PRINTF_BIN} "${app}" | ${CUT_BIN} -c1 | ${TR_BIN} '[a-z]' '[A-Z]')$(${PRINTF_BIN} "${app}" | ${SED_BIN} 's/^[a-zA-Z]//')"
-                if [ -d "${SOFT_DIR}${APP_NAME}" ]; then
+                if [ -d "${SOFTWARE_DIR}${APP_NAME}" ]; then
                     note "Removing ${APP_NAME}"
                     if [ "${APP_NAME}" = "/" ]; then
                         error "Czy Ty orzeszki?"
                         exit 1
                     fi
-                    debug "Removing software from: ${SOFT_DIR}${APP_NAME}"
-                    ${RM_BIN} -rfv "${SOFT_DIR}${APP_NAME}" >> "${LOG}"
+                    debug "Removing software from: ${SOFTWARE_DIR}${APP_NAME}"
+                    ${RM_BIN} -rfv "${SOFTWARE_DIR}${APP_NAME}" >> "${LOG}"
                 fi
                 update_shell_vars ${USERNAME}
             done
         else
             APP_NAME="$(${PRINTF_BIN} "${2}" | ${CUT_BIN} -c1 | ${TR_BIN} '[a-z]' '[A-Z]')$(${PRINTF_BIN} "${2}" | ${SED_BIN} 's/^[a-zA-Z]//')"
-            if [ -d "${SOFT_DIR}${APP_NAME}" ]; then
+            if [ -d "${SOFTWARE_DIR}${APP_NAME}" ]; then
                 note "Removing application: ${APP_NAME}"
                 if [ "${APP_NAME}" = "/" ]; then
                     error "Czy Ty orzeszki?"
                     exit 1
                 fi
-                debug "Removing software from: ${SOFT_DIR}${APP_NAME}"
-                ${RM_BIN} -rfv "${SOFT_DIR}${APP_NAME}" >> "${LOG}"
+                debug "Removing software from: ${SOFTWARE_DIR}${APP_NAME}"
+                ${RM_BIN} -rfv "${SOFTWARE_DIR}${APP_NAME}" >> "${LOG}"
                 update_shell_vars ${USERNAME}
             else
                 error "Application: ${APP_NAME} not installed."
@@ -533,13 +494,6 @@ if [ ! "$1" = "" ]; then
 
 
     update|updatedefs)
-        if [ ! "${USERNAME}" = "root" ]; then
-            export CACHE_DIR="${HOME_DIR}${USERNAME}/.cache/"
-            export DEFINITIONS_DIR="${CACHE_DIR}definitions/"
-            export LOG="${HOME_DIR}${USERNAME}/install.log"
-        fi
-        export LISTS_DIR="${CACHE_DIR}lists/"
-        export DEFAULTS="${DEFINITIONS_DIR}defaults.def"
         update_definitions
         note "Definitions were updated to latest version."
         exit
@@ -547,11 +501,6 @@ if [ ! "$1" = "" ]; then
 
 
     available)
-        if [ ! "${USERNAME}" = "root" ]; then
-            export CACHE_DIR="${HOME_DIR}${USERNAME}/.cache/"
-            export DEFINITIONS_DIR="${CACHE_DIR}definitions/"
-            export LISTS_DIR="${CACHE_DIR}lists/"
-        fi
         cd "${DEFINITIONS_DIR}"
         note "Available definitions:"
         ${LS_BIN} -m *def | ${SED_BIN} 's/\.def//g'
@@ -575,18 +524,13 @@ if [ ! "$1" = "" ]; then
         fi
         EXPORT="$2"
         APP="$(${PRINTF_BIN} "${3}" | ${CUT_BIN} -c1 | ${TR_BIN} '[a-z]' '[A-Z]')$(${PRINTF_BIN} "${3}" | ${SED_BIN} 's/^[a-zA-Z]//')"
-        SOFT_DIR="${SOFTWARE_DIR}"
-        if [ "${USERNAME}" != "root" ]; then
-            export SOFT_DIR="${HOME_DIR}${USERNAME}/${HOME_APPS_DIR}"
-            export LOG="${HOME_DIR}${USERNAME}/install.log"
-        fi
 
         for dir in "/bin/" "/sbin/" "/libexec/"; do
-            debug "Testing ${dir} looking into: ${SOFT_DIR}${APP}${dir}"
-            if [ -e "${SOFT_DIR}${APP}${dir}${EXPORT}" ]; then
-                note "Exporting binary: ${SOFT_DIR}${APP}${dir}${EXPORT}"
+            debug "Testing ${dir} looking into: ${SOFTWARE_DIR}${APP}${dir}"
+            if [ -e "${SOFTWARE_DIR}${APP}${dir}${EXPORT}" ]; then
+                note "Exporting binary: ${SOFTWARE_DIR}${APP}${dir}${EXPORT}"
                 curr_dir="$(${PWD_BIN})"
-                cd "${SOFT_DIR}${APP}${dir}"
+                cd "${SOFTWARE_DIR}${APP}${dir}"
                 ${LN_BIN} -vfs "..${dir}/${EXPORT}" "../exports/${EXPORT}" >> "$LOG"
                 cd "${curr_dir}"
             fi

@@ -18,8 +18,6 @@ readonly SCRIPT_NAME="/usr/bin/sofin.sh"
 readonly SCRIPT_ARGS="$*"
 readonly PRIVATE_METADATA_DIR="/Private/"
 readonly PRIVATE_METADATA_FILE="Metadata"
-readonly SOFTWARE_DIR="/Software/"
-readonly LOCK_FILE="${SOFTWARE_DIR}.sofin.lock"
 readonly HOME_APPS_DIR="Apps/"
 readonly DEFINITION_SNAPSHOT_FILE="defs.tar.bz2"
 readonly DEFAULT_PATH="/bin:/usr/bin:/sbin:/usr/sbin"
@@ -76,6 +74,41 @@ XARGS_BIN="/usr/bin/xargs"
 
 # probably the most crucial value in whole code. by design immutable
 USERNAME="$(${ID_BIN} ${ID_SVD})"
+
+# common functions
+# helpers
+
+cecho () {
+    if [ -t 1 ]; then # if it's terminal then use colors
+        ${PRINTF_BIN} "${2}${1}${reset}\n"
+    else
+        ${PRINTF_BIN} "${1}\n"
+    fi
+}
+
+
+debug () {
+    if [ "${DEBUG}" = "true" ]; then
+        cecho "# $1" ${magenta} # NOTE: this "#" is required for debug mode to work properly with generation of ~/.profile and /etc/profile_sofin files!
+    # else
+        # cecho " ~ $1" ${magenta} >> ${LOG}
+    fi
+}
+
+
+warn () {
+    cecho " • $1" ${yellow}
+}
+
+
+note () {
+    cecho " » $1" ${green}
+}
+
+
+error () {
+    cecho " # $1" ${red}
+}
 
 
 # System specific configuration
@@ -135,13 +168,74 @@ case "${SYSTEM_NAME}" in
 
 esac
 
-# global variables:
+
+SOFTWARE_DIR="/Software/"
 CACHE_DIR="${SOFTWARE_DIR}.cache/"
 DEFINITIONS_DIR="${CACHE_DIR}definitions/"
 HOME_DIR="/Users/"
 LOG="${CACHE_DIR}install.log"
 LISTS_DIR="${CACHE_DIR}lists/"
 DEFAULTS="${DEFINITIONS_DIR}defaults.def"
+
+
+# fallback for FHS users for standard BSD/Linux
+if [ ! -d "${HOME_DIR}" ]; then # fallback to FHS /home
+    HOME_DIR="/home/"
+else # if /Users/ exists, and it's not OSX, check for svd metadata
+    readonly CURRENT_USER_UID="$(${ID_BIN} -u)"
+    if [ "${CURRENT_USER_UID}" != "0" ]; then
+        if [ "$(${FIND_BIN} ${HOME_DIR} -maxdepth 1 2>/dev/null | ${WC_BIN} -l | ${TR_BIN} -d ' ')" = "0" ]; then
+            error "No user home dir found? Critial error. No entries in ${HOME_DIR}? Fix it and retry."
+            exit 1
+        fi
+        readonly USER_DIRNAME="$(${FIND_BIN} ${HOME_DIR} -maxdepth 1 -uid "${CURRENT_USER_UID}" 2> /dev/null)" # get user dir by uid and ignore access errors
+
+        # additional check for multiple dirs with same UID (illegal)
+        readonly USER_DIR_AMOUNT="$(echo "${USER_DIRNAME}" | ${WC_BIN} -l | ${TR_BIN} -d ' ')"
+        debug "User dirs amount: ${USER_DIR_AMOUNT}"
+        if [ "${USER_DIR_AMOUNT}" != "1" ]; then
+            error "Found more than one user with same uid in ${HOME_DIR}! That's illegal. Fix it an retry."
+            error "Conflicting users: $(echo "${USER_DIRNAME}" | ${TR_BIN} '\n' ' ')"
+            exit 1
+        fi
+        debug "User dirname: ${USER_DIRNAME}"
+        export USERNAME="$(${BASENAME_BIN} ${USER_DIRNAME})"
+        readonly METADATA_FILE="${HOME_DIR}${USERNAME}${PRIVATE_METADATA_DIR}${PRIVATE_METADATA_FILE}"
+        if [ -f "${METADATA_FILE}" ]; then
+            debug "ServeD System found. Username set to: ${USERNAME}. Home directory: ${HOME_DIR}${USERNAME}"
+            debug "Loading user metdata from ${METADATA_FILE}"
+            . "${METADATA_FILE}"
+            readonly export SVD_FULL_NAME="${SVD_FULL_NAME}"
+            #
+            # TODO: FIXME: 2013-03-19 15:34:07 - dmilith - fill metadata and define values of it...
+            # ...
+            #
+        else
+            debug "No metadata found in: ${METADATA_FILE} for user: ${USERNAME}. No additional user data accessible."
+        fi
+    fi
+fi
+
+
+if [ "${USERNAME}" != "root" ]; then
+    export SOFTWARE_DIR="${HOME_DIR}${USERNAME}/${HOME_APPS_DIR}"
+    export LOG="${HOME_DIR}${USERNAME}/install.log"
+    export CACHE_DIR="${HOME_DIR}${USERNAME}/.cache/"
+    export DEFINITIONS_DIR="${CACHE_DIR}definitions/"
+    export LISTS_DIR="${CACHE_DIR}lists/"
+    export DEFAULTS="${DEFINITIONS_DIR}defaults.def"
+fi
+readonly SOFTWARE_DIR
+readonly LOCK_FILE="${SOFTWARE_DIR}.sofin.lock"
+readonly LOG
+readonly CACHE_DIR
+readonly DEFINITIONS_DIR
+readonly LISTS_DIR
+readonly DEFAULTS
+readonly USERNAME
+
+
+# mutable state for compiler
 DEFAULT_LDFLAGS="-fPIC -fPIE"
 DEFAULT_COMPILER_FLAGS="-Os -fPIC -fPIE -fno-strict-overflow -fstack-protector-all"
 MAKE_OPTS="-j5"
@@ -162,42 +256,6 @@ readonly cyan='\033[36;40m'
 readonly gray='\033[37;40m'
 readonly white='\033[38;40m'
 readonly reset='\033[0m'
-
-
-# common functions
-# helpers
-
-cecho () {
-    if [ -t 1 ]; then # if it's terminal then use colors
-        ${PRINTF_BIN} "${2}${1}${reset}\n"
-    else
-        ${PRINTF_BIN} "${1}\n"
-    fi
-}
-
-
-debug () {
-    if [ "${DEBUG}" = "true" ]; then
-        cecho "# $1" ${magenta} # NOTE: this "#" is required for debug mode to work properly with generation of ~/.profile and /etc/profile_sofin files!
-    # else
-        # cecho " ~ $1" ${magenta} >> ${LOG}
-    fi
-}
-
-
-warn () {
-    cecho " • $1" ${yellow}
-}
-
-
-note () {
-    cecho " » $1" ${green}
-}
-
-
-error () {
-    cecho " # $1" ${red}
-}
 
 
 check_command_result () {
@@ -254,45 +312,3 @@ validate_env () {
         fi
     done || exit 1
 }
-
-
-# fallback
-if [ ! -d "${HOME_DIR}" ]; then # fallback to FHS /home
-    HOME_DIR="/home/"
-else # if /Users/ exists, and it's not OSX, check for svd metadata
-    readonly CURRENT_USER_UID="$(${ID_BIN} -u)"
-    if [ "${CURRENT_USER_UID}" != "0" ]; then
-        if [ "$(${FIND_BIN} ${HOME_DIR} -maxdepth 1 2>/dev/null | ${WC_BIN} -l | ${TR_BIN} -d ' ')" = "0" ]; then
-            error "No user home dir found? Critial error. No entries in ${HOME_DIR}? Fix it and retry."
-            exit 1
-        fi
-        readonly USER_DIRNAME="$(${FIND_BIN} ${HOME_DIR} -maxdepth 1 -uid "${CURRENT_USER_UID}" 2> /dev/null)" # get user dir by uid and ignore access errors
-
-        # additional check for multiple dirs with same UID (illegal)
-        readonly USER_DIR_AMOUNT="$(echo "${USER_DIRNAME}" | ${WC_BIN} -l | ${TR_BIN} -d ' ')"
-        debug "User dirs amount: ${USER_DIR_AMOUNT}"
-        if [ "${USER_DIR_AMOUNT}" != "1" ]; then
-            error "Found more than one user with same uid in ${HOME_DIR}! That's illegal. Fix it an retry."
-            error "Conflicting users: $(echo "${USER_DIRNAME}" | ${TR_BIN} '\n' ' ')"
-            exit 1
-        fi
-        debug "User dirname: ${USER_DIRNAME}"
-        export USERNAME="$(${BASENAME_BIN} ${USER_DIRNAME})"
-        readonly METADATA_FILE="${HOME_DIR}${USERNAME}${PRIVATE_METADATA_DIR}${PRIVATE_METADATA_FILE}"
-        if [ -f "${METADATA_FILE}" ]; then
-            debug "ServeD System found. Username set to: ${USERNAME}. Home directory: ${HOME_DIR}${USERNAME}"
-            debug "Loading user metdata from ${METADATA_FILE}"
-            . "${METADATA_FILE}"
-            readonly export SVD_FULL_NAME="${SVD_FULL_NAME}"
-            #
-            # TODO: FIXME: 2013-03-19 15:34:07 - dmilith - fill metadata and define values of it...
-            # ...
-            #
-        else
-            debug "No metadata found in: ${METADATA_FILE} for user: ${USERNAME}. No additional user data accessible."
-        fi
-    fi
-fi
-
-# at this stage we want to keep this value immutable:
-export readonly USERNAME
