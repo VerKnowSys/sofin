@@ -6,6 +6,3 @@ APP_POSTFIX="-legacy"
 APP_VERSION="2.7.3"
 APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.bz2"
 APP_EXPORTS="python python-config easy_install pip"
-if [ "${SYSTEM_NAME}" = "Darwin" ]; then
-  export APP_CONFIGURE_ARGS="${APP_CONFIGURE_ARGS} --enable-universalsdk --with-universal-archs=intel"
-fi
