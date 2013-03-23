@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.45.4"
+readonly VERSION="0.45.5"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -246,6 +246,7 @@ if [ ! "$1" = "" ]; then
                 fi
             done
         }
+        process ${SOFTWARE_ROOT_DIR}
         process ${SOFTWARE_DIR}
         if [ ! -z "$2" ]; then
             process ${HOME_DIR}${2}/${HOME_APPS_DIR}
@@ -272,6 +273,7 @@ if [ ! "$1" = "" ]; then
                 fi
             done
         }
+        process ${SOFTWARE_ROOT_DIR}
         process ${SOFTWARE_DIR}
         if [ ! -z "$2" ]; then
             process ${HOME_DIR}$2/${HOME_APPS_DIR}
@@ -300,6 +302,7 @@ if [ ! "$1" = "" ]; then
                 fi
             done
         }
+        process ${SOFTWARE_ROOT_DIR}
         process "${SOFTWARE_DIR}"
         if [ ! -z "$2" ]; then
             process "${HOME_DIR}${2}/${HOME_APPS_DIR}"
@@ -324,6 +327,7 @@ if [ ! "$1" = "" ]; then
                 fi
             done
         }
+        process ${SOFTWARE_ROOT_DIR}
         process "${SOFTWARE_DIR}"
         if [ ! -z "$2" ]; then
             process "${HOME_DIR}${2}/${HOME_APPS_DIR}"

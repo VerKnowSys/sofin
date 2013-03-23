@@ -169,6 +169,7 @@ case "${SYSTEM_NAME}" in
 esac
 
 
+readonly SOFTWARE_ROOT_DIR="/Software/"
 SOFTWARE_DIR="/Software/"
 CACHE_DIR="${SOFTWARE_DIR}.cache/"
 DEFINITIONS_DIR="${CACHE_DIR}definitions/"
