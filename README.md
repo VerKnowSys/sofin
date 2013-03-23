@@ -1,3 +1,5 @@
+# Sofin - SOFtware INstaller. Designed for BSD, Darwin and Linux.
+
 ## Author:
 * Daniel (dmilith) Dettlaff (dmilith [at] verknowsys.com). I'm also on #freebsd and #scala.pl @ freenode IRC.
 
@@ -172,10 +174,10 @@ It will put "sofin" in `/usr/bin/` and `sofin.conf.sh` in `/etc/`.
   ```
   wget -qO- https://raw.github.com/VerKnowSys/sofin/master/sofin-install-from-scratch.sh | sh
   ```
-
+  
 It will put "sofin" into /usr/bin/ and sofin.conf.sh into /etc/.
   - Build core software. Run as root:
-  
+
   ```
   sofin install base
   ```
