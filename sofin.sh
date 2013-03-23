@@ -584,7 +584,7 @@ if [ ! "$1" = "" ]; then
         fi
         EXPORT="$2"
         APP="$(${PRINTF_BIN} "${3}" | ${CUT_BIN} -c1 | ${TR_BIN} '[a-z]' '[A-Z]')$(${PRINTF_BIN} "${3}" | ${SED_BIN} 's/^[a-zA-Z]//')"
-        export SOFT_DIR="${SOFTWARE_DIR}"
+        SOFT_DIR="${SOFTWARE_DIR}"
         if [ "${USERNAME}" != "root" ]; then
             export SOFT_DIR="${HOME_DIR}${USERNAME}/${HOME_APPS_DIR}"
             export LOG="${HOME_DIR}${USERNAME}/install.log"
