@@ -76,7 +76,6 @@ XARGS_BIN="/usr/bin/xargs"
 USERNAME="$(${ID_BIN} ${ID_SVD})"
 DEFAULT_LDFLAGS="-fPIC -fPIE"
 DEFAULT_COMPILER_FLAGS="-Os -fPIC -fPIE -fno-strict-overflow -fstack-protector-all"
-MAKE_OPTS="-j5"
 
 # common functions
 # helpers
@@ -158,6 +157,8 @@ case "${SYSTEM_NAME}" in
         export DEFAULT_COMPILER_FLAGS="-Os -fPIC -fno-strict-overflow -fstack-protector-all"
         export DEFAULT_LDFLAGS="-fPIC "
         export TEST_BIN="/usr/bin/test"
+        export NPROC_BIN="/usr/bin/nproc"
+        export MAKE_OPTS="-j$(${NPROC_BIN})"
         if [ "${DEBIAN}" = "true" ]; then # we're dealing with debian or ubuntu.
             export AWK_BIN="/usr/bin/awk"
             export SHA_BIN="/usr/bin/sha1sum"
