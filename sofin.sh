@@ -92,9 +92,6 @@ update_definitions () { # accepts optional user uid param
         tar_options="${tar_options}v"
         rm_options="${rm_options}v"
     fi
-    if [ "${USERNAME}" != "root" ]; then
-        export LOG="${HOME_DIR}${USERNAME}/install.log" # set log for definitions update
-    fi
 
     debug "Checking for destination directories existance…"
     for element in "${LISTS_DIR}" "${DEFINITIONS_DIR}"; do
