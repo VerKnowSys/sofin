@@ -132,9 +132,9 @@ space than it does with "old fasioned, system wide, shared software".
 ### FreeBSD specific:
   - Install base 64bit system - I used 64bit FreeBSD 9.1 bootonly iso here.
   - Run as root:
-  
+
   ```
-  fetch -o - https://raw.github.com/VerKnowSys/sofin/master/sofin-install-from-scratch.sh | sh
+  fetch -o - http://dmilith.verknowsys.com/Public/sofin-install-from-scratch.sh | sh
   ```
 It will put "sofin" into `/usr/bin/` and `sofin.conf.sh` into `/etc/`.
   - Build core software. Run:
@@ -151,7 +151,7 @@ as root.
   - Run:
 
   ```
-  curl https://raw.github.com/VerKnowSys/sofin/master/sofin-install-from-scratch.sh | sh
+  curl http://dmilith.verknowsys.com/Public/sofin-install-from-scratch.sh | sh
   ```
 It will put "sofin" in `/usr/bin/` and `sofin.conf.sh` in `/etc/`.
   - Build core software. Run:
@@ -172,9 +172,9 @@ It will put "sofin" in `/usr/bin/` and `sofin.conf.sh` in `/etc/`.
   - Run as root:
 
   ```
-  wget -qO- https://raw.github.com/VerKnowSys/sofin/master/sofin-install-from-scratch.sh | sh
+  wget -qO- http://dmilith.verknowsys.com/Public/sofin-install-from-scratch.sh | sh
   ```
-  
+
 It will put "sofin" into /usr/bin/ and sofin.conf.sh into /etc/.
   - Build core software. Run as root:
 
