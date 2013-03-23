@@ -3,11 +3,13 @@
 #
 # global Sofin values:
 if [ "${DEBUG}" = "" ]; then
-    export readonly DEBUG="false"
+    export DEBUG="false"
 fi
 if [ "${TRACE}" = "" ]; then
-    export readonly TRACE="false"
+    export TRACE="false"
 fi
+readonly DEBUG
+readonly TRACE
 readonly DEBIAN="$(test -e /etc/debian_version && echo true)"
 readonly GENTOO="$(test -e /etc/gentoo-release && echo true)"
 readonly ID_SVD="-un"
