@@ -239,7 +239,7 @@ if [ ! "$1" = "" ]; then
             fi
         fi
         if [ -d ${SOFT_DIR} ]; then
-            for app in $(${FIND_BIN} ${SOFT_DIR}/* -maxdepth 0 -type d); do
+            for app in $(${FIND_BIN} ${SOFT_DIR}/ -maxdepth 1 -type d); do
                 echo "$(${BASENAME_BIN} ${app})"
             done
         fi
