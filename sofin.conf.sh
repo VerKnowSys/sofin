@@ -5,7 +5,9 @@
 if [ "${DEBUG}" = "" ]; then
     export readonly DEBUG="false"
 fi
-readonly TRACE="false"
+if [ "${TRACE}" = "" ]; then
+    export readonly TRACE="false"
+fi
 readonly DEBIAN="$(test -e /etc/debian_version && echo true)"
 readonly GENTOO="$(test -e /etc/gentoo-release && echo true)"
 readonly ID_SVD="-un"
