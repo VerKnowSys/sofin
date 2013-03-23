@@ -232,7 +232,7 @@ if [ ! "$1" = "" ]; then
         fi
         debug "Listing software from ${SOFT_DIR}"
         if [ -d ${SOFT_DIR} ]; then
-            ${FIND_BIN} ${SOFT_DIR}/ -maxdepth 1 -mindepth 1 -type d  -not -name ".*" -exec ${BASENAME_BIN} {} \;
+            ${FIND_BIN} ${SOFT_DIR} -maxdepth 1 -mindepth 1 -type d  -not -name ".*" -exec ${BASENAME_BIN} {} \;
         fi
         exit
         ;;
