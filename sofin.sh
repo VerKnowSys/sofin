@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.45.5"
+readonly VERSION="0.45.6"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -247,9 +247,8 @@ if [ ! "$1" = "" ]; then
             done
         }
         process ${SOFTWARE_ROOT_DIR}
-        process ${SOFTWARE_DIR}
-        if [ ! -z "$2" ]; then
-            process ${HOME_DIR}${2}/${HOME_APPS_DIR}
+        if [ "${USERNAME}" != "root" ]; then
+            process ${SOFTWARE_DIR}
         fi
         ${PRINTF_BIN} "# PATH:\n"
         ${PRINTF_BIN} "export PATH=${result}\n\n"
@@ -274,9 +273,8 @@ if [ ! "$1" = "" ]; then
             done
         }
         process ${SOFTWARE_ROOT_DIR}
-        process ${SOFTWARE_DIR}
-        if [ ! -z "$2" ]; then
-            process ${HOME_DIR}$2/${HOME_APPS_DIR}
+        if [ "${USERNAME}" != "root" ]; then
+            process ${SOFTWARE_DIR}
         fi
         # ${PRINTF_BIN} "# LD_LIBRARY_PATH:\n"
         # ${PRINTF_BIN} "export LD_LIBRARY_PATH='${ldresult}'\n\n"
@@ -303,9 +301,8 @@ if [ ! "$1" = "" ]; then
             done
         }
         process ${SOFTWARE_ROOT_DIR}
-        process "${SOFTWARE_DIR}"
-        if [ ! -z "$2" ]; then
-            process "${HOME_DIR}${2}/${HOME_APPS_DIR}"
+        if [ "${USERNAME}" != "root" ]; then
+            process ${SOFTWARE_DIR}
         fi
         cxxflags="${cflags}"
         ${PRINTF_BIN} "# CFLAGS:\n"
@@ -328,9 +325,8 @@ if [ ! "$1" = "" ]; then
             done
         }
         process ${SOFTWARE_ROOT_DIR}
-        process "${SOFTWARE_DIR}"
-        if [ ! -z "$2" ]; then
-            process "${HOME_DIR}${2}/${HOME_APPS_DIR}"
+        if [ "${USERNAME}" != "root" ]; then
+            process ${SOFTWARE_DIR}
         fi
         ${PRINTF_BIN} "# MANPATH:\n"
         ${PRINTF_BIN} "export MANPATH='${manpath}'\n\n"
