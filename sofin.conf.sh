@@ -245,7 +245,7 @@ readonly MAKE_OPTS
 readonly DEFAULT_PAUSE_WHEN_LOCKED="30" # seconds
 readonly MAIN_SOURCE_REPOSITORY="http://software.verknowsys.com/source/"
 readonly MAIN_BINARY_REPOSITORY="http://software.verknowsys.com/binary/$(${UNAME_BIN})/common/"
-readonly CCACHE_BIN_OPTIONAL="${SOFTWARE_DIR}Ccache/exports/ccache"
+readonly CCACHE_BIN_OPTIONAL="${SOFTWARE_ROOT_DIR}Ccache/exports/ccache"
 
 # ANSI color definitions
 readonly red='\033[31;40m'
