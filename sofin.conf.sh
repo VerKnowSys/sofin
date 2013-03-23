@@ -2,7 +2,9 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 #
 # global Sofin values:
-readonly DEBUG="false"
+if [ "${DEBUG}" = "" ]; then
+    export readonly DEBUG="false"
+fi
 readonly TRACE="false"
 readonly DEBIAN="$(test -e /etc/debian_version && echo true)"
 readonly GENTOO="$(test -e /etc/gentoo-release && echo true)"
