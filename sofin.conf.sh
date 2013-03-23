@@ -226,6 +226,8 @@ if [ "${USERNAME}" != "root" ]; then
     export LISTS_DIR="${CACHE_DIR}lists/"
     export DEFAULTS="${DEFINITIONS_DIR}defaults.def"
 fi
+
+# more values
 readonly SOFTWARE_DIR
 readonly LOCK_FILE="${SOFTWARE_DIR}.sofin.lock"
 readonly LOG
@@ -234,14 +236,9 @@ readonly DEFINITIONS_DIR
 readonly LISTS_DIR
 readonly DEFAULTS
 readonly USERNAME
-
-
-# mutable state for compiler
-DEFAULT_LDFLAGS="-fPIC -fPIE"
-DEFAULT_COMPILER_FLAGS="-Os -fPIC -fPIE -fno-strict-overflow -fstack-protector-all"
-MAKE_OPTS="-j5"
-
-# more values
+readonly DEFAULT_LDFLAGS
+readonly DEFAULT_COMPILER_FLAGS
+readonly MAKE_OPTS
 readonly DEFAULT_PAUSE_WHEN_LOCKED="30" # seconds
 readonly MAIN_SOURCE_REPOSITORY="http://software.verknowsys.com/source/"
 readonly MAIN_BINARY_REPOSITORY="http://software.verknowsys.com/binary/$(${UNAME_BIN})/common/"
