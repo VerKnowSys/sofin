@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.45.2"
+readonly VERSION="0.45.3"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -226,22 +226,13 @@ if [ ! "$1" = "" ]; then
 
 
     installed|list)
-        if [ -z "${2}" ]; then
-            export SOFT_DIR="${HOME_DIR}${USERNAME}/${HOME_APPS_DIR}"
-            if [ "${USERNAME}" = "root" ]; then
-                check_root
-                export SOFT_DIR="${SOFTWARE_DIR}"
-            fi
-        else
-            export SOFT_DIR="${HOME_DIR}$2/${HOME_APPS_DIR}"
-            if [ ! "${USERNAME}" = "${2}" ]; then
-                check_root
-            fi
+        SOFT_DIR="${SOFTWARE_DIR}"
+        if [ "${USERNAME}" != "root" ]; then
+            SOFT_DIR="${HOME_DIR}${USERNAME}/${HOME_APPS_DIR}"
         fi
+        debug "Listing software from ${SOFT_DIR}"
         if [ -d ${SOFT_DIR} ]; then
-            for app in $(${FIND_BIN} ${SOFT_DIR}/ -maxdepth 1 -type d); do
-                echo "$(${BASENAME_BIN} ${app})"
-            done
+            ${FIND_BIN} ${SOFT_DIR}/ -maxdepth 1 -mindepth 1 -type d -exec ${BASENAME_BIN} {} \;
         fi
         exit
         ;;
