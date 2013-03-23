@@ -8,6 +8,6 @@ APP_MAKE_METHOD="true"
 if [ "${SYSTEM_NAME}" = "Darwin" ]; then
   export APP_INSTALL_METHOD="${MKDIR_BIN} -p ${PREFIX}/bin; /usr/bin/clang ${CACHE_DIR}cache/${APP_NAME}-${APP_VERSION}/${APP_NAME}-${APP_VERSION}/pstree.c -o ${PREFIX}/bin/pstree"
 else
-  export APP_INSTALL_METHOD="${MKDIR_BIN} -p ${PREFIX}/bin; ${SOFTWARE_DIR}Clang/exports/clang ${CACHE_DIR}cache/${APP_NAME}-${APP_VERSION}/${APP_NAME}-${APP_VERSION}/pstree.c -o ${PREFIX}/bin/pstree"
+  export APP_INSTALL_METHOD="${MKDIR_BIN} -p ${PREFIX}/bin; ${SOFTWARE_ROOT_DIR}Clang/exports/clang ${CACHE_DIR}cache/${APP_NAME}-${APP_VERSION}/${APP_NAME}-${APP_VERSION}/pstree.c -o ${PREFIX}/bin/pstree"
 fi
 APP_EXPORTS="pstree"

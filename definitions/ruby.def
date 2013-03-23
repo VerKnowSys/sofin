@@ -7,7 +7,7 @@ APP_CONFIGURE_ARGS="--enable-pthread --with-opt-dir=${PREFIX} --disable-install-
 if [ "${SYSTEM_NAME}" = "Darwin" ]; then
   export APP_CONFIGURE_ARGS="${APP_CONFIGURE_ARGS} --with-gcc=/usr/bin/clang"
 else
-  export APP_CONFIGURE_ARGS="${APP_CONFIGURE_ARGS} --with-gcc=${SOFTWARE_DIR}Clang/exports/clang"
+  export APP_CONFIGURE_ARGS="${APP_CONFIGURE_ARGS} --with-gcc=${SOFTWARE_ROOT_DIR}Clang/exports/clang"
 fi
 APP_REQUIREMENTS="zlib bzip2 libxml2 gmake libtool libgpg-error libgcrypt libxslt yaml libffi sqlite perl openssl readline"
 APP_AFTER_INSTALL_CALLBACK="${PRINTF_BIN} 'gem: --no-ri --no-rdoc' > ${HOME}/.gemrc ; ${PREFIX}/bin/gem install bundler --force"
