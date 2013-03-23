@@ -19,7 +19,7 @@ case "${SYSTEM_NAME}" in
         ;;
 
     Linux)
-        CURL_BIN="/usr/bin/curl"
+        CURL_BIN="/usr/bin/wget -qO-"
         TAR_BIN="/bin/tar"
         ;;
 
