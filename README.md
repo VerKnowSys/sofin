@@ -132,7 +132,7 @@ space than it does with "old fasioned, system wide, shared software".
   - Run as root:
   
   ```
-  fetch -o - https://github.com/VerKnowSys/sofin/archive/master.tar.gz | tar xf - && cd ./sofin-master && ./sofin-install
+  fetch -o - https://raw.github.com/VerKnowSys/sofin/master/sofin-install-from-scratch.sh | sh
   ```
 It will put "sofin" into `/usr/bin/` and `sofin.conf.sh` into `/etc/`.
   - Build core software. Run:
@@ -149,7 +149,7 @@ as root.
   - Run:
 
   ```
-  git clone git://github.com/VerKnowSys/sofin.git && cd ./sofin && sudo ./sofin-install
+  curl https://raw.github.com/VerKnowSys/sofin/master/sofin-install-from-scratch.sh | sh
   ```
 It will put "sofin" in `/usr/bin/` and `sofin.conf.sh` in `/etc/`.
   - Build core software. Run:
@@ -170,7 +170,7 @@ It will put "sofin" in `/usr/bin/` and `sofin.conf.sh` in `/etc/`.
   - Run as root:
 
   ```
-  wget -qO- https://github.com/VerKnowSys/sofin/archive/master.tar.gz | tar zxf - && cd ./sofin-master && ./sofin-install
+  wget -qO- https://raw.github.com/VerKnowSys/sofin/master/sofin-install-from-scratch.sh | sh
   ```
 
 It will put "sofin" into /usr/bin/ and sofin.conf.sh into /etc/.
