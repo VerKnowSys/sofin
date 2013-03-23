@@ -74,6 +74,9 @@ XARGS_BIN="/usr/bin/xargs"
 
 # probably the most crucial value in whole code. by design immutable
 USERNAME="$(${ID_BIN} ${ID_SVD})"
+DEFAULT_LDFLAGS="-fPIC -fPIE"
+DEFAULT_COMPILER_FLAGS="-Os -fPIC -fPIE -fno-strict-overflow -fstack-protector-all"
+MAKE_OPTS="-j5"
 
 # common functions
 # helpers
