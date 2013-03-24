@@ -189,53 +189,70 @@ space than it does with "old fasioned, system wide, shared software".</li>
 
 <ul>
 <li>Install base 64bit system - I used 64bit FreeBSD 9.1 bootonly iso here.</li>
-<li>Run as root:
-<code>
-fetch -o - https://github.com/VerKnowSys/sofin/archive/master.tar.gz | tar xf - &amp;&amp; cd ./sofin-master &amp;&amp; ./sofin-install
-</code>
-It will put "sofin" into /usr/bin/ and sofin.conf.sh into /etc/.</li>
-<li>Build core software. Run:
-<code>
-sofin install base
-</code>
-as root.</li>
-<li>Start using sofin as regular user.</li>
+<li>
+<p>Run as root:</p>
+
+<pre><code>fetch -o - http://dmilith.verknowsys.com/Public/sofin-install-from-scratch.sh | sh
+</code></pre>
+
+<p>It will put "sofin" into <code>/usr/bin/</code> and <code>sofin.conf.sh</code> into <code>/etc/</code>.</p>
+</li>
+<li>
+<p>Build core software. Run:</p>
+
+<pre><code>sofin install base
+</code></pre>
+
+<p>as root.</p>
+</li>
+<li><p>Start using sofin as regular user.</p></li>
 </ul><h3>Darwin/ Mac OS X specific:</h3>
 
 <ul>
 <li>Install Mac OS X 10.8.</li>
 <li>Install <a href="http://xquartz.macosforge.org/landing/">XQuartz</a> (if you want to build definitions that require X11)</li>
-<li>Run:
-<code>
-git clone git://github.com/VerKnowSys/sofin.git &amp;&amp; cd ./sofin &amp;&amp; sudo ./sofin-install
-</code>
-It will put "sofin" in /usr/bin/ and sofin.conf.sh in /etc/.</li>
-<li>Build core software. Run:
-<code>
-sudo sofin install base
-</code>
+<li>
+<p>Run:</p>
+
+<pre><code>curl http://dmilith.verknowsys.com/Public/sofin-install-from-scratch.sh | sh
+</code></pre>
+
+<p>It will put "sofin" in <code>/usr/bin/</code> and <code>sofin.conf.sh</code> in <code>/etc/</code>.</p>
 </li>
-<li>Start using sofin as regular user.</li>
+<li>
+<p>Build core software. Run:</p>
+
+<pre><code>sudo sofin install base
+</code></pre>
+</li>
+<li><p>Start using sofin as regular user.</p></li>
 </ul><h3>Debian specific: (Yes - Linux is NOT a system)</h3>
 
 <ul>
 <li>Install base 64bit system - I used 64bit Debian 6.0.x netinstall iso here.</li>
-<li>To make base system "complete", run as root:
-<code>
-aptitude install gcc g++ bc patch make file libssl-dev build-essential kernel-package libmagic-dev libncurses5-dev unzip
-</code>
+<li>
+<p>To make base system "complete", run as root:</p>
+
+<pre><code>aptitude install gcc g++ bc patch make file libssl-dev build-essential kernel-package \
+       libmagic-dev libncurses5-dev libncursesw5-dev unzip
+</code></pre>
 </li>
-<li>Run as root:
-<code>
-wget -qO- https://github.com/VerKnowSys/sofin/archive/master.tar.gz | tar zxf - &amp;&amp; cd ./sofin-master &amp;&amp; ./sofin-install
-</code>
-It will put "sofin" into /usr/bin/ and sofin.conf.sh into /etc/.</li>
-<li>Build core software. Run as root:
-<code>
-sofin install base
-</code>
+<li>
+<p>Run as root:</p>
+
+<pre><code>wget -qO- http://dmilith.verknowsys.com/Public/sofin-install-from-scratch.sh | sh
+</code></pre>
 </li>
-<li>Start using sofin as regular user.</li>
+</ul><p>It will put "sofin" into /usr/bin/ and sofin.conf.sh into /etc/.</p>
+
+<ul>
+<li>
+<p>Build core software. Run as root:</p>
+
+<pre><code>sofin install base
+</code></pre>
+</li>
+<li><p>Start using sofin as regular user.</p></li>
 </ul><h2>License:</h2>
 
 <ul>
