@@ -77,11 +77,30 @@ USERNAME="$(${ID_BIN} ${ID_SVD})"
 DEFAULT_LDFLAGS="-fPIC -fPIE"
 DEFAULT_COMPILER_FLAGS="-Os -fPIC -fPIE -fno-strict-overflow -fstack-protector-all"
 
+TTY="false"
+SUCCESS_CHAR="V"
+WARN_CHAR="*"
+NOTE_CHAR=">"
+ERROR_CHAR="#"
+if [ -t 1 ]; then
+    TTY="true"
+    SUCCESS_CHAR="√"
+    WARN_CHAR="•"
+    NOTE_CHAR="»"
+    ERROR_CHAR="✘"
+fi
+readonly TTY
+readonly SUCCESS_CHAR
+readonly WARN_CHAR
+readonly NOTE_CHAR
+readonly ERROR_CHAR
+
+
 # common functions
 # helpers
 
 cecho () {
-    if [ -t 1 ]; then # if it's terminal then use colors
+    if [ "${TTY}" = "true" ]; then # if it's terminal then use colors
         ${PRINTF_BIN} "${2}${1}${reset}\n"
     else
         ${PRINTF_BIN} "${1}\n"
@@ -99,17 +118,17 @@ debug () {
 
 
 warn () {
-    cecho " • $1" ${yellow}
+    cecho " ${WARN_CHAR} $1" ${yellow}
 }
 
 
 note () {
-    cecho " » $1" ${green}
+    cecho " ${NOTE_CHAR} $1" ${green}
 }
 
 
 error () {
-    cecho " # $1" ${red}
+    cecho " ${ERROR_CHAR} $1" ${red}
 }
 
 

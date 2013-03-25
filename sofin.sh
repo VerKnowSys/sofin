@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.46.1"
+readonly VERSION="0.46.2"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -228,7 +228,7 @@ if [ ! "$1" = "" ]; then
                     pp="$(${PRINTF_BIN} "$(${BASENAME_BIN} ${req})" | ${SED_BIN} 's/\.installed//')"
                     note "  ${pp} [$(${CAT_BIN} ${req})]"
                 done
-                note "√ ${app_name}\n"
+                note "${SUCCESS_CHAR} ${app_name}\n"
             done
         fi
         exit
@@ -966,7 +966,7 @@ for application in ${APPLICATIONS}; do
 
             show_done () {
                 ver="$(${CAT_BIN} "${PREFIX}/${application}${INSTALLED_MARK}")"
-                note "√ ${application} [${ver}]\n"
+                note "${SUCCESS_CHAR} ${application} [${ver}]\n"
             }
 
             if [ -e "${PREFIX}/${application}${INSTALLED_MARK}" ]; then
@@ -982,14 +982,14 @@ for application in ${APPLICATIONS}; do
                     note "  ${application} (1 of ${req_all})"
                     check_current_by_definition "${application}"
                     show_done
-                    debug "√ ${application} current: ${ver}, definition: [${APP_VERSION}] Ok."
+                    debug "${SUCCESS_CHAR} ${application} current: ${ver}, definition: [${APP_VERSION}] Ok."
                 fi
             else
                 note "  ${application} (1 of ${req_all})"
                 execute_process "${application}"
                 mark
                 # strip_lib_bin
-                note "√ ${application} [${APP_VERSION}]\n"
+                note "${SUCCESS_CHAR} ${application} [${APP_VERSION}]\n"
             fi
 
             . "${DEFINITIONS_DIR}${application}.def"
