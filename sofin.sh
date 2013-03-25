@@ -551,7 +551,7 @@ if [ ! "$1" = "" ]; then
                     if [ ! "${1}" = "" ]; then
                         if [ ! "${2}" = "" ]; then
                             if [ ! "${1}" = "${2}" ]; then
-                                warn "${application}: ${2} vs ${1}"
+                                warn "${application}: version ${2} available in definition, but installed: ${1}"
                                 export outdated="true"
                             fi
                         fi
