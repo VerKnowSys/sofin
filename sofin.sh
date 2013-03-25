@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.45.6"
+readonly VERSION="0.46.0"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -132,6 +132,7 @@ usage_howto () {
     note "update                               - only update definitions from remote repository and exit"
     note "ver | version                        - shows $(${BASENAME_BIN} ${SCRIPT_NAME}) script version"
     note "clean                                - cleans install cache, downloaded content and logs"
+    note "outdated                             - lists outdated software"
     exit
 }
 
@@ -523,6 +524,42 @@ if [ ! "$1" = "" ]; then
                 cd "${curr_dir}"
             fi
         done
+        exit
+        ;;
+
+
+    outdated)
+        debug "Checking software from ${SOFTWARE_DIR}"
+        if [ -d ${SOFTWARE_DIR} ]; then
+            for prefix in ${SOFTWARE_DIR}*; do
+                debug "Looking into: ${prefix}"
+                application="$(${BASENAME_BIN} "${prefix}" | ${TR_BIN} '[A-Z]' '[a-z]')" # lowercase for case sensitive fs
+
+                if [ ! -f "${prefix}/${application}${INSTALLED_MARK}" ]; then
+                    error "Application: ${application} is not properly installed."
+                    continue
+                fi
+                ver="$(${CAT_BIN} "${prefix}/${application}${INSTALLED_MARK}")"
+
+                if [ ! -f "${DEFINITIONS_DIR}${application}.def" ]; then
+                    error "No such definition found: ${application}"
+                    continue
+                fi
+                . "${DEFINITIONS_DIR}${application}.def"
+
+                check_version () { # $1 => installed version, $2 => available version
+                    if [ ! "${1}" = "" ]; then
+                        if [ ! "${2}" = "" ]; then
+                            if [ ! "${1}" = "${2}" ]; then
+                                warn "${application}: ${2} vs ${1}"
+                            fi
+                        fi
+                    fi
+                }
+
+                check_version "${ver}" "${APP_VERSION}"
+            done
+        fi
         exit
         ;;
 
