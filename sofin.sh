@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.46.0"
+readonly VERSION="0.46.1"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -552,6 +552,7 @@ if [ ! "$1" = "" ]; then
                         if [ ! "${2}" = "" ]; then
                             if [ ! "${1}" = "${2}" ]; then
                                 warn "${application}: ${2} vs ${1}"
+                                export outdated="true"
                             fi
                         fi
                     fi
@@ -560,7 +561,13 @@ if [ ! "$1" = "" ]; then
                 check_version "${ver}" "${APP_VERSION}"
             done
         fi
-        exit
+
+        if [ "${outdated}" = "true" ]; then
+            exit 1
+        else
+            note "No outdated installed software found."
+            exit
+        fi
         ;;
 
 
