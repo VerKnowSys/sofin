@@ -224,6 +224,12 @@ else # if /Users/ exists, and it's not OSX, check for svd metadata
         fi
         debug "User dirname: ${USER_DIRNAME}"
         export USERNAME="$(${BASENAME_BIN} ${USER_DIRNAME})"
+
+        # also explicit check if virtual user exists in home dir:
+        if [ "${USERNAME}" = "" ]; then
+            error "No user homedir found in: ${HOME_DIR} for user: '${USERNAME}'"
+            exit 1
+        fi
         readonly METADATA_FILE="${HOME_DIR}${USERNAME}${PRIVATE_METADATA_DIR}${PRIVATE_METADATA_FILE}"
         if [ -f "${METADATA_FILE}" ]; then
             debug "ServeD System found. Username set to: ${USERNAME}. Home directory: ${HOME_DIR}${USERNAME}"
