@@ -15,6 +15,7 @@ graphicsmagick
 imagemagick
 jruby
 gmake
+lftp
 maven
 memcached
 mc
