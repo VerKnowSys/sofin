@@ -855,7 +855,7 @@ for application in ${APPLICATIONS}; do
                                     ;;
 
                                 cmake)
-                                    run "${APP_CONFIGURE_SCRIPT} . -LH -DCMAKE_INSTALL_PREFIX=${PREFIX} ${APP_CONFIGURE_ARGS}"
+                                    run "${APP_CONFIGURE_SCRIPT} . -LH -DCMAKE_INSTALL_PREFIX=${PREFIX} -DCMAKE_BUILD_TYPE=Release ${APP_CONFIGURE_ARGS}"
                                     ;;
 
                                 *)
