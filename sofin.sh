@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.46.4"
+readonly VERSION="0.46.5"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -437,35 +437,26 @@ if [ ! "$1" = "" ]; then
         if [ -e "${LISTS_DIR}${2}" ]; then
             export APPLICATIONS="$(${CAT_BIN} ${LISTS_DIR}$2 | ${TR_BIN} '\n' ' ')"
             note "Remove of list of software requested: ${APPLICATIONS}"
-            for app in $APPLICATIONS; do
-                APP_NAME="$(${PRINTF_BIN} "${app}" | ${CUT_BIN} -c1 | ${TR_BIN} '[a-z]' '[A-Z]')$(${PRINTF_BIN} "${app}" | ${SED_BIN} 's/^[a-zA-Z]//')"
-                if [ -d "${SOFTWARE_DIR}${APP_NAME}" ]; then
-                    note "Removing ${APP_NAME}"
-                    if [ "${APP_NAME}" = "/" ]; then
-                        error "Czy Ty orzeszki?"
-                        exit 1
-                    fi
-                    debug "Removing software from: ${SOFTWARE_DIR}${APP_NAME}"
-                    ${RM_BIN} -rfv "${SOFTWARE_DIR}${APP_NAME}" >> "${LOG}"
-                fi
-                update_shell_vars ${USERNAME}
-            done
         else
-            APP_NAME="$(${PRINTF_BIN} "${2}" | ${CUT_BIN} -c1 | ${TR_BIN} '[a-z]' '[A-Z]')$(${PRINTF_BIN} "${2}" | ${SED_BIN} 's/^[a-zA-Z]//')"
+            export APPLICATIONS="$(echo ${SOFIN_ARGS})"
+            note "Removing applications: ${SOFIN_ARGS}"
+        fi
+
+        for app in $APPLICATIONS; do
+            APP_NAME="$(${PRINTF_BIN} "${app}" | ${CUT_BIN} -c1 | ${TR_BIN} '[a-z]' '[A-Z]')$(${PRINTF_BIN} "${app}" | ${SED_BIN} 's/^[a-zA-Z]//')"
             if [ -d "${SOFTWARE_DIR}${APP_NAME}" ]; then
-                note "Removing application: ${APP_NAME}"
+                note "Removing ${APP_NAME}"
                 if [ "${APP_NAME}" = "/" ]; then
                     error "Czy Ty orzeszki?"
                     exit 1
                 fi
                 debug "Removing software from: ${SOFTWARE_DIR}${APP_NAME}"
                 ${RM_BIN} -rfv "${SOFTWARE_DIR}${APP_NAME}" >> "${LOG}"
-                update_shell_vars ${USERNAME}
             else
                 error "Application: ${APP_NAME} not installed."
-                exit 1
             fi
-        fi
+            update_shell_vars ${USERNAME}
+        done
         exit
         ;;
 
