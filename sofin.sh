@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.46.3"
+readonly VERSION="0.46.4"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -19,7 +19,7 @@ if [ "${TRACE}" = "true" ]; then
 fi
 
 SOFIN_ARGS=$*
-readonly SOFIN_ARGS=$(echo ${SOFIN_ARGS} | ${CUT_BIN} -d' ' -f2-)
+readonly SOFIN_ARGS="$(echo ${SOFIN_ARGS} | ${CUT_BIN} -d' ' -f2-)"
 
 # create runtime sha
 # RUNTIME_SHA="$(${DATE_BIN} | ${SHA_BIN})" # TODO: NYI
