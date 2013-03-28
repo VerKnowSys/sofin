@@ -529,6 +529,9 @@ if [ ! "$1" = "" ]; then
 
 
     outdated)
+        update_definitions
+        note "Definitions were updated to latest version."
+        echo
         debug "Checking software from ${SOFTWARE_DIR}"
         if [ -d ${SOFTWARE_DIR} ]; then
             for prefix in ${SOFTWARE_DIR}*; do
