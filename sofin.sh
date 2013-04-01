@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.46.5"
+readonly VERSION="0.46.6"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -377,7 +377,7 @@ if [ ! "$1" = "" ]; then
         ${RM_BIN} -f "${REM}"
 
         debug "Relaunching installation script once again…"
-        ${SCRIPT_NAME} install ${3} ${USERNAME}
+        ${SCRIPT_NAME} install ${3}
         exit
         ;;
 
