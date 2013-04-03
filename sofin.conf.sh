@@ -25,7 +25,7 @@ readonly DEFAULT_MANPATH="/usr/share/man:/usr/share/openssl/man"
 readonly SOFIN_PROFILE="/etc/profile_sofin"
 readonly DEPENDENCIES_FILE=".dependencies"
 readonly INSTALLED_MARK=".installed"
-readonly LOG_LINES_AMOUNT="250"
+readonly LOG_LINES_AMOUNT="1000"
 
 # utils software from POSIX base system variables:
 PRINTF_BIN="/usr/bin/printf"
@@ -249,8 +249,8 @@ fi
 
 if [ "${USERNAME}" != "root" ]; then
     export SOFTWARE_DIR="${HOME_DIR}${USERNAME}/${HOME_APPS_DIR}"
-    export LOG="${HOME_DIR}${USERNAME}/install.log"
     export CACHE_DIR="${HOME_DIR}${USERNAME}/.cache/"
+    export LOG="${CACHE_DIR}/install.log"
     export DEFINITIONS_DIR="${CACHE_DIR}definitions/"
     export LISTS_DIR="${CACHE_DIR}lists/"
     export DEFAULTS="${DEFINITIONS_DIR}defaults.def"

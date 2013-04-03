@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.46.6"
+readonly VERSION="0.46.7"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -473,7 +473,7 @@ if [ ! "$1" = "" ]; then
         ;;
 
 
-    update|updatedefs)
+    update|updatedefs|up)
         update_definitions
         note "Definitions were updated to latest version."
         exit
@@ -592,7 +592,7 @@ for application in ${APPLICATIONS}; do
     . "${DEFINITIONS_DIR}${application}.def" # prevent installation of requirements of disabled application:
     check_disabled "${DISABLE_ON}" # after which just check if it's not disabled
     if [ ! "${ALLOW}" = "1" ]; then
-        warn "Requirement: ${APP_NAME} disabled on architecture: ${SYSTEM_NAME}.\n"
+        note "Requirement: ${APP_NAME} disabled on architecture: ${SYSTEM_NAME}.\n"
     else
         for definition in ${DEFINITIONS_DIR}${application}.def; do
             debug "Reading definition: ${definition}"
