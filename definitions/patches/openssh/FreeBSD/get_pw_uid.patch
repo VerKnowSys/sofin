@@ -18,11 +18,11 @@
 +    if (pw == 0) {
 +        fatal("Unable to allocate memory for passwd struct.");
 +    }
-+    char homeDir[16];
-+    char userName[16];
-+    sprintf(homeDir, "%s", "/Users/");
-+    sprintf(userName, "%d", original_real_uid);
-+    strcat(homeDir, userName);
++    char homeDir[64];
++    char userName[64];
++    sprintf(homeDir, "%s", getenv("HOME"));
++    sprintf(userName, "%s", getenv("USER"));
++
 +
 +    pw->pw_uid = original_real_uid;
 +    pw->pw_gid = 0; /* wheel */
@@ -30,8 +30,8 @@
 +    sprintf(pw->pw_name, "%s", userName);
 +    pw->pw_dir = (char *)malloc((strlen(homeDir)+1)*sizeof(char));
 +    sprintf(pw->pw_dir, "%s", homeDir);
-+    
- 
++
+
  	/*
  	 * Set our umask to something reasonable, as some files are created
 @@ -1481,8 +1492,23 @@
@@ -45,11 +45,11 @@
 +    if (pw == 0) {
 +        fatal("Unable to allocate memory for passwd struct.");
 +    }
-+    char homeDir[16];
-+    char userName[16];
-+    sprintf(homeDir, "%s", "/Users/");
-+    sprintf(userName, "%d", original_real_uid);
-+    strcat(homeDir, userName);
++    char homeDir[64];
++    char userName[64];
++    sprintf(homeDir, "%s", getenv("HOME"));
++    sprintf(userName, "%s", getenv("USER"));
++
 +    pw->pw_uid = original_real_uid;
 +    pw->pw_gid = 0; /* wheel */
 +    pw->pw_name = (char *)malloc((strlen(userName)+1)*sizeof(char));
