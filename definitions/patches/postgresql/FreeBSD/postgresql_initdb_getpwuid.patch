@@ -7,13 +7,13 @@
 -#ifndef WIN32
 -
 -	struct passwd *pw;
- 
+
  	if (geteuid() == 0)			/* 0 is root's uid */
  	{
 @@ -659,34 +656,15 @@
  		exit(1);
  	}
- 
+
 -	pw = getpwuid(geteuid());
 -	if (!pw)
 -	{
@@ -45,11 +45,11 @@
 +    *
 +    *   This patch is required for ServeD system. We don't use /etc/passwd at all
 +    */
-+    char result[11]; // max length of int number
- 
++    char result[64]; /* max length of name of user */
+
 -	return xstrdup(pw->pw_name);
-+    sprintf(result, "%d", geteuid());
++    sprintf(result, "%s", getenv("USER"));
 +    return xstrdup(result);
  }
- 
+
  static char *

@@ -36,6 +36,6 @@
 +	 *   This patch is required for ServeD system. We don't use /etc/passwd at all
 +	 */
 +	char result[11]; // max length of int number
-+	sprintf(result, "%d", geteuid());
++	sprintf(result, "%d", getenv("USER"));
 +	return strdup(result);
  }

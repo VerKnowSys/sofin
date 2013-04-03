@@ -28,17 +28,17 @@
 +    char homeDir[16];
 +    char userName[16];
 +    *result = (struct passwd *)malloc(sizeof(struct passwd));
-+    sprintf(userName, "%d", uid);
-+    sprintf(homeDir, "/Users/%d", uid);
-+    
++    sprintf(userName, "%s", getenv("USER"));
++    sprintf(homeDir, "%s", getenv("HOME"));
++
 +    (*result)->pw_uid = uid;
 +    (*result)->pw_gid = 0; /* wheel */
 +    (*result)->pw_name = (char *)malloc((strlen(userName)+1)*sizeof(char));
 +    sprintf((*result)->pw_name, "%s", userName);
 +    (*result)->pw_dir = (char *)malloc((strlen(homeDir)+1)*sizeof(char));
 +    sprintf((*result)->pw_dir, "%s", homeDir);
-+    
++
 +	return 0;
  }
  #endif
- 
+

@@ -27,9 +27,9 @@
 +            *
 +            *   This patch is required for ServeD system. We don't use /etc/passwd at all
 +            */
-+           char result[20];
-+           sprintf(result, "/Users/%d", geteuid());
++           char result[64];
++           sprintf(result, "%s", getenv("HOME"));
 +           dir = strdup(result);
  		}
- 
+
  		if (chdir(dir) == -1)

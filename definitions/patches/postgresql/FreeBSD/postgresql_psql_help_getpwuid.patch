@@ -3,7 +3,7 @@
 @@ -57,30 +57,19 @@
  	const char *env;
  	const char *user;
- 
+
 -#ifndef WIN32
 -	struct passwd *pw = NULL;
 -#endif
@@ -33,10 +33,10 @@
 +        *
 +        *   This patch is required for ServeD system. We don't use /etc/passwd at all
 +        */
-+       char result[11]; // max length of int number
++       char result[64]; /* max length of user name */
 +
-+       sprintf(result, "%d", geteuid());
++       sprintf(result, "%s", getenv("USER"));
 +       user = strdup(result);
  	}
- 
+
  	printf(_("psql is the PostgreSQL interactive terminal.\n\n"));
