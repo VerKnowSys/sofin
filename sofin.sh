@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.46.7"
+readonly VERSION="0.46.8"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -191,11 +191,7 @@ if [ ! "$1" = "" ]; then
 
 
     log)
-        CURR_LOG="${LOG}"
-        if [ "${USERNAME}" != "root" ]; then
-            export CURR_LOG="${HOME_DIR}${USERNAME}/install.log"
-        fi
-        ${TAIL_BIN} -n "${LOG_LINES_AMOUNT}" -F "${CURR_LOG}"
+        ${TAIL_BIN} -n "${LOG_LINES_AMOUNT}" -F "${LOG}"
         ;;
 
 
