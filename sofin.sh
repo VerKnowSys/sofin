@@ -255,17 +255,17 @@ if [ ! "$1" = "" ]; then
         # pkg_config_path="."
         export ldflags="${LDFLAGS} ${DEFAULT_LDFLAGS}"
         process () {
-            for lib in ${1}*; do # LIB_DIR
-                if [ -e "${lib}/lib" ]; then
-                    ldresult="${lib}/lib:${ldresult}"
-                    ldflags="-R${lib}/lib -L${lib}/lib ${ldflags}"
+            for app in ${1}*; do # LIB_DIR
+                if [ -e "${app}/lib" ]; then
+                    ldresult="${app}/lib:${ldresult}"
+                    ldflags="-R${app}/lib -L${app}/lib ${ldflags}"
                 fi
-                if [ -e "${lib}/libexec" ]; then
-                    ldresult="${lib}/libexec:${ldresult}"
-                    ldflags="-R${lib}/libexec -L${lib}/libexec ${ldflags}"
+                if [ -e "${app}/libexec" ]; then
+                    ldresult="${app}/libexec:${ldresult}"
+                    ldflags="-R${app}/libexec -L${app}/libexec ${ldflags}"
                 fi
-                if [ -e "${lib}/lib/pkgconfig" ]; then
-                    pkg_config_path="${lib}/lib/pkgconfig:${pkg_config_path}"
+                if [ -e "${app}/lib/pkgconfig" ]; then
+                    pkg_config_path="${app}/lib/pkgconfig:${pkg_config_path}"
                 fi
             done
         }
