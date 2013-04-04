@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.46.8"
+readonly VERSION="0.46.9"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -264,8 +264,8 @@ if [ ! "$1" = "" ]; then
                     ldresult="${lib}/libexec:${ldresult}"
                     ldflags="-R${lib}/libexec -L${lib}/libexec ${ldflags}"
                 fi
-                if [ -e "${lib}/pkgconfig" ]; then
-                    pkg_config_path="${lib}/pkgconfig:${pkg_config_path}"
+                if [ -e "${lib}/lib/pkgconfig" ]; then
+                    pkg_config_path="${lib}/lib/pkgconfig:${pkg_config_path}"
                 fi
             done
         }
