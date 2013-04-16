@@ -117,5 +117,6 @@ fi
 note "Removing cached ${DEFINITION_SNAPSHOT_FILE}…"
 ${RM_BIN} ${DEFINITION_SNAPSHOT_FILE}
 
+sofin update
 note "Job's done."
 exit
