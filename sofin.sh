@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.46.9"
+readonly VERSION="0.46.10"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -984,23 +984,27 @@ for application in ${APPLICATIONS}; do
 
             . "${DEFINITIONS_DIR}${application}.def"
             debug "Exporting binaries:${EXPORT_LIST}"
-            ${MKDIR_BIN} -p "${PREFIX}/exports"
-            EXPORT_LIST=""
-            for exp in ${APP_EXPORTS}; do
-                for dir in "/bin/" "/sbin/" "/libexec/"; do
-                    debug "Testing ${dir} looking into: ${PREFIX}${dir}${exp}"
-                    if [ -f "${PREFIX}${dir}${exp}" ]; then # a file
-                        if [ -x "${PREFIX}${dir}${exp}" ]; then # and it's executable'
-                            curr_dir="$(${PWD_BIN})"
-                            cd "${PREFIX}${dir}"
-                            ${LN_BIN} -vfs "..${dir}${exp}" "../exports/${exp}" >> "$LOG"
-                            cd "${curr_dir}"
-                            exp_elem="$(${BASENAME_BIN} ${PREFIX}${dir}${exp})"
-                            EXPORT_LIST="${EXPORT_LIST} ${exp_elem}"
+            if [ -d "${PREFIX}/exports-disabled" ]; then # just bring back disabled exports
+                ${MV_BIN} "${PREFIX}/exports-disabled" "${PREFIX}/exports"
+            else
+                ${MKDIR_BIN} -p "${PREFIX}/exports"
+                EXPORT_LIST=""
+                for exp in ${APP_EXPORTS}; do
+                    for dir in "/bin/" "/sbin/" "/libexec/"; do
+                        debug "Testing ${dir} looking into: ${PREFIX}${dir}${exp}"
+                        if [ -f "${PREFIX}${dir}${exp}" ]; then # a file
+                            if [ -x "${PREFIX}${dir}${exp}" ]; then # and it's executable'
+                                curr_dir="$(${PWD_BIN})"
+                                cd "${PREFIX}${dir}"
+                                ${LN_BIN} -vfs "..${dir}${exp}" "../exports/${exp}" >> "$LOG"
+                                cd "${curr_dir}"
+                                exp_elem="$(${BASENAME_BIN} ${PREFIX}${dir}${exp})"
+                                EXPORT_LIST="${EXPORT_LIST} ${exp_elem}"
+                            fi
                         fi
-                    fi
+                    done
                 done
-            done
+            fi
             debug "Doing app conflict resolve"
             if [ ! -z "${APP_CONFLICTS_WITH}" ]; then
                 note "Resolving conflicts."
@@ -1013,7 +1017,9 @@ for application in ${APPLICATIONS}; do
                     an_app="${apphome}${app}"
                     if [ -d "${an_app}" ]; then
                         debug "Found app dir: ${an_app}"
-                        ${RM_BIN} -rf "${an_app}/exports"
+                        if [ -e "${an_app}/exports" ]; then
+                            ${MV_BIN} "${an_app}/exports" "${an_app}/exports-disabled"
+                        fi
                     fi
                 done
             fi
