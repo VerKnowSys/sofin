@@ -1,7 +1,7 @@
 APP_FULL_NAME="MongoDB - NoSQL database"
 APP_NAME="mongodb"
-APP_SHA="a51839210265d33802227b977ec0f4a956f3890b"
-APP_VERSION="2.4.1"
+APP_SHA="833348fdb2b74db85e83f094716927b0ee5cab1d"
+APP_VERSION="2.4.2"
 APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-src-r${APP_VERSION}.tar.gz"
 APP_REQUIREMENTS="libiconv bzip2 python-legacy scons libexecinfo gmake nspr" # v8
 APP_CONFIGURE_SCRIPT="ignore"
