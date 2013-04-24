@@ -17,5 +17,5 @@ case "${SYSTEM_NAME}" in
     APP_CONFIGURE_ARGS="--enable-version=1.9 --llvm-config=${SOFTWARE_ROOT_DIR}Clang/exports/llvm-config --enable-llvm --preserve-prefix"
     ;;
 esac
-APP_CONFLICTS_WITH="Ruby Jruby Ruby-legacy Ruby-minimal"
+APP_CONFLICTS_WITH="Ruby Jruby Ruby-legacy Ruby-minimal Passenger"
 

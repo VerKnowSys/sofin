@@ -5,4 +5,4 @@ APP_VERSION="2.0.0-p0"
 APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.bz2"
 APP_REQUIREMENTS="gmake readline perl openssl" # zlib bzip2 libxml2 libtool libgpg-error libgcrypt libxslt yaml libffi sqlite perl openssl
 APP_EXPORTS="ruby gem irb ri rdoc erb rake bundle"
-APP_CONFLICTS_WITH="Rubinius Jruby Ruby-legacy Ruby"
+APP_CONFLICTS_WITH="Rubinius Jruby Ruby-legacy Ruby Passenger"
