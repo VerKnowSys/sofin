@@ -60,7 +60,7 @@ int main(int argc, char const *argv[]) {
     char str[32];
     char *arguments[argc];
     stringstream cmd, lockfile;
-    const string list[] = {"ver", "version", "list", "installed", "fulllist", "fullinstalled", "export", "exp", "exportapp", "getshellvars", "log", "available"};
+    const string list[] = {"ver", "version", "list", "installed", "fulllist", "fullinstalled", "export", "exp", "exportapp", "getshellvars", "log", "available", "reload", "rehash"};
 
     /* create a lock */
     if (getuid() == 0)
