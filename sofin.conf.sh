@@ -71,6 +71,7 @@ SERVICE_BIN="/usr/sbin/service"
 TEST_BIN="/bin/test"
 CHMOD_BIN="/bin/chmod"
 XARGS_BIN="/usr/bin/xargs"
+SOFIN_BIN="/usr/bin/sofin"
 
 # probably the most crucial value in whole code. by design immutable
 USERNAME="$(${ID_BIN} ${ID_SVD})"
