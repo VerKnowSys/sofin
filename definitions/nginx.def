@@ -9,3 +9,4 @@ if [ "${SYSTEM_NAME}" != "Darwin" ]; then
 fi
 APP_CONFIGURE_ARGS="--with-http_ssl_module --with-http_gzip_static_module --user=nobody --group=nogroup --with-cc-opt='-I${PREFIX}/include' --with-ld-opt='-L${PREFIX}/lib${ADDITION}'"
 APP_EXPORTS="nginx"
+APP_CONFLICTS_WITH="Passenger"
