@@ -184,5 +184,10 @@ It will put "sofin" into /usr/bin/ and sofin.conf.sh into /etc/.
   - Start using sofin as regular user.
 
 
+## FAQ:
+* "It's not working on my Linux distro with applied grSecurity patch on kernel!" - You must set sysctl setting on your machine: `kernel.grsecurity.tpe = 0`. It's required by some software to perform tests successfully. (exec priviledges issue).
+* "It's not working!". Contribute with a fix!
+
+
 ## License:
 * Released under the [BSD](http://opensource.org/licenses/BSD-2-Clause) license.
