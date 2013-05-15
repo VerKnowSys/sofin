@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.46.13"
+readonly VERSION="0.46.14"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -785,8 +785,8 @@ for application in ${APPLICATIONS}; do
 
                             LIST_DIR="${DEFINITIONS_DIR}patches/$1"
                             if [ -d "${LIST_DIR}" ]; then
-                                if [ "$1" = "${APP_NAME}" ]; then # apply patch only when application/requirement for which patch is designed for
-                                    note "   → Applying patches for: ${APP_NAME}"
+                                if [ "$1" = "${APP_NAME}${APP_POSTFIX}" ]; then # apply patch only when application/requirement for which patch is designed for
+                                    note "   → Applying patches for: ${APP_NAME}${APP_POSTFIX}"
                                     patches_files="$(${FIND_BIN} ${LIST_DIR}/* -maxdepth 0 -type f)"
                                     for patch in ${patches_files}; do
                                         debug "Patching source code with patch: ${patch}"
