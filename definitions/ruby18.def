@@ -1,0 +1,22 @@
+APP_FULL_NAME="Ruby old stable 1.8.7"
+APP_SHA="ffc5736019c9aa692a05ed95af7fe976afb3da13"
+APP_NAME="ruby"
+APP_POSTFIX="18"
+APP_VERSION="1.8.7-p370"
+APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
+APP_CONFIGURE_ARGS="--enable-pthread --disable-install-doc --disable-install-rdoc"
+APP_REQUIREMENTS="zlib bzip2 libiconv libxml2 gmake libtool libgpg-error libgcrypt libxslt yaml libffi sqlite readline"
+APP_AFTER_INSTALL_CALLBACK="${PRINTF_BIN} 'gem: --no-ri --no-rdoc' > ${HOME}/.gemrc ; install_rubygems ; ${PREFIX}/bin/gem install bundler"
+APP_EXPORTS="ruby gem irb ri rdoc erb rake bundle"
+APP_MAKE_METHOD="gmake -s ${MAKE_OPTS}"
+APP_INSTALL_METHOD="gmake install -s ${MAKE_OPTS}"
+APP_CONFLICTS_WITH="Rubinius Jruby Ruby-legacy Ruby-minimal Passenger"
+FORCE_GNU_COMPILER="YES"
+
+install_rubygems () {
+    # it's specific version of rubygems for compatibility with ruby 1.8.7. Don't trust rubygems.org about this compatibility, with newest version expect problems under OSX 10.8
+    ${FETCH_BIN} "${MAIN_SOURCE_REPOSITORY}rubygems-1.8.15.tgz"
+    ${TAR_BIN} xf ./rubygems-1.8.15.tgz
+    cd rubygems-1.8.15
+    ${PREFIX}/bin/ruby ./setup.rb
+}
