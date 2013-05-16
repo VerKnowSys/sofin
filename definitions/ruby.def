@@ -1,7 +1,7 @@
 APP_FULL_NAME="Ruby YARV 2.0"
-APP_SHA="bd61b731d12ff4fd9d57f5d47bd2f9a2c4c007bf"
+APP_SHA="d42bcd5b610d23baaed8a80de268a5aa5cf204b8"
 APP_NAME="ruby"
-APP_VERSION="2.0.0-p0"
+APP_VERSION="2.0.0-p195"
 APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.bz2"
 APP_CONFIGURE_ARGS="--enable-pthread --with-opt-dir=${PREFIX} --disable-install-doc --disable-install-rdoc"
 if [ "${SYSTEM_NAME}" = "Darwin" ]; then
