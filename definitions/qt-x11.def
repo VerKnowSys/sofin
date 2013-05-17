@@ -1,0 +1,11 @@
+DISABLE_ON="Darwin" # use prebuilt version from Trolltech/Nokia site
+APP_FULL_NAME="Qt4 Library with X11"
+APP_NAME="qt"
+APP_SHA="f5880f11c139d7d8d01ecb8d874535f7d9553198"
+APP_VERSION="4.8.4"
+APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-everywhere-opensource-src-${APP_VERSION}.tar.gz"
+APP_CONFIGURE_ARGS="-prefix ${PREFIX} -I${PREFIX}include -L${PREFIX}lib -no-sql-sqlite -embedded -release -opensource -confirm-license -shared -no-largefile -no-accessibility -stl -no-qt3support -no-xmlpatterns -no-multimedia -no-audio-backend -no-phonon -no-phonon-backend -script -javascript-jit -scripttools -no-declarative -qt-zlib -no-libtiff -no-libpng -no-libmng -no-libjpeg -openssl -silent -optimized-qmake -no-cups -no-iconv -no-pch -no-dbus -no-nas-sound -no-gtkstyle -no-opengl -no-openvg -no-mitshm -no-fontconfig -exceptions -webkit -fast -verbose -no-silent -nomake examples -nomake demos -nomake docs -nomake translations -continue"
+APP_EXPORTS="moc lconvert lrelease lupdate qdoc3 qmake rcc"
+APP_REQUIREMENTS="pkgconf m4 bison perl autoconf automake libtool util-macros python-legacy libxml2 libxslt xcb-proto libpthread-stubs xproto libXau libxcb xtrans xextproto libX11 gmake"
+APP_MAKE_METHOD="LD_LIBRARY_PATH=${HOME}/.cache/cache/${APP_NAME}-${APP_VERSION}/qt-everywhere-opensource-src-${APP_VERSION}/lib/ gmake -s ${MAKE_OPTS}"
+APP_INSTALL_METHOD="gmake install -s ${MAKE_OPTS}"
