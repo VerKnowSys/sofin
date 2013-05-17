@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.46.14"
+readonly VERSION="0.46.15"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -142,8 +142,8 @@ update_shell_vars () {
         debug "Updating ${SOFIN_PROFILE} settings…"
         ${PRINTF_BIN} "$(${SCRIPT_NAME} getshellvars)" > "${SOFIN_PROFILE}"
     else
-        debug "Updating ${HOME_DIR}${USERNAME}/.profile settings…"
-        ${PRINTF_BIN} "$(${SCRIPT_NAME} getshellvars ${USERNAME})" > "${HOME_DIR}${USERNAME}/.profile"
+        debug "Updating ${HOME}/.profile settings…"
+        ${PRINTF_BIN} "$(${SCRIPT_NAME} getshellvars ${USERNAME})" > "${HOME}/.profile"
     fi
 }
 
@@ -611,9 +611,9 @@ for application in ${APPLICATIONS}; do
                 export PREFIX="${SOFTWARE_DIR}${APP_NAME}"
             else
                 debug "User build: ${USERNAME}"
-                export PREFIX="${HOME_DIR}${USERNAME}/${HOME_APPS_DIR}${APP_NAME}"
-                if [ ! -d "${HOME_DIR}${USERNAME}/${HOME_APPS_DIR}" ]; then
-                    ${MKDIR_BIN} -p "${HOME_DIR}${USERNAME}/${HOME_APPS_DIR}"
+                export PREFIX="${HOME}/${HOME_APPS_DIR}${APP_NAME}"
+                if [ ! -d "${HOME}/${HOME_APPS_DIR}" ]; then
+                    ${MKDIR_BIN} -p "${HOME}/${HOME_APPS_DIR}"
                 fi
             fi
 
@@ -1010,7 +1010,7 @@ for application in ${APPLICATIONS}; do
                 note "Resolving conflicts."
                 for app in ${APP_CONFLICTS_WITH}; do
                     if [ "${USERNAME}" != "root" ]; then
-                        export apphome="${HOME_DIR}${USERNAME}/${HOME_APPS_DIR}"
+                        export apphome="${HOME}/${HOME_APPS_DIR}"
                     else
                         export apphome="${SOFTWARE_DIR}${apps}"
                     fi

@@ -197,7 +197,7 @@ readonly SOFTWARE_ROOT_DIR="/Software/"
 SOFTWARE_DIR="/Software/"
 CACHE_DIR="${SOFTWARE_DIR}.cache/"
 DEFINITIONS_DIR="${CACHE_DIR}definitions/"
-HOME_DIR="${HOME}/../"
+HOME_DIR="${HOME}/.."
 LOG="${CACHE_DIR}install.log"
 LISTS_DIR="${CACHE_DIR}lists/"
 DEFAULTS="${DEFINITIONS_DIR}defaults.def"
@@ -226,9 +226,9 @@ if [ "${CURRENT_USER_UID}" != "0" ]; then
         error "No user homedir found in: ${HOME_DIR} for user: '${USERNAME}'"
         exit 1
     fi
-    readonly METADATA_FILE="${HOME_DIR}${USERNAME}${PRIVATE_METADATA_DIR}${PRIVATE_METADATA_FILE}"
+    readonly METADATA_FILE="${HOME}${PRIVATE_METADATA_DIR}${PRIVATE_METADATA_FILE}"
     if [ -f "${METADATA_FILE}" ]; then
-        debug "ServeD System found. Username set to: ${USERNAME}. Home directory: ${HOME_DIR}${USERNAME}"
+        debug "ServeD System found. Username set to: ${USERNAME}. Home directory: ${HOME}"
         debug "Loading user metdata from ${METADATA_FILE}"
         . "${METADATA_FILE}"
         readonly export SVD_FULL_NAME="${SVD_FULL_NAME}"
