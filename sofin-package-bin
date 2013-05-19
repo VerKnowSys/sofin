@@ -1,0 +1,33 @@
+#!/bin/sh
+
+SOFTWARE_DIR="/Software"
+
+RM_BIN="/bin/rm"
+TAR_BIN="/usr/bin/tar"
+UNAME_BIN="/usr/bin/uname"
+SCP_BIN="/usr/bin/scp"
+
+USERNAME="root" # NOTE: rpath in binaries, XXX: fixme: add support for regular user binary builds
+SYSTEM_ARCH="$($UNAME_BIN -m)"
+SYSTEM_NAME="$($UNAME_BIN)"
+MIDDLE="${SYSTEM_NAME}-${SYSTEM_ARCH}-${USERNAME}"
+MAIN_BINARY_REPOSITORY_DESTINATION="sofin@verknowsys.com:/opt/software/binary/${MIDDLE}/"
+
+postfix=".tar.gz"
+
+cd "${SOFTWARE_DIR}"
+$RM_BIN -vf "*${postfix}"
+for element in *; do
+    if [ -d "${element}" ]; then
+        if [ ! -L "${element}" ]; then
+            echo "Preparing archive of: $element"
+            ${TAR_BIN} cf "${element}${postfix}" "./${element}"
+            echo "Sending archive to remote: ${MAIN_BINARY_REPOSITORY_DESTINATION}"
+            ${SCP_BIN} "${element}${postfix}" "${MAIN_BINARY_REPOSITORY_DESTINATION}${element}${postfix}"
+        fi
+    fi
+done
+
+
+echo "Done"
+exit
