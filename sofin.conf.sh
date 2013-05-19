@@ -263,7 +263,7 @@ readonly USERNAME
 readonly DEFAULT_LDFLAGS
 readonly DEFAULT_COMPILER_FLAGS
 readonly MAKE_OPTS
-readonly DEFAULT_PAUSE_WHEN_LOCKED="30" # seconds
+# readonly DEFAULT_PAUSE_WHEN_LOCKED="30" # seconds
 readonly MAIN_SOURCE_REPOSITORY="http://software.verknowsys.com/source/"
 readonly MAIN_BINARY_REPOSITORY="http://software.verknowsys.com/binary/$(${UNAME_BIN})/common/"
 readonly CCACHE_BIN_OPTIONAL="${SOFTWARE_ROOT_DIR}Ccache/exports/ccache"
