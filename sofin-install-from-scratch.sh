@@ -39,7 +39,7 @@ fi
 printf "Installing / Upgrading Sofin\n"
 cwd="$(pwd)"
 cd /tmp
-${CURL_BIN} ${SOURCE} 2> /dev/null | ${TAR_BIN} xf - && cd ./sofin-master && ./sofin-install
+${CURL_BIN} ${SOURCE} 2> /dev/null | ${TAR_BIN} xzf - && cd ./sofin-master && ./sofin-install
 result="$?"
 cd "${cwd}"
 if [ "${result}" = "0" ]; then
