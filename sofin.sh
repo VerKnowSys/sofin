@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.46.15"
+readonly VERSION="0.46.16"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -783,24 +783,22 @@ for application in ${APPLICATIONS}; do
                                 run "${APP_AFTER_UNPACK_CALLBACK}"
                             fi
 
-                            LIST_DIR="${DEFINITIONS_DIR}patches/$1"
+                            LIST_DIR="${DEFINITIONS_DIR}patches/$1" # $1 is definition file name
                             if [ -d "${LIST_DIR}" ]; then
-                                if [ "$1" = "${APP_NAME}${APP_POSTFIX}" ]; then # apply patch only when application/requirement for which patch is designed for
-                                    note "   → Applying patches for: ${APP_NAME}${APP_POSTFIX}"
-                                    patches_files="$(${FIND_BIN} ${LIST_DIR}/* -maxdepth 0 -type f)"
-                                    for patch in ${patches_files}; do
-                                        debug "Patching source code with patch: ${patch}"
-                                        ${PATCH_BIN} -N -f -i "${patch}" >> "${LOG}" 2>> "${LOG}" # don't use run.. it may fail - we don't care
+                                note "   → Applying patches for: ${APP_NAME}${APP_POSTFIX}"
+                                patches_files="$(${FIND_BIN} ${LIST_DIR}/* -maxdepth 0 -type f)"
+                                for patch in ${patches_files}; do
+                                    debug "Patching source code with patch: ${patch}"
+                                    ${PATCH_BIN} -N -f -i "${patch}" >> "${LOG}" 2>> "${LOG}" # don't use run.. it may fail - we don't care
+                                done
+                                pspatch_dir="${LIST_DIR}/${SYSTEM_NAME}"
+                                debug "Checking psp dir: ${pspatch_dir}"
+                                if [ -d "${pspatch_dir}" ]; then
+                                    debug "Proceeding with Platform Specific Patches"
+                                    for platform_specific_patch in ${pspatch_dir}/*; do
+                                        debug "Patching source code with pspatch: ${platform_specific_patch}"
+                                        run "${PATCH_BIN} -i ${platform_specific_patch}"
                                     done
-                                    pspatch_dir="${LIST_DIR}/${SYSTEM_NAME}"
-                                    debug "Checking psp dir: ${pspatch_dir}"
-                                    if [ -d "${pspatch_dir}" ]; then
-                                        debug "Proceeding with Platform Specific Patches"
-                                        for platform_specific_patch in ${pspatch_dir}/*; do
-                                            debug "Patching source code with pspatch: ${platform_specific_patch}"
-                                            run "${PATCH_BIN} -i ${platform_specific_patch}"
-                                        done
-                                    fi
                                 fi
                             fi
 
