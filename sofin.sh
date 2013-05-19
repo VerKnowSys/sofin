@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.46.16"
+readonly VERSION="0.46.17"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -838,7 +838,7 @@ for application in ${APPLICATIONS}; do
                                     export APP_INSTALL_METHOD="true"
                                     ;;
 
-                                alternate)
+                                posix)
                                     run "./configure -prefix ${PREFIX} -cc $(${BASENAME_BIN} ${CC}) ${APP_CONFIGURE_ARGS}"
                                     ;;
 
