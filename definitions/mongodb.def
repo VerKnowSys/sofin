@@ -1,14 +1,21 @@
 APP_FULL_NAME="MongoDB - NoSQL database"
 APP_NAME="mongodb"
-APP_SHA="833348fdb2b74db85e83f094716927b0ee5cab1d"
-APP_VERSION="2.4.2"
+APP_SHA="6ceed642547cacda0de8dffd692cedc1fc100814"
+APP_VERSION="2.4.3"
 APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-src-r${APP_VERSION}.tar.gz"
 APP_REQUIREMENTS="libiconv bzip2 python-legacy scons libexecinfo gmake nspr" # v8
 APP_CONFIGURE_SCRIPT="ignore"
 APP_MAKE_METHOD="true"
-if [ "${SYSTEM_NAME}" = "Darwin" ]; then
-  export APP_INSTALL_METHOD="scons ${MAKE_OPTS} --clang --cc='/usr/bin/clang -w' --cxx='/usr/bin/clang++ -w' --extrapath=${PREFIX} --64 --release --prefix=${PREFIX} install"
-else
-  export APP_INSTALL_METHOD="scons ${MAKE_OPTS} --clang --cc='${SOFTWARE_ROOT_DIR}Clang/exports/clang -w' --cxx='${SOFTWARE_ROOT_DIR}Clang/exports/clang++ -w' --extrapath=${PREFIX} --64 --release --prefix=${PREFIX} install"
-fi
+case "${SYSTEM_NAME}" in
+    Darwin)
+        export APP_INSTALL_METHOD="scons ${MAKE_OPTS} --clang --cc='/usr/bin/clang -w' --cxx='/usr/bin/clang++ -w' --extrapath=${PREFIX} --64 --release --prefix=${PREFIX} install"
+        ;;
+
+    *)
+        # cannot be built with clang: https://groups.google.com/group/mongodb-user/browse_thread/thread/988eebe374e43624?hl=en&noredirect=true&pli=1
+        export APP_INSTALL_METHOD="scons ${MAKE_OPTS} --extrapath=${PREFIX} --64 --release --prefix=${PREFIX} install"
+        ;;
+
+esac
+
 APP_EXPORTS="mongod mongostat"
