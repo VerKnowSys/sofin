@@ -9,6 +9,7 @@ SCP_BIN="/usr/bin/scp"
 
 if [ "$(uname -s)" = "Linux" ]; then
     export TAR_BIN="/bin/tar"
+    export UNAME_BIN="/bin/uname"
 fi
 
 USERNAME="root" # NOTE: rpath in binaries, XXX: fixme: add support for regular user binary builds
