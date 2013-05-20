@@ -7,6 +7,10 @@ TAR_BIN="/usr/bin/tar"
 UNAME_BIN="/usr/bin/uname"
 SCP_BIN="/usr/bin/scp"
 
+if [ "$(uname -s)" = "Linux" ]; then
+    export TAR_BIN="/bin/tar"
+fi
+
 USERNAME="root" # NOTE: rpath in binaries, XXX: fixme: add support for regular user binary builds
 SYSTEM_ARCH="$($UNAME_BIN -m)"
 SYSTEM_NAME="$($UNAME_BIN)"
