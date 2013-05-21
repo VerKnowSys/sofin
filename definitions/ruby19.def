@@ -2,7 +2,7 @@
 
 APP_FULL_NAME="Ruby YARV 1.9"
 APP_SHA="18f464c49c857fad3b3b277c8ef5eb8c30a7794a"
-APP_POSTFIX="-legacy"
+APP_POSTFIX="19"
 APP_VERSION="1.9.3-p429"
 APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.bz2"
 APP_CURRENT_VERSION="$(${CURL_BIN} http://www.ruby-lang.org/en/downloads/ 2>/dev/null | ${AWK_BIN} '/pub\/ruby\/1.9/ {gsub(/ *<[^>]+> */, ""); print $2}')"
