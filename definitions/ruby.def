@@ -3,7 +3,7 @@ APP_SHA="d42bcd5b610d23baaed8a80de268a5aa5cf204b8"
 APP_NAME="ruby"
 APP_VERSION="2.0.0-p195"
 APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.bz2"
-APP_CONFIGURE_ARGS="--enable-pthread --with-opt-dir=${PREFIX} --disable-install-doc --disable-install-rdoc"
+APP_CONFIGURE_ARGS="--enable-pthread --with-opt-dir=${PREFIX}/lib --disable-install-doc --disable-install-rdoc --enable-load-relative"
 if [ "${SYSTEM_NAME}" = "Darwin" ]; then
   export APP_CONFIGURE_ARGS="${APP_CONFIGURE_ARGS} --with-gcc=/usr/bin/clang"
 else
