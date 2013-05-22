@@ -1,15 +1,15 @@
-APP_FULL_NAME="MySQL 5"
-APP_SHA="f37979eafc241a0ebeac9548cb3f4113074271b7"
+APP_FULL_NAME="MySQL 5.1.x"
+APP_SHA="f15d813cbb9b4ba6d72f053e52c29ed9036a4061"
 APP_NAME="mysql"
-APP_VERSION="5.6.10"
+APP_POSTFIX="51"
+APP_VERSION="5.1.69"
 APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
-APP_REQUIREMENTS="zlib bzip2 expat libiconv cmake ncurses"
+APP_REQUIREMENTS="zlib bzip2 expat libiconv ncurses libtool"
 case "${SYSTEM_NAME}" in
     Darwin)
-        export APP_REQUIREMENTS="zlib bzip2 expat cmake ncurses"
+        export APP_REQUIREMENTS="zlib bzip2 expat ncurses libtool"
         ;;
 esac
 
-APP_CONFIGURE_SCRIPT="cmake"
 APP_EXPORTS="mysql mysql_config mysqld mysqld_multi mysqld_safe mysqladmin mysqlshow mysqlimport mysqlbinlog mysqldump mysqlaccess mysqlcheck mysqlhotcopy mysql_upgrade"
-APP_CONFLICTS_WITH="Mysql51"
+APP_CONFLICTS_WITH="Mysql"
