@@ -4,12 +4,13 @@ APP_NAME="openssl"
 APP_VERSION="1.0.1e"
 APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
 APP_CONFIGURE_SCRIPT="./config"
-APP_CONFIGURE_ARGS="--shared"
+APP_CONFIGURE_ARGS="enable-shared --shared -L${PREFIX}/lib:/usr/lib:/lib"
 if [ "${SYSTEM_NAME}" = "Darwin" ]; then
 export APP_CONFIGURE_SCRIPT="./Configure"
 export APP_CONFIGURE_ARGS="darwin64-x86_64-cc"
 fi
-APP_REQUIREMENTS="bzip2 perl"
+APP_REQUIREMENTS="zlib bzip2 perl"
 APP_EXPORTS="openssl"
-APP_MAKE_METHOD="make -s"
+_ORIGIN='\"\$$ORIGIN/../lib\"'
+APP_MAKE_METHOD="make -s SHARED_LDFLAGS=-Wl,-rpath=${_ORIGIN},-rpath-link=${_ORIGIN},--enable-new-dtags"
 APP_INSTALL_METHOD="make -s install"
