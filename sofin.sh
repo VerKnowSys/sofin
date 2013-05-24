@@ -692,7 +692,8 @@ for application in ${APPLICATIONS}; do
                 # export LD_LIBRARY_PATH="${PREFIX}/lib:${PREFIX}/libexec:/usr/lib:/lib"
                 export CFLAGS="-I${PREFIX}/include ${APP_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
                 export CXXFLAGS="-I${PREFIX}/include ${APP_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
-                export LDFLAGS="-L${PREFIX}/lib ${APP_LINKER_ARGS} ${DEFAULT_LDFLAGS} -Wl,-rpath=\$ORIGIN/../lib,--enable-new-dtags"
+                ORIGIN_SRC='$ORIGIN/../lib'
+                export LDFLAGS="-L${PREFIX}/lib ${APP_LINKER_ARGS} ${DEFAULT_LDFLAGS} -Wl,-rpath=${ORIGIN_SRC},--enable-new-dtags"
 
                 if [ "${SYSTEM_NAME}" = "Darwin" ]; then
                     export PATH="${PATH}:/opt/X11/bin" # NOTE: requires XQuartz installed!
