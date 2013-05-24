@@ -18,4 +18,4 @@ case "${SYSTEM_NAME}" in
 
 esac
 
-APP_EXPORTS="mongod mongostat"
+APP_EXPORTS="mongo mongod mongostat"
