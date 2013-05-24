@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.47.0"
+readonly VERSION="0.47.1"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -692,8 +692,11 @@ for application in ${APPLICATIONS}; do
                 # export LD_LIBRARY_PATH="${PREFIX}/lib:${PREFIX}/libexec:/usr/lib:/lib"
                 export CFLAGS="-I${PREFIX}/include ${APP_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
                 export CXXFLAGS="-I${PREFIX}/include ${APP_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
-                ORIGIN_SRC='\"\$$ORIGIN/../lib\"'
-                export LDFLAGS="-L${PREFIX}/lib ${APP_LINKER_ARGS} ${DEFAULT_LDFLAGS} -Wl,-rpath=${ORIGIN_SRC},--enable-new-dtags"
+                export ORIGIN_SRC='\"\$$ORIGIN/../lib\"'
+                if [ "${APP_ABSOLUTE_RPATH}" != "" ]; then
+                    export ORIGIN_SRC="${PREFIX}/lib"
+                fi
+                export LDFLAGS="-L${PREFIX}/lib ${APP_LINKER_ARGS} ${DEFAULT_LDFLAGS} -Wl,-rpath=${ORIGIN_SRC},-rpath-link=${ORIGIN_SRC},--enable-new-dtags"
 
                 if [ "${SYSTEM_NAME}" = "Darwin" ]; then
                     export PATH="${PATH}:/opt/X11/bin" # NOTE: requires XQuartz installed!
