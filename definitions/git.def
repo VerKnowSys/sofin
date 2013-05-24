@@ -3,7 +3,7 @@ APP_SHA="172c6ad5a55276213c5e40b83a4c270f6f931b3e"
 APP_NAME="git"
 APP_VERSION="1.7.10.3"
 APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
-APP_CONFIGURE_ARGS="--without-tcltk --with-zlib --without-python --with-perl=${PREFIX}/bin/perl"
+APP_CONFIGURE_ARGS="--without-tcltk --with-zlib --without-python --with-perl=${PREFIX}/bin/perl --with-iconv=${PREFIX} --with-zlib=${PREFIX}"
 APP_REQUIREMENTS="gmake zlib libiconv expat perl bzip2 openssl curl"
 case "${SYSTEM_NAME}" in
   Darwin)
