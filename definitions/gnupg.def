@@ -13,3 +13,4 @@ case "${SYSTEM_NAME}" in
 esac
 APP_MAKE_METHOD="gmake -s ${MAKE_OPTS}"
 APP_INSTALL_METHOD="gmake install -s ${MAKE_OPTS}"
+APP_ABSOLUTE_RPATH="true"

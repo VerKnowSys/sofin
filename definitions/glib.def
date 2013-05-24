@@ -8,3 +8,4 @@ APP_CONFIGURE_ARGS="--disable-dependency-tracking --enable-gc-friendly --disable
 FORCE_GNU_COMPILER="true"
 APP_MAKE_METHOD="gmake -s ${MAKE_OPTS}"
 APP_INSTALL_METHOD="gmake install -s ${MAKE_OPTS}"
+APP_ABSOLUTE_RPATH="true"
