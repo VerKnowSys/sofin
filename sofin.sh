@@ -692,7 +692,7 @@ for application in ${APPLICATIONS}; do
                 # export LD_LIBRARY_PATH="${PREFIX}/lib:${PREFIX}/libexec:/usr/lib:/lib"
                 export CFLAGS="-I${PREFIX}/include ${APP_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
                 export CXXFLAGS="-I${PREFIX}/include ${APP_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
-                ORIGIN_SRC='$ORIGIN/../lib'
+                ORIGIN_SRC='\"\$$ORIGIN/../lib\"'
                 export LDFLAGS="-L${PREFIX}/lib ${APP_LINKER_ARGS} ${DEFAULT_LDFLAGS} -Wl,-rpath=${ORIGIN_SRC},--enable-new-dtags"
 
                 if [ "${SYSTEM_NAME}" = "Darwin" ]; then
