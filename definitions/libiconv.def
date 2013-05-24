@@ -4,6 +4,7 @@ APP_SHA="be7d67e50d72ff067b2c0291311bc283add36965"
 APP_NAME="libiconv"
 APP_VERSION="1.14"
 APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
+APP_CONFIGURE_ARGS="--enable-static --enable-shared" # --enable-relocatable
 APP_EXPORTS="iconv"
 APP_MAKE_METHOD="make -s"
 APP_INSTALL_METHOD="make -s install"
