@@ -13,7 +13,7 @@ case "${SYSTEM_NAME}" in
 
     *)
         # cannot be built with clang: https://groups.google.com/group/mongodb-user/browse_thread/thread/988eebe374e43624?hl=en&noredirect=true&pli=1
-        export APP_INSTALL_METHOD="scons ${MAKE_OPTS} --extrapath=${PREFIX} --64 --release --prefix=${PREFIX} install"
+        export APP_INSTALL_METHOD="scons ${MAKE_OPTS} --cc='/usr/bin/gcc -w' --cxx='/usr/bin/g++ -w' --extrapath=${PREFIX} --64 --release --prefix=${PREFIX} install"
         ;;
 
 esac
