@@ -11,3 +11,7 @@ APP_CURRENT_VERSION="$(${CURL_BIN} http://nodejs.org 2>/dev/null | ${AWK_BIN} '/
 APP_MAKE_METHOD="gmake -s ${MAKE_OPTS}"
 APP_INSTALL_METHOD="gmake install -s ${MAKE_OPTS}"
 APP_CONFLICTS_WITH="Node-legacy"
+# XXX: on ServeD OS, libexecinfo is built in base system
+if [ "${SYSTEM_NAME}" = "FreeBSD" ]; then
+    export APP_ABSOLUTE_RPATH="true" # caused by libexeinfo
+fi
