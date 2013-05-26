@@ -5,6 +5,17 @@ APP_VERSION="2.04"
 APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
 APP_CONFIGURE_SCRIPT="ignore"
 APP_MAKE_METHOD="true"
-APP_INSTALL_METHOD="${MKDIR_BIN} -p ${PREFIX}/bin; ${CP_BIN} ${CACHE_DIR}cache/${APP_NAME}-${APP_VERSION}/${APP_NAME}-${APP_VERSION}/bin/ack ${PREFIX}/bin"
+APP_INSTALL_METHOD="install_ack"
 APP_REQUIREMENTS="perl"
 APP_EXPORTS="ack"
+
+install_ack () {
+    # the whole thing is to replace standard location of perl by absolute call to prefixed perl
+    ${MKDIR_BIN} -p ${PREFIX}/bin
+    ${CP_BIN} ${CACHE_DIR}cache/${APP_NAME}-${APP_VERSION}/${APP_NAME}-${APP_VERSION}/bin/ack ${PREFIX}/bin/
+    echo "#!${PREFIX}/bin/perl" > ${PREFIX}/bin/ack-pre
+    ${CAT_BIN} ${PREFIX}/bin/ack >> ${PREFIX}/bin/ack-pre
+    ${SED_BIN} '2d' ${PREFIX}/bin/ack-pre > ${PREFIX}/bin/ack
+    ${RM_BIN} ${PREFIX}/bin/ack-pre
+    ${CHMOD_BIN} 755 ${PREFIX}/bin/ack
+}
