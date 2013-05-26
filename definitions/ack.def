@@ -11,11 +11,13 @@ APP_EXPORTS="ack"
 
 install_ack () {
     # the whole thing is to replace standard location of perl by absolute call to prefixed perl
-    ${MKDIR_BIN} -p ${PREFIX}/bin
-    ${CP_BIN} ${CACHE_DIR}cache/${APP_NAME}-${APP_VERSION}/${APP_NAME}-${APP_VERSION}/bin/ack ${PREFIX}/bin/
-    echo "#!${PREFIX}/bin/perl" > ${PREFIX}/bin/ack-pre
-    ${CAT_BIN} ${PREFIX}/bin/ack >> ${PREFIX}/bin/ack-pre
-    ${SED_BIN} '2d' ${PREFIX}/bin/ack-pre > ${PREFIX}/bin/ack
-    ${RM_BIN} ${PREFIX}/bin/ack-pre
-    ${CHMOD_BIN} 755 ${PREFIX}/bin/ack
+    if [ "${SYSTEM_NAME}" != "Darwin" ]; then
+        ${MKDIR_BIN} -p ${PREFIX}/bin
+        ${CP_BIN} ${CACHE_DIR}cache/${APP_NAME}-${APP_VERSION}/${APP_NAME}-${APP_VERSION}/bin/ack ${PREFIX}/bin/
+        echo "#!${PREFIX}/bin/perl" > ${PREFIX}/bin/ack-pre
+        ${CAT_BIN} ${PREFIX}/bin/ack >> ${PREFIX}/bin/ack-pre
+        ${SED_BIN} '2d' ${PREFIX}/bin/ack-pre > ${PREFIX}/bin/ack
+        ${RM_BIN} ${PREFIX}/bin/ack-pre
+        ${CHMOD_BIN} 755 ${PREFIX}/bin/ack
+    fi
 }
