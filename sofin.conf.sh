@@ -135,7 +135,7 @@ error () {
 
 # System specific configuration
 readonly SYSTEM_NAME="$(uname)"
-readonly SYSTEM_ARCH="$(uname -p)"
+readonly SYSTEM_ARCH="$(uname -m)"
 
 case "${SYSTEM_NAME}" in
 
@@ -265,7 +265,7 @@ readonly DEFAULT_COMPILER_FLAGS
 readonly MAKE_OPTS
 # readonly DEFAULT_PAUSE_WHEN_LOCKED="30" # seconds
 readonly MAIN_SOURCE_REPOSITORY="http://software.verknowsys.com/source/"
-readonly MAIN_BINARY_REPOSITORY="http://software.verknowsys.com/binary/$(${UNAME_BIN})/common/"
+readonly MAIN_BINARY_REPOSITORY="http://software.verknowsys.com/binary/"
 readonly CCACHE_BIN_OPTIONAL="${SOFTWARE_ROOT_DIR}Ccache/exports/ccache"
 
 # ANSI color definitions
