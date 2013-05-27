@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.47.2"
+readonly VERSION="0.47.3"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -622,19 +622,19 @@ for application in ${APPLICATIONS}; do
                 export PREFIX="${PREFIX}${APP_POSTFIX}"
             fi
 
-            # binary build
+            # binary build of whole software bundle
             cd "${HOME}/${HOME_APPS_DIR}"
             MIDDLE="${SYSTEM_NAME}-${SYSTEM_ARCH}-common"
-            note "Checking availability of binary build of version: ${APP_VERSION}"
+            note "Checking availability of binary build version: ${APP_VERSION}"
             debug "Binary build should be available here: ${MAIN_BINARY_REPOSITORY}${MIDDLE}/${APP_NAME}-${APP_VERSION}.tar.gz"
             ${FETCH_BIN} "${MAIN_BINARY_REPOSITORY}${MIDDLE}/${APP_NAME}-${APP_VERSION}.tar.gz"  >> ${LOG} 2>&1
             ${TAR_BIN} zxf ${APP_NAME}-${APP_VERSION}.tar.gz >> ${LOG} 2>&1
             if [ "$?" = "0" ]; then # if archive is valid
-                note "Binary build installed: ${APP_NAME} with version: ${APP_VERSION}"
+                note "Binary bundle installed: ${APP_NAME} with version: ${APP_VERSION}"
                 ${RM_BIN} -f ./${APP_NAME}-${APP_VERSION}.tar.gz
                 break
             else
-                note "No binary build available"
+                note "No binary bundle available"
                 ${RM_BIN} -f ./${APP_NAME}-${APP_VERSION}.tar.gz
             fi
 
@@ -693,6 +693,32 @@ for application in ${APPLICATIONS}; do
                     set_c_compiler GNU
                 else
                     set_c_compiler CLANG # look for bundled compiler:
+                fi
+
+                # binary build of software dependency
+                MIDDLE="${SYSTEM_NAME}-${SYSTEM_ARCH}-common"
+                REQ_APPNAME="$(${PRINTF_BIN} "${APP_NAME}" | ${CUT_BIN} -c1 | ${TR_BIN} '[a-z]' '[A-Z]')$(${PRINTF_BIN} "${APP_NAME}" | ${SED_BIN} 's/^[a-zA-Z]//')"
+                note "   → Checking availability of binary build of requirement: ${REQ_APPNAME} with version: ${APP_VERSION}"
+                TMP_REQ_DIR="tmp-req-${REQ_APPNAME}-${APP_VERSION}"
+                ${MKDIR_BIN} -p "${CACHE_DIR}${TMP_REQ_DIR}"
+                cd "${CACHE_DIR}${TMP_REQ_DIR}"
+                debug "Binary build should be available here: ${MAIN_BINARY_REPOSITORY}${MIDDLE}/${REQ_APPNAME}-${APP_VERSION}.tar.gz"
+                ${FETCH_BIN} "${MAIN_BINARY_REPOSITORY}${MIDDLE}/${REQ_APPNAME}-${APP_VERSION}.tar.gz"  >> ${LOG} 2>&1
+                ${TAR_BIN} zxf ${REQ_APPNAME}-${APP_VERSION}.tar.gz >> ${LOG} 2>&1
+                EXITCODE="$?"
+                ${RM_BIN} -rf "${CACHE_DIR}${TMP_REQ_DIR}/${REQ_APPNAME}/exports"
+                cd "${CACHE_DIR}" # back to existing cache dir
+                if [ "${EXITCODE}" = "0" ]; then # if archive is valid
+                    note "   → Binary requirement installed: ${REQ_APPNAME} with version: ${APP_VERSION}"
+                    if [ ! -d ${PREFIX} ]; then
+                        ${MKDIR_BIN} -p ${PREFIX}
+                    fi
+                    ${CP_BIN} -fR "${CACHE_DIR}${TMP_REQ_DIR}/${REQ_APPNAME}/" "${PREFIX}"
+                    ${RM_BIN} -fr "${CACHE_DIR}${TMP_REQ_DIR}"
+                    continue
+                else
+                    note "   → No binary build available for requirement: ${REQ_APPNAME}"
+                    ${RM_BIN} -fr "${CACHE_DIR}${TMP_REQ_DIR}"
                 fi
 
                 if [ "${APP_NO_CCACHE}" = "" ]; then # ccache is supported by default but it's optional
