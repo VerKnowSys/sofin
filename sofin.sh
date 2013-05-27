@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.46.17"
+readonly VERSION="0.47.2"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -622,6 +622,21 @@ for application in ${APPLICATIONS}; do
                 export PREFIX="${PREFIX}${APP_POSTFIX}"
             fi
 
+            # binary build
+            cd "${HOME}/${HOME_APPS_DIR}"
+            MIDDLE="${SYSTEM_NAME}-${SYSTEM_ARCH}-common"
+            note "Checking availability of binary build of version: ${APP_VERSION}"
+            debug "Binary build should be available here: ${MAIN_BINARY_REPOSITORY}${MIDDLE}/${APP_NAME}-${APP_VERSION}.tar.gz"
+            ${FETCH_BIN} "${MAIN_BINARY_REPOSITORY}${MIDDLE}/${APP_NAME}-${APP_VERSION}.tar.gz"  >> ${LOG} 2>&1
+            ${TAR_BIN} zxf ${APP_NAME}-${APP_VERSION}.tar.gz >> ${LOG} 2>&1
+            if [ "$?" = "0" ]; then # if archive is valid
+                note "Binary build installed: ${APP_NAME} with version: ${APP_VERSION}"
+                ${RM_BIN} -f ./${APP_NAME}-${APP_VERSION}.tar.gz
+                break
+            else
+                note "No binary build available"
+                ${RM_BIN} -f ./${APP_NAME}-${APP_VERSION}.tar.gz
+            fi
 
             run () {
                 if [ ! -z "$1" ]; then
