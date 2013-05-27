@@ -623,6 +623,7 @@ for application in ${APPLICATIONS}; do
             fi
 
             # binary build of whole software bundle
+            ${MKDIR_BIN} -p "${HOME}/${HOME_APPS_DIR}" > /dev/null 2>&1
             cd "${HOME}/${HOME_APPS_DIR}"
             MIDDLE="${SYSTEM_NAME}-${SYSTEM_ARCH}-common"
             note "Checking availability of binary build version: ${APP_VERSION}"
