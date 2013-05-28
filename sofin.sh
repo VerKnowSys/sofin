@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.47.6"
+readonly VERSION="0.47.7"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -588,6 +588,7 @@ for application in ${APPLICATIONS}; do
     . "${DEFINITIONS_DIR}${application}.def" # prevent installation of requirements of disabled application:
     check_disabled "${DISABLE_ON}" # after which just check if it's not disabled
     if [ ! "${ALLOW}" = "1" ]; then
+        note
         note "Requirement: ${APP_NAME} disabled on architecture: ${SYSTEM_NAME}.\n"
     else
         for definition in ${DEFINITIONS_DIR}${application}.def; do
@@ -637,7 +638,11 @@ for application in ${APPLICATIONS}; do
                 note "Seeking binary build: ${MIDDLE}/${APP_NAME}${APP_POSTFIX}-${APP_VERSION}"
                 ${FETCH_BIN} "${MAIN_BINARY_REPOSITORY}${MIDDLE}/${APP_NAME}${APP_POSTFIX}-${APP_VERSION}.tar.gz"  >> ${LOG} 2>&1
             fi
-            cd "${HOME}/${HOME_APPS_DIR}"
+            if [ "${USERNAME}" = "root" ]; then
+                cd "${SOFTWARE_ROOT_DIR}"
+            else
+                cd "${HOME}/${HOME_APPS_DIR}"
+            fi
             ${TAR_BIN} zxf "${BINBUILDS_CACHE_DIR}${ABSNAME}/${APP_NAME}${APP_POSTFIX}-${APP_VERSION}.tar.gz" >> ${LOG} 2>&1
             if [ "$?" = "0" ]; then # if archive is valid
                 note "Binary bundle installed: ${APP_NAME}${APP_POSTFIX} with version: ${APP_VERSION}"
