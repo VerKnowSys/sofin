@@ -1,18 +1,24 @@
 #!/bin/sh
 
-SOFTWARE_DIR="/Software"
-
+TR_BIN="/usr/bin/tr"
 RM_BIN="/bin/rm"
 TAR_BIN="/usr/bin/tar"
 UNAME_BIN="/usr/bin/uname"
 SCP_BIN="/usr/bin/scp"
+PRINTF_BIN="/usr/bin/printf"
 
 if [ "$(uname -s)" = "Linux" ]; then
     export TAR_BIN="/bin/tar"
     export UNAME_BIN="/bin/uname"
 fi
 
-USERNAME="root" # NOTE: rpath in binaries, XXX: fixme: add support for regular user binary builds
+if [ "$(id -u)" != "0" ]; then
+    export SOFTWARE_DIR="${HOME}/Apps"
+    export USERNAME="common" # NOTE: rpath in binaries, XXX: fixme: add support for regular user binary builds
+else
+    export SOFTWARE_DIR="/Software"
+    export USERNAME="root"
+fi
 SYSTEM_ARCH="$($UNAME_BIN -m)"
 SYSTEM_NAME="$($UNAME_BIN)"
 MIDDLE="${SYSTEM_NAME}-${SYSTEM_ARCH}-${USERNAME}"
@@ -26,9 +32,11 @@ for element in *; do
     if [ -d "${element}" ]; then
         if [ ! -L "${element}" ]; then
             echo "Preparing archive of: $element"
-            ${TAR_BIN} cf "${element}${postfix}" "./${element}"
+            lowercase_element="$(${PRINTF_BIN} "${element}" | ${TR_BIN} '[A-Z]' '[a-z]')"
+            version_element="$(cat ${element}/${lowercase_element}.installed)"
+            ${TAR_BIN} zcf "${element}-${version_element}${postfix}" "./${element}"
             echo "Sending archive to remote: ${MAIN_BINARY_REPOSITORY_DESTINATION}"
-            ${SCP_BIN} "${element}${postfix}" "${MAIN_BINARY_REPOSITORY_DESTINATION}${element}${postfix}"
+            ${SCP_BIN} "${element}-${version_element}${postfix}" "${MAIN_BINARY_REPOSITORY_DESTINATION}${element}-${version_element}${postfix}"
         fi
     fi
 done
