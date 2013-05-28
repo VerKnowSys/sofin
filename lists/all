@@ -1,5 +1,4 @@
 ant
-bash
 cairo
 ccache
 cmake
