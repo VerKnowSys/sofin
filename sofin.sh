@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.47.4"
+readonly VERSION="0.47.5"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -632,15 +632,14 @@ for application in ${APPLICATIONS}; do
             if [ ! -e "./${APP_NAME}${APP_POSTFIX}-${APP_VERSION}.tar.gz" ]; then
                 note "Fetching binary build: ${MIDDLE}/${APP_NAME}${APP_POSTFIX}-${APP_VERSION}"
                 ${FETCH_BIN} "${MAIN_BINARY_REPOSITORY}${MIDDLE}/${APP_NAME}${APP_POSTFIX}-${APP_VERSION}.tar.gz"  >> ${LOG} 2>&1
+            fi
+            cd "${HOME}/${HOME_APPS_DIR}"
+            ${TAR_BIN} zxf "${BINBUILDS_CACHE_DIR}${ABSNAME}/${APP_NAME}${APP_POSTFIX}-${APP_VERSION}.tar.gz" >> ${LOG} 2>&1
+            if [ "$?" = "0" ]; then # if archive is valid
+                note "Binary bundle installed: ${APP_NAME}${APP_POSTFIX} with version: ${APP_VERSION}"
+                break
             else
-                cd "${HOME}/${HOME_APPS_DIR}"
-                ${TAR_BIN} zxf "${BINBUILDS_CACHE_DIR}${ABSNAME}/${APP_NAME}${APP_POSTFIX}-${APP_VERSION}.tar.gz" >> ${LOG} 2>&1
-                if [ "$?" = "0" ]; then # if archive is valid
-                    note "Binary bundle installed: ${APP_NAME}${APP_POSTFIX} with version: ${APP_VERSION}"
-                    break
-                else
-                    note "No binary bundle available for ${APP_NAME}${APP_POSTFIX}"
-                fi
+                note "No binary bundle available for ${APP_NAME}${APP_POSTFIX}"
             fi
 
             run () {
