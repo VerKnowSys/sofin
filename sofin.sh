@@ -640,6 +640,7 @@ for application in ${APPLICATIONS}; do
                 break
             else
                 note "No binary bundle available for ${APP_NAME}${APP_POSTFIX}"
+                ${RM_BIN} -fr "${BINBUILDS_CACHE_DIR}${ABSNAME}"
             fi
 
             run () {
