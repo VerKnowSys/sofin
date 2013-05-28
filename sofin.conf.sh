@@ -196,25 +196,26 @@ esac
 readonly SOFTWARE_ROOT_DIR="/Software/"
 SOFTWARE_DIR="/Software/"
 CACHE_DIR="${SOFTWARE_DIR}.cache/"
+BINBUILDS_CACHE_DIR="${CACHE_DIR}binbuilds/"
 DEFINITIONS_DIR="${CACHE_DIR}definitions/"
-HOME_DIR="${HOME}/.."
+HOME_DIRS="${HOME}/.."
 LOG="${CACHE_DIR}install.log"
 LISTS_DIR="${CACHE_DIR}lists/"
 DEFAULTS="${DEFINITIONS_DIR}defaults.def"
 
 readonly CURRENT_USER_UID="$(${ID_BIN} -u)"
 if [ "${CURRENT_USER_UID}" != "0" ]; then
-    if [ "$(${FIND_BIN} ${HOME_DIR} -maxdepth 1 2>/dev/null | ${WC_BIN} -l | ${TR_BIN} -d ' ')" = "0" ]; then
-        error "No user home dir found? Critial error. No entries in ${HOME_DIR}? Fix it and retry."
+    if [ "$(${FIND_BIN} ${HOME_DIRS} -maxdepth 1 2>/dev/null | ${WC_BIN} -l | ${TR_BIN} -d ' ')" = "0" ]; then
+        error "No user home dir found? Critial error. No entries in ${HOME_DIRS}? Fix it and retry."
         exit 1
     fi
-    readonly USER_DIRNAME="$(${FIND_BIN} ${HOME_DIR} -maxdepth 1 -uid "${CURRENT_USER_UID}" 2> /dev/null)" # get user dir by uid and ignore access errors
+    readonly USER_DIRNAME="$(${FIND_BIN} ${HOME_DIRS} -maxdepth 1 -uid "${CURRENT_USER_UID}" 2> /dev/null)" # get user dir by uid and ignore access errors
 
     # additional check for multiple dirs with same UID (illegal)
     readonly USER_DIR_AMOUNT="$(echo "${USER_DIRNAME}" | ${WC_BIN} -l | ${TR_BIN} -d ' ')"
     debug "User dirs amount: ${USER_DIR_AMOUNT}"
     if [ "${USER_DIR_AMOUNT}" != "1" ]; then
-        error "Found more than one user with same uid in ${HOME_DIR}! That's illegal. Fix it an retry."
+        error "Found more than one user with same uid in ${HOME_DIRS}! That's illegal. Fix it an retry."
         error "Conflicting users: $(echo "${USER_DIRNAME}" | ${TR_BIN} '\n' ' ')"
         exit 1
     fi
@@ -223,7 +224,7 @@ if [ "${CURRENT_USER_UID}" != "0" ]; then
 
     # also explicit check if virtual user exists in home dir:
     if [ "${USERNAME}" = "" ]; then
-        error "No user homedir found in: ${HOME_DIR} for user: '${USERNAME}'"
+        error "No user homedir found in: ${HOME_DIRS} for user: '${USERNAME}'"
         exit 1
     fi
     readonly METADATA_FILE="${HOME}${PRIVATE_METADATA_DIR}${PRIVATE_METADATA_FILE}"
@@ -245,6 +246,7 @@ fi
 if [ "${USERNAME}" != "root" ]; then
     export SOFTWARE_DIR="${HOME}/${HOME_APPS_DIR}"
     export CACHE_DIR="${HOME}/.cache/"
+    export BINBUILDS_CACHE_DIR="${CACHE_DIR}binbuilds/"
     export LOG="${CACHE_DIR}install.log"
     export DEFINITIONS_DIR="${CACHE_DIR}definitions/"
     export LISTS_DIR="${CACHE_DIR}lists/"
@@ -252,6 +254,7 @@ if [ "${USERNAME}" != "root" ]; then
 fi
 
 # more values
+readonly BINBUILDS_CACHE_DIR
 readonly SOFTWARE_DIR
 readonly LOCK_FILE="${SOFTWARE_DIR}.sofin.lock"
 readonly LOG
