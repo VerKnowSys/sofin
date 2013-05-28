@@ -140,10 +140,7 @@ note "${SYSTEM_NAME} installation"
 case "${SYSTEM_NAME}" in
 
   Darwin)
-    if [ ! -e "${HOME}/.profile" ]; then
-      ${LN_BIN} -s "/Users/$(${ID_BIN} -u)/.profile" "${HOME}/.profile"
-      check_command_result $?
-    fi
+    check_root
     update_env_files
     install_base
     ;;

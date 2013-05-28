@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.46.17"
+readonly VERSION="0.47.5"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -622,6 +622,26 @@ for application in ${APPLICATIONS}; do
                 export PREFIX="${PREFIX}${APP_POSTFIX}"
             fi
 
+            # binary build of whole software bundle
+            ABSNAME="${APP_NAME}${APP_POSTFIX}-${APP_VERSION}"
+            ${MKDIR_BIN} -p "${HOME}/${HOME_APPS_DIR}" > /dev/null 2>&1
+            ${MKDIR_BIN} -p "${BINBUILDS_CACHE_DIR}${ABSNAME}" > /dev/null 2>&1
+
+            cd "${BINBUILDS_CACHE_DIR}${ABSNAME}/"
+            MIDDLE="${SYSTEM_NAME}-${SYSTEM_ARCH}-common"
+            if [ ! -e "./${APP_NAME}${APP_POSTFIX}-${APP_VERSION}.tar.gz" ]; then
+                note "Fetching binary build: ${MIDDLE}/${APP_NAME}${APP_POSTFIX}-${APP_VERSION}"
+                ${FETCH_BIN} "${MAIN_BINARY_REPOSITORY}${MIDDLE}/${APP_NAME}${APP_POSTFIX}-${APP_VERSION}.tar.gz"  >> ${LOG} 2>&1
+            fi
+            cd "${HOME}/${HOME_APPS_DIR}"
+            ${TAR_BIN} zxf "${BINBUILDS_CACHE_DIR}${ABSNAME}/${APP_NAME}${APP_POSTFIX}-${APP_VERSION}.tar.gz" >> ${LOG} 2>&1
+            if [ "$?" = "0" ]; then # if archive is valid
+                note "Binary bundle installed: ${APP_NAME}${APP_POSTFIX} with version: ${APP_VERSION}"
+                break
+            else
+                note "No binary bundle available for ${APP_NAME}${APP_POSTFIX}"
+                ${RM_BIN} -fr "${BINBUILDS_CACHE_DIR}${ABSNAME}"
+            fi
 
             run () {
                 if [ ! -z "$1" ]; then
@@ -678,6 +698,48 @@ for application in ${APPLICATIONS}; do
                     set_c_compiler GNU
                 else
                     set_c_compiler CLANG # look for bundled compiler:
+                fi
+
+                # binary build of software dependency
+                MIDDLE="${SYSTEM_NAME}-${SYSTEM_ARCH}-common"
+                REQ_APPNAME="$(${PRINTF_BIN} "${APP_NAME}" | ${CUT_BIN} -c1 | ${TR_BIN} '[a-z]' '[A-Z]')$(${PRINTF_BIN} "${APP_NAME}" | ${SED_BIN} 's/^[a-zA-Z]//')"
+                BINBUILD_ADDRESS="${MAIN_BINARY_REPOSITORY}${MIDDLE}/${REQ_APPNAME}${APP_POSTFIX}-${APP_VERSION}.tar.gz"
+                BINBUILD_FILE="$(${BASENAME_BIN} ${BINBUILD_ADDRESS})"
+                TMP_REQ_DIR="${BINBUILDS_CACHE_DIR}${REQ_APPNAME}${APP_POSTFIX}-${APP_VERSION}"
+                EXITCODE="0"
+                ${MKDIR_BIN} -p ${BINBUILDS_CACHE_DIR} > /dev/null 2>&1
+                ${MKDIR_BIN} -p ${TMP_REQ_DIR} > /dev/null 2>&1
+                note "   → Seeking binary build of requirement: ${REQ_APPNAME}${APP_POSTFIX} with version: ${APP_VERSION}"
+                debug "Binary build should be available here: ${MAIN_BINARY_REPOSITORY}${MIDDLE}/${REQ_APPNAME}${APP_POSTFIX}-${APP_VERSION}.tar.gz"
+
+                cd "${TMP_REQ_DIR}"
+                if [ ! -f "./${BINBUILD_FILE}" ]; then
+                    debug "Fetching binary build: ${BINBUILD_FILE}"
+                    ${FETCH_BIN} "${BINBUILD_ADDRESS}" >> ${LOG} 2>&1
+                fi
+                ${TAR_BIN} zxf ${REQ_APPNAME}${APP_POSTFIX}-${APP_VERSION}.tar.gz >> ${LOG} 2>&1
+                export EXITCODE="$?"
+
+                ${RM_BIN} -rf "${TMP_REQ_DIR}/${REQ_APPNAME}${APP_POSTFIX}/exports"
+                cd "${CACHE_DIR}" # back to existing cache dir
+                if [ "${EXITCODE}" = "0" ]; then # if archive is valid
+                    note "   → Binary requirement: ${REQ_APPNAME}${APP_POSTFIX} installed with version: ${APP_VERSION}"
+                    if [ ! -d ${PREFIX} ]; then
+                        ${MKDIR_BIN} -p ${PREFIX}
+                    fi
+                    cd "${TMP_REQ_DIR}/${REQ_APPNAME}${APP_POSTFIX}"
+                    for i in ${TMP_REQ_DIR}/${REQ_APPNAME}${APP_POSTFIX}/*; do # copy each folder to destination
+                        debug "COPY: ${i} to ${PREFIX}"
+                        ${CP_BIN} -fR "${i}/" "${PREFIX}" >> ${LOG} 2> ${LOG}
+                    done
+                    cd "${CACHE_DIR}"
+                    debug "Cleaning unpacked binary cache folder: ${TMP_REQ_DIR}/${REQ_APPNAME}${APP_POSTFIX}"
+                    ${RM_BIN} -rf "${TMP_REQ_DIR}/${REQ_APPNAME}${APP_POSTFIX}"
+                    debug "Marking as installed '$1' in: ${PREFIX}"
+                    ${TOUCH_BIN} "${PREFIX}/$1${INSTALLED_MARK}"
+                    continue
+                else
+                    note "   → No binary build available for requirement: ${REQ_APPNAME}"
                 fi
 
                 if [ "${APP_NO_CCACHE}" = "" ]; then # ccache is supported by default but it's optional
