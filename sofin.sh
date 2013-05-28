@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.47.5"
+readonly VERSION="0.47.6"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -628,9 +628,13 @@ for application in ${APPLICATIONS}; do
             ${MKDIR_BIN} -p "${BINBUILDS_CACHE_DIR}${ABSNAME}" > /dev/null 2>&1
 
             cd "${BINBUILDS_CACHE_DIR}${ABSNAME}/"
-            MIDDLE="${SYSTEM_NAME}-${SYSTEM_ARCH}-common"
+            BIN_POSTFIX="common"
+            if [ "${USERNAME}" = "root" ]; then
+                export BIN_POSTFIX="root"
+            fi
+            MIDDLE="${SYSTEM_NAME}-${SYSTEM_ARCH}-${BIN_POSTFIX}"
             if [ ! -e "./${APP_NAME}${APP_POSTFIX}-${APP_VERSION}.tar.gz" ]; then
-                note "Fetching binary build: ${MIDDLE}/${APP_NAME}${APP_POSTFIX}-${APP_VERSION}"
+                note "Seeking binary build: ${MIDDLE}/${APP_NAME}${APP_POSTFIX}-${APP_VERSION}"
                 ${FETCH_BIN} "${MAIN_BINARY_REPOSITORY}${MIDDLE}/${APP_NAME}${APP_POSTFIX}-${APP_VERSION}.tar.gz"  >> ${LOG} 2>&1
             fi
             cd "${HOME}/${HOME_APPS_DIR}"
@@ -701,7 +705,11 @@ for application in ${APPLICATIONS}; do
                 fi
 
                 # binary build of software dependency
-                MIDDLE="${SYSTEM_NAME}-${SYSTEM_ARCH}-common"
+                BIN_POSTFIX="common"
+                if [ "${USERNAME}" = "root" ]; then
+                    export BIN_POSTFIX="root"
+                fi
+                MIDDLE="${SYSTEM_NAME}-${SYSTEM_ARCH}-${BIN_POSTFIX}"
                 REQ_APPNAME="$(${PRINTF_BIN} "${APP_NAME}" | ${CUT_BIN} -c1 | ${TR_BIN} '[a-z]' '[A-Z]')$(${PRINTF_BIN} "${APP_NAME}" | ${SED_BIN} 's/^[a-zA-Z]//')"
                 BINBUILD_ADDRESS="${MAIN_BINARY_REPOSITORY}${MIDDLE}/${REQ_APPNAME}${APP_POSTFIX}-${APP_VERSION}.tar.gz"
                 BINBUILD_FILE="$(${BASENAME_BIN} ${BINBUILD_ADDRESS})"
