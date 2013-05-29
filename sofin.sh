@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.47.8"
+readonly VERSION="0.47.9"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -393,10 +393,10 @@ if [ ! "$1" = "" ]; then
         # first of all, try using a list if exists:
         if [ -f "${LISTS_DIR}$2" ]; then
             export APPLICATIONS="$(${CAT_BIN} ${LISTS_DIR}$2 | ${TR_BIN} '\n' ' ')"
-            note "Installing software: ${APPLICATIONS}"
+            note "Processing software: ${APPLICATIONS}"
         else
             export APPLICATIONS="$(echo ${SOFIN_ARGS})"
-            note "Installing software: ${SOFIN_ARGS}"
+            note "Processing software: ${SOFIN_ARGS}"
         fi
         ;;
 
@@ -636,47 +636,48 @@ for application in ${APPLICATIONS}; do
             fi
             MIDDLE="${SYSTEM_NAME}-${SYSTEM_ARCH}-${BIN_POSTFIX}"
             ARCHIVE_NAME="${APP_NAME}${APP_POSTFIX}-${APP_VERSION}.tar.gz"
-            if [ ! -e "./${ARCHIVE_NAME}" ]; then
-                note "Seeking binary build: ${MIDDLE}/${APP_NAME}${APP_POSTFIX}-${APP_VERSION}"
-                ${FETCH_BIN} "${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}"  >> ${LOG} 2>&1
-                ${FETCH_BIN} "${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}.sha1"  >> ${LOG} 2>&1
-
-                # checking archive sha1 checksum
-                if [ -e "${ARCHIVE_NAME}" ]; then
-                    export current_archive_sha1="$(${SHA_BIN} "${ARCHIVE_NAME}" | ${AWK_BIN} '{ print $1 }')"
-                fi
-                current_sha_file="${ARCHIVE_NAME}.sha1"
-                if [ -e "${current_sha_file}" ]; then
-                    export sha1_value="$(cat ${current_sha_file})"
-                fi
-
-                debug "${current_archive_sha1} vs ${sha1_value}"
-                if [ "${current_archive_sha1}" != "${sha1_value}" ]; then
-                    ${RM_BIN} -f ${ARCHIVE_NAME}
-                    ${RM_BIN} -f ${ARCHIVE_NAME}.sha1
-                fi
-            fi
-            if [ "${USERNAME}" = "root" ]; then
-                cd "${SOFTWARE_ROOT_DIR}"
-            else
-                cd "${HOME}/${HOME_APPS_DIR}"
-            fi
             INSTALLED_INDICATOR="${PREFIX}/${APP_LOWER}.installed"
             if [ ! -e "${INSTALLED_INDICATOR}" ]; then
+                if [ ! -e "./${ARCHIVE_NAME}" ]; then
+                    note "Fetching binary build for ${MIDDLE}/${APP_NAME}${APP_POSTFIX}-${APP_VERSION}"
+                    ${FETCH_BIN} "${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}"  >> ${LOG} 2>&1
+                    ${FETCH_BIN} "${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}.sha1"  >> ${LOG} 2>&1
+
+                    # checking archive sha1 checksum
+                    if [ -e "${ARCHIVE_NAME}" ]; then
+                        export current_archive_sha1="$(${SHA_BIN} "${ARCHIVE_NAME}" | ${AWK_BIN} '{ print $1 }')"
+                    fi
+                    current_sha_file="${ARCHIVE_NAME}.sha1"
+                    if [ -e "${current_sha_file}" ]; then
+                        export sha1_value="$(cat ${current_sha_file})"
+                    fi
+
+                    debug "${current_archive_sha1} vs ${sha1_value}"
+                    if [ "${current_archive_sha1}" != "${sha1_value}" ]; then
+                        ${RM_BIN} -f ${ARCHIVE_NAME}
+                        ${RM_BIN} -f ${ARCHIVE_NAME}.sha1
+                    fi
+                fi
+                if [ "${USERNAME}" = "root" ]; then
+                    cd "${SOFTWARE_ROOT_DIR}"
+                else
+                    cd "${HOME}/${HOME_APPS_DIR}"
+                fi
+
                 if [ -e "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" ]; then # if exists, then checksum is ok
                     ${TAR_BIN} zxf "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" >> ${LOG} 2>&1
                     if [ "$?" = "0" ]; then # if archive is valid
-                        note "Binary bundle installed: ${APP_NAME}${APP_POSTFIX} with version: ${APP_VERSION}"
+                        note "  → Binary bundle installed: ${APP_NAME}${APP_POSTFIX} with version: ${APP_VERSION}"
                         break
                     else
-                        note "No binary bundle available for ${APP_NAME}${APP_POSTFIX}"
+                        note "  → No binary bundle available for ${APP_NAME}${APP_POSTFIX}"
                         ${RM_BIN} -fr "${BINBUILDS_CACHE_DIR}${ABSNAME}"
                     fi
                 else
-                    debug "Binary build checksum not matching for ${APP_NAME}${APP_POSTFIX}"
+                    debug "  → Binary build checksum doesn't match for: ${ABSNAME}"
                 fi
             else
-                note "Software already installed: ${APP_NAME}${APP_POSTFIX} with version: $(cat ${INSTALLED_INDICATOR})"
+                note "  → Software already installed: ${APP_NAME}${APP_POSTFIX} with version: $(cat ${INSTALLED_INDICATOR})"
                     break
             fi
 
