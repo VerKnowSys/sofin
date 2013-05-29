@@ -50,6 +50,7 @@ customizable software for FreeBSD servers. Darwin (Mac OS X) support started wit
   - APP_AFTER_INSTALL_CALLBACK (executed after software installation process)
   Each callback can be sh function itself and to be called by name. Look into [sbt.def](https://github.com/VerKnowSys/sofin/blob/master/definitions/sbt.def) for an example createLaunchScript().
 * Supports collisions between definitions through APP_CONFLICTS_WITH option since version 0.38.0. An example in [ruby.def](https://github.com/VerKnowSys/sofin/blob/master/definitions/ruby.def)
+* Supports binary builds of software bundles and requirements since 0.47.2
 
 
 ## Examples:
