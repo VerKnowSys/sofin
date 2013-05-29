@@ -638,7 +638,7 @@ for application in ${APPLICATIONS}; do
             INSTALLED_INDICATOR="${PREFIX}/${APP_LOWER}.installed"
             if [ ! -e "${INSTALLED_INDICATOR}" ]; then
                 if [ ! -e "./${ARCHIVE_NAME}" ]; then
-                    note "Fetching binary build for ${MIDDLE}/${APP_NAME}${APP_POSTFIX}-${APP_VERSION}"
+                    note "Trying binary build for: ${MIDDLE}/${APP_NAME}${APP_POSTFIX}-${APP_VERSION}"
                     ${FETCH_BIN} "${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}"  >> ${LOG} 2>&1
                     ${FETCH_BIN} "${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}.sha1"  >> ${LOG} 2>&1
 
@@ -669,7 +669,7 @@ for application in ${APPLICATIONS}; do
                         note "  → Binary bundle installed: ${APP_NAME}${APP_POSTFIX} with version: ${APP_VERSION}"
                         break
                     else
-                        note "  → No binary bundle available for ${APP_NAME}${APP_POSTFIX}"
+                        debug "  → No binary bundle available for ${APP_NAME}${APP_POSTFIX}"
                         ${RM_BIN} -fr "${BINBUILDS_CACHE_DIR}${ABSNAME}"
                     fi
                 else
@@ -751,7 +751,7 @@ for application in ${APPLICATIONS}; do
                 EXITCODE="0"
                 ${MKDIR_BIN} -p ${BINBUILDS_CACHE_DIR} > /dev/null 2>&1
                 ${MKDIR_BIN} -p ${TMP_REQ_DIR} > /dev/null 2>&1
-                note "   → Seeking binary build of requirement: ${REQ_APPNAME}${APP_POSTFIX} with version: ${APP_VERSION}"
+                debug "Fetching binary build of requirement: ${REQ_APPNAME}${APP_POSTFIX} with version: ${APP_VERSION}"
                 debug "Binary build should be available here: ${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}"
 
                 cd "${TMP_REQ_DIR}"
