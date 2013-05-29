@@ -37,7 +37,17 @@ for element in *; do
             else
                 note "Archive already exists. Skipping: ${name}"
             fi
-            archive_sha1="$(${SHA_BIN} "${name}" | ${AWK_BIN} '{ print $1 }')"
+
+            case "${SYSTEM_NAME}" in
+                Darwin|Linux)
+                    export archive_sha1="$(${SHA_BIN} "${name}" | ${AWK_BIN} '{ print $1 }')"
+                    ;;
+
+                FreeBSD)
+                    export archive_sha1="$(${SHA_BIN} -q "${name}")"
+                    ;;
+            esac
+
             ${PRINTF_BIN} "${archive_sha1}" > "${name}.sha1"
             note "Archive sha: ${archive_sha1}"
 

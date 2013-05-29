@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.47.9"
+readonly VERSION="0.47.10"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -644,7 +644,15 @@ for application in ${APPLICATIONS}; do
 
                     # checking archive sha1 checksum
                     if [ -e "${ARCHIVE_NAME}" ]; then
-                        export current_archive_sha1="$(${SHA_BIN} "${ARCHIVE_NAME}" | ${AWK_BIN} '{ print $1 }')"
+                        case "${SYSTEM_NAME}" in
+                            Darwin|Linux)
+                                export current_archive_sha1="$(${SHA_BIN} "${ARCHIVE_NAME}" | ${AWK_BIN} '{ print $1 }')"
+                                ;;
+
+                            FreeBSD)
+                                export current_archive_sha1="$(${SHA_BIN} -q "${ARCHIVE_NAME}")"
+                                ;;
+                        esac
                     fi
                     current_sha_file="${ARCHIVE_NAME}.sha1"
                     if [ -e "${current_sha_file}" ]; then
@@ -762,7 +770,15 @@ for application in ${APPLICATIONS}; do
 
                     # checking archive sha1 checksum
                     if [ -e "${BINBUILD_FILE}" ]; then
-                        export current_archive_sha1="$(${SHA_BIN} "${BINBUILD_FILE}" | ${AWK_BIN} '{ print $1 }')"
+                        case "${SYSTEM_NAME}" in
+                            Darwin|Linux)
+                                export current_archive_sha1="$(${SHA_BIN} "${BINBUILD_FILE}" | ${AWK_BIN} '{ print $1 }')"
+                                ;;
+
+                            FreeBSD)
+                                export current_archive_sha1="$(${SHA_BIN} -q "${BINBUILD_FILE}")"
+                                ;;
+                        esac
                     fi
                     current_sha_file="${BINBUILD_FILE}.sha1"
                     if [ -e "${current_sha_file}" ]; then
