@@ -677,7 +677,7 @@ for application in ${APPLICATIONS}; do
                     debug "  → Binary build checksum doesn't match for: ${ABSNAME}"
                 fi
             else
-                note "  → Software already installed: ${APP_NAME}${APP_POSTFIX} with version: $(cat ${INSTALLED_INDICATOR})"
+                note "Software already installed: ${APP_NAME}${APP_POSTFIX} with version: $(cat ${INSTALLED_INDICATOR})"
                     break
             fi
 
