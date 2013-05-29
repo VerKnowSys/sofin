@@ -789,7 +789,7 @@ for application in ${APPLICATIONS}; do
                         fi
                         cd "${TMP_REQ_DIR}/${REQ_APPNAME}${APP_POSTFIX}"
                         for i in ${TMP_REQ_DIR}/${REQ_APPNAME}${APP_POSTFIX}/*; do # copy each folder to destination
-                            warn "COPY: ${i} to ${PREFIX}"
+                            debug "COPY: ${i} to ${PREFIX}"
                             ${CP_BIN} -fR "${i}/" "${PREFIX}/$(${BASENAME_BIN} "${i}")" >> ${LOG} 2> ${LOG}
                         done
                         cd "${CACHE_DIR}"
