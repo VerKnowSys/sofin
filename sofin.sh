@@ -635,9 +635,26 @@ for application in ${APPLICATIONS}; do
                 export BIN_POSTFIX="root"
             fi
             MIDDLE="${SYSTEM_NAME}-${SYSTEM_ARCH}-${BIN_POSTFIX}"
-            if [ ! -e "./${APP_NAME}${APP_POSTFIX}-${APP_VERSION}.tar.gz" ]; then
+            ARCHIVE_NAME="${APP_NAME}${APP_POSTFIX}-${APP_VERSION}.tar.gz"
+            if [ ! -e "./${ARCHIVE_NAME}" ]; then
                 note "Seeking binary build: ${MIDDLE}/${APP_NAME}${APP_POSTFIX}-${APP_VERSION}"
-                ${FETCH_BIN} "${MAIN_BINARY_REPOSITORY}${MIDDLE}/${APP_NAME}${APP_POSTFIX}-${APP_VERSION}.tar.gz"  >> ${LOG} 2>&1
+                ${FETCH_BIN} "${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}"  >> ${LOG} 2>&1
+                ${FETCH_BIN} "${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}.sha1"  >> ${LOG} 2>&1
+
+                # checking archive sha1 checksum
+                if [ -e "${ARCHIVE_NAME}" ]; then
+                    export current_archive_sha1="$(${SHA_BIN} "${ARCHIVE_NAME}" | ${AWK_BIN} '{ print $1 }')"
+                fi
+                current_sha_file="${ARCHIVE_NAME}.sha1"
+                if [ -e "${current_sha_file}" ]; then
+                    export sha1_value="$(cat ${current_sha_file})"
+                fi
+
+                debug "${current_archive_sha1} vs ${sha1_value}"
+                if [ "${current_archive_sha1}" != "${sha1_value}" ]; then
+                    ${RM_BIN} -f ${ARCHIVE_NAME}
+                    ${RM_BIN} -f ${ARCHIVE_NAME}.sha1
+                fi
             fi
             if [ "${USERNAME}" = "root" ]; then
                 cd "${SOFTWARE_ROOT_DIR}"
@@ -646,13 +663,17 @@ for application in ${APPLICATIONS}; do
             fi
             INSTALLED_INDICATOR="${PREFIX}/${APP_LOWER}.installed"
             if [ ! -e "${INSTALLED_INDICATOR}" ]; then
-                ${TAR_BIN} zxf "${BINBUILDS_CACHE_DIR}${ABSNAME}/${APP_NAME}${APP_POSTFIX}-${APP_VERSION}.tar.gz" >> ${LOG} 2>&1
-                if [ "$?" = "0" ]; then # if archive is valid
-                    note "Binary bundle installed: ${APP_NAME}${APP_POSTFIX} with version: ${APP_VERSION}"
-                    break
+                if [ -e "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" ]; then # if exists, then checksum is ok
+                    ${TAR_BIN} zxf "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" >> ${LOG} 2>&1
+                    if [ "$?" = "0" ]; then # if archive is valid
+                        note "Binary bundle installed: ${APP_NAME}${APP_POSTFIX} with version: ${APP_VERSION}"
+                        break
+                    else
+                        note "No binary bundle available for ${APP_NAME}${APP_POSTFIX}"
+                        ${RM_BIN} -fr "${BINBUILDS_CACHE_DIR}${ABSNAME}"
+                    fi
                 else
-                    note "No binary bundle available for ${APP_NAME}${APP_POSTFIX}"
-                    ${RM_BIN} -fr "${BINBUILDS_CACHE_DIR}${ABSNAME}"
+                    debug "Binary build checksum not matching for ${APP_NAME}${APP_POSTFIX}"
                 fi
             else
                 note "Software already installed: ${APP_NAME}${APP_POSTFIX} with version: $(cat ${INSTALLED_INDICATOR})"
@@ -723,43 +744,63 @@ for application in ${APPLICATIONS}; do
                 fi
                 MIDDLE="${SYSTEM_NAME}-${SYSTEM_ARCH}-${BIN_POSTFIX}"
                 REQ_APPNAME="$(${PRINTF_BIN} "${APP_NAME}" | ${CUT_BIN} -c1 | ${TR_BIN} '[a-z]' '[A-Z]')$(${PRINTF_BIN} "${APP_NAME}" | ${SED_BIN} 's/^[a-zA-Z]//')"
-                BINBUILD_ADDRESS="${MAIN_BINARY_REPOSITORY}${MIDDLE}/${REQ_APPNAME}${APP_POSTFIX}-${APP_VERSION}.tar.gz"
+                ARCHIVE_NAME="${REQ_APPNAME}${APP_POSTFIX}-${APP_VERSION}.tar.gz"
+                BINBUILD_ADDRESS="${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}"
                 BINBUILD_FILE="$(${BASENAME_BIN} ${BINBUILD_ADDRESS})"
                 TMP_REQ_DIR="${BINBUILDS_CACHE_DIR}${REQ_APPNAME}${APP_POSTFIX}-${APP_VERSION}"
                 EXITCODE="0"
                 ${MKDIR_BIN} -p ${BINBUILDS_CACHE_DIR} > /dev/null 2>&1
                 ${MKDIR_BIN} -p ${TMP_REQ_DIR} > /dev/null 2>&1
                 note "   → Seeking binary build of requirement: ${REQ_APPNAME}${APP_POSTFIX} with version: ${APP_VERSION}"
-                debug "Binary build should be available here: ${MAIN_BINARY_REPOSITORY}${MIDDLE}/${REQ_APPNAME}${APP_POSTFIX}-${APP_VERSION}.tar.gz"
+                debug "Binary build should be available here: ${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}"
 
                 cd "${TMP_REQ_DIR}"
                 if [ ! -f "./${BINBUILD_FILE}" ]; then
                     debug "Fetching binary build: ${BINBUILD_FILE}"
                     ${FETCH_BIN} "${BINBUILD_ADDRESS}" >> ${LOG} 2>&1
-                fi
-                ${TAR_BIN} zxf ${REQ_APPNAME}${APP_POSTFIX}-${APP_VERSION}.tar.gz >> ${LOG} 2>&1
-                export EXITCODE="$?"
+                    ${FETCH_BIN} "${BINBUILD_ADDRESS}.sha1" >> ${LOG} 2>&1
 
-                ${RM_BIN} -rf "${TMP_REQ_DIR}/${REQ_APPNAME}${APP_POSTFIX}/exports"
-                cd "${CACHE_DIR}" # back to existing cache dir
-                if [ "${EXITCODE}" = "0" ]; then # if archive is valid
-                    note "   → Binary requirement: ${REQ_APPNAME}${APP_POSTFIX} installed with version: ${APP_VERSION}"
-                    if [ ! -d ${PREFIX} ]; then
-                        ${MKDIR_BIN} -p ${PREFIX}
+                    # checking archive sha1 checksum
+                    if [ -e "${BINBUILD_FILE}" ]; then
+                        export current_archive_sha1="$(${SHA_BIN} "${BINBUILD_FILE}" | ${AWK_BIN} '{ print $1 }')"
                     fi
-                    cd "${TMP_REQ_DIR}/${REQ_APPNAME}${APP_POSTFIX}"
-                    for i in ${TMP_REQ_DIR}/${REQ_APPNAME}${APP_POSTFIX}/*; do # copy each folder to destination
-                        debug "COPY: ${i} to ${PREFIX}"
-                        ${CP_BIN} -fR "${i}/" "${PREFIX}" >> ${LOG} 2> ${LOG}
-                    done
-                    cd "${CACHE_DIR}"
-                    debug "Cleaning unpacked binary cache folder: ${TMP_REQ_DIR}/${REQ_APPNAME}${APP_POSTFIX}"
-                    ${RM_BIN} -rf "${TMP_REQ_DIR}/${REQ_APPNAME}${APP_POSTFIX}"
-                    debug "Marking as installed '$1' in: ${PREFIX}"
-                    ${TOUCH_BIN} "${PREFIX}/$1${INSTALLED_MARK}"
-                    continue
-                else
-                    note "   → No binary build available for requirement: ${REQ_APPNAME}"
+                    current_sha_file="${BINBUILD_FILE}.sha1"
+                    if [ -e "${current_sha_file}" ]; then
+                        export sha1_value="$(cat ${current_sha_file})"
+                    fi
+
+                    debug "${current_archive_sha1} vs ${sha1_value}"
+                    if [ "${current_archive_sha1}" != "${sha1_value}" ]; then
+                        ${RM_BIN} -f ${BINBUILD_FILE}
+                        ${RM_BIN} -f ${BINBUILD_FILE}.sha1
+                    fi
+                fi
+
+                if [ -e "./${BINBUILD_FILE}" ]; then # if exists then checksum is ok
+                    ${TAR_BIN} zxf ${ARCHIVE_NAME} >> ${LOG} 2>&1
+                    export EXITCODE="$?"
+
+                    ${RM_BIN} -rf "${TMP_REQ_DIR}/${REQ_APPNAME}${APP_POSTFIX}/exports"
+                    cd "${CACHE_DIR}" # back to existing cache dir
+                    if [ "${EXITCODE}" = "0" ]; then # if archive is valid
+                        note "   → Binary requirement: ${REQ_APPNAME}${APP_POSTFIX} installed with version: ${APP_VERSION}"
+                        if [ ! -d ${PREFIX} ]; then
+                            ${MKDIR_BIN} -p ${PREFIX}
+                        fi
+                        cd "${TMP_REQ_DIR}/${REQ_APPNAME}${APP_POSTFIX}"
+                        for i in ${TMP_REQ_DIR}/${REQ_APPNAME}${APP_POSTFIX}/*; do # copy each folder to destination
+                            warn "COPY: ${i} to ${PREFIX}"
+                            ${CP_BIN} -fR "${i}/" "${PREFIX}/$(${BASENAME_BIN} "${i}")" >> ${LOG} 2> ${LOG}
+                        done
+                        cd "${CACHE_DIR}"
+                        debug "Cleaning unpacked binary cache folder: ${TMP_REQ_DIR}/${REQ_APPNAME}${APP_POSTFIX}"
+                        ${RM_BIN} -rf "${TMP_REQ_DIR}/${REQ_APPNAME}${APP_POSTFIX}"
+                        debug "Marking as installed '$1' in: ${PREFIX}"
+                        ${TOUCH_BIN} "${PREFIX}/$1${INSTALLED_MARK}"
+                        continue
+                    else
+                        note "   → No binary build available for requirement: ${REQ_APPNAME}"
+                    fi
                 fi
 
                 if [ "${APP_NO_CCACHE}" = "" ]; then # ccache is supported by default but it's optional
