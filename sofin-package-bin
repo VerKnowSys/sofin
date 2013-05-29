@@ -1,6 +1,5 @@
 #!/bin/sh
 
-NOUPLOAD="YES"
 
 readonly CONF_FILE="/etc/sofin.conf.sh"
 if [ -e "${CONF_FILE}" ]; then
@@ -11,6 +10,7 @@ else
     exit 1
 fi
 
+note "Upload enabled for: $1"
 
 if [ "$(id -u)" != "0" ]; then
     export USER_TYPE="common" # NOTE: rpath in binaries, XXX: fixme: add support for regular user binary builds
@@ -51,7 +51,7 @@ for element in *; do
             ${PRINTF_BIN} "${archive_sha1}" > "${name}.sha1"
             note "Archive sha: ${archive_sha1}"
 
-            if [ "${NOUPLOAD}" != "YES" ]; then
+            if [ "${element}" = "$1" ]; then
                 note "Sending archive to remote: ${MAIN_BINARY_REPOSITORY_DESTINATION}"
                 ${SCP_BIN} "${name}" "${MAIN_BINARY_REPOSITORY_DESTINATION}${name}"
                 ${SCP_BIN} "${name}.sha1" "${MAIN_BINARY_REPOSITORY_DESTINATION}${name}.sha1"
