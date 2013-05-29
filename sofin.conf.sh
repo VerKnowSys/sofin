@@ -70,6 +70,7 @@ HEAD_BIN="/usr/bin/head"
 SERVICE_BIN="/usr/sbin/service"
 TEST_BIN="/bin/test"
 CHMOD_BIN="/bin/chmod"
+SCP_BIN="/usr/bin/scp"
 XARGS_BIN="/usr/bin/xargs"
 SOFIN_BIN="/usr/bin/sofin"
 

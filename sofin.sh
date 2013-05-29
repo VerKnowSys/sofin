@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.47.7"
+readonly VERSION="0.47.8"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -598,6 +598,7 @@ for application in ${APPLICATIONS}; do
             check_disabled "${DISABLE_ON}" # after which just check if it's not disabled
 
             # fancy old style Capitalize
+            APP_LOWER="${APP_NAME}"
             APP_NAME="$(${PRINTF_BIN} "${APP_NAME}" | ${CUT_BIN} -c1 | ${TR_BIN} '[a-z]' '[A-Z]')$(${PRINTF_BIN} "${APP_NAME}" | ${SED_BIN} 's/^[a-zA-Z]//')"
             if [ "${REQUIRE_ROOT_ACCESS}" = "true" ]; then
                 if [ "${USERNAME}" != "root" ]; then
@@ -643,13 +644,19 @@ for application in ${APPLICATIONS}; do
             else
                 cd "${HOME}/${HOME_APPS_DIR}"
             fi
-            ${TAR_BIN} zxf "${BINBUILDS_CACHE_DIR}${ABSNAME}/${APP_NAME}${APP_POSTFIX}-${APP_VERSION}.tar.gz" >> ${LOG} 2>&1
-            if [ "$?" = "0" ]; then # if archive is valid
-                note "Binary bundle installed: ${APP_NAME}${APP_POSTFIX} with version: ${APP_VERSION}"
-                break
+            INSTALLED_INDICATOR="${PREFIX}/${APP_LOWER}.installed"
+            if [ ! -e "${INSTALLED_INDICATOR}" ]; then
+                ${TAR_BIN} zxf "${BINBUILDS_CACHE_DIR}${ABSNAME}/${APP_NAME}${APP_POSTFIX}-${APP_VERSION}.tar.gz" >> ${LOG} 2>&1
+                if [ "$?" = "0" ]; then # if archive is valid
+                    note "Binary bundle installed: ${APP_NAME}${APP_POSTFIX} with version: ${APP_VERSION}"
+                    break
+                else
+                    note "No binary bundle available for ${APP_NAME}${APP_POSTFIX}"
+                    ${RM_BIN} -fr "${BINBUILDS_CACHE_DIR}${ABSNAME}"
+                fi
             else
-                note "No binary bundle available for ${APP_NAME}${APP_POSTFIX}"
-                ${RM_BIN} -fr "${BINBUILDS_CACHE_DIR}${ABSNAME}"
+                note "Software already installed: ${APP_NAME}${APP_POSTFIX} with version: $(cat ${INSTALLED_INDICATOR})"
+                    break
             fi
 
             run () {
