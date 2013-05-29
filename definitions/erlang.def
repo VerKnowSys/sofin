@@ -1,0 +1,6 @@
+APP_FULL_NAME="Erlang OTP"
+APP_SHA="a538c64a4fd9ed16a29f981321f0830a3da02bae"
+APP_NAME="otp"
+APP_VERSION="R16B"
+APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}_src_${APP_VERSION}.tar.gz"
+APP_EXPORTS="ct_run dialyzer epmd erl erlc escript run_erl to_erl typer"
