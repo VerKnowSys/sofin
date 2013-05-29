@@ -432,10 +432,10 @@ if [ ! "$1" = "" ]; then
         # first look for a list with that name:
         if [ -e "${LISTS_DIR}${2}" ]; then
             export APPLICATIONS="$(${CAT_BIN} ${LISTS_DIR}$2 | ${TR_BIN} '\n' ' ')"
-            note "Remove of list of software requested: ${APPLICATIONS}"
+            debug "Removing list of applications: ${APPLICATIONS}"
         else
             export APPLICATIONS="$(echo ${SOFIN_ARGS})"
-            note "Removing applications: ${SOFIN_ARGS}"
+            debug "Removing applications: ${SOFIN_ARGS}"
         fi
 
         for app in $APPLICATIONS; do
@@ -588,8 +588,7 @@ for application in ${APPLICATIONS}; do
     . "${DEFINITIONS_DIR}${application}.def" # prevent installation of requirements of disabled application:
     check_disabled "${DISABLE_ON}" # after which just check if it's not disabled
     if [ ! "${ALLOW}" = "1" ]; then
-        note
-        note "Requirement: ${APP_NAME} disabled on architecture: ${SYSTEM_NAME}.\n"
+        note "Software: ${application} disabled on architecture: ${SYSTEM_NAME}-${SYSTEM_ARCH}"
     else
         for definition in ${DEFINITIONS_DIR}${application}.def; do
             debug "Reading definition: ${definition}"
