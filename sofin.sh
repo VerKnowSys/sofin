@@ -764,7 +764,7 @@ for application in ${APPLICATIONS}; do
 
                 cd "${TMP_REQ_DIR}"
                 if [ ! -f "./${BINBUILD_FILE}" ]; then
-                    debug "Fetching binary build: ${BINBUILD_FILE}"
+                    note "Fetching binary build: ${BINBUILD_FILE}"
                     ${FETCH_BIN} "${BINBUILD_ADDRESS}" >> ${LOG} 2>&1
                     ${FETCH_BIN} "${BINBUILD_ADDRESS}.sha1" >> ${LOG} 2>&1
 
