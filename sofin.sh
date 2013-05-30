@@ -805,8 +805,16 @@ for application in ${APPLICATIONS}; do
                         fi
                         cd "${TMP_REQ_DIR}/${REQ_APPNAME}${APP_POSTFIX}"
                         for i in ${TMP_REQ_DIR}/${REQ_APPNAME}${APP_POSTFIX}/*; do # copy each folder to destination
-                            debug "COPY: ${i} to ${PREFIX}"
-                            ${CP_BIN} -fR "${i}/" "${PREFIX}/$(${BASENAME_BIN} "${i}")" >> ${LOG} 2> ${LOG}
+                            case "$(${BASENAME_BIN} ${i})" in
+                                exports|exports-disabled)
+                                    debug "Do nothing. I won't copy exports dirs."
+                                    ;;
+
+                                *)
+                                    debug "COPY: ${i} to ${PREFIX}"
+                                    ${CP_BIN} -fR "${i}/" "${PREFIX}/$(${BASENAME_BIN} "${i}")" >> ${LOG} 2> ${LOG}
+                                    ;;
+                            esac
                         done
                         cd "${CACHE_DIR}"
                         debug "Cleaning unpacked binary cache folder: ${TMP_REQ_DIR}/${REQ_APPNAME}${APP_POSTFIX}"
