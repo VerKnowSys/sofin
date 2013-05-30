@@ -25,7 +25,7 @@ postfix=".tar.gz"
 note "Changing dir to: ${SOFTWARE_DIR}"
 cd "${SOFTWARE_DIR}"
 #$RM_BIN -vf "*${postfix}"
-for element in *; do
+for element in $*; do
     if [ -d "${element}" ]; then
         if [ ! -L "${element}" ]; then
             lowercase_element="$(${PRINTF_BIN} "${element}" | ${TR_BIN} '[A-Z]' '[a-z]')"
@@ -50,15 +50,12 @@ for element in *; do
 
             ${PRINTF_BIN} "${archive_sha1}" > "${name}.sha1"
             note "Archive sha: ${archive_sha1}"
-
-            if [ "${element}" = "$1" ]; then
-                note "Sending archive to remote: ${MAIN_BINARY_REPOSITORY_DESTINATION}"
-                ${SCP_BIN} "${name}" "${MAIN_BINARY_REPOSITORY_DESTINATION}${name}"
-                ${SCP_BIN} "${name}.sha1" "${MAIN_BINARY_REPOSITORY_DESTINATION}${name}.sha1"
-            else
-                note "Upload disabled for: ${name}"
-            fi
+            note "Sending archive to remote: ${MAIN_BINARY_REPOSITORY_DESTINATION}"
+            ${SCP_BIN} "${name}" "${MAIN_BINARY_REPOSITORY_DESTINATION}${name}"
+            ${SCP_BIN} "${name}.sha1" "${MAIN_BINARY_REPOSITORY_DESTINATION}${name}.sha1"
         fi
+    else
+        warn "Not found software named: ${element}!"
     fi
 done
 
