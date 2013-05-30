@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.47.10"
+readonly VERSION="0.47.11"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -685,7 +685,7 @@ for application in ${APPLICATIONS}; do
                 fi
             else
                 note "Software already installed: ${APP_NAME}${APP_POSTFIX} with version: $(cat ${INSTALLED_INDICATOR})"
-                    break
+                export DONT_BUILD_BUT_DO_EXPORTS="true"
             fi
 
             run () {
@@ -764,7 +764,7 @@ for application in ${APPLICATIONS}; do
 
                 cd "${TMP_REQ_DIR}"
                 if [ ! -f "./${BINBUILD_FILE}" ]; then
-                    note "Fetching binary build: ${BINBUILD_FILE}"
+                    note "   → Trying binary build: ${BINBUILD_FILE}"
                     ${FETCH_BIN} "${BINBUILD_ADDRESS}" >> ${LOG} 2>&1
                     ${FETCH_BIN} "${BINBUILD_ADDRESS}.sha1" >> ${LOG} 2>&1
 
@@ -1035,31 +1035,33 @@ for application in ${APPLICATIONS}; do
                 fi
             }
 
-            if [ "${APP_REQUIREMENTS}" = "" ]; then
-                note "Installing ${application}"
-            else
-                note "Installing ${application} with requirements: ${APP_REQUIREMENTS}"
-            fi
-            export req_amount="$(${PRINTF_BIN} "${APP_REQUIREMENTS}" | ${WC_BIN} -w | ${AWK_BIN} '{print $1}')"
-            export req_amount="$(${PRINTF_BIN} "${req_amount} + 1\n" | ${BC_BIN})"
-            export req_all="${req_amount}"
-            for req in ${APP_REQUIREMENTS}; do
-                if [ ! "${APP_USER_INFO}" = "" ]; then
-                    warn "${APP_USER_INFO}"
-                fi
-                if [ -z "${req}" ]; then
-                    note "  No requirements required."
-                    break
+            if [ "${DONT_BUILD_BUT_DO_EXPORTS}" = "" ]; then
+                if [ "${APP_REQUIREMENTS}" = "" ]; then
+                    note "Installing ${application}"
                 else
-                    note "  ${req} (${req_amount} of ${req_all} remaining)"
-                    if [ ! -e "${PREFIX}/${req}${INSTALLED_MARK}" ]; then
-                        export CHANGED="true"
-                        execute_process "${req}"
-                    fi
+                    note "Installing ${application} with requirements: ${APP_REQUIREMENTS}"
                 fi
-                check_current_by_definition "${req}"
-                export req_amount="$(${PRINTF_BIN} "${req_amount} - 1\n" | ${BC_BIN})"
-            done
+                export req_amount="$(${PRINTF_BIN} "${APP_REQUIREMENTS}" | ${WC_BIN} -w | ${AWK_BIN} '{print $1}')"
+                export req_amount="$(${PRINTF_BIN} "${req_amount} + 1\n" | ${BC_BIN})"
+                export req_all="${req_amount}"
+                for req in ${APP_REQUIREMENTS}; do
+                    if [ ! "${APP_USER_INFO}" = "" ]; then
+                        warn "${APP_USER_INFO}"
+                    fi
+                    if [ -z "${req}" ]; then
+                        note "  No requirements required."
+                        break
+                    else
+                        note "  ${req} (${req_amount} of ${req_all} remaining)"
+                        if [ ! -e "${PREFIX}/${req}${INSTALLED_MARK}" ]; then
+                            export CHANGED="true"
+                            execute_process "${req}"
+                        fi
+                    fi
+                    check_current_by_definition "${req}"
+                    export req_amount="$(${PRINTF_BIN} "${req_amount} - 1\n" | ${BC_BIN})"
+                done
+            fi
 
             mark () {
                 debug "Marking definition: ${application} installed"
@@ -1096,27 +1098,29 @@ for application in ${APPLICATIONS}; do
                 note "${SUCCESS_CHAR} ${application} [${ver}]\n"
             }
 
-            if [ -e "${PREFIX}/${application}${INSTALLED_MARK}" ]; then
-                if [ "${CHANGED}" = "true" ]; then
-                    note "  ${application} (1 of ${req_all})"
-                    note "   → App dependencies changed. Rebuilding ${application}"
-                    execute_process "${application}"
-                    unset CHANGED
-                    mark
-                    # strip_lib_bin
-                    show_done
+            if [ "${DONT_BUILD_BUT_DO_EXPORTS}" = "" ]; then
+                if [ -e "${PREFIX}/${application}${INSTALLED_MARK}" ]; then
+                    if [ "${CHANGED}" = "true" ]; then
+                        note "  ${application} (1 of ${req_all})"
+                        note "   → App dependencies changed. Rebuilding ${application}"
+                        execute_process "${application}"
+                        unset CHANGED
+                        mark
+                        # strip_lib_bin
+                        show_done
+                    else
+                        note "  ${application} (1 of ${req_all})"
+                        check_current_by_definition "${application}"
+                        show_done
+                        debug "${SUCCESS_CHAR} ${application} current: ${ver}, definition: [${APP_VERSION}] Ok."
+                    fi
                 else
                     note "  ${application} (1 of ${req_all})"
-                    check_current_by_definition "${application}"
-                    show_done
-                    debug "${SUCCESS_CHAR} ${application} current: ${ver}, definition: [${APP_VERSION}] Ok."
+                    execute_process "${application}"
+                    mark
+                    # strip_lib_bin
+                    note "${SUCCESS_CHAR} ${application} [${APP_VERSION}]\n"
                 fi
-            else
-                note "  ${application} (1 of ${req_all})"
-                execute_process "${application}"
-                mark
-                # strip_lib_bin
-                note "${SUCCESS_CHAR} ${application} [${APP_VERSION}]\n"
             fi
 
             . "${DEFINITIONS_DIR}${application}.def"
