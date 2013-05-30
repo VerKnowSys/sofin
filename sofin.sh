@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.47.11"
+readonly VERSION="0.47.12"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -591,6 +591,7 @@ for application in ${APPLICATIONS}; do
         note "Software: ${application} disabled on architecture: ${SYSTEM_NAME}-${SYSTEM_ARCH}"
     else
         for definition in ${DEFINITIONS_DIR}${application}.def; do
+            export DONT_BUILD_BUT_DO_EXPORTS=""
             debug "Reading definition: ${definition}"
             . "${DEFAULTS}"
             . "${definition}"
@@ -675,7 +676,7 @@ for application in ${APPLICATIONS}; do
                     ${TAR_BIN} zxf "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" >> ${LOG} 2>&1
                     if [ "$?" = "0" ]; then # if archive is valid
                         note "  → Binary bundle installed: ${APP_NAME}${APP_POSTFIX} with version: ${APP_VERSION}"
-                        break
+                        export DONT_BUILD_BUT_DO_EXPORTS="true"
                     else
                         debug "  → No binary bundle available for ${APP_NAME}${APP_POSTFIX}"
                         ${RM_BIN} -fr "${BINBUILDS_CACHE_DIR}${ABSNAME}"
@@ -796,7 +797,6 @@ for application in ${APPLICATIONS}; do
                     ${TAR_BIN} zxf ${ARCHIVE_NAME} >> ${LOG} 2>&1
                     export EXITCODE="$?"
 
-                    ${RM_BIN} -rf "${TMP_REQ_DIR}/${REQ_APPNAME}${APP_POSTFIX}/exports"
                     cd "${CACHE_DIR}" # back to existing cache dir
                     if [ "${EXITCODE}" = "0" ]; then # if archive is valid
                         note "   → Binary requirement: ${REQ_APPNAME}${APP_POSTFIX} installed with version: ${APP_VERSION}"
@@ -1132,7 +1132,7 @@ for application in ${APPLICATIONS}; do
             fi
 
             . "${DEFINITIONS_DIR}${application}.def"
-            debug "Exporting binaries:${EXPORT_LIST}"
+            note "Exporting binaries: ${APP_EXPORTS} of prefix: ${PREFIX}"
             if [ -d "${PREFIX}/exports-disabled" ]; then # just bring back disabled exports
                 ${MV_BIN} "${PREFIX}/exports-disabled" "${PREFIX}/exports"
             else
