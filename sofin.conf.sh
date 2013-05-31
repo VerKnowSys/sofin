@@ -13,7 +13,7 @@ readonly TRACE
 readonly DEBIAN="$(test -e /etc/debian_version && echo true)"
 readonly GENTOO="$(test -e /etc/gentoo-release && echo true)"
 readonly ID_SVD="-un"
-readonly HEADER="Sofin v${VERSION} - © 2o12-2o13 - Versatile Knowledge Systems - VerKnowSys.com"
+readonly HEADER="Sofin v${VERSION} - © 2o11-2o13 - Versatile Knowledge Systems - VerKnowSys.com"
 readonly SCRIPT_NAME="/usr/bin/sofin.sh"
 readonly SCRIPT_ARGS="$*"
 readonly PRIVATE_METADATA_DIR="/Private/"
