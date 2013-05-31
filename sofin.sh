@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.47.12"
+readonly VERSION="0.47.13"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -1083,18 +1083,13 @@ for application in ${APPLICATIONS}; do
 
             strip_lib_bin () {
                 if [ -z "${DEVEL}" ]; then
-                    debug "→ Stripping all libraries…"
-                    for elem in $(${FIND_BIN} ${PREFIX} -name '*.so' -o -name '*.dylib'); do
-                        debug "Stripping: ${elem}"
-                        "${STRIP_BIN}" -sv "${elem}" >> "${LOG}" 2>> "${LOG}"
-                    done
-                    debug "→ Stripping all binaries…"
-                    for elem in "/bin/" "/sbin/" "/libexec/"; do
+                    debug "→ Stripping libraries and binaries…"
+                    for elem in "/bin" "/sbin" "/libexec" "/lib"; do
                         if [ -d "${PREFIX}${elem}" ]; then
-                            for e in $(${FIND_BIN} ${PREFIX}${elem}); do
-                                if [ -f "${e}" ]; then
+                            for e in $(${FIND_BIN} ${PREFIX}${elem} -maxdepth 1 -type f); do
+                                if [ -e "${e}" ]; then
                                     debug "Stripping: ${e}"
-                                    "${STRIP_BIN}" -s "${e}" >> "${LOG}" 2>> "${LOG}"
+                                    "${STRIP_BIN}" "${e}" >> "${LOG}" 2>&1
                                 fi
                             done
                         fi
@@ -1117,7 +1112,7 @@ for application in ${APPLICATIONS}; do
                         execute_process "${application}"
                         unset CHANGED
                         mark
-                        # strip_lib_bin
+                        strip_lib_bin
                         show_done
                     else
                         note "  ${application} (1 of ${req_all})"
@@ -1129,7 +1124,7 @@ for application in ${APPLICATIONS}; do
                     note "  ${application} (1 of ${req_all})"
                     execute_process "${application}"
                     mark
-                    # strip_lib_bin
+                    strip_lib_bin
                     note "${SUCCESS_CHAR} ${application} [${APP_VERSION}]\n"
                 fi
             fi
