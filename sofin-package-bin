@@ -53,6 +53,8 @@ for element in $*; do
             note "Sending archive to remote: ${MAIN_BINARY_REPOSITORY_DESTINATION}"
             ${SCP_BIN} "${name}" "${MAIN_BINARY_REPOSITORY_DESTINATION}${name}"
             ${SCP_BIN} "${name}.sha1" "${MAIN_BINARY_REPOSITORY_DESTINATION}${name}.sha1"
+            ${RM_BIN} -f "${name}"
+            ${RM_BIN} -f "${name}.sha1"
         fi
     else
         warn "Not found software named: ${element}!"
