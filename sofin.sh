@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.47.14"
+readonly VERSION="0.47.15"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -807,24 +807,10 @@ for application in ${APPLICATIONS}; do
                             ${MKDIR_BIN} -p ${PREFIX}
                         fi
                         cd "${TMP_REQ_DIR}/${REQ_APPNAME}${APP_POSTFIX}"
-                        for i in ${TMP_REQ_DIR}/${REQ_APPNAME}${APP_POSTFIX}/*; do # copy each folder to destination
-                            case "$(${BASENAME_BIN} ${i})" in
-                                exports|exports-disabled)
-                                    debug "Do nothing. I won't copy exports dirs."
-                                    ;;
+                        ${CP_BIN} -fR ./* ${PREFIX} >> ${LOG} 2>&1
+                        ${RM_BIN} -rf ${PREFIX}/exports >> ${LOG} 2>&1
+                        ${RM_BIN} -rf ${PREFIX}/exports-disabled >> ${LOG} 2>&1
 
-                                *)
-                                    debug "COPY: ${i} to ${PREFIX}"
-                                    if [ -d "${i}" ]; then
-                                        if [ ! -d "${PREFIX}/$(${BASENAME_BIN} "${i}")" ]; then
-                                            debug "Making empty dir: ${i}"
-                                            ${MKDIR_BIN} -p "${PREFIX}/$(${BASENAME_BIN} "${i}")"
-                                        fi
-                                    fi
-                                    ${CP_BIN} -fR "${i}/" "${PREFIX}" >> ${LOG} 2> ${LOG}
-                                    ;;
-                            esac
-                        done
                         cd "${CACHE_DIR}"
                         debug "Cleaning unpacked binary cache folder: ${TMP_REQ_DIR}/${REQ_APPNAME}${APP_POSTFIX}"
                         ${RM_BIN} -rf "${TMP_REQ_DIR}/${REQ_APPNAME}${APP_POSTFIX}"
