@@ -133,6 +133,7 @@ usage_howto () {
     note "ver | version                        - shows $(${BASENAME_BIN} ${SCRIPT_NAME}) script version"
     note "clean                                - cleans install cache, downloaded content and logs"
     note "outdated                             - lists outdated software"
+    note "push | binpush                       - creates binary build from prebuilt software bundles name given as params (example: $(${BASENAME_BIN} ${SCRIPT_NAME}) push Ruby Vifm Curl)"
     exit
 }
 
