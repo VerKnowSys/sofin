@@ -138,6 +138,13 @@ error () {
 # System specific configuration
 readonly SYSTEM_NAME="$(uname)"
 readonly SYSTEM_ARCH="$(uname -m)"
+
+if [ "$(id -u)" != "0" ]; then
+    export USER_TYPE="common" # NOTE: rpath in binaries, XXX: fixme: add support for regular user binary builds
+else
+    export USER_TYPE="root"
+fi
+
 readonly MAIN_BINARY_REPOSITORY_DESTINATION="sofin@verknowsys.com:/opt/software/binary/${SYSTEM_NAME}-${SYSTEM_ARCH}-${USER_TYPE}/"
 DEFAULT_SOFTWARE_BUILD_USERNAME="a562638e6b6693eb" # max 16 chars in BSD
 

@@ -12,12 +12,6 @@ fi
 
 note "Upload enabled for: $1"
 
-if [ "$(id -u)" != "0" ]; then
-    export USER_TYPE="common" # NOTE: rpath in binaries, XXX: fixme: add support for regular user binary builds
-else
-    export USER_TYPE="root"
-fi
-
 postfix=".tar.gz"
 
 note "Changing dir to: ${SOFTWARE_DIR}"
