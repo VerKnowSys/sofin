@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.47.15"
+readonly VERSION="0.48.0"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -806,7 +806,19 @@ for application in ${APPLICATIONS}; do
                         if [ ! -d ${PREFIX} ]; then
                             ${MKDIR_BIN} -p ${PREFIX}
                         fi
-                        cd "${TMP_REQ_DIR}/${REQ_APPNAME}${APP_POSTFIX}"
+                        BINREQ_PATH="${TMP_REQ_DIR}/${REQ_APPNAME}${APP_POSTFIX}"
+                        cd "${BINREQ_PATH}"
+
+                        # patch RPATH values from all binaries and libraries of binary bundle
+                        for dir in "/lib" "/bin" "/sbin" "/libexec"; do # take all files in bundle
+                            if [ -d "${BINREQ_PATH}${dir}" ]; then
+                                for file in $(${FIND_BIN} "${BINREQ_PATH}${dir}" -type f); do
+                                    warn "Patching binary file: ${file}"
+                                    ${SOFIN_RPATH_PATCHER_BIN} "${DEFAULT_SOFTWARE_BUILD_USERNAME}" "${file}" >> ${LOG} 2>&1
+                                done
+                            fi
+                        done
+
                         ${CP_BIN} -fR ./* ${PREFIX} >> ${LOG} 2>&1
                         ${RM_BIN} -rf ${PREFIX}/exports >> ${LOG} 2>&1
                         ${RM_BIN} -rf ${PREFIX}/exports-disabled >> ${LOG} 2>&1
