@@ -796,7 +796,8 @@ for application in ${APPLICATIONS}; do
                 fi
 
                 if [ -e "./${BINBUILD_FILE}" ]; then # if exists then checksum is ok
-                    ${TAR_BIN} zxf ${ARCHIVE_NAME} >> ${LOG} 2>&1
+                    debug "Binbuild file: ${BINBUILD_FILE}"
+                    ${TAR_BIN} zxf ${BINBUILD_FILE} >> ${LOG} 2>&1
                     export EXITCODE="$?"
 
                     cd "${CACHE_DIR}" # back to existing cache dir
@@ -825,7 +826,7 @@ for application in ${APPLICATIONS}; do
                         ${TOUCH_BIN} "${PREFIX}/$1${INSTALLED_MARK}"
                         continue
                     else
-                        note "   → No binary build available for requirement: ${REQ_APPNAME}"
+                        note "   → No binary build available for requirement: ${REQ_APPNAME}${APP_POSTFIX}"
                     fi
                 fi
 
@@ -1099,7 +1100,7 @@ for application in ${APPLICATIONS}; do
                         fi
                     done
                 else
-                    warn "Debug mode enabled. Omitting binary/library strip…"
+                    warn "Devel mode enabled. Skipping binary/library strip…"
                 fi
             }
 
@@ -1142,9 +1143,9 @@ for application in ${APPLICATIONS}; do
                 EXPORT_LIST=""
                 for exp in ${APP_EXPORTS}; do
                     for dir in "/bin/" "/sbin/" "/libexec/"; do
-                        debug "Testing ${dir} looking into: ${PREFIX}${dir}${exp}"
                         if [ -f "${PREFIX}${dir}${exp}" ]; then # a file
                             if [ -x "${PREFIX}${dir}${exp}" ]; then # and it's executable'
+                                debug "Exporting ${PREFIX}${dir}${exp}"
                                 curr_dir="$(${PWD_BIN})"
                                 cd "${PREFIX}${dir}"
                                 ${LN_BIN} -vfs "..${dir}${exp}" "../exports/${exp}" >> "$LOG"
