@@ -198,6 +198,8 @@ if [ ! "$1" = "" ]; then
     clean)
         note "Performing cleanup of ${CACHE_DIR}cache"
         ${RM_BIN} -rf "${CACHE_DIR}cache"
+        note "Removing binary builds from ${BINBUILDS_CACHE_DIR}"
+        ${RM_BIN} -rf "${BINBUILDS_CACHE_DIR}"
         note "Removing ${LOG}"
         ${RM_BIN} -rf "${LOG}"
         exit
