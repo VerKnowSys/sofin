@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.47.13"
+readonly VERSION="0.47.14"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -815,7 +815,13 @@ for application in ${APPLICATIONS}; do
 
                                 *)
                                     debug "COPY: ${i} to ${PREFIX}"
-                                    ${CP_BIN} -fR "${i}/" "${PREFIX}/$(${BASENAME_BIN} "${i}")" >> ${LOG} 2> ${LOG}
+                                    if [ -d "${i}" ]; then
+                                        if [ ! -d "${PREFIX}/$(${BASENAME_BIN} "${i}")" ]; then
+                                            debug "Making empty dir: ${i}"
+                                            ${MKDIR_BIN} -p "${PREFIX}/$(${BASENAME_BIN} "${i}")"
+                                        fi
+                                    fi
+                                    ${CP_BIN} -fR "${i}/" "${PREFIX}" >> ${LOG} 2> ${LOG}
                                     ;;
                             esac
                         done
