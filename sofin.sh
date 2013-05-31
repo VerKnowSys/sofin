@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.48.2"
+readonly VERSION="0.48.3"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -425,6 +425,49 @@ if [ ! "$1" = "" ]; then
         ;;
 
 
+    push|binpush)
+        note "Preparing to push binary bundle: ${SOFIN_ARGS} from ${SOFTWARE_DIR} to binary repository."
+        cd "${SOFTWARE_DIR}"
+        for element in ${SOFIN_ARGS}; do
+            if [ -d "${element}" ]; then
+                if [ ! -L "${element}" ]; then
+                    lowercase_element="$(${PRINTF_BIN} "${element}" | ${TR_BIN} '[A-Z]' '[a-z]')"
+                    version_element="$(${CAT_BIN} ${element}/${lowercase_element}.installed)"
+                    name="${element}-${version_element}${DEFAULT_ARCHIVE_EXT}"
+                    note "Preparing archive of: ${name}"
+                    if [ ! -e "./${name}" ]; then
+                        ${TAR_BIN} zcf "${name}" "./${element}"
+                    else
+                        note "Archive already exists. Skipping: ${name}"
+                    fi
+
+                    case "${SYSTEM_NAME}" in
+                        Darwin|Linux)
+                            export archive_sha1="$(${SHA_BIN} "${name}" | ${AWK_BIN} '{ print $1 }')"
+                            ;;
+
+                        FreeBSD)
+                            export archive_sha1="$(${SHA_BIN} -q "${name}")"
+                            ;;
+                    esac
+
+                    ${PRINTF_BIN} "${archive_sha1}" > "${name}.sha1"
+                    note "Archive sha: ${archive_sha1}"
+                    note "Sending archive to remote: ${MAIN_BINARY_REPOSITORY_DESTINATION}"
+                    ${SCP_BIN} "${name}" "${MAIN_BINARY_REPOSITORY_DESTINATION}${name}" >> "${LOG}" 2>&1
+                    ${SCP_BIN} "${name}.sha1" "${MAIN_BINARY_REPOSITORY_DESTINATION}${name}.sha1" >> "${LOG}" 2>&1
+                    ${RM_BIN} -f "${name}"
+                    ${RM_BIN} -f "${name}.sha1"
+                    note "Done."
+                fi
+            else
+                warn "Not found software named: ${element}!"
+            fi
+        done
+        exit
+        ;;
+
+
     delete|remove|uninstall|rm)
         if [ "$2" = "" ]; then
             error "For \"$1\" task, second argument with application name is required!"
@@ -653,7 +696,7 @@ for application in ${APPLICATIONS}; do
                 export BIN_POSTFIX="root"
             fi
             MIDDLE="${SYSTEM_NAME}-${SYSTEM_ARCH}-${BIN_POSTFIX}"
-            ARCHIVE_NAME="${APP_NAME}${APP_POSTFIX}-${APP_VERSION}.tar.gz"
+            ARCHIVE_NAME="${APP_NAME}${APP_POSTFIX}-${APP_VERSION}${DEFAULT_ARCHIVE_EXT}"
             INSTALLED_INDICATOR="${PREFIX}/${APP_LOWER}.installed"
             if [ ! -e "${INSTALLED_INDICATOR}" ]; then
                 if [ ! -e "./${ARCHIVE_NAME}" ]; then
@@ -774,7 +817,7 @@ for application in ${APPLICATIONS}; do
                 fi
                 MIDDLE="${SYSTEM_NAME}-${SYSTEM_ARCH}-${BIN_POSTFIX}"
                 REQ_APPNAME="$(${PRINTF_BIN} "${APP_NAME}" | ${CUT_BIN} -c1 | ${TR_BIN} '[a-z]' '[A-Z]')$(${PRINTF_BIN} "${APP_NAME}" | ${SED_BIN} 's/^[a-zA-Z]//')"
-                ARCHIVE_NAME="${REQ_APPNAME}${APP_POSTFIX}-${APP_VERSION}.tar.gz"
+                ARCHIVE_NAME="${REQ_APPNAME}${APP_POSTFIX}-${APP_VERSION}${DEFAULT_ARCHIVE_EXT}"
                 BINBUILD_ADDRESS="${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}"
                 BINBUILD_FILE="$(${BASENAME_BIN} ${BINBUILD_ADDRESS})"
                 TMP_REQ_DIR="${BINBUILDS_CACHE_DIR}${REQ_APPNAME}${APP_POSTFIX}-${APP_VERSION}"
