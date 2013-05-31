@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.48.0"
+readonly VERSION="0.48.1"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -626,6 +626,19 @@ for application in ${APPLICATIONS}; do
                 export PREFIX="${PREFIX}${APP_POSTFIX}"
             fi
 
+            rpath_patch () { # param is a directory root prefix of dependency to install
+                cd "${1}"
+                # patch RPATH values from all binaries and libraries of binary bundle
+                for dir in "lib" "bin" "sbin" "libexec"; do # take all files in bundle
+                    if [ -d "${dir}" ]; then
+                        for file in $(${FIND_BIN} "${dir}" -type f); do
+                            warn "Patching binary file: ${1}/${file}"
+                            ${SOFIN_RPATH_PATCHER_BIN} "${DEFAULT_SOFTWARE_BUILD_USERNAME}" "${1}/${file}" >> ${LOG} 2>&1
+                        done
+                    fi
+                done
+            }
+
             # binary build of whole software bundle
             ABSNAME="${APP_NAME}${APP_POSTFIX}-${APP_VERSION}"
             ${MKDIR_BIN} -p "${HOME}/${HOME_APPS_DIR}" > /dev/null 2>&1
@@ -677,6 +690,9 @@ for application in ${APPLICATIONS}; do
                 if [ -e "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" ]; then # if exists, then checksum is ok
                     ${TAR_BIN} zxf "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" >> ${LOG} 2>&1
                     if [ "$?" = "0" ]; then # if archive is valid
+                        if [ "${USERNAME}" != "root" ]; then
+                            rpath_patch "${HOME}/${HOME_APPS_DIR}${APP_NAME}"
+                        fi
                         note "  → Binary bundle installed: ${APP_NAME}${APP_POSTFIX} with version: ${APP_VERSION}"
                         export DONT_BUILD_BUT_DO_EXPORTS="true"
                     else
@@ -807,17 +823,8 @@ for application in ${APPLICATIONS}; do
                             ${MKDIR_BIN} -p ${PREFIX}
                         fi
                         BINREQ_PATH="${TMP_REQ_DIR}/${REQ_APPNAME}${APP_POSTFIX}"
-                        cd "${BINREQ_PATH}"
-
-                        # patch RPATH values from all binaries and libraries of binary bundle
-                        for dir in "/lib" "/bin" "/sbin" "/libexec"; do # take all files in bundle
-                            if [ -d "${BINREQ_PATH}${dir}" ]; then
-                                for file in $(${FIND_BIN} "${BINREQ_PATH}${dir}" -type f); do
-                                    warn "Patching binary file: ${file}"
-                                    ${SOFIN_RPATH_PATCHER_BIN} "${DEFAULT_SOFTWARE_BUILD_USERNAME}" "${file}" >> ${LOG} 2>&1
-                                done
-                            fi
-                        done
+                        # patch rpath in binaries/ libraries
+                        rpath_patch "${BINREQ_PATH}"
 
                         ${CP_BIN} -fR ./* ${PREFIX} >> ${LOG} 2>&1
                         ${RM_BIN} -rf ${PREFIX}/exports >> ${LOG} 2>&1
