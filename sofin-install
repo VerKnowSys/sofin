@@ -89,6 +89,7 @@ update_env_files () {
 
 install_base () {
     ${RM_BIN} -rf "./sofin"
+    ${RM_BIN} -rf "./sofin-rpp"
     ${RM_BIN} -rf "./sofin.sh.x"
     ${RM_BIN} -rf "/usr/bin/sofin"
     ${RM_BIN} -rf "/usr/bin/sofin.sh"
