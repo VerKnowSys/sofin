@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.48.3"
+readonly VERSION="0.48.4"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -670,6 +670,20 @@ for application in ${APPLICATIONS}; do
                 export PREFIX="${PREFIX}${APP_POSTFIX}"
             fi
 
+            run () {
+                if [ ! -z "$1" ]; then
+                    if [ ! -e "${LOG}" ]; then
+                        ${TOUCH_BIN} "${LOG}"
+                    fi
+                    debug "Running '$@' @ $(${DATE_BIN})"
+                    eval PATH="${PATH}" "$@" 1>> "${LOG}" 2>> "${LOG}"
+                    check_command_result $?
+                else
+                    error "Empty command to run?"
+                    exit
+                fi
+            }
+
             rpath_patch () {
                 # $1 param is a directory root prefix of dependency to install
                 # $2 param is a name of destination bundle name, f.e. "Ruby"
@@ -680,7 +694,7 @@ for application in ${APPLICATIONS}; do
                     if [ -d "${dir}" ]; then
                         for file in $(${FIND_BIN} "${dir}" -type f); do
                             warn "Patching binary file: ${1}/${file} of bundle: ${2}"
-                            ${SOFIN_RPATH_PATCHER_BIN} "${DEFAULT_SOFTWARE_BUILD_USERNAME}" "$2" "${1}/${file}" >> ${LOG} 2>&1
+                            run ${SOFIN_RPATH_PATCHER_BIN} "${DEFAULT_SOFTWARE_BUILD_USERNAME}" "$2" "${1}/${file}"
                         done
                     fi
                 done
@@ -753,20 +767,6 @@ for application in ${APPLICATIONS}; do
                 note "Software already installed: ${APP_NAME}${APP_POSTFIX} with version: $(cat ${INSTALLED_INDICATOR})"
                 export DONT_BUILD_BUT_DO_EXPORTS="true"
             fi
-
-            run () {
-                if [ ! -z "$1" ]; then
-                    if [ ! -e "${LOG}" ]; then
-                        ${TOUCH_BIN} "${LOG}"
-                    fi
-                    debug "Running '$@' @ $(${DATE_BIN})"
-                    eval PATH="${PATH}" "$@" 1>> "${LOG}" 2>> "${LOG}"
-                    check_command_result $?
-                else
-                    error "Empty command to run?"
-                    exit
-                fi
-            }
 
             check_current () { # $1 => version, $2 => current version
                 if [ ! "${1}" = "" ]; then
