@@ -1,10 +1,13 @@
 /*
-    Author: Daniel (dmilith) Dettlaff
-    © 2012 - VerKnowSys
+    Author: Michał Lipski
+    © 2013 - VerKnowSys
 */
 
 
+#include <stdio.h>
 #include <iostream>
+#include <vector>
+#include <iterator>
 #include <string.h>
 #include <fstream>
 #include <sstream>
@@ -17,103 +20,168 @@
 #endif
 #include <sys/user.h>
 
+#define APP_VERSION "0.1.0"
+#define COPYRIGHT "Copyright © 2o13 VerKnowSys.com - All Rights Reserved."
+
+#define REPLACED_SIZE_ERROR 100
+#define PATCHED_FILE_SIZE_ERROR 101
+#define NOT_ENOUGH_ARGS_ERROR 102
 
 using namespace std;
 
-#define DEFAULT_SHELL_COMMAND "/bin/sh"
-#define DEFAULT_SOFIN_SCRIPTNAME "/usr/bin/sofin.sh"
-#define SLEEP_TIME 2 /* seconds */
 
-#define EXECVP_EXIT 666
-#define FORK_EXIT 667
-#define ACCESS_DENIED_EXIT 668
+const string replace_prefix_in_path(string &path, string &prefix) {
+    size_t found = path.find("/Apps/");
+    if (found != string::npos)
+        if ((found = path.find("/", found + 6)) == string::npos)
+            found = prefix.length();
 
-
-void parse(char *line, char **argv) {
-    while (*line != '\0') {
-        while (*line == ' ' || *line == '\t' || *line == '\n') *line++ = '\0';
-        *argv++ = line;
-        while (*line != '\0' && *line != ' ' && *line != '\t' && *line != '\n') line++;
-    }
-    *argv = NULL;
+    cout << " * Replaced `" << path;
+    string replaced = path.replace(0, found, prefix);
+    cout << "` with `" << replaced << "`" << endl;
+    return replaced;
 }
 
-
-void execute(char **argv, int uid) {
-    int status;
-    pid_t  pid;
-    if ((pid = fork()) < 0) {
-        exit(FORK_EXIT);
-    } else if (pid == 0) {
-        if (execvp(*argv, argv) < 0) {
-            exit(EXECVP_EXIT);
-        }
-    } else {
-        while (wait(&status) != pid);
-        if (status != 0) exit(1);
-    }
+void replace_original_file(string &patched, string &original) {
+    // FIXME
+    cout << " * Renaming `" << patched << "` to `" << original << "`" << endl;
+    rename(patched.c_str(), original.c_str());
+    chmod(original.c_str(), 0755);
 }
 
 
 int main(int argc, char const *argv[]) {
 
-    const char* BUILDUSER_UUID="a562638e6b6693ebe04eee717ef1cf79";
+    int error = 0;
+    ifstream ifs;
+    ofstream ofs;
+    size_t isize, osize;
+    char c, buf[1024];
+
+    cout << " * Sofin RPath Patcher " << APP_VERSION << " - " << COPYRIGHT << endl;
+
+    if (argc < 4) {
+        cerr << "Not enough arguments..." << endl;
+        exit(NOT_ENOUGH_ARGS_ERROR);
+    }
+
+    string builduser = argv[1];
+    string bundle = argv[2];
+    string original_filename = argv[3];
+    string patched_filename = original_filename + ".patched";
+
+    cout << " * Patching file: " << original_filename << endl;
+
+    ifs.open(original_filename.c_str(), ios::binary);
+    istream_iterator<string> begin(ifs);
+    istream_iterator<string> end;
+    vector<size_t> positions;
+
+    string home = getenv("HOME");
+    string prefix = home + "/Apps/" + bundle;
+    cout << " * Prefix: " << prefix << endl;
+
+    string pattern = string("/Users/") + builduser;
+    cout << " * Searching for pattern: " << pattern << endl;
 
 
+    while (ifs.good())
+    {
+        string str = *begin;
+
+        if (str.length() < pattern.length()) {
+            ++begin;
+            continue;
+        }
+
+        size_t current = ifs.tellg();
+        size_t found = str.find(pattern.c_str());
+
+        if (found != string::npos) {
+            size_t global = current - str.length() + found;
+            positions.push_back(global);
+        }
+
+        ++begin;
+    }
+
+    if (positions.size() == 0) {
+        cout << " * Pattern not found. Exiting..." << endl;
+        goto DONE;
+    }
+
+    ifs.clear();
+    ifs.seekg(0, ifs.beg);
 
 
-    char str[32];
-    char *arguments[argc];
+    ofs.open(patched_filename.c_str(), fstream::binary);
+    cout << " * Writing to file: " << patched_filename << endl;
 
-    parse((char*)argv, arguments);
-    cout << arguments;
+    for (std::vector<size_t>::iterator it = positions.begin(); it != positions.end(); ++it) {
 
-    // stringstream cmd, lockfile;
-    // const string list[] = {"ver", "version", "list", "installed", "fulllist", "fullinstalled", "export", "exp", "exportapp", "getshellvars", "log", "available", "reload", "rehash"};
+        /* Write data until the occurrence of the search string */
+        while (ifs.tellg() < *it) {
+            ifs.get(c);
+            ofs.put(c);
+        }
 
-    // /* build command line */
-    // cmd << string(DEFAULT_SOFIN_SCRIPTNAME);
-    // if (argc > 1) {
+        /* Replace string */
+        if (ifs.get(buf, sizeof(buf), '\0')) {
+            string str = buf;
+            size_t str_len = ifs.gcount();
 
-    //     for (int i = 1; i < argc; ++i) {
-    //         cmd << " " << argv[i];
-    //     }
+            string replaced = replace_prefix_in_path(str, prefix);
 
-    //     bool lockLessMode = false;
-    //     for (int i = 0; i < sizeof(list)/ sizeof(*list); i++) {
-    //         if (strcmp(argv[1], list[i].c_str()) == 0) {
-    //             lockLessMode = true;
-    //         }
-    //     }
-    //     if (lockLessMode) { // just execute without locking:
-    //         parse((char*)cmd.str().c_str(), arguments);
-    //         execute(arguments, getuid());
-    //         return 0;
-    //     }
-    // }
+            if (replaced.length() > str_len) {
+                cout << " * Fatal: Replaced string is greater than original ("
+                     << replaced.length() << " vs " << str_len << ")" << endl;
+                error = REPLACED_SIZE_ERROR;
+                goto DONE;
+            }
 
-    // while (true) {
-    //     const char* lockff = lockfile.str().c_str();
-    //     const int lfp = open(lockff, O_RDWR | O_CREAT, 0600);
-    //     if (lfp < 0) {
-    //         cerr << "Error: " << strerror(errno) << endl;
-    //         exit(ACCESS_DENIED_EXIT); /* can not open */
-    //     }
-    //     if (lockf(lfp, F_TLOCK, 0) < 0) {
-    //         cerr << ".";
-    //         sleep(SLEEP_TIME);
-    //     } else {
-    //         sprintf(str, "%d\n", getpid());
-    //         write(lfp, str, strlen(str)); /* record pid to lockfile */
+            /* Write replaced string */
+            ofs << replaced;
+            /* Fill gap with zeros */
+            for (int i = replaced.length(); i < str_len; i++) {
+                ofs << '\0';
+            }
+        }
+    }
+    /* Write everything else */
+    while (ifs.get(c)) {
+        if (ifs.good())
+            ofs.put(c);
+    }
 
-    //         signal(SIGTSTP, SIG_IGN); /* ignore tty signals */
-    //         signal(SIGTTOU, SIG_IGN);
-    //         signal(SIGTTIN, SIG_IGN);
+    ifs.clear();
+    ifs.seekg(0, ifs.end);
+    isize = ifs.tellg();
 
-    //         parse((char*)cmd.str().c_str(), arguments);
-    //         execute(arguments, getuid());
-    //         break;
-    //     }
-    // }
-    return 0;
+    ofs.clear();
+    ofs.seekp(0, ofs.end);
+    osize = ofs.tellp();
+
+    cout << " * Input: " << isize << " bytes." << endl;
+    cout << " * Output: " << osize << " bytes." << endl;
+
+    if (isize != osize) {
+        cout << " * Failure: Patched file size differs from original file." << endl;
+        error = PATCHED_FILE_SIZE_ERROR;
+        goto DONE;
+    }
+
+DONE:
+    ifs.close();
+    ofs.close();
+    positions.clear();
+
+    if (!error) {
+        replace_original_file(patched_filename, original_filename);
+        cout << " * Success" << endl << endl;
+        exit(0);
+    } else {
+        // unlink(patched_filename.c_str());
+        cout << endl;
+        exit(error);
+    }
 }
