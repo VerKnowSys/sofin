@@ -1,5 +1,6 @@
 /*
-    Author: Michał Lipski
+    Authors: Michał Lipski
+             Daniel (dmilith) Dettlaff
     © 2013 - VerKnowSys
 */
 
@@ -81,32 +82,39 @@ int main(int argc, char const *argv[]) {
     string prefix = home + "/Apps/" + bundle;
     cout << " * Prefix: " << prefix << endl;
 
-    string pattern = string("/Users/") + builduser;
-    cout << " * Searching for pattern: " << pattern << endl;
+    vector<string> patterns = vector<string>();
 
+    patterns.push_back(string("/home/") + builduser);
+    patterns.push_back(string("/Users/") + builduser);
 
-    while (ifs.good())
-    {
-        string str = *begin;
+    /* do a search for each pattern */
+    for (int indx = 0; indx < patterns.size(); indx++) {
+        string pattern = patterns.at(indx);
+        cout << " * Searching for pattern: " << pattern << endl;
 
-        if (str.length() < pattern.length()) {
+        while (ifs.good())
+        {
+            string str = *begin;
+
+            if (str.length() < pattern.length()) {
+                ++begin;
+                continue;
+            }
+
+            size_t current = ifs.tellg();
+            size_t found = str.find(pattern.c_str());
+
+            if (found != string::npos) {
+                size_t global = current - str.length() + found;
+                positions.push_back(global);
+            }
+
             ++begin;
-            continue;
         }
-
-        size_t current = ifs.tellg();
-        size_t found = str.find(pattern.c_str());
-
-        if (found != string::npos) {
-            size_t global = current - str.length() + found;
-            positions.push_back(global);
-        }
-
-        ++begin;
     }
 
     if (positions.size() == 0) {
-        cout << " * Pattern not found. Exiting..." << endl;
+        cout << " * Patterns were not found. Exiting..." << endl;
         goto DONE;
     }
 
