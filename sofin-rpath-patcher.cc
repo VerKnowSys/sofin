@@ -21,7 +21,7 @@
 #endif
 #include <sys/user.h>
 
-#define APP_VERSION "0.1.2"
+#define APP_VERSION "0.2.0"
 #define COPYRIGHT "Copyright © 2o13 VerKnowSys.com - All Rights Reserved."
 #define BUILD_USER_HOME "/7a231cbcbac22d3ef975e7b554d7ddf09b97782b-bdbfede7e6764c6203224a63190dbff3137adfda/"
 #define BUILD_USER_NAME "build-user"
@@ -29,7 +29,61 @@
 #define PATCHED_FILE_SIZE_ERROR 101
 #define NOT_ENOUGH_ARGS_ERROR 102
 
+#define N_ELEMENTS(arr) (sizeof(arr) / sizeof((arr)[0]))
+
 using namespace std;
+
+
+bool binary_magic_match(string &filename) {
+    bool matched = false;
+    const unsigned char magic[][4] = {
+    #ifdef __APPLE__
+        { 0xCE, 0xFA, 0xED, 0xFE }, // 32-bit
+        { 0xCA, 0xFE, 0xBA, 0xBE }, // Universal
+        { 0xCF, 0xFA, 0xED, 0xFE }, // 64-bit
+    #else
+        { 0x7F, 0x45, 0x4C, 0x46 }, // ELF
+    #endif
+    };
+
+    char buf[4];
+    ifstream file(filename.c_str());
+    file.read(buf, 4);
+
+    for (int i = 0; i < N_ELEMENTS(magic); ++i) {
+        matched = false;
+        for (int j = 0; j < sizeof(buf); ++j) {
+            if (buf[j] == magic[i][j])
+                matched = true;
+            else {
+                matched = false;
+                break;
+            }
+        }
+        if (matched)
+            break;
+    }
+
+    return matched;
+}
+
+
+bool binary_ext_match(string &filename) {
+    return false;
+}
+
+
+bool is_binary(string &filename) {
+    bool matched;
+
+    if ((matched = binary_ext_match(filename)))
+        return true;
+
+    if ((matched = binary_magic_match(filename)))
+        return true;
+
+    return false;
+}
 
 
 const string replace_prefix_in_path(string &path, string &prefix) {
@@ -72,6 +126,7 @@ int main(int argc, char const *argv[]) {
     string original_filename = argv[2];
     string patched_filename = original_filename + ".patched";
 
+    cout << " * Binary: " << (is_binary(original_filename) ? "yes" : "no") << endl;
     cout << " * Patching file: " << original_filename << endl;
 
     ifs.open(original_filename.c_str(), ios::binary);
