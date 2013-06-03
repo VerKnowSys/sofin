@@ -62,7 +62,7 @@ int main(int argc, char const *argv[]) {
 
     cout << " * Sofin RPath Patcher " << APP_VERSION << " - " << COPYRIGHT << endl;
 
-    if (argc < 4) {
+    if (argc < 3) {
         cerr << "Not enough arguments!" << endl;
         cerr << "   Usage: sofin-rpp Destination-bundle-name /absolute/path/to/any-file" << endl;
         exit(NOT_ENOUGH_ARGS_ERROR);
