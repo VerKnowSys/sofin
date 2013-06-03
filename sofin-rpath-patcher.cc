@@ -21,9 +21,9 @@
 #endif
 #include <sys/user.h>
 
-#define APP_VERSION "0.2.2"
+#define APP_VERSION "0.2.3"
 #define COPYRIGHT "Copyright © 2o13 VerKnowSys.com - All Rights Reserved."
-#define BUILD_USER_HOME "/7a231cbcbac22d3ef975e7b554d7ddf09b97782b-bdbfede7e6764c6203224a63190dbff3137adfda/"
+#define BUILD_USER_HOME "/7a231cbcbac22d3ef975e7b554d7ddf09b97782b/"
 #define BUILD_USER_NAME "build-user"
 #define REPLACED_SIZE_ERROR 100
 #define PATCHED_FILE_SIZE_ERROR 101
