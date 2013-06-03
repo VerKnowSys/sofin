@@ -21,7 +21,7 @@
 #endif
 #include <sys/user.h>
 
-#define APP_VERSION "0.2.0"
+#define APP_VERSION "0.2.1"
 #define COPYRIGHT "Copyright © 2o13 VerKnowSys.com - All Rights Reserved."
 #define BUILD_USER_HOME "/7a231cbcbac22d3ef975e7b554d7ddf09b97782b-bdbfede7e6764c6203224a63190dbff3137adfda/"
 #define BUILD_USER_NAME "build-user"
@@ -63,6 +63,8 @@ bool binary_magic_match(string &filename) {
         if (matched)
             break;
     }
+
+    file.close();
 
     return matched;
 }
@@ -113,6 +115,7 @@ int main(int argc, char const *argv[]) {
     ofstream ofs;
     size_t isize, osize;
     char c, buf[1024];
+    bool binary;
 
     cout << " * Sofin RPath Patcher " << APP_VERSION << " - " << COPYRIGHT << endl;
 
@@ -126,8 +129,16 @@ int main(int argc, char const *argv[]) {
     string original_filename = argv[2];
     string patched_filename = original_filename + ".patched";
 
-    cout << " * Binary: " << (is_binary(original_filename) ? "yes" : "no") << endl;
+    binary = is_binary(original_filename);
+
     cout << " * Patching file: " << original_filename << endl;
+    cout << " * Binary: " << (binary ? "yes" : "no") << endl;
+
+    if (!binary) {
+        cout << " * Probably a text file. Exiting..." << endl << endl;
+        exit(0);
+    }
+
 
     ifs.open(original_filename.c_str(), ios::binary);
     istream_iterator<string> begin(ifs);
