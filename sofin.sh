@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.48.4"
+readonly VERSION="0.48.5"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -694,7 +694,7 @@ for application in ${APPLICATIONS}; do
                     if [ -d "${dir}" ]; then
                         for file in $(${FIND_BIN} "${dir}" -type f); do
                             warn "Patching binary file: ${1}/${file} of bundle: ${2}"
-                            run ${SOFIN_RPATH_PATCHER_BIN} "${DEFAULT_SOFTWARE_BUILD_USERNAME}" "$2" "${1}/${file}"
+                            run ${SOFIN_RPATH_PATCHER_BIN} "$2" "${1}/${file}"
                         done
                     fi
                 done

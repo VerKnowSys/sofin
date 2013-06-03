@@ -21,9 +21,10 @@
 #endif
 #include <sys/user.h>
 
-#define APP_VERSION "0.1.1"
+#define APP_VERSION "0.1.2"
 #define COPYRIGHT "Copyright © 2o13 VerKnowSys.com - All Rights Reserved."
-
+#define BUILD_USER_HOME "/7a231cbcbac22d3ef975e7b554d7ddf09b97782b-bdbfede7e6764c6203224a63190dbff3137adfda/"
+#define BUILD_USER_NAME "build-user"
 #define REPLACED_SIZE_ERROR 100
 #define PATCHED_FILE_SIZE_ERROR 101
 #define NOT_ENOUGH_ARGS_ERROR 102
@@ -62,13 +63,13 @@ int main(int argc, char const *argv[]) {
     cout << " * Sofin RPath Patcher " << APP_VERSION << " - " << COPYRIGHT << endl;
 
     if (argc < 4) {
-        cerr << "Not enough arguments..." << endl;
+        cerr << "Not enough arguments!" << endl;
+        cerr << "   Usage: sofin-rpp Destination-bundle-name /absolute/path/to/any-file" << endl;
         exit(NOT_ENOUGH_ARGS_ERROR);
     }
 
-    string builduser = argv[1];
-    string bundle = argv[2];
-    string original_filename = argv[3];
+    string bundle = argv[1];
+    string original_filename = argv[2];
     string patched_filename = original_filename + ".patched";
 
     cout << " * Patching file: " << original_filename << endl;
@@ -82,38 +83,30 @@ int main(int argc, char const *argv[]) {
     string prefix = home + "/Apps/" + bundle;
     cout << " * Prefix: " << prefix << endl;
 
-    vector<string> patterns = vector<string>();
+    string pattern = string(BUILD_USER_HOME) + BUILD_USER_NAME;
+    cout << " * Searching for pattern: " << pattern << endl;
 
-    patterns.push_back(string("/home/") + builduser);
-    patterns.push_back(string("/Users/") + builduser);
+    while (ifs.good())
+    {
+        string str = *begin;
 
-    /* do a search for each pattern */
-    for (int indx = 0; indx < patterns.size(); indx++) {
-        string pattern = patterns.at(indx);
-        cout << " * Searching for pattern: " << pattern << endl;
-
-        while (ifs.good())
-        {
-            string str = *begin;
-
-            if (str.length() < pattern.length()) {
-                ++begin;
-                continue;
-            }
-
-            size_t current = ifs.tellg();
-            size_t found = str.find(pattern.c_str());
-
-            if (found != string::npos) {
-                size_t global = current - str.length() + found;
-                positions.push_back(global);
-            }
-
+        if (str.length() < pattern.length()) {
             ++begin;
+            continue;
         }
-        ifs.clear();
-        ifs.seekg(0, ios::beg);
+
+        size_t current = ifs.tellg();
+        size_t found = str.find(pattern.c_str());
+
+        if (found != string::npos) {
+            size_t global = current - str.length() + found;
+            positions.push_back(global);
+        }
+
+        ++begin;
     }
+    ifs.clear();
+    ifs.seekg(0, ios::beg);
 
     if (positions.size() == 0) {
         cout << " * Patterns were not found. Exiting..." << endl;

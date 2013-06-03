@@ -147,7 +147,6 @@ else
 fi
 
 readonly MAIN_BINARY_REPOSITORY_DESTINATION="sofin@verknowsys.com:/opt/software/binary/${SYSTEM_NAME}-${SYSTEM_ARCH}-${USER_TYPE}/"
-DEFAULT_SOFTWARE_BUILD_USERNAME="a562638e6b6693eb" # max 16 chars in BSD
 
 
 case "${SYSTEM_NAME}" in
@@ -201,13 +200,11 @@ case "${SYSTEM_NAME}" in
         if [ "${GENTOO}" = "true" ]; then # Gentoo Linux
             export SERVICE_BIN="/sbin/rc-service"
         fi
-        export DEFAULT_SOFTWARE_BUILD_USERNAME="a562638e6b6693ebe04eee717ef1cf79" # 32 characters max on Linux hosts
         ;;
 
 esac
 
 
-readonly DEFAULT_SOFTWARE_BUILD_USERNAME
 readonly SOFTWARE_ROOT_DIR="/Software/"
 SOFTWARE_DIR="/Software/"
 CACHE_DIR="${SOFTWARE_DIR}.cache/"
