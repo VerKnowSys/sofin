@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.48.6"
+readonly VERSION="0.48.7"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -714,54 +714,58 @@ for application in ${APPLICATIONS}; do
             ARCHIVE_NAME="${APP_NAME}${APP_POSTFIX}-${APP_VERSION}${DEFAULT_ARCHIVE_EXT}"
             INSTALLED_INDICATOR="${PREFIX}/${APP_LOWER}.installed"
             if [ ! -e "${INSTALLED_INDICATOR}" ]; then
-                if [ ! -e "./${ARCHIVE_NAME}" ]; then
-                    note "Trying binary build for: ${MIDDLE}/${APP_NAME}${APP_POSTFIX}-${APP_VERSION}"
-                    ${FETCH_BIN} "${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}"  >> ${LOG} 2>&1
-                    ${FETCH_BIN} "${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}.sha1"  >> ${LOG} 2>&1
+                if [ "${USERNAME}" != "${BUILD_USER_NAME}" ]; then # don't use bin builds for build-user
+                    if [ ! -e "./${ARCHIVE_NAME}" ]; then
+                        note "Trying binary build for: ${MIDDLE}/${APP_NAME}${APP_POSTFIX}-${APP_VERSION}"
+                        ${FETCH_BIN} "${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}"  >> ${LOG} 2>&1
+                        ${FETCH_BIN} "${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}.sha1"  >> ${LOG} 2>&1
 
-                    # checking archive sha1 checksum
-                    if [ -e "${ARCHIVE_NAME}" ]; then
-                        case "${SYSTEM_NAME}" in
-                            Darwin|Linux)
-                                export current_archive_sha1="$(${SHA_BIN} "${ARCHIVE_NAME}" | ${AWK_BIN} '{ print $1 }')"
-                                ;;
+                        # checking archive sha1 checksum
+                        if [ -e "${ARCHIVE_NAME}" ]; then
+                            case "${SYSTEM_NAME}" in
+                                Darwin|Linux)
+                                    export current_archive_sha1="$(${SHA_BIN} "${ARCHIVE_NAME}" | ${AWK_BIN} '{ print $1 }')"
+                                    ;;
 
-                            FreeBSD)
-                                export current_archive_sha1="$(${SHA_BIN} -q "${ARCHIVE_NAME}")"
-                                ;;
-                        esac
-                    fi
-                    current_sha_file="${ARCHIVE_NAME}.sha1"
-                    if [ -e "${current_sha_file}" ]; then
-                        export sha1_value="$(cat ${current_sha_file})"
-                    fi
-
-                    debug "${current_archive_sha1} vs ${sha1_value}"
-                    if [ "${current_archive_sha1}" != "${sha1_value}" ]; then
-                        ${RM_BIN} -f ${ARCHIVE_NAME}
-                        ${RM_BIN} -f ${ARCHIVE_NAME}.sha1
-                    fi
-                fi
-                if [ "${USERNAME}" = "root" ]; then
-                    cd "${SOFTWARE_ROOT_DIR}"
-                else
-                    cd "${HOME}/${HOME_APPS_DIR}"
-                fi
-
-                if [ -e "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" ]; then # if exists, then checksum is ok
-                    ${TAR_BIN} zxf "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" >> ${LOG} 2>&1
-                    if [ "$?" = "0" ]; then # if archive is valid
-                        if [ "${USERNAME}" != "root" ]; then
-                            rpath_patch "${HOME}/${HOME_APPS_DIR}${APP_NAME}" "${APP_NAME}"
+                                FreeBSD)
+                                    export current_archive_sha1="$(${SHA_BIN} -q "${ARCHIVE_NAME}")"
+                                    ;;
+                            esac
                         fi
-                        note "  → Binary bundle installed: ${APP_NAME}${APP_POSTFIX} with version: ${APP_VERSION}"
-                        export DONT_BUILD_BUT_DO_EXPORTS="true"
-                    else
-                        debug "  → No binary bundle available for ${APP_NAME}${APP_POSTFIX}"
-                        ${RM_BIN} -fr "${BINBUILDS_CACHE_DIR}${ABSNAME}"
+                        current_sha_file="${ARCHIVE_NAME}.sha1"
+                        if [ -e "${current_sha_file}" ]; then
+                            export sha1_value="$(cat ${current_sha_file})"
+                        fi
+
+                        debug "${current_archive_sha1} vs ${sha1_value}"
+                        if [ "${current_archive_sha1}" != "${sha1_value}" ]; then
+                            ${RM_BIN} -f ${ARCHIVE_NAME}
+                            ${RM_BIN} -f ${ARCHIVE_NAME}.sha1
+                        fi
                     fi
-                else
-                    debug "  → Binary build checksum doesn't match for: ${ABSNAME}"
+                    if [ "${USERNAME}" = "root" ]; then
+                        cd "${SOFTWARE_ROOT_DIR}"
+                    else
+                        cd "${HOME}/${HOME_APPS_DIR}"
+                    fi
+
+                    if [ -e "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" ]; then # if exists, then checksum is ok
+                        ${TAR_BIN} zxf "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" >> ${LOG} 2>&1
+                        if [ "$?" = "0" ]; then # if archive is valid
+                            if [ "${USERNAME}" != "root" ]; then
+                                rpath_patch "${HOME}/${HOME_APPS_DIR}${APP_NAME}" "${APP_NAME}"
+                            fi
+                            note "  → Binary bundle installed: ${APP_NAME}${APP_POSTFIX} with version: ${APP_VERSION}"
+                            export DONT_BUILD_BUT_DO_EXPORTS="true"
+                        else
+                            debug "  → No binary bundle available for ${APP_NAME}${APP_POSTFIX}"
+                            ${RM_BIN} -fr "${BINBUILDS_CACHE_DIR}${ABSNAME}"
+                        fi
+                    else
+                        debug "  → Binary build checksum doesn't match for: ${ABSNAME}"
+                    fi
+                else # build-user
+                    note "Binary builds disabled for ${BUILD_USER_NAME} user!"
                 fi
             else
                 note "Software already installed: ${APP_NAME}${APP_POSTFIX} with version: $(cat ${INSTALLED_INDICATOR})"
@@ -816,76 +820,80 @@ for application in ${APPLICATIONS}; do
                 if [ "${USERNAME}" = "root" ]; then
                     export BIN_POSTFIX="root"
                 fi
-                MIDDLE="${SYSTEM_NAME}-${SYSTEM_ARCH}-${BIN_POSTFIX}"
-                REQ_APPNAME="$(${PRINTF_BIN} "${APP_NAME}" | ${CUT_BIN} -c1 | ${TR_BIN} '[a-z]' '[A-Z]')$(${PRINTF_BIN} "${APP_NAME}" | ${SED_BIN} 's/^[a-zA-Z]//')"
-                ARCHIVE_NAME="${REQ_APPNAME}${APP_POSTFIX}-${APP_VERSION}${DEFAULT_ARCHIVE_EXT}"
-                BINBUILD_ADDRESS="${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}"
-                BINBUILD_FILE="$(${BASENAME_BIN} ${BINBUILD_ADDRESS})"
-                TMP_REQ_DIR="${BINBUILDS_CACHE_DIR}${REQ_APPNAME}${APP_POSTFIX}-${APP_VERSION}"
-                EXITCODE="0"
-                ${MKDIR_BIN} -p ${BINBUILDS_CACHE_DIR} > /dev/null 2>&1
-                ${MKDIR_BIN} -p ${TMP_REQ_DIR} > /dev/null 2>&1
-                debug "Fetching binary build of requirement: ${REQ_APPNAME}${APP_POSTFIX} with version: ${APP_VERSION}"
-                debug "Binary build should be available here: ${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}"
 
-                cd "${TMP_REQ_DIR}"
-                if [ ! -f "./${BINBUILD_FILE}" ]; then
-                    note "   → Trying binary build: ${BINBUILD_FILE}"
-                    ${FETCH_BIN} "${BINBUILD_ADDRESS}" >> ${LOG} 2>&1
-                    ${FETCH_BIN} "${BINBUILD_ADDRESS}.sha1" >> ${LOG} 2>&1
+                if [ "${USERNAME}" != "${BUILD_USER_NAME}" ]; then # don't use bin builds for build-user
+                    MIDDLE="${SYSTEM_NAME}-${SYSTEM_ARCH}-${BIN_POSTFIX}"
+                    REQ_APPNAME="$(${PRINTF_BIN} "${APP_NAME}" | ${CUT_BIN} -c1 | ${TR_BIN} '[a-z]' '[A-Z]')$(${PRINTF_BIN} "${APP_NAME}" | ${SED_BIN} 's/^[a-zA-Z]//')"
+                    ARCHIVE_NAME="${REQ_APPNAME}${APP_POSTFIX}-${APP_VERSION}${DEFAULT_ARCHIVE_EXT}"
+                    BINBUILD_ADDRESS="${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}"
+                    BINBUILD_FILE="$(${BASENAME_BIN} ${BINBUILD_ADDRESS})"
+                    TMP_REQ_DIR="${BINBUILDS_CACHE_DIR}${REQ_APPNAME}${APP_POSTFIX}-${APP_VERSION}"
+                    EXITCODE="0"
+                    ${MKDIR_BIN} -p ${BINBUILDS_CACHE_DIR} > /dev/null 2>&1
+                    ${MKDIR_BIN} -p ${TMP_REQ_DIR} > /dev/null 2>&1
+                    debug "Fetching binary build of requirement: ${REQ_APPNAME}${APP_POSTFIX} with version: ${APP_VERSION}"
+                    debug "Binary build should be available here: ${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}"
+                    cd "${TMP_REQ_DIR}"
+                    if [ ! -f "./${BINBUILD_FILE}" ]; then
+                        note "   → Trying binary build: ${BINBUILD_FILE}"
+                        ${FETCH_BIN} "${BINBUILD_ADDRESS}" >> ${LOG} 2>&1
+                        ${FETCH_BIN} "${BINBUILD_ADDRESS}.sha1" >> ${LOG} 2>&1
 
-                    # checking archive sha1 checksum
-                    if [ -e "${BINBUILD_FILE}" ]; then
-                        case "${SYSTEM_NAME}" in
-                            Darwin|Linux)
-                                export current_archive_sha1="$(${SHA_BIN} "${BINBUILD_FILE}" | ${AWK_BIN} '{ print $1 }')"
-                                ;;
+                        # checking archive sha1 checksum
+                        if [ -e "${BINBUILD_FILE}" ]; then
+                            case "${SYSTEM_NAME}" in
+                                Darwin|Linux)
+                                    export current_archive_sha1="$(${SHA_BIN} "${BINBUILD_FILE}" | ${AWK_BIN} '{ print $1 }')"
+                                    ;;
 
-                            FreeBSD)
-                                export current_archive_sha1="$(${SHA_BIN} -q "${BINBUILD_FILE}")"
-                                ;;
-                        esac
-                    fi
-                    current_sha_file="${BINBUILD_FILE}.sha1"
-                    if [ -e "${current_sha_file}" ]; then
-                        export sha1_value="$(cat ${current_sha_file})"
-                    fi
-
-                    debug "${current_archive_sha1} vs ${sha1_value}"
-                    if [ "${current_archive_sha1}" != "${sha1_value}" ]; then
-                        ${RM_BIN} -f ${BINBUILD_FILE}
-                        ${RM_BIN} -f ${BINBUILD_FILE}.sha1
-                    fi
-                fi
-
-                if [ -e "./${BINBUILD_FILE}" ]; then # if exists then checksum is ok
-                    debug "Binbuild file: ${BINBUILD_FILE}"
-                    ${TAR_BIN} zxf ${BINBUILD_FILE} >> ${LOG} 2>&1
-                    export EXITCODE="$?"
-
-                    cd "${CACHE_DIR}" # back to existing cache dir
-                    if [ "${EXITCODE}" = "0" ]; then # if archive is valid
-                        note "   → Binary requirement: ${REQ_APPNAME}${APP_POSTFIX} installed with version: ${APP_VERSION}"
-                        if [ ! -d ${PREFIX} ]; then
-                            ${MKDIR_BIN} -p ${PREFIX}
+                                FreeBSD)
+                                    export current_archive_sha1="$(${SHA_BIN} -q "${BINBUILD_FILE}")"
+                                    ;;
+                            esac
                         fi
-                        BINREQ_PATH="${TMP_REQ_DIR}/${REQ_APPNAME}${APP_POSTFIX}"
-                        # patch rpath in binaries/ libraries
-                        rpath_patch "${BINREQ_PATH}" "$(${BASENAME_BIN} ${PREFIX})"
+                        current_sha_file="${BINBUILD_FILE}.sha1"
+                        if [ -e "${current_sha_file}" ]; then
+                            export sha1_value="$(cat ${current_sha_file})"
+                        fi
 
-                        ${CP_BIN} -fR ./* ${PREFIX} >> ${LOG} 2>&1
-                        ${RM_BIN} -rf ${PREFIX}/exports >> ${LOG} 2>&1
-                        ${RM_BIN} -rf ${PREFIX}/exports-disabled >> ${LOG} 2>&1
-
-                        cd "${CACHE_DIR}"
-                        debug "Cleaning unpacked binary cache folder: ${TMP_REQ_DIR}/${REQ_APPNAME}${APP_POSTFIX}"
-                        ${RM_BIN} -rf "${TMP_REQ_DIR}/${REQ_APPNAME}${APP_POSTFIX}"
-                        debug "Marking as installed '$1' in: ${PREFIX}"
-                        ${TOUCH_BIN} "${PREFIX}/$1${INSTALLED_MARK}"
-                        continue
-                    else
-                        note "   → No binary build available for requirement: ${REQ_APPNAME}${APP_POSTFIX}"
+                        debug "${current_archive_sha1} vs ${sha1_value}"
+                        if [ "${current_archive_sha1}" != "${sha1_value}" ]; then
+                            ${RM_BIN} -f ${BINBUILD_FILE}
+                            ${RM_BIN} -f ${BINBUILD_FILE}.sha1
+                        fi
                     fi
+
+                    if [ -e "./${BINBUILD_FILE}" ]; then # if exists then checksum is ok
+                        debug "Binbuild file: ${BINBUILD_FILE}"
+                        ${TAR_BIN} zxf ${BINBUILD_FILE} >> ${LOG} 2>&1
+                        export EXITCODE="$?"
+
+                        cd "${CACHE_DIR}" # back to existing cache dir
+                        if [ "${EXITCODE}" = "0" ]; then # if archive is valid
+                            note "   → Binary requirement: ${REQ_APPNAME}${APP_POSTFIX} installed with version: ${APP_VERSION}"
+                            if [ ! -d ${PREFIX} ]; then
+                                ${MKDIR_BIN} -p ${PREFIX}
+                            fi
+                            BINREQ_PATH="${TMP_REQ_DIR}/${REQ_APPNAME}${APP_POSTFIX}"
+                            # patch rpath in binaries/ libraries
+                            rpath_patch "${BINREQ_PATH}" "$(${BASENAME_BIN} ${PREFIX})"
+
+                            ${CP_BIN} -fR ./* ${PREFIX} >> ${LOG} 2>&1
+                            ${RM_BIN} -rf ${PREFIX}/exports >> ${LOG} 2>&1
+                            ${RM_BIN} -rf ${PREFIX}/exports-disabled >> ${LOG} 2>&1
+
+                            cd "${CACHE_DIR}"
+                            debug "Cleaning unpacked binary cache folder: ${TMP_REQ_DIR}/${REQ_APPNAME}${APP_POSTFIX}"
+                            ${RM_BIN} -rf "${TMP_REQ_DIR}/${REQ_APPNAME}${APP_POSTFIX}"
+                            debug "Marking as installed '$1' in: ${PREFIX}"
+                            ${TOUCH_BIN} "${PREFIX}/$1${INSTALLED_MARK}"
+                            continue
+                        else
+                            note "   → No binary build available for requirement: ${REQ_APPNAME}${APP_POSTFIX}"
+                        fi
+                    fi
+                else # binary-build
+                    note "Binary build disabled for: ${BUILD_USER_NAME} user!"
                 fi
 
                 if [ "${APP_NO_CCACHE}" = "" ]; then # ccache is supported by default but it's optional

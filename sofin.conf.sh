@@ -214,7 +214,7 @@ HOME_DIRS="${HOME}/.."
 LOG="${CACHE_DIR}install.log"
 LISTS_DIR="${CACHE_DIR}lists/"
 DEFAULTS="${DEFINITIONS_DIR}defaults.def"
-BUILD_USER_NAME="build-user"
+readonly BUILD_USER_NAME="build-user"
 BUILD_USER_HOME="/7a231cbcbac22d3ef975e7b554d7ddf09b97782b/${BUILD_USER_NAME}"
 
 readonly CURRENT_USER_UID="$(${ID_BIN} -u)"
