@@ -214,25 +214,31 @@ HOME_DIRS="${HOME}/.."
 LOG="${CACHE_DIR}install.log"
 LISTS_DIR="${CACHE_DIR}lists/"
 DEFAULTS="${DEFINITIONS_DIR}defaults.def"
+BUILD_USER_NAME="build-user"
+BUILD_USER_HOME="/7a231cbcbac22d3ef975e7b554d7ddf09b97782b-bdbfede7e6764c6203224a63190dbff3137adfda/${BUILD_USER_NAME}"
 
 readonly CURRENT_USER_UID="$(${ID_BIN} -u)"
 if [ "${CURRENT_USER_UID}" != "0" ]; then
-    if [ "$(${FIND_BIN} ${HOME_DIRS} -maxdepth 1 2>/dev/null | ${WC_BIN} -l | ${TR_BIN} -d ' ')" = "0" ]; then
-        error "No user home dir found? Critial error. No entries in ${HOME_DIRS}? Fix it and retry."
-        exit 1
-    fi
-    readonly USER_DIRNAME="$(${FIND_BIN} ${HOME_DIRS} -maxdepth 1 -uid "${CURRENT_USER_UID}" 2> /dev/null)" # get user dir by uid and ignore access errors
+    if [ "${HOME}" != "${BUILD_USER_HOME}" ]; then
+        if [ "$(${FIND_BIN} ${HOME_DIRS} -maxdepth 1 2>/dev/null | ${WC_BIN} -l | ${TR_BIN} -d ' ')" = "0" ]; then
+            error "No user home dir found? Critial error. No entries in ${HOME_DIRS}? Fix it and retry."
+            exit 1
+        fi
+        readonly USER_DIRNAME="$(${FIND_BIN} ${HOME_DIRS} -maxdepth 1 -uid "${CURRENT_USER_UID}" 2> /dev/null)" # get user dir by uid and ignore access errors
 
-    # additional check for multiple dirs with same UID (illegal)
-    readonly USER_DIR_AMOUNT="$(echo "${USER_DIRNAME}" | ${WC_BIN} -l | ${TR_BIN} -d ' ')"
-    debug "User dirs amount: ${USER_DIR_AMOUNT}"
-    if [ "${USER_DIR_AMOUNT}" != "1" ]; then
-        error "Found more than one user with same uid in ${HOME_DIRS}! That's illegal. Fix it an retry."
-        error "Conflicting users: $(echo "${USER_DIRNAME}" | ${TR_BIN} '\n' ' ')"
-        exit 1
+        # additional check for multiple dirs with same UID (illegal)
+        readonly USER_DIR_AMOUNT="$(echo "${USER_DIRNAME}" | ${WC_BIN} -l | ${TR_BIN} -d ' ')"
+        debug "User dirs amount: ${USER_DIR_AMOUNT}"
+        if [ "${USER_DIR_AMOUNT}" != "1" ]; then
+            error "Found more than one user with same uid in ${HOME_DIRS}! That's illegal. Fix it an retry."
+            error "Conflicting users: $(echo "${USER_DIRNAME}" | ${TR_BIN} '\n' ' ')"
+            exit 1
+        fi
+        debug "User dirname: ${USER_DIRNAME}"
+        export USERNAME="$(${BASENAME_BIN} ${USER_DIRNAME})"
+    else
+        export USERNAME="${BUILD_USER_NAME}"
     fi
-    debug "User dirname: ${USER_DIRNAME}"
-    export USERNAME="$(${BASENAME_BIN} ${USER_DIRNAME})"
 
     # also explicit check if virtual user exists in home dir:
     if [ "${USERNAME}" = "" ]; then
