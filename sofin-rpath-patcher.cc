@@ -9,19 +9,21 @@
 #include <iostream>
 #include <vector>
 #include <iterator>
+#include <algorithm>
 #include <string.h>
 #include <fstream>
 #include <sstream>
 #include <sys/stat.h>
 #include <sys/fcntl.h>
 #include <errno.h>
+#include <regex.h>
 #if defined(__FreeBSD__) || defined(__linux__)
     #include <cstdlib>
     #include <sys/wait.h>
 #endif
 #include <sys/user.h>
 
-#define APP_VERSION "0.2.4"
+#define APP_VERSION "0.3.0"
 #define COPYRIGHT "Copyright © 2o13 VerKnowSys.com - All Rights Reserved."
 #define BUILD_USER_HOME "/7a231cbcbac22d3ef975e7b554d7ddf09b97782b/"
 #define BUILD_USER_NAME "build-user"
@@ -76,12 +78,11 @@ bool binary_ext_match(string &filename) {
 
 
 bool is_binary(string &filename) {
-    bool matched;
 
-    if ((matched = binary_ext_match(filename)))
+    if (binary_ext_match(filename))
         return true;
 
-    if ((matched = binary_magic_match(filename)))
+    if (binary_magic_match(filename))
         return true;
 
     return false;
@@ -89,14 +90,27 @@ bool is_binary(string &filename) {
 
 
 const string replace_prefix_in_path(string &path, string &prefix) {
-    size_t found = path.find("/Apps/");
-    if (found != string::npos)
-        if ((found = path.find("/", found + 6)) == string::npos)
-            found = prefix.length();
+    regex_t regex;
+    regmatch_t match[1];
+    int ret;
+    string replaced;
 
-    cout << " * Replaced `" << path;
-    string replaced = path.replace(0, found, prefix);
-    cout << "` with `" << replaced << "`" << endl;
+    if (regcomp(&regex, "/Apps/[A-Za-z0-9\\.\\-]*", 0)) {
+        cerr << "Could not compile regex" << endl;
+        return path;
+    }
+
+    ret = regexec(&regex, path.c_str(), 1, match, 0);
+    if (!ret) {
+        cout << " * Replaced `" << path;
+        replaced = path.replace(0, match[0].rm_eo, prefix);
+        cout << "` with `" << replaced << "`" << endl;
+    } else {
+        cerr << "Pattern not matched" << endl;
+        replaced = path;
+    }
+
+    regfree(&regex);
     return replaced;
 }
 
@@ -145,8 +159,7 @@ int main(int argc, char const *argv[]) {
 
 
     ifs.open(original_filename.c_str(), ios::binary);
-    istream_iterator<string> begin(ifs);
-    istream_iterator<string> end;
+    istream_iterator<char> begin(ifs), end;
     vector<size_t> positions;
 
     string home = getenv("HOME");
@@ -156,25 +169,13 @@ int main(int argc, char const *argv[]) {
     string pattern = string(BUILD_USER_HOME) + BUILD_USER_NAME;
     cout << " * Searching for pattern: " << pattern << endl;
 
-    while (ifs.good())
-    {
-        string str = *begin;
+    while (ifs.good()) {
+        begin = search(begin, end, pattern.begin(), pattern.end());
 
-        if (str.length() < pattern.length()) {
-            ++begin;
-            continue;
-        }
-
-        size_t current = ifs.tellg();
-        size_t found = str.find(pattern.c_str());
-
-        while (found != string::npos) {
-            size_t global = current - str.length() + found;
+        if (begin != end) {
+            size_t global = (size_t)ifs.tellg() - pattern.length();
             positions.push_back(global);
-            found = str.find(pattern.c_str(), found + pattern.length());
         }
-
-        ++begin;
     }
     ifs.clear();
     ifs.seekg(0, ios::beg);
@@ -184,14 +185,13 @@ int main(int argc, char const *argv[]) {
         goto DONE;
     }
 
-    ifs.clear();
-    ifs.seekg(0, ifs.beg);
-
-
     ofs.open(patched_filename.c_str(), fstream::binary);
     cout << " * Writing to file: " << patched_filename << endl;
 
     for (std::vector<size_t>::iterator it = positions.begin(); it != positions.end(); ++it) {
+
+        bool last = (positions.end() - it == 1);
+        size_t next_pos = *(it + 1);
 
         /* Write data until the occurrence of the search string */
         while (ifs.tellg() < *it) {
@@ -200,15 +200,21 @@ int main(int argc, char const *argv[]) {
         }
 
         char delimiter = ' ';
-        while (ifs.tellg() < *(it+1)) {
+        while (ifs.good()) {
             ifs.get(c);
 
             if (c == '\0' || c == ' ') {
                 delimiter = c;
                 ifs.seekg(-1, ios::cur);
                 break;
-            } else
-                buf.push_back(c);
+            }
+
+            if (not last && (size_t)ifs.tellg() + 1 == next_pos) {
+                ifs.seekg(-1, ios::cur);
+                break;
+            }
+
+            buf.push_back(c);
         }
 
         /* Replace string */
