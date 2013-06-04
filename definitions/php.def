@@ -9,7 +9,7 @@ APP_CONFIGURE_ARGS="--disable-all --with-libdir=${PREFIX}/lib --with-layout=PHP 
 if [ "${SYSTEM_NAME}" = "Linux" ]; then
   export APP_CONFIGURE_ARGS="${APP_CONFIGURE_ARGS} --with-iconv"
 else
-  export APP_CONFIGURE_ARGS="${APP_CONFIGURE_ARGS} --with-iconv=${PREFIX}"
+  export APP_CONFIGURE_ARGS="${APP_CONFIGURE_ARGS} --with-iconv-dir=${PREFIX}"
 fi
 APP_REQUIREMENTS="gmake libiconv gettext pkgconf zlib bzip2 m4 bison libxml2 pcre libexif libpng jpeg freetype fontconfig gd expat cmake ncurses mysql icu libmcrypt"
 APP_EXPORTS="php php-fpm php-config phpize"
