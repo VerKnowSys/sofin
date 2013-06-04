@@ -4,7 +4,14 @@ APP_SHA="8f948bf74a56f0bca70b2f37de6b585af6602b11"
 APP_NAME="php"
 APP_VERSION="5.3.25"
 APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.bz2"
-APP_CONFIGURE_ARGS="--disable-all --with-layout=PHP --with-libxml-dir=${PREFIX} --with-pcre-regex=${PREFIX} --with-zlib-dir=${PREFIX} --with-gettext=${PREFIX} --with-gd=${PREFIX} --with-png-dir=${PREFIX} --with-jpeg-dir=${PREFIX} --enable-exif --enable-zend-multibyte --enable-zip --enable-mysqlnd --without-apache --disable-debug --disable-ipv6 --enable-fpm --enable-sockets --enable-soap --enable-json --enable-libxml --enable-dom --enable-cli --enable-session --enable-hash --enable-simplexml --enable-xml --enable-filter --enable-pdo --with-pdo-mysql=${PREFIX} --enable-mbstring --enable-fileinfo --with-iconv=${PREFIX} --with-openssl --with-openssl-dir=${PREFIX} --enable-intl --with-mcrypt=${PREFIX}"
+APP_CONFIGURE_SCRIPT="CC=/Software/Clang/exports/clang CXX=/Software/Clang/exports/clang++ ./configure"
+APP_CONFIGURE_ARGS="--disable-all --with-layout=PHP --with-libxml-dir=${PREFIX} --with-pcre-regex=${PREFIX} --with-zlib-dir=${PREFIX} --with-gettext=${PREFIX} --with-gd=${PREFIX} --with-png-dir=${PREFIX} --with-jpeg-dir=${PREFIX} --enable-exif --enable-zend-multibyte --enable-zip --enable-mysqlnd --without-apache --disable-debug --disable-ipv6 --enable-fpm --enable-sockets --enable-soap --enable-json --enable-libxml --enable-dom --enable-cli --enable-session --enable-hash --enable-simplexml --enable-xml --enable-filter --enable-pdo --with-pdo-mysql=${PREFIX} --enable-mbstring --enable-fileinfo --with-openssl --with-openssl-dir=${PREFIX} --enable-intl --with-mcrypt=${PREFIX}"
+if [ "${SYSTEM_NAME}" = "Linux" ]; then
+  export APP_CONFIGURE_ARGS="${APP_CONFIGURE_ARGS} --with-iconv"
+else
+  export APP_CONFIGURE_ARGS="${APP_CONFIGURE_ARGS} --with-iconv=${PREFIX}"
+fi
 APP_REQUIREMENTS="gmake libiconv gettext pkgconf zlib bzip2 m4 bison libxml2 pcre libexif libpng jpeg freetype fontconfig gd expat cmake ncurses mysql icu libmcrypt"
 APP_EXPORTS="php php-fpm php-config phpize"
 APP_CONFLICTS_WITH="Php-postgresql"
+APP_NO_CCACHE="YES"
