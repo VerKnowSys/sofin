@@ -765,7 +765,7 @@ for application in ${APPLICATIONS}; do
                         debug "  → Binary build checksum doesn't match for: ${ABSNAME}"
                     fi
                 else # build-user
-                    note "Binary builds disabled for ${BUILD_USER_NAME} user!"
+                    note "Binary builds disabled for ${BUILD_USER_NAME}!"
                 fi
             else
                 note "Software already installed: ${APP_NAME}${APP_POSTFIX} with version: $(cat ${INSTALLED_INDICATOR})"
@@ -893,7 +893,7 @@ for application in ${APPLICATIONS}; do
                         fi
                     fi
                 else # binary-build
-                    note "Binary build disabled for: ${BUILD_USER_NAME} user!"
+                    note "Binary build disabled for: ${BUILD_USER_NAME}!"
                 fi
 
                 if [ "${APP_NO_CCACHE}" = "" ]; then # ccache is supported by default but it's optional
