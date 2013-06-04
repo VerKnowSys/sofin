@@ -4,7 +4,6 @@ ccache
 cmake
 courier
 curl
-dhcpd
 gd
 ghostscript
 git
