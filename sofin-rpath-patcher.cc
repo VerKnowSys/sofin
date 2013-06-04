@@ -21,7 +21,7 @@
 #endif
 #include <sys/user.h>
 
-#define APP_VERSION "0.2.3"
+#define APP_VERSION "0.2.4"
 #define COPYRIGHT "Copyright © 2o13 VerKnowSys.com - All Rights Reserved."
 #define BUILD_USER_HOME "/7a231cbcbac22d3ef975e7b554d7ddf09b97782b/"
 #define BUILD_USER_NAME "build-user"
@@ -114,7 +114,8 @@ int main(int argc, char const *argv[]) {
     ifstream ifs;
     ofstream ofs;
     size_t isize, osize;
-    char c, buf[1024];
+    char c;
+    vector<char> buf;
     bool binary;
 
     if (strcmp(getenv("USER"), BUILD_USER_NAME) == 0)
@@ -167,9 +168,10 @@ int main(int argc, char const *argv[]) {
         size_t current = ifs.tellg();
         size_t found = str.find(pattern.c_str());
 
-        if (found != string::npos) {
+        while (found != string::npos) {
             size_t global = current - str.length() + found;
             positions.push_back(global);
+            found = str.find(pattern.c_str(), found + pattern.length());
         }
 
         ++begin;
@@ -197,10 +199,22 @@ int main(int argc, char const *argv[]) {
             ofs.put(c);
         }
 
+        char delimiter = ' ';
+        while (ifs.tellg() < *(it+1)) {
+            ifs.get(c);
+
+            if (c == '\0' || c == ' ') {
+                delimiter = c;
+                ifs.seekg(-1, ios::cur);
+                break;
+            } else
+                buf.push_back(c);
+        }
+
         /* Replace string */
-        if (ifs.get(buf, sizeof(buf), '\0')) {
-            string str = buf;
-            size_t str_len = ifs.gcount();
+        if (not buf.empty()) {
+            string str(buf.begin(), buf.end());
+            size_t str_len = str.length();
 
             string replaced = replace_prefix_in_path(str, prefix);
 
@@ -213,11 +227,13 @@ int main(int argc, char const *argv[]) {
 
             /* Write replaced string */
             ofs << replaced;
-            /* Fill gap with zeros */
+            /* Fill gap with delimiter */
             for (int i = replaced.length(); i < str_len; i++) {
-                ofs << '\0';
+                ofs << delimiter;
             }
         }
+        /* Clear buffer */
+        buf.clear();
     }
     /* Write everything else */
     while (ifs.get(c)) {
@@ -246,6 +262,7 @@ DONE:
     ifs.close();
     ofs.close();
     positions.clear();
+    buf.clear();
 
     if (!error) {
         replace_original_file(patched_filename, original_filename);
