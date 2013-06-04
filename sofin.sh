@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.48.8"
+readonly VERSION="0.48.9"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -886,7 +886,7 @@ for application in ${APPLICATIONS}; do
                             debug "Cleaning unpacked binary cache folder: ${TMP_REQ_DIR}/${REQ_APPNAME}${APP_POSTFIX}"
                             ${RM_BIN} -rf "${TMP_REQ_DIR}/${REQ_APPNAME}${APP_POSTFIX}"
                             debug "Marking as installed '$1' in: ${PREFIX}"
-                            ${TOUCH_BIN} "${PREFIX}/$1${INSTALLED_MARK}"
+                            ${TOUCH_BIN} "${PREFIX}/$1${APP_POSTFIX}${INSTALLED_MARK}"
                             continue
                         else
                             note "   → No binary build available for requirement: ${REQ_APPNAME}${APP_POSTFIX}"
@@ -1090,7 +1090,7 @@ for application in ${APPLICATIONS}; do
                             fi
 
                             debug "Marking as installed '$1' in: ${PREFIX}"
-                            ${TOUCH_BIN} "${PREFIX}/$1${INSTALLED_MARK}"
+                            ${TOUCH_BIN} "${PREFIX}/$1${APP_POSTFIX}${INSTALLED_MARK}"
                             debug "Writing version: ${APP_VERSION} of app: '${APP_NAME}' installed in: ${PREFIX}"
                             ${PRINTF_BIN} "${APP_VERSION}" > "${PREFIX}/$1${INSTALLED_MARK}"
                         done
@@ -1107,7 +1107,7 @@ for application in ${APPLICATIONS}; do
                     if [ ! -d "${PREFIX}" ]; then # case when disabled requirement is first on list of dependencies
                         ${MKDIR_BIN} -p "${PREFIX}"
                     fi
-                    ${TOUCH_BIN} "${PREFIX}/${req}${INSTALLED_MARK}"
+                    ${TOUCH_BIN} "${PREFIX}/${req}${APP_POSTFIX}${INSTALLED_MARK}"
                     ${PRINTF_BIN} "system-version" > "${PREFIX}/${req}${INSTALLED_MARK}"
                 fi
             }
@@ -1142,7 +1142,7 @@ for application in ${APPLICATIONS}; do
 
             mark () {
                 debug "Marking definition: ${application} installed"
-                ${TOUCH_BIN} "${PREFIX}/${application}${INSTALLED_MARK}"
+                ${TOUCH_BIN} "${PREFIX}/${application}${APP_POSTFIX}${INSTALLED_MARK}"
                 debug "Writing version: ${APP_VERSION} of app: '${application}' installed in: ${PREFIX}"
                 ${PRINTF_BIN} "${APP_VERSION}" > "${PREFIX}/${application}${INSTALLED_MARK}"
             }
