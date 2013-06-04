@@ -14,4 +14,3 @@ fi
 APP_REQUIREMENTS="gmake libiconv gettext pkgconf zlib bzip2 m4 bison libxml2 pcre libexif libpng jpeg freetype fontconfig gd expat cmake ncurses mysql icu libmcrypt"
 APP_EXPORTS="php php-fpm php-config phpize"
 APP_CONFLICTS_WITH="Php-postgresql"
-APP_NO_CCACHE="YES"
