@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.48.7"
+readonly VERSION="0.48.8"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -712,7 +712,7 @@ for application in ${APPLICATIONS}; do
             fi
             MIDDLE="${SYSTEM_NAME}-${SYSTEM_ARCH}-${BIN_POSTFIX}"
             ARCHIVE_NAME="${APP_NAME}${APP_POSTFIX}-${APP_VERSION}${DEFAULT_ARCHIVE_EXT}"
-            INSTALLED_INDICATOR="${PREFIX}/${APP_LOWER}.installed"
+            INSTALLED_INDICATOR="${PREFIX}/${APP_LOWER}${APP_POSTFIX}.installed"
             if [ ! -e "${INSTALLED_INDICATOR}" ]; then
                 if [ "${USERNAME}" != "${BUILD_USER_NAME}" ]; then # don't use bin builds for build-user
                     if [ ! -e "./${ARCHIVE_NAME}" ]; then
