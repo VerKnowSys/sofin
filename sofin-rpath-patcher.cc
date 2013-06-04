@@ -23,7 +23,7 @@
 #endif
 #include <sys/user.h>
 
-#define APP_VERSION "0.3.0"
+#define APP_VERSION "0.3.1"
 #define COPYRIGHT "Copyright © 2o13 VerKnowSys.com - All Rights Reserved."
 #define BUILD_USER_HOME "/7a231cbcbac22d3ef975e7b554d7ddf09b97782b/"
 #define BUILD_USER_NAME "build-user"
@@ -209,7 +209,7 @@ int main(int argc, char const *argv[]) {
                 break;
             }
 
-            if (not last && (size_t)ifs.tellg() + 1 == next_pos) {
+            if (not last && (size_t)ifs.tellg() == next_pos) {
                 ifs.seekg(-1, ios::cur);
                 break;
             }
