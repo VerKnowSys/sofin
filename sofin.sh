@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.48.10"
+readonly VERSION="0.48.11"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -227,7 +227,13 @@ if [ ! "$1" = "" ]; then
                     pp="$(${PRINTF_BIN} "$(${BASENAME_BIN} ${req})" | ${SED_BIN} 's/\.installed//')"
                     note "  ${pp} [$(${CAT_BIN} ${req})]"
                 done
-                note "${SUCCESS_CHAR} ${app_name}\n"
+                lowercase="$(${PRINTF_BIN} "${app_name}" | ${TR_BIN} '[A-Z]' '[a-z]')"
+                installed_file="${SOFTWARE_DIR}/${app_name}/${lowercase}${INSTALLED_MARK}"
+                if [ -e "${installed_file}" ]; then
+                    note "${SUCCESS_CHAR} ${app_name} [$(${CAT_BIN} ${installed_file})]\n"
+                else
+                    note "${SUCCESS_CHAR} ${app_name} [unknown]\n"
+                fi
             done
         fi
         exit
