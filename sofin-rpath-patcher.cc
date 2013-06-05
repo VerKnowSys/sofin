@@ -23,7 +23,7 @@
 #endif
 #include <sys/user.h>
 
-#define APP_VERSION "0.3.2"
+#define APP_VERSION "0.3.3"
 #define COPYRIGHT "Copyright © 2o13 VerKnowSys.com - All Rights Reserved."
 #define BUILD_USER_HOME "/7a231cbcbac22d3ef975e7b554d7ddf09b97782b/"
 #define BUILD_USER_NAME "build-user"
@@ -266,12 +266,14 @@ int main(int argc, char const *argv[]) {
                 goto DONE;
             }
 
+            /* HACK: prepend path with /././././. */
+            int fill = replaced.length();
+            for ( ; fill + 1 < str_len; fill += 2)
+                ofs << "/.";
+            if (fill < str_len)
+                ofs << '/';
             /* Write replaced string */
             ofs << replaced;
-            /* Fill gap with delimiter */
-            for (int i = replaced.length(); i < str_len; i++) {
-                ofs << delimiter;
-            }
         }
         /* Clear buffer */
         buf.clear();
