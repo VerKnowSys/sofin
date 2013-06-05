@@ -23,7 +23,7 @@
 #endif
 #include <sys/user.h>
 
-#define APP_VERSION "0.3.1"
+#define APP_VERSION "0.3.2"
 #define COPYRIGHT "Copyright © 2o13 VerKnowSys.com - All Rights Reserved."
 #define BUILD_USER_HOME "/7a231cbcbac22d3ef975e7b554d7ddf09b97782b/"
 #define BUILD_USER_NAME "build-user"
@@ -72,8 +72,43 @@ bool binary_magic_match(string &filename) {
 }
 
 
+bool ext_match(string &filename, vector<string> &ext) {
+    regex_t regex;
+    int ret;
+    bool matched = false;
+
+    for (vector<string>::iterator it = ext.begin(); it != ext.end(); ++it) {
+        string pattern = *it;
+        cout << " * Matching extension: " << pattern << endl;
+
+        if (regcomp(&regex, pattern.c_str(), 0)) {
+            cerr << "Could not compile regex" << endl;
+            return false;
+        }
+
+        ret = regexec(&regex, filename.c_str(), 0, NULL, 0);
+        regfree(&regex);
+
+        if (!ret) {
+            cout << " * Matched" << endl;
+            matched = true;
+            break;
+        }
+    }
+
+    return matched;
+}
+
+
 bool binary_ext_match(string &filename) {
-    return false;
+    vector<string> ext;
+    ext.push_back("\\.a$");
+    ext.push_back("\\.so[0-9\\.]*$");
+#if __APPLE__
+    ext.push_back("\\.dylib$");
+#endif
+
+    return ext_match(filename, ext);
 }
 
 
