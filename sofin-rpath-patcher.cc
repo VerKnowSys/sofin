@@ -23,7 +23,7 @@
 #endif
 #include <sys/user.h>
 
-#define APP_VERSION "0.3.3"
+#define APP_VERSION "0.3.5"
 #define COPYRIGHT "Copyright © 2o13 VerKnowSys.com - All Rights Reserved."
 #define BUILD_USER_HOME "/7a231cbcbac22d3ef975e7b554d7ddf09b97782b/"
 #define BUILD_USER_NAME "build-user"
@@ -187,10 +187,10 @@ int main(int argc, char const *argv[]) {
     cout << " * Patching file: " << original_filename << endl;
     cout << " * Binary: " << (binary ? "yes" : "no") << endl;
 
-    if (!binary) {
-        cout << " * Probably a text file. Exiting..." << endl << endl;
-        exit(0);
-    }
+    // if (!binary) {
+    //     cout << " * Probably a text file. Exiting..." << endl << endl;
+    //     exit(0);
+    // }
 
 
     ifs.open(original_filename.c_str(), ios::binary);
@@ -234,12 +234,11 @@ int main(int argc, char const *argv[]) {
             ofs.put(c);
         }
 
-        char delimiter = ' ';
         while (ifs.good()) {
             ifs.get(c);
 
-            if (c == '\0' || c == ' ') {
-                delimiter = c;
+            /* Break on non-printable and whitespace */
+            if (c >= 0 && c < 33) {
                 ifs.seekg(-1, ios::cur);
                 break;
             }
@@ -266,12 +265,14 @@ int main(int argc, char const *argv[]) {
                 goto DONE;
             }
 
-            /* HACK: prepend path with /././././. */
-            int fill = replaced.length();
-            for ( ; fill + 1 < str_len; fill += 2)
-                ofs << "/.";
-            if (fill < str_len)
-                ofs << '/';
+            if (binary) {
+                /* HACK: prepend path with /././././. */
+                int fill = replaced.length();
+                for ( ; fill + 1 < str_len; fill += 2)
+                    ofs << "/.";
+                if (fill < str_len)
+                    ofs << '/';
+            }
             /* Write replaced string */
             ofs << replaced;
         }
@@ -295,7 +296,7 @@ int main(int argc, char const *argv[]) {
     cout << " * Input: " << isize << " bytes." << endl;
     cout << " * Output: " << osize << " bytes." << endl;
 
-    if (isize != osize) {
+    if (binary && isize != osize) {
         cout << " * Failure: Patched file size differs from original file." << endl;
         error = PATCHED_FILE_SIZE_ERROR;
         goto DONE;
