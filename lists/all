@@ -4,7 +4,9 @@ ccache
 cmake
 courier
 curl
-dhcpd
+erlang15
+erlang
+ffmpeg
 gd
 ghostscript
 git
@@ -42,6 +44,8 @@ qt
 redis
 rsync
 rtorrent
+ruby18
+ruby19
 ruby
 scala
 scons

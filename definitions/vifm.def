@@ -6,7 +6,7 @@ APP_REQUIREMENTS="gmake ncurses"
 APP_CONFIGURE_ARGS="--disable-desktop-files --without-X11 --without-gtk --enable-extended-keys"
 APP_EXPORTS="vifm vifm-pause vifmrc-converter"
 APP_MAKE_METHOD="${PREFIX}/bin/gmake -s ${MAKE_OPTS}"
-APP_INSTALL_METHOD="${PREFIX}/bin/gmake -s ${MAKE_OPTS} install"
+APP_INSTALL_METHOD="${PREFIX}/bin/gmake -s ${MAKE_OPTS} install; true"
 APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.bz2"
 APP_AFTER_INSTALL_CALLBACK="update_vifm_default_config"
 

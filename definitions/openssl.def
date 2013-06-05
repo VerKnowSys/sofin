@@ -12,4 +12,4 @@ fi
 APP_REQUIREMENTS="zlib bzip2 perl"
 APP_EXPORTS="openssl"
 APP_MAKE_METHOD="make -s"
-APP_INSTALL_METHOD="make -s install"
+APP_INSTALL_METHOD="make -s install ; true"

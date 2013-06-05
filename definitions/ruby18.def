@@ -1,3 +1,4 @@
+DISABLE_ON="FreeBSD"
 APP_FULL_NAME="Ruby old stable 1.8.7"
 APP_SHA="ffc5736019c9aa692a05ed95af7fe976afb3da13"
 APP_NAME="ruby"

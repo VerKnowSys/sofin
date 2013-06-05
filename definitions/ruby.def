@@ -3,12 +3,21 @@ APP_SHA="d42bcd5b610d23baaed8a80de268a5aa5cf204b8"
 APP_NAME="ruby"
 APP_VERSION="2.0.0-p195"
 APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.bz2"
-APP_CONFIGURE_ARGS="--enable-shared --with-opt-dir=${PREFIX} --disable-install-doc --disable-install-rdoc --enable-load-relative"
-if [ "${SYSTEM_NAME}" = "Darwin" ]; then
-  export APP_CONFIGURE_ARGS="${APP_CONFIGURE_ARGS} --with-gcc=/usr/bin/clang"
-else
-  export APP_CONFIGURE_ARGS="${APP_CONFIGURE_ARGS} --with-gcc=${SOFTWARE_ROOT_DIR}Clang/exports/clang"
-fi
+APP_CONFIGURE_ARGS="--with-opt-dir=${PREFIX} --disable-install-doc --disable-install-rdoc --enable-load-relative"
+case "${SYSTEM_NAME}" in
+    FreeBSD)
+        export APP_CONFIGURE_ARGS="${APP_CONFIGURE_ARGS} --with-gcc=${SOFTWARE_ROOT_DIR}Clang/exports/clang"
+        ;;
+
+    Darwin)
+        export APP_CONFIGURE_ARGS="${APP_CONFIGURE_ARGS} --with-gcc=/usr/bin/clang --enable-shared"
+        ;;
+
+    Linux)
+        export APP_CONFIGURE_ARGS="${APP_CONFIGURE_ARGS} --with-gcc=${SOFTWARE_ROOT_DIR}Clang/exports/clang --enable-shared"
+
+  ;;
+esac
 APP_REQUIREMENTS="zlib bzip2 libiconv libxml2 gmake libtool libgpg-error libgcrypt libxslt yaml libffi sqlite perl openssl readline"
 APP_AFTER_INSTALL_CALLBACK="${PRINTF_BIN} 'gem: --no-ri --no-rdoc' > ${HOME}/.gemrc ; ${PREFIX}/bin/gem install bundler rack --force"
 APP_EXPORTS="ruby gem irb ri rdoc erb rake bundle rackup"
