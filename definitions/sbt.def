@@ -12,7 +12,7 @@ APP_EXPORTS="sbt"
 createLaunchScript () {
   ${PRINTF_BIN} "#!/bin/sh
 
-java \
+exec java \
 -XX:+AggressiveOpts \
 -Xms512M \
 -Xmx1536M \
