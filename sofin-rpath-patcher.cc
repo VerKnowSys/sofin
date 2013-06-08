@@ -23,7 +23,7 @@
 #endif
 #include <sys/user.h>
 
-#define APP_VERSION "0.3.5"
+#define APP_VERSION "0.3.6"
 #define COPYRIGHT "Copyright © 2o13 VerKnowSys.com - All Rights Reserved."
 #define BUILD_USER_HOME "/7a231cbcbac22d3ef975e7b554d7ddf09b97782b/"
 #define BUILD_USER_NAME "build-user"
@@ -150,10 +150,11 @@ const string replace_prefix_in_path(string &path, string &prefix) {
 }
 
 void replace_original_file(string &patched, string &original) {
-    // FIXME
+    struct stat st;
     cout << " * Renaming `" << patched << "` to `" << original << "`" << endl;
+    stat(original.c_str(), &st);
     rename(patched.c_str(), original.c_str());
-    chmod(original.c_str(), 0755);
+    chmod(original.c_str(), st.st_mode);
 }
 
 
