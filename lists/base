@@ -5,6 +5,7 @@ bash
 git
 nginx
 mercurial
+most
 openafs
 openssh
 subversion
