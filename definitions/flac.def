@@ -1,4 +1,3 @@
-# DISABLE_ON="Darwin"
 APP_FULL_NAME="Flac lossless audio codec"
 APP_SHA="bc5e6b4108832d68d706e681f954496aadfd2070"
 APP_NAME="flac"
