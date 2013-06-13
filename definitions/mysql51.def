@@ -12,5 +12,5 @@ case "${SYSTEM_NAME}" in
         ;;
 esac
 
-APP_EXPORTS="mysql mysql_config mysqld mysqld_multi mysqld_safe mysqladmin mysqlshow mysqlimport mysqlbinlog mysqldump mysqlaccess mysqlcheck mysqlhotcopy mysql_upgrade"
+APP_EXPORTS="mysql mysql_config mysqld mysqld_multi mysqld_safe mysqladmin mysqlshow mysqlimport mysqlbinlog mysqldump mysqlaccess mysqlcheck mysqlhotcopy mysql_upgrade mysql_install_db"
 APP_CONFLICTS_WITH="Mysql"
