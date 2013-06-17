@@ -5,6 +5,6 @@ APP_VERSION="0.40.11"
 APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.bz2"
 APP_CONFIGURE_SCRIPT="ignore"
 APP_REQUIREMENTS="gmake pkgconf qt" # requires clang installed in OS
-APP_MAKE_METHOD="bin/build ss && ${MKDIR_BIN} -p ${PREFIX}"
+APP_MAKE_METHOD="bin/build && ${MKDIR_BIN} -p ${PREFIX}"
 APP_INSTALL_METHOD="${CP_BIN} -fR ${CACHE_DIR}cache/${APP_NAME}-${APP_VERSION}/${APP_NAME}-${APP_VERSION}/* ${PREFIX}"
 APP_EXPORTS="svddw svdss svdmon panel"
