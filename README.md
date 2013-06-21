@@ -187,11 +187,12 @@ It will put "sofin" into /usr/bin/ and sofin.conf.sh into /etc/.
 
 ## Conflicts/ Problems/ Known issues:
 * Sofin build mechanism is known to be in conflict with other software managment solutions like: BSD Ports, HomeBrew, MacPorts, Fink. Keep that in mind before reporting problems.
-* It's recommended to change shell by doing: `chsh -s /Software/Zsh/exports/zsh` for each user which will use TheSS. TheSS internally uses Shell from that path by default (currently Shell path is hardcoded due to lack of TheSS config in current version)
+* It's recommended to change shell by doing: `chsh -s /Software/Zsh/exports/zsh` for each user which will use Sofin. It's caused shells that don't read standard default shell initialization scripts like /etc/zshenv.
 
 
 ## FAQ:
 * "It's not working on my Linux distro with applied grSecurity patch on kernel!" - You must set sysctl setting on your machine: `kernel.grsecurity.tpe = 0`. It's required by some software to perform tests successfully. (exec priviledges issue).
+* "Definition 'name' is broken and it doesn't build on my system!" - Usually caused by conflicting software, installed in system paths (f.e. /usr/bin, /usr/lib, /usr/local). Sofin implies clean base system.
 * "It's not working!". Contribute with a fix!
 
 
