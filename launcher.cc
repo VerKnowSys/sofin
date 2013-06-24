@@ -64,9 +64,9 @@ int main(int argc, char const *argv[]) {
 
     /* create a lock */
     if (getuid() == 0)
-        lockfile << "/var/run/.sofin-lock-" << getuid() << endl;
+        lockfile << "/var/run/.sofin-lock-" << getuid();
     else
-        lockfile << "/tmp/.sofin-lock-" << getuid() << endl;
+        lockfile << "/tmp/.sofin-lock-" << getuid();
 
     /* build command line */
     cmd << string(DEFAULT_SOFIN_SCRIPTNAME);
