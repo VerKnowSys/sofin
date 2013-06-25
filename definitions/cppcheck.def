@@ -1,9 +1,12 @@
-# DISABLE_ON="Darwin"
 APP_FULL_NAME="CPP check"
 APP_SHA="282e74459747d6c940fa65376049cb642cd32e6a"
 APP_NAME="cppcheck"
 APP_VERSION="1.60.1"
 APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.bz2"
 APP_CONFIGURE_SCRIPT="no-conf"
-#APP_REQUIREMENTS="gmake m4"
 APP_EXPORTS="cppcheck"
+if [ "${SYSTEM_NAME}" = "FreeBSD" ]; then
+    export APP_REQUIREMENTS="gmake"
+    export APP_MAKE_METHOD="gmake -s ${MAKE_OPTS}"
+    export APP_INSTALL_METHOD="gmake install -s ${MAKE_OPTS}"
+fi
