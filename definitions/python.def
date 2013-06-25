@@ -7,5 +7,5 @@ APP_CONFIGURE_ARGS="--with-fpectl --without-pydebug --disable-ipv6 --without-doc
 APP_REQUIREMENTS="zlib bzip2 yaml libiconv"
 APP_EXPORTS="python3 python3-config easy_install pip"
 if [ "${SYSTEM_NAME}" = "Darwin" ]; then
-  export APP_CONFIGURE_ARGS="${APP_CONFIGURE_ARGS} --enable-universalsdk --with-universal-archs=intel"
+  export APP_CONFIGURE_ARGS="${APP_CONFIGURE_ARGS} --enable-universalsdk --with-universal-archs=intel --enable-shared"
 fi
