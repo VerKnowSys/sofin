@@ -1,7 +1,6 @@
-APP_FULL_NAME="Implementation of the Domain Name System (DNS)"
+. ${DEFINITIONS_DIR}bind.def
+
+APP_POSTFIX="96"
 APP_SHA="739cd279243308af616179dcf3d84fbe8a57e9c3"
-APP_NAME="bind"
 APP_VERSION="9.6-ESV-R9-P1"
 APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
-APP_CONFIGURE_ARGS="--enable-threads --disable-chroot"
-APP_EXPORTS="dig host nslookup nsupdate isc-config.sh named named-checkconf named-checkzone named-compilezone rndc rndc-confgen lwresd dnssec-signzone dnssec-keygen dnssec-keyfromlabel dnssec-dsfromkey"
