@@ -11,4 +11,4 @@ APP_CURRENT_VERSION="$(${CURL_BIN} http://nodejs.org 2>/dev/null | ${AWK_BIN} '/
 APP_CONFIGURE_SCRIPT="LD_LIBRARY_PATH=${PREFIX}/lib:/usr/lib ${PREFIX}/bin/python ./configure"
 APP_MAKE_METHOD="LD_LIBRARY_PATH=${PREFIX}/lib:/usr/lib gmake -s ${MAKE_OPTS}"
 APP_INSTALL_METHOD="LD_LIBRARY_PATH=${PREFIX}/lib:/usr/lib gmake install -s ${MAKE_OPTS}"
-APP_CONFLICTS_WITH="Node-legacy"
+APP_CONFLICTS_WITH="Node06 Node08"
