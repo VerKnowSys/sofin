@@ -27,7 +27,8 @@ mysql
 nginx
 nmap
 node
-node-legacy
+node08
+node06
 oidentd
 openssh
 openssl
