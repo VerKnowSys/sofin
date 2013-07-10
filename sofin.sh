@@ -1045,17 +1045,17 @@ for application in ${APPLICATIONS}; do
                             case "${APP_CONFIGURE_SCRIPT}" in
 
                                 ignore)
-                                    note "   → Ignored configuration part $1"
+                                    note "   → Ignored configuration of definition: $1"
                                     ;;
 
                                 no-conf)
-                                    note "   → Skipped configuration for $1"
+                                    note "   → No configuration for definition: $1"
                                     export APP_MAKE_METHOD="${APP_MAKE_METHOD} PREFIX=${PREFIX}"
                                     export APP_INSTALL_METHOD="${APP_INSTALL_METHOD} PREFIX=${PREFIX}"
                                     ;;
 
                                 binary)
-                                    note "   → Binary definition: $1"
+                                    note "   → Prebuilt definition of: $1"
                                     export APP_MAKE_METHOD="true"
                                     export APP_INSTALL_METHOD="true"
                                     ;;
