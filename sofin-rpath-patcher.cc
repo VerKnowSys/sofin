@@ -22,6 +22,7 @@
     #include <sys/wait.h>
 #endif
 #include <sys/user.h>
+#include <unistd.h>
 
 #define APP_VERSION "0.3.7"
 #define COPYRIGHT "Copyright © 2o13 VerKnowSys.com - All Rights Reserved."
@@ -122,6 +123,19 @@ bool is_binary(string &filename) {
         return true;
 
     return false;
+}
+
+
+bool is_symlink(string &filename)
+{
+    struct stat st;
+
+    if (lstat(filename.c_str(), &st) < 0) {
+        cerr << "Calling stat() failed." << endl;
+        return false;
+    }
+
+    return (S_ISLNK(st.st_mode) == 1);
 }
 
 
