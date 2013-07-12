@@ -23,10 +23,11 @@
 #endif
 #include <sys/user.h>
 
-#define APP_VERSION "0.3.6"
+#define APP_VERSION "0.3.7"
 #define COPYRIGHT "Copyright © 2o13 VerKnowSys.com - All Rights Reserved."
 #define BUILD_USER_HOME "/7a231cbcbac22d3ef975e7b554d7ddf09b97782b/"
 #define BUILD_USER_NAME "build-user"
+#define BUILD_USER_HOME_DIR BUILD_USER_HOME BUILD_USER_NAME
 #define REPLACED_SIZE_ERROR 100
 #define PATCHED_FILE_SIZE_ERROR 101
 #define NOT_ENOUGH_ARGS_ERROR 102
@@ -124,11 +125,22 @@ bool is_binary(string &filename) {
 }
 
 
-const string replace_prefix_in_path(string &path, string &prefix) {
+const string replace_prefix_in_path(string &path, string &home, string &bundle) {
     regex_t regex;
     regmatch_t match[1];
     int ret;
-    string replaced;
+
+    if (regcomp(&regex, BUILD_USER_HOME_DIR, 0)) {
+        cerr << "Could not compile regex" << endl;
+        return path;
+    }
+
+    ret = regexec(&regex, path.c_str(), 1, match, 0);
+    regfree(&regex);
+
+    if (!ret)
+        /* Replace home dir */
+        path.replace(match[0].rm_so, match[0].rm_eo - match[0].rm_so, home);
 
     if (regcomp(&regex, "/Apps/[A-Za-z0-9\\.\\-]*", 0)) {
         cerr << "Could not compile regex" << endl;
@@ -136,18 +148,15 @@ const string replace_prefix_in_path(string &path, string &prefix) {
     }
 
     ret = regexec(&regex, path.c_str(), 1, match, 0);
-    if (!ret) {
-        cout << " * Replaced `" << path;
-        replaced = path.replace(0, match[0].rm_eo, prefix);
-        cout << "` with `" << replaced << "`" << endl;
-    } else {
-        cerr << "Pattern not matched" << endl;
-        replaced = path;
-    }
-
     regfree(&regex);
-    return replaced;
+
+    if (!ret)
+        /* Replace bundle name */
+        path.replace(match[0].rm_so, match[0].rm_eo - match[0].rm_so, "/Apps/" + bundle);
+
+    return path;
 }
+
 
 void replace_original_file(string &patched, string &original) {
     struct stat st;
@@ -202,7 +211,7 @@ int main(int argc, char const *argv[]) {
     string prefix = home + "/Apps/" + bundle;
     cout << " * Prefix: " << prefix << endl;
 
-    string pattern = string(BUILD_USER_HOME) + BUILD_USER_NAME;
+    string pattern = string(BUILD_USER_HOME_DIR);
     cout << " * Searching for pattern: " << pattern << endl;
 
     while (ifs.good()) {
@@ -257,7 +266,7 @@ int main(int argc, char const *argv[]) {
             string str(buf.begin(), buf.end());
             size_t str_len = str.length();
 
-            string replaced = replace_prefix_in_path(str, prefix);
+            string replaced = replace_prefix_in_path(str, home, bundle);
 
             if (replaced.length() > str_len) {
                 cout << " * Fatal: Replaced string is greater than original ("
