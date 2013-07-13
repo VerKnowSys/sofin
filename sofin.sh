@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.48.12"
+readonly VERSION="0.49.0"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -698,7 +698,7 @@ for application in ${APPLICATIONS}; do
                 # patch RPATH values from all binaries and libraries of binary bundle
                 for dir in "lib" "bin" "sbin" "libexec"; do # take all files in bundle
                     if [ -d "${dir}" ]; then
-                        for file in $(${FIND_BIN} "${dir}" -type f); do
+                        for file in $(${FIND_BIN} "${dir}" -type f -o -type l); do
                             debug "Patching binary file: ${1}/${file} of bundle: ${2}"
                             run ${SOFIN_RPATH_PATCHER_BIN} "$2" "${1}/${file}"
                         done
