@@ -24,7 +24,7 @@
 #include <sys/user.h>
 #include <unistd.h>
 
-#define APP_VERSION "0.3.7"
+#define APP_VERSION "0.4.0"
 #define COPYRIGHT "Copyright © 2o13 VerKnowSys.com - All Rights Reserved."
 #define BUILD_USER_HOME "/7a231cbcbac22d3ef975e7b554d7ddf09b97782b/"
 #define BUILD_USER_NAME "build-user"
@@ -139,7 +139,7 @@ bool is_symlink(string &filename)
 }
 
 
-const string replace_prefix_in_path(string &path, string &home, string &bundle) {
+const string replace_prefix_in_path(string path, string &home, string &bundle) {
     regex_t regex;
     regmatch_t match[1];
     int ret;
@@ -189,7 +189,7 @@ int main(int argc, char const *argv[]) {
     size_t isize, osize;
     char c;
     vector<char> buf;
-    bool binary;
+    bool binary, slink;
 
     if (strcmp(getenv("USER"), BUILD_USER_NAME) == 0)
         return 0;
@@ -202,9 +202,34 @@ int main(int argc, char const *argv[]) {
         exit(NOT_ENOUGH_ARGS_ERROR);
     }
 
+    string home = getenv("HOME");
     string bundle = argv[1];
     string original_filename = argv[2];
     string patched_filename = original_filename + ".patched";
+
+    slink = is_symlink(original_filename);
+
+    if (slink) {
+        char buf[4096]; // PATH_MAX
+        readlink(original_filename.c_str(), buf, sizeof(buf));
+        string path = string(buf);
+
+        cout << " * Symbolic link found: " << original_filename << " -> " << path << endl;
+        string replaced = replace_prefix_in_path(path, home, bundle);
+
+        if (path == replaced)
+            cout << " * Path is correct. Exiting..." << endl << endl;
+        else {
+            cout << " * Creating symbolic link: " << patched_filename << " -> " <<  replaced << endl;
+            symlink(replaced.c_str(), patched_filename.c_str());
+
+            cout << " * Renaming `" << patched_filename << "` to `" << original_filename << "`" << endl;
+            rename(patched_filename.c_str(), original_filename.c_str());
+            cout << " * Success" << endl << endl;
+        }
+
+        return 0;
+    }
 
     binary = is_binary(original_filename);
 
@@ -221,7 +246,6 @@ int main(int argc, char const *argv[]) {
     istream_iterator<char> begin(ifs), end;
     vector<size_t> positions;
 
-    string home = getenv("HOME");
     string prefix = home + "/Apps/" + bundle;
     cout << " * Prefix: " << prefix << endl;
 
