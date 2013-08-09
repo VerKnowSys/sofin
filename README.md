@@ -69,16 +69,6 @@ sofin install ruby
 sofin install databases
 ```
 
-* Upgrade application requirement: Xml in bundle Ruby as current user:
-```bash
-sofin upgrade libxml2 ruby
-```
-
-* Upgrade Ruby in Ruby bundle without recompiling all requirements (already compiled requirements will be reused):
-```bash
-sofin upgrade ruby ruby
-```
-
 * Show list of available software:
 ```bash
 sofin available

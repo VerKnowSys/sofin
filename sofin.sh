@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.49.1"
+readonly VERSION="0.50.0"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -119,7 +119,6 @@ usage_howto () {
     note "Built in tasks:"
     note
     note "install | get                        - installs software from list or from definition (example: $(${BASENAME_BIN} ${SCRIPT_NAME}) install ruby)"
-    note "upgrade                              - upgrades one of dependencies of installed definition (example: $(${BASENAME_BIN} ${SCRIPT_NAME}) upgrade iconv ruby - to upgrade iconv in Ruby bundle)"
     note "dependencies | deps | local          - installs software from list defined in '${DEPENDENCIES_FILE}' file in current directory"
     note "uninstall | remove | delete          - removes an application or list (example: $(${BASENAME_BIN} ${SCRIPT_NAME}) uninstall ruby)"
     note "list | installed                     - short list of installed software"
@@ -344,45 +343,6 @@ if [ ! "$1" = "" ]; then
         ${PRINTF_BIN} "export CXX='${CXX}'\n\n"
         ${PRINTF_BIN} "# CPP:\n"
         ${PRINTF_BIN} "export CPP='${CPP}'\n\n"
-        exit
-        ;;
-
-
-    upgrade)
-        if [ "$2" = "" ]; then
-            error "For application \"$1\", second argument with application requirement name is required!"
-            exit 1
-        fi
-        if [ "$3" = "" ]; then
-            error "For application \"$1\", third argument with application name is required!"
-            exit 1
-        fi
-        REQ="${2}"
-        APP="$(${PRINTF_BIN} "${3}" | ${CUT_BIN} -c1 | ${TR_BIN} '[a-z]' '[A-Z]')$(${PRINTF_BIN} "${3}" | ${SED_BIN} 's/^[a-zA-Z]//')"
-        if [ ! -e "${SOFTWARE_DIR}${APP}" ]; then
-            error "Bundle not found: ${APP}"
-            exit 1
-        fi
-        note "Performing upgrade of requirement: ${REQ} in application bundle: ${APP}"
-        REM="${SOFTWARE_DIR}${APP}/${REQ}${INSTALLED_MARK}"
-        if [ ! -e "${REM}" ]; then
-            error "No requirement: ${REM} found of bundle: ${APP}"
-            exit 1
-        fi
-
-        # getting list of file/ folders matching definition name
-        files=""
-        debug "Performing find in ${SOFTWARE_DIR}${APP}"
-        for old in $(${FIND_BIN} "${SOFTWARE_DIR}${APP}" -name "*${REQ}*" -regex '.*\.[o\$\|so\|a\$\|la\$\|h\$\|hpp\$].*' -type f); do
-            files="${files}${old} "
-            ${RM_BIN} -f "${old}"
-        done
-        debug "Old files removed before doing upgrade: ${files}"
-        debug "Removing install marker: ${REM}"
-        ${RM_BIN} -f "${REM}"
-
-        debug "Relaunching installation script once again…"
-        ${SCRIPT_NAME} install ${3}
         exit
         ;;
 
