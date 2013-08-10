@@ -113,7 +113,7 @@ space than it does with "old fasioned, system wide, shared software".
 ## Pitfalls/ Limitations:
 * Windows isn't supported, but Sofin will run just fine everywhere after a couple of configuration fights.
 * Sofin is designed, tested and heavy supported under both 64bit: FreeBSD 9.1 and Darwin 12.2.0, but it should also work on any compliant architectures as well.
-* Currently all official Sofin software used by current definitions is mirrored only on [software.verknowsys.com](http://software.verknowsys.com/source) and [software.verknowsys.com](http://software.verknowsys.com/binary).
+* Currently all official Sofin software used by current definitions is mirrored only on [software.verknowsys.com](http://software.verknowsys.com/source).
 * Currently some definitions provided by Sofin include a couple of custom patches on software required by VerKnowSys ServeD © System. Patches (if any) usually come from current [FreeBSD ports](http://www.freebsd.org/ports/index.html).
 * Some definitions with X11 requirement will need [XQuartz](http://xquartz.macosforge.org/landing/) installation. (Darwin hosts only).
 
