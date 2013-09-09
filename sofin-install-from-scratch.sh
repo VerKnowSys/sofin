@@ -2,7 +2,7 @@
 # © 2o13, by Daniel (dmilith) Dettlaff
 
 PATH="/usr/bin:/bin"
-SOURCE="https://nodeload.github.com/VerKnowSys/sofin/tar.gz/master"
+SOURCE="https://codeload.github.com/VerKnowSys/sofin/tar.gz/master"
 SYSTEM_NAME="$(uname)"
 CURL_BIN="/usr/bin/fetch -o -"
 TAR_BIN="/usr/bin/tar"
