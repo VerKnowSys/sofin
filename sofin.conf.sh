@@ -2,7 +2,6 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 #
 # global Sofin values:
-export USE_BINBUILD="true"
 if [ "${DEBUG}" = "" ]; then
     export DEBUG="false"
 fi
@@ -154,17 +153,19 @@ case "${SYSTEM_NAME}" in
 
     FreeBSD)
         # Default
+        readonly FREEBSD_MINIMUM_VERSION="9.1"
         cpus="$(${SYSCTL_BIN} -a | ${GREP_BIN} kern.smp.cpus: | ${AWK_BIN} '{printf $2}')"
         export CURL_BIN="/usr/bin/fetch -o -"
         export MAKE_OPTS="-j${cpus}"
 
-        if [ "$(printf \"$(${SOFIN_VERSION_UTILITY_BIN}) >= 9.1\" | ${BC_BIN})" != "1" ]; then
+        if [ $(echo "$(${SOFIN_VERSION_UTILITY_BIN}) >= ${FREEBSD_MINIMUM_VERSION}" | ${BC_BIN}) -eq 0 ]; then
             export USE_BINBUILD="false"
         fi
         ;;
 
     Darwin)
         # OSX specific configuration
+        readonly DARWIN_MINIMUM_VERSION="12.4"
         export CURL_BIN="/usr/bin/curl"
         export FETCH_BIN="/usr/bin/curl -O"
         export PATCH_BIN="/usr/bin/patch -p0 "
@@ -177,12 +178,13 @@ case "${SYSTEM_NAME}" in
         export MAKE_OPTS="-j${cpus}"
         unset SERVICE_BIN # not necessary
 
-        if [ "$(printf \"$(${SOFIN_VERSION_UTILITY_BIN}) >= 12.4\" | ${BC_BIN})" != "1" ]; then
+        if [ $(echo "$(${SOFIN_VERSION_UTILITY_BIN}) >= ${DARWIN_MINIMUM_VERSION}" | ${BC_BIN}) -eq 0 ]; then
             export USE_BINBUILD="false"
         fi
         ;;
 
     Linux)
+        readonly GLIBC_MINIMUM_VERSION="2.11"
         export CURL_BIN="/usr/bin/wget -qO -"
         export FETCH_BIN="/usr/bin/wget -N"
         export PATCH_BIN="/usr/bin/patch -p0 "
@@ -209,7 +211,7 @@ case "${SYSTEM_NAME}" in
         if [ "${GENTOO}" = "true" ]; then # Gentoo Linux
             export SERVICE_BIN="/sbin/rc-service"
         fi
-        if [ "$(printf \"$(${SOFIN_VERSION_UTILITY_BIN}) >= 2.11\" | ${BC_BIN})" != "1" ]; then
+        if [ $(echo "$(${SOFIN_VERSION_UTILITY_BIN}) >= ${GLIBC_MINIMUM_VERSION}" | ${BC_BIN}) -eq 0 ]; then
             export USE_BINBUILD="false"
         fi
         ;;
