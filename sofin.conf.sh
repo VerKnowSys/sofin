@@ -2,6 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 #
 # global Sofin values:
+export USE_BINBUILD="true"
 if [ "${DEBUG}" = "" ]; then
     export DEBUG="false"
 fi
@@ -75,7 +76,7 @@ SCP_BIN="/usr/bin/scp"
 XARGS_BIN="/usr/bin/xargs"
 SOFIN_BIN="/usr/bin/sofin"
 SOFIN_RPATH_PATCHER_BIN="/usr/bin/sofin-rpp"
-
+SOFIN_VERSION_UTILITY_BIN="/usr/bin/sofin-version-utility"
 # probably the most crucial value in whole code. by design immutable
 USERNAME="$(${ID_BIN} ${ID_SVD})"
 DEFAULT_LDFLAGS="-fPIC -fPIE"
@@ -156,6 +157,10 @@ case "${SYSTEM_NAME}" in
         cpus="$(${SYSCTL_BIN} -a | ${GREP_BIN} kern.smp.cpus: | ${AWK_BIN} '{printf $2}')"
         export CURL_BIN="/usr/bin/fetch -o -"
         export MAKE_OPTS="-j${cpus}"
+
+        if [ "$(printf \"$(${SOFIN_VERSION_UTILITY_BIN}) >= 9.1\" | ${BC_BIN})" != "1" ]; then
+            export USE_BINBUILD="false"
+        fi
         ;;
 
     Darwin)
@@ -171,6 +176,10 @@ case "${SYSTEM_NAME}" in
         cpus=$(${SYSCTL_BIN} -a | ${GREP_BIN} cpu.core_count: | ${AWK_BIN} '{printf $2}')
         export MAKE_OPTS="-j${cpus}"
         unset SERVICE_BIN # not necessary
+
+        if [ "$(printf \"$(${SOFIN_VERSION_UTILITY_BIN}) >= 12.4\" | ${BC_BIN})" != "1" ]; then
+            export USE_BINBUILD="false"
+        fi
         ;;
 
     Linux)
@@ -199,6 +208,9 @@ case "${SYSTEM_NAME}" in
         fi
         if [ "${GENTOO}" = "true" ]; then # Gentoo Linux
             export SERVICE_BIN="/sbin/rc-service"
+        fi
+        if [ "$(printf \"$(${SOFIN_VERSION_UTILITY_BIN}) >= 2.11\" | ${BC_BIN})" != "1" ]; then
+            export USE_BINBUILD="false"
         fi
         ;;
 
