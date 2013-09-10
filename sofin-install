@@ -94,6 +94,7 @@ install_base () {
     ${RM_BIN} -rf "/usr/bin/sofin"
     ${RM_BIN} -rf "/usr/bin/sofin.sh"
     ${RM_BIN} -rf "/usr/bin/sofin-rpp"
+    ${RM_BIN} -rf "/usr/bin/sofin-version-utility"
     ${RM_BIN} -rf "/etc/${CONF_FILE}"
 
     build_launcher
@@ -106,6 +107,7 @@ install_base () {
         # compiler available, build was done
         ${CP_BIN} "$($PWD_BIN)/sofin" /usr/bin/sofin
         ${CP_BIN} "$($PWD_BIN)/sofin-rpp" /usr/bin/sofin-rpp
+        ${CP_BIN} "$($PWD_BIN)/sofin-version-utility" /usr/bin/sofin-version-utility
         SHC_BIN="$(which shc)"
         if [ "${SHC_BIN}" = "" ]; then
             note "SHC compiler unavailable"
@@ -136,6 +138,8 @@ build_launcher () {
         ${CXX} -Os -fPIC ./launcher.cc -o sofin
         note "Building patcher"
         ${CXX} -Os -fPIC ./sofin-rpath-patcher.cc -o sofin-rpp
+        note "Building version utility"
+        ${CXX} -Os -fPIC ./sofin-version-utility.cc -o sofin-version-utility
     else
         note "No C++ compiler available"
     fi
