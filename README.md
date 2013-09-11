@@ -51,12 +51,10 @@ customizable software for FreeBSD servers. Darwin (Mac OS X) support started wit
   Each callback can be sh function itself and to be called by name. Look into [sbt.def](https://github.com/VerKnowSys/sofin/blob/master/definitions/sbt.def) for an example createLaunchScript().
 * Supports collisions between definitions through APP_CONFLICTS_WITH option since version 0.38.0. An example in [ruby.def](https://github.com/VerKnowSys/sofin/blob/master/definitions/ruby.def)
 * Supports binary builds of software bundles and requirements since 0.47.2
-* Sofin automatically avoids using software binary builds, that won't work on given host. In that case,  software will be built from source. Minimum system requirements for binary builds to work, depend on platfrom:
+* Since version 0.51.0, Sofin automatically avoids using software binary builds, that won't work on given host. In that case, software will be built from source. Minimum system requirements for binary builds to work, depend on platfrom:
    - FreeBSD: OS version >= 9.1
    - Linux: GLibC version >= 2.11
    - Darwin: OS version >= 12.4
-
-usage only on supported system versions since
 
 
 ## Examples:
