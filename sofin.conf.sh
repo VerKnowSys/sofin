@@ -76,7 +76,13 @@ XARGS_BIN="/usr/bin/xargs"
 SOFIN_BIN="/usr/bin/sofin"
 SOFIN_RPATH_PATCHER_BIN="/usr/bin/sofin-rpp"
 SOFIN_VERSION_UTILITY_BIN="/usr/bin/sofin-version-utility"
+
 # probably the most crucial value in whole code. by design immutable
+if [ ! -x "${SOFIN_VERSION_UTILITY_BIN}" ]; then
+    export OS_VERSION="0"
+else
+    export OS_VERSION="$(echo $(${SOFIN_VERSION_UTILITY_BIN}) | ${AWK_BIN} '{ gsub(/\./, ""); print $1; }' )"
+fi
 USERNAME="$(${ID_BIN} ${ID_SVD})"
 DEFAULT_LDFLAGS="-fPIC -fPIE"
 DEFAULT_COMPILER_FLAGS="-Os -fPIC -fPIE -fno-strict-overflow -fstack-protector-all"
@@ -153,19 +159,18 @@ case "${SYSTEM_NAME}" in
 
     FreeBSD)
         # Default
-        readonly FREEBSD_MINIMUM_VERSION="9.1"
+        readonly FREEBSD_MINIMUM_VERSION="91"
         cpus="$(${SYSCTL_BIN} -a | ${GREP_BIN} kern.smp.cpus: | ${AWK_BIN} '{printf $2}')"
         export CURL_BIN="/usr/bin/fetch -o -"
         export MAKE_OPTS="-j${cpus}"
-
-        if [ $(echo "$(${SOFIN_VERSION_UTILITY_BIN}) ${FREEBSD_MINIMUM_VERSION}" | ${AWK_BIN} '{if ($1 >= $2) print 0; else print 1}') -eq 0 ]; then
+        if [ ${OS_VERSION} -lt ${FREEBSD_MINIMUM_VERSION} ]; then
             export USE_BINBUILD="false"
         fi
         ;;
 
     Darwin)
         # OSX specific configuration
-        readonly DARWIN_MINIMUM_VERSION="12.4"
+        readonly DARWIN_MINIMUM_VERSION="124"
         export CURL_BIN="/usr/bin/curl"
         export FETCH_BIN="/usr/bin/curl -O"
         export PATCH_BIN="/usr/bin/patch -p0 "
@@ -178,13 +183,13 @@ case "${SYSTEM_NAME}" in
         export MAKE_OPTS="-j${cpus}"
         unset SERVICE_BIN # not necessary
 
-        if [ $(echo "$(${SOFIN_VERSION_UTILITY_BIN}) ${DARWIN_MINIMUM_VERSION}" | ${AWK_BIN} '{if ($1 >= $2) print 0; else print 1}') -eq 0 ]; then
+        if [ ${OS_VERSION} -lt ${DARWIN_MINIMUM_VERSION} ]; then
             export USE_BINBUILD="false"
         fi
         ;;
 
     Linux)
-        readonly GLIBC_MINIMUM_VERSION="2.11"
+        readonly GLIBC_MINIMUM_VERSION="211"
         export CURL_BIN="/usr/bin/wget -qO -"
         export FETCH_BIN="/usr/bin/wget -N"
         export PATCH_BIN="/usr/bin/patch -p0 "
@@ -211,7 +216,7 @@ case "${SYSTEM_NAME}" in
         if [ "${GENTOO}" = "true" ]; then # Gentoo Linux
             export SERVICE_BIN="/sbin/rc-service"
         fi
-        if [ $(echo "$(${SOFIN_VERSION_UTILITY_BIN}) ${GLIBC_MINIMUM_VERSION}" | ${AWK_BIN} '{if ($1 >= $2) print 0; else print 1}') -eq 0 ]; then
+        if [ ${OS_VERSION} -lt ${GLIBC_MINIMUM_VERSION} ]; then
             export USE_BINBUILD="false"
         fi
         ;;
