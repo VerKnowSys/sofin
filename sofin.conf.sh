@@ -158,7 +158,7 @@ case "${SYSTEM_NAME}" in
         export CURL_BIN="/usr/bin/fetch -o -"
         export MAKE_OPTS="-j${cpus}"
 
-        if [ $(echo "$(${SOFIN_VERSION_UTILITY_BIN}) >= ${FREEBSD_MINIMUM_VERSION}" | ${BC_BIN}) -eq 0 ]; then
+        if [ $(echo "$(${SOFIN_VERSION_UTILITY_BIN}) ${FREEBSD_MINIMUM_VERSION}" | ${AWK_BIN} '{if ($1 >= $2) print 0; else print 1}') -eq 0 ]; then
             export USE_BINBUILD="false"
         fi
         ;;
@@ -178,7 +178,7 @@ case "${SYSTEM_NAME}" in
         export MAKE_OPTS="-j${cpus}"
         unset SERVICE_BIN # not necessary
 
-        if [ $(echo "$(${SOFIN_VERSION_UTILITY_BIN}) >= ${DARWIN_MINIMUM_VERSION}" | ${BC_BIN}) -eq 0 ]; then
+        if [ $(echo "$(${SOFIN_VERSION_UTILITY_BIN}) ${DARWIN_MINIMUM_VERSION}" | ${AWK_BIN} '{if ($1 >= $2) print 0; else print 1}') -eq 0 ]; then
             export USE_BINBUILD="false"
         fi
         ;;
@@ -211,7 +211,7 @@ case "${SYSTEM_NAME}" in
         if [ "${GENTOO}" = "true" ]; then # Gentoo Linux
             export SERVICE_BIN="/sbin/rc-service"
         fi
-        if [ $(echo "$(${SOFIN_VERSION_UTILITY_BIN}) >= ${GLIBC_MINIMUM_VERSION}" | ${BC_BIN}) -eq 0 ]; then
+        if [ $(echo "$(${SOFIN_VERSION_UTILITY_BIN}) ${GLIBC_MINIMUM_VERSION}" | ${AWK_BIN} '{if ($1 >= $2) print 0; else print 1}') -eq 0 ]; then
             export USE_BINBUILD="false"
         fi
         ;;
