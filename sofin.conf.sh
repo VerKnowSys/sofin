@@ -77,7 +77,6 @@ SOFIN_BIN="/usr/bin/sofin"
 SOFIN_RPATH_PATCHER_BIN="/usr/bin/sofin-rpp"
 SOFIN_VERSION_UTILITY_BIN="/usr/bin/sofin-version-utility"
 
-# probably the most crucial value in whole code. by design immutable
 if [ ! -x "${SOFIN_VERSION_UTILITY_BIN}" ]; then
     export OS_VERSION="0"
 else

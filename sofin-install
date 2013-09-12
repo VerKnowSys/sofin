@@ -19,7 +19,8 @@ if [ -x "/usr/bin/clang++" ]; then
     export CXX="/usr/bin/clang++"
 fi
 if [ ! -x "${CXX}" ]; then
-    warn "C++ compiler unavailable. Wrapper wont be built"
+    error "C++ compiler is required to install Sofin"
+    exit 1
 fi
 
 
@@ -88,9 +89,7 @@ update_env_files () {
 
 
 install_base () {
-    ${RM_BIN} -rf "./sofin"
     ${RM_BIN} -rf "./sofin-rpp"
-    ${RM_BIN} -rf "./sofin.sh.x"
     ${RM_BIN} -rf "/usr/bin/sofin"
     ${RM_BIN} -rf "/usr/bin/sofin.sh"
     ${RM_BIN} -rf "/usr/bin/sofin-rpp"
@@ -98,36 +97,9 @@ install_base () {
     ${RM_BIN} -rf "/etc/${CONF_FILE}"
 
     build_launcher
-
-    if [ ! -x "$($PWD_BIN)/sofin" ]; then
-        # no compiler available in system, using plain script
-        ${CP_BIN} "$($PWD_BIN)/sofin.sh" /usr/bin/sofin
-        check_command_result $?
-    else
-        # compiler available, build was done
-        ${CP_BIN} "$($PWD_BIN)/sofin" /usr/bin/sofin
-        ${CP_BIN} "$($PWD_BIN)/sofin-rpp" /usr/bin/sofin-rpp
-        ${CP_BIN} "$($PWD_BIN)/sofin-version-utility" /usr/bin/sofin-version-utility
-        SHC_BIN="$(which shc)"
-        if [ "${SHC_BIN}" = "" ]; then
-            note "SHC compiler unavailable"
-            ${CP_BIN} "$($PWD_BIN)/sofin.sh" /usr/bin/sofin.sh
-            check_command_result $?
-        else
-            note "SHC compiler available"
-            ${SHC_BIN} -T -f "$($PWD_BIN)/sofin.sh"
-            check_command_result $?
-            chmod 755 "$($PWD_BIN)/sofin.sh.x"
-            ${CP_BIN} "$($PWD_BIN)/sofin.sh.x" /usr/bin/sofin.sh
-            check_command_result $?
-        fi
-    fi
-
-    ${CP_BIN} "$($PWD_BIN)/${CONF_FILE}" "/etc/${CONF_FILE}"
-    check_command_result $?
+    install_sofin
 
     ${MKDIR_BIN} -p /Software/.cache
-    note "Installation succeeded."
 }
 
 
@@ -136,37 +108,42 @@ build_launcher () {
         note "C++ compiler available. Using: ${CXX}"
         note "Building launcher"
         ${CXX} -Os -fPIC ./launcher.cc -o sofin
+        check_command_result $?
+
         note "Building patcher"
         ${CXX} -Os -fPIC ./sofin-rpath-patcher.cc -o sofin-rpp
+        check_command_result $?
+
         note "Building version utility"
         ${CXX} -Os -fPIC ./sofin-version-utility.cc -o sofin-version-utility
+        check_command_result $?
     else
-        note "No C++ compiler available"
+        error "C++ compiler is required to continue"
+        exit 1
     fi
 }
 
 
-note "${SYSTEM_NAME} installation"
-case "${SYSTEM_NAME}" in
+install_sofin () {
+    ${CP_BIN} "$($PWD_BIN)/${CONF_FILE}" "/etc/${CONF_FILE}"
+    check_command_result $?
+    ${CP_BIN} "$($PWD_BIN)/sofin" /usr/bin/sofin
+    check_command_result $?
+    ${CP_BIN} "$($PWD_BIN)/sofin-rpp" /usr/bin/sofin-rpp
+    check_command_result $?
+    ${CP_BIN} "$($PWD_BIN)/sofin-version-utility" /usr/bin/sofin-version-utility
+    check_command_result $?
+    ${CP_BIN} "$($PWD_BIN)/sofin.sh" /usr/bin/sofin.sh
+    check_command_result $?
+}
 
-  Darwin)
-    check_root
-    update_env_files
-    install_base
-    ;;
 
-  FreeBSD|Linux)
-    check_root
-    # create_user_symlinks
-    update_env_files
-    install_base
-    ;;
+check_root
+update_env_files
+install_base
+note "Sofin installed on: ${SYSTEM_NAME} $(/usr/bin/sofin-version-utility)"
 
-  *)
-    echo "No supported architecture found"
-    ;;
-
-esac
-
-note "Performing initial definitions update."
-/usr/bin/sofin update
+if [ ! -f "/Software/.cache/definitions/defaults.def" ]; then
+    note "Performing initial definitions update."
+    /usr/bin/sofin update
+fi

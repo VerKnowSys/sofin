@@ -10,10 +10,6 @@ MV_BIN="/bin/mv"
 
 
 case "${SYSTEM_NAME}" in
-    FreeBSD)
-        # default
-        ;;
-
     Darwin)
         CURL_BIN="/usr/bin/curl"
         ;;
@@ -24,8 +20,7 @@ case "${SYSTEM_NAME}" in
         ;;
 
     *)
-        printf "Unsupported system found: ${SYSTEM_NAME}. Cannot continue. Please contact dmilith to add support for your system.\n"
-        exit 1
+        # default
         ;;
 
 esac
