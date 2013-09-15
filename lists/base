@@ -1,5 +1,6 @@
 clang
 ccache
+zeromq
 git
 nginx
 mercurial
