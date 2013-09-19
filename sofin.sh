@@ -654,13 +654,13 @@ for application in ${APPLICATIONS}; do
                 # $1 param is a directory root prefix of dependency to install
                 # $2 param is a name of destination bundle name, f.e. "Ruby"
                 #
-                cd "${1}"
+                cd "${1}${APP_POSTFIX}"
                 # patch RPATH values from all binaries and libraries of binary bundle
                 for dir in "lib" "bin" "sbin" "libexec"; do # take all files in bundle
                     if [ -d "${dir}" ]; then
                         for file in $(${FIND_BIN} "${dir}" -type f -o -type l); do
-                            debug "Patching binary file: ${1}/${file} of bundle: ${2}"
-                            run ${SOFIN_RPATH_PATCHER_BIN} "$2" "${1}/${file}"
+                            debug "Patching binary file: ${1}${APP_POSTFIX}/${file} of bundle: ${2}${APP_POSTFIX}"
+                            run ${SOFIN_RPATH_PATCHER_BIN} "${2}${APP_POSTFIX}" "${1}${APP_POSTFIX}/${file}"
                         done
                     fi
                 done
