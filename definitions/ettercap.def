@@ -4,7 +4,10 @@ APP_NAME="ettercap"
 APP_VERSION="0.7.4.1"
 APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
 APP_REQUIREMENTS="gmake zlib pkgconf libiconv bzip2 ncurses m4 flex bison perl openssl pcre libnet libtool libpcap"
-APP_CONFIGURE_ARGS="--with-libnet=${PREFIX} --with-libpcap=${PREFIX} --with-openssl=${PREFIX} --with-libpcre=${PREFIX} --with-iconv=${PREFIX} --disable-gtk --disable-plugins"
+APP_CONFIGURE_ARGS="--with-libnet=${PREFIX} --with-libpcap=${PREFIX} --with-openssl=${PREFIX} --with-libpcre=${PREFIX} --disable-gtk --disable-plugins"
+if [ "${SYSTEM_NAME}" != "Linux" ]; then
+    export APP_CONFIGURE_ARGS="${APP_CONFIGURE_ARGS} --with-iconv=${PREFIX}"
+fi
 APP_EXPORTS="ettercap etterfilter etterlog"
 FORCE_GNU_COMPILER="true"
 APP_MAKE_METHOD="gmake -s"
