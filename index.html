@@ -39,29 +39,35 @@
         <ul></ul>
       </nav>
       <section>
-        <h2>Author:</h2>
+        <h2>
+<a name="author" class="anchor" href="#author"><span class="octicon octicon-link"></span></a>Author:</h2>
 
 <ul>
 <li>Daniel (dmilith) Dettlaff (dmilith [at] verknowsys.com). I'm also on #freebsd and #scala.pl @ freenode IRC.</li>
-</ul><h2>Definition authors:</h2>
+</ul><h2>
+<a name="definition-authors" class="anchor" href="#definition-authors"><span class="octicon octicon-link"></span></a>Definition authors:</h2>
 
 <ul>
 <li>Daniel (dmilith) Dettlaff</li>
 <li>Michał (tallica) Lipski</li>
-</ul><h2>Contributors:</h2>
+</ul><h2>
+<a name="contributors" class="anchor" href="#contributors"><span class="octicon octicon-link"></span></a>Contributors:</h2>
 
 <ul>
 <li>Michał (tallica) Lipski</li>
-</ul><h2>Thanks:</h2>
+</ul><h2>
+<a name="thanks" class="anchor" href="#thanks"><span class="octicon octicon-link"></span></a>Thanks:</h2>
 
 <ul>
 <li>Tymon (teamon) Tobolski (ideas of improvments)</li>
-</ul><h2>About:</h2>
+</ul><h2>
+<a name="about" class="anchor" href="#about"><span class="octicon octicon-link"></span></a>About:</h2>
 
 <p>This software is my way of how to get reliable, updatable, bundled, closed-dependency, secure and fully
 customizable software for FreeBSD servers. Darwin (Mac OS X) support started with version &gt;=0.14.10. Linux support started with version &gt;=0.24.4.</p>
 
-<h2>Features:</h2>
+<h2>
+<a name="features" class="anchor" href="#features"><span class="octicon octicon-link"></span></a>Features:</h2>
 
 <ul>
 <li>Designed to work on all *BSD, *Darwin, *Linux</li>
@@ -96,78 +102,77 @@ Each callback can be sh function itself and to be called by name. Look into <a h
 </li>
 <li>Supports collisions between definitions through APP_CONFLICTS_WITH option since version 0.38.0. An example in <a href="https://github.com/VerKnowSys/sofin/blob/master/definitions/ruby.def">ruby.def</a>
 </li>
-</ul><h2>Examples:</h2>
+<li>Supports binary builds of software bundles and requirements since 0.47.2</li>
+<li>Since version 0.51.0, Sofin automatically avoids using software binary builds, that won't work on given host. In that case, software will be built from source. Minimum system requirements for binary builds to work, depend on platfrom:
+
+<ul>
+<li>FreeBSD: OS version &gt;= 9.1</li>
+<li>Linux: GLibC version &gt;= 2.11</li>
+<li>Darwin: OS version &gt;= 12.4</li>
+</ul>
+</li>
+</ul><h2>
+<a name="examples" class="anchor" href="#examples"><span class="octicon octicon-link"></span></a>Examples:</h2>
 
 <ul>
 <li>
 <p>Install all available software defined in a list called "all":</p>
 
-<div class="highlight"><pre>sofin install all
+<div class="highlight highlight-bash"><pre>sofin install all
 </pre></div>
 </li>
 <li>
 <p>Install one software from definition called "ruby.def" for current user:</p>
 
-<div class="highlight"><pre>sofin install ruby
+<div class="highlight highlight-bash"><pre>sofin install ruby
 </pre></div>
 </li>
 <li>
 <p>Install software list called "databases" for current user:</p>
 
-<div class="highlight"><pre>sofin install databases
-</pre></div>
-</li>
-<li>
-<p>Upgrade application requirement: Xml in bundle Ruby as current user:</p>
-
-<div class="highlight"><pre>sofin upgrade libxml2 ruby
-</pre></div>
-</li>
-<li>
-<p>Upgrade Ruby in Ruby bundle without recompiling all requirements (already compiled requirements will be reused):</p>
-
-<div class="highlight"><pre>sofin upgrade ruby ruby
+<div class="highlight highlight-bash"><pre>sofin install databases
 </pre></div>
 </li>
 <li>
 <p>Show list of available software:</p>
 
-<div class="highlight"><pre>sofin available
+<div class="highlight highlight-bash"><pre>sofin available
 </pre></div>
 </li>
 <li>
 <p>Show list of installed software:</p>
 
-<div class="highlight"><pre>sofin fullinstalled
+<div class="highlight highlight-bash"><pre>sofin fullinstalled
 </pre></div>
 
 <p>or</p>
 
-<div class="highlight"><pre>sofin installed
+<div class="highlight highlight-bash"><pre>sofin installed
 </pre></div>
 </li>
 <li>
 <p>Export "ruby" binary from "Passenger" bundle:</p>
 
-<div class="highlight"><pre>sofin <span class="nb">export </span>ruby Passenger
+<div class="highlight highlight-bash"><pre>sofin <span class="nb">export </span>ruby Passenger
 </pre></div>
 </li>
 <li>
 <p>Uninstall installed software "SomeApp"?</p>
 
-<div class="highlight"><pre>sofin uninstall someApp
+<div class="highlight highlight-bash"><pre>sofin uninstall someApp
 </pre></div>
 </li>
 <li>
 <p>Create a list called "databases", with definitions: "postgresql" and "mysql", and install it with Sofin:</p>
 
-<div class="highlight"><pre><span class="nb">cd </span>Sofin
+<div class="highlight highlight-bash"><pre><span class="nb">cd </span>Sofin
 <span class="nb">echo</span> <span class="s2">"postgresql\nmysql"</span> &gt; lists/databases
 ./push-definitions <span class="c"># to create a snapshot and upload it to Your remote respository.</span>
 sofin install databases
 </pre></div>
 </li>
-</ul><h2>Differences from <a href="https://en.wikipedia.org/wiki/POSIX">POSIX</a> and <a href="https://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard">FHS</a> standards:</h2>
+</ul><h2>
+<a name="differences-from-posix-and-fhs-standards" class="anchor" href="#differences-from-posix-and-fhs-standards"><span class="octicon octicon-link"></span></a>Differences from <a href="https://en.wikipedia.org/wiki/POSIX">POSIX</a> and <a href="https://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard">FHS</a> standards:</h2>
 
 <ul>
 <li>Sofin provides a slightly different approach to shell PATH variable. By default user PATH variable is overriden to include APP-PREFIX/exports instead of default APP-PREFIX/(s)bin. After each successful software installation sofin will populate APP-PREFIX/exports with relative symlinks to existing binaries of bundle. Application exports are defined in "APP_EXPORTS" variable (available for any definition).</li>
@@ -175,17 +180,20 @@ sofin install databases
 <li>Each application has own "root" directory (Similar to Mac OS X software in *.app folders).</li>
 <li>Each software bundle includes all dependencies of given software, hence application bundle requires more disk
 space than it does with "old fasioned, system wide, shared software".</li>
-</ul><h2>Pitfalls/ Limitations:</h2>
+</ul><h2>
+<a name="pitfalls-limitations" class="anchor" href="#pitfalls-limitations"><span class="octicon octicon-link"></span></a>Pitfalls/ Limitations:</h2>
 
 <ul>
 <li>Windows isn't supported, but Sofin will run just fine everywhere after a couple of configuration fights.</li>
 <li>Sofin is designed, tested and heavy supported under both 64bit: FreeBSD 9.1 and Darwin 12.2.0, but it should also work on any compliant architectures as well.</li>
-<li>Currently all official Sofin software used by current definitions is mirrored only on <a href="http://software.verknowsys.com/source">software.verknowsys.com</a> and <a href="http://software.verknowsys.com/binary">software.verknowsys.com</a>.</li>
+<li>Currently all official Sofin software used by current definitions is mirrored only on <a href="http://software.verknowsys.com/source">software.verknowsys.com</a>.</li>
 <li>Currently some definitions provided by Sofin include a couple of custom patches on software required by VerKnowSys ServeD © System. Patches (if any) usually come from current <a href="http://www.freebsd.org/ports/index.html">FreeBSD ports</a>.</li>
 <li>Some definitions with X11 requirement will need <a href="http://xquartz.macosforge.org/landing/">XQuartz</a> installation. (Darwin hosts only).</li>
-</ul><h2>Installation info (platform specific):</h2>
+</ul><h2>
+<a name="installation-info-platform-specific" class="anchor" href="#installation-info-platform-specific"><span class="octicon octicon-link"></span></a>Installation info (platform specific):</h2>
 
-<h3>FreeBSD specific:</h3>
+<h3>
+<a name="freebsd-specific" class="anchor" href="#freebsd-specific"><span class="octicon octicon-link"></span></a>FreeBSD specific:</h3>
 
 <ul>
 <li>Install base 64bit system - I used 64bit FreeBSD 9.1 bootonly iso here.</li>
@@ -206,7 +214,8 @@ space than it does with "old fasioned, system wide, shared software".</li>
 <p>as root.</p>
 </li>
 <li><p>Start using sofin as regular user.</p></li>
-</ul><h3>Darwin/ Mac OS X specific:</h3>
+</ul><h3>
+<a name="darwin-mac-os-x-specific" class="anchor" href="#darwin-mac-os-x-specific"><span class="octicon octicon-link"></span></a>Darwin/ Mac OS X specific:</h3>
 
 <ul>
 <li>Install Mac OS X 10.8.</li>
@@ -226,7 +235,8 @@ space than it does with "old fasioned, system wide, shared software".</li>
 </code></pre>
 </li>
 <li><p>Start using sofin as regular user.</p></li>
-</ul><h3>Debian specific: (Yes - Linux is NOT a system)</h3>
+</ul><h3>
+<a name="debian-specific-yes---linux-is-not-a-system" class="anchor" href="#debian-specific-yes---linux-is-not-a-system"><span class="octicon octicon-link"></span></a>Debian specific: (Yes - Linux is NOT a system)</h3>
 
 <ul>
 <li>Install base 64bit system - I used 64bit Debian 6.0.x netinstall iso here.</li>
@@ -253,7 +263,22 @@ space than it does with "old fasioned, system wide, shared software".</li>
 </code></pre>
 </li>
 <li><p>Start using sofin as regular user.</p></li>
-</ul><h2>License:</h2>
+</ul><h2>
+<a name="conflicts-problems-known-issues" class="anchor" href="#conflicts-problems-known-issues"><span class="octicon octicon-link"></span></a>Conflicts/ Problems/ Known issues:</h2>
+
+<ul>
+<li>Latest versions of OSX 10.8 lack GNU compiler (even through Xcode command line utilities, the only available compiler is Clang). Due to this fact, it is required to have installed binaries: <code>/usr/bin/llvm-gcc</code> <code>/usr/bin/llvm-g++</code> and <code>/usr/bin/llvm-cpp-4.2</code> on your system. (Only if you want Sofin to build software that requires GNU compiler). In older versions of Xcode (=&lt;4.1) this compiler is built in and usually resides in <code>/usr/llvm-gcc-4.2</code> directory and is linked to <code>/usr/bin</code>. I uploaded this compiler taken from my 10.8 system. It's available <a href="http://software.verknowsys.com/binary/Darwin-x86_64-common/llvm-gcc-4.2-prebuilt.tar.bz2">here</a>. Put it anywhere and make symlinks to <code>/usr/bin</code> to solve this issue permanently.</li>
+<li>Sofin build mechanism is known to be in conflict with other software managment solutions like: BSD Ports, HomeBrew, MacPorts, Fink. Keep that in mind before reporting problems.</li>
+<li>It's recommended to change shell by doing: <code>chsh -s /Software/Zsh/exports/zsh</code> for each user which will use Sofin. It's caused shells that don't read standard default shell initialization scripts like /etc/zshenv.</li>
+</ul><h2>
+<a name="faq" class="anchor" href="#faq"><span class="octicon octicon-link"></span></a>FAQ:</h2>
+
+<ul>
+<li>"It's not working on my Linux distro with applied grSecurity patch on kernel!" - You must set sysctl setting on your machine: <code>kernel.grsecurity.tpe = 0</code>. It's required by some software to perform tests successfully. (exec priviledges issue).</li>
+<li>"Definition 'name' is broken and it doesn't build on my system!" - Usually caused by conflicting software, installed in system paths (f.e. /usr/bin, /usr/lib, /usr/local). Sofin implies clean base system.</li>
+<li>"It's not working!". Contribute with a fix!</li>
+</ul><h2>
+<a name="license" class="anchor" href="#license"><span class="octicon octicon-link"></span></a>License:</h2>
 
 <ul>
 <li>Released under the <a href="http://opensource.org/licenses/BSD-2-Clause">BSD</a> license.</li>
@@ -261,7 +286,7 @@ space than it does with "old fasioned, system wide, shared software".</li>
       </section>
       <footer>
         <p>Project maintained by <a href="https://github.com/VerKnowSys">VerKnowSys</a></p>
-        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="http://twitter.com/#!/michigangraham">mattgraham</a></small></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></small></p>
       </footer>
     </div>
     <!--[if !IE]><script>fixScale(document);</script><![endif]-->
