@@ -180,6 +180,7 @@ It will put "sofin" into /usr/bin/ and sofin.conf.sh into /etc/.
 
 
 ## Conflicts/ Problems/ Known issues:
+* Latest versions of OSX 10.8 lack GNU compiler (even through Xcode command line utilities, the only available compiler is Clang). Due to this fact, it is required to have installed binaries: `/usr/bin/llvm-gcc` `/usr/bin/llvm-g++` and `/usr/bin/llvm-cpp-4.2` on your system. (Only if you want Sofin to build software that requires GNU compiler). In older versions of Xcode (=<4.1) this compiler is built in and usually resides in `/usr/llvm-gcc-4.2` directory and is linked to `/usr/bin`. I uploaded this compiler taken from my 10.8 system. It's available [here](http://software.verknowsys.com/binary/Darwin-x86_64-common/llvm-gcc-4.2-prebuilt.tar.bz2). Put it anywhere and make symlinks to `/usr/bin` to solve this issue permanently.
 * Sofin build mechanism is known to be in conflict with other software managment solutions like: BSD Ports, HomeBrew, MacPorts, Fink. Keep that in mind before reporting problems.
 * It's recommended to change shell by doing: `chsh -s /Software/Zsh/exports/zsh` for each user which will use Sofin. It's caused shells that don't read standard default shell initialization scripts like /etc/zshenv.
 
