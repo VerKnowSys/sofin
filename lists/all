@@ -1,4 +1,5 @@
 ant
+aspell
 cairo
 ccache
 cmake
