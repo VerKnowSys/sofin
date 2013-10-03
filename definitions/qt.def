@@ -1,5 +1,5 @@
 DISABLE_ON="Darwin" # use prebuilt version from Trolltech/Nokia site
-APP_FULL_NAME="Qt4 Library"
+APP_FULL_NAME="Qt4 Core Library. This build doesn't include any GUI applications."
 APP_NAME="qt"
 APP_SHA="f5880f11c139d7d8d01ecb8d874535f7d9553198"
 APP_VERSION="4.8.4"
