@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.51.4"
+readonly VERSION="0.51.5"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -1218,6 +1218,12 @@ for application in ${APPLICATIONS}; do
             fi
 
         done
+
+        if [ ! -z "${APP_AFTER_EXPORT_CALLBACK}" ]; then
+            debug "Executing APP_AFTER_EXPORT_CALLBACK"
+            run "${APP_AFTER_EXPORT_CALLBACK}"
+        fi
+
     fi
 done
 

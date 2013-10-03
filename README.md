@@ -1,7 +1,7 @@
 # Sofin - SOFtware INstaller. Designed for BSD, Darwin and Linux.
 
 ## Author:
-* Daniel (dmilith) Dettlaff (dmilith [at] verknowsys.com). I'm also on #freebsd and #scala.pl @ freenode IRC.
+* Daniel (dmilith) Dettlaff (dmilith [at] verknowsys.com). I'm also on #verknowsys @ freenode IRC.
 
 
 ## Definition authors:
@@ -48,6 +48,7 @@ customizable software for FreeBSD servers. Darwin (Mac OS X) support started wit
   - APP_AFTER_CONFIGURE_CALLBACK (executed after software configuration process)
   - APP_AFTER_MAKE_CALLBACK (executed after software compilation process)
   - APP_AFTER_INSTALL_CALLBACK (executed after software installation process)
+  - APP_AFTER_EXPORT_CALLBACK (executed after final stage of exporting software executables)
   Each callback can be sh function itself and to be called by name. Look into [sbt.def](https://github.com/VerKnowSys/sofin/blob/master/definitions/sbt.def) for an example createLaunchScript().
 * Supports collisions between definitions through APP_CONFLICTS_WITH option since version 0.38.0. An example in [ruby.def](https://github.com/VerKnowSys/sofin/blob/master/definitions/ruby.def)
 * Supports binary builds of software bundles and requirements since 0.47.2
