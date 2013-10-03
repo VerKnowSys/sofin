@@ -9,9 +9,16 @@ if [ "${SYSTEM_NAME}" = "Darwin" ]; then
     export DEVEL="true" # it's a hack for Postgresql dev team stupidity, to skip symbol strip from binaries/libraries.
                         # this fixes issue with "Symbol not found: _check_encoding_conversion_args" on OSX
 fi
-APP_AFTER_INSTALL_CALLBACK="cd ${CACHE_DIR}cache/${APP_NAME}-${APP_VERSION}/${APP_NAME}-${APP_VERSION}/contrib/pg_archivecleanup && gmake install"
+APP_AFTER_INSTALL_CALLBACK="build_addons_and_extensions"
 APP_EXPORTS="postgres pg_ctl initdb pg_dump pg_dumpall pg_config psql createdb createuser dropdb pg_controldata pg_restore pg_resetxlog reindexdb vacuumdb"
 APP_NO_CCACHE="YES"
 APP_CURRENT_VERSION="$(${CURL_BIN} http://www.postgresql.org 2>/dev/null | ${AWK_BIN} '/static\/release/ {gsub(/ *<[^>]+> */, " "); print $1; exit}')"
 APP_MAKE_METHOD="gmake -s ${MAKE_OPTS}"
 APP_INSTALL_METHOD="gmake install -s ${MAKE_OPTS}"
+
+
+build_addons_and_extensions () {
+    base_dir="${CACHE_DIR}cache/${APP_NAME}-${APP_VERSION}/${APP_NAME}-${APP_VERSION}/contrib"
+    cd ${base_dir}/pg_archivecleanup && gmake install
+    cd ${base_dir}/hstore && gmake install
+}
