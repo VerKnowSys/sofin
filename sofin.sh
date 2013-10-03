@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.51.5"
+readonly VERSION="0.51.6"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -1094,9 +1094,9 @@ for application in ${APPLICATIONS}; do
 
             if [ "${DONT_BUILD_BUT_DO_EXPORTS}" = "" ]; then
                 if [ "${APP_REQUIREMENTS}" = "" ]; then
-                    note "Installing ${application}"
+                    note "Installing ${application} v${APP_VERSION}"
                 else
-                    note "Installing ${application} with requirements: ${APP_REQUIREMENTS}"
+                    note "Installing ${application} v${APP_VERSION}, with requirements: ${APP_REQUIREMENTS}"
                 fi
                 export req_amount="$(${PRINTF_BIN} "${APP_REQUIREMENTS}" | ${WC_BIN} -w | ${AWK_BIN} '{print $1}')"
                 export req_amount="$(${PRINTF_BIN} "${req_amount} + 1\n" | ${BC_BIN})"
