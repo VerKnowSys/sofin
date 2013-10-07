@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.51.6"
+readonly VERSION="0.51.7"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -915,7 +915,7 @@ for application in ${APPLICATIONS}; do
                                 fi
                             fi
                         done
-                        if [ ! -e ${BUILD_DIR_ROOT}${APP_NAME}*${APP_HTTP_PATH##*.} ]; then
+                        if [ ! -e ${BUILD_DIR_ROOT}$(${BASENAME_BIN} ${APP_HTTP_PATH}) ]; then
                             note "   → Fetching requirement source from: ${APP_HTTP_PATH}"
                             run "${FETCH_BIN} ${APP_HTTP_PATH}"
                         else
