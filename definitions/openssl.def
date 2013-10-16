@@ -7,7 +7,7 @@ APP_CONFIGURE_SCRIPT="./config"
 APP_CONFIGURE_ARGS="shared -L${PREFIX}/lib -I${PREFIX}/include"
 if [ "${SYSTEM_NAME}" = "Darwin" ]; then
 export APP_CONFIGURE_SCRIPT="./Configure"
-export APP_CONFIGURE_ARGS="darwin64-x86_64-cc"
+export APP_CONFIGURE_ARGS="darwin64-x86_64-cc -shared"
 fi
 APP_REQUIREMENTS="perl"
 APP_EXPORTS="openssl"
