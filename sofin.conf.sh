@@ -151,7 +151,7 @@ else
     export USER_TYPE="root"
 fi
 
-readonly MAIN_BINARY_REPOSITORY_DESTINATION="sofin@verknowsys.com:/opt/software/binary/${SYSTEM_NAME}-${SYSTEM_ARCH}-${USER_TYPE}/"
+readonly MAIN_BINARY_REPOSITORY_DESTINATION="sofin@verknowsys.com:/Mirror/software/binary/${SYSTEM_NAME}-${SYSTEM_ARCH}-${USER_TYPE}/"
 
 
 case "${SYSTEM_NAME}" in

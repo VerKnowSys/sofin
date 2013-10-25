@@ -7,7 +7,7 @@ DEBUG="false"
 
 LOG="/tmp/sofin-make-defs.log"
 DEFINITION_SNAPSHOT_FILE="defs.tar.bz2"
-DESTINATION_REPOSITORY_SERVER="sofin@software.verknowsys.com:/opt/software/source/definitions/"
+DESTINATION_REPOSITORY_SERVER="sofin@software.verknowsys.com:/Mirror/software/source/definitions/"
 
 # config binary requirements definitions
 PRINTF_BIN="/usr/bin/printf"
