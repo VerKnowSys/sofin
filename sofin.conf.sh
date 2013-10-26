@@ -187,39 +187,6 @@ case "${SYSTEM_NAME}" in
         fi
         ;;
 
-    Linux)
-        readonly GLIBC_MINIMUM_VERSION="211"
-        export CURL_BIN="/usr/bin/wget -qO -"
-        export FETCH_BIN="/usr/bin/wget -N"
-        export PATCH_BIN="/usr/bin/patch -p0 "
-        export UNAME_BIN="/bin/uname"
-        export KLDLOAD_BIN="/sbin/modprobe"
-        export SHA_BIN="/usr/bin/shasum"
-        export SED_BIN="/bin/sed"
-        export TAR_BIN="/bin/tar"
-        export GREP_BIN="/bin/grep"
-        export EGREP_BIN="/bin/egrep"
-        export BC_BIN="/usr/bin/bc"
-        export CHOWN_BIN="/bin/chown"
-        export DEFAULT_COMPILER_FLAGS="-Os -fPIC -fno-strict-overflow -fstack-protector-all"
-        export DEFAULT_LDFLAGS="-fPIC "
-        export TEST_BIN="/usr/bin/test"
-        export NPROC_BIN="/usr/bin/nproc"
-        export MAKE_OPTS="-j$(${NPROC_BIN})"
-        if [ "${DEBIAN}" = "true" ]; then # we're dealing with debian or ubuntu.
-            export AWK_BIN="/usr/bin/awk"
-            export SHA_BIN="/usr/bin/sha1sum"
-        else
-            export AWK_BIN="/usr/bin/awk -c"
-        fi
-        if [ "${GENTOO}" = "true" ]; then # Gentoo Linux
-            export SERVICE_BIN="/sbin/rc-service"
-        fi
-        if [ ${OS_VERSION} -lt ${GLIBC_MINIMUM_VERSION} ]; then
-            export USE_BINBUILD="false"
-        fi
-        ;;
-
 esac
 
 
@@ -350,11 +317,8 @@ check_os () {
         Darwin)
             ;;
 
-        Linux)
-            ;;
-
         *)
-            error "Currently only FreeBSD, Darwin and Linux hosts are supported."
+            error "Currently only FreeBSD and Darwin hosts are supported."
             exit
             ;;
 

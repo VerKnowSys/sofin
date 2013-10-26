@@ -1,4 +1,4 @@
-# Sofin - SOFtware INstaller. Designed for BSD, Darwin and Linux.
+# Sofin - SOFtware INstaller. Designed for BSD and Darwin.
 
 ## Author:
 * Daniel (dmilith) Dettlaff (dmilith [at] verknowsys.com). I'm also on #verknowsys @ freenode IRC.
@@ -19,11 +19,11 @@
 
 ## About:
 This software is my way of how to get reliable, updatable, bundled, closed-dependency, secure and fully
-customizable software for FreeBSD servers. Darwin (Mac OS X) support started with version >=0.14.10. Linux support started with version >=0.24.4.
+customizable software for FreeBSD servers. Darwin (Mac OS X) support started with version >=0.14.10. Linux support started with version >=0.24.4 and ended with 0.51.9. If you wish me to continue Linux support, please consider a donation.
 
 
 ## Features:
-* Designed to work on all *BSD, *Darwin, *Linux
+* Designed to work on all *BSD (FreeBSD >=9.x), *Darwin (OSX >=10.8.x)
 * User friendly, clean and clear colorful information. No magic. KISS, DRY, BDD driven development.
 * Simple, ~1k LOC solution, written in legacy /bin/sh shell scripting language.
 * Every "software" has own definition ("def" file) with defined flat dependency list and basic information.
@@ -54,7 +54,6 @@ customizable software for FreeBSD servers. Darwin (Mac OS X) support started wit
 * Supports binary builds of software bundles and requirements since 0.47.2
 * Since version 0.51.0, Sofin automatically avoids using software binary builds, that won't work on given host. In that case, software will be built from source. Minimum system requirements for binary builds to work, depend on platfrom:
    - FreeBSD: OS version >= 9.1
-   - Linux: GLibC version >= 2.11
    - Darwin: OS version >= 12.4
 
 
@@ -157,20 +156,6 @@ It will put "sofin" in `/usr/bin/` and `sofin.conf.sh` in `/etc/`.
   ```
   - Start using sofin as regular user.
 
-### Debian specific: (Yes - Linux is NOT a system)
-  - Install base 64bit system - I used 64bit Debian 6.0.x netinstall iso here.
-  - To make base system "complete", run as root:
-
-  ```
-  aptitude install gcc g++ bc patch make file libssl-dev build-essential kernel-package \
-           libmagic-dev libncurses5-dev libncursesw5-dev unzip
-  ```
-  - Run as root:
-
-  ```
-  wget -qO- http://dmilith.verknowsys.com/Public/sofin-install-from-scratch.sh | sh
-  ```
-
 It will put "sofin" into /usr/bin/ and sofin.conf.sh into /etc/.
   - Build core software. Run as root:
 
@@ -187,7 +172,6 @@ It will put "sofin" into /usr/bin/ and sofin.conf.sh into /etc/.
 
 
 ## FAQ:
-* "It's not working on my Linux distro with applied grSecurity patch on kernel!" - You must set sysctl setting on your machine: `kernel.grsecurity.tpe = 0`. It's required by some software to perform tests successfully. (exec priviledges issue).
 * "Definition 'name' is broken and it doesn't build on my system!" - Usually caused by conflicting software, installed in system paths (f.e. /usr/bin, /usr/lib, /usr/local). Sofin implies clean base system.
 * "It's not working!". Contribute with a fix!
 

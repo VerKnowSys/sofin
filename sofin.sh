@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.51.9"
+readonly VERSION="0.52.0"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -415,7 +415,7 @@ if [ ! "$1" = "" ]; then
                     fi
 
                     case "${SYSTEM_NAME}" in
-                        Darwin|Linux)
+                        Darwin)
                             export archive_sha1="$(${SHA_BIN} "${name}" | ${AWK_BIN} '{ print $1 }')"
                             ;;
 
@@ -698,7 +698,7 @@ for application in ${APPLICATIONS}; do
                             # checking archive sha1 checksum
                             if [ -e "${ARCHIVE_NAME}" ]; then
                                 case "${SYSTEM_NAME}" in
-                                    Darwin|Linux)
+                                    Darwin)
                                         export current_archive_sha1="$(${SHA_BIN} "${ARCHIVE_NAME}" | ${AWK_BIN} '{ print $1 }')"
                                         ;;
 
@@ -821,7 +821,7 @@ for application in ${APPLICATIONS}; do
                             # checking archive sha1 checksum
                             if [ -e "${BINBUILD_FILE}" ]; then
                                 case "${SYSTEM_NAME}" in
-                                    Darwin|Linux)
+                                    Darwin)
                                         export current_archive_sha1="$(${SHA_BIN} "${BINBUILD_FILE}" | ${AWK_BIN} '{ print $1 }')"
                                         ;;
 
@@ -930,7 +930,7 @@ for application in ${APPLICATIONS}; do
                             exit
                         else
                             case "${SYSTEM_NAME}" in
-                                Darwin|Linux)
+                                Darwin)
                                     export cur="$(${SHA_BIN} ${file} | ${AWK_BIN} '{print $1}')"
                                     ;;
 
