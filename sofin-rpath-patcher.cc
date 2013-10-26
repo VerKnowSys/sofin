@@ -17,7 +17,7 @@
 #include <sys/fcntl.h>
 #include <errno.h>
 #include <regex.h>
-#if defined(__FreeBSD__) || defined(__linux__)
+#if defined(__FreeBSD__)
     #include <cstdlib>
     #include <sys/wait.h>
 #endif

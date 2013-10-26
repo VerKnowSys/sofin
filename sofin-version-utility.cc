@@ -7,11 +7,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#ifdef __linux__
-    #include <gnu/libc-version.h>
-    #include <string.h>
-#endif
-
 #ifdef __FreeBSD__
     #include <sys/param.h>
 #endif
@@ -24,14 +19,6 @@
 
 
 int main(int argc, char *argv[]) {
-
-    /* for Linux distribution, just give glibc major and minor version */
-    #ifdef __linux__
-        char* version = new char[5];
-        strncpy(version, gnu_get_libc_version(), 4);
-        printf("%s\n", version);
-        delete version;
-    #endif
 
     /* for FreeBSD, give major and minor version from OS cause there's only one FreeBSD :} */
     #ifdef __FreeBSD__
