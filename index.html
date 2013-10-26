@@ -18,7 +18,7 @@
 
       <header>
         <h1>Sofin</h1>
-        <p>SOFtware INstaller. Designed for BSD, DARWIN and LINUX.</p>
+        <p>SOFtware INstaller. Designed for BSD and DARWIN.</p>
       </header>
 
       <div id="banner">
@@ -43,7 +43,7 @@
 <a name="author" class="anchor" href="#author"><span class="octicon octicon-link"></span></a>Author:</h2>
 
 <ul>
-<li>Daniel (dmilith) Dettlaff (dmilith [at] verknowsys.com). I'm also on #freebsd and #scala.pl @ freenode IRC.</li>
+<li>Daniel (dmilith) Dettlaff (dmilith [at] verknowsys.com). I'm also on #verknowsys @ freenode IRC.</li>
 </ul><h2>
 <a name="definition-authors" class="anchor" href="#definition-authors"><span class="octicon octicon-link"></span></a>Definition authors:</h2>
 
@@ -64,13 +64,13 @@
 <a name="about" class="anchor" href="#about"><span class="octicon octicon-link"></span></a>About:</h2>
 
 <p>This software is my way of how to get reliable, updatable, bundled, closed-dependency, secure and fully
-customizable software for FreeBSD servers. Darwin (Mac OS X) support started with version &gt;=0.14.10. Linux support started with version &gt;=0.24.4.</p>
+customizable software for FreeBSD servers. Darwin (Mac OS X) support started with version &gt;=0.14.10. Linux support started with version &gt;=0.24.4 and ended with 0.51.9. If you wish me to continue Linux support, please consider a donation.</p>
 
 <h2>
 <a name="features" class="anchor" href="#features"><span class="octicon octicon-link"></span></a>Features:</h2>
 
 <ul>
-<li>Designed to work on all *BSD, *Darwin, *Linux</li>
+<li>Designed to work on all *BSD (FreeBSD &gt;=9.x), *Darwin (OSX &gt;=10.8.x)</li>
 <li>User friendly, clean and clear colorful information. No magic. KISS, DRY, BDD driven development.</li>
 <li>Simple, ~1k LOC solution, written in legacy /bin/sh shell scripting language.</li>
 <li>Every "software" has own definition ("def" file) with defined flat dependency list and basic information.
@@ -96,7 +96,8 @@ Every definition is sh script itself (More in <a href="https://github.com/VerKno
 <li>APP_AFTER_PATCH_CALLBACK (executed after software patch process)</li>
 <li>APP_AFTER_CONFIGURE_CALLBACK (executed after software configuration process)</li>
 <li>APP_AFTER_MAKE_CALLBACK (executed after software compilation process)</li>
-<li>APP_AFTER_INSTALL_CALLBACK (executed after software installation process)
+<li>APP_AFTER_INSTALL_CALLBACK (executed after software installation process)</li>
+<li>APP_AFTER_EXPORT_CALLBACK (executed after final stage of exporting software executables)
 Each callback can be sh function itself and to be called by name. Look into <a href="https://github.com/VerKnowSys/sofin/blob/master/definitions/sbt.def">sbt.def</a> for an example createLaunchScript().</li>
 </ul>
 </li>
@@ -106,9 +107,12 @@ Each callback can be sh function itself and to be called by name. Look into <a h
 <li>Since version 0.51.0, Sofin automatically avoids using software binary builds, that won't work on given host. In that case, software will be built from source. Minimum system requirements for binary builds to work, depend on platfrom:
 
 <ul>
-<li>FreeBSD: OS version &gt;= 9.1</li>
-<li>Linux: GLibC version &gt;= 2.11</li>
+<li>FreeBSD: OS version &gt;= 9.1
+
+<ul>
 <li>Darwin: OS version &gt;= 12.4</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul><h2>
@@ -235,24 +239,6 @@ space than it does with "old fasioned, system wide, shared software".</li>
 </code></pre>
 </li>
 <li><p>Start using sofin as regular user.</p></li>
-</ul><h3>
-<a name="debian-specific-yes---linux-is-not-a-system" class="anchor" href="#debian-specific-yes---linux-is-not-a-system"><span class="octicon octicon-link"></span></a>Debian specific: (Yes - Linux is NOT a system)</h3>
-
-<ul>
-<li>Install base 64bit system - I used 64bit Debian 6.0.x netinstall iso here.</li>
-<li>
-<p>To make base system "complete", run as root:</p>
-
-<pre><code>aptitude install gcc g++ bc patch make file libssl-dev build-essential kernel-package \
-       libmagic-dev libncurses5-dev libncursesw5-dev unzip
-</code></pre>
-</li>
-<li>
-<p>Run as root:</p>
-
-<pre><code>wget -qO- http://dmilith.verknowsys.com/Public/sofin-install-from-scratch.sh | sh
-</code></pre>
-</li>
 </ul><p>It will put "sofin" into /usr/bin/ and sofin.conf.sh into /etc/.</p>
 
 <ul>
@@ -274,7 +260,6 @@ space than it does with "old fasioned, system wide, shared software".</li>
 <a name="faq" class="anchor" href="#faq"><span class="octicon octicon-link"></span></a>FAQ:</h2>
 
 <ul>
-<li>"It's not working on my Linux distro with applied grSecurity patch on kernel!" - You must set sysctl setting on your machine: <code>kernel.grsecurity.tpe = 0</code>. It's required by some software to perform tests successfully. (exec priviledges issue).</li>
 <li>"Definition 'name' is broken and it doesn't build on my system!" - Usually caused by conflicting software, installed in system paths (f.e. /usr/bin, /usr/lib, /usr/local). Sofin implies clean base system.</li>
 <li>"It's not working!". Contribute with a fix!</li>
 </ul><h2>
