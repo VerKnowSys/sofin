@@ -72,6 +72,7 @@ SERVICE_BIN="/usr/sbin/service"
 TEST_BIN="/bin/test"
 CHMOD_BIN="/bin/chmod"
 SCP_BIN="/usr/bin/scp"
+HOST_BIN="/usr/bin/host"
 XARGS_BIN="/usr/bin/xargs"
 SOFIN_BIN="/usr/bin/sofin"
 SOFIN_RPATH_PATCHER_BIN="/usr/bin/sofin-rpp"
@@ -150,8 +151,6 @@ if [ "$(id -u)" != "0" ]; then
 else
     export USER_TYPE="root"
 fi
-
-readonly MAIN_BINARY_REPOSITORY_DESTINATION="sofin@verknowsys.com:/Mirror/software/binary/${SYSTEM_NAME}-${SYSTEM_ARCH}-${USER_TYPE}/"
 
 
 case "${SYSTEM_NAME}" in
@@ -270,8 +269,12 @@ readonly DEFAULT_LDFLAGS
 readonly DEFAULT_COMPILER_FLAGS
 readonly MAKE_OPTS
 # readonly DEFAULT_PAUSE_WHEN_LOCKED="30" # seconds
-readonly MAIN_SOURCE_REPOSITORY="http://software.verknowsys.com/source/"
-readonly MAIN_BINARY_REPOSITORY="http://software.verknowsys.com/binary/"
+readonly MAIN_PORT="60022"
+readonly MAIN_USER="sofin"
+readonly MAIN_SOFTWARE_PREFIX="/Mirror"
+readonly MAIN_SOFTWARE_ADDRESS="software.verknowsys.com"
+readonly MAIN_SOURCE_REPOSITORY="http://${MAIN_SOFTWARE_ADDRESS}/source/"
+readonly MAIN_BINARY_REPOSITORY="http://${MAIN_SOFTWARE_ADDRESS}/binary/"
 readonly CCACHE_BIN_OPTIONAL="${SOFTWARE_ROOT_DIR}Ccache/exports/ccache"
 
 # ANSI color definitions

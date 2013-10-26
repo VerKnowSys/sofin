@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.52.0"
+readonly VERSION="0.52.1"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -426,9 +426,13 @@ if [ ! "$1" = "" ]; then
 
                     ${PRINTF_BIN} "${archive_sha1}" > "${name}.sha1"
                     note "Archive sha: ${archive_sha1}"
-                    note "Sending archive to remote: ${MAIN_BINARY_REPOSITORY_DESTINATION}"
-                    ${SCP_BIN} "${name}" "${MAIN_BINARY_REPOSITORY_DESTINATION}${name}" >> "${LOG}" 2>&1
-                    ${SCP_BIN} "${name}.sha1" "${MAIN_BINARY_REPOSITORY_DESTINATION}${name}.sha1" >> "${LOG}" 2>&1
+
+                    for mirror in $(${HOST_BIN} ${MAIN_SOFTWARE_ADDRESS} | ${AWK_BIN} '{print $4}'); do
+                        address="${MAIN_USER}@${mirror}:${MAIN_SOFTWARE_PREFIX}/software/binary/${SYSTEM_NAME}-${SYSTEM_ARCH}-${USER_TYPE}/"
+                        note "Sending archive to remote: ${address}"
+                        ${SCP_BIN} -P ${MAIN_PORT} "${name}" "${address}${name}" >> "${LOG}" 2>&1
+                        ${SCP_BIN} -P ${MAIN_PORT} "${name}.sha1" "${address}${name}.sha1" >> "${LOG}" 2>&1
+                    done
                     ${RM_BIN} -f "${name}"
                     ${RM_BIN} -f "${name}.sha1"
                     note "Done."
