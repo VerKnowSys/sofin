@@ -141,7 +141,8 @@ install_sofin () {
 check_root
 update_env_files
 install_base
-note "Sofin installed on: ${SYSTEM_NAME} $(/usr/bin/sofin-version-utility)"
+sofin_version=$(${CAT_BIN} ./sofin.sh | ${GREP_BIN} VERSION= | ${AWK_BIN} '{print $2}')
+note "Sofin installed on: ${SYSTEM_NAME} $(/usr/bin/sofin-version-utility) with ${sofin_version}"
 
 if [ ! -f "/Software/.cache/definitions/defaults.def" ]; then
     note "Performing initial definitions update."
