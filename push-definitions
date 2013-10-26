@@ -7,7 +7,10 @@ DEBUG="false"
 
 LOG="/tmp/sofin-make-defs.log"
 DEFINITION_SNAPSHOT_FILE="defs.tar.bz2"
-DESTINATION_REPOSITORY_SERVER="sofin@software.verknowsys.com:/Mirror/software/source/definitions/"
+DEFAULT_SOURCE_PATH="/Mirror/software/source"
+DEFAULT_HOST="software.verknowsys.com"
+DEFAULT_USER="sofin"
+DEFAULT_PORT="60022"
 
 # config binary requirements definitions
 PRINTF_BIN="/usr/bin/printf"
@@ -108,11 +111,12 @@ check_required_dirs_and_create_snapshot () {
 note "Creating definitions and lists package: ${DEFINITION_SNAPSHOT_FILE}"
 check_required_dirs_and_create_snapshot
 
-if [ ! -z "${DESTINATION_REPOSITORY_SERVER}" ]; then
-    note "Sending definitions to repository…"
-    ${SCP_BIN} "${DEFINITION_SNAPSHOT_FILE}" "${DESTINATION_REPOSITORY_SERVER}" >> "${LOG}"
+note "Sending definitions to repositories…"
+for mirror in $(host ${DEFAULT_HOST} | awk '{print $4}'); do
+    note "Uploading definitions to: ${mirror}"
+    ${SCP_BIN} -P ${DEFAULT_PORT} "${DEFINITION_SNAPSHOT_FILE}" "${DEFAULT_USER}@${mirror}:${DEFAULT_SOURCE_PATH}/definitions" >> "${LOG}"
     check_command_result $?
-fi
+done
 
 note "Removing cached ${DEFINITION_SNAPSHOT_FILE}…"
 ${RM_BIN} ${DEFINITION_SNAPSHOT_FILE}
