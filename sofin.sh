@@ -909,8 +909,8 @@ for application in ${APPLICATIONS}; do
                         error "No source given for definition! Aborting"
                         exit 1
                     else
-                        # debug "Runtime SHA1: ${RUNTIME_SHA}"
-                        export BUILD_DIR_ROOT="${CACHE_DIR}cache/${APP_NAME}${APP_POSTFIX}-${APP_VERSION}/"
+                        debug "Runtime SHA1: ${RUNTIME_SHA}"
+                        export BUILD_DIR_ROOT="${CACHE_DIR}cache/${APP_NAME}${APP_POSTFIX}-${APP_VERSION}-${RUNTIME_SHA}/"
                         ${MKDIR_BIN} -p "${BUILD_DIR_ROOT}"
                         CUR_DIR="$(${PWD_BIN})"
                         cd "${BUILD_DIR_ROOT}"
