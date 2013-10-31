@@ -96,7 +96,7 @@ update_definitions () { # accepts optional user uid param
         rm_options="${rm_options}v"
     fi
 
-    debug "Checking for destination directories existance…"
+    debug "Checking for destination directories existance."
     for element in "${LISTS_DIR}" "${DEFINITIONS_DIR}"; do
         ${MKDIR_BIN} -p "${element}" > "${LOG}"
         debug "Removing old definitions: ${element}"
@@ -143,10 +143,10 @@ usage_howto () {
 
 update_shell_vars () {
     if [ "${USERNAME}" = "root" ]; then
-        debug "Updating ${SOFIN_PROFILE} settings…"
+        debug "Updating ${SOFIN_PROFILE} settings."
         ${PRINTF_BIN} "$(${SCRIPT_NAME} getshellvars)" > "${SOFIN_PROFILE}"
     else
-        debug "Updating ${HOME}/.profile settings…"
+        debug "Updating ${HOME}/.profile settings."
         ${PRINTF_BIN} "$(${SCRIPT_NAME} getshellvars ${USERNAME})" > "${HOME}/.profile"
     fi
 }
@@ -375,7 +375,7 @@ if [ ! "$1" = "" ]; then
         fi
 
         if [ ! -f "${CACHE_DIR}definitions/defaults.def" ]; then
-            note "No definitions found in ${CACHE_DIR}definitions/defaults.def. Updating…"
+            note "No definitions found in ${CACHE_DIR}definitions/defaults.def. Updating."
             update_definitions
         fi
 
@@ -398,11 +398,11 @@ if [ ! "$1" = "" ]; then
             # unset USERNAME
         fi
         if [ ! -f "${CACHE_DIR}definitions/defaults.def" ]; then
-            note "No definitions found in ${CACHE_DIR}definitions/defaults.def. Updating…"
+            note "No definitions found in ${CACHE_DIR}definitions/defaults.def. Updating."
             update_definitions
         fi
         cd "${LOCAL_DIR}"
-        note "Looking for $(${PWD_BIN})/${DEPENDENCIES_FILE} file…"
+        note "Looking for $(${PWD_BIN})/${DEPENDENCIES_FILE} file."
         if [ ! -e "$(${PWD_BIN})/${DEPENDENCIES_FILE}" ]; then
             error "Dependencies file not found!"
             exit 1
@@ -496,7 +496,7 @@ if [ ! "$1" = "" ]; then
     reload|rehash)
         if [ ! -z "${SHELL_PID}" ]; then
             update_shell_vars
-            note "Reloading configuration of $(${BASENAME_BIN} ${SHELL}) with pid: ${SHELL_PID}…"
+            note "Reloading configuration of $(${BASENAME_BIN} ${SHELL}) with pid: ${SHELL_PID}."
             ${KILL_BIN} -SIGUSR2 ${SHELL_PID}
         else
             write_info_about_shell_configuration
@@ -1138,7 +1138,7 @@ for application in ${APPLICATIONS}; do
 
             strip_lib_bin () {
                 if [ -z "${DEVEL}" ]; then
-                    debug "→ Stripping libraries and binaries…"
+                    debug "→ Stripping libraries and binaries."
                     for elem in "/bin" "/sbin" "/libexec" "/lib"; do
                         if [ -d "${PREFIX}${elem}" ]; then
                             for e in $(${FIND_BIN} ${PREFIX}${elem} -maxdepth 1 -type f); do
@@ -1150,7 +1150,7 @@ for application in ${APPLICATIONS}; do
                         fi
                     done
                 else
-                    warn "Devel mode enabled. Skipping binary/library strip…"
+                    warn "Devel mode enabled. Skipping binary/library strip."
                 fi
             }
 
@@ -1240,7 +1240,7 @@ done
 update_shell_vars
 
 if [ ! -z "${SHELL_PID}" ]; then
-    note "All done. Reloading configuration of $(${BASENAME_BIN} ${SHELL}) with pid: ${SHELL_PID}…"
+    note "All done. Reloading configuration of $(${BASENAME_BIN} ${SHELL}) with pid: ${SHELL_PID}."
     ${KILL_BIN} -SIGUSR2 ${SHELL_PID}
 else
     write_info_about_shell_configuration

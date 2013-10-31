@@ -91,14 +91,14 @@ check_command_result () {
 
 check_required_dirs_and_create_snapshot () {
     REQS="definitions lists"
-    note "Checking directories…"
+    note "Checking directories."
     for req in ${REQS}; do
         if [ ! -d "${req}" ]; then
-            note "No '${req}' folder found in current directory. Aborting…"
+            note "No '${req}' folder found in current directory. Aborting."
             exit 1
         fi
     done
-    note "Creating snapshot…"
+    note "Creating snapshot."
     tar_options="cfj"
     if [ "${DEBUG}" = "true" ]; then
         tar_options="${tar_options}v"
@@ -111,14 +111,14 @@ check_required_dirs_and_create_snapshot () {
 note "Creating definitions and lists package: ${DEFINITION_SNAPSHOT_FILE}"
 check_required_dirs_and_create_snapshot
 
-note "Sending definitions to repositories…"
+note "Sending definitions to repositories."
 for mirror in $(host ${DEFAULT_HOST} | awk '{print $4}'); do
     note "Uploading definitions to: ${mirror}"
     ${SCP_BIN} -P ${DEFAULT_PORT} "${DEFINITION_SNAPSHOT_FILE}" "${DEFAULT_USER}@${mirror}:${DEFAULT_SOURCE_PATH}/definitions" >> "${LOG}"
     check_command_result $?
 done
 
-note "Removing cached ${DEFINITION_SNAPSHOT_FILE}…"
+note "Removing cached ${DEFINITION_SNAPSHOT_FILE}."
 ${RM_BIN} ${DEFINITION_SNAPSHOT_FILE}
 
 sofin update
