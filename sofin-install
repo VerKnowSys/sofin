@@ -107,9 +107,6 @@ install_base () {
 build_natives () {
     if [ -x "${CXX}" ]; then
         note "C++ compiler available. Using: ${CXX}"
-        note "Building launcher"
-        ${CXX} -Os -fPIC ./launcher.cc -o sofin
-        check_command_result $?
 
         note "Building patcher"
         ${CXX} -Os -fPIC ./sofin-rpath-patcher.cc -o sofin-rpp
@@ -132,7 +129,7 @@ build_natives () {
 install_sofin () {
     ${CP_BIN} "$($PWD_BIN)/${CONF_FILE}" "/etc/${CONF_FILE}"
     check_command_result $?
-    ${CP_BIN} "$($PWD_BIN)/sofin" /usr/bin/sofin
+    ${CP_BIN} "$($PWD_BIN)/sofin.sh" /usr/bin/sofin
     check_command_result $?
     ${CP_BIN} "$($PWD_BIN)/sofin-rpp" /usr/bin/sofin-rpp
     check_command_result $?
