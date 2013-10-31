@@ -186,10 +186,12 @@ unset PKG_CONFIG_PATH
 
 perform_clean () {
     note "Cleaning failed build directories"
-    for i in $(${FIND_BIN} "${CACHE_DIR}cache" -maxdepth 1 -mindepth 1 -type d); do
-        note "Removing build directory: ${i}"
-        ${RM_BIN} -rf "${i}"
-    done
+    if [ -d "${CACHE_DIR}cache" ]; then
+        for i in $(${FIND_BIN} "${CACHE_DIR}cache" -maxdepth 1 -mindepth 1 -type d); do
+            note "Removing build directory: ${i}"
+            ${RM_BIN} -rf "${i}"
+        done
+    fi
     note "Removing binary builds from ${BINBUILDS_CACHE_DIR}"
     ${RM_BIN} -rf "${BINBUILDS_CACHE_DIR}"
     note "Removing log: ${LOG}"
