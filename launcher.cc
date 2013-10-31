@@ -57,60 +57,22 @@ void execute(char **argv, int uid) {
 
 int main(int argc, char const *argv[]) {
 
-    char str[32];
     char *arguments[argc];
     stringstream cmd;
-    // const string list[] = {"ver", "version", "list", "installed", "fulllist", "fullinstalled", "export", "exp", "exportapp", "getshellvars", "log", "available", "reload", "rehash"};
-
-    /* create a lock */
-    // if (getuid() == 0)
-    //     lockfile << "/var/run/.sofin-lock-" << getuid();
-    // else
-    //     lockfile << "/tmp/.sofin-lock-" << getuid();
 
     /* build command line */
     cmd << string(DEFAULT_SOFIN_SCRIPTNAME);
     if (argc > 1) {
-
         for (int i = 1; i < argc; ++i) {
             cmd << " " << argv[i];
         }
-
-        // bool lockLessMode = false;
-        // for (int i = 0; i < sizeof(list)/ sizeof(*list); i++) {
-        //     if (strcmp(argv[1], list[i].c_str()) == 0) {
-        //         lockLessMode = true;
-        //     }
-        // }
-        // if (lockLessMode) { // just execute without locking:
-        parse((char*)cmd.str().c_str(), arguments);
-        execute(arguments, getuid());
-        return 0;
-        // }
     }
 
-    while (true) {
-        // const char* lockff = lockfile.str().c_str();
-        // const int lfp = open(lockff, O_RDWR | O_CREAT, 0600);
-        // if (lfp < 0) {
-            // cerr << "Error: " << strerror(errno) << endl;
-            // exit(ACCESS_DENIED_EXIT); /* can not open */
-        // }
-        // if (lockf(lfp, F_TLOCK, 0) < 0) {
-            // cerr << ".";
-            // sleep(SLEEP_TIME);
-        // } else {
-            // sprintf(str, "%d\n", getpid());
-            // write(lfp, str, strlen(str)); /* record pid to lockfile */
+    signal(SIGTSTP, SIG_IGN); /* ignore tty signals */
+    signal(SIGTTOU, SIG_IGN);
+    signal(SIGTTIN, SIG_IGN);
 
-            signal(SIGTSTP, SIG_IGN); /* ignore tty signals */
-            signal(SIGTTOU, SIG_IGN);
-            signal(SIGTTIN, SIG_IGN);
-
-            parse((char*)cmd.str().c_str(), arguments);
-            execute(arguments, getuid());
-            break;
-        // }
-    }
+    parse((char*)cmd.str().c_str(), arguments);
+    execute(arguments, getuid());
     return 0;
 }
