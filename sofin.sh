@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.54.1"
+readonly VERSION="0.54.2"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -20,9 +20,6 @@ fi
 
 SOFIN_ARGS=$*
 readonly SOFIN_ARGS="$(echo ${SOFIN_ARGS} | ${CUT_BIN} -d' ' -f2-)"
-
-# create runtime sha
-# RUNTIME_SHA="$(${DATE_BIN} | ${SHA_BIN})" # TODO: NYI
 
 check_definition_dir () {
     if [ ! -d "${SOFTWARE_DIR}" ]; then
@@ -136,7 +133,8 @@ usage_howto () {
     note "reload | rehash                      - recreate shell vars and reload current shell"
     note "update                               - only update definitions from remote repository and exit"
     note "ver | version                        - shows $(${BASENAME_BIN} ${SCRIPT_NAME}) script version"
-    note "clean                                - cleans install cache, downloaded content and logs"
+    note "clean                                - cleans binbuilds cache, unpacked source content and logs"
+    note "distclean                            - cleans binbuilds cache, source cache, unpacked source content and logs"
     note "outdated                             - lists outdated software"
     note "push | binpush                       - creates binary build from prebuilt software bundles name given as params (example: $(${BASENAME_BIN} ${SCRIPT_NAME}) push Ruby Vifm Curl)"
     exit
@@ -186,6 +184,19 @@ unset DYLD_LIBRARY_PATH
 unset PKG_CONFIG_PATH
 
 
+perform_clean () {
+    note "Cleaning failed build directories"
+    for i in $(${FIND_BIN} "${CACHE_DIR}cache" -maxdepth 1 -mindepth 1 -type d); do
+        note "Removing build directory: ${i}"
+        ${RM_BIN} -rf "${i}"
+    done
+    note "Removing binary builds from ${BINBUILDS_CACHE_DIR}"
+    ${RM_BIN} -rf "${BINBUILDS_CACHE_DIR}"
+    note "Removing log: ${LOG}"
+    ${RM_BIN} -rf "${LOG}"
+}
+
+
 if [ ! "$1" = "" ]; then
     case $1 in
 
@@ -201,13 +212,16 @@ if [ ! "$1" = "" ]; then
         ;;
 
 
-    clean)
-        note "Performing cleanup of ${CACHE_DIR}cache"
+    distclean)
+        note "Performing dist-clean."
         ${RM_BIN} -rf "${CACHE_DIR}cache"
-        note "Removing binary builds from ${BINBUILDS_CACHE_DIR}"
-        ${RM_BIN} -rf "${BINBUILDS_CACHE_DIR}"
-        note "Removing ${LOG}"
-        ${RM_BIN} -rf "${LOG}"
+        perform_clean
+        exit
+        ;;
+
+
+    clean)
+        perform_clean
         exit
         ;;
 
