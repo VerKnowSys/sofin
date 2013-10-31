@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.52.1"
+readonly VERSION="0.52.2"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -531,9 +531,12 @@ if [ ! "$1" = "" ]; then
                 cd "${SOFTWARE_DIR}${APP}${dir}"
                 ${LN_BIN} -vfs "..${dir}/${EXPORT}" "../exports/${EXPORT}" >> "$LOG"
                 cd "${curr_dir}"
+                exit
+            else
+                debug "Not found: ${SOFTWARE_DIR}${APP}${dir}${EXPORT}"
             fi
         done
-        exit
+        exit 1
         ;;
 
 
