@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.52.2"
+readonly VERSION="0.54.0"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -922,16 +922,14 @@ for application in ${APPLICATIONS}; do
                                 fi
                             fi
                         done
-                        if [ ! -e ${BUILD_DIR_ROOT}$(${BASENAME_BIN} ${APP_HTTP_PATH}) ]; then
+                        if [ ! -e ${BUILD_DIR_ROOT}/../$(${BASENAME_BIN} ${APP_HTTP_PATH}) ]; then
                             note "   → Fetching requirement source from: ${APP_HTTP_PATH}"
                             run "${FETCH_BIN} ${APP_HTTP_PATH}"
-                        else
-                            debug "Already fetched. Using tarball from cache"
+                            ${MV_BIN} $(${BASENAME_BIN} ${APP_HTTP_PATH}) ${BUILD_DIR_ROOT}/..
                         fi
 
-                        FIND_RESULT="${FIND_BIN} ${BUILD_DIR_ROOT} -maxdepth 1 -type f"
-                        debug "Build dir: ${BUILD_DIR_ROOT}, find result: ${FIND_RESULT}"
-                        file="$(${BASENAME_BIN} $(${FIND_RESULT}))"
+                        file="${BUILD_DIR_ROOT}/../$(${BASENAME_BIN} ${APP_HTTP_PATH})"
+                        debug "Build dir: ${BUILD_DIR_ROOT}, file: ${file}"
                         if [ "${APP_SHA}" = "" ]; then
                             error "→ Missing SHA sum for source: ${file}."
                             exit
@@ -951,12 +949,7 @@ for application in ${APPLICATIONS}; do
                                 error "→ ${cur} vs ${APP_SHA}"
                                 error "→ SHA sum mismatch. Removing corrupted file from cache: ${file}, and retrying."
                                 # remove corrupted file
-                                $($FIND_BIN "${BUILD_DIR_ROOT}" -maxdepth 1 -type f -name "${file}" | ${XARGS_BIN} ${RM_BIN} -f)
-                                # remove lock
-                                if [ -e "${LOCK_FILE}" ]; then
-                                    debug "Removing lock file: ${LOCK_FILE}"
-                                    ${RM_BIN} -f "${LOCK_FILE}"
-                                fi
+                                ${RM_BIN} -v "${file}" >> "${LOG}"
                                 # and restart script with same arguments:
                                 eval "${SCRIPT_NAME} ${SCRIPT_ARGS}"
                                 exit
@@ -965,12 +958,7 @@ for application in ${APPLICATIONS}; do
 
                         debug "→ Unpacking source code of: ${APP_NAME}"
                         debug "Build dir root: ${BUILD_DIR_ROOT}"
-
-                        # export BUILD_DIRECTORY="${BUILD_DIR}/${RUNTIME_SHA}"
-                        # ${MKDIR_BIN} -p "${BUILD_DIRECTORY}"
-
-                        APP_LOC="${BUILD_DIR_ROOT}${APP_NAME}"
-                        run "${TAR_BIN} xf ${APP_LOC}*"
+                        run "${TAR_BIN} xf ${file}"
 
                         export BUILD_DIR="$(${FIND_BIN} ${BUILD_DIR_ROOT}/* -maxdepth 0 -type d -name "*${APP_VERSION}*")"
                         debug "Build Dir Core before: '${BUILD_DIR}'"
@@ -1082,8 +1070,8 @@ for application in ${APPLICATIONS}; do
                             ${PRINTF_BIN} "${APP_VERSION}" > "${PREFIX}/$1${INSTALLED_MARK}"
                         done
                         if [ -z "${DEVEL}" ]; then # if devel mode not set
-                            debug "Removing build dir: ${BUILD_DIR}"
-                            ${RM_BIN} -rf "${BUILD_DIR}"
+                            debug "Removing build dirs: ${BUILD_DIR} and ${BUILD_DIR_ROOT}"
+                            ${RM_BIN} -rf "${BUILD_DIR}" "${BUILD_DIR_ROOT}"
                         else
                             debug "Leaving build dir cause in devel mode: ${BUILD_DIR_ROOT}"
                         fi
