@@ -60,7 +60,7 @@ int main(int argc, char const *argv[]) {
     char str[32];
     char *arguments[argc];
     stringstream cmd, lockfile;
-    const string list[] = {"ver", "version", "list", "installed", "fulllist", "fullinstalled", "export", "exp", "exportapp", "getshellvars", "log", "available", "reload", "rehash"};
+    // const string list[] = {"ver", "version", "list", "installed", "fulllist", "fullinstalled", "export", "exp", "exportapp", "getshellvars", "log", "available", "reload", "rehash"};
 
     /* create a lock */
     if (getuid() == 0)
@@ -76,17 +76,17 @@ int main(int argc, char const *argv[]) {
             cmd << " " << argv[i];
         }
 
-        bool lockLessMode = false;
-        for (int i = 0; i < sizeof(list)/ sizeof(*list); i++) {
-            if (strcmp(argv[1], list[i].c_str()) == 0) {
-                lockLessMode = true;
-            }
-        }
-        if (lockLessMode) { // just execute without locking:
-            parse((char*)cmd.str().c_str(), arguments);
-            execute(arguments, getuid());
-            return 0;
-        }
+        // bool lockLessMode = false;
+        // for (int i = 0; i < sizeof(list)/ sizeof(*list); i++) {
+        //     if (strcmp(argv[1], list[i].c_str()) == 0) {
+        //         lockLessMode = true;
+        //     }
+        // }
+        // if (lockLessMode) { // just execute without locking:
+        parse((char*)cmd.str().c_str(), arguments);
+        execute(arguments, getuid());
+        return 0;
+        // }
     }
 
     while (true) {
