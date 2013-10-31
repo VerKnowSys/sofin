@@ -18,7 +18,7 @@ APP_INSTALL_METHOD="gmake install -s ${MAKE_OPTS}"
 
 
 build_addons_and_extensions () {
-    base_dir="${CACHE_DIR}cache/${APP_NAME}-${APP_VERSION}/${APP_NAME}-${APP_VERSION}/contrib"
+    base_dir="${CACHE_DIR}cache/${APP_NAME}-${APP_VERSION}-${RUNTIME_SHA}/${APP_NAME}-${APP_VERSION}/contrib"
     cd ${base_dir}/pg_archivecleanup && gmake install
     cd ${base_dir}/hstore && gmake install
 }

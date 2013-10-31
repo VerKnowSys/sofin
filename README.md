@@ -55,6 +55,7 @@ customizable software for FreeBSD servers. Darwin (Mac OS X) support started wit
 * Since version 0.51.0, Sofin automatically avoids using software binary builds, that won't work on given host. In that case, software will be built from source. Minimum system requirements for binary builds to work, depend on platfrom:
    - FreeBSD: OS version >= 9.1
    - Darwin: OS version >= 12.4
+* Supports concurrent, lockless builds. (feature available since 0.54.0).
 
 
 ## Examples:

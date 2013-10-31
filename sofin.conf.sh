@@ -77,6 +77,7 @@ XARGS_BIN="/usr/bin/xargs"
 SOFIN_BIN="/usr/bin/sofin"
 SOFIN_RPATH_PATCHER_BIN="/usr/bin/sofin-rpp"
 SOFIN_VERSION_UTILITY_BIN="/usr/bin/sofin-version-utility"
+SOFIN_MILISECONDS_UTILITY_BIN="/usr/bin/sofin-miliseconds"
 
 if [ ! -x "${SOFIN_VERSION_UTILITY_BIN}" ]; then
     export OS_VERSION="0"
@@ -164,6 +165,9 @@ case "${SYSTEM_NAME}" in
         if [ ${OS_VERSION} -lt ${FREEBSD_MINIMUM_VERSION} ]; then
             export USE_BINBUILD="false"
         fi
+
+        # runtime sha
+        RUNTIME_SHA="$(${PRINTF_BIN} "$(${DATE_BIN})-$(${SOFIN_MILISECONDS_UTILITY_BIN})" | ${SHA_BIN})"
         ;;
 
     Darwin)
@@ -184,6 +188,9 @@ case "${SYSTEM_NAME}" in
         if [ ${OS_VERSION} -lt ${DARWIN_MINIMUM_VERSION} ]; then
             export USE_BINBUILD="false"
         fi
+
+        # runtime sha
+        RUNTIME_SHA="$(${PRINTF_BIN} "$(${DATE_BIN})-$(${SOFIN_MILISECONDS_UTILITY_BIN})" | ${SHA_BIN} | ${AWK_BIN} '{print $1}')"
         ;;
 
 esac
