@@ -164,6 +164,9 @@ case "${SYSTEM_NAME}" in
         if [ ${OS_VERSION} -lt ${FREEBSD_MINIMUM_VERSION} ]; then
             export USE_BINBUILD="false"
         fi
+
+        # runtime sha
+        RUNTIME_SHA="$(${PRINTF_BIN} "$(${DATE_BIN})" | ${SHA_BIN})"
         ;;
 
     Darwin)
@@ -184,6 +187,9 @@ case "${SYSTEM_NAME}" in
         if [ ${OS_VERSION} -lt ${DARWIN_MINIMUM_VERSION} ]; then
             export USE_BINBUILD="false"
         fi
+
+        # runtime sha
+        RUNTIME_SHA="$(${PRINTF_BIN} "$(${DATE_BIN})" | ${SHA_BIN} | ${AWK_BIN} '{print $1}')"
         ;;
 
 esac
