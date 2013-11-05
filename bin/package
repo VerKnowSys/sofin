@@ -15,7 +15,7 @@ fi
 
 bin/clean
 ${MKDIR_BIN} -p releases
-version="$(grep 'readonly VERSION=' src/sofin.sh | awk '{ gsub(/\"/, "", $2); gsub(/VERSION=/, "", $2); print $2; }')"
+version="$(${GREP_BIN} 'readonly VERSION=' src/sofin.sh | ${AWK_BIN} '{ gsub(/\"/, "", $2); gsub(/VERSION=/, "", $2); print $2; }')"
 base_name="sofin-${version}"
 archive_name="${base_name}.tar.bz2"
 note "Preparing package: ${archive_name} with version: ${version}"
