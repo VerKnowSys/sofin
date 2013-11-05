@@ -1,9 +1,6 @@
-defs.tar.gz
 .DS_Store
 /sofin
-/sofin.sh.x
-/sofin.sh.x.c
 /defs.tar.bz2
-/sofin-rpp
-/sofin-version-utility
-/sofin-miliseconds
+/bin/sofin-version-utility
+/bin/sofin-rpp
+/bin/sofin-miliseconds
