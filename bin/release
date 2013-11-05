@@ -15,12 +15,12 @@ fi
 
 bin/clean
 ${MKDIR_BIN} -p releases
-version="$(${GREP_BIN} 'readonly VERSION=' src/sofin.sh | ${AWK_BIN} '{ gsub(/\"/, "", $2); gsub(/VERSION=/, "", $2); print $2; }')"
+version="$(grep 'readonly VERSION=' src/sofin.sh | awk '{ gsub(/\"/, "", $2); gsub(/VERSION=/, "", $2); print $2; }')"
 base_name="sofin-${version}"
 archive_name="${base_name}.tar.bz2"
 note "Preparing package: ${archive_name} with version: ${version}"
 
-${TAR_BIN} --disable-copyfile --exclude='.' --exclude='.git' --exclude='.gitignore' --exclude='releases' -cjf releases/${archive_name} ./
+tar --disable-copyfile --exclude='.' --exclude='.git' --exclude='.gitignore' --exclude='releases' -cjf releases/${archive_name} ./
 
 if [ "${USER}" = "dmilith" ]; then
     note "Pushing package to remote server"
