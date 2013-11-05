@@ -1,0 +1,19 @@
+#!/bin/sh
+# @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
+
+# load configuration from sofin.conf
+CONF_FILE="sofin.conf.sh"
+if [ -e "src/${CONF_FILE}" ]; then
+    . "src/${CONF_FILE}"
+    note "Validating environment"
+    validate_env
+else
+    echo "FATAL: No configuration file found: ${CONF_FILE}"
+    exit 1
+fi
+
+note "Cleaning natives"
+${RM_BIN} -rf "bin/sofin-rpp"
+${RM_BIN} -rf "bin/sofin-version-utility"
+${RM_BIN} -rf "bin/sofin-miliseconds"
+

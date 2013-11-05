@@ -1,0 +1,38 @@
+#!/bin/sh
+# @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
+
+# load configuration from sofin.conf
+CONF_FILE="sofin.conf.sh"
+if [ -e "src/${CONF_FILE}" ]; then
+    . "src/${CONF_FILE}"
+    note "Validating environment"
+    validate_env
+else
+    echo "FATAL: No configuration file found: ${CONF_FILE}"
+    exit 1
+fi
+
+
+bin/clean
+${MKDIR_BIN} -p releases
+version="$(grep 'readonly VERSION=' src/sofin.sh | awk '{ gsub(/\"/, "", $2); gsub(/VERSION=/, "", $2); print $2; }')"
+base_name="sofin-${version}"
+archive_name="${base_name}.tar.bz2"
+note "Preparing package: ${archive_name} with version: ${version}"
+
+${TAR_BIN} --disable-copyfile --exclude='.git' --exclude='.gitignore' --exclude='releases' -cjf releases/${archive_name} ./
+${MKDIR_BIN} -p releases/${base_name}
+${MV_BIN} releases/${archive_name} releases/${base_name}/
+cd releases/${base_name}
+${TAR_BIN} xf ${archive_name}
+${RM_BIN} -f ${archive_name}
+cd ..
+${TAR_BIN} -cjf ${archive_name} ./${base_name}
+${RM_BIN} -rf ${base_name}
+cd ..
+
+
+if [ "${USER}" = "dmilith" ]; then
+    note "Pushing package to remote server"
+    scp releases/sofin-${version}.tar.bz2 dmilith@v:/home/dmilith/Web/Public/Sofin-releases
+fi
