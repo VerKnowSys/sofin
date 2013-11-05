@@ -20,17 +20,7 @@ base_name="sofin-${version}"
 archive_name="${base_name}.tar.bz2"
 note "Preparing package: ${archive_name} with version: ${version}"
 
-${TAR_BIN} --disable-copyfile --exclude='.git' --exclude='.gitignore' --exclude='releases' -cjf releases/${archive_name} ./
-${MKDIR_BIN} -p releases/${base_name}
-${MV_BIN} releases/${archive_name} releases/${base_name}/
-cd releases/${base_name}
-${TAR_BIN} xf ${archive_name}
-${RM_BIN} -f ${archive_name}
-cd ..
-${TAR_BIN} -cjf ${archive_name} ./${base_name}
-${RM_BIN} -rf ${base_name}
-cd ..
-
+${TAR_BIN} --disable-copyfile --exclude='.' --exclude='.git' --exclude='.gitignore' --exclude='releases' -cjf releases/${archive_name} ./
 
 if [ "${USER}" = "dmilith" ]; then
     note "Pushing package to remote server"
