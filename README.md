@@ -127,12 +127,7 @@ space than it does with "old fasioned, system wide, shared software".
 
 ### FreeBSD specific:
   - Install base 64bit system - I used 64bit FreeBSD 9.1 bootonly iso here.
-  - Run as root:
-
-  ```
-  fetch -o - http://dmilith.verknowsys.com/Public/sofin-install-from-scratch.sh | sh
-  ```
-It will put "sofin" into `/usr/bin/` and `sofin.conf.sh` into `/etc/`.
+  - Fetch latest package from [this site](http://dmilith.verknowsys.com/Public/Sofin-releases/), unpack and run `bin/install` as root.
   - Build core software. Run:
 
   ```
@@ -144,12 +139,7 @@ as root.
 ### Darwin/ Mac OS X specific:
   - Install Mac OS X 10.8.
   - Install [XQuartz](http://xquartz.macosforge.org/landing/) (if you want to build definitions that require X11)
-  - Run:
-
-  ```
-  curl http://dmilith.verknowsys.com/Public/sofin-install-from-scratch.sh | sh
-  ```
-It will put "sofin" in `/usr/bin/` and `sofin.conf.sh` in `/etc/`.
+  - Fetch latest package from [this site](http://dmilith.verknowsys.com/Public/Sofin-releases/), unpack and run `bin/install` as root.
   - Build core software. Run:
 
   ```
