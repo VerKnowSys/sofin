@@ -165,6 +165,7 @@ case "${SYSTEM_NAME}" in
         fi
 
         # runtime sha
+        test -x "${SOFIN_MILISECONDS_UTILITY_BIN}" && \
         RUNTIME_SHA="$(${PRINTF_BIN} "$(${DATE_BIN})-$(${SOFIN_MILISECONDS_UTILITY_BIN})" | ${SHA_BIN})"
         ;;
 
@@ -188,6 +189,7 @@ case "${SYSTEM_NAME}" in
         fi
 
         # runtime sha
+        test -x "${SOFIN_MILISECONDS_UTILITY_BIN}" && \
         RUNTIME_SHA="$(${PRINTF_BIN} "$(${DATE_BIN})-$(${SOFIN_MILISECONDS_UTILITY_BIN})" | ${SHA_BIN} | ${AWK_BIN} '{print $1}')"
         ;;
 
