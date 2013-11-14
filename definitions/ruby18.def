@@ -1,4 +1,4 @@
-DISABLE_ON="FreeBSD"
+DISABLE_ON="FreeBSD Darwin"
 APP_FULL_NAME="Ruby old stable 1.8.7"
 APP_SHA="cf82b6cbeed8e389705aa6b66c2a8141626705c3"
 APP_NAME="ruby"
@@ -11,9 +11,8 @@ APP_AFTER_INSTALL_CALLBACK="${PRINTF_BIN} 'gem: --no-ri --no-rdoc' > ${HOME}/.ge
 APP_EXPORTS="ruby gem irb ri rdoc erb rake bundle rackup"
 APP_MAKE_METHOD="gmake -s ${MAKE_OPTS}"
 APP_INSTALL_METHOD="gmake install -s ${MAKE_OPTS}"
-APP_CONFLICTS_WITH="Rubinius Jruby Ruby-legacy Ruby-minimal Passenger Ruby"
+APP_CONFLICTS_WITH="Rubinius Jruby Ruby-legacy Ruby-minimal Passenger Ruby Ruby19"
 FORCE_GNU_COMPILER="YES"
-
 install_rubygems () {
     # it's specific version of rubygems for compatibility with ruby 1.8.7. Don't trust rubygems.org about this compatibility, with newest version expect problems under OSX 10.8
     RUBYGEMS_VERSION="1.8.15"
