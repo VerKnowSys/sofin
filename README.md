@@ -128,30 +128,21 @@ space than it does with "old fasioned, system wide, shared software".
 ### FreeBSD specific:
   - Install base 64bit system - I used 64bit FreeBSD 9.1 bootonly iso here.
   - Fetch latest package from [this site](http://dmilith.verknowsys.com/Public/Sofin-releases/), unpack and run `bin/install` as root.
-  - Build core software. Run:
+  - Install additional base system software. Run:
 
   ```
-  sofin install base
+  sofin install base # It will put "sofin" into /usr/bin/ and sofin.conf.sh into /etc/
   ```
-as root.
   - Start using sofin as regular user.
 
 ### Darwin/ Mac OS X specific:
   - Install Mac OS X 10.8.
   - Install [XQuartz](http://xquartz.macosforge.org/landing/) (if you want to build definitions that require X11)
   - Fetch latest package from [this site](http://dmilith.verknowsys.com/Public/Sofin-releases/), unpack and run `bin/install` as root.
-  - Build core software. Run:
+  - Install additional base system software. Run:
 
   ```
-  sudo sofin install base
-  ```
-  - Start using sofin as regular user.
-
-It will put "sofin" into /usr/bin/ and sofin.conf.sh into /etc/.
-  - Build core software. Run as root:
-
-  ```
-  sofin install base
+  sudo sofin install base # It will put "sofin" into /usr/bin/ and sofin.conf.sh into /etc/
   ```
   - Start using sofin as regular user.
 
