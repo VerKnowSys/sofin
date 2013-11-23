@@ -275,7 +275,6 @@ readonly USERNAME
 readonly DEFAULT_LDFLAGS
 readonly DEFAULT_COMPILER_FLAGS
 readonly MAKE_OPTS
-# readonly DEFAULT_PAUSE_WHEN_LOCKED="30" # seconds
 readonly MAIN_PORT="60022"
 readonly MAIN_USER="sofin"
 readonly MAIN_SOFTWARE_PREFIX="/Mirror"
