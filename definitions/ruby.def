@@ -1,7 +1,7 @@
 APP_FULL_NAME="Ruby YARV 2.0"
-APP_SHA="9d3e5758c87a2c8016aec246f278b7551f8cb675"
+APP_SHA="0be863f1c39d7764c52cbb79ca06105743e27c42"
 APP_NAME="ruby"
-APP_VERSION="2.0.0-p247"
+APP_VERSION="2.0.0-p353"
 APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.bz2"
 APP_CONFIGURE_ARGS="--with-opt-dir=${PREFIX} --disable-install-doc --disable-install-rdoc --enable-load-relative"
 case "${SYSTEM_NAME}" in
