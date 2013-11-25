@@ -1,14 +1,14 @@
 APP_FULL_NAME="The Service Spawner"
-APP_SHA="cfb562674542074c00fd313bfa0a9245dc457a2e"
+APP_SHA="d856337a412adc5fefcf4b0c81231a2712b81adf"
 APP_NAME="thess"
-APP_VERSION="0.62.3"
+APP_VERSION="0.64.0"
 APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.bz2"
 APP_CONFIGURE_SCRIPT="ignore"
 APP_REQUIREMENTS="gmake pkgconf qt" # requires clang installed in OS
 APP_MAKE_METHOD="bin/build && ${MKDIR_BIN} -p ${PREFIX}"
 APP_INSTALL_METHOD="install_thess_fun"
 APP_AFTER_EXPORT_CALLBACK="igniters_install"
-APP_EXPORTS="svdpanel svdss svddw ignitersinstall"
+APP_EXPORTS="svdpanel svdss svddw ignitersinstall svdirc_notify"
 
 install_thess_fun () {
     if [ "${SYSTEM_NAME}" = "Linux" ]; then
