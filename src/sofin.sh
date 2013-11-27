@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.54.5"
+readonly VERSION="0.56.0"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -137,6 +137,7 @@ usage_howto () {
     note "distclean                            - cleans binbuilds cache, source cache, unpacked source content and logs"
     note "outdated                             - lists outdated software"
     note "push | binpush                       - creates binary build from prebuilt software bundles name given as params (example: $(${BASENAME_BIN} ${SCRIPT_NAME}) push Ruby Vifm Curl)"
+    note "port                                 - gather port of TheSS running service by service name"
     exit
 }
 
@@ -201,6 +202,31 @@ perform_clean () {
 
 if [ ! "$1" = "" ]; then
     case $1 in
+
+
+   p|port)
+        # support for TheSS /SoftwareData:
+        app="$2"
+        if [ "$app" = "" ]; then
+            error "Must specify service name!"
+            exit 1
+        fi
+
+        user_app_dir="${HOME}/SoftwareData/${app}"
+        user_port_file="${user_app_dir}/.ports/0"
+        if [ "${USERNAME}" = "root" ]; then
+            user_app_dir="/SystemUsers/SoftwareData/${app}"
+            user_port_file="${user_app_dir}/.ports/0"
+        fi
+        if [ -f "${user_port_file}" ]; then
+            printf "$(${CAT_BIN} ${user_port_file})\n"
+        else
+            error "No service port found with name: '${app}'"
+            exit 1
+        fi
+
+        exit
+        ;;
 
 
     ver|version)
