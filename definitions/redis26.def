@@ -1,4 +1,4 @@
-APP_FULL_NAME="Redis database"
+APP_FULL_NAME="Redis data store"
 APP_SHA="f94c0f623aaa8c310f9be2a88e81716de01ce0ce"
 APP_NAME="redis"
 APP_POSTFIX="26"
