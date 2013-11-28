@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.56.0"
+readonly VERSION="0.58.0"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -36,7 +36,6 @@ check_definition_dir () {
 check_requirements () {
     if [ "${APPLICATIONS}" = "" ]; then
         error "Empty applications list!"
-        exit 1
     fi
     if [ "${SYSTEM_NAME}" != "Darwin" ]; then
         files="$(${FIND_BIN} /usr/local -type f | ${WC_BIN} -l | ${SED_BIN} -e 's/^ *//g;s/ *$//g' )"
@@ -222,7 +221,6 @@ if [ ! "$1" = "" ]; then
         app="$2"
         if [ "$app" = "" ]; then
             error "Must specify service name!"
-            exit 1
         fi
 
         user_app_dir="${HOME}/SoftwareData/${app}"
@@ -235,7 +233,6 @@ if [ ! "$1" = "" ]; then
             printf "$(${CAT_BIN} ${user_port_file})\n"
         else
             error "No service port found with name: '${app}'"
-            exit 1
         fi
 
         exit
@@ -412,7 +409,6 @@ if [ ! "$1" = "" ]; then
 
         if [ "$2" = "" ]; then
             error "For \"$1\" application installation mode, second argument with at least one application name or list is required!"
-            exit 1
         fi
 
         if [ ! -f "${DEFAULTS}" ]; then
@@ -446,7 +442,6 @@ if [ ! "$1" = "" ]; then
         note "Looking for $(${PWD_BIN})/${DEPENDENCIES_FILE} file."
         if [ ! -e "$(${PWD_BIN})/${DEPENDENCIES_FILE}" ]; then
             error "Dependencies file not found!"
-            exit 1
         fi
         export APPLICATIONS="$(${CAT_BIN} ${LOCAL_DIR}${DEPENDENCIES_FILE} | ${TR_BIN} '\n' ' ')"
         note "Installing dependencies: ${APPLICATIONS}\n"
@@ -503,7 +498,6 @@ if [ ! "$1" = "" ]; then
     delete|remove|uninstall|rm)
         if [ "$2" = "" ]; then
             error "For \"$1\" task, second argument with application name is required!"
-            exit 1
         fi
 
         # first look for a list with that name:
@@ -521,7 +515,6 @@ if [ ! "$1" = "" ]; then
                 note "Removing ${APP_NAME}"
                 if [ "${APP_NAME}" = "/" ]; then
                     error "Czy Ty orzeszki?"
-                    exit 1
                 fi
                 debug "Removing software from: ${SOFTWARE_DIR}${APP_NAME}"
                 ${RM_BIN} -rfv "${SOFTWARE_DIR}${APP_NAME}" >> "${LOG}"
@@ -569,11 +562,9 @@ if [ ! "$1" = "" ]; then
     exportapp|export|exp)
         if [ "$2" = "" ]; then
             error "Missing second argument with export app is required!"
-            exit 1
         fi
         if [ "$3" = "" ]; then
             error "Missing third argument with source app is required!"
-            exit 1
         fi
         EXPORT="$2"
         APP="$(${PRINTF_BIN} "${3}" | ${CUT_BIN} -c1 | ${TR_BIN} '[a-z]' '[A-Z]')$(${PRINTF_BIN} "${3}" | ${SED_BIN} 's/^[a-zA-Z]//')"
@@ -598,7 +589,6 @@ if [ ! "$1" = "" ]; then
     outdated)
         update_definitions
         note "Definitions were updated to latest version."
-        echo
         debug "Checking software from ${SOFTWARE_DIR}"
         if [ -d ${SOFTWARE_DIR} ]; then
             for prefix in ${SOFTWARE_DIR}*; do
@@ -606,13 +596,13 @@ if [ ! "$1" = "" ]; then
                 application="$(${BASENAME_BIN} "${prefix}" | ${TR_BIN} '[A-Z]' '[a-z]')" # lowercase for case sensitive fs
 
                 if [ ! -f "${prefix}/${application}${INSTALLED_MARK}" ]; then
-                    error "Application: ${application} is not properly installed."
+                    warn "Application: ${application} is not properly installed."
                     continue
                 fi
                 ver="$(${CAT_BIN} "${prefix}/${application}${INSTALLED_MARK}")"
 
                 if [ ! -f "${DEFINITIONS_DIR}${application}.def" ]; then
-                    error "No such definition found: ${application}"
+                    warn "No such definition found: ${application}"
                     continue
                 fi
                 . "${DEFINITIONS_DIR}${application}.def"
@@ -662,7 +652,7 @@ for application in ${APPLICATIONS}; do
     application="$(${PRINTF_BIN} "${application}" | ${TR_BIN} '[A-Z]' '[a-z]')" # lowercase for case sensitive fs
     . "${DEFAULTS}"
     if [ ! -f "${DEFINITIONS_DIR}${application}.def" ]; then
-        error "No such definition found: ${application}"
+        warn "No such definition found: ${application}"
         continue
     fi
     . "${DEFINITIONS_DIR}${application}.def" # prevent installation of requirements of disabled application:
@@ -714,7 +704,6 @@ for application in ${APPLICATIONS}; do
                     check_command_result $?
                 else
                     error "Empty command to run?"
-                    exit
                 fi
             }
 
@@ -832,13 +821,11 @@ for application in ${APPLICATIONS}; do
             execute_process () {
                 if [ -z "$1" ]; then
                     error "No param given for execute_process()!"
-                    exit 1
                 fi
                 req_definition_file="${DEFINITIONS_DIR}${1}.def"
                 debug "Checking requirement: $1 file: $req_definition_file"
                 if [ ! -e "${req_definition_file}" ]; then
                     error "Cannot fetch definition ${req_definition_file}! Aborting!"
-                    exit 1
                 fi
 
                 . "${DEFAULTS}" # load definition and check for current version
@@ -962,7 +949,6 @@ for application in ${APPLICATIONS}; do
                 if [ "${ALLOW}" = "1" ]; then
                     if [ -z "${APP_HTTP_PATH}" ]; then
                         error "No source given for definition! Aborting"
-                        exit 1
                     else
                         debug "Runtime SHA1: ${RUNTIME_SHA}"
                         export BUILD_DIR_ROOT="${CACHE_DIR}cache/${APP_NAME}${APP_POSTFIX}-${APP_VERSION}-${RUNTIME_SHA}/"
@@ -987,7 +973,6 @@ for application in ${APPLICATIONS}; do
                         debug "Build dir: ${BUILD_DIR_ROOT}, file: ${file}"
                         if [ "${APP_SHA}" = "" ]; then
                             error "→ Missing SHA sum for source: ${file}."
-                            exit
                         else
                             case "${SYSTEM_NAME}" in
                                 Darwin)
@@ -1001,8 +986,8 @@ for application in ${APPLICATIONS}; do
                             if [ "${cur}" = "${APP_SHA}" ]; then
                                 debug "→ SHA sum match in file: ${file}"
                             else
-                                error "→ ${cur} vs ${APP_SHA}"
-                                error "→ SHA sum mismatch. Removing corrupted file from cache: ${file}, and retrying."
+                                warn "→ ${cur} vs ${APP_SHA}"
+                                warn "→ SHA sum mismatch. Removing corrupted file from cache: ${file}, and retrying."
                                 # remove corrupted file
                                 ${RM_BIN} -v "${file}" >> "${LOG}"
                                 # and restart script with same arguments:
