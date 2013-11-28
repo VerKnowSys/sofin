@@ -174,6 +174,11 @@ case "${SYSTEM_NAME}" in
             export USE_BINBUILD="false"
         fi
 
+        # XXX: disable ssl verification of https://github.com which fails on FreeBSD by default.
+        if [ -x "${GIT_BIN}" ]; then
+            ${GIT_BIN} config --global http.sslVerify false
+        fi
+
         # runtime sha
         test -x "${SOFIN_MILISECONDS_UTILITY_BIN}" && \
         RUNTIME_SHA="$(${PRINTF_BIN} "$(${DATE_BIN})-$(${SOFIN_MILISECONDS_UTILITY_BIN})" | ${SHA_BIN})"
