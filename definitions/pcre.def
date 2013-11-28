@@ -1,7 +1,0 @@
-APP_FULL_NAME="PCRE Library"
-APP_SHA="b3ab606864606c9f980045653554bf4a12cadde2"
-APP_NAME="pcre"
-APP_VERSION="8.12"
-APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
-APP_CONFIGURE_ARGS="--enable-utf8 --enable-unicode-properties --enable-pcregrep-libz"
-APP_EXPORTS="pcre-config pcregrep"

@@ -1,8 +1,0 @@
-APP_FULL_NAME="TCP Dump"
-APP_SHA="6c1e72ae32eabb3ab823ff366a2d2f48ad4695f4"
-APP_NAME="tcpdump"
-APP_VERSION="4.4.0"
-APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
-APP_REQUIREMENTS="gmake zlib pkgconf libiconv bzip2 libtool m4 flex bison libpcap"
-APP_CONFIGURE_ARGS="--with-flex=${PREFIX}"
-APP_EXPORTS="tcpdump"

@@ -1,7 +1,0 @@
-DISABLE_ON="Darwin"
-APP_FULL_NAME="Lib Xft for Xorg"
-APP_NAME="libXft"
-APP_SHA="c55fb1b79e6e8459a343e4986f0607a438eff340"
-APP_VERSION="2.1.12"
-APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.bz2"
-# APP_CONFIGURE_ARGS="--disable-specs --without-xmlto"

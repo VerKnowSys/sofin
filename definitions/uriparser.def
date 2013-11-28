@@ -1,7 +1,0 @@
-APP_FULL_NAME="UriParser"
-APP_SHA="160c1e6102a56efea47f257cbb261d935ae136ad"
-APP_NAME="uriparser"
-APP_VERSION="0.7.7"
-APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.bz2"
-APP_CONFIGURE_ARGS="--disable-test --disable-doc"
-APP_EXPORTS="uriparser"

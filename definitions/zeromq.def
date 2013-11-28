@@ -1,9 +1,0 @@
-APP_FULL_NAME="ZMQ - zeromq.org"
-APP_SHA="6857a3a0e908eca58f7c0f90e2ba4695f6700957"
-APP_NAME="zeromq"
-APP_VERSION="3.2.3"
-APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
-APP_CONFIGURE_ARGS="--without-documentation --with-poller"
-if [ "${SYSTEM_NAME}" != "Darwin" ]; then
-    export FORCE_GNU_COMPILER="true"
-fi

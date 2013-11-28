@@ -1,8 +1,0 @@
-APP_FULL_NAME="Portable Threads library"
-APP_NAME="pth"
-APP_SHA="9a71915c89ff2414de69fe104ae1016d513afeee"
-APP_VERSION="2.0.7"
-APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
-APP_CONFIGURE_ARGS="--enable-optimize"
-APP_MAKE_METHOD="make -s"
-APP_INSTALL_METHOD="make -s install"

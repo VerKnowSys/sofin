@@ -1,8 +1,0 @@
-APP_FULL_NAME="FreeBSD Kernel Source Package"
-APP_NAME="bsd-kernel"
-APP_SHA="06a77e1b779216927b237fdfc84e611a89902539"
-APP_VERSION="9.1-RELEASE-p1"
-APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.bz2"
-APP_CONFIGURE_SCRIPT="binary"
-APP_AFTER_UNPACK_CALLBACK="${MKDIR_BIN} -p ${PREFIX}/sys ; ${CP_BIN} -fR ${CACHE_DIR}cache/${APP_NAME}-${APP_VERSION}-${RUNTIME_SHA}/${APP_NAME}-${APP_VERSION}/ ${PREFIX}/sys"
-APP_AFTER_INSTALL_CALLBACK="test -L /usr/src/sys && ${RM_BIN} ${PREFIX}/sys ; test ! -d /usr/src/sys && ${LN_BIN} -s ${PREFIX}/sys /usr/src/sys ; true"

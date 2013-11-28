@@ -1,7 +1,0 @@
-DISABLE_ON="Darwin"
-APP_FULL_NAME="Libxslt"
-APP_SHA="69f74df8228b504a87e2b257c2d5238281c65154"
-APP_NAME="libxslt"
-APP_VERSION="1.1.26"
-APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
-APP_REQUIREMENTS="gmake libtool libxml2 libgpg-error libgcrypt"

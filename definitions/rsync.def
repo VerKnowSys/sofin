@@ -1,8 +1,0 @@
-APP_FULL_NAME="Rsync"
-APP_NAME="rsync"
-APP_SHA="c64c8341984aea647506eb504496999fd968ddfc"
-APP_VERSION="3.0.9"
-APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
-APP_REQUIREMENTS="perl"
-APP_CONFIGURE_ARGS="--disable-ipv6 --disable-locale --disable-debug --disable-iconv"
-APP_EXPORTS="rsync"

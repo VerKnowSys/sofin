@@ -1,8 +1,0 @@
-APP_FULL_NAME="jq - Lightweight and flexible command-line JSON processor."
-APP_SHA="efe5141527ab186baa44f38fa082b0b8b3d749d5"
-APP_NAME="jq"
-APP_VERSION="925ec3751f3b407c17412b0fa04a84fe39c1e0b7"
-APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.bz2"
-APP_CONFIGURE_SCRIPT="no-conf"
-APP_REQUIREMENTS="gmake m4 flex bison-latest python-legacy"
-APP_EXPORTS="jq"

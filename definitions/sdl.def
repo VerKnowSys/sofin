@@ -1,6 +1,0 @@
-APP_FULL_NAME="SDL"
-APP_NAME="sdl"
-APP_SHA="0c5f193ced810b0d7ce3ab06d808cbb5eef03a2c"
-APP_VERSION="1.2.15"
-APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
-APP_CONFIGURE_ARGS="--without-x --disable-nasm --disable-video --disable-joystick"

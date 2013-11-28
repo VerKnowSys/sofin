@@ -1,8 +1,0 @@
-APP_FULL_NAME="FreeBSD VMWare kernel modules"
-APP_NAME="freebsd-vmware-modules"
-APP_SHA="1215c3e5021b9b8e1ddca9426c380906b39d14d1"
-APP_VERSION="9.1"
-APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.bz2"
-APP_CONFIGURE_SCRIPT="binary"
-APP_AFTER_UNPACK_CALLBACK="${CP_BIN} -fR ${CACHE_DIR}cache/${APP_NAME}-${APP_VERSION}-${RUNTIME_SHA}/${APP_NAME}-${APP_VERSION}/ /boot/modules"
-# APP_AFTER_INSTALL_CALLBACK="test -L /usr/src/sys && ${RM_BIN} ${PREFIX}/sys ; test ! -d /usr/src/sys && ${LN_BIN} -s ${PREFIX}/sys /usr/src/sys ; true"

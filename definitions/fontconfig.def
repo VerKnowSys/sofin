@@ -1,8 +1,0 @@
-APP_FULL_NAME="Fontconfig Library"
-APP_NAME="fontconfig"
-APP_SHA="570fb55eb14f2c92a7b470b941e9d35dbfafa716"
-APP_VERSION="2.8.0"
-APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
-APP_REQUIREMENTS="gmake freetype expat"
-APP_MAKE_METHOD="gmake -s ${MAKE_OPTS}"
-APP_INSTALL_METHOD="gmake install -s ${MAKE_OPTS}"

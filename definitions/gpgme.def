@@ -1,7 +1,0 @@
-APP_FULL_NAME="GNU gpgme"
-APP_NAME="gpgme"
-APP_SHA="7d19a95a2239da13764dad7f97541be884ec5a37"
-APP_VERSION="1.3.1"
-APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
-APP_REQUIREMENTS="bzip2 zlib libiconv gmake libgpg-error libgcrypt libassuan libksba pth curl gnupg"
-APP_CONFIGURE_ARGS="--disable-nls"

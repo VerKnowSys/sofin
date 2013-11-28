@@ -1,7 +1,0 @@
-APP_FULL_NAME="Autoconf GNU Library"
-APP_NAME="autoconf"
-APP_SHA="843f7dfcc6addf129dc2c8b12f7d72d371478f42"
-APP_VERSION="2.68"
-APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
-APP_REQUIREMENTS="m4 gmake perl"
-APP_EXPORTS="autoconf autoconf autoheader autom4te autoreconf autoscan autoupdate ifnames"

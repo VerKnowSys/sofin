@@ -1,7 +1,0 @@
-APP_FULL_NAME="tmux - terminal multiplexer"
-APP_SHA="08677ea914e1973ce605b0008919717184cbd033"
-APP_NAME="tmux"
-APP_VERSION="1.8"
-APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
-APP_REQUIREMENTS="pkgconf libevent ncurses"
-APP_EXPORTS="tmux"

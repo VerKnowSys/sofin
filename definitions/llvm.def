@@ -1,8 +1,0 @@
-DISABLE_ON="Darwin"
-APP_FULL_NAME="LLVM"
-APP_SHA="234c96e73ef81aec9a54da92fc2a9024d653b059"
-APP_NAME="llvm"
-APP_VERSION="3.1"
-APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.src.tar.gz"
-APP_CONFIGURE_ARGS="--disable-docs --disable-doxygen --enable-shared"
-APP_REQUIREMENTS="gmake python-legacy"

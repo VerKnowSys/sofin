@@ -1,8 +1,0 @@
-DISABLE_ON="Darwin"
-APP_FULL_NAME="Lib Xi for Xorg"
-APP_NAME="libXi"
-APP_SHA="8ac24dec8e488f49fd6a6b256c815da9ceec9737"
-APP_VERSION="1.4.5"
-APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.bz2"
-# APP_REQUIREMENTS=""
-APP_CONFIGURE_ARGS="--disable-specs --without-xmlto"

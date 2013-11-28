@@ -1,6 +1,0 @@
-. ${DEFINITIONS_DIR}passenger.def
-
-APP_POSTFIX="19"
-APP_REQUIREMENTS="zlib bzip2 libiconv libxml2 gmake libtool libgpg-error libgcrypt libxslt yaml curl libffi python-legacy scons ruby19"
-APP_AFTER_PATCH_CALLBACK="${CP_BIN} -r ${CACHE_DIR}cache/${APP_NAME}${APP_POSTFIX}-${APP_VERSION}/${APP_NAME}-${APP_VERSION} ${PREFIX}/lib/${APP_NAME}${APP_POSTFIX}"
-APP_INSTALL_METHOD="EXTRA_CFLAGS='${EXTRA_CFLAGS}' EXTRA_CXXFLAGS='${EXTRA_CXXFLAGS}' EXTRA_LDFLAGS='${EXTRA_LDFLAGS}' CC=${EXTRA_CC} CXX=${EXTRA_CXX} ${PREFIX}/bin/ruby ${PREFIX}/lib/${APP_NAME}${APP_POSTFIX}/bin/passenger-install-nginx-module --auto --auto-download --prefix=${PREFIX} --extra-configure-flags=\"${EXTRA_NGINX_CONF_FLAGS}\""

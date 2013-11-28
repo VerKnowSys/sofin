@@ -1,8 +1,0 @@
-APP_FULL_NAME="Implementation of the Domain Name System (DNS)"
-APP_SHA="9e1a9e5e45685befce6b93d4fcfd63e50eaeb2cf"
-APP_NAME="bind"
-APP_VERSION="9.9.3-P1"
-APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.gz"
-APP_CONFIGURE_ARGS="--enable-threads"
-APP_REQUIREMENTS="perl"
-APP_EXPORTS="dig host nslookup nsupdate isc-config.sh named named-checkconf named-checkzone named-compilezone rndc rndc-confgen lwresd dnssec-signzone dnssec-keygen dnssec-keyfromlabel dnssec-dsfromkey arpaname ddns-confgen dnssec-checkds dnssec-coverage dnssec-dsfromkey dnssec-keyfromlabel dnssec-keygen dnssec-revoke dnssec-settime dnssec-signzone dnssec-verify genrandom isc-hmac-fixup lwresd named named-checkconf named-checkzone named-compilezone named-journalprint nsec3hash rndc rndc-confgen"

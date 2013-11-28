@@ -1,7 +1,0 @@
-DISABLE_ON="Darwin"
-APP_FULL_NAME="Lib Xaw for Xorg"
-APP_NAME="libXaw"
-APP_SHA="5f8fc1b10316f31d4c6fa1d938b2297ff5bd2da5"
-APP_VERSION="1.0.9"
-APP_HTTP_PATH="${MAIN_SOURCE_REPOSITORY}${APP_NAME}-${APP_VERSION}.tar.bz2"
-# APP_CONFIGURE_ARGS="--disable-specs --without-xmlto"
