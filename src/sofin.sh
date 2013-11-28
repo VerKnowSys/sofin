@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.58.0"
+readonly VERSION="0.58.2"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -407,16 +407,10 @@ if [ ! "$1" = "" ]; then
 
 
     install|get)
-
         if [ "$2" = "" ]; then
             error "For \"$1\" application installation mode, second argument with at least one application name or list is required!"
         fi
-
-        if [ ! -f "${DEFAULTS}" ]; then
-            note "No definitions found in ${DEFAULTS}. Updating."
-            update_definitions
-        fi
-
+        update_definitions
         # first of all, try using a list if exists:
         if [ -f "${LISTS_DIR}$2" ]; then
             export APPLICATIONS="$(${CAT_BIN} ${LISTS_DIR}$2 | ${TR_BIN} '\n' ' ')"
@@ -432,13 +426,8 @@ if [ ! "$1" = "" ]; then
         LOCAL_DIR="$(${PWD_BIN})/"
         if [ "${USERNAME}" = "root" ]; then
             warn "Installation of project dependencies as root is immoral."
-            # exit 1
-            # unset USERNAME
         fi
-        if [ ! -f "${DEFAULTS}" ]; then
-            note "No definitions found in ${DEFAULTS}. Updating."
-            update_definitions
-        fi
+        update_definitions
         cd "${LOCAL_DIR}"
         note "Looking for $(${PWD_BIN})/${DEPENDENCIES_FILE} file."
         if [ ! -e "$(${PWD_BIN})/${DEPENDENCIES_FILE}" ]; then
