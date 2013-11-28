@@ -4,11 +4,6 @@
 * Daniel (dmilith) Dettlaff (dmilith [at] verknowsys.com). I'm also on #verknowsys @ freenode IRC.
 
 
-## Definition authors:
-* Daniel (dmilith) Dettlaff
-* Michał (tallica) Lipski
-
-
 ## Contributors:
 * Michał (tallica) Lipski
 
@@ -39,7 +34,7 @@ customizable software for FreeBSD servers. Darwin (Mac OS X) support started wit
 * Sofin is designed to not touch any part of system. The only exception is /etc/profile_sofin created after system wide software installation (/Software/) in ServeD system.
 * By default Sofin verbosity is limited to minimum. More detailed information is written to LOG file (located in /Software/.cache/install.log by default or /Users/USER_NAME/.cache/install.log)
 * Exports. Each app has own ROOT_DIR/exports/ with symlinks to exported software. Exported software are just simple symlinks used to generate PATH environment variable.
-* Sofin has own configuration file: [sofin.conf.sh](https://github.com/VerKnowSys/sofin-definitions/blob/master/sofin.conf.sh) which is SH script itself.
+* Sofin has own configuration file: [sofin.conf.sh](https://github.com/VerKnowSys/sofin/blob/master/src/sofin.conf.sh) which is SH script itself.
 * Supports parallel builds by default (from version 0.24.5)
 * Supports custom callbacks executed in order as follows:
   - APP_AFTER_UNPACK_CALLBACK (executed after software unpack process)
