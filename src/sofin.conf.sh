@@ -10,9 +10,8 @@ if [ "${TRACE}" = "" ]; then
 fi
 
 # setting up definitions repository
-if [ "${REPOSITORY}" = "" ]; then
-    export REPOSITORY="http://github.com/dmilith/sofin-definitions.git" # this is official sofin definitions repository
-fi
+readonly DEFAULT_REPOSITORY="http://github.com/dmilith/sofin-definitions.git" # this is official sofin definitions repository
+# REPOSITORY is set after determining CACHE_DIR (L300)
 # and branch used
 if [ "${BRANCH}" = "" ]; then
     export BRANCH="stable"
@@ -294,6 +293,19 @@ readonly MAIN_SOFTWARE_ADDRESS="software.verknowsys.com"
 readonly MAIN_SOURCE_REPOSITORY="http://${MAIN_SOFTWARE_ADDRESS}/source/"
 readonly MAIN_BINARY_REPOSITORY="http://${MAIN_SOFTWARE_ADDRESS}/binary/"
 readonly CCACHE_BIN_OPTIONAL="${SOFTWARE_ROOT_DIR}Ccache/exports/ccache"
+
+
+# last repository cache setup:
+export REPOSITORY_CACHE_FILE="${CACHE_DIR}.last_repository.pos"
+if [ "${REPOSITORY}" = "" ]; then # :this value is given by user as shell param
+    if [ -f "${REPOSITORY_CACHE_FILE}" ]; then
+        export REPOSITORY="$(${CAT_BIN} ${REPOSITORY_CACHE_FILE})"
+    else
+        ${PRINTF_BIN} "${DEFAULT_REPOSITORY}\n" > ${REPOSITORY_CACHE_FILE}
+        export REPOSITORY="${DEFAULT_REPOSITORY}"
+    fi
+fi
+
 
 # ANSI color definitions
 readonly red='\033[31;40m'

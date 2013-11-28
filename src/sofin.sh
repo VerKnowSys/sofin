@@ -83,7 +83,7 @@ set_c_compiler () {
 }
 
 
-update_definitions () { # accepts optional user uid param
+update_definitions () {
     note "${HEADER}"
     if [ -d "${CACHE_DIR}definitions" ]; then
         cd "${CACHE_DIR}definitions"
@@ -95,7 +95,7 @@ update_definitions () { # accepts optional user uid param
             note "Updated branch ${current_branch} of repository ${REPOSITORY}"
         else # else use default branch
             ${GIT_BIN} checkout -b "${BRANCH}" >> ${LOG} 2>&1 || ${GIT_BIN} checkout "${BRANCH}" >> ${LOG} 2>&1
-            (${GIT_BIN} pull origin "${BRANCH}" >> ${LOG} 2>&1 || error "Error occureded: Update from branch: ${BRANCH} of repository ${REPOSITORY} isn't possible. Make sure that given repository and branch are valid."
+            (${GIT_BIN} pull origin "${BRANCH}" >> ${LOG} 2>&1 || error "Error occureded: Update from branch: ${BRANCH} of repository ${REPOSITORY} isn't possible. Make sure that given REPOSITORY and BRANCH values are valid."
             note "Updated branch ${BRANCH} of repository ${REPOSITORY}")
         fi
 
@@ -211,6 +211,7 @@ if [ ! "$1" = "" ]; then
         else
             note "Changing repository to: ${REPOSITORY}"
         fi
+        ${PRINTF_BIN} "${REPOSITORY}\n" > "${REPOSITORY_CACHE_FILE}" # print repository name to cache file
         ${RM_BIN} -rf "${CACHE_DIR}/definitions" # wipe out current definitions from cache
         update_definitions # get repository specified by user
         exit
