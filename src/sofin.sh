@@ -85,30 +85,32 @@ set_c_compiler () {
 
 
 update_definitions () { # accepts optional user uid param
-    if [ "${DEVEL}" != "" ]; then
-        warn "Devel mode enabled. Not updating definitions from repository: ${MAIN_SOURCE_REPOSITORY}"
-        return
-    fi
-    tar_options="xf"
-    rm_options="-rf"
-    if [ "${DEBUG}" = "true" ]; then
-        tar_options="${tar_options}v"
-        rm_options="${rm_options}v"
-    fi
-
-    debug "Checking for destination directories existance."
-    for element in "${LISTS_DIR}" "${DEFINITIONS_DIR}"; do
-        ${MKDIR_BIN} -p "${element}" > "${LOG}"
-        debug "Removing old definitions: ${element}"
-        ${RM_BIN} ${rm_options} ${element} >> "${LOG}"
-    done
-    cd "${CACHE_DIR}"
-    debug "Working in cache dir: ${CACHE_DIR}"
     note "${HEADER}"
-    ${PRINTF_BIN} "${reset}\n"
-    debug "Updating definitions snapshot from: ${MAIN_SOURCE_REPOSITORY}definitions/${DEFINITION_SNAPSHOT_FILE}"
-    ${FETCH_BIN} "${MAIN_SOURCE_REPOSITORY}definitions/${DEFINITION_SNAPSHOT_FILE}" >> "${LOG}" 2>> "${LOG}"
-    ${TAR_BIN} ${tar_options} "${DEFINITION_SNAPSHOT_FILE}" >> "${LOG}" 2>> "${LOG}"
+    if [ -d "${CACHE_DIR}definitions" ]; then
+        cd "${CACHE_DIR}definitions"
+        current_branch="$(${GIT_BIN} rev-parse --abbrev-ref HEAD)"
+        if [ "${current_branch}" != "${BRANCH}" ]; then # use current_branch value if branch isn't matching default branch
+            # ${GIT_BIN} stash save -a >> ${LOG} 2>&1
+            ${GIT_BIN} checkout -b "${current_branch}" >> ${LOG} 2>&1 || ${GIT_BIN} checkout "${current_branch}" >> ${LOG} 2>&1
+            ${GIT_BIN} pull origin "${current_branch}" >> ${LOG} 2>&1 || error "Error occureded: Update from branch: ${BRANCH} of repository ${REPOSITORY} isn't possible. Make sure that given repository and branch are valid."
+            note "Updated branch ${current_branch} of repository ${REPOSITORY}"
+        else # else use default branch
+            ${GIT_BIN} checkout -b "${BRANCH}" >> ${LOG} 2>&1 || ${GIT_BIN} checkout "${BRANCH}" >> ${LOG} 2>&1
+            (${GIT_BIN} pull origin "${BRANCH}" >> ${LOG} 2>&1 || error "Error occureded: Update from branch: ${BRANCH} of repository ${REPOSITORY} isn't possible. Make sure that given repository and branch are valid."
+            note "Updated branch ${BRANCH} of repository ${REPOSITORY}")
+        fi
+
+    else
+        # clone definitions repository:
+        cd "${CACHE_DIR}"
+        note "Cloning repository ${REPOSITORY} from branch: ${BRANCH}"
+        # ${RM_BIN} -rf "${CACHE_DIR}/definitions" # if something is already here, wipe it out from cache
+        ${GIT_BIN} clone "${REPOSITORY}" definitions >> ${LOG} 2>&1
+        cd "${CACHE_DIR}definitions"
+        ${GIT_BIN} checkout -b "${BRANCH}" >> ${LOG} 2>&1
+        ${GIT_BIN} pull origin "${BRANCH}" >> ${LOG} 2>&1 || error "Error occureded: Update from branch: ${BRANCH} of repository ${REPOSITORY} isn't possible. Make sure that given repository and branch are valid."
+        note "Updated branch ${BRANCH} of repository ${REPOSITORY}"
+    fi
 }
 
 
