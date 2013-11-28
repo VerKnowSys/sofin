@@ -217,7 +217,7 @@ if [ ! "$1" = "" ]; then
         exit
         ;;
 
-   p|port)
+    p|port)
         # support for TheSS /SoftwareData:
         app="$2"
         if [ "$app" = "" ]; then
@@ -415,8 +415,8 @@ if [ ! "$1" = "" ]; then
             exit 1
         fi
 
-        if [ ! -f "${CACHE_DIR}definitions/defaults.def" ]; then
-            note "No definitions found in ${CACHE_DIR}definitions/defaults.def. Updating."
+        if [ ! -f "${DEFAULTS}" ]; then
+            note "No definitions found in ${DEFAULTS}. Updating."
             update_definitions
         fi
 
@@ -438,8 +438,8 @@ if [ ! "$1" = "" ]; then
             # exit 1
             # unset USERNAME
         fi
-        if [ ! -f "${CACHE_DIR}definitions/defaults.def" ]; then
-            note "No definitions found in ${CACHE_DIR}definitions/defaults.def. Updating."
+        if [ ! -f "${DEFAULTS}" ]; then
+            note "No definitions found in ${DEFAULTS}. Updating."
             update_definitions
         fi
         cd "${LOCAL_DIR}"
