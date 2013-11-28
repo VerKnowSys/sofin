@@ -8,6 +8,16 @@ fi
 if [ "${TRACE}" = "" ]; then
     export TRACE="false"
 fi
+
+# setting up definitions repository
+if [ "${REPOSITORY}" = "" ]; then
+    export REPOSITORY="http://github.com/dmilith/sofin-definitions.git" # this is official sofin definitions repository
+fi
+# and branch used
+if [ "${BRANCH}" = "" ]; then
+    export BRANCH="stable"
+fi
+
 readonly DEBUG
 readonly TRACE
 readonly ID_SVD="-un"
@@ -75,6 +85,7 @@ SOFIN_BIN="/usr/bin/sofin"
 SOFIN_RPATH_PATCHER_BIN="/usr/bin/sofin-rpp"
 SOFIN_VERSION_UTILITY_BIN="/usr/bin/sofin-version-utility"
 SOFIN_MILISECONDS_UTILITY_BIN="/usr/bin/sofin-miliseconds"
+GIT_BIN="/Software/Git/exports/git"
 
 if [ ! -x "${SOFIN_VERSION_UTILITY_BIN}" ]; then
     export OS_VERSION="0"
@@ -171,6 +182,7 @@ case "${SYSTEM_NAME}" in
     Darwin)
         # OSX specific configuration
         readonly DARWIN_MINIMUM_VERSION="124"
+        export GIT_BIN="/usr/bin/git"
         export CURL_BIN="/usr/bin/curl"
         export FETCH_BIN="/usr/bin/curl -O"
         export PATCH_BIN="/usr/bin/patch -p0 "
