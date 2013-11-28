@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.58.2"
+readonly VERSION="0.58.3"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -103,8 +103,8 @@ update_definitions () {
         # clone definitions repository:
         cd "${CACHE_DIR}"
         note "Cloning repository ${REPOSITORY} from branch: ${BRANCH}"
-        # ${RM_BIN} -rf "${CACHE_DIR}/definitions" # if something is already here, wipe it out from cache
-        ${GIT_BIN} clone "${REPOSITORY}" definitions >> ${LOG} 2>&1
+        ${RM_BIN} -rf "${CACHE_DIR}/definitions" >> ${LOG} 2>&1 # if something is already here, wipe it out from cache
+        ${GIT_BIN} clone "${REPOSITORY}" definitions >> ${LOG} 2>&1 || error "Error occureded: Cloning repository ${REPOSITORY} isn't possible. Make sure it's valid."
         cd "${CACHE_DIR}definitions"
         ${GIT_BIN} checkout -b "${BRANCH}" >> ${LOG} 2>&1
         ${GIT_BIN} pull origin "${BRANCH}" >> ${LOG} 2>&1 || error "Error occureded: Update from branch: ${BRANCH} of repository ${REPOSITORY} isn't possible. Make sure that given repository and branch are valid."
