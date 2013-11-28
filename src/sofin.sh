@@ -140,6 +140,7 @@ usage_howto () {
     note "outdated                             - lists outdated software"
     note "push | binpush                       - creates binary build from prebuilt software bundles name given as params (example: $(${BASENAME_BIN} ${SCRIPT_NAME}) push Ruby Vifm Curl)"
     note "port                                 - gather port of TheSS running service by service name"
+    note "setup                                - switch definitions repository/ branch from env value 'REPOSITORY' and 'BRANCH' (example: BRANCH=master REPOSITORY=/my/local/definitions/repo/ sofin setup)"
     exit
 }
 
@@ -205,6 +206,16 @@ perform_clean () {
 if [ ! "$1" = "" ]; then
     case $1 in
 
+    s|setup)
+        if [ -d "${REPOSITORY}" ]; then
+            note "Changing repository to local directory: ${REPOSITORY}"
+        else
+            note "Changing repository to: ${REPOSITORY}"
+        fi
+        ${RM_BIN} -rf "${CACHE_DIR}/definitions" # wipe out current definitions from cache
+        update_definitions # get repository specified by user
+        exit
+        ;;
 
    p|port)
         # support for TheSS /SoftwareData:
