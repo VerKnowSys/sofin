@@ -85,7 +85,7 @@ set_c_compiler () {
 
 update_definitions () {
     note "${HEADER}"
-    if [ -d "${CACHE_DIR}definitions" ]; then
+    if [ -d "${CACHE_DIR}definitions/.git" ]; then
         cd "${CACHE_DIR}definitions"
         current_branch="$(${GIT_BIN} rev-parse --abbrev-ref HEAD)"
         if [ "${current_branch}" != "${BRANCH}" ]; then # use current_branch value if branch isn't matching default branch
