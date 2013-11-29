@@ -21,6 +21,17 @@ archive_name="${base_name}.tar.bz2"
 note "Preparing package: ${archive_name} with version: ${version}"
 
 tar --disable-copyfile --exclude='.' --exclude='.git' --exclude='.gitignore' --exclude='releases' -cjf releases/${archive_name} ./
+mkdir -p releases/${base_name}
+mv releases/${archive_name} releases/${base_name}/
+cd releases/${base_name}
+tar xf ${archive_name}
+rm -f ${archive_name}
+cd ..
+tar -cjf ${archive_name} ./${base_name}
+rm -rf ${base_name}
+cd ..
+
+# tar --disable-copyfile --exclude='.' --exclude='.git' --exclude='.gitignore' --exclude='releases' -cjf releases/${archive_name} ./
 
 if [ "${USER}" = "dmilith" ]; then
     note "Pushing package to remote server"
