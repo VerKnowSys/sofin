@@ -214,7 +214,8 @@ esac
 
 readonly SOFTWARE_ROOT_DIR="/Software/"
 SOFTWARE_DIR="/Software/"
-CACHE_DIR="${SOFTWARE_DIR}.cache/"
+SYSTEM_HOME_DIR="/SystemUsers/"
+CACHE_DIR="${SYSTEM_HOME_DIR}.cache/"
 BINBUILDS_CACHE_DIR="${CACHE_DIR}binbuilds/"
 DEFINITIONS_DIR="${CACHE_DIR}definitions/definitions/"
 HOME_DIRS="${HOME}/.."
