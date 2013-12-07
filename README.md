@@ -9,7 +9,7 @@
 
 
 ## Thanks:
-* Tymon (teamon) Tobolski (ideas of improvments)
+* Tymon (teamon) Tobolski (ideas of improvements)
 
 
 ## About:
