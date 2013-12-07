@@ -107,8 +107,7 @@ update_definitions () {
         ${GIT_BIN} clone "${REPOSITORY}" definitions >> ${LOG} 2>&1 || error "Error occureded: Cloning repository ${REPOSITORY} isn't possible. Make sure it's valid."
         cd "${CACHE_DIR}definitions"
         ${GIT_BIN} checkout -b "${BRANCH}" >> ${LOG} 2>&1
-        ${GIT_BIN} pull origin "${BRANCH}" >> ${LOG} 2>&1 || error "Error occureded: Update from branch: ${BRANCH} of repository ${REPOSITORY} isn't possible. Make sure that given repository and branch are valid."
-        note "Updated branch ${BRANCH} of repository ${REPOSITORY}"
+        (${GIT_BIN} pull origin "${BRANCH}" >> ${LOG} 2>&1 && note "Updated branch ${BRANCH} of repository ${REPOSITORY}") || error "Error occureded: Update from branch: ${BRANCH} of repository ${REPOSITORY} isn't possible. Make sure that given repository and branch are valid."
     fi
 }
 
