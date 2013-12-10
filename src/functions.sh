@@ -28,7 +28,7 @@ binbuild () {
 # NOTE: this function is local helper to run gather-source() on remote mirror host
 src () {
   test "$1" = "" && echo "No http source given" && exit 1
-  ssh sofin@v "source ~/syncer && gather-source $1"
+  ssh sofin@v "source ~/.functions.sh && gather-source $1"
 }
 
 
