@@ -1,4 +1,13 @@
 #!/bin/sh
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
+
+. /etc/sofin.conf.sh
+. /etc/profile_sofin
+
 INSTALL="YES" bin/build
+
+if [ "$(uname)" = "FreeBSD" ]; then
+    note "Installing Sofin base software"
+    sofin install base
+fi

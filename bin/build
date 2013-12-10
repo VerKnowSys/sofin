@@ -149,8 +149,3 @@ install_sofin () {
 
 update_env_files
 install_base
-
-if [ ! -f "/Software/.cache/definitions/defaults.def" ]; then
-    note "Performing initial definitions update."
-    src/sofin.sh update
-fi

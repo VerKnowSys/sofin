@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.58.3"
+readonly VERSION="0.58.4"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -85,6 +85,16 @@ set_c_compiler () {
 
 update_definitions () {
     note "${HEADER}"
+    if [ ! -x "${GIT_BIN}" ]; then
+        note "Installing initial definition list from tarball."
+        cd "${CACHE_DIR}"
+        INITIAL_DEFINITIONS="http://dmilith.verknowsys.com/Public/Sofin-releases/initial-definitions.tar.gz"
+        ${RM_BIN} -rf definitions
+        ${FETCH_BIN} "${INITIAL_DEFINITIONS}" >> ${LOG} 2>&1
+        ${TAR_BIN} xf "$(${BASENAME_BIN} ${INITIAL_DEFINITIONS})"
+        ${RM_BIN} -rf "$(${BASENAME_BIN} ${INITIAL_DEFINITIONS})"
+        return
+    fi
     if [ -d "${CACHE_DIR}definitions/.git" ]; then
         cd "${CACHE_DIR}definitions"
         current_branch="$(${GIT_BIN} rev-parse --abbrev-ref HEAD)"
