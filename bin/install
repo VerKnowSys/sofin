@@ -11,3 +11,8 @@ if [ "$(uname)" = "FreeBSD" ]; then
     note "Installing Sofin base software"
     sofin install base
 fi
+
+if [ -d "/Users/sofin" ]; then
+    note "Updating functions for sofin user"
+    cat src/functions.sh > /Users/sofin/.functions.sh
+fi
