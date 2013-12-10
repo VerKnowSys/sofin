@@ -88,7 +88,7 @@ update_definitions () {
     if [ ! -x "${GIT_BIN}" ]; then
         note "Installing initial definition list from tarball."
         cd "${CACHE_DIR}"
-        INITIAL_DEFINITIONS="http://dmilith.verknowsys.com/Public/Sofin-releases/initial-definitions.tar.gz"
+        INITIAL_DEFINITIONS="${MAIN_SOURCE_REPOSITORY}initial-definitions.tar.gz"
         ${RM_BIN} -rf definitions
         ${FETCH_BIN} "${INITIAL_DEFINITIONS}" >> ${LOG} 2>&1
         ${TAR_BIN} xf "$(${BASENAME_BIN} ${INITIAL_DEFINITIONS})"
