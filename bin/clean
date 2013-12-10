@@ -17,3 +17,5 @@ ${RM_BIN} -rf "bin/sofin-rpp"
 ${RM_BIN} -rf "bin/sofin-version-utility"
 ${RM_BIN} -rf "bin/sofin-miliseconds"
 
+note "Cleaning definitions"
+${RM_BIN} -rf "/Software/.cache/definitions"
