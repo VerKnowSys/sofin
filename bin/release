@@ -23,7 +23,7 @@ note "Preparing package: ${archive_name} with version: ${version}"
 tar --disable-copyfile --exclude='.' --exclude='.git' --exclude='.gitignore' --exclude='releases' -cjf releases/${archive_name} ./
 mkdir -p releases/${base_name}
 mv releases/${archive_name} releases/${base_name}/
-cd releases/${base_name}
+cd releases/${base_name} > /dev/null
 tar xf ${archive_name}
 rm -f ${archive_name}
 cd ..
@@ -35,5 +35,6 @@ cd ..
 
 if [ "${USER}" = "dmilith" ]; then
     note "Pushing package to remote server"
-    scp releases/sofin-${version}.tar.bz2 dmilith@v:/home/dmilith/Web/Public/Sofin-releases
+    scp releases/sofin-${version}.tar.bz2 v:/home/dmilith/Web/Public/Sofin-releases > /dev/null 2>&1
+    ssh sofin@v "source ~/.functions.sh && gather-source http://dmilith.verknowsys.com/Public/Sofin-releases/sofin-${version}.tar.bz2"
 fi
