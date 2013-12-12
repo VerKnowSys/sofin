@@ -21,3 +21,5 @@ if [ -d "/Users/dmilith" ]; then
     note "Developer mode. Installing/ updating functions in home dir"
     cat src/functions.sh > /Users/dmilith/.functions.sh
 fi
+
+sofin clean
