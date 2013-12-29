@@ -85,6 +85,7 @@ SOFIN_RPATH_PATCHER_BIN="/usr/bin/sofin-rpp"
 SOFIN_VERSION_UTILITY_BIN="/usr/bin/sofin-version-utility"
 SOFIN_MILISECONDS_UTILITY_BIN="/usr/bin/sofin-miliseconds"
 GIT_BIN="/Software/Git/exports/git"
+SSH_BIN="/usr/bin/ssh"
 
 if [ ! -x "${SOFIN_VERSION_UTILITY_BIN}" ]; then
     export OS_VERSION="0"
