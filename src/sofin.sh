@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.58.5"
+readonly VERSION="0.58.6"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -113,7 +113,7 @@ update_definitions () {
         # clone definitions repository:
         cd "${CACHE_DIR}"
         note "Cloning repository ${REPOSITORY} from branch: ${BRANCH}"
-        ${RM_BIN} -rf "${CACHE_DIR}/definitions" >> ${LOG} 2>&1 # if something is already here, wipe it out from cache
+        ${RM_BIN} -rf definitions >> ${LOG} 2>&1 # if something is already here, wipe it out from cache
         ${GIT_BIN} clone "${REPOSITORY}" definitions >> ${LOG} 2>&1 || error "Error occureded: Cloning repository ${REPOSITORY} isn't possible. Make sure it's valid."
         cd "${CACHE_DIR}definitions"
         ${GIT_BIN} checkout -b "${BRANCH}" >> ${LOG} 2>&1
@@ -218,6 +218,7 @@ if [ ! "$1" = "" ]; then
         if [ -d "${REPOSITORY}" ]; then
             note "Changing repository to local directory: ${REPOSITORY}"
         else
+            export REPOSITORY="${DEFAULT_REPOSITORY}"
             note "Changing repository to: ${REPOSITORY}"
         fi
         ${PRINTF_BIN} "${REPOSITORY}\n" > "${REPOSITORY_CACHE_FILE}" # print repository name to cache file
