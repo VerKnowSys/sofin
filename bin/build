@@ -96,7 +96,9 @@ install_base () {
         check_root
         note "Removing old installation."
         ${RM_BIN} -rf "/usr/bin/sofin"
-        ${RM_BIN} -rf "/usr/bin/sofin-rpp"
+        if [ "$(uname)" != "Darwin" ]; then
+            ${RM_BIN} -rf "/usr/bin/sofin-rpp"
+        fi
         ${RM_BIN} -rf "/usr/bin/sofin-version-utility"
         ${RM_BIN} -rf "/usr/bin/sofin-miliseconds"
         ${RM_BIN} -rf "/etc/${CONF_FILE}"
@@ -112,9 +114,11 @@ build_natives () {
     if [ -x "${CXX}" ]; then
         note "C++ compiler available. Using: ${CXX}"
 
-        note "Building patcher"
-        ${CXX} -Os -fPIC src/sofin-rpath-patcher.cc -o bin/sofin-rpp
-        check_command_result $?
+        if [ "$(uname)" != "Darwin" ]; then
+            note "Building patcher"
+            ${CXX} -Os -fPIC src/sofin-rpath-patcher.cc -o bin/sofin-rpp
+            check_command_result $?
+        fi
 
         note "Building sofin_miliseconds"
         ${CXX} -Os -fPIC src/sofin_miliseconds.cc -o bin/sofin-miliseconds
@@ -133,8 +137,10 @@ build_natives () {
 install_sofin () {
     ${CP_BIN} "src/${CONF_FILE}" "/etc/${CONF_FILE}"
     check_command_result $?
-    ${CP_BIN} "bin/sofin-rpp" /usr/bin/sofin-rpp
-    check_command_result $?
+    if [ "$(uname)" != "Darwin" ]; then
+        ${CP_BIN} "bin/sofin-rpp" /usr/bin/sofin-rpp
+        check_command_result $?
+    fi
     ${CP_BIN} "bin/sofin-version-utility" /usr/bin/sofin-version-utility
     check_command_result $?
     ${CP_BIN} "bin/sofin-miliseconds" /usr/bin/sofin-miliseconds
