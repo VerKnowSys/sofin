@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.58.7"
+readonly VERSION="0.58.8"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -218,7 +218,6 @@ if [ ! "$1" = "" ]; then
         if [ -d "${REPOSITORY}" ]; then
             note "Changing repository to local directory: ${REPOSITORY}"
         else
-            export REPOSITORY="${DEFAULT_REPOSITORY}"
             note "Changing repository to: ${REPOSITORY}"
         fi
         ${PRINTF_BIN} "${REPOSITORY}\n" > "${REPOSITORY_CACHE_FILE}" # print repository name to cache file
