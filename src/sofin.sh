@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.58.8"
+readonly VERSION="0.58.9"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -574,6 +574,7 @@ if [ ! "$1" = "" ]; then
                 note "Exporting binary: ${SOFTWARE_DIR}${APP}${dir}${EXPORT}"
                 curr_dir="$(${PWD_BIN})"
                 cd "${SOFTWARE_DIR}${APP}${dir}"
+                ${MKDIR_BIN} -p "${SOFTWARE_DIR}${APP}/exports" # make sure exports dir already exists
                 ${LN_BIN} -vfs "..${dir}/${EXPORT}" "../exports/${EXPORT}" >> "$LOG"
                 cd "${curr_dir}"
                 exit
