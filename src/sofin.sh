@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.58.10"
+readonly VERSION="0.58.11"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -476,7 +476,7 @@ if [ ! "$1" = "" ]; then
                     ${PRINTF_BIN} "${archive_sha1}" > "${name}.sha1"
                     note "Archive sha: ${archive_sha1}"
 
-                    for mirror in $(${HOST_BIN} ${MAIN_SOFTWARE_ADDRESS} | ${AWK_BIN} '{print $4}'); do
+                    for mirror in $(${DIG_BIN} +short ${MAIN_SOFTWARE_ADDRESS} A); do
                         address="${MAIN_USER}@${mirror}:${MAIN_SOFTWARE_PREFIX}/software/binary/${SYSTEM_NAME}-${SYSTEM_ARCH}-${USER_TYPE}/"
                         note "Sending archive to remote: ${address}"
                         ${SCP_BIN} -P ${MAIN_PORT} "${name}" "${address}${name}" >> "${LOG}" 2>&1
