@@ -20,7 +20,7 @@ fi
 readonly DEBUG
 readonly TRACE
 readonly ID_SVD="-un"
-readonly HEADER="Sofin v${VERSION} - © 2o11-2o13 - Versatile Knowledge Systems - VerKnowSys.com"
+readonly HEADER="Sofin v${VERSION} (c) 2o11-2o14 verknowsys.com"
 readonly SCRIPT_NAME="/usr/bin/sofin"
 readonly SCRIPT_ARGS="$*"
 readonly PRIVATE_METADATA_DIR="/Private/"
