@@ -170,7 +170,7 @@ case "${SYSTEM_NAME}" in
     FreeBSD)
         # Default
         readonly FREEBSD_MINIMUM_VERSION="91"
-        cpus="$(${SYSCTL_BIN} -a | ${GREP_BIN} kern.smp.cpus: | ${AWK_BIN} '{printf $2}')"
+        cpus="$(${SYSCTL_BIN} kern.smp.cpus | ${AWK_BIN} '{printf $2}')"
         export CURL_BIN="/usr/bin/fetch -o -"
         export MAKE_OPTS="-j${cpus}"
         if [ ${OS_VERSION} -lt ${FREEBSD_MINIMUM_VERSION} ]; then
@@ -199,7 +199,7 @@ case "${SYSTEM_NAME}" in
         export SHA_BIN="/usr/bin/shasum"
         export SYSCTL_BIN="/usr/sbin/sysctl"
         export KLDLOAD_BIN="/sbin/kextload"
-        cpus=$(${SYSCTL_BIN} -a | ${GREP_BIN} cpu.core_count: | ${AWK_BIN} '{printf $2}')
+        cpus=$(${SYSCTL_BIN} machdep.cpu.thread_count | ${AWK_BIN} '{printf $2}')
         export MAKE_OPTS="-j${cpus}"
         unset SERVICE_BIN # not necessary
 
