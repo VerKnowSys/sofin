@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.58.12"
+readonly VERSION="0.58.13"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -197,7 +197,7 @@ unset PKG_CONFIG_PATH
 
 
 perform_clean () {
-    note "Cleaning failed build directories"
+    note "Cleaning failed build directories in: ${CACHE_DIR}cache"
     if [ -d "${CACHE_DIR}cache" ]; then
         for i in $(${FIND_BIN} "${CACHE_DIR}cache" -maxdepth 1 -mindepth 1 -type d); do
             note "Removing build directory: ${i}"

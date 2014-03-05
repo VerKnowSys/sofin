@@ -272,7 +272,7 @@ if [ "${CURRENT_USER_UID}" != "0" ]; then
 fi
 
 
-if [ "${USERNAME}" != "root" ]; then
+if [ "${USER_TYPE}" != "root" ]; then
     export SOFTWARE_DIR="${HOME}/${HOME_APPS_DIR}"
     export CACHE_DIR="${HOME}/.cache/"
     export BINBUILDS_CACHE_DIR="${CACHE_DIR}binbuilds/"
@@ -344,7 +344,7 @@ check_command_result () {
 
 
 check_root () {
-    if [ ! "${USERNAME}" = "root" ]; then
+    if [ ! "${USER_TYPE}" = "root" ]; then
         error "This command should be run as root."
         exit 1
     fi
