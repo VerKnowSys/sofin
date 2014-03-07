@@ -1,42 +1,45 @@
 <!doctype html>
-<!-- The Time Machine GitHub pages theme was designed and developed by Jon Rohan, on Feb 7, 2012. -->
-<!-- Follow him for fun. http://twitter.com/jonrohan. Tail his code on http://github.com/jonrohan -->
 <html>
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Sofin by VerKnowSys</title>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="javascripts/main.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
 
-  <link rel="stylesheet" href="stylesheets/stylesheet.css" media="screen"/>
-  <link rel="stylesheet" href="stylesheets/pygment_trac.css"/>
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-  <script type="text/javascript" src="javascripts/script.js"></script>
+  </head>
+  <body>
 
-  <title>Sofin</title>
-  <meta name="description" content="SOFtware INstaller. Designed for BSD and DARWIN.">
+      <header>
+        <h1>Sofin</h1>
+        <p>SOFtware INstaller. Designed for BSD and DARWIN.</p>
+      </header>
 
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+      <div id="banner">
+        <span id="logo"></span>
 
-</head>
-
-<body>
-
-  <div class="wrapper">
-    <header>
-      <h1 class="title">Sofin</h1>
-    </header>
-    <div id="container">
-      <p class="tagline">SOFtware INstaller. Designed for BSD and DARWIN.</p>
-      <div id="main" role="main">
-        <div class="download-bar">
-        <div class="inner">
-          <a href="https://github.com/VerKnowSys/sofin/tarball/master" class="download-button tar"><span>Download</span></a>
-          <a href="https://github.com/VerKnowSys/sofin/zipball/master" class="download-button zip"><span>Download</span></a>
-          <a href="https://github.com/VerKnowSys/sofin" class="code">View Sofin on GitHub</a>
+        <a href="https://github.com/VerKnowSys/sofin" class="button fork"><strong>View On GitHub</strong></a>
+        <div class="downloads">
+          <span>Downloads:</span>
+          <ul>
+            <li><a href="https://github.com/VerKnowSys/sofin/zipball/master" class="button">ZIP</a></li>
+            <li><a href="https://github.com/VerKnowSys/sofin/tarball/master" class="button">TAR</a></li>
+          </ul>
         </div>
-        <span class="blc"></span><span class="trc"></span>
-        </div>
-        <article class="markdown-body">
-          <h1>
+      </div><!-- end banner -->
+
+    <div class="wrapper">
+      <nav>
+        <ul></ul>
+      </nav>
+      <section>
+        <h1>
 <a name="sofin---software-installer-designed-for-bsd-and-darwin" class="anchor" href="#sofin---software-installer-designed-for-bsd-and-darwin"><span class="octicon octicon-link"></span></a>Sofin - SOFtware INstaller. Designed for BSD and Darwin.</h1>
 
 <h2>
@@ -44,12 +47,6 @@
 
 <ul>
 <li>Daniel (dmilith) Dettlaff (dmilith [at] verknowsys.com). I'm also on #verknowsys @ freenode IRC.</li>
-</ul><h2>
-<a name="definition-authors" class="anchor" href="#definition-authors"><span class="octicon octicon-link"></span></a>Definition authors:</h2>
-
-<ul>
-<li>Daniel (dmilith) Dettlaff</li>
-<li>Michał (tallica) Lipski</li>
 </ul><h2>
 <a name="contributors" class="anchor" href="#contributors"><span class="octicon octicon-link"></span></a>Contributors:</h2>
 
@@ -59,7 +56,7 @@
 <a name="thanks" class="anchor" href="#thanks"><span class="octicon octicon-link"></span></a>Thanks:</h2>
 
 <ul>
-<li>Tymon (teamon) Tobolski (ideas of improvments)</li>
+<li>Tymon (teamon) Tobolski (ideas of improvements)</li>
 </ul><h2>
 <a name="about" class="anchor" href="#about"><span class="octicon octicon-link"></span></a>About:</h2>
 
@@ -74,20 +71,19 @@ customizable software for FreeBSD servers. Darwin (Mac OS X) support started wit
 <li>User friendly, clean and clear colorful information. No magic. KISS, DRY, BDD driven development.</li>
 <li>Simple, ~1k LOC solution, written in legacy /bin/sh shell scripting language.</li>
 <li>Every "software" has own definition ("def" file) with defined flat dependency list and basic information.
-Every definition is sh script itself (More in <a href="https://github.com/VerKnowSys/sofin/blob/master/definitions/skeleton.def.sample">skeleton.def</a> and <a href="https://github.com/VerKnowSys/sofin/blob/master/definitions/defaults.def">defaults.def</a>)</li>
+Every definition is sh script itself (More in <a href="https://github.com/VerKnowSys/sofin-definitions/blob/stable/definitions/skeleton.def.sample">skeleton.def</a> and <a href="https://github.com/VerKnowSys/sofin-definitions/blob/stable/definitions/defaults.def">defaults.def</a>)</li>
 <li>Supports selective application installation or from list. (By "install" param. More in <a href="https://github.com/VerKnowSys/sofin#examples">examples</a>).</li>
 <li>Supports installation of user and system wide applications (more in <a href="https://github.com/VerKnowSys/sofin#examples">examples</a>).</li>
 <li>Has simple flat dependency managment. Sofin architecture is flexible enough to bundle almost any mix of requirements in application bundle, if only it's supported by given software. No need to install tons of useless/ not needed dependencies just because software supports it.</li>
 <li>Has simple way of creating "lists" of definitions to build. Just create a text file with your definitions in "lists/" directory, create/update definitions snapshot (using sofin-make-defs) and give that list filename to sofin as parameter (more in <a href="https://github.com/VerKnowSys/sofin#examples">examples</a>).</li>
 <li>Software patches are supported out of the box. The only thing required is to put patches into "definitions/patches/definition_file_name_without_def_extension/" directory. Sofin will do the rest.</li>
 <li>Software bundling. Every application is bundled separately with all dependencies in own root directory. The only external dependencies used by Sofin are those from base system. No other external dependencies allowed at all.</li>
-<li>Uses definitions snapshots in "tar.gz" format, generated by "sofin-make-defs" script also available in this repository. Currently You need to manually put generated "defs.tar.gz" into remote repository (defined in MAIN_SOURCE_REPOSITORY variable).</li>
 <li>Supports basic "marking" of status of installed applications/ dependencies to resume broken/ failed/ interrupted installation.</li>
 <li>You may feel safe upgrading only <em>one</em> software bundle without headache of "how it affects rest of my software". No application bundle will affect any other. Ever.</li>
 <li>Sofin is designed to not touch any part of system. The only exception is /etc/profile_sofin created after system wide software installation (/Software/) in ServeD system.</li>
 <li>By default Sofin verbosity is limited to minimum. More detailed information is written to LOG file (located in /Software/.cache/install.log by default or /Users/USER_NAME/.cache/install.log)</li>
 <li>Exports. Each app has own ROOT_DIR/exports/ with symlinks to exported software. Exported software are just simple symlinks used to generate PATH environment variable.</li>
-<li>Sofin has own configuration file: <a href="https://github.com/VerKnowSys/sofin/blob/master/sofin.conf.sh">sofin.conf.sh</a> which is SH script itself.</li>
+<li>Sofin has own configuration file: <a href="https://github.com/VerKnowSys/sofin/blob/stable/src/sofin.conf.sh">sofin.conf.sh</a> which is SH script itself.</li>
 <li>Supports parallel builds by default (from version 0.24.5)</li>
 <li>Supports custom callbacks executed in order as follows:
 
@@ -98,10 +94,10 @@ Every definition is sh script itself (More in <a href="https://github.com/VerKno
 <li>APP_AFTER_MAKE_CALLBACK (executed after software compilation process)</li>
 <li>APP_AFTER_INSTALL_CALLBACK (executed after software installation process)</li>
 <li>APP_AFTER_EXPORT_CALLBACK (executed after final stage of exporting software executables)
-Each callback can be sh function itself and to be called by name. Look into <a href="https://github.com/VerKnowSys/sofin/blob/master/definitions/sbt.def">sbt.def</a> for an example createLaunchScript().</li>
+Each callback can be sh function itself and to be called by name. Look into <a href="https://github.com/VerKnowSys/sofin-definitions/blob/stable/definitions/sbt.def">sbt.def</a> for an example createLaunchScript().</li>
 </ul>
 </li>
-<li>Supports collisions between definitions through APP_CONFLICTS_WITH option since version 0.38.0. An example in <a href="https://github.com/VerKnowSys/sofin/blob/master/definitions/ruby.def">ruby.def</a>
+<li>Supports collisions between definitions through APP_CONFLICTS_WITH option since version 0.38.0. An example in <a href="https://github.com/VerKnowSys/sofin-definitions/blob/stable/definitions/ruby.def">ruby.def</a>
 </li>
 <li>Supports binary builds of software bundles and requirements since 0.47.2</li>
 <li>Since version 0.51.0, Sofin automatically avoids using software binary builds, that won't work on given host. In that case, software will be built from source. Minimum system requirements for binary builds to work, depend on platfrom:
@@ -112,67 +108,61 @@ Each callback can be sh function itself and to be called by name. Look into <a h
 </ul>
 </li>
 <li>Supports concurrent, lockless builds. (feature available since 0.54.0).</li>
+<li>Supports custom source of software definitions/ lists (as git repository cloned into cache directory). No more tarballs with definitions (feature available since 0.58.0).</li>
+<li>Supports git repositories as definition source (feature available since 0.60.0). An example in <a href="https://github.com/VerKnowSys/sofin-definitions/blob/stable/definitions/vifm-devel.def">vifm-devel.def</a>
+</li>
 </ul><h2>
 <a name="examples" class="anchor" href="#examples"><span class="octicon octicon-link"></span></a>Examples:</h2>
 
 <ul>
-<li>
-<p>Install all available software defined in a list called "all":</p>
-
-<div class="highlight highlight-bash"><pre>sofin install all
+<li>Install all available software defined in a list called "all":</li>
+</ul><div class="highlight highlight-bash"><pre>sofin install all
 </pre></div>
-</li>
-<li>
-<p>Install one software from definition called "ruby.def" for current user:</p>
 
-<div class="highlight highlight-bash"><pre>sofin install ruby
+<ul>
+<li>Install one software from definition called "ruby.def" for current user:</li>
+</ul><div class="highlight highlight-bash"><pre>sofin install ruby
 </pre></div>
-</li>
-<li>
-<p>Install software list called "databases" for current user:</p>
 
-<div class="highlight highlight-bash"><pre>sofin install databases
+<ul>
+<li>Install software list called "databases" for current user:</li>
+</ul><div class="highlight highlight-bash"><pre>sofin install databases
 </pre></div>
-</li>
-<li>
-<p>Show list of available software:</p>
 
-<div class="highlight highlight-bash"><pre>sofin available
+<ul>
+<li>Show list of available software:</li>
+</ul><div class="highlight highlight-bash"><pre>sofin available
 </pre></div>
-</li>
-<li>
-<p>Show list of installed software:</p>
 
-<div class="highlight highlight-bash"><pre>sofin fullinstalled
+<ul>
+<li>Show list of installed software:</li>
+</ul><div class="highlight highlight-bash"><pre>sofin fullinstalled
 </pre></div>
 
 <p>or</p>
 
 <div class="highlight highlight-bash"><pre>sofin installed
 </pre></div>
-</li>
-<li>
-<p>Export "ruby" binary from "Passenger" bundle:</p>
 
-<div class="highlight highlight-bash"><pre>sofin <span class="nb">export </span>ruby Passenger
+<ul>
+<li>Export "ruby" binary from "Passenger" bundle:</li>
+</ul><div class="highlight highlight-bash"><pre>sofin <span class="nb">export </span>ruby Passenger
 </pre></div>
-</li>
-<li>
-<p>Uninstall installed software "SomeApp"?</p>
 
-<div class="highlight highlight-bash"><pre>sofin uninstall someApp
+<ul>
+<li>Uninstall installed software "SomeApp"?</li>
+</ul><div class="highlight highlight-bash"><pre>sofin uninstall someApp
 </pre></div>
-</li>
-<li>
-<p>Create a list called "databases", with definitions: "postgresql" and "mysql", and install it with Sofin:</p>
 
-<div class="highlight highlight-bash"><pre><span class="nb">cd </span>Sofin
+<ul>
+<li>Create a list called "databases", with definitions: "postgresql" and "mysql", and install it with Sofin:</li>
+</ul><div class="highlight highlight-bash"><pre><span class="nb">cd </span>Sofin
 <span class="nb">echo</span> <span class="s2">"postgresql\nmysql"</span> &gt; lists/databases
 ./push-definitions <span class="c"># to create a snapshot and upload it to Your remote respository.</span>
 sofin install databases
 </pre></div>
-</li>
-</ul><h2>
+
+<h2>
 <a name="differences-from-posix-and-fhs-standards" class="anchor" href="#differences-from-posix-and-fhs-standards"><span class="octicon octicon-link"></span></a>Differences from <a href="https://en.wikipedia.org/wiki/POSIX">POSIX</a> and <a href="https://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard">FHS</a> standards:</h2>
 
 <ul>
@@ -224,7 +214,7 @@ space than it does with "old fasioned, system wide, shared software".</li>
 <a name="conflicts-problems-known-issues" class="anchor" href="#conflicts-problems-known-issues"><span class="octicon octicon-link"></span></a>Conflicts/ Problems/ Known issues:</h2>
 
 <ul>
-<li>Latest versions of OSX 10.8 lack GNU compiler (even through Xcode command line utilities, the only available compiler is Clang). Due to this fact, it is required to have installed binaries: <code>/usr/bin/llvm-gcc</code> <code>/usr/bin/llvm-g++</code> and <code>/usr/bin/llvm-cpp-4.2</code> on your system. (Only if you want Sofin to build software that requires GNU compiler). In older versions of Xcode (=&lt;4.1) this compiler is built in and usually resides in <code>/usr/llvm-gcc-4.2</code> directory and is linked to <code>/usr/bin</code>. I uploaded this compiler taken from my 10.8 system. It's available <a href="http://software.verknowsys.com/binary/Darwin-x86_64-common/llvm-gcc-4.2-prebuilt.tar.bz2">here</a>. Put it anywhere and make symlinks to <code>/usr/bin</code> to solve this issue permanently.</li>
+<li>Latest versions of OSX 10.8/ 10.9 lack GNU compiler (even through Xcode command line utilities, the only available compiler is Clang). Due to this fact, it is required to have installed binaries: <code>/usr/bin/llvm-gcc</code> <code>/usr/bin/llvm-g++</code> and <code>/usr/bin/llvm-cpp-4.2</code> on your system. (Only if you want Sofin to build software that requires GNU compiler). In older versions of Xcode (=&lt;4.1) this compiler is built in and usually resides in <code>/usr/llvm-gcc-4.2</code> directory and is linked to <code>/usr/bin</code>. I uploaded this compiler taken from my 10.8 system. It's available <a href="http://software.verknowsys.com/binary/Darwin-x86_64-common/llvm-gcc-4.2-prebuilt.tar.bz2">here</a>. Put it anywhere and make symlinks to <code>/usr/bin</code> to solve this issue permanently.</li>
 <li>Sofin build mechanism is known to be in conflict with other software managment solutions like: BSD Ports, HomeBrew, MacPorts, Fink. Keep that in mind before reporting problems.</li>
 <li>It's recommended to change shell by doing: <code>chsh -s /Software/Zsh/exports/zsh</code> for each user which will use Sofin. It's caused shells that don't read standard default shell initialization scripts like /etc/zshenv.</li>
 </ul><h2>
@@ -239,26 +229,13 @@ space than it does with "old fasioned, system wide, shared software".</li>
 <ul>
 <li>Released under the <a href="http://opensource.org/licenses/BSD-2-Clause">BSD</a> license.</li>
 </ul>
-        </article>
-      </div>
+      </section>
+      <footer>
+        <p>Project maintained by <a href="https://github.com/VerKnowSys">VerKnowSys</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></small></p>
+      </footer>
     </div>
-    <footer>
-      <div class="owner">
-      <p><a href="https://github.com/VerKnowSys" class="avatar"><img src="https://1.gravatar.com/avatar/774171fdf63b4d80ceff8fb307ca12aa?d=https%3A%2F%2Fidenticons.github.com%2F0d76cc239133e4a62762ede05e0ca7b1.png&amp;r=x&amp;s=60" width="48" height="48"/></a> <a href="https://github.com/VerKnowSys">VerKnowSys</a> maintains <a href="https://github.com/VerKnowSys/sofin">Sofin</a></p>
-
-
-      </div>
-      <div class="creds">
-        <small>This page generated using <a href="http://pages.github.com/">GitHub Pages</a><br/>theme by <a href="https://twitter.com/jonrohan/">Jon Rohan</a></small>
-      </div>
-    </footer>
-  </div>
-  <div class="current-section">
-    <a href="#top">Scroll to top</a>
-    <a href="https://github.com/VerKnowSys/sofin/tarball/master" class="tar">tar</a><a href="https://github.com/VerKnowSys/sofin/zipball/master" class="zip">zip</a><a href="" class="code">source code</a>
-    <p class="name"></p>
-  </div>
-
-  
-</body>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    
+  </body>
 </html>
