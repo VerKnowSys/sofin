@@ -965,7 +965,7 @@ for application in ${APPLICATIONS}; do
                             fi
                         done
 
-                        if [ "${APP_USE_GIT_PATH}" = "" ]; then
+                        if [ "${APP_GIT_MODE}" = "" ]; then
                             # Standard http tarball method:
                             if [ ! -e ${BUILD_DIR_ROOT}/../$(${BASENAME_BIN} ${APP_HTTP_PATH}) ]; then
                                 note "   → Fetching requirement source from: ${APP_HTTP_PATH}"
@@ -1019,6 +1019,12 @@ for application in ${APPLICATIONS}; do
                         for dir in ${BUILD_DIR}; do
                             debug "Changing dir to: ${dir}/${APP_SOURCE_DIR_POSTFIX}"
                             cd "${dir}/${APP_SOURCE_DIR_POSTFIX}"
+
+                            if [ "${APP_GIT_CHECKOUT}" != "" ]; then
+                                note "   → Checking out: ${APP_GIT_CHECKOUT}"
+                                run "${GIT_BIN} checkout ${APP_GIT_CHECKOUT}"
+                            fi
+
                             if [ ! -z "${APP_AFTER_UNPACK_CALLBACK}" ]; then
                                 debug "Running after unpack callback"
                                 run "${APP_AFTER_UNPACK_CALLBACK}"
