@@ -109,7 +109,7 @@ if [ -t 1 ]; then
     SUCCESS_CHAR="√"
     WARN_CHAR="•"
     NOTE_CHAR="»"
-    NOTE_CHAR2="${NOTE_CHAR2}"
+    NOTE_CHAR2="→"
     ERROR_CHAR="✘"
 fi
 readonly TTY
