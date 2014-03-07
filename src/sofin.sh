@@ -1006,6 +1006,7 @@ for application in ${APPLICATIONS}; do
 
                         else
                             # git method
+                            note "   → Fetching requirement source from git repository: ${APP_HTTP_PATH}"
                             run "${GIT_BIN} clone ${APP_HTTP_PATH} ${APP_NAME}${APP_VERSION}"
                         fi
 
