@@ -22,7 +22,7 @@ customizable software for FreeBSD servers. Darwin (Mac OS X) support started wit
 * User friendly, clean and clear colorful information. No magic. KISS, DRY, BDD driven development.
 * Simple, ~1k LOC solution, written in legacy /bin/sh shell scripting language.
 * Every "software" has own definition ("def" file) with defined flat dependency list and basic information.
-  Every definition is sh script itself (More in [skeleton.def](https://github.com/VerKnowSys/sofin-definitions/blob/master/definitions/skeleton.def.sample) and [defaults.def](https://github.com/VerKnowSys/sofin-definitions/blob/master/definitions/defaults.def))
+  Every definition is sh script itself (More in [skeleton.def](https://github.com/VerKnowSys/sofin-definitions/blob/stable/definitions/skeleton.def.sample) and [defaults.def](https://github.com/VerKnowSys/sofin-definitions/blob/stable/definitions/defaults.def))
 * Supports selective application installation or from list. (By "install" param. More in [examples](https://github.com/VerKnowSys/sofin#examples)).
 * Supports installation of user and system wide applications (more in [examples](https://github.com/VerKnowSys/sofin#examples)).
 * Has simple flat dependency managment. Sofin architecture is flexible enough to bundle almost any mix of requirements in application bundle, if only it's supported by given software. No need to install tons of useless/ not needed dependencies just because software supports it.
@@ -34,7 +34,7 @@ customizable software for FreeBSD servers. Darwin (Mac OS X) support started wit
 * Sofin is designed to not touch any part of system. The only exception is /etc/profile_sofin created after system wide software installation (/Software/) in ServeD system.
 * By default Sofin verbosity is limited to minimum. More detailed information is written to LOG file (located in /Software/.cache/install.log by default or /Users/USER_NAME/.cache/install.log)
 * Exports. Each app has own ROOT_DIR/exports/ with symlinks to exported software. Exported software are just simple symlinks used to generate PATH environment variable.
-* Sofin has own configuration file: [sofin.conf.sh](https://github.com/VerKnowSys/sofin/blob/master/src/sofin.conf.sh) which is SH script itself.
+* Sofin has own configuration file: [sofin.conf.sh](https://github.com/VerKnowSys/sofin/blob/stable/src/sofin.conf.sh) which is SH script itself.
 * Supports parallel builds by default (from version 0.24.5)
 * Supports custom callbacks executed in order as follows:
   - APP_AFTER_UNPACK_CALLBACK (executed after software unpack process)
@@ -43,15 +43,15 @@ customizable software for FreeBSD servers. Darwin (Mac OS X) support started wit
   - APP_AFTER_MAKE_CALLBACK (executed after software compilation process)
   - APP_AFTER_INSTALL_CALLBACK (executed after software installation process)
   - APP_AFTER_EXPORT_CALLBACK (executed after final stage of exporting software executables)
-  Each callback can be sh function itself and to be called by name. Look into [sbt.def](https://github.com/VerKnowSys/sofin-definitions/blob/master/definitions/sbt.def) for an example createLaunchScript().
-* Supports collisions between definitions through APP_CONFLICTS_WITH option since version 0.38.0. An example in [ruby.def](https://github.com/VerKnowSys/sofin-definitions/blob/master/definitions/ruby.def)
+  Each callback can be sh function itself and to be called by name. Look into [sbt.def](https://github.com/VerKnowSys/sofin-definitions/blob/stable/definitions/sbt.def) for an example createLaunchScript().
+* Supports collisions between definitions through APP_CONFLICTS_WITH option since version 0.38.0. An example in [ruby.def](https://github.com/VerKnowSys/sofin-definitions/blob/stable/definitions/ruby.def)
 * Supports binary builds of software bundles and requirements since 0.47.2
 * Since version 0.51.0, Sofin automatically avoids using software binary builds, that won't work on given host. In that case, software will be built from source. Minimum system requirements for binary builds to work, depend on platfrom:
    - FreeBSD: OS version >= 9.1
    - Darwin: OS version >= 12.4
 * Supports concurrent, lockless builds. (feature available since 0.54.0).
 * Supports custom source of software definitions/ lists (as git repository cloned into cache directory). No more tarballs with definitions (feature available since 0.58.0).
-* Supports git repositories as definition source (feature available since 0.60.0).
+* Supports git repositories as definition source (feature available since 0.60.0). An example in [vifm-devel.def](https://github.com/VerKnowSys/sofin-definitions/blob/stable/definitions/vifm-devel.def)
 
 
 ## Examples:
