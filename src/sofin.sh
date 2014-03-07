@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.58.13"
+readonly VERSION="0.60.0"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -955,6 +955,7 @@ for application in ${APPLICATIONS}; do
                         ${MKDIR_BIN} -p "${BUILD_DIR_ROOT}"
                         CUR_DIR="$(${PWD_BIN})"
                         cd "${BUILD_DIR_ROOT}"
+
                         for bd in ${BUILD_DIR_ROOT}/*; do
                             if [ -d "${bd}" ]; then
                                 debug "Unpacked source code found in build dir. Removing: ${bd}"
@@ -963,42 +964,50 @@ for application in ${APPLICATIONS}; do
                                 fi
                             fi
                         done
-                        if [ ! -e ${BUILD_DIR_ROOT}/../$(${BASENAME_BIN} ${APP_HTTP_PATH}) ]; then
-                            note "   → Fetching requirement source from: ${APP_HTTP_PATH}"
-                            run "${FETCH_BIN} ${APP_HTTP_PATH}"
-                            ${MV_BIN} $(${BASENAME_BIN} ${APP_HTTP_PATH}) ${BUILD_DIR_ROOT}/..
-                        fi
 
-                        file="${BUILD_DIR_ROOT}/../$(${BASENAME_BIN} ${APP_HTTP_PATH})"
-                        debug "Build dir: ${BUILD_DIR_ROOT}, file: ${file}"
-                        if [ "${APP_SHA}" = "" ]; then
-                            error "→ Missing SHA sum for source: ${file}."
-                        else
-                            case "${SYSTEM_NAME}" in
-                                Darwin)
-                                    export cur="$(${SHA_BIN} ${file} | ${AWK_BIN} '{print $1}')"
-                                    ;;
-
-                                FreeBSD)
-                                    export cur="$(${SHA_BIN} -q ${file})"
-                                    ;;
-                            esac
-                            if [ "${cur}" = "${APP_SHA}" ]; then
-                                debug "→ SHA sum match in file: ${file}"
-                            else
-                                warn "→ ${cur} vs ${APP_SHA}"
-                                warn "→ SHA sum mismatch. Removing corrupted file from cache: ${file}, and retrying."
-                                # remove corrupted file
-                                ${RM_BIN} -v "${file}" >> "${LOG}"
-                                # and restart script with same arguments:
-                                eval "${SCRIPT_NAME} ${SCRIPT_ARGS}"
-                                exit
+                        if [ "${APP_USE_GIT_PATH}" = "" ]; then
+                            # Standard http tarball method:
+                            if [ ! -e ${BUILD_DIR_ROOT}/../$(${BASENAME_BIN} ${APP_HTTP_PATH}) ]; then
+                                note "   → Fetching requirement source from: ${APP_HTTP_PATH}"
+                                run "${FETCH_BIN} ${APP_HTTP_PATH}"
+                                ${MV_BIN} $(${BASENAME_BIN} ${APP_HTTP_PATH}) ${BUILD_DIR_ROOT}/..
                             fi
-                        fi
 
-                        debug "→ Unpacking source code of: ${APP_NAME}"
-                        debug "Build dir root: ${BUILD_DIR_ROOT}"
-                        run "${TAR_BIN} xf ${file}"
+                            file="${BUILD_DIR_ROOT}/../$(${BASENAME_BIN} ${APP_HTTP_PATH})"
+                            debug "Build dir: ${BUILD_DIR_ROOT}, file: ${file}"
+                            if [ "${APP_SHA}" = "" ]; then
+                                error "→ Missing SHA sum for source: ${file}."
+                            else
+                                case "${SYSTEM_NAME}" in
+                                    Darwin)
+                                        export cur="$(${SHA_BIN} ${file} | ${AWK_BIN} '{print $1}')"
+                                        ;;
+
+                                    FreeBSD)
+                                        export cur="$(${SHA_BIN} -q ${file})"
+                                        ;;
+                                esac
+                                if [ "${cur}" = "${APP_SHA}" ]; then
+                                    debug "→ SHA sum match in file: ${file}"
+                                else
+                                    warn "→ ${cur} vs ${APP_SHA}"
+                                    warn "→ SHA sum mismatch. Removing corrupted file from cache: ${file}, and retrying."
+                                    # remove corrupted file
+                                    ${RM_BIN} -v "${file}" >> "${LOG}"
+                                    # and restart script with same arguments:
+                                    eval "${SCRIPT_NAME} ${SCRIPT_ARGS}"
+                                    exit
+                                fi
+                            fi
+
+                            debug "→ Unpacking source code of: ${APP_NAME}"
+                            debug "Build dir root: ${BUILD_DIR_ROOT}"
+                            run "${TAR_BIN} xf ${file}"
+
+                        else
+                            # git method
+                            run "${GIT_BIN} clone ${APP_HTTP_PATH} ${APP_NAME}${APP_VERSION}"
+                        fi
 
                         export BUILD_DIR="$(${FIND_BIN} ${BUILD_DIR_ROOT}/* -maxdepth 0 -type d -name "*${APP_VERSION}*")"
                         debug "Build Dir Core before: '${BUILD_DIR}'"
