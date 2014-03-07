@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.60.0"
+readonly VERSION="0.60.1"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -738,7 +738,7 @@ for application in ${APPLICATIONS}; do
             INSTALLED_INDICATOR="${PREFIX}/${APP_LOWER}${APP_POSTFIX}.installed"
             if [ ! -e "${INSTALLED_INDICATOR}" ]; then
                 if [ "${USE_BINBUILD}" = "false" ]; then
-                    note "   → Binary build skipped for this OS"
+                    note "   ${NOTE_CHAR2} Binary build skipped for this OS"
                 else
                     if [ "${USERNAME}" != "${BUILD_USER_NAME}" ]; then # don't use bin builds for build-user
                         if [ ! -e "./${ARCHIVE_NAME}" ]; then
@@ -781,14 +781,14 @@ for application in ${APPLICATIONS}; do
                                 if [ "${USERNAME}" != "root" ]; then
                                     rpath_patch "${HOME}/${HOME_APPS_DIR}${APP_NAME}" "${APP_NAME}"
                                 fi
-                                note "  → Binary bundle installed: ${APP_NAME}${APP_POSTFIX} with version: ${APP_VERSION}"
+                                note "  ${NOTE_CHAR2} Binary bundle installed: ${APP_NAME}${APP_POSTFIX} with version: ${APP_VERSION}"
                                 export DONT_BUILD_BUT_DO_EXPORTS="true"
                             else
-                                debug "  → No binary bundle available for ${APP_NAME}${APP_POSTFIX}"
+                                debug "  ${NOTE_CHAR2} No binary bundle available for ${APP_NAME}${APP_POSTFIX}"
                                 ${RM_BIN} -fr "${BINBUILDS_CACHE_DIR}${ABSNAME}"
                             fi
                         else
-                            debug "  → Binary build checksum doesn't match for: ${ABSNAME}"
+                            debug "  ${NOTE_CHAR2} Binary build checksum doesn't match for: ${ABSNAME}"
                         fi
                     else # build-user
                         note "Binary builds disabled for ${BUILD_USER_NAME}!"
@@ -803,9 +803,9 @@ for application in ${APPLICATIONS}; do
                 if [ ! "${1}" = "" ]; then
                     if [ ! "${2}" = "" ]; then
                         if [ ! "${1}" = "${2}" ]; then
-                            warn "   → Found different remote version: ${2} vs ${1}."
+                            warn "   ${NOTE_CHAR2} Found different remote version: ${2} vs ${1}."
                         else
-                            note "   → Definition version is up to date: ${1}"
+                            note "   ${NOTE_CHAR2} Definition version is up to date: ${1}"
                         fi
                     fi
                 fi
@@ -834,7 +834,7 @@ for application in ${APPLICATIONS}; do
                 check_disabled "${DISABLE_ON}" # check requirement for disabled state:
 
                 if [ ! -z "${FORCE_GNU_COMPILER}" ]; then # force GNU compiler usage on definition side:
-                    warn "   → GNU compiler set for: ${APP_NAME}"
+                    warn "   ${NOTE_CHAR2} GNU compiler set for: ${APP_NAME}"
                     set_c_compiler GNU
                 else
                     set_c_compiler CLANG # look for bundled compiler:
@@ -847,7 +847,7 @@ for application in ${APPLICATIONS}; do
                 fi
 
                 if [ "${USE_BINBUILD}" = "false" ]; then
-                    note "   → Binary build skipped for this OS"
+                    note "   ${NOTE_CHAR2} Binary build skipped for this OS"
                 else
                     if [ "${USERNAME}" != "${BUILD_USER_NAME}" ]; then # don't use bin builds for build-user
                         MIDDLE="${SYSTEM_NAME}-${SYSTEM_ARCH}-${BIN_POSTFIX}"
@@ -863,7 +863,7 @@ for application in ${APPLICATIONS}; do
                         debug "Binary build should be available here: ${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}"
                         cd "${TMP_REQ_DIR}"
                         if [ ! -f "./${BINBUILD_FILE}" ]; then
-                            note "   → Trying binary build: ${BINBUILD_FILE}"
+                            note "   ${NOTE_CHAR2} Trying binary build: ${BINBUILD_FILE}"
                             ${FETCH_BIN} "${BINBUILD_ADDRESS}" >> ${LOG} 2>&1
                             ${FETCH_BIN} "${BINBUILD_ADDRESS}.sha1" >> ${LOG} 2>&1
 
@@ -898,7 +898,7 @@ for application in ${APPLICATIONS}; do
 
                             cd "${CACHE_DIR}" # back to existing cache dir
                             if [ "${EXITCODE}" = "0" ]; then # if archive is valid
-                                note "   → Binary requirement: ${REQ_APPNAME}${APP_POSTFIX} installed with version: ${APP_VERSION}"
+                                note "   ${NOTE_CHAR2} Binary requirement: ${REQ_APPNAME}${APP_POSTFIX} installed with version: ${APP_VERSION}"
                                 if [ ! -d ${PREFIX} ]; then
                                     ${MKDIR_BIN} -p ${PREFIX}
                                 fi
@@ -917,7 +917,7 @@ for application in ${APPLICATIONS}; do
                                 ${TOUCH_BIN} "${PREFIX}/$1${INSTALLED_MARK}"
                                 continue
                             else
-                                note "   → No binary build available for requirement: ${REQ_APPNAME}${APP_POSTFIX}"
+                                note "   ${NOTE_CHAR2} No binary build available for requirement: ${REQ_APPNAME}${APP_POSTFIX}"
                             fi
                         fi
                     else # binary-build
@@ -968,7 +968,7 @@ for application in ${APPLICATIONS}; do
                         if [ "${APP_GIT_MODE}" = "" ]; then
                             # Standard http tarball method:
                             if [ ! -e ${BUILD_DIR_ROOT}/../$(${BASENAME_BIN} ${APP_HTTP_PATH}) ]; then
-                                note "   → Fetching requirement source from: ${APP_HTTP_PATH}"
+                                note "   ${NOTE_CHAR2} Fetching requirement source from: ${APP_HTTP_PATH}"
                                 run "${FETCH_BIN} ${APP_HTTP_PATH}"
                                 ${MV_BIN} $(${BASENAME_BIN} ${APP_HTTP_PATH}) ${BUILD_DIR_ROOT}/..
                             fi
@@ -976,7 +976,7 @@ for application in ${APPLICATIONS}; do
                             file="${BUILD_DIR_ROOT}/../$(${BASENAME_BIN} ${APP_HTTP_PATH})"
                             debug "Build dir: ${BUILD_DIR_ROOT}, file: ${file}"
                             if [ "${APP_SHA}" = "" ]; then
-                                error "→ Missing SHA sum for source: ${file}."
+                                error "${NOTE_CHAR2} Missing SHA sum for source: ${file}."
                             else
                                 case "${SYSTEM_NAME}" in
                                     Darwin)
@@ -988,10 +988,10 @@ for application in ${APPLICATIONS}; do
                                         ;;
                                 esac
                                 if [ "${cur}" = "${APP_SHA}" ]; then
-                                    debug "→ SHA sum match in file: ${file}"
+                                    debug "${NOTE_CHAR2} SHA sum match in file: ${file}"
                                 else
-                                    warn "→ ${cur} vs ${APP_SHA}"
-                                    warn "→ SHA sum mismatch. Removing corrupted file from cache: ${file}, and retrying."
+                                    warn "${NOTE_CHAR2} ${cur} vs ${APP_SHA}"
+                                    warn "${NOTE_CHAR2} SHA sum mismatch. Removing corrupted file from cache: ${file}, and retrying."
                                     # remove corrupted file
                                     ${RM_BIN} -v "${file}" >> "${LOG}"
                                     # and restart script with same arguments:
@@ -1000,13 +1000,13 @@ for application in ${APPLICATIONS}; do
                                 fi
                             fi
 
-                            debug "→ Unpacking source code of: ${APP_NAME}"
+                            debug "${NOTE_CHAR2} Unpacking source code of: ${APP_NAME}"
                             debug "Build dir root: ${BUILD_DIR_ROOT}"
                             run "${TAR_BIN} xf ${file}"
 
                         else
                             # git method
-                            note "   → Fetching requirement source from git repository: ${APP_HTTP_PATH}"
+                            note "   ${NOTE_CHAR2} Fetching requirement source from git repository: ${APP_HTTP_PATH}"
                             run "${GIT_BIN} clone ${APP_HTTP_PATH} ${APP_NAME}${APP_VERSION}"
                         fi
 
@@ -1021,7 +1021,7 @@ for application in ${APPLICATIONS}; do
                             cd "${dir}/${APP_SOURCE_DIR_POSTFIX}"
 
                             if [ "${APP_GIT_CHECKOUT}" != "" ]; then
-                                note "   → Checking out: ${APP_GIT_CHECKOUT}"
+                                note "   ${NOTE_CHAR2} Checking out: ${APP_GIT_CHECKOUT}"
                                 run "${GIT_BIN} checkout ${APP_GIT_CHECKOUT}"
                             fi
 
@@ -1032,7 +1032,7 @@ for application in ${APPLICATIONS}; do
 
                             LIST_DIR="${DEFINITIONS_DIR}patches/$1" # $1 is definition file name
                             if [ -d "${LIST_DIR}" ]; then
-                                note "   → Applying patches for: ${APP_NAME}${APP_POSTFIX}"
+                                note "   ${NOTE_CHAR2} Applying patches for: ${APP_NAME}${APP_POSTFIX}"
                                 patches_files="$(${FIND_BIN} ${LIST_DIR}/* -maxdepth 0 -type f)"
                                 for patch in ${patches_files}; do
                                     debug "Patching source code with patch: ${patch}"
@@ -1066,21 +1066,21 @@ for application in ${APPLICATIONS}; do
                             debug "LDFLAGS: ${LDFLAGS}"
                             debug "LD_LIBRARY_PATH: ${LD_LIBRARY_PATH}"
 
-                            note "   → Configuring: $1, version: ${APP_VERSION}"
+                            note "   ${NOTE_CHAR2} Configuring: $1, version: ${APP_VERSION}"
                             case "${APP_CONFIGURE_SCRIPT}" in
 
                                 ignore)
-                                    note "   → Ignored configuration of definition: $1"
+                                    note "   ${NOTE_CHAR2} Ignored configuration of definition: $1"
                                     ;;
 
                                 no-conf)
-                                    note "   → No configuration for definition: $1"
+                                    note "   ${NOTE_CHAR2} No configuration for definition: $1"
                                     export APP_MAKE_METHOD="${APP_MAKE_METHOD} PREFIX=${PREFIX}"
                                     export APP_INSTALL_METHOD="${APP_INSTALL_METHOD} PREFIX=${PREFIX}"
                                     ;;
 
                                 binary)
-                                    note "   → Prebuilt definition of: $1"
+                                    note "   ${NOTE_CHAR2} Prebuilt definition of: $1"
                                     export APP_MAKE_METHOD="true"
                                     export APP_INSTALL_METHOD="true"
                                     ;;
@@ -1105,7 +1105,7 @@ for application in ${APPLICATIONS}; do
                             fi
 
                             if [ "${APP_MAKE_METHOD}" != "true" ]; then
-                                note "   → Building requirement: $1"
+                                note "   ${NOTE_CHAR2} Building requirement: $1"
                                 run "${APP_MAKE_METHOD}"
                                 if [ ! -z "${APP_AFTER_MAKE_CALLBACK}" ]; then
                                     debug "Running after make callback"
@@ -1113,7 +1113,7 @@ for application in ${APPLICATIONS}; do
                                 fi
                             fi
 
-                            note "   → Installing requirement: $1"
+                            note "   ${NOTE_CHAR2} Installing requirement: $1"
                             run "${APP_INSTALL_METHOD}"
                             if [ ! "${APP_AFTER_INSTALL_CALLBACK}" = "" ]; then
                                 debug "After install callback: ${APP_AFTER_INSTALL_CALLBACK}"
@@ -1134,7 +1134,7 @@ for application in ${APPLICATIONS}; do
                         cd "${CUR_DIR}"
                     fi
                 else
-                    warn "   → Requirement: ${APP_NAME} disabled on architecture: ${SYSTEM_NAME}."
+                    warn "   ${NOTE_CHAR2} Requirement: ${APP_NAME} disabled on architecture: ${SYSTEM_NAME}."
                     if [ ! -d "${PREFIX}" ]; then # case when disabled requirement is first on list of dependencies
                         ${MKDIR_BIN} -p "${PREFIX}"
                     fi
@@ -1180,7 +1180,7 @@ for application in ${APPLICATIONS}; do
 
             strip_lib_bin () {
                 if [ -z "${DEVEL}" ]; then
-                    debug "→ Stripping libraries and binaries."
+                    debug "${NOTE_CHAR2} Stripping libraries and binaries."
                     for elem in "/bin" "/sbin" "/libexec" "/lib"; do
                         if [ -d "${PREFIX}${elem}" ]; then
                             for e in $(${FIND_BIN} ${PREFIX}${elem} -maxdepth 1 -type f); do
@@ -1205,7 +1205,7 @@ for application in ${APPLICATIONS}; do
                 if [ -e "${PREFIX}/${application}${INSTALLED_MARK}" ]; then
                     if [ "${CHANGED}" = "true" ]; then
                         note "  ${application} (1 of ${req_all})"
-                        note "   → App dependencies changed. Rebuilding ${application}"
+                        note "   ${NOTE_CHAR2} App dependencies changed. Rebuilding ${application}"
                         execute_process "${application}"
                         unset CHANGED
                         mark
