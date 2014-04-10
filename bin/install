@@ -1,8 +1,8 @@
 #!/bin/sh
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
-test -f src/sofin.conf.sh && source src/sofin.conf.sh
-test -f /etc/profile_sofin && source /etc/profile_sofin
+test -f src/sofin.conf.sh && . src/sofin.conf.sh
+test -f /etc/profile_sofin && . /etc/profile_sofin
 
 INSTALL="YES" bin/build
 REPOSITORY= sofin setup
