@@ -101,11 +101,11 @@ update_definitions () {
         if [ "${current_branch}" != "${BRANCH}" ]; then # use current_branch value if branch isn't matching default branch
             # ${GIT_BIN} stash save -a >> ${LOG} 2>&1
             ${GIT_BIN} checkout -b "${current_branch}" >> ${LOG} 2>&1 || ${GIT_BIN} checkout "${current_branch}" >> ${LOG} 2>&1
-            ${GIT_BIN} pull origin "${current_branch}" >> ${LOG} 2>&1 && note "Updated branch ${current_branch} of repository ${REPOSITORY}" || error "Error occureded: Update from branch: ${BRANCH} of repository ${REPOSITORY} isn't possible. Make sure that given repository and branch are valid."
+            ${GIT_BIN} pull origin "${current_branch}" >> ${LOG} 2>&1 && note "Updated branch ${current_branch} of repository ${REPOSITORY}" || error "Error occured: Update from branch: ${BRANCH} of repository ${REPOSITORY} isn't possible. Make sure that given repository and branch are valid."
 
         else # else use default branch
             ${GIT_BIN} checkout -b "${BRANCH}" >> ${LOG} 2>&1 || ${GIT_BIN} checkout "${BRANCH}" >> ${LOG} 2>&1
-            (${GIT_BIN} pull origin "${BRANCH}" >> ${LOG} 2>&1 && note "Updated branch ${BRANCH} of repository ${REPOSITORY}") || error "Error occureded: Update from branch: ${BRANCH} of repository ${REPOSITORY} isn't possible. Make sure that given REPOSITORY and BRANCH values are valid."
+            (${GIT_BIN} pull origin "${BRANCH}" >> ${LOG} 2>&1 && note "Updated branch ${BRANCH} of repository ${REPOSITORY}") || error "Error occured: Update from branch: ${BRANCH} of repository ${REPOSITORY} isn't possible. Make sure that given REPOSITORY and BRANCH values are valid."
 
         fi
 
@@ -114,7 +114,7 @@ update_definitions () {
         cd "${CACHE_DIR}"
         note "Cloning repository ${REPOSITORY} from branch: ${BRANCH}"
         ${RM_BIN} -rf definitions >> ${LOG} 2>&1 # if something is already here, wipe it out from cache
-        ${GIT_BIN} clone "${REPOSITORY}" definitions >> ${LOG} 2>&1 || error "Error occureded: Cloning repository ${REPOSITORY} isn't possible. Make sure it's valid."
+        ${GIT_BIN} clone "${REPOSITORY}" definitions >> ${LOG} 2>&1 || error "Error occured: Cloning repository ${REPOSITORY} isn't possible. Make sure it's valid."
         cd "${CACHE_DIR}definitions"
         ${GIT_BIN} checkout -b "${BRANCH}" >> ${LOG} 2>&1
         (${GIT_BIN} pull origin "${BRANCH}" && note "Updated branch ${BRANCH} of repository ${REPOSITORY}") || error "Error occured: Update from branch: ${BRANCH} of repository ${REPOSITORY} isn't possible. Make sure that given repository and branch are valid." # XXX: temporary >> ${LOG} 2>&1
