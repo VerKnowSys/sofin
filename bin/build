@@ -6,7 +6,7 @@
 CONF_FILE="sofin.conf.sh"
 if [ -e "src/${CONF_FILE}" ]; then
     . "src/${CONF_FILE}"
-    note "Validating environment"
+    echo "Validating environment"
     validate_env
 else
     echo "FATAL: No configuration file found: ${CONF_FILE}"
@@ -49,12 +49,12 @@ update_env_files () {
             if [ $? -eq 0 ]; then
                 continue
             else
-                note "Updating environment file: ${i}"
+                echo "Updating environment file: ${i}"
                 echo "${shell_configuration}" >> "${i}"
                 check_command_result $?
             fi
         else
-            note "Creating environment file: ${i}"
+            echo "Creating environment file: ${i}"
             echo "${shell_configuration}" >> "${i}"
             check_command_result $?
         fi
@@ -64,7 +64,7 @@ update_env_files () {
 
 # create_user_symlinks () {
 #     if [ ! -d "${HOME_DIR}" ]; then
-#         note "Creating ${HOME_DIR} directory."
+#         echo "Creating ${HOME_DIR} directory."
 #         ${MKDIR_BIN} "${HOME_DIR}"
 #         check_command_result $?
 #     fi
@@ -78,7 +78,7 @@ update_env_files () {
 #             continue
 #         fi
 #         if [ ! -L "${HOME_DIR}${uid}" ]; then
-#             note "Creating symlink ${HOME_DIR}${uid} -> /home/${i}."
+#             echo "Creating symlink ${HOME_DIR}${uid} -> /home/${i}."
 #             ${LN_BIN} -s "/home/${i}" "${HOME_DIR}${uid}"
 #             check_command_result $?
 #         fi
@@ -89,12 +89,10 @@ update_env_files () {
 
 
 install_base () {
-    note "Building utilities."
     build_natives
 
     if [ "${INSTALL}" = "YES" ]; then
         check_root
-        note "Removing old installation."
         ${RM_BIN} -rf "/usr/bin/sofin"
         if [ "$(uname)" != "Darwin" ]; then
             ${RM_BIN} -rf "/usr/bin/sofin-rpp"
@@ -102,8 +100,6 @@ install_base () {
         ${RM_BIN} -rf "/usr/bin/sofin-version-utility"
         ${RM_BIN} -rf "/usr/bin/sofin-miliseconds"
         ${RM_BIN} -rf "/etc/${CONF_FILE}"
-
-        note "Installing Sofin"
         install_sofin
     fi
     ${MKDIR_BIN} -p /Software/.cache
@@ -112,19 +108,19 @@ install_base () {
 
 build_natives () {
     if [ -x "${CXX}" ]; then
-        note "C++ compiler available. Using: ${CXX}"
+        echo "C++ compiler available. Using: ${CXX}"
 
         if [ "$(uname)" != "Darwin" ]; then
-            note "Building patcher"
+            echo "Building patcher"
             ${CXX} -Os -fPIC src/sofin-rpath-patcher.cc -o bin/sofin-rpp
             check_command_result $?
         fi
 
-        note "Building sofin_miliseconds"
+        echo "Building sofin_miliseconds"
         ${CXX} -Os -fPIC src/sofin_miliseconds.cc -o bin/sofin-miliseconds
         check_command_result $?
 
-        note "Building version utility"
+        echo "Building version utility"
         ${CXX} -Os -fPIC src/sofin-version-utility.cc -o bin/sofin-version-utility
         check_command_result $?
     else
@@ -149,7 +145,7 @@ install_sofin () {
     check_command_result $?
 
     sofin_version=$(${CAT_BIN} src/sofin.sh | ${GREP_BIN} VERSION= | ${AWK_BIN} '{print $2}')
-    note "Sofin installed on: ${SYSTEM_NAME} $(bin/sofin-version-utility) with ${sofin_version}"
+    echo "Sofin installed on: ${SYSTEM_NAME} $(bin/sofin-version-utility) with ${sofin_version}"
 }
 
 
