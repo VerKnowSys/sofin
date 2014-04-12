@@ -309,6 +309,7 @@ readonly CCACHE_BIN_OPTIONAL="${SOFTWARE_ROOT_DIR}Ccache/exports/ccache"
 # last repository cache setup:
 export REPOSITORY_CACHE_FILE="${CACHE_DIR}.last_repository.pos"
 if [ "${REPOSITORY}" = "" ]; then # :this value is given by user as shell param
+    ${MKDIR_BIN} -p "${CACHE_DIR}"
     if [ -f "${REPOSITORY_CACHE_FILE}" ]; then
         export REPOSITORY="$(${CAT_BIN} ${REPOSITORY_CACHE_FILE})"
     else
