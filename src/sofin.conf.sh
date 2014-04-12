@@ -61,7 +61,7 @@ SED_BIN="/usr/bin/sed"
 CHOWN_BIN="/usr/sbin/chown"
 GREP_BIN="/usr/bin/grep"
 EGREP_BIN="/usr/bin/egrep"
-FETCH_BIN="/usr/bin/fetch"
+FETCH_BIN="/usr/bin/fetch -T 3"
 UNAME_BIN="/usr/bin/uname"
 FIND_BIN="/usr/bin/find"
 STRIP_BIN="/usr/bin/strip"
@@ -173,7 +173,7 @@ case "${SYSTEM_NAME}" in
         # Default
         readonly FREEBSD_MINIMUM_VERSION="91"
         cpus="$(${SYSCTL_BIN} kern.smp.cpus | ${AWK_BIN} '{printf $2}')"
-        export CURL_BIN="/usr/bin/fetch -o -"
+        export CURL_BIN="/usr/bin/fetch -T 3 -o -"
         export MAKE_OPTS="-j${cpus}"
         if [ ${OS_VERSION} -lt ${FREEBSD_MINIMUM_VERSION} ]; then
             export USE_BINBUILD="false"
@@ -194,7 +194,7 @@ case "${SYSTEM_NAME}" in
         readonly DARWIN_MINIMUM_VERSION="124"
         export GIT_BIN="/usr/bin/git"
         export CURL_BIN="/usr/bin/curl"
-        export FETCH_BIN="/usr/bin/curl -O"
+        export FETCH_BIN="/usr/bin/curl --connect-timeout 3 -O"
         export PATCH_BIN="/usr/bin/patch -p0 "
         export DEFAULT_LDFLAGS="-fPIC" # -arch x86_64 fPIE isn't well supported on OSX, but it's not production anyway
         export DEFAULT_COMPILER_FLAGS="-Os -fPIC -fno-strict-overflow -fstack-protector-all" # -arch x86_64
