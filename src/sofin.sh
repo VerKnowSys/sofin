@@ -334,11 +334,11 @@ if [ ! "$1" = "" ]; then
             for app in ${1}*; do # LIB_DIR
                 if [ -e "${app}/lib" ]; then
                     ldresult="${app}/lib:${ldresult}"
-                    ldflags="-R${app}/lib -L${app}/lib ${ldflags}"
+                    ldflags="-L${app}/lib ${ldflags}" # NOTE: not required anymore? -R${app}/lib
                 fi
                 if [ -e "${app}/libexec" ]; then
                     ldresult="${app}/libexec:${ldresult}"
-                    ldflags="-R${app}/libexec -L${app}/libexec ${ldflags}"
+                    ldflags="-L${app}/libexec ${ldflags}" # NOTE: not required anymore? -R${app}/libexec
                 fi
                 if [ -e "${app}/lib/pkgconfig" ]; then
                     pkg_config_path="${app}/lib/pkgconfig:${pkg_config_path}"
