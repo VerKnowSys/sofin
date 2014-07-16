@@ -33,6 +33,7 @@ readonly DEPENDENCIES_FILE=".dependencies"
 readonly INSTALLED_MARK=".installed"
 readonly LOG_LINES_AMOUNT="1000"
 readonly DEFAULT_ARCHIVE_EXT=".tar.gz"
+readonly SOFIN_DISABLED_INDICATOR_FILE="${HOME}/.sofin-disabled"
 
 # utils software from POSIX base system variables:
 PRINTF_BIN="/usr/bin/printf"

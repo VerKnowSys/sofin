@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.60.3"
+readonly VERSION="0.62.0"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -149,6 +149,8 @@ usage_howto () {
     note "push | binpush                       - creates binary build from prebuilt software bundles name given as params (example: $(${BASENAME_BIN} ${SCRIPT_NAME}) push Ruby Vifm Curl)"
     note "port                                 - gather port of TheSS running service by service name"
     note "setup                                - switch definitions repository/ branch from env value 'REPOSITORY' and 'BRANCH' (example: BRANCH=master REPOSITORY=/my/local/definitions/repo/ sofin setup)"
+    note "enable                               - enable Sofin developer environment (full environment stored in ~/.profile). It's the default"
+    note "disable                              - disable Sofin developer environment (only PATH, PKG_CONFIG_PATH and MANPATH written to ~/.profile)"
     exit
 }
 
@@ -268,6 +270,24 @@ if [ ! "$1" = "" ]; then
         ;;
 
 
+    enable)
+        ${RM_BIN} -f ${SOFIN_DISABLED_INDICATOR_FILE}
+        update_shell_vars
+        note "Enabled Sofin environment. Reloading shell"
+        ${KILL_BIN} -SIGUSR2 ${SHELL_PID}
+        exit
+        ;;
+
+
+    disable)
+        ${TOUCH_BIN} ${SOFIN_DISABLED_INDICATOR_FILE}
+        update_shell_vars
+        note "Disabled Sofin environment. Reloading shell"
+        ${KILL_BIN} -SIGUSR2 ${SHELL_PID}
+        exit
+        ;;
+
+
     clean)
         perform_clean
         exit
@@ -323,8 +343,6 @@ if [ ! "$1" = "" ]; then
         if [ "${USERNAME}" != "root" ]; then
             process ${SOFTWARE_DIR}
         fi
-        ${PRINTF_BIN} "# PATH:\n"
-        ${PRINTF_BIN} "export PATH=${result}\n\n"
 
         # LD_LIBRARY_PATH, LDFLAGS, PKG_CONFIG_PATH:
         # ldresult="/lib:/usr/lib"
@@ -351,17 +369,6 @@ if [ ! "$1" = "" ]; then
         fi
         # ${PRINTF_BIN} "# LD_LIBRARY_PATH:\n"
         # ${PRINTF_BIN} "export LD_LIBRARY_PATH='${ldresult}'\n\n"
-        ${PRINTF_BIN} "# LDFLAGS:\n"
-        if [ "${SYSTEM_NAME}" = "Darwin" ]; then
-            ${PRINTF_BIN} "export LDFLAGS='${ldflags}'\n\n"
-            ${PRINTF_BIN} "# PKG_CONFIG_PATH:\n"
-            ${PRINTF_BIN} "export PKG_CONFIG_PATH='${pkg_config_path}:/opt/X11/lib/pkgconfig'\n\n"
-            # ${PRINTF_BIN} "export DYLD_LIBRARY_PATH='${ldresult}:/opt/X11/lib'\n\n"
-        else
-            ${PRINTF_BIN} "export LDFLAGS='${ldflags} -Wl,--enable-new-dtags'\n\n"
-            ${PRINTF_BIN} "# PKG_CONFIG_PATH:\n"
-            ${PRINTF_BIN} "export PKG_CONFIG_PATH='${pkg_config_path}'\n\n"
-        fi
 
         # CFLAGS, CXXFLAGS:
         cflags="${CFLAGS} -fPIC ${DEFAULT_COMPILER_FLAGS}"
@@ -378,10 +385,6 @@ if [ ! "$1" = "" ]; then
             process ${SOFTWARE_DIR}
         fi
         cxxflags="${cflags}"
-        ${PRINTF_BIN} "# CFLAGS:\n"
-        ${PRINTF_BIN} "export CFLAGS='${cflags}'\n\n"
-        ${PRINTF_BIN} "# CXXFLAGS:\n"
-        ${PRINTF_BIN} "export CXXFLAGS='${cxxflags}'\n\n"
 
         # MANPATH
         manpath="${DEFAULT_MANPATH}"
@@ -401,16 +404,41 @@ if [ ! "$1" = "" ]; then
         if [ "${USERNAME}" != "root" ]; then
             process ${SOFTWARE_DIR}
         fi
-        ${PRINTF_BIN} "# MANPATH:\n"
-        ${PRINTF_BIN} "export MANPATH='${manpath}'\n\n"
 
         set_c_compiler CLANG
-        ${PRINTF_BIN} "# CC:\n"
-        ${PRINTF_BIN} "export CC='${CC}'\n\n"
-        ${PRINTF_BIN} "# CXX:\n"
-        ${PRINTF_BIN} "export CXX='${CXX}'\n\n"
-        ${PRINTF_BIN} "# CPP:\n"
-        ${PRINTF_BIN} "export CPP='${CPP}'\n\n"
+        ${PRINTF_BIN} "# CC:\nexport CC='${CC}'\n\n"
+        ${PRINTF_BIN} "# CXX:\nexport CXX='${CXX}'\n\n"
+        ${PRINTF_BIN} "# CPP:\nexport CPP='${CPP}'\n\n"
+
+        if [ -f "${SOFIN_DISABLED_INDICATOR_FILE}" ]; then # sofin disabled. Default system environment
+            ${PRINTF_BIN} "# PATH:\nexport PATH=${result}\n\n"
+            ${PRINTF_BIN} "# CFLAGS:\nexport CFLAGS=''\n\n"
+            ${PRINTF_BIN} "# CXXFLAGS:\nexport CXXFLAGS=''\n\n"
+            if [ "${SYSTEM_NAME}" = "Darwin" ]; then
+                ${PRINTF_BIN} "# LDFLAGS:\nexport LDFLAGS=''\n\n"
+                ${PRINTF_BIN} "# PKG_CONFIG_PATH:\nexport PKG_CONFIG_PATH='${pkg_config_path}:/opt/X11/lib/pkgconfig'\n\n" # pkg config should be ok
+            else
+                ${PRINTF_BIN} "# LDFLAGS:\nexport LDFLAGS=''\n\n"
+                ${PRINTF_BIN} "# PKG_CONFIG_PATH:\nexport PKG_CONFIG_PATH='${pkg_config_path}'\n\n"
+            fi
+            ${PRINTF_BIN} "# MANPATH:\nexport MANPATH='${manpath}'\n\n"
+
+        else # sofin enabled, Default behavior:
+
+            ${PRINTF_BIN} "# PATH:\nexport PATH=${result}\n\n"
+            ${PRINTF_BIN} "# CFLAGS:\nexport CFLAGS='${cflags}'\n\n"
+            ${PRINTF_BIN} "# CXXFLAGS:\nexport CXXFLAGS='${cxxflags}'\n\n"
+            if [ "${SYSTEM_NAME}" = "Darwin" ]; then
+                ${PRINTF_BIN} "# LDFLAGS:\nexport LDFLAGS='${ldflags}'\n\n"
+                ${PRINTF_BIN} "# PKG_CONFIG_PATH:\nexport PKG_CONFIG_PATH='${pkg_config_path}:/opt/X11/lib/pkgconfig'\n\n"
+            else
+                ${PRINTF_BIN} "# LDFLAGS:\nexport LDFLAGS='${ldflags} -Wl,--enable-new-dtags'\n\n"
+                ${PRINTF_BIN} "# PKG_CONFIG_PATH:\nexport PKG_CONFIG_PATH='${pkg_config_path}'\n\n"
+            fi
+            ${PRINTF_BIN} "# MANPATH:\nexport MANPATH='${manpath}'\n\n"
+
+        fi
+
         exit
         ;;
 
