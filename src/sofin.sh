@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.62.0"
+readonly VERSION="0.62.1"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -1301,6 +1301,13 @@ for application in ${APPLICATIONS}; do
         if [ ! -z "${APP_AFTER_EXPORT_CALLBACK}" ]; then
             debug "Executing APP_AFTER_EXPORT_CALLBACK"
             run "${APP_AFTER_EXPORT_CALLBACK}"
+        fi
+
+        if [ "${APP_APPLE_BUNDLE}" = "true" ]; then
+            note "Creating Apple bundle: ${APP_NAME} in ${PREFIX}.app"
+            ${CP_BIN} -R ${PREFIX}/* ${PREFIX}.app/
+            cd ${PREFIX}.app/Contents
+            test -L MacOS || ${LN_BIN} -s ../exports MacOS
         fi
 
     fi
