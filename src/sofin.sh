@@ -1304,10 +1304,13 @@ for application in ${APPLICATIONS}; do
         fi
 
         if [ "${APP_APPLE_BUNDLE}" = "true" ]; then
+            APP_NAME="$(${PRINTF_BIN} "${APP_NAME}" | ${CUT_BIN} -c1 | ${TR_BIN} '[a-z]' '[A-Z]')$(${PRINTF_BIN} "${APP_NAME}" | ${SED_BIN} 's/^[a-zA-Z]//')"
             note "Creating Apple bundle: ${APP_NAME} in ${PREFIX}.app"
-            ${CP_BIN} -R ${PREFIX}/* ${PREFIX}.app/
+            ${CP_BIN} -R ${PREFIX}/${APP_NAME}.app ${PREFIX}/../ >> ${LOG} 2>&1
+            ${CP_BIN} -R ${PREFIX}/* ${PREFIX}.app/ >> ${LOG} 2>&1
+            ${RM_BIN} -rf "${APP_NAME}.app/${APP_NAME}.app"
             cd ${PREFIX}.app/Contents
-            test -L MacOS || ${LN_BIN} -s ../exports MacOS
+            test -L MacOS || ${LN_BIN} -s ../exports MacOS >> ${LOG} 2>&1
         fi
 
     fi
