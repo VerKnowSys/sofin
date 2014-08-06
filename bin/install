@@ -25,4 +25,4 @@ if [ -d "/Users/dmilith" ]; then
     cat src/functions.sh > /Users/dmilith/.functions.sh
 fi
 
-sofin distclean
+bin/clean
