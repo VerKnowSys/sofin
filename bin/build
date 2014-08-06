@@ -23,6 +23,7 @@ if [ ! -x "${CXX}" ]; then
     exit 1
 fi
 
+readonly CLANG_OPTIONS="-Os -fPIC -fPIE"
 
 shell_configuration=$(${CAT_BIN} <<EOF
 if [ "\$(${ID_BIN} -u)" = "0" ]; then
@@ -112,17 +113,27 @@ build_natives () {
 
         if [ "$(uname)" != "Darwin" ]; then
             echo "Building patcher"
-            ${CXX} -Os -fPIC src/sofin-rpath-patcher.cc -o bin/sofin-rpp
+            ${CXX} ${CLANG_OPTIONS} -o bin/sofin-rpp src/sofin-rpath-patcher.cc
             check_command_result $?
         fi
 
         echo "Building sofin_miliseconds"
-        ${CXX} -Os -fPIC src/sofin_miliseconds.cc -o bin/sofin-miliseconds
+        ${CXX} ${CLANG_OPTIONS} -o bin/sofin-miliseconds src/sofin_miliseconds.cc
         check_command_result $?
 
         echo "Building version utility"
-        ${CXX} -Os -fPIC src/sofin-version-utility.cc -o bin/sofin-version-utility
+        ${CXX} ${CLANG_OPTIONS} -o bin/sofin-version-utility src/sofin-version-utility.cc
         check_command_result $?
+
+        if [ "$(uname)" = "Darwin" ]; then
+            echo "Building dylibbundler"
+            ${CXX} ${CLANG_OPTIONS} -c -I./src/dylibbundler ./src/dylibbundler/Settings.cpp -o src/.Settings.o
+            ${CXX} ${CLANG_OPTIONS} -c -I./src/dylibbundler ./src/dylibbundler/DylibBundler.cpp -o src/.DylibBundler.o
+            ${CXX} ${CLANG_OPTIONS} -c -I./src/dylibbundler ./src/dylibbundler/Dependency.cpp -o src/.Dependency.o
+            ${CXX} ${CLANG_OPTIONS} -c -I./src/dylibbundler ./src/dylibbundler/main.cpp -o src/.main.o
+            ${CXX} ${CLANG_OPTIONS} -c -I./src/dylibbundler ./src/dylibbundler/Utils.cpp -o src/.Utils.o
+            ${CXX} ${CLANG_OPTIONS} -o bin/dylibbundler src/.Settings.o src/.DylibBundler.o src/.Dependency.o src/.main.o src/.Utils.o
+        fi
     else
         error "C++ compiler is required to continue"
         exit 1
@@ -140,6 +151,8 @@ install_sofin () {
     ${CP_BIN} "bin/sofin-version-utility" /usr/bin/sofin-version-utility
     check_command_result $?
     ${CP_BIN} "bin/sofin-miliseconds" /usr/bin/sofin-miliseconds
+    check_command_result $?
+    ${CP_BIN} "bin/dylibbundler" /usr/bin/sofin-libbundle
     check_command_result $?
     ${CP_BIN} "src/sofin.sh" /usr/bin/sofin
     check_command_result $?
