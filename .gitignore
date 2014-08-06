@@ -9,3 +9,7 @@
 
 /Sofin.sublime-project
 /Sofin.sublime-workspace
+
+src/.*.o
+
+/bin/dylibbundler

@@ -87,6 +87,7 @@ SOFIN_BIN="/usr/bin/sofin"
 SOFIN_RPATH_PATCHER_BIN="/usr/bin/sofin-rpp"
 SOFIN_VERSION_UTILITY_BIN="/usr/bin/sofin-version-utility"
 SOFIN_MILISECONDS_UTILITY_BIN="/usr/bin/sofin-miliseconds"
+SOFIN_LIBBUNDLE_BIN="/usr/bin/sofin-libbundle"
 GIT_BIN="/Software/Git/exports/git"
 SSH_BIN="/usr/bin/ssh"
 

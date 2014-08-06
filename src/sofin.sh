@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.62.1"
+readonly VERSION="0.64.0"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -1304,13 +1304,45 @@ for application in ${APPLICATIONS}; do
         fi
 
         if [ "${APP_APPLE_BUNDLE}" = "true" ]; then
+            APP_LOWERNAME="${APP_NAME}"
             APP_NAME="$(${PRINTF_BIN} "${APP_NAME}" | ${CUT_BIN} -c1 | ${TR_BIN} '[a-z]' '[A-Z]')$(${PRINTF_BIN} "${APP_NAME}" | ${SED_BIN} 's/^[a-zA-Z]//')"
-            note "Creating Apple bundle: ${APP_NAME} in ${PREFIX}.app"
-            ${CP_BIN} -R ${PREFIX}/${APP_NAME}.app ${PREFIX}/../ >> ${LOG} 2>&1
-            ${CP_BIN} -R ${PREFIX}/* ${PREFIX}.app/ >> ${LOG} 2>&1
-            ${RM_BIN} -rf "${APP_NAME}.app/${APP_NAME}.app"
-            cd ${PREFIX}.app/Contents
+            APP_BUNDLE_NAME="${PREFIX}.app"
+            note "Creating Apple bundle: ${APP_NAME} in ${APP_BUNDLE_NAME}"
+            ${MKDIR_BIN} -p "${APP_BUNDLE_NAME}/libs"
+            ${MKDIR_BIN} -p "${APP_BUNDLE_NAME}/Contents"
+            ${MKDIR_BIN} -p "${APP_BUNDLE_NAME}/Contents/Resources/${APP_LOWERNAME}"
+            ${MKDIR_BIN} -p "${APP_BUNDLE_NAME}/exports"
+            ${MKDIR_BIN} -p "${APP_BUNDLE_NAME}/share"
+
+            ${CP_BIN} -R ${PREFIX}/${APP_NAME}.app/Contents/* "${APP_BUNDLE_NAME}/Contents/"
+            ${CP_BIN} -R ${PREFIX}/bin/${APP_LOWERNAME} "${APP_BUNDLE_NAME}/exports/"
+
+            for lib in $(${FIND_BIN} "${PREFIX}" -name '*.dylib' -type f); do
+                ${CP_BIN} -vf ${lib} ${APP_BUNDLE_NAME}/libs/ >> ${LOG} 2>&1
+            done
+
+            # if symlink exists, remove it.
+            test -L "${APP_BUNDLE_NAME}/lib" && ${RM_BIN} -rf ${APP_BUNDLE_NAME}/lib
+            ${LN_BIN} -s "${APP_BUNDLE_NAME}/libs ${APP_BUNDLE_NAME}/lib"
+
+            # move data, and support files from origin:
+            ${CP_BIN} -R "${PREFIX}/share/${APP_LOWERNAME}" "${APP_BUNDLE_NAME}/share/"
+            ${CP_BIN} -R "${PREFIX}/lib/${APP_LOWERNAME}" "${APP_BUNDLE_NAME}/libs/"
+
+            cd "${APP_BUNDLE_NAME}/Contents"
             test -L MacOS || ${LN_BIN} -s ../exports MacOS >> ${LOG} 2>&1
+
+            note "Creating relative libraries search path"
+            cd ${APP_BUNDLE_NAME}
+
+            for i in $(find . -name '*.dylib' -o -name '*.bundle' -type f); do
+                note "Processing shared library: ${i}"
+                ${SOFIN_LIBBUNDLE_BIN} -x "${i}" >> ${LOG} 2>&1
+            done
+
+            note "Processing exported binary: ${i}"
+            ${SOFIN_LIBBUNDLE_BIN} -x "${APP_BUNDLE_NAME}/Contents/MacOS/${APP_LOWERNAME}" >> ${LOG} 2>&1
+
         fi
 
     fi
