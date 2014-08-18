@@ -147,12 +147,13 @@ install_sofin () {
     if [ "$(uname)" != "Darwin" ]; then
         ${CP_BIN} "bin/sofin-rpp" /usr/bin/sofin-rpp
         check_command_result $?
+    else
+        ${CP_BIN} "bin/dylibbundler" /usr/bin/sofin-libbundle
+        check_command_result $?
     fi
     ${CP_BIN} "bin/sofin-version-utility" /usr/bin/sofin-version-utility
     check_command_result $?
     ${CP_BIN} "bin/sofin-miliseconds" /usr/bin/sofin-miliseconds
-    check_command_result $?
-    ${CP_BIN} "bin/dylibbundler" /usr/bin/sofin-libbundle
     check_command_result $?
     ${CP_BIN} "src/sofin.sh" /usr/bin/sofin
     check_command_result $?
