@@ -17,6 +17,10 @@
     #include <string.h>
 #endif
 
+#ifdef __linux__
+    #include <gnu/libc-version.h>
+    #include <string.h>
+#endif
 
 int main(int argc, char *argv[]) {
 
@@ -41,6 +45,14 @@ int main(int argc, char *argv[]) {
         version = new char[significant];
         strncpy(version, kernelVersion, significant);
         free(kernelVersion);
+        printf("%s\n", version);
+        delete version;
+    #endif
+
+    /* for Linux distribution, just give glibc major and minor version */
+    #ifdef __linux__
+        char* version = new char[5];
+        strncpy(version, gnu_get_libc_version(), 4);
         printf("%s\n", version);
         delete version;
     #endif

@@ -492,7 +492,7 @@ if [ ! "$1" = "" ]; then
                     fi
 
                     case "${SYSTEM_NAME}" in
-                        Darwin)
+                        Darwin|Linux)
                             export archive_sha1="$(${SHA_BIN} "${name}" | ${AWK_BIN} '{ print $1 }')"
                             ;;
 
@@ -777,7 +777,7 @@ for application in ${APPLICATIONS}; do
                             # checking archive sha1 checksum
                             if [ -e "${ARCHIVE_NAME}" ]; then
                                 case "${SYSTEM_NAME}" in
-                                    Darwin)
+                                    Darwin|Linux)
                                         export current_archive_sha1="$(${SHA_BIN} "${ARCHIVE_NAME}" | ${AWK_BIN} '{ print $1 }')"
                                         ;;
 
@@ -898,7 +898,7 @@ for application in ${APPLICATIONS}; do
                             # checking archive sha1 checksum
                             if [ -e "${BINBUILD_FILE}" ]; then
                                 case "${SYSTEM_NAME}" in
-                                    Darwin)
+                                    Darwin|Linux)
                                         export current_archive_sha1="$(${SHA_BIN} "${BINBUILD_FILE}" | ${AWK_BIN} '{ print $1 }')"
                                         ;;
 
@@ -1007,7 +1007,7 @@ for application in ${APPLICATIONS}; do
                                 error "${NOTE_CHAR2} Missing SHA sum for source: ${file}."
                             else
                                 case "${SYSTEM_NAME}" in
-                                    Darwin)
+                                    Darwin|Linux)
                                         export cur="$(${SHA_BIN} ${file} | ${AWK_BIN} '{print $1}')"
                                         ;;
 
