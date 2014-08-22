@@ -38,9 +38,11 @@ check_requirements () {
         error "Empty applications list!"
     fi
     if [ "${SYSTEM_NAME}" != "Darwin" ]; then
-        files="$(${FIND_BIN} /usr/local -type f | ${WC_BIN} -l | ${SED_BIN} -e 's/^ *//g;s/ *$//g' )"
-        if [ "${files}" != "0" ]; then
-            warn "/usr/local has been found, and contains ${files} file(s)"
+        if [ -d "/usr/local" ]; then
+            files="$(${FIND_BIN} /usr/local -type f | ${WC_BIN} -l | ${SED_BIN} -e 's/^ *//g;s/ *$//g' )"
+            if [ "${files}" != "0" ]; then
+                warn "/usr/local has been found, and contains ${files} file(s)"
+            fi
         fi
     fi
 }
