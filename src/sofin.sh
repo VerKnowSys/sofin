@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.64.0"
+readonly VERSION="0.64.1"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -1260,6 +1260,7 @@ for application in ${APPLICATIONS}; do
             . "${DEFINITIONS_DIR}${application}.def"
             note "Exporting binaries: ${APP_EXPORTS} of prefix: ${PREFIX}"
             if [ -d "${PREFIX}/exports-disabled" ]; then # just bring back disabled exports
+                debug "Moving ${PREFIX}/exports-disabled to ${PREFIX}/exports"
                 ${MV_BIN} "${PREFIX}/exports-disabled" "${PREFIX}/exports"
             else
                 ${MKDIR_BIN} -p "${PREFIX}/exports"
@@ -1282,7 +1283,7 @@ for application in ${APPLICATIONS}; do
             fi
             debug "Doing app conflict resolve"
             if [ ! -z "${APP_CONFLICTS_WITH}" ]; then
-                note "Resolving conflicts."
+                note "Resolving conflicts: ${APP_CONFLICTS_WITH}"
                 for app in ${APP_CONFLICTS_WITH}; do
                     if [ "${USERNAME}" != "root" ]; then
                         export apphome="${HOME}/${HOME_APPS_DIR}"
@@ -1291,8 +1292,9 @@ for application in ${APPLICATIONS}; do
                     fi
                     an_app="${apphome}${app}"
                     if [ -d "${an_app}" ]; then
-                        debug "Found app dir: ${an_app}"
+                        debug "Found conflicting app: ${an_app}"
                         if [ -e "${an_app}/exports" ]; then
+                            note "Disabling exports for ${an_app}"
                             ${MV_BIN} "${an_app}/exports" "${an_app}/exports-disabled"
                         fi
                     fi
