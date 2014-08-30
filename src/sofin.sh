@@ -267,6 +267,7 @@ if [ ! "$1" = "" ]; then
     distclean)
         note "Performing dist-clean."
         ${RM_BIN} -rf "${CACHE_DIR}cache"
+        ${RM_BIN} -rf "${CACHE_DIR}definitions"
         perform_clean
         exit
         ;;
