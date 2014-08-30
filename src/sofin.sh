@@ -1286,7 +1286,7 @@ for application in ${APPLICATIONS}; do
                     if [ "${USERNAME}" != "root" ]; then
                         export apphome="${HOME}/${HOME_APPS_DIR}"
                     else
-                        export apphome="${SOFTWARE_DIR}${apps}"
+                        export apphome="${SOFTWARE_DIR}"
                     fi
                     an_app="${apphome}${app}"
                     if [ -d "${an_app}" ]; then
