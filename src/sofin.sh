@@ -1031,7 +1031,7 @@ for application in ${APPLICATIONS}; do
                                 fi
                             fi
 
-                            note "${NOTE_CHAR2} Unpacking source code of: ${APP_NAME}"
+                            note "   ${NOTE_CHAR2} Unpacking source code of: ${APP_NAME}"
                             debug "Build dir root: ${BUILD_DIR_ROOT}"
                             run "${TAR_BIN} xf ${file}"
 
