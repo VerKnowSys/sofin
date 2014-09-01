@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.64.1"
+readonly VERSION="0.64.2"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -769,7 +769,7 @@ for application in ${APPLICATIONS}; do
             INSTALLED_INDICATOR="${PREFIX}/${APP_LOWER}${APP_POSTFIX}.installed"
             if [ ! -e "${INSTALLED_INDICATOR}" ]; then
                 if [ "${USE_BINBUILD}" = "false" ]; then
-                    note "   ${NOTE_CHAR2} Binary build skipped for this OS"
+                    note "   ${NOTE_CHAR2} Binary build check was skipped"
                 else
                     if [ "${USERNAME}" != "${BUILD_USER_NAME}" ]; then # don't use bin builds for build-user
                         if [ ! -e "./${ARCHIVE_NAME}" ]; then
@@ -951,8 +951,8 @@ for application in ${APPLICATIONS}; do
                                 note "   ${NOTE_CHAR2} No binary build available for requirement: ${REQ_APPNAME}${APP_POSTFIX}"
                             fi
                         fi
-                    else # binary-build
-                        note "Binary build disabled for: ${BUILD_USER_NAME}!"
+                    else # build from source
+                        note "   ${NOTE_CHAR2} Forced build from source."
                     fi
                 fi
 
