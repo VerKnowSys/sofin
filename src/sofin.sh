@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.64.2"
+readonly VERSION="0.64.3"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -1327,7 +1327,7 @@ for application in ${APPLICATIONS}; do
             done
 
             # if symlink exists, remove it.
-            test -L "${APP_BUNDLE_NAME}/lib" && ${RM_BIN} -rf ${APP_BUNDLE_NAME}/lib
+            ${RM_BIN} -f ${APP_BUNDLE_NAME}/lib
             ${LN_BIN} -s "${APP_BUNDLE_NAME}/libs ${APP_BUNDLE_NAME}/lib"
 
             # move data, and support files from origin:
