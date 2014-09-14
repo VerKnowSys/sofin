@@ -90,6 +90,7 @@ SOFIN_MILISECONDS_UTILITY_BIN="/usr/bin/sofin-miliseconds"
 SOFIN_LIBBUNDLE_BIN="/usr/bin/sofin-libbundle"
 GIT_BIN="/Software/Git/exports/git"
 SSH_BIN="/usr/bin/ssh"
+DIFF_BIN="/usr/bin/diff"
 
 if [ ! -x "${SOFIN_VERSION_UTILITY_BIN}" ]; then
     export OS_VERSION="0"
