@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.66.0"
+readonly VERSION="0.66.1"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -755,8 +755,13 @@ for application in ${APPLICATIONS}; do
                 for dir in "lib" "bin" "sbin" "libexec"; do # take all files in bundle
                     if [ -d "${dir}" ]; then
                         for file in $(${FIND_BIN} "${dir}" -type f -o -type l); do
-                            debug "Patching binary file: ${1}${APP_POSTFIX}/${file} of bundle: ${2}${APP_POSTFIX}"
-                            run ${SOFIN_RPATH_PATCHER_BIN} "${2}${APP_POSTFIX}" "${1}${APP_POSTFIX}/${file}"
+                            debug "Patching executable: ${1}${APP_POSTFIX}/${file} of bundle: ${2}${APP_POSTFIX}"
+                            if [ "${SYSTEM_NAME}" = "Darwin" ]; then
+                                ${SOFIN_RPATH_PATCHER_BIN} --install-path "${PREFIX}/lib" -x "${1}${APP_POSTFIX}/${file}" >> ${LOG} 2>&1
+                            else
+                                current_interpreter="$(${SOFIN_RPATH_PATCHER_BIN} --print-interpreter ${file} 2>/dev/null)"
+                                ${SOFIN_RPATH_PATCHER_BIN} --set-interpreter ${current_interpreter} --set-rpath "${PREFIX}/lib" "${1}${APP_POSTFIX}/${file}" >> ${LOG} 2>&1
+                            fi
                         done
                     fi
                 done
