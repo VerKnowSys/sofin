@@ -145,7 +145,8 @@ install_sofin () {
     ${CP_BIN} "src/${CONF_FILE}" "/etc/${CONF_FILE}"
     check_command_result $?
     if [ "$(uname)" = "Darwin" ]; then
-        ${CP_BIN} "bin/dylibbundler" /usr/bin/sofin-libbundle
+        # this bullshit is obviously caused GPL licensed patchelf:
+        ${CP_BIN} "bin/dylibbundler" "${SOFIN_RPATH_PATCHER_BIN}"
         check_command_result $?
     fi
     ${CP_BIN} "bin/sofin-version-utility" /usr/bin/sofin-version-utility

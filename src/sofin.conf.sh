@@ -84,7 +84,7 @@ HOST_BIN="/usr/bin/host"
 DIG_BIN="/usr/bin/dig"
 XARGS_BIN="/usr/bin/xargs"
 SOFIN_BIN="/usr/bin/sofin"
-SOFIN_RPATH_PATCHER_BIN="/usr/bin/sofin-rpp"
+SOFIN_RPATH_PATCHER_BIN="/Software/Patchelf/exports/patchelf" # separation caused GPL licensed patchelf
 SOFIN_VERSION_UTILITY_BIN="/usr/bin/sofin-version-utility"
 SOFIN_MILISECONDS_UTILITY_BIN="/usr/bin/sofin-miliseconds"
 SOFIN_LIBBUNDLE_BIN="/usr/bin/sofin-libbundle"
@@ -212,6 +212,7 @@ case "${SYSTEM_NAME}" in
         cpus=$(${SYSCTL_BIN} machdep.cpu.thread_count | ${AWK_BIN} '{printf $2}')
         export MAKE_OPTS="-j${cpus}"
         unset SERVICE_BIN # not necessary
+        export SOFIN_RPATH_PATCHER_BIN="/usr/bin/sofin-libbundle"
 
         if [ ${OS_VERSION} -lt ${DARWIN_MINIMUM_VERSION} ]; then
             export USE_BINBUILD="false"
