@@ -103,7 +103,6 @@ install_base () {
         ${RM_BIN} -rf "/etc/${CONF_FILE}"
         install_sofin
     fi
-    ${MKDIR_BIN} -p /Software/.cache
 }
 
 
