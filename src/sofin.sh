@@ -1217,23 +1217,23 @@ for application in ${APPLICATIONS}; do
                 ${PRINTF_BIN} "${APP_VERSION}" > "${PREFIX}/${application}${INSTALLED_MARK}"
             }
 
-            strip_lib_bin () {
-                if [ -z "${DEVEL}" ]; then
-                    debug "${NOTE_CHAR2} Stripping libraries and binaries."
-                    for elem in "/bin" "/sbin" "/libexec" "/lib"; do
-                        if [ -d "${PREFIX}${elem}" ]; then
-                            for e in $(${FIND_BIN} ${PREFIX}${elem} -maxdepth 1 -type f); do
-                                if [ -e "${e}" ]; then
-                                    debug "Stripping: ${e}"
-                                    "${STRIP_BIN}" "${e}" >> "${LOG}" 2>&1
-                                fi
-                            done
-                        fi
-                    done
-                else
-                    warn "Devel mode enabled. Skipping binary/library strip."
-                fi
-            }
+            # strip_lib_bin () {
+            #     if [ -z "${DEVEL}" ]; then
+            #         debug "${NOTE_CHAR2} Stripping libraries and binaries."
+            #         for elem in "/bin" "/sbin" "/libexec" "/lib"; do
+            #             if [ -d "${PREFIX}${elem}" ]; then
+            #                 for e in $(${FIND_BIN} ${PREFIX}${elem} -maxdepth 1 -type f); do
+            #                     if [ -e "${e}" ]; then
+            #                         debug "Stripping: ${e}"
+            #                         "${STRIP_BIN}" "${e}" >> "${LOG}" 2>&1
+            #                     fi
+            #                 done
+            #             fi
+            #         done
+            #     else
+            #         warn "Devel mode enabled. Skipping binary/library strip."
+            #     fi
+            # }
 
             show_done () {
                 ver="$(${CAT_BIN} "${PREFIX}/${application}${INSTALLED_MARK}")"
@@ -1248,7 +1248,7 @@ for application in ${APPLICATIONS}; do
                         execute_process "${application}"
                         unset CHANGED
                         mark
-                        strip_lib_bin
+                        # strip_lib_bin
                         show_done
                     else
                         note "  ${application} (1 of ${req_all})"
@@ -1260,7 +1260,7 @@ for application in ${APPLICATIONS}; do
                     note "  ${application} (1 of ${req_all})"
                     execute_process "${application}"
                     mark
-                    strip_lib_bin
+                    # strip_lib_bin
                     note "${SUCCESS_CHAR} ${application} [${APP_VERSION}]\n"
                 fi
             fi
