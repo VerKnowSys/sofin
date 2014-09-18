@@ -182,6 +182,10 @@ case "${SYSTEM_NAME}" in
             export USE_BINBUILD="false"
         fi
 
+        if [ "${FULL_SYSTEM_VERSION}" = "10.0" ]; then
+            export DIG_BIN="/Software/Bind/exports/dig"
+        fi
+
         # XXX: disable ssl verification of https://github.com which fails on FreeBSD by default.
         if [ -x "${GIT_BIN}" ]; then
             ${GIT_BIN} config --global http.sslVerify false
