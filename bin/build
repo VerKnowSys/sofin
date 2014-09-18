@@ -95,9 +95,9 @@ install_base () {
     if [ "${INSTALL}" = "YES" ]; then
         check_root
         ${RM_BIN} -rf "/usr/bin/sofin"
-        if [ "$(uname)" != "Darwin" ]; then
-            ${RM_BIN} -rf "/usr/bin/sofin-rpp"
-        fi
+        # if [ "$(uname)" != "Darwin" ]; then
+        #     ${RM_BIN} -rf "/usr/bin/sofin-rpp"
+        # fi
         ${RM_BIN} -rf "/usr/bin/sofin-version-utility"
         ${RM_BIN} -rf "/usr/bin/sofin-miliseconds"
         ${RM_BIN} -rf "/etc/${CONF_FILE}"
@@ -111,11 +111,11 @@ build_natives () {
     if [ -x "${CXX}" ]; then
         echo "C++ compiler available. Using: ${CXX}"
 
-        if [ "$(uname)" != "Darwin" ]; then
-            echo "Building patcher"
-            ${CXX} ${CLANG_OPTIONS} -o bin/sofin-rpp src/sofin-rpath-patcher.cc
-            check_command_result $?
-        fi
+        # if [ "$(uname)" != "Darwin" ]; then
+        #     echo "Building patcher"
+        #     ${CXX} ${CLANG_OPTIONS} -o bin/sofin-rpp src/sofin-rpath-patcher.cc
+        #     check_command_result $?
+        # fi
 
         echo "Building sofin_miliseconds"
         ${CXX} ${CLANG_OPTIONS} -o bin/sofin-miliseconds src/sofin_miliseconds.cc
@@ -144,10 +144,7 @@ build_natives () {
 install_sofin () {
     ${CP_BIN} "src/${CONF_FILE}" "/etc/${CONF_FILE}"
     check_command_result $?
-    if [ "$(uname)" != "Darwin" ]; then
-        ${CP_BIN} "bin/sofin-rpp" /usr/bin/sofin-rpp
-        check_command_result $?
-    else
+    if [ "$(uname)" = "Darwin" ]; then
         ${CP_BIN} "bin/dylibbundler" /usr/bin/sofin-libbundle
         check_command_result $?
     fi
