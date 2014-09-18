@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.64.4"
+readonly VERSION="0.66.0"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -508,7 +508,10 @@ if [ ! "$1" = "" ]; then
                     note "Archive sha: ${archive_sha1}"
 
                     for mirror in $(${DIG_BIN} +short ${MAIN_SOFTWARE_ADDRESS} A); do
-                        address="${MAIN_USER}@${mirror}:${MAIN_SOFTWARE_PREFIX}/software/binary/${SYSTEM_NAME}-${SYSTEM_ARCH}-${USER_TYPE}/"
+                        SYS="${SYSTEM_NAME}-${FULL_SYSTEM_VERSION}-${SYSTEM_ARCH}-${USER_TYPE}"
+                        address="${MAIN_USER}@${mirror}:${MAIN_SOFTWARE_PREFIX}/software/binary/${SYS}/"
+                        note "Creating destination dirs for ${SYS} if necessary"
+                        ${SSH_BIN} -p ${MAIN_PORT} ${MAIN_USER}@${mirror} "mkdir -p ${MAIN_SOFTWARE_PREFIX}/software/binary/${SYS}"
                         note "Sending archive to remote: ${address}"
                         ${SCP_BIN} -P ${MAIN_PORT} "${name}" "${address}${name}" >> "${LOG}" 2>&1
                         ${SCP_BIN} -P ${MAIN_PORT} "${name}.sha1" "${address}${name}.sha1" >> "${LOG}" 2>&1
@@ -689,7 +692,7 @@ for application in ${APPLICATIONS}; do
     . "${DEFINITIONS_DIR}${application}.def" # prevent installation of requirements of disabled application:
     check_disabled "${DISABLE_ON}" # after which just check if it's not disabled
     if [ ! "${ALLOW}" = "1" ]; then
-        note "Software: ${application} disabled on architecture: ${SYSTEM_NAME}-${SYSTEM_ARCH}"
+        note "Software: ${application} disabled on architecture: ${SYSTEM_NAME}-${FULL_SYSTEM_VERSION}-${SYSTEM_ARCH}"
     else
         for definition in ${DEFINITIONS_DIR}${application}.def; do
             export DONT_BUILD_BUT_DO_EXPORTS=""
@@ -764,7 +767,7 @@ for application in ${APPLICATIONS}; do
             if [ "${USERNAME}" = "root" ]; then
                 export BIN_POSTFIX="root"
             fi
-            MIDDLE="${SYSTEM_NAME}-${SYSTEM_ARCH}-${BIN_POSTFIX}"
+            MIDDLE="${SYSTEM_NAME}-${FULL_SYSTEM_VERSION}-${SYSTEM_ARCH}-${BIN_POSTFIX}"
             ARCHIVE_NAME="${APP_NAME}${APP_POSTFIX}-${APP_VERSION}${DEFAULT_ARCHIVE_EXT}"
             INSTALLED_INDICATOR="${PREFIX}/${APP_LOWER}${APP_POSTFIX}.installed"
             if [ ! -e "${INSTALLED_INDICATOR}" ]; then
@@ -881,7 +884,7 @@ for application in ${APPLICATIONS}; do
                     note "   ${NOTE_CHAR2} Binary build skipped for this OS"
                 else
                     if [ "${USERNAME}" != "${BUILD_USER_NAME}" ]; then # don't use bin builds for build-user
-                        MIDDLE="${SYSTEM_NAME}-${SYSTEM_ARCH}-${BIN_POSTFIX}"
+                        MIDDLE="${SYSTEM_NAME}-${FULL_SYSTEM_VERSION}-${SYSTEM_ARCH}-${BIN_POSTFIX}"
                         REQ_APPNAME="$(${PRINTF_BIN} "${APP_NAME}" | ${CUT_BIN} -c1 | ${TR_BIN} '[a-z]' '[A-Z]')$(${PRINTF_BIN} "${APP_NAME}" | ${SED_BIN} 's/^[a-zA-Z]//')"
                         ARCHIVE_NAME="${REQ_APPNAME}${APP_POSTFIX}-${APP_VERSION}${DEFAULT_ARCHIVE_EXT}"
                         BINBUILD_ADDRESS="${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}"

@@ -97,6 +97,7 @@ if [ ! -x "${SOFIN_VERSION_UTILITY_BIN}" ]; then
 else
     export OS_VERSION="$(echo $(${SOFIN_VERSION_UTILITY_BIN}) | ${AWK_BIN} '{ gsub(/\./, ""); print $1; }' )"
 fi
+FULL_SYSTEM_VERSION="$(${SOFIN_VERSION_UTILITY_BIN})"
 USERNAME="$(${ID_BIN} ${ID_SVD})"
 DEFAULT_LDFLAGS="-fPIC -fPIE"
 DEFAULT_COMPILER_FLAGS="-Os -fPIC -fPIE -fno-strict-overflow -fstack-protector-all"
