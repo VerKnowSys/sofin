@@ -506,7 +506,7 @@ if [ ! "$1" = "" ]; then
 
                     ${PRINTF_BIN} "${archive_sha1}" > "${name}.sha1"
                     note "Archive sha: ${archive_sha1}"
-                    dig_query="${DIG_BIN} +short ${MAIN_SOFTWARE_ADDRESS} A"
+                    dig_query="$(${DIG_BIN} +short ${MAIN_SOFTWARE_ADDRESS} A)"
                     if [ ${OS_VERSION} -gt 93 ]; then
                         # In FreeBSD 10 there's drill utility instead of dig
                         dig_query=$(${DIG_BIN} A ${MAIN_SOFTWARE_ADDRESS} | ${GREP_BIN} "^${MAIN_SOFTWARE_ADDRESS}" | ${AWK_BIN} '{print $5}')
