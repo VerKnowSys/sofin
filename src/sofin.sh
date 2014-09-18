@@ -506,8 +506,12 @@ if [ ! "$1" = "" ]; then
 
                     ${PRINTF_BIN} "${archive_sha1}" > "${name}.sha1"
                     note "Archive sha: ${archive_sha1}"
-
-                    for mirror in $(${DIG_BIN} +short ${MAIN_SOFTWARE_ADDRESS} A); do
+                    dig_query="${DIG_BIN} +short ${MAIN_SOFTWARE_ADDRESS} A"
+                    if [ "${OS_VERSION}" -gt 93 ]; then
+                        # In FreeBSD 10 there's drill utility instead of dig
+                        dig_query="${DIG_BIN} A ${MAIN_SOFTWARE_ADDRESS} | ${GREP_BIN} '^${MAIN_SOFTWARE_ADDRESS}' | ${AWK_BIN} '{print $5}'"
+                    fi
+                    for mirror in $(${dig_query}); do
                         SYS="${SYSTEM_NAME}-${FULL_SYSTEM_VERSION}-${SYSTEM_ARCH}-${USER_TYPE}"
                         address="${MAIN_USER}@${mirror}:${MAIN_SOFTWARE_PREFIX}/software/binary/${SYS}/"
                         note "Creating destination dirs for ${SYS} if necessary"

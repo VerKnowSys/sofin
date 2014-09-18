@@ -183,8 +183,8 @@ case "${SYSTEM_NAME}" in
             export USE_BINBUILD="false"
         fi
 
-        if [ "${FULL_SYSTEM_VERSION}" = "10.0" ]; then
-            export DIG_BIN="/Software/Bind/exports/dig"
+        if [ "${OS_VERSION}" -gt 93 ]; then
+            export DIG_BIN="/usr/bin/drill"
         fi
 
         # XXX: disable ssl verification of https://github.com which fails on FreeBSD by default.
