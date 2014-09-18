@@ -183,7 +183,7 @@ case "${SYSTEM_NAME}" in
             export USE_BINBUILD="false"
         fi
 
-        if [ "${OS_VERSION}" -gt 93 ]; then
+        if [ ${OS_VERSION} -gt 93 ]; then
             export DIG_BIN="/usr/bin/drill"
         fi
 
