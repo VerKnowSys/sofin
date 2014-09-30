@@ -4,12 +4,9 @@
 /bin/sofin-version-utility
 /bin/sofin-rpp
 /bin/sofin-miliseconds
-
 /releases/
-
 /Sofin.sublime-project
 /Sofin.sublime-workspace
-
 src/.*.o
-
 /bin/dylibbundler
+dylibbundler

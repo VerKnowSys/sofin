@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.68.0"
+readonly VERSION="0.68.1"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -717,16 +717,7 @@ for application in ${APPLICATIONS}; do
             fi
 
             # note "Preparing application: ${APP_NAME}${APP_POSTFIX} (${APP_FULL_NAME} v${APP_VERSION})"
-            if [ "${USERNAME}" = "root" ]; then
-                debug "Normal build"
-                export PREFIX="${SOFTWARE_DIR}${APP_NAME}"
-            else
-                debug "User build: ${USERNAME}"
-                export PREFIX="${HOME}/${HOME_APPS_DIR}${APP_NAME}"
-                if [ ! -d "${HOME}/${HOME_APPS_DIR}" ]; then
-                    ${MKDIR_BIN} -p "${HOME}/${HOME_APPS_DIR}"
-                fi
-            fi
+            export PREFIX="${SOFTWARE_DIR}${APP_NAME}"
 
             # append app postfix
             if [ ! -z "$APP_POSTFIX" ]; then
@@ -746,30 +737,8 @@ for application in ${APPLICATIONS}; do
                 fi
             }
 
-            rpath_patch () {
-                # $1 param is a directory root prefix of dependency to install
-                # $2 param is a name of destination bundle name, f.e. "Ruby"
-                #
-                cd "${1}${APP_POSTFIX}"
-                # patch RPATH values from all binaries and libraries of binary bundle
-                for dir in "lib" "bin" "sbin" "libexec"; do # take all files in bundle
-                    if [ -d "${dir}" ]; then
-                        for file in $(${FIND_BIN} "${dir}" -type f -o -type l); do
-                            debug "Patching executable: ${1}${APP_POSTFIX}/${file} of bundle: ${2}${APP_POSTFIX}"
-                            if [ "${SYSTEM_NAME}" = "Darwin" ]; then
-                                ${SOFIN_RPATH_PATCHER_BIN} --install-path "${PREFIX}/lib" -x "${1}${APP_POSTFIX}/${file}" >> ${LOG} 2>&1
-                            else
-                                current_interpreter="$(${SOFIN_RPATH_PATCHER_BIN} --print-interpreter ${file} 2>/dev/null)"
-                                ${SOFIN_RPATH_PATCHER_BIN} --set-interpreter ${current_interpreter} --set-rpath "${PREFIX}/lib" "${1}${APP_POSTFIX}/${file}" >> ${LOG} 2>&1
-                            fi
-                        done
-                    fi
-                done
-            }
-
             # binary build of whole software bundle
             ABSNAME="${APP_NAME}${APP_POSTFIX}-${APP_VERSION}"
-            ${MKDIR_BIN} -p "${HOME}/${HOME_APPS_DIR}" > /dev/null 2>&1
             ${MKDIR_BIN} -p "${BINBUILDS_CACHE_DIR}${ABSNAME}" > /dev/null 2>&1
 
             cd "${BINBUILDS_CACHE_DIR}${ABSNAME}/"
@@ -818,9 +787,9 @@ for application in ${APPLICATIONS}; do
                         if [ -e "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" ]; then # if exists, then checksum is ok
                             ${TAR_BIN} zxf "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" >> ${LOG} 2>&1
                             if [ "$?" = "0" ]; then # if archive is valid
-                                if [ "${USERNAME}" != "root" ]; then
-                                    rpath_patch "${HOME}/${HOME_APPS_DIR}${APP_NAME}" "${APP_NAME}"
-                                fi
+                                # if [ "${USERNAME}" != "root" ]; then
+                                #     rpath_patch "${HOME}/${HOME_APPS_DIR}${APP_NAME}" "${APP_NAME}"
+                                # fi
                                 note "  ${NOTE_CHAR2} Binary bundle installed: ${APP_NAME}${APP_POSTFIX} with version: ${APP_VERSION}"
                                 export DONT_BUILD_BUT_DO_EXPORTS="true"
                             else
@@ -938,7 +907,7 @@ for application in ${APPLICATIONS}; do
                                 fi
                                 BINREQ_PATH="${TMP_REQ_DIR}/${REQ_APPNAME}${APP_POSTFIX}"
                                 # patch rpath in binaries/ libraries
-                                rpath_patch "${BINREQ_PATH}" "$(${BASENAME_BIN} ${PREFIX})"
+                                # rpath_patch "${BINREQ_PATH}" "$(${BASENAME_BIN} ${PREFIX})"
 
                                 ${CP_BIN} -fR ./* ${PREFIX} >> ${LOG} 2>&1
                                 ${RM_BIN} -rf ${PREFIX}/exports >> ${LOG} 2>&1

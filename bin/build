@@ -110,12 +110,6 @@ build_natives () {
     if [ -x "${CXX}" ]; then
         echo "C++ compiler available. Using: ${CXX}"
 
-        # if [ "$(uname)" != "Darwin" ]; then
-        #     echo "Building patcher"
-        #     ${CXX} ${CLANG_OPTIONS} -o bin/sofin-rpp src/sofin-rpath-patcher.cc
-        #     check_command_result $?
-        # fi
-
         echo "Building sofin_miliseconds"
         ${CXX} ${CLANG_OPTIONS} -o bin/sofin-miliseconds src/sofin_miliseconds.cc
         check_command_result $?
