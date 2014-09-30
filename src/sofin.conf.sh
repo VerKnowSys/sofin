@@ -164,11 +164,11 @@ error () {
 readonly SYSTEM_NAME="$(uname)"
 readonly SYSTEM_ARCH="$(uname -m)"
 
-if [ "$(id -u)" != "0" ]; then
-    export USER_TYPE="common" # NOTE: rpath in binaries, XXX: fixme: add support for regular user binary builds
-else
-    export USER_TYPE="root"
-fi
+# if [ "$(id -u)" != "0" ]; then
+#     export USER_TYPE="common" # NOTE: rpath in binaries, XXX: fixme: add support for regular user binary builds
+# else
+#     export USER_TYPE="root"
+# fi
 
 
 case "${SYSTEM_NAME}" in
@@ -310,15 +310,15 @@ if [ "${CURRENT_USER_UID}" != "0" ]; then
 fi
 
 
-if [ "${USER_TYPE}" != "root" ]; then
-    export SOFTWARE_DIR="${HOME}/${HOME_APPS_DIR}"
-    export CACHE_DIR="${HOME}/.cache/"
-    export BINBUILDS_CACHE_DIR="${CACHE_DIR}binbuilds/"
-    export LOG="${CACHE_DIR}install.log"
-    export DEFINITIONS_DIR="${CACHE_DIR}definitions/definitions/"
-    export LISTS_DIR="${CACHE_DIR}definitions/lists/"
-    export DEFAULTS="${DEFINITIONS_DIR}defaults.def"
-fi
+# if [ "${USER_TYPE}" != "root" ]; then
+#     export SOFTWARE_DIR="${HOME}/${HOME_APPS_DIR}"
+#     export CACHE_DIR="${HOME}/.cache/"
+#     export BINBUILDS_CACHE_DIR="${CACHE_DIR}binbuilds/"
+#     export LOG="${CACHE_DIR}install.log"
+#     export DEFINITIONS_DIR="${CACHE_DIR}definitions/definitions/"
+#     export LISTS_DIR="${CACHE_DIR}definitions/lists/"
+#     export DEFAULTS="${DEFINITIONS_DIR}defaults.def"
+# fi
 
 # more values
 readonly BINBUILDS_CACHE_DIR
@@ -383,7 +383,7 @@ check_command_result () {
 
 
 check_root () {
-    if [ ! "${USER_TYPE}" = "root" ]; then
+    if [ "$(id -u)" != "0" ]; then
         error "This command should be run as root."
         exit 1
     fi

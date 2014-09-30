@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.66.1"
+readonly VERSION="0.68.0"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -266,7 +266,7 @@ if [ ! "$1" = "" ]; then
 
     distclean)
         note "Performing dist-clean."
-        ${RM_BIN} -rf "${CACHE_DIR}cache"
+        #${RM_BIN} -rf "${CACHE_DIR}cache"
         ${RM_BIN} -rf "${CACHE_DIR}definitions"
         perform_clean
         exit
@@ -513,7 +513,7 @@ if [ ! "$1" = "" ]; then
                     fi
                     debug "MIRROR: ${dig_query}"
                     for mirror in ${dig_query}; do
-                        SYS="${SYSTEM_NAME}-${FULL_SYSTEM_VERSION}-${SYSTEM_ARCH}-${USER_TYPE}"
+                        SYS="${SYSTEM_NAME}-${FULL_SYSTEM_VERSION}-${SYSTEM_ARCH}"
                         address="${MAIN_USER}@${mirror}:${MAIN_SOFTWARE_PREFIX}/software/binary/${SYS}/"
                         note "Creating destination dirs for ${SYS} if necessary"
                         ${SSH_BIN} -p ${MAIN_PORT} ${MAIN_USER}@${mirror} "mkdir -p ${MAIN_SOFTWARE_PREFIX}/software/binary/${SYS}"
@@ -1178,7 +1178,7 @@ for application in ${APPLICATIONS}; do
                         cd "${CUR_DIR}"
                     fi
                 else
-                    warn "   ${NOTE_CHAR2} Requirement: ${APP_NAME} disabled on architecture: ${SYSTEM_NAME}."
+                    warn "   ${NOTE_CHAR2} Requirement: ${APP_NAME} disabled on architecture: ${SYSTEM_NAME}-${FULL_SYSTEM_VERSION}-${SYSTEM_ARCH}"
                     if [ ! -d "${PREFIX}" ]; then # case when disabled requirement is first on list of dependencies
                         ${MKDIR_BIN} -p "${PREFIX}"
                     fi
@@ -1353,10 +1353,10 @@ for application in ${APPLICATIONS}; do
             note "Creating relative libraries search path"
             cd ${APP_BUNDLE_NAME}
 
-            for i in $(find . -name '*.dylib' -o -name '*.bundle' -type f); do
-                note "Processing shared library: ${i}"
-                ${SOFIN_LIBBUNDLE_BIN} -x "${i}" >> ${LOG} 2>&1
-            done
+            # for i in $(find . -name '*.dylib' -o -name '*.bundle' -type f); do
+            #     note "Processing shared library: ${i}"
+            #     ${SOFIN_LIBBUNDLE_BIN} -x "${i}" >> ${LOG} 2>&1
+            # done
 
             note "Processing exported binary: ${i}"
             ${SOFIN_LIBBUNDLE_BIN} -x "${APP_BUNDLE_NAME}/Contents/MacOS/${APP_LOWERNAME}" >> ${LOG} 2>&1
