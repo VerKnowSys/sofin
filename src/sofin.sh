@@ -773,11 +773,7 @@ for application in ${APPLICATIONS}; do
             ${MKDIR_BIN} -p "${BINBUILDS_CACHE_DIR}${ABSNAME}" > /dev/null 2>&1
 
             cd "${BINBUILDS_CACHE_DIR}${ABSNAME}/"
-            BIN_POSTFIX="common"
-            if [ "${USERNAME}" = "root" ]; then
-                export BIN_POSTFIX="root"
-            fi
-            MIDDLE="${SYSTEM_NAME}-${FULL_SYSTEM_VERSION}-${SYSTEM_ARCH}-${BIN_POSTFIX}"
+            MIDDLE="${SYSTEM_NAME}-${FULL_SYSTEM_VERSION}-${SYSTEM_ARCH}"
             ARCHIVE_NAME="${APP_NAME}${APP_POSTFIX}-${APP_VERSION}${DEFAULT_ARCHIVE_EXT}"
             INSTALLED_INDICATOR="${PREFIX}/${APP_LOWER}${APP_POSTFIX}.installed"
             if [ ! -e "${INSTALLED_INDICATOR}" ]; then
@@ -884,17 +880,11 @@ for application in ${APPLICATIONS}; do
                     set_c_compiler CLANG # look for bundled compiler:
                 fi
 
-                # binary build of software dependency
-                BIN_POSTFIX="common"
-                if [ "${USERNAME}" = "root" ]; then
-                    export BIN_POSTFIX="root"
-                fi
-
                 if [ "${USE_BINBUILD}" = "false" ]; then
                     note "   ${NOTE_CHAR2} Binary build skipped for this OS"
                 else
                     if [ "${USERNAME}" != "${BUILD_USER_NAME}" ]; then # don't use bin builds for build-user
-                        MIDDLE="${SYSTEM_NAME}-${FULL_SYSTEM_VERSION}-${SYSTEM_ARCH}-${BIN_POSTFIX}"
+                        MIDDLE="${SYSTEM_NAME}-${FULL_SYSTEM_VERSION}-${SYSTEM_ARCH}"
                         REQ_APPNAME="$(${PRINTF_BIN} "${APP_NAME}" | ${CUT_BIN} -c1 | ${TR_BIN} '[a-z]' '[A-Z]')$(${PRINTF_BIN} "${APP_NAME}" | ${SED_BIN} 's/^[a-zA-Z]//')"
                         ARCHIVE_NAME="${REQ_APPNAME}${APP_POSTFIX}-${APP_VERSION}${DEFAULT_ARCHIVE_EXT}"
                         BINBUILD_ADDRESS="${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}"
