@@ -778,18 +778,11 @@ for application in ${APPLICATIONS}; do
                                 ${RM_BIN} -f ${ARCHIVE_NAME}.sha1
                             fi
                         fi
-                        if [ "${USERNAME}" = "root" ]; then
-                            cd "${SOFTWARE_ROOT_DIR}"
-                        else
-                            cd "${HOME}/${HOME_APPS_DIR}"
-                        fi
+                        cd "${SOFTWARE_ROOT_DIR}"
 
                         if [ -e "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" ]; then # if exists, then checksum is ok
                             ${TAR_BIN} zxf "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" >> ${LOG} 2>&1
                             if [ "$?" = "0" ]; then # if archive is valid
-                                # if [ "${USERNAME}" != "root" ]; then
-                                #     rpath_patch "${HOME}/${HOME_APPS_DIR}${APP_NAME}" "${APP_NAME}"
-                                # fi
                                 note "  ${NOTE_CHAR2} Binary bundle installed: ${APP_NAME}${APP_POSTFIX} with version: ${APP_VERSION}"
                                 export DONT_BUILD_BUT_DO_EXPORTS="true"
                             else
@@ -1257,11 +1250,7 @@ for application in ${APPLICATIONS}; do
             if [ ! -z "${APP_CONFLICTS_WITH}" ]; then
                 note "Resolving conflicts: ${APP_CONFLICTS_WITH}"
                 for app in ${APP_CONFLICTS_WITH}; do
-                    if [ "${USERNAME}" != "root" ]; then
-                        export apphome="${HOME}/${HOME_APPS_DIR}"
-                    else
-                        export apphome="${SOFTWARE_DIR}"
-                    fi
+                    export apphome="${SOFTWARE_DIR}"
                     an_app="${apphome}${app}"
                     if [ -d "${an_app}" ]; then
                         debug "Found conflicting app: ${an_app}"
