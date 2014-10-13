@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.68.1"
+readonly VERSION="0.68.2"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -842,84 +842,84 @@ for application in ${APPLICATIONS}; do
                     set_c_compiler CLANG # look for bundled compiler:
                 fi
 
-                if [ "${USE_BINBUILD}" = "false" ]; then
-                    note "   ${NOTE_CHAR2} Binary build skipped for this OS"
-                else
-                    if [ "${USERNAME}" != "${BUILD_USER_NAME}" ]; then # don't use bin builds for build-user
-                        MIDDLE="${SYSTEM_NAME}-${FULL_SYSTEM_VERSION}-${SYSTEM_ARCH}"
-                        REQ_APPNAME="$(${PRINTF_BIN} "${APP_NAME}" | ${CUT_BIN} -c1 | ${TR_BIN} '[a-z]' '[A-Z]')$(${PRINTF_BIN} "${APP_NAME}" | ${SED_BIN} 's/^[a-zA-Z]//')"
-                        ARCHIVE_NAME="${REQ_APPNAME}${APP_POSTFIX}-${APP_VERSION}${DEFAULT_ARCHIVE_EXT}"
-                        BINBUILD_ADDRESS="${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}"
-                        BINBUILD_FILE="$(${BASENAME_BIN} ${BINBUILD_ADDRESS})"
-                        TMP_REQ_DIR="${BINBUILDS_CACHE_DIR}${REQ_APPNAME}${APP_POSTFIX}-${APP_VERSION}"
-                        EXITCODE="0"
-                        ${MKDIR_BIN} -p ${BINBUILDS_CACHE_DIR} > /dev/null 2>&1
-                        ${MKDIR_BIN} -p ${TMP_REQ_DIR} > /dev/null 2>&1
-                        debug "Fetching binary build of requirement: ${REQ_APPNAME}${APP_POSTFIX} with version: ${APP_VERSION}"
-                        debug "Binary build should be available here: ${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}"
-                        cd "${TMP_REQ_DIR}"
-                        if [ ! -f "./${BINBUILD_FILE}" ]; then
-                            note "   ${NOTE_CHAR2} Trying binary build: ${BINBUILD_FILE}"
-                            ${FETCH_BIN} "${BINBUILD_ADDRESS}" >> ${LOG} 2>&1
-                            ${FETCH_BIN} "${BINBUILD_ADDRESS}.sha1" >> ${LOG} 2>&1
+                # if [ "${USE_BINBUILD}" = "false" ]; then
+                #     note "   ${NOTE_CHAR2} Binary build skipped for this OS"
+                # else
+                #     if [ "${USERNAME}" != "${BUILD_USER_NAME}" ]; then # don't use bin builds for build-user
+                #         MIDDLE="${SYSTEM_NAME}-${FULL_SYSTEM_VERSION}-${SYSTEM_ARCH}"
+                #         REQ_APPNAME="$(${PRINTF_BIN} "${APP_NAME}" | ${CUT_BIN} -c1 | ${TR_BIN} '[a-z]' '[A-Z]')$(${PRINTF_BIN} "${APP_NAME}" | ${SED_BIN} 's/^[a-zA-Z]//')"
+                #         ARCHIVE_NAME="${REQ_APPNAME}${APP_POSTFIX}-${APP_VERSION}${DEFAULT_ARCHIVE_EXT}"
+                #         BINBUILD_ADDRESS="${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}"
+                #         BINBUILD_FILE="$(${BASENAME_BIN} ${BINBUILD_ADDRESS})"
+                #         TMP_REQ_DIR="${BINBUILDS_CACHE_DIR}${REQ_APPNAME}${APP_POSTFIX}-${APP_VERSION}"
+                #         EXITCODE="0"
+                #         ${MKDIR_BIN} -p ${BINBUILDS_CACHE_DIR} > /dev/null 2>&1
+                #         ${MKDIR_BIN} -p ${TMP_REQ_DIR} > /dev/null 2>&1
+                #         debug "Fetching binary build of requirement: ${REQ_APPNAME}${APP_POSTFIX} with version: ${APP_VERSION}"
+                #         debug "Binary build should be available here: ${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}"
+                #         cd "${TMP_REQ_DIR}"
+                #         if [ ! -f "./${BINBUILD_FILE}" ]; then
+                #             note "   ${NOTE_CHAR2} Trying binary build: ${BINBUILD_FILE}"
+                #             ${FETCH_BIN} "${BINBUILD_ADDRESS}" >> ${LOG} 2>&1
+                #             ${FETCH_BIN} "${BINBUILD_ADDRESS}.sha1" >> ${LOG} 2>&1
 
-                            # checking archive sha1 checksum
-                            if [ -e "${BINBUILD_FILE}" ]; then
-                                case "${SYSTEM_NAME}" in
-                                    Darwin|Linux)
-                                        export current_archive_sha1="$(${SHA_BIN} "${BINBUILD_FILE}" | ${AWK_BIN} '{ print $1 }')"
-                                        ;;
+                #             # checking archive sha1 checksum
+                #             if [ -e "${BINBUILD_FILE}" ]; then
+                #                 case "${SYSTEM_NAME}" in
+                #                     Darwin|Linux)
+                #                         export current_archive_sha1="$(${SHA_BIN} "${BINBUILD_FILE}" | ${AWK_BIN} '{ print $1 }')"
+                #                         ;;
 
-                                    FreeBSD)
-                                        export current_archive_sha1="$(${SHA_BIN} -q "${BINBUILD_FILE}")"
-                                        ;;
-                                esac
-                            fi
-                            current_sha_file="${BINBUILD_FILE}.sha1"
-                            if [ -e "${current_sha_file}" ]; then
-                                export sha1_value="$(cat ${current_sha_file})"
-                            fi
+                #                     FreeBSD)
+                #                         export current_archive_sha1="$(${SHA_BIN} -q "${BINBUILD_FILE}")"
+                #                         ;;
+                #                 esac
+                #             fi
+                #             current_sha_file="${BINBUILD_FILE}.sha1"
+                #             if [ -e "${current_sha_file}" ]; then
+                #                 export sha1_value="$(cat ${current_sha_file})"
+                #             fi
 
-                            debug "${current_archive_sha1} vs ${sha1_value}"
-                            if [ "${current_archive_sha1}" != "${sha1_value}" ]; then
-                                ${RM_BIN} -f ${BINBUILD_FILE}
-                                ${RM_BIN} -f ${BINBUILD_FILE}.sha1
-                            fi
-                        fi
+                #             debug "${current_archive_sha1} vs ${sha1_value}"
+                #             if [ "${current_archive_sha1}" != "${sha1_value}" ]; then
+                #                 ${RM_BIN} -f ${BINBUILD_FILE}
+                #                 ${RM_BIN} -f ${BINBUILD_FILE}.sha1
+                #             fi
+                #         fi
 
-                        if [ -e "./${BINBUILD_FILE}" ]; then # if exists then checksum is ok
-                            debug "Binbuild file: ${BINBUILD_FILE}"
-                            ${TAR_BIN} zxf ${BINBUILD_FILE} >> ${LOG} 2>&1
-                            export EXITCODE="$?"
+                #         if [ -e "./${BINBUILD_FILE}" ]; then # if exists then checksum is ok
+                #             debug "Binbuild file: ${BINBUILD_FILE}"
+                #             ${TAR_BIN} zxf ${BINBUILD_FILE} >> ${LOG} 2>&1
+                #             export EXITCODE="$?"
 
-                            cd "${CACHE_DIR}" # back to existing cache dir
-                            if [ "${EXITCODE}" = "0" ]; then # if archive is valid
-                                note "   ${NOTE_CHAR2} Binary requirement: ${REQ_APPNAME}${APP_POSTFIX} installed with version: ${APP_VERSION}"
-                                if [ ! -d ${PREFIX} ]; then
-                                    ${MKDIR_BIN} -p ${PREFIX}
-                                fi
-                                BINREQ_PATH="${TMP_REQ_DIR}/${REQ_APPNAME}${APP_POSTFIX}"
-                                # patch rpath in binaries/ libraries
-                                # rpath_patch "${BINREQ_PATH}" "$(${BASENAME_BIN} ${PREFIX})"
+                #             cd "${CACHE_DIR}" # back to existing cache dir
+                #             if [ "${EXITCODE}" = "0" ]; then # if archive is valid
+                #                 note "   ${NOTE_CHAR2} Binary requirement: ${REQ_APPNAME}${APP_POSTFIX} installed with version: ${APP_VERSION}"
+                #                 if [ ! -d ${PREFIX} ]; then
+                #                     ${MKDIR_BIN} -p ${PREFIX}
+                #                 fi
+                #                 BINREQ_PATH="${TMP_REQ_DIR}/${REQ_APPNAME}${APP_POSTFIX}"
+                #                 # patch rpath in binaries/ libraries
+                #                 # rpath_patch "${BINREQ_PATH}" "$(${BASENAME_BIN} ${PREFIX})"
 
-                                ${CP_BIN} -fR ./* ${PREFIX} >> ${LOG} 2>&1
-                                ${RM_BIN} -rf ${PREFIX}/exports >> ${LOG} 2>&1
-                                ${RM_BIN} -rf ${PREFIX}/exports-disabled >> ${LOG} 2>&1
+                #                 ${CP_BIN} -fR ./* ${PREFIX} >> ${LOG} 2>&1
+                #                 ${RM_BIN} -rf ${PREFIX}/exports >> ${LOG} 2>&1
+                #                 ${RM_BIN} -rf ${PREFIX}/exports-disabled >> ${LOG} 2>&1
 
-                                cd "${CACHE_DIR}"
-                                debug "Cleaning unpacked binary cache folder: ${TMP_REQ_DIR}/${REQ_APPNAME}${APP_POSTFIX}"
-                                ${RM_BIN} -rf "${TMP_REQ_DIR}/${REQ_APPNAME}${APP_POSTFIX}"
-                                debug "Marking as installed '$1' in: ${PREFIX}"
-                                ${TOUCH_BIN} "${PREFIX}/$1${INSTALLED_MARK}"
-                                continue
-                            else
-                                note "   ${NOTE_CHAR2} No binary build available for requirement: ${REQ_APPNAME}${APP_POSTFIX}"
-                            fi
-                        fi
-                    else # build from source
-                        note "   ${NOTE_CHAR2} Forced build from source."
-                    fi
-                fi
+                #                 cd "${CACHE_DIR}"
+                #                 debug "Cleaning unpacked binary cache folder: ${TMP_REQ_DIR}/${REQ_APPNAME}${APP_POSTFIX}"
+                #                 ${RM_BIN} -rf "${TMP_REQ_DIR}/${REQ_APPNAME}${APP_POSTFIX}"
+                #                 debug "Marking as installed '$1' in: ${PREFIX}"
+                #                 ${TOUCH_BIN} "${PREFIX}/$1${INSTALLED_MARK}"
+                #                 continue
+                #             else
+                #                 note "   ${NOTE_CHAR2} No binary build available for requirement: ${REQ_APPNAME}${APP_POSTFIX}"
+                #             fi
+                #         fi
+                #     else # build from source
+                #         note "   ${NOTE_CHAR2} Forced build from source."
+                #     fi
+                # fi
 
                 if [ "${APP_NO_CCACHE}" = "" ]; then # ccache is supported by default but it's optional
                     if [ -x "${CCACHE_BIN_OPTIONAL}" ]; then # check for CCACHE availability
