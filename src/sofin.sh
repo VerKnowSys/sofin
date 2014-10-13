@@ -103,11 +103,11 @@ update_definitions () {
         if [ "${current_branch}" != "${BRANCH}" ]; then # use current_branch value if branch isn't matching default branch
             # ${GIT_BIN} stash save -a >> ${LOG} 2>&1
             ${GIT_BIN} checkout -b "${current_branch}" >> ${LOG} 2>&1 || ${GIT_BIN} checkout "${current_branch}" >> ${LOG} 2>&1
-            ${GIT_BIN} pull origin "${current_branch}" >> ${LOG} 2>&1 && note "Updated branch ${current_branch} of repository ${REPOSITORY}" || error "Error occured: Update from branch: ${BRANCH} of repository ${REPOSITORY} isn't possible. Make sure that given repository and branch are valid."
+            ${GIT_BIN} pull origin "${current_branch}" >> ${LOG} && note "Updated branch ${current_branch} of repository ${REPOSITORY}" || error "Error occured: Update from branch: ${BRANCH} of repository ${REPOSITORY} wasn't possible."
 
         else # else use default branch
             ${GIT_BIN} checkout -b "${BRANCH}" >> ${LOG} 2>&1 || ${GIT_BIN} checkout "${BRANCH}" >> ${LOG} 2>&1
-            (${GIT_BIN} pull origin "${BRANCH}" >> ${LOG} 2>&1 && note "Updated branch ${BRANCH} of repository ${REPOSITORY}") || error "Error occured: Update from branch: ${BRANCH} of repository ${REPOSITORY} isn't possible. Make sure that given REPOSITORY and BRANCH values are valid."
+            (${GIT_BIN} pull origin "${BRANCH}" >> ${LOG} && note "Updated branch ${BRANCH} of repository ${REPOSITORY}") || error "Error occured: Update from branch: ${BRANCH} of repository ${REPOSITORY} wasn't possible."
 
         fi
 
