@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.68.2"
+readonly VERSION="0.68.3"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -1031,8 +1031,11 @@ for application in ${APPLICATIONS}; do
                                 note "   ${NOTE_CHAR2} Applying patches for: ${APP_NAME}${APP_POSTFIX}"
                                 patches_files="$(${FIND_BIN} ${LIST_DIR}/* -maxdepth 0 -type f)"
                                 for patch in ${patches_files}; do
-                                    debug "Patching source code with patch: ${patch}"
-                                    ${PATCH_BIN} -N -f -i "${patch}" >> "${LOG}" 2>> "${LOG}" # don't use run.. it may fail - we don't care
+                                    for level in 0 1 2 3 4 5; do
+                                        debug "Trying to patch source with patch: ${patch} (p${level})"
+                                        ${PATCH_BIN} -p${level} -N -f -i "${patch}" >> "${LOG}" 2>> "${LOG}" # don't use run.. it may fail - we don't care
+                                        debug "Patching (p${level}) exit code: $?"
+                                    done
                                 done
                                 pspatch_dir="${LIST_DIR}/${SYSTEM_NAME}"
                                 debug "Checking psp dir: ${pspatch_dir}"
