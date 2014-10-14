@@ -229,7 +229,7 @@ case "${SYSTEM_NAME}" in
         export PATCH_BIN="/usr/bin/patch -p0 "
         export UNAME_BIN="/bin/uname"
         export KLDLOAD_BIN="/sbin/modprobe"
-        export SHA_BIN="/usr/bin/shasum"
+        export SHA_BIN="/usr/bin/sha1sum"
         export SED_BIN="/bin/sed"
         export TAR_BIN="/bin/tar"
         export GREP_BIN="/bin/grep"
@@ -242,10 +242,12 @@ case "${SYSTEM_NAME}" in
         export NPROC_BIN="/usr/bin/nproc"
         export MAKE_OPTS="-j$(${NPROC_BIN})"
         export AWK_BIN="/usr/bin/awk"
-        export SHA_BIN="/usr/bin/shasum"
         if [ ${OS_VERSION} -lt ${GLIBC_MINIMUM_VERSION} ]; then
             export USE_BINBUILD="false"
         fi
+        # runtime sha
+        test -x "${SOFIN_MILISECONDS_UTILITY_BIN}" && \
+        RUNTIME_SHA="$(${PRINTF_BIN} "$(${DATE_BIN})-$(${SOFIN_MILISECONDS_UTILITY_BIN})" | ${SHA_BIN} | ${AWK_BIN} '{print $1}')"
         ;;
 
 esac
