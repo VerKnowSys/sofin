@@ -1040,10 +1040,14 @@ for application in ${APPLICATIONS}; do
                                 pspatch_dir="${LIST_DIR}/${SYSTEM_NAME}"
                                 debug "Checking psp dir: ${pspatch_dir}"
                                 if [ -d "${pspatch_dir}" ]; then
-                                    debug "Proceeding with Platform Specific Patches"
-                                    for platform_specific_patch in ${pspatch_dir}/*; do
-                                        debug "Patching source code with pspatch: ${platform_specific_patch}"
-                                        run "${PATCH_BIN} -i ${platform_specific_patch}"
+                                    note "   ${NOTE_CHAR2} Applying platform specific patches for: ${APP_NAME}${APP_POSTFIX}/${SYSTEM_NAME}"
+                                    patches_files="$(${FIND_BIN} ${pspatch_dir}/* -maxdepth 0 -type f)"
+                                    for platform_specific_patch in ${patches_files}; do
+                                        for level in 0 1 2 3 4 5; do
+                                            debug "Patching source code with pspatch: ${platform_specific_patch} (p${level})"
+                                            ${PATCH_BIN} -p${level} -N -f -i "${platform_specific_patch}" >> "${LOG}" 2>> "${LOG}"
+                                            debug "Patching (p${level}) exit code: $?"
+                                        done
                                     done
                                 fi
                             fi
