@@ -85,7 +85,7 @@ DIG_BIN="/usr/bin/dig"
 XARGS_BIN="/usr/bin/xargs"
 SOFIN_BIN="/usr/bin/sofin"
 SOFIN_VERSION_UTILITY_BIN="/usr/bin/sofin-version-utility"
-SOFIN_MILISECONDS_UTILITY_BIN="/usr/bin/sofin-miliseconds"
+SOFIN_MICROSECONDS_UTILITY_BIN="/usr/bin/sofin-miliseconds"
 SOFIN_LIBBUNDLE_BIN="/usr/bin/sofin-libbundle"
 GIT_BIN="/Software/Git/exports/git"
 SSH_BIN="/usr/bin/ssh"
@@ -192,8 +192,8 @@ case "${SYSTEM_NAME}" in
         fi
 
         # runtime sha
-        test -x "${SOFIN_MILISECONDS_UTILITY_BIN}" && \
-        RUNTIME_SHA="$(${PRINTF_BIN} "$(${DATE_BIN})-$(${SOFIN_MILISECONDS_UTILITY_BIN})" | ${SHA_BIN})"
+        test -x "${SOFIN_MICROSECONDS_UTILITY_BIN}" && \
+        RUNTIME_SHA="$(${PRINTF_BIN} "$(${DATE_BIN})-$(${SOFIN_MICROSECONDS_UTILITY_BIN})" | ${SHA_BIN})"
         ;;
 
     Darwin)
@@ -217,8 +217,8 @@ case "${SYSTEM_NAME}" in
         fi
 
         # runtime sha
-        test -x "${SOFIN_MILISECONDS_UTILITY_BIN}" && \
-        RUNTIME_SHA="$(${PRINTF_BIN} "$(${DATE_BIN})-$(${SOFIN_MILISECONDS_UTILITY_BIN})" | ${SHA_BIN} | ${AWK_BIN} '{print $1}')"
+        test -x "${SOFIN_MICROSECONDS_UTILITY_BIN}" && \
+        RUNTIME_SHA="$(${PRINTF_BIN} "$(${DATE_BIN})-$(${SOFIN_MICROSECONDS_UTILITY_BIN})" | ${SHA_BIN} | ${AWK_BIN} '{print $1}')"
         ;;
 
     Linux)
@@ -246,8 +246,8 @@ case "${SYSTEM_NAME}" in
             export USE_BINBUILD="false"
         fi
         # runtime sha
-        test -x "${SOFIN_MILISECONDS_UTILITY_BIN}" && \
-        RUNTIME_SHA="$(${PRINTF_BIN} "$(${DATE_BIN})-$(${SOFIN_MILISECONDS_UTILITY_BIN})" | ${SHA_BIN} | ${AWK_BIN} '{print $1}')"
+        test -x "${SOFIN_MICROSECONDS_UTILITY_BIN}" && \
+        RUNTIME_SHA="$(${PRINTF_BIN} "$(${DATE_BIN})-$(${SOFIN_MICROSECONDS_UTILITY_BIN})" | ${SHA_BIN} | ${AWK_BIN} '{print $1}')"
         ;;
 
 esac
