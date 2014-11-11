@@ -801,24 +801,24 @@ for application in ${APPLICATIONS}; do
                 export DONT_BUILD_BUT_DO_EXPORTS="true"
             fi
 
-            check_current () { # $1 => version, $2 => current version
-                if [ ! "${1}" = "" ]; then
-                    if [ ! "${2}" = "" ]; then
-                        if [ ! "${1}" = "${2}" ]; then
-                            warn "   ${NOTE_CHAR2} Found different remote version: ${2} vs ${1}."
-                        else
-                            note "   ${NOTE_CHAR2} Definition version is up to date: ${1}"
-                        fi
-                    fi
-                fi
-            }
+            # check_current () { # $1 => version, $2 => current version
+            #     if [ ! "${1}" = "" ]; then
+            #         if [ ! "${2}" = "" ]; then
+            #             if [ ! "${1}" = "${2}" ]; then
+            #                 warn "   ${NOTE_CHAR2} Found different remote version: ${2} vs ${1}."
+            #             else
+            #                 note "   ${NOTE_CHAR2} Definition version is up to date: ${1}"
+            #             fi
+            #         fi
+            #     fi
+            # }
 
-            check_current_by_definition () {
-                req_definition_file="${DEFINITIONS_DIR}${1}.def"
-                . "${DEFAULTS}"
-                . "${req_definition_file}"
-                check_current "${APP_VERSION}" "${APP_CURRENT_VERSION}"
-            }
+            # check_current_by_definition () {
+            #     req_definition_file="${DEFINITIONS_DIR}${1}.def"
+            #     . "${DEFAULTS}"
+            #     . "${req_definition_file}"
+            #     check_current "${APP_VERSION}" "${APP_CURRENT_VERSION}"
+            # }
 
             execute_process () {
                 if [ -z "$1" ]; then
@@ -832,7 +832,7 @@ for application in ${APPLICATIONS}; do
 
                 . "${DEFAULTS}" # load definition and check for current version
                 . "${req_definition_file}"
-                check_current "${APP_VERSION}" "${APP_CURRENT_VERSION}"
+                # check_current "${APP_VERSION}" "${APP_CURRENT_VERSION}"
                 check_disabled "${DISABLE_ON}" # check requirement for disabled state:
 
                 if [ ! -z "${FORCE_GNU_COMPILER}" ]; then # force GNU compiler usage on definition side:
@@ -1169,7 +1169,7 @@ for application in ${APPLICATIONS}; do
                             execute_process "${req}"
                         fi
                     fi
-                    check_current_by_definition "${req}"
+                    # check_current_by_definition "${req}"
                     export req_amount="$(${PRINTF_BIN} "${req_amount} - 1\n" | ${BC_BIN})"
                 done
             fi
@@ -1216,7 +1216,7 @@ for application in ${APPLICATIONS}; do
                         show_done
                     else
                         note "  ${application} (1 of ${req_all})"
-                        check_current_by_definition "${application}"
+                        # check_current_by_definition "${application}"
                         show_done
                         debug "${SUCCESS_CHAR} ${application} current: ${ver}, definition: [${APP_VERSION}] Ok."
                     fi
