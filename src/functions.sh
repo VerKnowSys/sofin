@@ -3,35 +3,6 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 
-# NOTE: this function takes (capitalized) bundle name builts and pushes binary software bundle to remote repository
-binbuild () {
-  build_user_name="build-user"
-
-  if [ "${1}" = "" ]; then
-    printf "You must give software name as param!\n"
-    return
-  fi
-
-  name="${1}"
-  bundle_name="$(printf "${name}" | cut -c1 | tr '[a-z]' '[A-Z]')$(printf "${name}" | sed 's/^[a-zA-Z]//')"
-
-  for i in phoebe.verknowsys.com; do
-    ssh ${build_user_name}@${i} "rm -rf ~/Apps"
-  done
-
-   for i in phoebe.verknowsys.com; do
-    ssh ${build_user_name}@${i} "sofin clean; sofin reload; sofin remove ${name}; sofin get ${name} && sofin push ${bundle_name} && printf 'done\n'"
-   done
-}
-
-
-# NOTE: this function is local helper to run gather-source() on remote mirror host
-src () {
-  test "$1" = "" && echo "No http source given" && exit 1
-  ssh sofin@v "source ~/.functions.sh && gather-source $1"
-}
-
-
 # NOTE: this function must be running on mirror side:
 gather-source () {
     if [ "$1" = "" ]; then
