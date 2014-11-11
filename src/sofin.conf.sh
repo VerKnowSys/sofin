@@ -326,7 +326,7 @@ readonly SOFTWARE_DIR
 readonly LOCK_FILE="${SOFTWARE_DIR}.sofin.lock"
 readonly LOG
 readonly CACHE_DIR
-readonly DEFINITIONS_DIR
+# readonly DEFINITIONS_DIR
 readonly LISTS_DIR
 readonly DEFAULTS
 readonly USERNAME
