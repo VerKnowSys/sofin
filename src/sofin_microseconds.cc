@@ -5,6 +5,6 @@
 int main(void) {
     struct timeval now;
     gettimeofday(&now, NULL);
-    printf("%ld\n", (long)now.tv_usec);
+    printf("%ld%ld\n", (long)now.tv_sec, (long)now.tv_usec);
     return 0;
 }

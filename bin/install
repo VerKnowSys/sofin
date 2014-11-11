@@ -10,19 +10,14 @@ if [ "$PURE" != "" ]; then
     REPOSITORY= sofin setup
 fi
 
-# if [ "$(uname)" = "FreeBSD" ]; then
-#     note "Installing Sofin base software"
-#     sofin install base
+# if [ -d "/Users/sofin" ]; then
+#     note "Updating functions for sofin user"
+#     cat src/functions.sh > /Users/sofin/.functions.sh
 # fi
 
-if [ -d "/Users/sofin" ]; then
-    note "Updating functions for sofin user"
-    cat src/functions.sh > /Users/sofin/.functions.sh
-fi
-
-if [ -d "/Users/dmilith" ]; then
-    note "Developer mode. Installing/ updating functions in home dir"
-    cat src/functions.sh > /Users/dmilith/.functions.sh
-fi
+# if [ -d "/Users/dmilith" ]; then
+#     note "Developer mode. Installing/ updating functions in home dir"
+#     cat src/functions.sh > /Users/dmilith/.functions.sh
+# fi
 
 bin/clean

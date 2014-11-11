@@ -3,7 +3,7 @@
 /defs.tar.bz2
 /bin/sofin-version-utility
 /bin/sofin-rpp
-/bin/sofin-miliseconds
+/bin/sofin-microseconds
 /releases/
 /Sofin.sublime-project
 /Sofin.sublime-workspace

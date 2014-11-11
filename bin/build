@@ -99,7 +99,7 @@ install_base () {
         #     ${RM_BIN} -rf "/usr/bin/sofin-rpp"
         # fi
         ${RM_BIN} -rf "/usr/bin/sofin-version-utility"
-        ${RM_BIN} -rf "/usr/bin/sofin-miliseconds"
+        ${RM_BIN} -rf "/usr/bin/sofin-microseconds"
         ${RM_BIN} -rf "/etc/${CONF_FILE}"
         install_sofin
     fi
@@ -110,8 +110,8 @@ build_natives () {
     if [ -x "${CXX}" ]; then
         echo "C++ compiler available. Using: ${CXX}"
 
-        echo "Building sofin_miliseconds"
-        ${CXX} ${CLANG_OPTIONS} -o bin/sofin-miliseconds src/sofin_miliseconds.cc
+        echo "Building sofin_microseconds"
+        ${CXX} ${CLANG_OPTIONS} -o bin/sofin-microseconds src/sofin_microseconds.cc
         check_command_result $?
 
         echo "Building version utility"
@@ -144,7 +144,7 @@ install_sofin () {
     fi
     ${CP_BIN} "bin/sofin-version-utility" /usr/bin/sofin-version-utility
     check_command_result $?
-    ${CP_BIN} "bin/sofin-miliseconds" /usr/bin/sofin-miliseconds
+    ${CP_BIN} "bin/sofin-microseconds" /usr/bin/sofin-microseconds
     check_command_result $?
     ${CP_BIN} "src/sofin.sh" /usr/bin/sofin
     check_command_result $?
