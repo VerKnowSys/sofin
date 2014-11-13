@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.70.1"
+readonly VERSION="0.70.2"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -153,6 +153,7 @@ usage_howto () {
     note "setup                                - switch definitions repository/ branch from env value 'REPOSITORY' and 'BRANCH' (example: BRANCH=master REPOSITORY=/my/local/definitions/repo/ sofin setup)"
     note "enable                               - enable Sofin developer environment (full environment stored in ~/.profile). It's the default"
     note "disable                              - disable Sofin developer environment (only PATH, PKG_CONFIG_PATH and MANPATH written to ~/.profile)"
+    note "dev                                  - puts definition content on the fly. Second argument is definition name (no extension)"
     exit
 }
 
@@ -217,6 +218,13 @@ perform_clean () {
 
 if [ ! "$1" = "" ]; then
     case $1 in
+
+    dev)
+        test -d ${DEFINITIONS_DIR} || update_definitions
+        note "Paste your definition below. Hit ctrl-d after a newline to commit"
+        ${CAT_BIN} > ${DEFINITIONS_DIR}/${2}.def
+        exit
+        ;;
 
     s|setup)
         if [ -d "${REPOSITORY}" ]; then
