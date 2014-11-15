@@ -281,7 +281,7 @@ if [ ! "$1" = "" ]; then
         ;;
 
 
-    purge
+    purge)
         note "Performing purge-clean."
         perform_clean
         ${RM_BIN} -rf "${CACHE_DIR}"
