@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.70.2"
+readonly VERSION="0.70.3"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -140,7 +140,8 @@ usage_howto () {
     note "update                               - only update definitions from remote repository and exit"
     note "ver | version                        - shows $(${BASENAME_BIN} ${SCRIPT_NAME}) script version"
     note "clean                                - cleans binbuilds cache, unpacked source content and logs"
-    note "distclean                            - cleans binbuilds cache, source cache, unpacked source content and logs"
+    note "distclean                            - cleans binbuilds cache, unpacked source content, logs and definitions"
+    note "purge                                - cleans binbuilds cache, unpacked source content, logs, definitions, source cache and possible states"
     note "outdated                             - lists outdated software"
     note "push | binpush                       - creates binary build from prebuilt software bundles name given as params (example: $(${BASENAME_BIN} ${SCRIPT_NAME}) push Ruby Vifm Curl)"
     note "port                                 - gather port of TheSS running service by service name"
@@ -266,11 +267,24 @@ if [ ! "$1" = "" ]; then
         ;;
 
 
+    clean)
+        perform_clean
+        exit
+        ;;
+
+
     distclean)
         note "Performing dist-clean."
-        #${RM_BIN} -rf "${CACHE_DIR}cache"
         ${RM_BIN} -rf "${CACHE_DIR}definitions"
         perform_clean
+        exit
+        ;;
+
+
+    purge
+        note "Performing purge-clean."
+        perform_clean
+        ${RM_BIN} -rf "${CACHE_DIR}"
         exit
         ;;
 
@@ -289,12 +303,6 @@ if [ ! "$1" = "" ]; then
         update_shell_vars
         note "Disabled Sofin environment. Reloading shell"
         ${KILL_BIN} -SIGUSR2 ${SHELL_PID}
-        exit
-        ;;
-
-
-    clean)
-        perform_clean
         exit
         ;;
 
