@@ -52,15 +52,9 @@ set_c_compiler () {
     case $1 in
         GNU)
             BASE_COMPILER="/usr/bin"
-            if [ "${SYSTEM_NAME}" = "Darwin" ]; then
-                export CC="${BASE_COMPILER}/llvm-gcc ${APP_COMPILER_ARGS}"
-                export CXX="${BASE_COMPILER}/llvm-g++ ${APP_COMPILER_ARGS}"
-                export CPP="${BASE_COMPILER}/llvm-cpp-4.2"
-            else
-                export CC="${BASE_COMPILER}/gcc ${APP_COMPILER_ARGS}"
-                export CXX="${BASE_COMPILER}/g++ ${APP_COMPILER_ARGS}"
-                export CPP="${BASE_COMPILER}/cpp"
-            fi
+            export CC="${BASE_COMPILER}/gcc ${APP_COMPILER_ARGS}"
+            export CXX="${BASE_COMPILER}/g++ ${APP_COMPILER_ARGS}"
+            export CPP="${BASE_COMPILER}/cpp"
             ;;
 
         CLANG)
