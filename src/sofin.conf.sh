@@ -185,6 +185,9 @@ case "${SYSTEM_NAME}" in
         if [ ${OS_VERSION} -gt 93 ]; then
             export DIG_BIN="/usr/bin/drill"
         fi
+        export JAIL_BIN="/usr/sbin/jail"
+        export JEXEC_BIN="/usr/sbin/jexec"
+        export JLS_BIN="/usr/sbin/jls"
 
         # XXX: disable ssl verification of https://github.com which fails on FreeBSD by default.
         if [ -x "${GIT_BIN}" ]; then
