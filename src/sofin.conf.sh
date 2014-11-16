@@ -91,12 +91,11 @@ GIT_BIN="/Software/Git/exports/git"
 SSH_BIN="/usr/bin/ssh"
 DIFF_BIN="/usr/bin/diff"
 
-if [ ! -x "${SOFIN_VERSION_UTILITY_BIN}" ]; then
-    export OS_VERSION="0"
-else
+OS_VERSION=10
+if [ -x "${SOFIN_VERSION_UTILITY_BIN}" ]; then
     export OS_VERSION="$(echo $(${SOFIN_VERSION_UTILITY_BIN}) | ${AWK_BIN} '{ gsub(/\./, ""); print $1; }' )"
+    export FULL_SYSTEM_VERSION="$(${SOFIN_VERSION_UTILITY_BIN})"
 fi
-FULL_SYSTEM_VERSION="$(${SOFIN_VERSION_UTILITY_BIN})"
 USERNAME="$(${ID_BIN} ${ID_SVD})"
 DEFAULT_LDFLAGS="-fPIC -fPIE"
 DEFAULT_COMPILER_FLAGS="-Os -fPIC -fPIE -fno-strict-overflow -fstack-protector-all"
