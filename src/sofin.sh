@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.70.3"
+readonly VERSION="0.70.4"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -120,7 +120,7 @@ update_definitions () {
 
 write_info_about_shell_configuration () {
     note
-    warn "SHELL_PID is not set. It means that Sofin isn't properly configured or wasn't installed."
+    warn "SHELL_PID is not set. Sofin auto-reload function is temporarely disabled."
 }
 
 
