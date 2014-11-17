@@ -94,13 +94,13 @@ install_base () {
 
     if [ "${INSTALL}" = "YES" ]; then
         check_root
-        ${RM_BIN} -rf "/usr/bin/sofin"
+        ${RM_BIN} -rf "${PREFIX}/usr/bin/sofin"
         # if [ "$(uname)" != "Darwin" ]; then
         #     ${RM_BIN} -rf "/usr/bin/sofin-rpp"
         # fi
-        ${RM_BIN} -rf "/usr/bin/sofin-version-utility"
-        ${RM_BIN} -rf "/usr/bin/sofin-microseconds"
-        ${RM_BIN} -rf "/etc/${CONF_FILE}"
+        ${RM_BIN} -rf "${PREFIX}/usr/bin/sofin-version-utility"
+        ${RM_BIN} -rf "${PREFIX}/usr/bin/sofin-microseconds"
+        ${RM_BIN} -rf "${PREFIX}/etc/${CONF_FILE}"
         install_sofin
     fi
 }
