@@ -125,7 +125,7 @@ build_natives () {
             ${CXX} ${CLANG_OPTIONS} -c -I./src/dylibbundler ./src/dylibbundler/Dependency.cpp -o src/.Dependency.o
             ${CXX} ${CLANG_OPTIONS} -c -I./src/dylibbundler ./src/dylibbundler/main.cpp -o src/.main.o
             ${CXX} ${CLANG_OPTIONS} -c -I./src/dylibbundler ./src/dylibbundler/Utils.cpp -o src/.Utils.o
-            ${CXX} ${CLANG_OPTIONS} -o bin/dylibbundler src/.Settings.o src/.DylibBundler.o src/.Dependency.o src/.main.o src/.Utils.o
+            ${CXX} ${CLANG_OPTIONS} -o bin/sofin-dylibbundler src/.Settings.o src/.DylibBundler.o src/.Dependency.o src/.main.o src/.Utils.o
         fi
     else
         error "C++ compiler is required to continue"
@@ -141,7 +141,7 @@ install_sofin () {
     ${CP_BIN} "src/${CONF_FILE}" "${PREFIX}/etc/${CONF_FILE}"
     check_command_result $?
     if [ "$(uname)" = "Darwin" ]; then
-        ${CP_BIN} "bin/dylibbundler" "${PREFIX}/usr/bin/sofin-dylibbundler"
+        ${CP_BIN} "bin/sofin-dylibbundler" "${PREFIX}/usr/bin/sofin-dylibbundler"
         check_command_result $?
     fi
     ${CP_BIN} "bin/sofin-version-utility" ${PREFIX}/usr/bin/sofin-version-utility

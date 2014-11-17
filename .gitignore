@@ -1,12 +1,7 @@
 .DS_Store
 /sofin
-/defs.tar.bz2
-/bin/sofin-version-utility
-/bin/sofin-rpp
-/bin/sofin-microseconds
+/bin/sofin-*
 /releases/
 /Sofin.sublime-project
 /Sofin.sublime-workspace
 src/.*.o
-/bin/dylibbundler
-dylibbundler
