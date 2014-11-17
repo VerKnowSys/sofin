@@ -13,9 +13,7 @@ else
 fi
 
 note "Cleaning natives"
-${RM_BIN} -rf "bin/sofin-rpp"
-${RM_BIN} -rf "bin/sofin-version-utility"
-${RM_BIN} -rf "bin/sofin-miliseconds"
+${RM_BIN} -rf "bin/sofin-*"
 ${RM_BIN} -rf "src/.*.o"
 
 note "Cleaning definitions"
