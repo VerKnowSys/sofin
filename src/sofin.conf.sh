@@ -187,6 +187,7 @@ case "${SYSTEM_NAME}" in
         export JAIL_BIN="/usr/sbin/jail"
         export JEXEC_BIN="/usr/sbin/jexec"
         export JLS_BIN="/usr/sbin/jls"
+        export TRUSS_BIN="/usr/bin/truss"
 
         # XXX: disable ssl verification of https://github.com which fails on FreeBSD by default.
         if [ -x "${GIT_BIN}" ]; then
