@@ -4,7 +4,7 @@
 test -f src/sofin.conf.sh && . src/sofin.conf.sh
 test -f /etc/profile_sofin && . /etc/profile_sofin
 
-INSTALL="YES" bin/build
+PREFIX="${PREFIX}" INSTALL="YES" bin/build
 if [ "$PURE" != "" ]; then
     note "Pure mode"
     REPOSITORY= sofin setup
