@@ -262,55 +262,55 @@ SYSTEM_HOME_DIR="/SystemUsers/"
 CACHE_DIR="${SYSTEM_HOME_DIR}.cache/"
 BINBUILDS_CACHE_DIR="${CACHE_DIR}binbuilds/"
 DEFINITIONS_DIR="${CACHE_DIR}definitions/definitions/"
-HOME_DIRS="${HOME}/.."
+# HOME_DIRS="${HOME}/.."
 LOG="${CACHE_DIR}install.log"
 LISTS_DIR="${CACHE_DIR}definitions/lists/"
 DEFAULTS="${DEFINITIONS_DIR}defaults.def"
-readonly BUILD_USER_NAME="build-user"
-BUILD_USER_HOME="/7a231cbcbac22d3ef975e7b554d7ddf09b97782b/${BUILD_USER_NAME}"
+# readonly BUILD_USER_NAME="build-user"
+# BUILD_USER_HOME="/7a231cbcbac22d3ef975e7b554d7ddf09b97782b/${BUILD_USER_NAME}"
 
-readonly CURRENT_USER_UID="$(${ID_BIN} -u)"
-if [ "${CURRENT_USER_UID}" != "0" ]; then
-    if [ "${HOME}" != "${BUILD_USER_HOME}" ]; then
-        if [ "$(${FIND_BIN} ${HOME_DIRS} -maxdepth 1 2>/dev/null | ${WC_BIN} -l | ${TR_BIN} -d ' ')" = "0" ]; then
-            error "No user home dir found? Critial error. No entries in ${HOME_DIRS}? Fix it and retry."
-            exit 1
-        fi
-        readonly USER_DIRNAME="$(${FIND_BIN} ${HOME_DIRS} -maxdepth 1 -uid "${CURRENT_USER_UID}" 2> /dev/null)" # get user dir by uid and ignore access errors
+# readonly CURRENT_USER_UID="$(${ID_BIN} -u)"
+# if [ "${CURRENT_USER_UID}" != "0" ]; then
+#     if [ "${HOME}" != "${BUILD_USER_HOME}" ]; then
+#         # if [ "$(${FIND_BIN} ${HOME_DIRS} -maxdepth 1 2>/dev/null | ${WC_BIN} -l | ${TR_BIN} -d ' ')" = "0" ]; then
+#         #     error "No user home dir found? Critial error. No entries in ${HOME_DIRS}? Fix it and retry."
+#         #     exit 1
+#         # fi
+#         # readonly USER_DIRNAME="$(${FIND_BIN} ${HOME_DIRS} -maxdepth 1 -uid "${CURRENT_USER_UID}" 2> /dev/null)" # get user dir by uid and ignore access errors
 
-        # additional check for multiple dirs with same UID (illegal)
-        readonly USER_DIR_AMOUNT="$(echo "${USER_DIRNAME}" | ${WC_BIN} -l | ${TR_BIN} -d ' ')"
-        debug "User dirs amount: ${USER_DIR_AMOUNT}"
-        if [ "${USER_DIR_AMOUNT}" != "1" ]; then
-            error "Found more than one user with same uid in ${HOME_DIRS}! That's illegal. Fix it an retry."
-            error "Conflicting users: $(echo "${USER_DIRNAME}" | ${TR_BIN} '\n' ' ')"
-            exit 1
-        fi
-        debug "User dirname: ${USER_DIRNAME}"
-        export USERNAME="$(${BASENAME_BIN} ${USER_DIRNAME})"
-    else
-        export USERNAME="${BUILD_USER_NAME}"
-    fi
+#         # additional check for multiple dirs with same UID (illegal)
+#         # readonly USER_DIR_AMOUNT="$(echo "${USER_DIRNAME}" | ${WC_BIN} -l | ${TR_BIN} -d ' ')"
+#         # debug "User dirs amount: ${USER_DIR_AMOUNT}"
+#         # if [ "${USER_DIR_AMOUNT}" != "1" ]; then
+#         #     error "Found more than one user with same uid in ${HOME_DIRS}! That's illegal. Fix it an retry."
+#         #     error "Conflicting users: $(echo "${USER_DIRNAME}" | ${TR_BIN} '\n' ' ')"
+#         #     exit 1
+#         # fi
+#         debug "User dirname: ${USER_DIRNAME}"
+#         export USERNAME="$(${BASENAME_BIN} ${USER_DIRNAME})"
+#     else
+#         export USERNAME="${BUILD_USER_NAME}"
+#     fi
 
-    # also explicit check if virtual user exists in home dir:
-    if [ "${USERNAME}" = "" ]; then
-        error "No user homedir found in: ${HOME_DIRS} for user: '${USERNAME}'"
-        exit 1
-    fi
-    readonly METADATA_FILE="${HOME}${PRIVATE_METADATA_DIR}${PRIVATE_METADATA_FILE}"
-    if [ -f "${METADATA_FILE}" ]; then
-        debug "ServeD System found. Username set to: ${USERNAME}. Home directory: ${HOME}"
-        debug "Loading user metdata from ${METADATA_FILE}"
-        . "${METADATA_FILE}"
-        readonly export SVD_FULL_NAME="${SVD_FULL_NAME}"
-        #
-        # TODO: FIXME: 2013-03-19 15:34:07 - dmilith - fill metadata and define values of it...
-        # ...
-        #
-    else
-        debug "No metadata found in: ${METADATA_FILE} for user: ${USERNAME}. No additional user data accessible."
-    fi
-fi
+#     # also explicit check if virtual user exists in home dir:
+#     if [ "${USERNAME}" = "" ]; then
+#         error "No user homedir found in: ${HOME_DIRS} for user: '${USERNAME}'"
+#         exit 1
+#     fi
+#     readonly METADATA_FILE="${HOME}${PRIVATE_METADATA_DIR}${PRIVATE_METADATA_FILE}"
+#     if [ -f "${METADATA_FILE}" ]; then
+#         debug "ServeD System found. Username set to: ${USERNAME}. Home directory: ${HOME}"
+#         debug "Loading user metdata from ${METADATA_FILE}"
+#         . "${METADATA_FILE}"
+#         readonly export SVD_FULL_NAME="${SVD_FULL_NAME}"
+#         #
+#         # TODO: FIXME: 2013-03-19 15:34:07 - dmilith - fill metadata and define values of it...
+#         # ...
+#         #
+#     else
+#         debug "No metadata found in: ${METADATA_FILE} for user: ${USERNAME}. No additional user data accessible."
+#     fi
+# fi
 
 
 # if [ "${USER_TYPE}" != "root" ]; then
