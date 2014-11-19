@@ -13,6 +13,8 @@ ssh sofin@verknowsys.com "uname -a"
 for software in $(cat software.list); do
     note "Processing software: ${software}"
     USE_BINBUILD=false sofin get ${software}
-    sofin push ${software}
-    sofin remove ${software}
+    if [ -d "/Software/${software}" ]; then
+        sofin push ${software}
+        sofin remove ${software}
+    fi
 done
