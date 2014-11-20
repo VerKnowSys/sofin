@@ -152,7 +152,7 @@ install_sofin () {
     check_command_result $?
 
     sofin_version=$(${CAT_BIN} src/sofin.sh | ${GREP_BIN} VERSION= | ${AWK_BIN} '{print $2}')
-    echo "Sofin installed on: ${SYSTEM_NAME} $(bin/sofin-version-utility) with ${sofin_version}"
+    echo "Sofin ${sofin_version} installed"
 }
 
 
