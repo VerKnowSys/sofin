@@ -27,8 +27,14 @@ int main(int argc, char *argv[]) {
     /* for FreeBSD, give major and minor version from OS cause there's only one FreeBSD :} */
     #ifdef __FreeBSD__
         const int modifier = 100000;
-        int major = __FreeBSD_version / modifier;
-        printf("%1d.%1d\n", major, (__FreeBSD_version - (major * modifier)) / 1000);
+        char buff[16];
+        FILE *in;
+        in = popen("/usr/bin/uname -U", "r");
+        fgets(buff, sizeof(buff), in);
+        pclose(in);
+        int ver = atoi(buff);
+        int major = ver / modifier;
+        printf("%1d.%1d\n", major, (ver - (major * modifier)) / 1000);
     #endif
 
     /* for Darwin, give major version of OS */
