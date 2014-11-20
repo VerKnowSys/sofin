@@ -313,15 +313,15 @@ DEFAULTS="${DEFINITIONS_DIR}defaults.def"
 # fi
 
 
-# if [ "${USER_TYPE}" != "root" ]; then
+if [ "${USERNAME}" != "root" ]; then
+    export CACHE_DIR="${HOME}/.cache/"
+    export LOG="${CACHE_DIR}install.log"
+    export BINBUILDS_CACHE_DIR="${CACHE_DIR}binbuilds/"
+    export DEFINITIONS_DIR="${CACHE_DIR}definitions/definitions/"
+    export LISTS_DIR="${CACHE_DIR}definitions/lists/"
+    export DEFAULTS="${DEFINITIONS_DIR}defaults.def"
+fi
 #     export SOFTWARE_DIR="${HOME}/${HOME_APPS_DIR}"
-#     export CACHE_DIR="${HOME}/.cache/"
-#     export BINBUILDS_CACHE_DIR="${CACHE_DIR}binbuilds/"
-#     export LOG="${CACHE_DIR}install.log"
-#     export DEFINITIONS_DIR="${CACHE_DIR}definitions/definitions/"
-#     export LISTS_DIR="${CACHE_DIR}definitions/lists/"
-#     export DEFAULTS="${DEFINITIONS_DIR}defaults.def"
-# fi
 
 # more values
 readonly BINBUILDS_CACHE_DIR
