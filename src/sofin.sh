@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.70.8"
+readonly VERSION="0.70.9"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -429,7 +429,7 @@ if [ ! "$1" = "" ]; then
             ${PRINTF_BIN} "# CXXFLAGS:\nexport CXXFLAGS=''\n\n"
             if [ "${SYSTEM_NAME}" = "Darwin" ]; then
                 ${PRINTF_BIN} "# LDFLAGS:\nexport LDFLAGS=''\n\n"
-                ${PRINTF_BIN} "# PKG_CONFIG_PATH:\nexport PKG_CONFIG_PATH='${pkg_config_path}:/opt/X11/lib/pkgconfig'\n\n" # pkg config should be ok
+                ${PRINTF_BIN} "# PKG_CONFIG_PATH:\nexport PKG_CONFIG_PATH='${pkg_config_path}'\n\n" # commented out: :/opt/X11/lib/pkgconfig
             else
                 ${PRINTF_BIN} "# LDFLAGS:\nexport LDFLAGS=''\n\n"
                 ${PRINTF_BIN} "# PKG_CONFIG_PATH:\nexport PKG_CONFIG_PATH='${pkg_config_path}'\n\n"
@@ -443,7 +443,7 @@ if [ ! "$1" = "" ]; then
             ${PRINTF_BIN} "# CXXFLAGS:\nexport CXXFLAGS='${cxxflags}'\n\n"
             if [ "${SYSTEM_NAME}" = "Darwin" ]; then
                 ${PRINTF_BIN} "# LDFLAGS:\nexport LDFLAGS='${ldflags}'\n\n"
-                ${PRINTF_BIN} "# PKG_CONFIG_PATH:\nexport PKG_CONFIG_PATH='${pkg_config_path}:/opt/X11/lib/pkgconfig'\n\n"
+                ${PRINTF_BIN} "# PKG_CONFIG_PATH:\nexport PKG_CONFIG_PATH='${pkg_config_path}'\n\n" # commented out: :/opt/X11/lib/pkgconfig
             else
                 ${PRINTF_BIN} "# LDFLAGS:\nexport LDFLAGS='${ldflags} -Wl,--enable-new-dtags'\n\n"
                 ${PRINTF_BIN} "# PKG_CONFIG_PATH:\nexport PKG_CONFIG_PATH='${pkg_config_path}'\n\n"
@@ -848,10 +848,10 @@ for application in ${APPLICATIONS}; do
                 export LDFLAGS="-L${PREFIX}/lib ${APP_LINKER_ARGS} ${DEFAULT_LDFLAGS} -Wl,-rpath=${PREFIX}/lib,--enable-new-dtags"
 
                 if [ "${SYSTEM_NAME}" = "Darwin" ]; then
-                    export PATH="${PATH}:/opt/X11/bin" # NOTE: requires XQuartz installed!
-                    export CFLAGS="${CFLAGS} -I/opt/X11/include" # NOTE: requires XQuartz installed!
-                    export CXXFLAGS="${CXXFLAGS} -I/opt/X11/include" # NOTE: requires XQuartz installed!
-                    export LDFLAGS="-L${PREFIX}/lib ${APP_LINKER_ARGS} ${DEFAULT_LDFLAGS} -L/opt/X11/lib" # NOTE: requires XQuartz installed!
+                    export PATH="${PATH}" # commented out :/opt/X11/bin NOTE: requires XQuartz installed!
+                    export CFLAGS="${CFLAGS}" # commented out -I/opt/X11/include NOTE: requires XQuartz installed!
+                    export CXXFLAGS="${CXXFLAGS}" # commented out -I/opt/X11/include NOTE: requires XQuartz installed!
+                    export LDFLAGS="-L${PREFIX}/lib ${APP_LINKER_ARGS} ${DEFAULT_LDFLAGS}" # commented out -L/opt/X11/lib  NOTE: requires XQuartz installed!
                 fi
 
                 if [ "${ALLOW}" = "1" ]; then
