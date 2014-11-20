@@ -39,20 +39,12 @@ int main(int argc, char *argv[]) {
 
     /* for Darwin, give major version of OS */
     #ifdef __APPLE__
-        const int significant = 4;
-        int mib[2];
-        size_t len;
-        char *kernelVersion, *version;
-        mib[0] = CTL_KERN;
-        mib[1] = KERN_OSRELEASE;
-        sysctl(mib, 2, NULL, &len, NULL, 0);
-        kernelVersion = (char*)malloc(len * sizeof(char));
-        sysctl(mib, 2, kernelVersion, &len, NULL, 0);
-        version = new char[significant];
-        strncpy(version, kernelVersion, significant);
-        free(kernelVersion);
-        printf("%s\n", version);
-        delete version;
+        char buff[16];
+        FILE *in;
+        in = popen("/usr/bin/defaults read /System/Library/CoreServices/SystemVersion ProductUserVisibleVersion | /usr/bin/cut -d . -f1-2", "r");
+        fgets(buff, sizeof(buff), in);
+        pclose(in);
+        printf("%s", buff);
     #endif
 
     /* for Linux distribution, just give glibc major and minor version */
