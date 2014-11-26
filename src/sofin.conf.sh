@@ -200,6 +200,7 @@ case "${SYSTEM_NAME}" in
         export ZPOOL_BIN="/sbin/zpool"
         export ZFS_BIN="/sbin/zfs"
         export PFCTL_BIN="/sbin/pfctl"
+        export DIALOG_BIN="/usr/bin/dialog"
 
         # XXX: disable ssl verification of https://github.com which fails on FreeBSD by default.
         if [ -x "${GIT_BIN}" ]; then
