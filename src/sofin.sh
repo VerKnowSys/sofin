@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.70.10"
+readonly VERSION="0.70.11"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -728,7 +728,7 @@ for application in ${APPLICATIONS}; do
 
             # note "Preparing application: ${APP_NAME}${APP_POSTFIX} (${APP_FULL_NAME} v${APP_VERSION})"
             export PREFIX="${SOFTWARE_DIR}${APP_NAME}${APP_POSTFIX}"
-            export SOFTWARE_DATA_DIR="/Users/${USERNAME}/SoftwareData/${APP_NAME}${APP_POSTFIX}"
+            export SOFTWARE_DATA_DIR="/SoftwareData/${APP_NAME}${APP_POSTFIX}"
             if [ "${USERNAME}" = "root" ]; then
                 export SOFTWARE_DATA_DIR="${SYSTEM_HOME_DIR}SoftwareData/${APP_NAME}${APP_POSTFIX}"
             fi
