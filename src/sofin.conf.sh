@@ -90,6 +90,7 @@ SOFIN_LIBBUNDLE_BIN="/usr/bin/sofin-dylibbundler"
 GIT_BIN="/Software/Git/exports/git"
 SSH_BIN="/usr/bin/ssh"
 DIFF_BIN="/usr/bin/diff"
+IFCONFIG_BIN="/sbin/ifconfig"
 
 OS_VERSION=10
 if [ -x "${SOFIN_VERSION_UTILITY_BIN}" ]; then
@@ -188,6 +189,10 @@ case "${SYSTEM_NAME}" in
         export JEXEC_BIN="/usr/sbin/jexec"
         export JLS_BIN="/usr/sbin/jls"
         export TRUSS_BIN="/usr/bin/truss"
+        export MOUNT_BIN="/sbin/mount"
+        export ROUTE_BIN="/sbin/route"
+        export MOUNT_NULLFS="/sbin/mount_nullfs"
+        export RCTL_BIN="/usr/bin/rctl"
 
         # XXX: disable ssl verification of https://github.com which fails on FreeBSD by default.
         if [ -x "${GIT_BIN}" ]; then
