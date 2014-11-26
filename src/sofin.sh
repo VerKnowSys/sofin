@@ -730,7 +730,7 @@ for application in ${APPLICATIONS}; do
             export PREFIX="${SOFTWARE_DIR}${APP_NAME}${APP_POSTFIX}"
             export SOFTWARE_DATA_DIR="/Users/${USERNAME}/SoftwareData/${APP_NAME}${APP_POSTFIX}"
             if [ "${USERNAME}" = "root" ]; then
-                export SOFTWARE_DATA_DIR="${SYSTEM_HOME_DIR}/SoftwareData/${APP_NAME}${APP_POSTFIX}"
+                export SOFTWARE_DATA_DIR="${SYSTEM_HOME_DIR}SoftwareData/${APP_NAME}${APP_POSTFIX}"
             fi
 
             run () {
