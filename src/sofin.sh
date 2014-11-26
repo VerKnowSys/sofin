@@ -727,11 +727,10 @@ for application in ${APPLICATIONS}; do
             fi
 
             # note "Preparing application: ${APP_NAME}${APP_POSTFIX} (${APP_FULL_NAME} v${APP_VERSION})"
-            export PREFIX="${SOFTWARE_DIR}${APP_NAME}"
-
-            # append app postfix
-            if [ ! -z "$APP_POSTFIX" ]; then
-                export PREFIX="${PREFIX}${APP_POSTFIX}"
+            export PREFIX="${SOFTWARE_DIR}${APP_NAME}${APP_POSTFIX}"
+            export SOFTWARE_DATA_DIR="/Users/${USERNAME}/SoftwareData/${APP_NAME}${APP_POSTFIX}"
+            if [ "${USERNAME}" = "root" ]; then
+                export SOFTWARE_DATA_DIR="${SYSTEM_HOME_DIR}/SoftwareData/${APP_NAME}${APP_POSTFIX}"
             fi
 
             run () {
