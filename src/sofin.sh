@@ -758,51 +758,47 @@ for application in ${APPLICATIONS}; do
                 if [ "${USE_BINBUILD}" = "false" ]; then
                     note "   ${NOTE_CHAR2} Binary build check was skipped"
                 else
-                    if [ "${USERNAME}" != "${BUILD_USER_NAME}" ]; then # don't use bin builds for build-user
-                        if [ ! -e "./${ARCHIVE_NAME}" ]; then
-                            note "Trying binary build for: ${MIDDLE}/${APP_NAME}${APP_POSTFIX}-${APP_VERSION}"
-                            ${FETCH_BIN} "${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}"  >> ${LOG} 2>&1
-                            ${FETCH_BIN} "${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}.sha1"  >> ${LOG} 2>&1
+                    if [ ! -e "./${ARCHIVE_NAME}" ]; then
+                        note "Trying binary build for: ${MIDDLE}/${APP_NAME}${APP_POSTFIX}-${APP_VERSION}"
+                        ${FETCH_BIN} "${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}"  >> ${LOG} 2>&1
+                        ${FETCH_BIN} "${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}.sha1"  >> ${LOG} 2>&1
 
-                            # checking archive sha1 checksum
-                            if [ -e "${ARCHIVE_NAME}" ]; then
-                                case "${SYSTEM_NAME}" in
-                                    Darwin|Linux)
-                                        export current_archive_sha1="$(${SHA_BIN} "${ARCHIVE_NAME}" | ${AWK_BIN} '{ print $1 }')"
-                                        ;;
+                        # checking archive sha1 checksum
+                        if [ -e "${ARCHIVE_NAME}" ]; then
+                            case "${SYSTEM_NAME}" in
+                                Darwin|Linux)
+                                    export current_archive_sha1="$(${SHA_BIN} "${ARCHIVE_NAME}" | ${AWK_BIN} '{ print $1 }')"
+                                    ;;
 
-                                    FreeBSD)
-                                        export current_archive_sha1="$(${SHA_BIN} -q "${ARCHIVE_NAME}")"
-                                        ;;
-                                esac
-                            fi
-                            current_sha_file="${ARCHIVE_NAME}.sha1"
-                            if [ -e "${current_sha_file}" ]; then
-                                export sha1_value="$(cat ${current_sha_file})"
-                            fi
-
-                            debug "${current_archive_sha1} vs ${sha1_value}"
-                            if [ "${current_archive_sha1}" != "${sha1_value}" ]; then
-                                ${RM_BIN} -f ${ARCHIVE_NAME}
-                                ${RM_BIN} -f ${ARCHIVE_NAME}.sha1
-                            fi
+                                FreeBSD)
+                                    export current_archive_sha1="$(${SHA_BIN} -q "${ARCHIVE_NAME}")"
+                                    ;;
+                            esac
                         fi
-                        cd "${SOFTWARE_ROOT_DIR}"
+                        current_sha_file="${ARCHIVE_NAME}.sha1"
+                        if [ -e "${current_sha_file}" ]; then
+                            export sha1_value="$(cat ${current_sha_file})"
+                        fi
 
-                        if [ -e "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" ]; then # if exists, then checksum is ok
-                            ${TAR_BIN} zxf "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" >> ${LOG} 2>&1
-                            if [ "$?" = "0" ]; then # if archive is valid
-                                note "  ${NOTE_CHAR2} Binary bundle installed: ${APP_NAME}${APP_POSTFIX} with version: ${APP_VERSION}"
-                                export DONT_BUILD_BUT_DO_EXPORTS="true"
-                            else
-                                debug "  ${NOTE_CHAR2} No binary bundle available for ${APP_NAME}${APP_POSTFIX}"
-                                ${RM_BIN} -fr "${BINBUILDS_CACHE_DIR}${ABSNAME}"
-                            fi
+                        debug "${current_archive_sha1} vs ${sha1_value}"
+                        if [ "${current_archive_sha1}" != "${sha1_value}" ]; then
+                            ${RM_BIN} -f ${ARCHIVE_NAME}
+                            ${RM_BIN} -f ${ARCHIVE_NAME}.sha1
+                        fi
+                    fi
+                    cd "${SOFTWARE_ROOT_DIR}"
+
+                    if [ -e "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" ]; then # if exists, then checksum is ok
+                        ${TAR_BIN} zxf "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" >> ${LOG} 2>&1
+                        if [ "$?" = "0" ]; then # if archive is valid
+                            note "  ${NOTE_CHAR2} Binary bundle installed: ${APP_NAME}${APP_POSTFIX} with version: ${APP_VERSION}"
+                            export DONT_BUILD_BUT_DO_EXPORTS="true"
                         else
-                            debug "  ${NOTE_CHAR2} Binary build checksum doesn't match for: ${ABSNAME}"
+                            debug "  ${NOTE_CHAR2} No binary bundle available for ${APP_NAME}${APP_POSTFIX}"
+                            ${RM_BIN} -fr "${BINBUILDS_CACHE_DIR}${ABSNAME}"
                         fi
-                    else # build-user
-                        note "Binary builds disabled for ${BUILD_USER_NAME}!"
+                    else
+                        debug "  ${NOTE_CHAR2} Binary build checksum doesn't match for: ${ABSNAME}"
                     fi
                 fi
             else
