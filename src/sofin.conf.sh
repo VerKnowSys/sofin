@@ -199,6 +199,7 @@ case "${SYSTEM_NAME}" in
         export CAP_MKDB_BIN="/usr/bin/cap_mkdb"
         export ZPOOL_BIN="/sbin/zpool"
         export ZFS_BIN="/sbin/zfs"
+        export PFCTL_BIN="/sbin/pfctl"
 
         # XXX: disable ssl verification of https://github.com which fails on FreeBSD by default.
         if [ -x "${GIT_BIN}" ]; then
