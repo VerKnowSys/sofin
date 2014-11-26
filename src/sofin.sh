@@ -732,6 +732,8 @@ for application in ${APPLICATIONS}; do
             if [ "${USERNAME}" = "root" ]; then
                 export SOFTWARE_DATA_DIR="${SYSTEM_HOME_DIR}SoftwareData/${APP_NAME}${APP_POSTFIX}"
             fi
+            ${MKDIR_BIN} -p "${SOFTWARE_DATA_DIR}"
+            ${CHMOD_BIN} 0711 "${SOFTWARE_DATA_DIR}"
 
             run () {
                 if [ ! -z "$1" ]; then
