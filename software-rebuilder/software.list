@@ -7,14 +7,12 @@ Atop
 Automake
 Bacula
 Bacula-client
-Bind96
 Bind
 Clamav
 Curl
 Dhcp
 Httpd
 Mc
-Mongodb
 Mercurial
 Mysql
 Node
@@ -30,7 +28,6 @@ Php54
 Php55
 Pkgconf
 Postgresql
-Qtbase53
 Qtws53
 Ruby
 Ruby19
