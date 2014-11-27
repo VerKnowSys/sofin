@@ -1,5 +1,5 @@
 # NOTE: this file is SH shell script
-# @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
+# @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
 #
 # global Sofin values:
 if [ "${DEBUG}" = "" ]; then

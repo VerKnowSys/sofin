@@ -1,5 +1,5 @@
 #!/bin/sh
-# @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
+# @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
 
 test -f src/sofin.conf.sh && . src/sofin.conf.sh
 test -f /etc/profile_sofin && . /etc/profile_sofin

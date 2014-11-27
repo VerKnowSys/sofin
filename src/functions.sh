@@ -1,6 +1,6 @@
 #!/bin/sh
 # helper functions to sync software tarballs between multiple hosts
-# @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
+# @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
 
 
 # NOTE: this function must be running on mirror side:

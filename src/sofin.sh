@@ -1,5 +1,5 @@
 #!/bin/sh
-# @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
+# @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
 
 # config settings
 readonly VERSION="0.70.12"
