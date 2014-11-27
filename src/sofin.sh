@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
 
 # config settings
-readonly VERSION="0.70.12"
+readonly VERSION="0.70.13"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -524,12 +524,19 @@ if [ ! "$1" = "" ]; then
                     debug "MIRROR: ${dig_query}"
                     for mirror in ${dig_query}; do
                         SYS="${SYSTEM_NAME}-${FULL_SYSTEM_VERSION}-${SYSTEM_ARCH}"
-                        address="${MAIN_USER}@${mirror}:${MAIN_SOFTWARE_PREFIX}/software/binary/${SYS}/"
+                        system_path="${MAIN_SOFTWARE_PREFIX}/software/binary/${SYS}"
+                        address="${MAIN_USER}@${mirror}:${system_path}"
                         note "Creating destination dirs for ${SYS} if necessary"
                         ${SSH_BIN} -p ${MAIN_PORT} ${MAIN_USER}@${mirror} "mkdir -p ${MAIN_SOFTWARE_PREFIX}/software/binary/${SYS}"
-                        note "Sending archive to remote: ${address}"
-                        ${SCP_BIN} -P ${MAIN_PORT} "${name}" "${address}${name}" >> "${LOG}" 2>&1
-                        ${SCP_BIN} -P ${MAIN_PORT} "${name}.sha1" "${address}${name}.sha1" >> "${LOG}" 2>&1
+                        # NOTE: quick check of remote file existance. If archive and sha1 files exist - don't overwrite them.
+                        ${SSH_BIN} -p ${MAIN_PORT} ${MAIN_USER}@${mirror} "test -f ${system_path}/${name} && test -f ${system_path}/${name}.sha1" >> "${LOG}" 2>&1
+                        if [ "$?" != "0" ]; then
+                            note "Sending archive to remote: ${address}"
+                            ${SCP_BIN} -P ${MAIN_PORT} "${name}" "${address}${name}" >> "${LOG}" 2>&1
+                            ${SCP_BIN} -P ${MAIN_PORT} "${name}.sha1" "${address}${name}.sha1" >> "${LOG}" 2>&1
+                        else
+                            note "Already sent to remote: ${address}"
+                        fi
                     done
                     ${RM_BIN} -f "${name}"
                     ${RM_BIN} -f "${name}.sha1"
