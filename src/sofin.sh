@@ -729,9 +729,6 @@ for application in ${APPLICATIONS}; do
             # note "Preparing application: ${APP_NAME}${APP_POSTFIX} (${APP_FULL_NAME} v${APP_VERSION})"
             export PREFIX="${SOFTWARE_DIR}${APP_NAME}${APP_POSTFIX}"
             export SOFTWARE_DATA_DIR="/User/SoftwareData/${APP_NAME}${APP_POSTFIX}"
-            if [ "${USERNAME}" = "root" ]; then
-                export SOFTWARE_DATA_DIR="${SYSTEM_HOME_DIR}SoftwareData/${APP_NAME}${APP_POSTFIX}"
-            fi
             ${MKDIR_BIN} -p "${SOFTWARE_DATA_DIR}"
             ${CHMOD_BIN} 0711 "${SOFTWARE_DATA_DIR}"
 
