@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
 
 # config settings
-readonly VERSION="0.70.11"
+readonly VERSION="0.70.12"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -839,13 +839,10 @@ for application in ${APPLICATIONS}; do
                 # export LD_LIBRARY_PATH="${PREFIX}/lib:${PREFIX}/libexec:/usr/lib:/lib"
                 export CFLAGS="-I${PREFIX}/include ${APP_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
                 export CXXFLAGS="-I${PREFIX}/include ${APP_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
-                export LDFLAGS="-L${PREFIX}/lib ${APP_LINKER_ARGS} ${DEFAULT_LDFLAGS} -Wl,-rpath=${PREFIX}/lib,--enable-new-dtags"
+                export LDFLAGS="-L${PREFIX}/lib ${APP_LINKER_ARGS} ${DEFAULT_LDFLAGS}"
 
-                if [ "${SYSTEM_NAME}" = "Darwin" ]; then
-                    export PATH="${PATH}" # commented out :/opt/X11/bin NOTE: requires XQuartz installed!
-                    export CFLAGS="${CFLAGS}" # commented out -I/opt/X11/include NOTE: requires XQuartz installed!
-                    export CXXFLAGS="${CXXFLAGS}" # commented out -I/opt/X11/include NOTE: requires XQuartz installed!
-                    export LDFLAGS="-L${PREFIX}/lib ${APP_LINKER_ARGS} ${DEFAULT_LDFLAGS}" # commented out -L/opt/X11/lib  NOTE: requires XQuartz installed!
+                if [ "${SYSTEM_NAME}" != "Darwin" ]; then
+                    export LDFLAGS="${LDFLAGS} -Wl,-rpath=${PREFIX}/lib,--enable-new-dtags "
                 fi
 
                 if [ "${ALLOW}" = "1" ]; then
@@ -966,6 +963,7 @@ for application in ${APPLICATIONS}; do
                             debug "-------------- PRE CONFIGURE SETTINGS DUMP --------------"
                             debug "Current DIR: $(${PWD_BIN})"
                             debug "PREFIX: ${PREFIX}"
+                            debug "SOFTWARE_DATA_DIR: ${SOFTWARE_DATA_DIR}"
                             debug "PATH: ${PATH}"
                             debug "CC: ${CC}"
                             debug "CXX: ${CXX}"
@@ -1075,7 +1073,6 @@ for application in ${APPLICATIONS}; do
                             execute_process "${req}"
                         fi
                     fi
-                    # check_current_by_definition "${req}"
                     export req_amount="$(${PRINTF_BIN} "${req_amount} - 1\n" | ${BC_BIN})"
                 done
             fi
@@ -1100,11 +1097,9 @@ for application in ${APPLICATIONS}; do
                         execute_process "${application}"
                         unset CHANGED
                         mark
-                        # strip_lib_bin
                         show_done
                     else
                         note "  ${application} (1 of ${req_all})"
-                        # check_current_by_definition "${application}"
                         show_done
                         debug "${SUCCESS_CHAR} ${application} current: ${ver}, definition: [${APP_VERSION}] Ok."
                     fi
@@ -1112,7 +1107,6 @@ for application in ${APPLICATIONS}; do
                     note "  ${application} (1 of ${req_all})"
                     execute_process "${application}"
                     mark
-                    # strip_lib_bin
                     note "${SUCCESS_CHAR} ${application} [${APP_VERSION}]\n"
                 fi
             fi
