@@ -1008,7 +1008,7 @@ for application in ${APPLICATIONS}; do
                                     ;;
 
                                 *)
-                                    run "${APP_CONFIGURE_SCRIPT} ${APP_CONFIGURE_ARGS} --prefix=${PREFIX} --localstatedir=${SOFTWARE_DATA_DIR}/var --sysconfdir=${SOFTWARE_DATA_DIR}/etc --datadir=${SOFTWARE_DATA_DIR} --datarootdir=${SOFTWARE_DATA_DIR}/share"
+                                    run "${APP_CONFIGURE_SCRIPT} ${APP_CONFIGURE_ARGS} --prefix=${PREFIX}"
                                     ;;
 
                             esac
