@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
 
 # config settings
-readonly VERSION="0.70.13"
+readonly VERSION="0.70.14"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -1004,11 +1004,11 @@ for application in ${APPLICATIONS}; do
                                     ;;
 
                                 cmake)
-                                    run "${APP_CONFIGURE_SCRIPT} . -LH -DCMAKE_INSTALL_PREFIX=${PREFIX} -DCMAKE_BUILD_TYPE=Release ${APP_CONFIGURE_ARGS}"
+                                    run "${APP_CONFIGURE_SCRIPT} . -LH -DCMAKE_INSTALL_PREFIX=${PREFIX} -DCMAKE_BUILD_TYPE=Release -DSYSCONFDIR=${SOFTWARE_DATA_DIR} -DWITH_DEBUG=0 ${APP_CONFIGURE_ARGS}"
                                     ;;
 
                                 *)
-                                    run "${APP_CONFIGURE_SCRIPT} ${APP_CONFIGURE_ARGS} --prefix=${PREFIX}"
+                                    run "${APP_CONFIGURE_SCRIPT} ${APP_CONFIGURE_ARGS} --prefix=${PREFIX} --localstatedir=${SOFTWARE_DATA_DIR}/var --sysconfdir=${SOFTWARE_DATA_DIR}/etc --datadir=${SOFTWARE_DATA_DIR} --datarootdir=${SOFTWARE_DATA_DIR}/share"
                                     ;;
 
                             esac
