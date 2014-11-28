@@ -191,6 +191,7 @@ case "${SYSTEM_NAME}" in
         export JLS_BIN="/usr/sbin/jls"
         export TRUSS_BIN="/usr/bin/truss"
         export MOUNT_BIN="/sbin/mount"
+        export UMOUNT_BIN="/sbin/umount"
         export ROUTE_BIN="/sbin/route"
         export MOUNT_NULLFS="/sbin/mount_nullfs"
         export RCTL_BIN="/usr/bin/rctl"
