@@ -145,17 +145,17 @@ debug () {
 
 
 warn () {
-    cecho " ${WARN_CHAR} $1" ${yellow}
+    cecho "${WARN_CHAR} $1" ${yellow}
 }
 
 
 note () {
-    cecho " ${NOTE_CHAR} $1" ${green}
+    cecho "$1" ${green}
 }
 
 
 error () {
-    cecho " ${ERROR_CHAR} $1" ${red}
+    cecho "${ERROR_CHAR} $1" ${red}
     exit 1
 }
 
