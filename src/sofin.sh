@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
 
 # config settings
-readonly VERSION="0.70.15"
+readonly VERSION="0.70.16"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -143,6 +143,7 @@ usage_howto () {
     note "  ${cyan}purge                                ${gray}-${green} cleans binbuilds cache, unpacked source content, logs, definitions, source cache and possible states"
     note "  ${cyan}outdated                             ${gray}-${green} lists outdated software"
     note "  ${cyan}push | binpush                       ${gray}-${green} creates binary build from prebuilt software bundles name given as params (example: $(${BASENAME_BIN} ${SCRIPT_NAME}) push Ruby Vifm Curl)"
+    note "  ${cyan}wipe                                 ${gray}-${green} wipes binary build from respository (example: $(${BASENAME_BIN} ${SCRIPT_NAME}) wipe Ruby Vifm)"
     note "  ${cyan}port                                 ${gray}-${green} gather port of TheSS running service by service name"
     note "  ${cyan}setup                                ${gray}-${green} switch definitions repository/ branch from env value 'REPOSITORY' and 'BRANCH' (example: BRANCH=master REPOSITORY=/my/local/definitions/repo/ sofin setup)"
     note "  ${cyan}enable                               ${gray}-${green} enable Sofin developer environment (full environment stored in ~/.profile). It's the default"
@@ -539,12 +540,42 @@ if [ ! "$1" = "" ]; then
                     done
                     ${RM_BIN} -f "${name}"
                     ${RM_BIN} -f "${name}.sha1"
-                    note "Done."
                 fi
             else
                 warn "Not found software named: ${element}!"
             fi
         done
+        note "Done."
+        exit
+        ;;
+
+
+    wipe)
+        note "Preparing to wipe binary bundle: ${SOFIN_ARGS} from repository ${MAIN_BINARY_REPOSITORY}"
+        cd "${SOFTWARE_DIR}"
+        for element in ${SOFIN_ARGS}; do
+            lowercase_element="$(${PRINTF_BIN} "${element}" | ${TR_BIN} '[A-Z]' '[a-z]')"
+            version_element="$(${CAT_BIN} ${element}/${lowercase_element}.installed)"
+            name="${element}-${version_element}${DEFAULT_ARCHIVE_EXT}"
+            dig_query="$(${DIG_BIN} +short ${MAIN_SOFTWARE_ADDRESS} A)"
+            if [ ${OS_VERSION} -gt 93 ]; then
+                # In FreeBSD 10 there's drill utility instead of dig
+                dig_query=$(${DIG_BIN} A ${MAIN_SOFTWARE_ADDRESS} | ${GREP_BIN} "^${MAIN_SOFTWARE_ADDRESS}" | ${AWK_BIN} '{print $5}')
+            fi
+            debug "MIRROR: ${dig_query}"
+            for mirror in ${dig_query}; do
+                SYS="${SYSTEM_NAME}-${FULL_SYSTEM_VERSION}-${SYSTEM_ARCH}"
+                system_path="${MAIN_SOFTWARE_PREFIX}/software/binary/${SYS}"
+                ${SSH_BIN} -p ${MAIN_PORT} ${MAIN_USER}@${mirror} "test -f ${system_path}/${name} || test -f ${system_path}/${name}.sha1" >> "${LOG}" 2>&1
+                if [ "$?" = "0" ]; then
+                    note "Wiping out archive: ${name}"
+                    ${SSH_BIN} -p ${MAIN_PORT} ${MAIN_USER}@${mirror} "${RM_BIN} -f ${system_path}/${name} ${system_path}/${name}.sha1" >> "${LOG}" 2>&1
+                else
+                    warn "No such archive to wipe: ${name}"
+                fi
+            done
+        done
+        note "Done."
         exit
         ;;
 
