@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
 
 # config settings
-readonly VERSION="0.70.14"
+readonly VERSION="0.70.15"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -531,8 +531,8 @@ if [ ! "$1" = "" ]; then
                         ${SSH_BIN} -p ${MAIN_PORT} ${MAIN_USER}@${mirror} "test -f ${system_path}/${name} && test -f ${system_path}/${name}.sha1" >> "${LOG}" 2>&1
                         if [ "$?" != "0" ]; then
                             note "Sending archive to remote: ${address}"
-                            ${SCP_BIN} -P ${MAIN_PORT} "${name}" "${address}${name}" >> "${LOG}" 2>&1
-                            ${SCP_BIN} -P ${MAIN_PORT} "${name}.sha1" "${address}${name}.sha1" >> "${LOG}" 2>&1
+                            ${SCP_BIN} -P ${MAIN_PORT} "${name}" "${address}/${name}" >> "${LOG}" 2>&1
+                            ${SCP_BIN} -P ${MAIN_PORT} "${name}.sha1" "${address}/${name}.sha1" >> "${LOG}" 2>&1
                         else
                             note "Already sent to remote: ${address}"
                         fi
