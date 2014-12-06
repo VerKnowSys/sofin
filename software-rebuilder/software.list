@@ -9,6 +9,7 @@ Bacula-client
 Bind
 Clamav
 Curl
+Gnupg
 Dhcp
 Httpd
 Mc
