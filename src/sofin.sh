@@ -149,6 +149,7 @@ usage_howto () {
     note "  ${cyan}enable                               ${gray}-${green} enable Sofin developer environment (full environment stored in ~/.profile). It's the default"
     note "  ${cyan}disable                              ${gray}-${green} disable Sofin developer environment (only PATH, PKG_CONFIG_PATH and MANPATH written to ~/.profile)"
     note "  ${cyan}dev                                  ${gray}-${green} puts definition content on the fly. Second argument is definition name (no extension)"
+    note "  ${cyan}rebuild                              ${gray}-${green} rebuilds, wipes and pushes each software bundle that depends on definition given as a param. (example: $(${BASENAME_BIN} ${SCRIPT_NAME}) rebuild openssl - will rebuild all bundles that have 'openssl' dependency)"
     exit
 }
 
@@ -546,6 +547,38 @@ if [ ! "$1" = "" ]; then
             fi
         done
         note "Done."
+        exit
+        ;;
+
+
+    rebuild)
+        update_definitions
+        if [ "$2" = "" ]; then
+            error "Missing second argument with library/software name."
+        fi
+        dependency="$2"
+
+        # go to definitions dir, and gather software list that include given dependency:
+        all_defs="$(${FIND_BIN} ${DEFINITIONS_DIR} -maxdepth 1 -type f -name '*.def')"
+        to_rebuild=""
+        for deps in ${all_defs}; do
+            ${GREP_BIN} -R "${dependency}" ${deps} >/dev/null 2>&1
+            if [ "$?" = "0" ]; then
+                dep="$(${BASENAME_BIN} "${deps}")"
+                rawname="$(${PRINTF_BIN} "${dep}" | ${SED_BIN} 's/\.def//g')"
+                app_name="$(${PRINTF_BIN} "${rawname}" | ${CUT_BIN} -c1 | ${TR_BIN} '[a-z]' '[A-Z]')$(${PRINTF_BIN} "${rawname}" | ${SED_BIN} 's/^[a-zA-Z]//')"
+                to_rebuild="${app_name} ${to_rebuild}"
+            fi
+        done
+
+        note "Will rebuild, wipe and push these bundles: ${to_rebuild}"
+        for software in ${to_rebuild}; do
+            eval "${SCRIPT_NAME} remove ${software}"
+            eval "USE_BINBUILD=false ${SCRIPT_NAME} get ${software}" && \
+            eval "${SCRIPT_NAME} wipe ${software}" && \
+            eval "${SCRIPT_NAME} push ${software}" && \
+            eval "${SCRIPT_NAME} remove ${software}"
+        done
         exit
         ;;
 
