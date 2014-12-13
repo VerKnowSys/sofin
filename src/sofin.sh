@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
 
 # config settings
-readonly VERSION="0.70.16"
+readonly VERSION="0.72.0"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -533,8 +533,8 @@ if [ ! "$1" = "" ]; then
                         ${SSH_BIN} -p ${MAIN_PORT} ${MAIN_USER}@${mirror} "test -f ${system_path}/${name} && test -f ${system_path}/${name}.sha1" >> "${LOG}" 2>&1
                         if [ "$?" != "0" ]; then
                             note "Sending archive to remote: ${address}"
-                            ${SCP_BIN} -P ${MAIN_PORT} "${name}" "${address}/${name}" >> "${LOG}" 2>&1
-                            ${SCP_BIN} -P ${MAIN_PORT} "${name}.sha1" "${address}/${name}.sha1" >> "${LOG}" 2>&1
+                            ${SCP_BIN} -P ${MAIN_PORT} "${name}" "${address}/${name}" 2>> "${LOG}"
+                            ${SCP_BIN} -P ${MAIN_PORT} "${name}.sha1" "${address}/${name}.sha1" 2>> "${LOG}"
                         else
                             note "Already sent to remote: ${address}"
                         fi
@@ -831,8 +831,8 @@ for application in ${APPLICATIONS}; do
                 else
                     if [ ! -e "./${ARCHIVE_NAME}" ]; then
                         note "Trying binary build for: ${MIDDLE}/${APP_NAME}${APP_POSTFIX}-${APP_VERSION}"
-                        ${FETCH_BIN} "${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}"
-                        ${FETCH_BIN} "${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}.sha1"
+                        ${FETCH_BIN} "${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}" 2>>${LOG}
+                        ${FETCH_BIN} "${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}.sha1" 2>>${LOG}
 
                         # checking archive sha1 checksum
                         if [ -e "${ARCHIVE_NAME}" ]; then
