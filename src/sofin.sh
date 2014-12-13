@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
 
 # config settings
-readonly VERSION="0.72.0"
+readonly VERSION="0.72.1"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -527,14 +527,17 @@ if [ ! "$1" = "" ]; then
                         SYS="${SYSTEM_NAME}-${FULL_SYSTEM_VERSION}-${SYSTEM_ARCH}"
                         system_path="${MAIN_SOFTWARE_PREFIX}/software/binary/${SYS}"
                         address="${MAIN_USER}@${mirror}:${system_path}"
+                        def_error () {
+                            error "Error sending ${1} to ${address}/${1}"
+                        }
                         note "Creating destination dirs for ${SYS} if necessary"
                         ${SSH_BIN} -p ${MAIN_PORT} ${MAIN_USER}@${mirror} "mkdir -p ${MAIN_SOFTWARE_PREFIX}/software/binary/${SYS}"
                         # NOTE: quick check of remote file existance. If archive and sha1 files exist - don't overwrite them.
                         ${SSH_BIN} -p ${MAIN_PORT} ${MAIN_USER}@${mirror} "test -f ${system_path}/${name} && test -f ${system_path}/${name}.sha1" >> "${LOG}" 2>&1
                         if [ "$?" != "0" ]; then
                             note "Sending archive to remote: ${address}"
-                            ${SCP_BIN} -P ${MAIN_PORT} "${name}" "${address}/${name}" 2>> "${LOG}"
-                            ${SCP_BIN} -P ${MAIN_PORT} "${name}.sha1" "${address}/${name}.sha1" 2>> "${LOG}"
+                            ${SCP_BIN} -P ${MAIN_PORT} ${name} ${address}/${name} || def_error ${name}
+                            ${SCP_BIN} -P ${MAIN_PORT} ${name}.sha1 ${address}/${name}.sha1 || def_error ${name}.sha1
                         else
                             note "Already sent to remote: ${address}"
                         fi
@@ -571,13 +574,20 @@ if [ ! "$1" = "" ]; then
             fi
         done
 
+        def_error () {
+            error "Failure in definition: ${software}. Report or fix the definition please!"
+        }
+
         note "Will rebuild, wipe and push these bundles: ${to_rebuild}"
         for software in ${to_rebuild}; do
-            eval "${SCRIPT_NAME} remove ${software}"
-            eval "USE_BINBUILD=false ${SCRIPT_NAME} get ${software}" && \
-            eval "${SCRIPT_NAME} wipe ${software}" && \
-            eval "${SCRIPT_NAME} push ${software}" && \
-            eval "${SCRIPT_NAME} remove ${software}"
+            if [ "${software}" = "Git" ]; then
+                continue
+            fi
+            ${SCRIPT_NAME} remove ${software}
+            USE_BINBUILD=false ${SCRIPT_NAME} get ${software} || def_error
+            ${SCRIPT_NAME} wipe ${software} || def_error
+            ${SCRIPT_NAME} push ${software} || def_error
+            ${SCRIPT_NAME} remove ${software} || def_error
         done
         exit
         ;;
