@@ -55,9 +55,22 @@ customizable software for FreeBSD servers. Darwin (Mac OS X) support started wit
 
 
 ## Shell (hidden) options:
-* USE_UPDATE=false sofin get vim  - will skip definitions update before installing "Vim" bundle (useful in conjuction with "sofin dev" feature)
-* USE_BINBUILD=false sofin get vifm  - will skip checking for binary build for "Vifm" bundle.
-* USE_UPDATE=false USE_BINBUILD=false sofin get git  - this trick is required to rebuild bundles like "Git". Note that Sofin requires Git to work properly. By default on clean systems, it's trying to fetch initial definitions tarball, that must be purged manually after first run by using "sofin distclean". On ServeD systems Git bundle is always installed by default.
+* Will skip definitions update before installing "Vim" bundle (useful in conjuction with "sofin dev" feature):
+```bash
+USE_UPDATE=false sofin get vim
+```
+
+
+* Will skip checking for binary build for "Vifm" bundle.
+```bash
+USE_BINBUILD=false sofin get vifm
+```
+
+
+* This trick is required to rebuild bundles like "Git". Note that Sofin requires Git to work properly. By default on clean systems, it's trying to fetch initial definitions tarball, that must be purged manually after first run by using "sofin distclean". On ServeD systems Git bundle is always installed by default.
+```bash
+USE_UPDATE=false USE_BINBUILD=false sofin get git
+```
 
 
 ## Examples:
