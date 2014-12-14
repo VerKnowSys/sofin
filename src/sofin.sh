@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
 
 # config settings
-readonly VERSION="0.72.1"
+readonly VERSION="0.72.2"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -80,6 +80,10 @@ set_c_compiler () {
 
 
 update_definitions () {
+    if [ "${USE_UPDATE}" = "false" ]; then
+        warn "Skipped definitions update."
+        return
+    fi
     note "${HEADER}"
     if [ ! -x "${GIT_BIN}" ]; then
         note "Installing initial definition list from tarball."
