@@ -54,6 +54,12 @@ customizable software for FreeBSD servers. Darwin (Mac OS X) support started wit
 * Supports git repositories as definition source (feature available since 0.60.0). An example in [vifm-devel.def](https://github.com/VerKnowSys/sofin-definitions/blob/stable/definitions/vifm-devel.def)
 
 
+## Shell (hidden) options:
+* USE_UPDATE=false sofin get vim  - will skip definitions update before installing "Vim" bundle (useful in conjuction with "sofin dev" feature)
+* USE_BINBUILD=false sofin get vifm  - will skip checking for binary build for "Vifm" bundle.
+* USE_UPDATE=false USE_BINBUILD=false sofin get git  - this trick is required to rebuild bundles like "Git". Note that Sofin requires Git to work properly. By default on clean systems, it's trying to fetch initial definitions tarball, that must be purged manually after first run by using "sofin distclean". On ServeD systems Git bundle is always installed by default.
+
+
 ## Examples:
 * Install all available software defined in a list called "all":
 ```bash
