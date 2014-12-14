@@ -145,7 +145,7 @@ debug () {
 
 
 warn () {
-    cecho "${WARN_CHAR} $1" ${yellow}
+    cecho "$1" ${yellow}
 }
 
 
