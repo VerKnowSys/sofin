@@ -647,7 +647,8 @@ if [ ! "$1" = "" ]; then
                 debug "Removing software from: ${SOFTWARE_DIR}${APP_NAME}"
                 ${RM_BIN} -rfv "${SOFTWARE_DIR}${APP_NAME}" >> "${LOG}"
             else
-                error "Application: ${APP_NAME} not installed."
+                warn "Application: ${APP_NAME} not installed."
+                exit 1 # throw an error exit code
             fi
             update_shell_vars ${USERNAME}
         done
