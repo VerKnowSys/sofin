@@ -35,6 +35,15 @@ cd ..
 
 if [ "${USER}" = "dmilith" ]; then
     note "Pushing package to remote server"
-    scp releases/sofin-${version}.tar.bz2 v:/home/dmilith/Web/Public/Sofin-releases > /dev/null 2>&1
+    scp releases/sofin-${version}.tar.bz2 v:/home/dmilith/Web/Public/Sofin-releases 2>&1
     ssh sofin@v "source ~/.functions.sh && gather-source http://dmilith.verknowsys.com/Public/Sofin-releases/sofin-${version}.tar.bz2"
+    note "Creating initial-definitions snapshot"
+    git clone https://github.com/VerKnowSys/sofin-definitions.git
+    cd ./sofin-definitions
+    tar cf ../releases/initial-definitions.tar.gz --exclude='*.tar.*' ./
+    cd ..
+    note "Pushing initial-definitions snapshot to remote servers"
+    scp releases/initial-definitions.tar.gz v:/home/dmilith/Web/Public/Sofin-releases > /dev/null 2>&1
+    ssh sofin@v "rm /Mirror/software/source/initial-definitions.tar.gz ; source ~/.functions.sh && gather-source http://dmilith.verknowsys.com/Public/Sofin-releases/initial-definitions.tar.gz" # XXX: hacky
+    rm -rf ./sofin-definitions initial-definitions.tar.gz
 fi
