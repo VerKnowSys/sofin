@@ -1,7 +1,7 @@
 # Sofin - SOFtware INstaller. Designed for BSD and Darwin.
 
 ## Author:
-* Daniel (dmilith) Dettlaff (dmilith [at] verknowsys.com). I'm also on #verknowsys @ freenode IRC.
+* Daniel (dmilith) Dettlaff (dmilith at me dot com). I'm also on freenode IRC.
 
 
 ## Contributors:
@@ -32,7 +32,7 @@ customizable software for FreeBSD servers. Darwin (Mac OS X) support started wit
 * Supports basic "marking" of status of installed applications/ dependencies to resume broken/ failed/ interrupted installation.
 * You may feel safe upgrading only *one* software bundle without headache of "how it affects rest of my software". No application bundle will affect any other. Ever.
 * Sofin is designed to not touch any part of system. The only exception is /etc/profile_sofin created after system wide software installation (/Software/) in ServeD system.
-* By default Sofin verbosity is limited to minimum. More detailed information is written to LOG file (located in /Software/.cache/install.log by default or /Users/USER_NAME/.cache/install.log)
+* By default Sofin verbosity is limited to minimum. More detailed information is written to LOG file (located in ~/.cache/install.log)
 * Exports. Each app has own ROOT_DIR/exports/ with symlinks to exported software. Exported software are just simple symlinks used to generate PATH environment variable.
 * Sofin has own configuration file: [sofin.conf.sh](https://github.com/VerKnowSys/sofin/blob/stable/src/sofin.conf.sh) which is SH script itself.
 * Supports parallel builds by default (from version 0.24.5)
@@ -45,7 +45,7 @@ customizable software for FreeBSD servers. Darwin (Mac OS X) support started wit
   - APP_AFTER_EXPORT_CALLBACK (executed after final stage of exporting software executables)
   Each callback can be sh function itself and to be called by name. Look into [sbt.def](https://github.com/VerKnowSys/sofin-definitions/blob/stable/definitions/sbt.def) for an example createLaunchScript().
 * Supports collisions between definitions through APP_CONFLICTS_WITH option since version 0.38.0. An example in [ruby.def](https://github.com/VerKnowSys/sofin-definitions/blob/stable/definitions/ruby.def)
-* Supports binary builds of software bundles and requirements since 0.47.2
+* Supports binary builds of software bundles since 0.47.2
 * Since version 0.51.0, Sofin automatically avoids using software binary builds, that won't work on given host. In that case, software will be built from source. Minimum system requirements for binary builds to work, depend on platfrom:
    - FreeBSD: OS version >= 9.1
    - Darwin: OS version >= 12.4
@@ -124,53 +124,36 @@ sofin install databases
 
 ## Differences from [POSIX](https://en.wikipedia.org/wiki/POSIX) and [FHS](https://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard) standards:
 * Sofin provides a slightly different approach to shell PATH variable. By default user PATH variable is overriden to include APP-PREFIX/exports instead of default APP-PREFIX/(s)bin. After each successful software installation sofin will populate APP-PREFIX/exports with relative symlinks to existing binaries of bundle. Application exports are defined in "APP_EXPORTS" variable (available for any definition).
-* Sofin suggests empty /usr/local folder. It's caused by POSIX "shared nature" of /usr/local. Sofin was built against this rule to prevent cross requirements between prefixes (/opt/X11 is an exception on Darwin), and to make sure that each software is easily movable between machines with same architecture.
-* Each application has own "root" directory (Similar to Mac OS X software in *.app folders).
+* Sofin suggests empty /usr/local folder. It's caused by POSIX "shared nature" of /usr/local. Sofin was built against this rule to prevent cross requirements between prefixes, and to make sure that each software is easily movable between machines with same architecture.
+* Each application has own "root" directory (Similarly to Mac OS X software in *.app folders).
 * Each software bundle includes all dependencies of given software, hence application bundle requires more disk
 space than it does with "old fasioned, system wide, shared software".
 
 
 ## Pitfalls/ Limitations:
 * Windows isn't supported, but Sofin will run just fine everywhere after a couple of configuration fights.
-* Sofin is designed, tested and heavy supported under both 64bit: FreeBSD 9.1 and Darwin 12.2.0, but it should also work on any compliant architectures as well.
+* Sofin is designed, tested and heavy supported under both 64bit: FreeBSD 10.x and Darwin 14.0.0, but it should also work on any compliant architectures as well.
 * Currently all official Sofin software used by current definitions is mirrored only on [software.verknowsys.com](http://software.verknowsys.com/source).
 * Currently some definitions provided by Sofin include a couple of custom patches on software required by VerKnowSys ServeD © System. Patches (if any) usually come from current [FreeBSD ports](http://www.freebsd.org/ports/index.html).
-* Some definitions with X11 requirement will need [XQuartz](http://xquartz.macosforge.org/landing/) installation. (Darwin hosts only).
 
 
 ## Installation info (platform specific):
 
 ### FreeBSD specific:
-  - Install base 64bit system - I used 64bit FreeBSD 9.1 bootonly iso here.
+  - Install base 64bit system - I used 64bit FreeBSD 10.1 bootonly iso here.
   - Fetch latest package from [this site](http://dmilith.verknowsys.com/Public/Sofin-releases/), unpack and run `bin/install` as root.
-  - Install additional base system software. Run:
-
-  ```
-  sofin install base # It will put "sofin" into /usr/bin/ and sofin.conf.sh into /etc/
-  ```
   - Start using sofin as regular user.
 
 ### Darwin/ Mac OS X specific:
-  - Install Mac OS X 10.8.
-  - Install [XQuartz](http://xquartz.macosforge.org/landing/) (if you want to build definitions that require X11)
+  - Install Mac OS X 10.9 or 10.10 (currently supported)
   - Fetch latest package from [this site](http://dmilith.verknowsys.com/Public/Sofin-releases/), unpack and run `bin/install` as root.
-  - Install additional base system software. Run:
-
-  ```
-  sudo sofin install base # It will put "sofin" into /usr/bin/ and sofin.conf.sh into /etc/
-  ```
   - Start using sofin as regular user.
 
 
 ## Conflicts/ Problems/ Known issues:
-* Latest versions of OSX 10.8/ 10.9 lack GNU compiler (even through Xcode command line utilities, the only available compiler is Clang). Due to this fact, it is required to have installed binaries: `/usr/bin/llvm-gcc` `/usr/bin/llvm-g++` and `/usr/bin/llvm-cpp-4.2` on your system. (Only if you want Sofin to build software that requires GNU compiler). In older versions of Xcode (=<4.1) this compiler is built in and usually resides in `/usr/llvm-gcc-4.2` directory and is linked to `/usr/bin`. I uploaded this compiler taken from my 10.8 system. It's available [here](http://software.verknowsys.com/binary/Darwin-x86_64-common/llvm-gcc-4.2-prebuilt.tar.bz2). Put it anywhere and make symlinks to `/usr/bin` to solve this issue permanently.
+* Latest versions of OSX 10.8/ 10.9/ 10.10 lack GNU compiler (even through Xcode command line utilities, the only available compiler is Clang). Due to this fact, it is required to have installed binaries: `/usr/bin/llvm-gcc` `/usr/bin/llvm-g++` and `/usr/bin/llvm-cpp-4.2` on your system. (Only if you want Sofin to build software that requires GNU compiler). In older versions of Xcode (=<4.1) this compiler is built in and usually resides in `/usr/llvm-gcc-4.2` directory and is linked to `/usr/bin`. I uploaded this compiler taken from my 10.8 system. It's available [here](http://software.verknowsys.com/binary/Darwin-x86_64-common/llvm-gcc-4.2-prebuilt.tar.bz2). Put it anywhere and make symlinks to `/usr/bin` to solve this issue permanently.
 * Sofin build mechanism is known to be in conflict with other software managment solutions like: BSD Ports, HomeBrew, MacPorts, Fink. Keep that in mind before reporting problems.
 * It's recommended to change shell by doing: `chsh -s /Software/Zsh/exports/zsh` for each user which will use Sofin. It's caused shells that don't read standard default shell initialization scripts like /etc/zshenv.
-
-
-## FAQ:
-* "Definition 'name' is broken and it doesn't build on my system!" - Usually caused by conflicting software, installed in system paths (f.e. /usr/bin, /usr/lib, /usr/local). Sofin implies clean base system.
-* "It's not working!". Contribute with a fix!
 
 
 ## License:
