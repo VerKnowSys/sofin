@@ -10,30 +10,40 @@ if [ "${TRACE}" = "" ]; then
 fi
 
 # setting up definitions repository
-readonly DEFAULT_REPOSITORY="http://github.com/VerKnowSys/sofin-definitions.git" # this is official sofin definitions repository
+readonly DEFAULT_REPOSITORY="http://github.com/VerKnowSys/sofin-definitions.git" # official sofin definitions repository
 # REPOSITORY is set after determining CACHE_DIR (L300)
 # and branch used
 if [ "${BRANCH}" = "" ]; then
     export BRANCH="stable"
 fi
 
+# ANSI color definitions
+readonly red='\033[31;40m'
+readonly green='\033[32;40m'
+readonly yellow='\033[33;40m'
+readonly blue='\033[34;40m'
+readonly magenta='\033[35;40m'
+readonly cyan='\033[36;40m'
+readonly gray='\033[37;40m'
+readonly white='\033[38;40m'
+readonly reset='\033[0m'
+
 readonly DEBUG
 readonly TRACE
-readonly ID_SVD="-un"
-readonly HEADER="Sofin v${VERSION} (c) 2o11-2o14 verknowsys.com"
-readonly SCRIPT_NAME="/usr/bin/sofin"
-readonly SCRIPT_ARGS="$*"
-readonly PRIVATE_METADATA_DIR="/Private/"
-readonly PRIVATE_METADATA_FILE="Metadata"
-readonly HOME_APPS_DIR="Apps/"
-readonly DEFAULT_PATH="/bin:/usr/bin:/sbin:/usr/sbin"
-readonly DEFAULT_MANPATH="/usr/share/man:/usr/share/openssl/man"
+
+readonly SOFIN_HEADER="Sofin v${VERSION} (c) 2o11-2o14 verknowsys.com"
 readonly SOFIN_PROFILE="/etc/profile_sofin"
+readonly SOFIN_DISABLED_INDICATOR_FILE="${HOME}/.sofin-disabled"
+
+DEFAULT_LDFLAGS="-fPIC -fPIE"
+DEFAULT_COMPILER_FLAGS="-Os -fPIC -fPIE -fno-strict-overflow -fstack-protector-all"
+readonly DEFAULT_ID_OPTIONS="-un"
+readonly DEFAULT_MANPATH="/usr/share/man"
+readonly DEFAULT_PATH="/bin:/usr/bin:/sbin:/usr/sbin"
+readonly DEFAULT_ARCHIVE_EXT=".txz"
 readonly DEPENDENCIES_FILE=".dependencies"
 readonly INSTALLED_MARK=".installed"
 readonly LOG_LINES_AMOUNT="1000"
-readonly DEFAULT_ARCHIVE_EXT=".tar.gz"
-readonly SOFIN_DISABLED_INDICATOR_FILE="${HOME}/.sofin-disabled"
 
 # utils software from POSIX base system variables:
 PRINTF_BIN="/usr/bin/printf"
@@ -98,9 +108,7 @@ if [ -x "${SOFIN_VERSION_UTILITY_BIN}" ]; then
     export OS_VERSION="$(echo $(${SOFIN_VERSION_UTILITY_BIN}) | ${AWK_BIN} '{ gsub(/\./, ""); print $1; }' )"
     export FULL_SYSTEM_VERSION="$(${SOFIN_VERSION_UTILITY_BIN})"
 fi
-USERNAME="$(${ID_BIN} ${ID_SVD})"
-DEFAULT_LDFLAGS="-fPIC -fPIE"
-DEFAULT_COMPILER_FLAGS="-Os -fPIC -fPIE -fno-strict-overflow -fstack-protector-all"
+USERNAME="$(${ID_BIN} ${DEFAULT_ID_OPTIONS})"
 
 TTY="false"
 SUCCESS_CHAR="V"
@@ -163,12 +171,6 @@ error () {
 # System specific configuration
 readonly SYSTEM_NAME="$(uname)"
 readonly SYSTEM_ARCH="$(uname -m)"
-
-# if [ "$(id -u)" != "0" ]; then
-#     export USER_TYPE="common" # NOTE: rpath in binaries, XXX: fixme: add support for regular user binary builds
-# else
-#     export USER_TYPE="root"
-# fi
 
 
 case "${SYSTEM_NAME}" in
@@ -276,55 +278,9 @@ SYSTEM_HOME_DIR="/SystemUsers/"
 CACHE_DIR="${SYSTEM_HOME_DIR}.cache/"
 BINBUILDS_CACHE_DIR="${CACHE_DIR}binbuilds/"
 DEFINITIONS_DIR="${CACHE_DIR}definitions/definitions/"
-# HOME_DIRS="${HOME}/.."
 LOG="${CACHE_DIR}install.log"
 LISTS_DIR="${CACHE_DIR}definitions/lists/"
 DEFAULTS="${DEFINITIONS_DIR}defaults.def"
-# readonly BUILD_USER_NAME="build-user"
-# BUILD_USER_HOME="/7a231cbcbac22d3ef975e7b554d7ddf09b97782b/${BUILD_USER_NAME}"
-
-# readonly CURRENT_USER_UID="$(${ID_BIN} -u)"
-# if [ "${CURRENT_USER_UID}" != "0" ]; then
-#     if [ "${HOME}" != "${BUILD_USER_HOME}" ]; then
-#         # if [ "$(${FIND_BIN} ${HOME_DIRS} -maxdepth 1 2>/dev/null | ${WC_BIN} -l | ${TR_BIN} -d ' ')" = "0" ]; then
-#         #     error "No user home dir found? Critial error. No entries in ${HOME_DIRS}? Fix it and retry."
-#         #     exit 1
-#         # fi
-#         # readonly USER_DIRNAME="$(${FIND_BIN} ${HOME_DIRS} -maxdepth 1 -uid "${CURRENT_USER_UID}" 2> /dev/null)" # get user dir by uid and ignore access errors
-
-#         # additional check for multiple dirs with same UID (illegal)
-#         # readonly USER_DIR_AMOUNT="$(echo "${USER_DIRNAME}" | ${WC_BIN} -l | ${TR_BIN} -d ' ')"
-#         # debug "User dirs amount: ${USER_DIR_AMOUNT}"
-#         # if [ "${USER_DIR_AMOUNT}" != "1" ]; then
-#         #     error "Found more than one user with same uid in ${HOME_DIRS}! That's illegal. Fix it an retry."
-#         #     error "Conflicting users: $(echo "${USER_DIRNAME}" | ${TR_BIN} '\n' ' ')"
-#         #     exit 1
-#         # fi
-#         debug "User dirname: ${USER_DIRNAME}"
-#         export USERNAME="$(${BASENAME_BIN} ${USER_DIRNAME})"
-#     else
-#         export USERNAME="${BUILD_USER_NAME}"
-#     fi
-
-#     # also explicit check if virtual user exists in home dir:
-#     if [ "${USERNAME}" = "" ]; then
-#         error "No user homedir found in: ${HOME_DIRS} for user: '${USERNAME}'"
-#         exit 1
-#     fi
-#     readonly METADATA_FILE="${HOME}${PRIVATE_METADATA_DIR}${PRIVATE_METADATA_FILE}"
-#     if [ -f "${METADATA_FILE}" ]; then
-#         debug "ServeD System found. Username set to: ${USERNAME}. Home directory: ${HOME}"
-#         debug "Loading user metdata from ${METADATA_FILE}"
-#         . "${METADATA_FILE}"
-#         readonly export SVD_FULL_NAME="${SVD_FULL_NAME}"
-#         #
-#         # TODO: FIXME: 2013-03-19 15:34:07 - dmilith - fill metadata and define values of it...
-#         # ...
-#         #
-#     else
-#         debug "No metadata found in: ${METADATA_FILE} for user: ${USERNAME}. No additional user data accessible."
-#     fi
-# fi
 
 
 if [ "${USERNAME}" != "root" ]; then
@@ -335,7 +291,6 @@ if [ "${USERNAME}" != "root" ]; then
     export LISTS_DIR="${CACHE_DIR}definitions/lists/"
     export DEFAULTS="${DEFINITIONS_DIR}defaults.def"
 fi
-#     export SOFTWARE_DIR="${HOME}/${HOME_APPS_DIR}"
 
 # more values
 readonly BINBUILDS_CACHE_DIR
@@ -372,18 +327,6 @@ if [ "${REPOSITORY}" = "" ]; then # :this value is given by user as shell param
 fi
 
 
-# ANSI color definitions
-readonly red='\033[31;40m'
-readonly green='\033[32;40m'
-readonly yellow='\033[33;40m'
-readonly blue='\033[34;40m'
-readonly magenta='\033[35;40m'
-readonly cyan='\033[36;40m'
-readonly gray='\033[37;40m'
-readonly white='\033[38;40m'
-readonly reset='\033[0m'
-
-
 check_command_result () {
     if [ -z "$1" ]; then
         error "No param given for check_command_result()!"
@@ -393,7 +336,7 @@ check_command_result () {
         debug "CORRECT"
     else
         error
-        error "FAILURE. Run $(${BASENAME_BIN} ${SCRIPT_NAME}) log to see what went wrong."
+        error "FAILURE. Run $(${BASENAME_BIN} ${SOFIN_BIN}) log to see what went wrong."
         exit 1
     fi
 }
