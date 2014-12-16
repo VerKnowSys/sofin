@@ -152,6 +152,7 @@ usage_howto () {
     note "  ${cyan}setup                                ${gray}-${green} switch definitions repository/ branch from env value 'REPOSITORY' and 'BRANCH' (example: BRANCH=master REPOSITORY=/my/local/definitions/repo/ sofin setup)"
     note "  ${cyan}enable                               ${gray}-${green} enable Sofin developer environment (full environment stored in ~/.profile). It's the default"
     note "  ${cyan}disable                              ${gray}-${green} disable Sofin developer environment (only PATH, PKG_CONFIG_PATH and MANPATH written to ~/.profile)"
+    note "  ${cyan}status                               ${gray}-${green} shows Sofin status"
     note "  ${cyan}dev                                  ${gray}-${green} puts definition content on the fly. Second argument is definition name (no extension)"
     note "  ${cyan}rebuild                              ${gray}-${green} rebuilds, wipes and pushes each software bundle that depends on definition given as a param. (example: $(${BASENAME_BIN} ${SCRIPT_NAME}) rebuild openssl - will rebuild all bundles that have 'openssl' dependency)"
     exit
@@ -308,6 +309,16 @@ if [ ! "$1" = "" ]; then
         update_shell_vars
         note "Disabled Sofin environment. Reloading shell"
         ${KILL_BIN} -SIGUSR2 ${SHELL_PID}
+        exit
+        ;;
+
+
+    status)
+        if [ -f ${SOFIN_DISABLED_INDICATOR_FILE} ]; then
+            note "Sofin is disabled"
+        else
+            note "Sofin is enabled"
+        fi
         exit
         ;;
 
