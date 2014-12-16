@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
 
 # config settings
-readonly VERSION="0.72.4"
+readonly VERSION="0.72.5"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -603,7 +603,7 @@ if [ ! "$1" = "" ]; then
             fi
             ${SOFIN_BIN} remove ${software}
             USE_BINBUILD=false ${SOFIN_BIN} get ${software} || def_error
-            ${SOFIN_BIN} wipe ${software} || def_error
+            FORCE=true ${SOFIN_BIN} wipe ${software} || def_error
             ${SOFIN_BIN} push ${software} || def_error
             ${SOFIN_BIN} remove ${software} || def_error
         done
@@ -612,8 +612,11 @@ if [ ! "$1" = "" ]; then
 
 
     wipe)
-        note "Are you sure you want to wipe binary bundles: ${SOFIN_ARGS} from binary repository ${MAIN_BINARY_REPOSITORY}? (YES to confirm)"
-        read ANS
+        ANS="YES"
+        if [ "${FORCE}" != "true" ]; then
+            note "Are you sure you want to wipe binary bundles: ${SOFIN_ARGS} from binary repository ${MAIN_BINARY_REPOSITORY}? (YES to confirm)"
+            read ANS
+        fi
         if [ "${ANS}" = "YES" ]; then
             cd "${SOFTWARE_DIR}"
             for element in ${SOFIN_ARGS}; do
