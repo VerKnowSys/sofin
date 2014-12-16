@@ -515,25 +515,6 @@ if [ ! "$1" = "" ]; then
                     lowercase_element="$(${PRINTF_BIN} "${element}" | ${TR_BIN} '[A-Z]' '[a-z]')"
                     version_element="$(${CAT_BIN} ${element}/${lowercase_element}.installed)"
                     name="${element}-${version_element}${DEFAULT_ARCHIVE_EXT}"
-                    note "Preparing archive of: ${name}"
-                    if [ ! -e "./${name}" ]; then
-                        ${TAR_BIN} --options xz:compression-level=1 -cJf "${name}" "./${element}"
-                    else
-                        note "Archive already exists. Skipping: ${name}"
-                    fi
-
-                    case "${SYSTEM_NAME}" in
-                        Darwin|Linux)
-                            export archive_sha1="$(${SHA_BIN} "${name}" | ${AWK_BIN} '{ print $1 }')"
-                            ;;
-
-                        FreeBSD)
-                            export archive_sha1="$(${SHA_BIN} -q "${name}")"
-                            ;;
-                    esac
-
-                    ${PRINTF_BIN} "${archive_sha1}" > "${name}.sha1"
-                    note "Archive sha: ${archive_sha1}"
                     dig_query="$(${DIG_BIN} +short ${MAIN_SOFTWARE_ADDRESS} A)"
                     if [ ${OS_VERSION} -gt 93 ]; then
                         # In FreeBSD 10 there's drill utility instead of dig
@@ -548,10 +529,30 @@ if [ ! "$1" = "" ]; then
                             error "Error sending ${1} to ${address}/${1}"
                         }
                         note "Creating destination dirs for ${SYS} if necessary"
-                        ${SSH_BIN} -p ${MAIN_PORT} ${MAIN_USER}@${mirror} "mkdir -p ${MAIN_SOFTWARE_PREFIX}/software/binary/${SYS}"
                         # NOTE: quick check of remote file existance. If archive and sha1 files exist - don't overwrite them.
-                        ${SSH_BIN} -p ${MAIN_PORT} ${MAIN_USER}@${mirror} "test -f ${system_path}/${name} && test -f ${system_path}/${name}.sha1" >> "${LOG}" 2>&1
+                        ${SSH_BIN} -p ${MAIN_PORT} ${MAIN_USER}@${mirror} "mkdir -p ${MAIN_SOFTWARE_PREFIX}/software/binary/${SYS} ; test -f ${system_path}/${name} && test -f ${system_path}/${name}.sha1" >> "${LOG}" 2>&1
                         if [ "$?" != "0" ]; then
+                            note "Preparing archive of: ${name}"
+                            if [ ! -e "./${name}" ]; then
+                                ${TAR_BIN} --options xz:compression-level=1 -cJf "${name}" "./${element}"
+                            else
+                                note "Archive already exists. Skipping: ${name}"
+                            fi
+
+                            archive_sha1="NO-SHA"
+                            case "${SYSTEM_NAME}" in
+                                Darwin|Linux)
+                                    archive_sha1="$(${SHA_BIN} "${name}" | ${AWK_BIN} '{ print $1 }')"
+                                    ;;
+
+                                FreeBSD)
+                                    archive_sha1="$(${SHA_BIN} -q "${name}")"
+                                    ;;
+                            esac
+
+                            ${PRINTF_BIN} "${archive_sha1}" > "${name}.sha1"
+                            note "Archive sha: ${archive_sha1}"
+
                             note "Sending archive to remote: ${address}"
                             ${SCP_BIN} -P ${MAIN_PORT} ${name} ${address}/${name} || def_error ${name}
                             ${SCP_BIN} -P ${MAIN_PORT} ${name}.sha1 ${address}/${name}.sha1 || def_error ${name}.sha1
