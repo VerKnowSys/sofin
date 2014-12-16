@@ -515,7 +515,7 @@ if [ ! "$1" = "" ]; then
                     name="${element}-${version_element}${DEFAULT_ARCHIVE_EXT}"
                     note "Preparing archive of: ${name}"
                     if [ ! -e "./${name}" ]; then
-                        ${TAR_BIN} zcf "${name}" "./${element}"
+                        ${TAR_BIN} --options xz:compression-level=1 -cJf "${name}" "./${element}"
                     else
                         note "Archive already exists. Skipping: ${name}"
                     fi
