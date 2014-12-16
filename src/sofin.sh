@@ -86,11 +86,13 @@ update_definitions () {
     fi
     note "${SOFIN_HEADER}"
     if [ ! -x "${GIT_BIN}" ]; then
-        note "Installing initial definition list from tarball."
+        note "Installing initial definition list from tarball to cache dir: ${CACHE_DIR}"
         cd "${CACHE_DIR}"
-        INITIAL_DEFINITIONS="${MAIN_SOURCE_REPOSITORY}initial-definitions.tar.gz"
+        INITIAL_DEFINITIONS="${MAIN_SOURCE_REPOSITORY}initial-definitions${DEFAULT_ARCHIVE_EXT}"
         ${RM_BIN} -rf definitions
-        ${FETCH_BIN} "${INITIAL_DEFINITIONS}" >> ${LOG} 2>&1
+        ${MKDIR_BIN} -p definitions
+        cd definitions
+        ${FETCH_BIN} "${INITIAL_DEFINITIONS}"
         ${TAR_BIN} xf "$(${BASENAME_BIN} ${INITIAL_DEFINITIONS})"
         ${RM_BIN} -rf "$(${BASENAME_BIN} ${INITIAL_DEFINITIONS})"
         return
