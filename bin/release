@@ -17,10 +17,10 @@ bin/clean
 ${MKDIR_BIN} -p releases
 version="$(grep 'readonly VERSION=' src/sofin.sh | awk '{ gsub(/\"/, "", $2); gsub(/VERSION=/, "", $2); print $2; }')"
 base_name="sofin-${version}"
-archive_name="${base_name}.tar.bz2"
+archive_name="${base_name}.txz"
 note "Preparing package: ${archive_name} with version: ${version}"
 
-tar --disable-copyfile --exclude='sofin-*' --exclude='*.o' --exclude='.git' --exclude='.gitignore' --exclude='releases' -cjf releases/${archive_name} ./
+tar --disable-copyfile --exclude='sofin-*' --exclude='*.o' --exclude='.gitignore' --exclude='.Trashes' --exclude='.Spotlight-V100' --exclude='.VolumeIcon.icns' --exclude='.fseventsd' --exclude='.git' -cJf releases/${archive_name} ./
 mkdir -p releases/${base_name}
 mv releases/${archive_name} releases/${base_name}/
 cd releases/${base_name} > /dev/null
@@ -35,15 +35,15 @@ cd ..
 
 if [ "${USER}" = "dmilith" ]; then
     note "Pushing package to remote server"
-    scp releases/sofin-${version}.tar.bz2 v:/home/dmilith/Web/Public/Sofin-releases 2>&1
-    ssh sofin@v "source ~/.functions.sh && gather-source http://dmilith.verknowsys.com/Public/Sofin-releases/sofin-${version}.tar.bz2"
+    scp releases/sofin-${version}${DEFAULT_ARCHIVE_EXT} v:/home/dmilith/Web/Public/Sofin-releases 2>&1
+    ssh sofin@v "source ~/.functions.sh && gather-source http://dmilith.verknowsys.com/Public/Sofin-releases/sofin-${version}${DEFAULT_ARCHIVE_EXT}"
     note "Creating initial-definitions snapshot"
     git clone https://github.com/VerKnowSys/sofin-definitions.git
     cd ./sofin-definitions
-    tar cf ../releases/initial-definitions.tar.gz --exclude='*.tar.*' ./
+    tar cf ../releases/initial-definitions${DEFAULT_ARCHIVE_EXT} --exclude='*.tar.*' --exclude='sofin-*' --exclude='*.o' --exclude='.gitignore' --exclude='.Trashes' --exclude='.Spotlight-V100' --exclude='.VolumeIcon.icns' --exclude='.fseventsd' --exclude='.git' --exclude='releases' ./
     cd ..
     note "Pushing initial-definitions snapshot to remote servers"
-    scp releases/initial-definitions.tar.gz v:/home/dmilith/Web/Public/Sofin-releases > /dev/null 2>&1
-    ssh sofin@v "rm /Mirror/software/source/initial-definitions.tar.gz ; source ~/.functions.sh && gather-source http://dmilith.verknowsys.com/Public/Sofin-releases/initial-definitions.tar.gz" # XXX: hacky
-    rm -rf ./sofin-definitions initial-definitions.tar.gz
+    scp releases/initial-definitions${DEFAULT_ARCHIVE_EXT} v:/home/dmilith/Web/Public/Sofin-releases > /dev/null 2>&1
+    ssh sofin@v "rm /Mirror/software/source/initial-definitions${DEFAULT_ARCHIVE_EXT} ; source ~/.functions.sh && gather-source http://dmilith.verknowsys.com/Public/Sofin-releases/initial-definitions${DEFAULT_ARCHIVE_EXT}" # XXX: hacky
+    rm -rf ./sofin-definitions initial-definitions${DEFAULT_ARCHIVE_EXT}
 fi
