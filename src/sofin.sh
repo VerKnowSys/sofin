@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
 
 # config settings
-readonly VERSION="0.72.2"
+readonly VERSION="0.72.3"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -84,7 +84,7 @@ update_definitions () {
         warn "Skipped definitions update."
         return
     fi
-    note "${HEADER}"
+    note "${SOFIN_HEADER}"
     if [ ! -x "${GIT_BIN}" ]; then
         note "Installing initial definition list from tarball."
         cd "${CACHE_DIR}"
@@ -130,31 +130,31 @@ write_info_about_shell_configuration () {
 
 usage_howto () {
     note "Built in tasks:"
-    note "  ${cyan}install | get                        ${gray}-${green} installs software from list or from definition (example: $(${BASENAME_BIN} ${SCRIPT_NAME}) install ruby)"
+    note "  ${cyan}install | get                        ${gray}-${green} installs software from list or from definition (example: $(${BASENAME_BIN} ${SOFIN_BIN}) install ruby)"
     note "  ${cyan}dependencies | deps | local          ${gray}-${green} installs software from list defined in '${DEPENDENCIES_FILE}' file in current directory"
-    note "  ${cyan}uninstall | remove | delete          ${gray}-${green} removes an application or list (example: $(${BASENAME_BIN} ${SCRIPT_NAME}) uninstall ruby)"
-    note "  ${cyan}list | installed                     ${gray}-${green} short list of installed software"
-    note "  ${cyan}fulllist | fullinstalled             ${gray}-${green} detailed lists with installed software including requirements"
+    note "  ${cyan}uninstall | remove | delete          ${gray}-${green} removes an application or list (example: $(${BASENAME_BIN} ${SOFIN_BIN}) uninstall ruby)"
+    note "  ${cyan}list | installed                     ${gray}-${green} gives short list of installed software"
+    note "  ${cyan}fulllist | fullinstalled             ${gray}-${green} gives detailed list with installed software including requirements"
     note "  ${cyan}available                            ${gray}-${green} lists available software"
-    note "  ${cyan}export | exp | exportapp             ${gray}-${green} adds given command to application exports (example: $(${BASENAME_BIN} ${SCRIPT_NAME}) export rails ruby)"
+    note "  ${cyan}export | exp | exportapp             ${gray}-${green} adds given command to application exports (example: $(${BASENAME_BIN} ${SOFIN_BIN}) export rails ruby)"
     note "  ${cyan}getshellvars | shellvars | vars      ${gray}-${green} returns shell variables for installed software"
     note "  ${cyan}log                                  ${gray}-${green} shows and watches log file (for debug messages and verbose info)"
-    note "  ${cyan}reload | rehash                      ${gray}-${green} recreate shell vars and reload current shell"
+    note "  ${cyan}reload | rehash                      ${gray}-${green} recreates shell vars and reloads current shell"
     note "  ${cyan}update                               ${gray}-${green} only update definitions from remote repository and exit"
-    note "  ${cyan}ver | version                        ${gray}-${green} shows $(${BASENAME_BIN} ${SCRIPT_NAME}) script version"
+    note "  ${cyan}ver | version                        ${gray}-${green} shows $(${BASENAME_BIN} ${SOFIN_BIN}) script version"
     note "  ${cyan}clean                                ${gray}-${green} cleans binbuilds cache, unpacked source content and logs"
     note "  ${cyan}distclean                            ${gray}-${green} cleans binbuilds cache, unpacked source content, logs and definitions"
     note "  ${cyan}purge                                ${gray}-${green} cleans binbuilds cache, unpacked source content, logs, definitions, source cache and possible states"
     note "  ${cyan}outdated                             ${gray}-${green} lists outdated software"
-    note "  ${cyan}push | binpush                       ${gray}-${green} creates binary build from prebuilt software bundles name given as params (example: $(${BASENAME_BIN} ${SCRIPT_NAME}) push Ruby Vifm Curl)"
-    note "  ${cyan}wipe                                 ${gray}-${green} wipes binary build from respository (example: $(${BASENAME_BIN} ${SCRIPT_NAME}) wipe Ruby Vifm)"
-    note "  ${cyan}port                                 ${gray}-${green} gather port of TheSS running service by service name"
-    note "  ${cyan}setup                                ${gray}-${green} switch definitions repository/ branch from env value 'REPOSITORY' and 'BRANCH' (example: BRANCH=master REPOSITORY=/my/local/definitions/repo/ sofin setup)"
-    note "  ${cyan}enable                               ${gray}-${green} enable Sofin developer environment (full environment stored in ~/.profile). It's the default"
-    note "  ${cyan}disable                              ${gray}-${green} disable Sofin developer environment (only PATH, PKG_CONFIG_PATH and MANPATH written to ~/.profile)"
+    note "  ${cyan}push | binpush                       ${gray}-${green} creates binary build from prebuilt software bundles name given as params (example: $(${BASENAME_BIN} ${SOFIN_BIN}) push Ruby Vifm Curl)"
+    note "  ${cyan}wipe                                 ${gray}-${green} wipes binary build from respository (example: $(${BASENAME_BIN} ${SOFIN_BIN}) wipe Ruby Vifm)"
+    note "  ${cyan}port                                 ${gray}-${green} gathers port of TheSS running service by service name"
+    note "  ${cyan}setup                                ${gray}-${green} switches definitions repository/ branch from env value 'REPOSITORY' and 'BRANCH' (example: BRANCH=master REPOSITORY=/my/local/definitions/repo/ sofin setup)"
+    note "  ${cyan}enable                               ${gray}-${green} enables Sofin developer environment (full environment stored in ~/.profile). It's the default"
+    note "  ${cyan}disable                              ${gray}-${green} disables Sofin developer environment (only PATH, PKG_CONFIG_PATH and MANPATH written to ~/.profile)"
     note "  ${cyan}status                               ${gray}-${green} shows Sofin status"
     note "  ${cyan}dev                                  ${gray}-${green} puts definition content on the fly. Second argument is definition name (no extension)"
-    note "  ${cyan}rebuild                              ${gray}-${green} rebuilds, wipes and pushes each software bundle that depends on definition given as a param. (example: $(${BASENAME_BIN} ${SCRIPT_NAME}) rebuild openssl - will rebuild all bundles that have 'openssl' dependency)"
+    note "  ${cyan}rebuild                              ${gray}-${green} rebuilds, wipes and pushes each software bundle that depends on definition given as a param. (example: $(${BASENAME_BIN} ${SOFIN_BIN}) rebuild openssl - will rebuild all bundles that have 'openssl' dependency)"
     exit
 }
 
@@ -162,10 +162,10 @@ usage_howto () {
 update_shell_vars () {
     if [ "${USERNAME}" = "root" ]; then
         debug "Updating ${SOFIN_PROFILE} settings."
-        ${PRINTF_BIN} "$(${SCRIPT_NAME} getshellvars)" > "${SOFIN_PROFILE}"
+        ${PRINTF_BIN} "$(${SOFIN_BIN} getshellvars)" > "${SOFIN_PROFILE}"
     else
         debug "Updating ${HOME}/.profile settings."
-        ${PRINTF_BIN} "$(${SCRIPT_NAME} getshellvars ${USERNAME})" > "${HOME}/.profile"
+        ${PRINTF_BIN} "$(${SOFIN_BIN} getshellvars ${USERNAME})" > "${HOME}/.profile"
     fi
 }
 
@@ -263,7 +263,7 @@ if [ ! "$1" = "" ]; then
 
 
     ver|version)
-        note "${HEADER}"
+        note "${SOFIN_HEADER}"
         exit
         ;;
 
@@ -598,11 +598,11 @@ if [ ! "$1" = "" ]; then
             if [ "${software}" = "Git" ]; then
                 continue
             fi
-            ${SCRIPT_NAME} remove ${software}
-            USE_BINBUILD=false ${SCRIPT_NAME} get ${software} || def_error
-            ${SCRIPT_NAME} wipe ${software} || def_error
-            ${SCRIPT_NAME} push ${software} || def_error
-            ${SCRIPT_NAME} remove ${software} || def_error
+            ${SOFIN_BIN} remove ${software}
+            USE_BINBUILD=false ${SOFIN_BIN} get ${software} || def_error
+            ${SOFIN_BIN} wipe ${software} || def_error
+            ${SOFIN_BIN} push ${software} || def_error
+            ${SOFIN_BIN} remove ${software} || def_error
         done
         exit
         ;;
@@ -885,7 +885,7 @@ for application in ${APPLICATIONS}; do
                     cd "${SOFTWARE_ROOT_DIR}"
 
                     if [ -e "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" ]; then # if exists, then checksum is ok
-                        ${TAR_BIN} zxf "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" >> ${LOG} 2>&1
+                        ${TAR_BIN} xf "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" >> ${LOG} 2>&1
                         if [ "$?" = "0" ]; then # if archive is valid
                             note "  ${NOTE_CHAR2} Binary bundle installed: ${APP_NAME}${APP_POSTFIX} with version: ${APP_VERSION}"
                             export DONT_BUILD_BUT_DO_EXPORTS="true"
@@ -991,7 +991,7 @@ for application in ${APPLICATIONS}; do
                                     # remove corrupted file
                                     ${RM_BIN} -v "${file}" >> "${LOG}"
                                     # and restart script with same arguments:
-                                    eval "${SCRIPT_NAME} ${SCRIPT_ARGS}"
+                                    eval "${SOFIN_BIN} ${SOFIN_ARGS}"
                                     exit
                                 fi
                             fi
