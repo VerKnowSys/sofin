@@ -5,3 +5,6 @@
 /Sofin.sublime-project
 /Sofin.sublime-workspace
 src/.*.o
+.fseventsd
+.Spotlight-V100
+.VolumeIcon.icns
