@@ -609,31 +609,30 @@ if [ ! "$1" = "" ]; then
 
 
     wipe)
-        note "Preparing to wipe binary bundle: ${SOFIN_ARGS} from repository ${MAIN_BINARY_REPOSITORY}"
-        cd "${SOFTWARE_DIR}"
-        for element in ${SOFIN_ARGS}; do
-            lowercase_element="$(${PRINTF_BIN} "${element}" | ${TR_BIN} '[A-Z]' '[a-z]')"
-            version_element="$(${CAT_BIN} ${element}/${lowercase_element}.installed)"
-            name="${element}-${version_element}${DEFAULT_ARCHIVE_EXT}"
-            dig_query="$(${DIG_BIN} +short ${MAIN_SOFTWARE_ADDRESS} A)"
-            if [ ${OS_VERSION} -gt 93 ]; then
-                # In FreeBSD 10 there's drill utility instead of dig
-                dig_query=$(${DIG_BIN} A ${MAIN_SOFTWARE_ADDRESS} | ${GREP_BIN} "^${MAIN_SOFTWARE_ADDRESS}" | ${AWK_BIN} '{print $5}')
-            fi
-            debug "MIRROR: ${dig_query}"
-            for mirror in ${dig_query}; do
-                SYS="${SYSTEM_NAME}-${FULL_SYSTEM_VERSION}-${SYSTEM_ARCH}"
-                system_path="${MAIN_SOFTWARE_PREFIX}/software/binary/${SYS}"
-                ${SSH_BIN} -p ${MAIN_PORT} ${MAIN_USER}@${mirror} "test -f ${system_path}/${name} || test -f ${system_path}/${name}.sha1" >> "${LOG}" 2>&1
-                if [ "$?" = "0" ]; then
-                    note "Wiping out archive: ${name}"
-                    ${SSH_BIN} -p ${MAIN_PORT} ${MAIN_USER}@${mirror} "${RM_BIN} -f ${system_path}/${name} ${system_path}/${name}.sha1" >> "${LOG}" 2>&1
-                else
-                    warn "No such archive to wipe: ${name}"
+        note "Are you sure you want to wipe binary bundles: ${SOFIN_ARGS} from binary repository ${MAIN_BINARY_REPOSITORY}? (YES to confirm)"
+        read ANS
+        if [ "${ANS}" = "YES" ]; then
+            cd "${SOFTWARE_DIR}"
+            for element in ${SOFIN_ARGS}; do
+                lowercase_element="$(${PRINTF_BIN} "${element}" | ${TR_BIN} '[A-Z]' '[a-z]')"
+                name="${element}-"
+                dig_query="$(${DIG_BIN} +short ${MAIN_SOFTWARE_ADDRESS} A)"
+                if [ ${OS_VERSION} -gt 93 ]; then
+                    # In FreeBSD 10 there's drill utility instead of dig
+                    dig_query=$(${DIG_BIN} A ${MAIN_SOFTWARE_ADDRESS} | ${GREP_BIN} "^${MAIN_SOFTWARE_ADDRESS}" | ${AWK_BIN} '{print $5}')
                 fi
+                debug "MIRROR: ${dig_query}"
+                for mirror in ${dig_query}; do
+                    SYS="${SYSTEM_NAME}-${FULL_SYSTEM_VERSION}-${SYSTEM_ARCH}"
+                    system_path="${MAIN_SOFTWARE_PREFIX}/software/binary/${SYS}"
+                    note "Wiping out remote binary archives: ${name}*"
+                    ${SSH_BIN} -p ${MAIN_PORT} ${MAIN_USER}@${mirror} "${RM_BIN} -f ${system_path}/${name}* ${system_path}/${name}.sha1" >> "${LOG}" 2>&1
+                done
             done
-        done
-        note "Done."
+            note "Done."
+        else
+            note "Aborted."
+        fi
         exit
         ;;
 
