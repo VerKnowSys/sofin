@@ -648,7 +648,7 @@ if [ ! "$1" = "" ]; then
                 for mirror in ${dig_query}; do
                     SYS="${SYSTEM_NAME}-${FULL_SYSTEM_VERSION}-${SYSTEM_ARCH}"
                     system_path="${MAIN_SOFTWARE_PREFIX}/software/binary/${SYS}"
-                    note "Wiping out remote binary archives: ${name}*"
+                    note "Wiping out remote (${mirror}) binary archives: ${name}*"
                     ${SSH_BIN} -p ${MAIN_PORT} ${MAIN_USER}@${mirror} "${RM_BIN} -f ${system_path}/${name}* ${system_path}/${name}.sha1" >> "${LOG}" 2>&1
                 done
             done
