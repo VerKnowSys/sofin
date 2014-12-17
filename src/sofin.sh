@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
 
 # config settings
-readonly VERSION="0.72.5"
+readonly VERSION="0.72.6"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -147,6 +147,7 @@ usage_howto () {
     note "  ${cyan}distclean                            ${gray}-${green} cleans binbuilds cache, unpacked source content, logs and definitions"
     note "  ${cyan}purge                                ${gray}-${green} cleans binbuilds cache, unpacked source content, logs, definitions, source cache and possible states"
     note "  ${cyan}outdated                             ${gray}-${green} lists outdated software"
+    note "  ${cyan}build                                ${gray}-${green} does binary build from source for software specified as params and automatically sents it to binary repository"
     note "  ${cyan}push | binpush                       ${gray}-${green} creates binary build from prebuilt software bundles name given as params (example: $(${BASENAME_BIN} ${SOFIN_BIN}) push Ruby Vifm Curl)"
     note "  ${cyan}wipe                                 ${gray}-${green} wipes binary build from respository (example: $(${BASENAME_BIN} ${SOFIN_BIN}) wipe Ruby Vifm)"
     note "  ${cyan}port                                 ${gray}-${green} gathers port of TheSS running service by service name"
@@ -567,6 +568,23 @@ if [ ! "$1" = "" ]; then
             fi
         done
         note "Done."
+        exit
+        ;;
+
+
+    build)
+        update_definitions
+        shift
+        dependencies="$*"
+        note "Software bundles to be built and pushed to remote: ${dependencies}"
+        def_error () {
+            error "Failure in definition: ${software}. Report or fix the definition please!"
+        }
+        for software in ${dependencies}; do
+            USE_BINBUILD=false ${SOFIN_BIN} get ${software} || def_error
+            FORCE=true ${SOFIN_BIN} wipe ${software} || def_error
+            ${SOFIN_BIN} push ${software} || def_error
+        done
         exit
         ;;
 
