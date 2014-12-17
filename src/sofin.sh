@@ -534,7 +534,11 @@ if [ ! "$1" = "" ]; then
                         if [ "$?" != "0" ]; then
                             note "Preparing archive of: ${name}"
                             if [ ! -e "./${name}" ]; then
-                                ${TAR_BIN} --options xz:compression-level=1 -cJf "${name}" "./${element}"
+                                if [ "${SYSTEM_NAME}" = "Linux" ]; then
+                                    ${TAR_BIN} -cJf "${name}" "./${element}"
+                                else
+                                    ${TAR_BIN} --options xz:compression-level=1 -cJf "${name}" "./${element}"
+                                fi
                             else
                                 note "Archive already exists. Skipping: ${name}"
                             fi
