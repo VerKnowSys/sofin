@@ -604,7 +604,7 @@ if [ ! "$1" = "" ]; then
             USE_BINBUILD=false ${SOFIN_BIN} get ${software} || def_error
             FORCE=true ${SOFIN_BIN} wipe ${software} || def_error
             ${SOFIN_BIN} push ${software} || def_error
-            ${SOFIN_BIN} remove ${software} || def_error
+            # ${SOFIN_BIN} remove ${software} || def_error
         done
         exit
         ;;
