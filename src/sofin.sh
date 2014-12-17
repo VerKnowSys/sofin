@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
 
 # config settings
-readonly VERSION="0.72.6"
+readonly VERSION="0.72.7"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -883,8 +883,8 @@ for application in ${APPLICATIONS}; do
                 else
                     if [ ! -e "./${ARCHIVE_NAME}" ]; then
                         note "Trying binary build for: ${MIDDLE}/${APP_NAME}${APP_POSTFIX}-${APP_VERSION}"
-                        ${FETCH_BIN} "${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}" 2>>${LOG}
                         ${FETCH_BIN} "${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}.sha1" 2>>${LOG}
+                        ${FETCH_BIN} "${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}" 2>>${LOG}
 
                         # checking archive sha1 checksum
                         if [ -e "${ARCHIVE_NAME}" ]; then
@@ -900,7 +900,7 @@ for application in ${APPLICATIONS}; do
                         fi
                         current_sha_file="${ARCHIVE_NAME}.sha1"
                         if [ -e "${current_sha_file}" ]; then
-                            export sha1_value="$(cat ${current_sha_file})"
+                            export sha1_value="$(${CAT_BIN} ${current_sha_file})"
                         fi
 
                         debug "${current_archive_sha1} vs ${sha1_value}"
