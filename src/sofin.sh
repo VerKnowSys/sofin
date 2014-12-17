@@ -890,7 +890,7 @@ for application in ${APPLICATIONS}; do
                         if [ -e "${ARCHIVE_NAME}" ]; then
                             case "${SYSTEM_NAME}" in
                                 Darwin|Linux)
-                                    export current_archive_sha1="$(${SHA_BIN} "${ARCHIVE_NAME}" | ${AWK_BIN} '{ print $1 }')"
+                                    export current_archive_sha1="$(${SHA_BIN} "${ARCHIVE_NAME}" | ${AWK_BIN} '{print $1;}')"
                                     ;;
 
                                 FreeBSD)
