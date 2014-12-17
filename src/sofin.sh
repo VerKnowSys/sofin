@@ -911,8 +911,9 @@ for application in ${APPLICATIONS}; do
                     fi
                     cd "${SOFTWARE_ROOT_DIR}"
 
+                    debug "ARCHIVE_NAME: ${ARCHIVE_NAME}"
                     if [ -e "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" ]; then # if exists, then checksum is ok
-                        ${TAR_BIN} xf "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" >> ${LOG} 2>&1
+                        ${TAR_BIN} xfJ "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" >> ${LOG} 2>&1
                         if [ "$?" = "0" ]; then # if archive is valid
                             note "  ${NOTE_CHAR2} Binary bundle installed: ${APP_NAME}${APP_POSTFIX} with version: ${APP_VERSION}"
                             export DONT_BUILD_BUT_DO_EXPORTS="true"
