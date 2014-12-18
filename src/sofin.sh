@@ -829,7 +829,7 @@ for application in ${APPLICATIONS}; do
     . "${DEFINITIONS_DIR}${application}.def" # prevent installation of requirements of disabled application:
     check_disabled "${DISABLE_ON}" # after which just check if it's not disabled
     if [ ! "${ALLOW}" = "1" ]; then
-        note "Software: ${application} disabled on architecture: ${SYSTEM_NAME}-${FULL_SYSTEM_VERSION}-${SYSTEM_ARCH}"
+        warn "Software: ${application} disabled on architecture: ${SYSTEM_NAME}-${FULL_SYSTEM_VERSION}-${SYSTEM_ARCH}"
     else
         for definition in ${DEFINITIONS_DIR}${application}.def; do
             export DONT_BUILD_BUT_DO_EXPORTS=""
