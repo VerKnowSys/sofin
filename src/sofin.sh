@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
 
 # config settings
-readonly VERSION="0.72.7"
+readonly VERSION="0.72.8"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -819,7 +819,7 @@ check_requirements
 PATH=${DEFAULT_PATH}
 
 for application in ${APPLICATIONS}; do
-
+    specified="${application}" # store original value of user input
     application="$(${PRINTF_BIN} "${application}" | ${TR_BIN} '[A-Z]' '[a-z]')" # lowercase for case sensitive fs
     . "${DEFAULTS}"
     if [ ! -f "${DEFINITIONS_DIR}${application}.def" ]; then
@@ -841,6 +841,11 @@ for application in ${APPLICATIONS}; do
             # fancy old style Capitalize
             APP_LOWER="${APP_NAME}"
             APP_NAME="$(${PRINTF_BIN} "${APP_NAME}" | ${CUT_BIN} -c1 | ${TR_BIN} '[a-z]' '[A-Z]')$(${PRINTF_BIN} "${APP_NAME}" | ${SED_BIN} 's/^[a-zA-Z]//')"
+            # some additional convention check:
+            if [ "${APP_NAME}" != "${specified}" ]; then
+                warn "You specified lowercase name of bundle, which is in contradiction to Sofin's convention (bundle - capitalized: f.e. \"Ruby\", dependencies and definitions - lowercase: f.e. \"yaml\")."
+            fi
+            # if definition requires root privileges, throw an "exception":
             if [ "${REQUIRE_ROOT_ACCESS}" = "true" ]; then
                 if [ "${USERNAME}" != "root" ]; then
                     warn "Definition requires root priviledges to install: ${APP_NAME}. Wont install."
