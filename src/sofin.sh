@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
 
 # config settings
-readonly VERSION="0.72.8"
+readonly VERSION="0.72.9"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -857,8 +857,10 @@ for application in ${APPLICATIONS}; do
             export PREFIX="${SOFTWARE_DIR}${APP_NAME}${APP_POSTFIX}"
             export SOFTWARE_DATA_DIR="/User/SoftwareData/${APP_NAME}${APP_POSTFIX}"
             if [ "${USERNAME}" != "root" ]; then
-                ${MKDIR_BIN} -p "${SOFTWARE_DATA_DIR}"
-                ${CHMOD_BIN} 0711 "${SOFTWARE_DATA_DIR}"
+                if [ "${APP_STANDALONE}" = "true" ]; then
+                    ${MKDIR_BIN} -p "${SOFTWARE_DATA_DIR}"
+                    ${CHMOD_BIN} 0711 "${SOFTWARE_DATA_DIR}"
+                fi
             fi
 
             run () {

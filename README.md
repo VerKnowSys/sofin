@@ -18,7 +18,7 @@ customizable software for FreeBSD servers. Darwin (Mac OS X) support started wit
 
 
 ## Features:
-* Designed to work on all *BSD (FreeBSD >=9.x), *Darwin (OSX >=10.8.x)
+* Designed to work on all *BSD (FreeBSD >=10.x), *Darwin (OSX >=10.8.x)
 * User friendly, clean and clear colorful information. No magic. KISS, DRY, BDD driven development.
 * Simple, ~1k LOC solution, written in legacy /bin/sh shell scripting language.
 * Every "software" has own definition ("def" file) with defined flat dependency list and basic information.
