@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
 
 # config settings
-readonly VERSION="0.72.9"
+readonly VERSION="0.72.10"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -558,7 +558,12 @@ if [ ! "$1" = "" ]; then
                             note "Archive sha: ${archive_sha1}"
 
                             note "Sending archive to remote: ${address}"
-                            ${SCP_BIN} -P ${MAIN_PORT} ${name} ${address}/${name} || def_error ${name}
+                            ${SCP_BIN} -P ${MAIN_PORT} ${name} ${address}/${name}.partial || def_error ${name}
+                            if [ "$?" = "0" ]; then
+                                ${SSH_BIN} -p ${MAIN_PORT} ${MAIN_USER}@${mirror} "cd ${MAIN_SOFTWARE_PREFIX}/software/binary/${SYS} && mv ${name}.partial ${name}"
+                            else
+                                error "Failed to send binary build for: ${name} to remote: ${mirror}"
+                            fi
                             ${SCP_BIN} -P ${MAIN_PORT} ${name}.sha1 ${address}/${name}.sha1 || def_error ${name}.sha1
                         else
                             note "Already sent to remote: ${address}"
