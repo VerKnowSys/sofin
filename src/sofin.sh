@@ -131,13 +131,13 @@ write_info_about_shell_configuration () {
 
 usage_howto () {
     note "Built in tasks:"
-    note "  ${cyan}install | get                        ${gray}-${green} installs software from list or from definition (example: $(${BASENAME_BIN} ${SOFIN_BIN}) install ruby)"
+    note "  ${cyan}install | get                        ${gray}-${green} installs software from list or from definition (example: $(${BASENAME_BIN} ${SOFIN_BIN}) install Ruby)"
     note "  ${cyan}dependencies | deps | local          ${gray}-${green} installs software from list defined in '${DEPENDENCIES_FILE}' file in current directory"
-    note "  ${cyan}uninstall | remove | delete          ${gray}-${green} removes an application or list (example: $(${BASENAME_BIN} ${SOFIN_BIN}) uninstall ruby)"
+    note "  ${cyan}uninstall | remove | delete          ${gray}-${green} removes an application or list (example: $(${BASENAME_BIN} ${SOFIN_BIN}) uninstall Ruby)"
     note "  ${cyan}list | installed                     ${gray}-${green} gives short list of installed software"
     note "  ${cyan}fulllist | fullinstalled             ${gray}-${green} gives detailed list with installed software including requirements"
     note "  ${cyan}available                            ${gray}-${green} lists available software"
-    note "  ${cyan}export | exp | exportapp             ${gray}-${green} adds given command to application exports (example: $(${BASENAME_BIN} ${SOFIN_BIN}) export rails ruby)"
+    note "  ${cyan}export | exp | exportapp             ${gray}-${green} adds given command to application exports (example: $(${BASENAME_BIN} ${SOFIN_BIN}) export rails Ruby)"
     note "  ${cyan}getshellvars | shellvars | vars      ${gray}-${green} returns shell variables for installed software"
     note "  ${cyan}log                                  ${gray}-${green} shows and watches log file (for debug messages and verbose info)"
     note "  ${cyan}reload | rehash                      ${gray}-${green} recreates shell vars and reloads current shell"
