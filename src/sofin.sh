@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
 
 # config settings
-readonly VERSION="0.72.10"
+readonly VERSION="0.72.11"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -534,11 +534,7 @@ if [ ! "$1" = "" ]; then
                         if [ "$?" != "0" ]; then
                             note "Preparing archive of: ${name}"
                             if [ ! -e "./${name}" ]; then
-                                if [ "${SYSTEM_NAME}" = "Linux" ]; then
-                                    ${TAR_BIN} -cJf "${name}" "./${element}"
-                                else
-                                    ${TAR_BIN} --options xz:compression-level=1 -cJf "${name}" "./${element}"
-                                fi
+                                ${TAR_BIN} -cJf "${name}" "./${element}"
                             else
                                 note "Archive already exists. Skipping: ${name}"
                             fi
