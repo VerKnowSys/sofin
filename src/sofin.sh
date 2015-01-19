@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
 
 # config settings
-readonly VERSION="0.72.11"
+readonly VERSION="0.74.0"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -156,7 +156,7 @@ usage_howto () {
     note "  ${cyan}disable                              ${gray}-${green} disables Sofin developer environment (only PATH, PKG_CONFIG_PATH and MANPATH written to ~/.profile)"
     note "  ${cyan}status                               ${gray}-${green} shows Sofin status"
     note "  ${cyan}dev                                  ${gray}-${green} puts definition content on the fly. Second argument is definition name (no extension)"
-    note "  ${cyan}rebuild                              ${gray}-${green} rebuilds, wipes and pushes each software bundle that depends on definition given as a param. (example: $(${BASENAME_BIN} ${SOFIN_BIN}) rebuild openssl - will rebuild all bundles that have 'openssl' dependency)"
+    note "  ${cyan}rebuild                              ${gray}-${green} rebuilds and pushes each software bundle that depends on definition given as a param. (example: $(${BASENAME_BIN} ${SOFIN_BIN}) rebuild openssl - will rebuild all bundles that have 'openssl' dependency)"
     exit
 }
 
@@ -528,41 +528,35 @@ if [ ! "$1" = "" ]; then
                         def_error () {
                             error "Error sending ${1} to ${address}/${1}"
                         }
-                        note "Creating destination dirs for ${SYS} if necessary"
-                        # NOTE: quick check of remote file existance. If archive and sha1 files exist - don't overwrite them.
-                        ${SSH_BIN} -p ${MAIN_PORT} ${MAIN_USER}@${mirror} "mkdir -p ${MAIN_SOFTWARE_PREFIX}/software/binary/${SYS} ; test -f ${system_path}/${name} && test -f ${system_path}/${name}.sha1" >> "${LOG}" 2>&1
-                        if [ "$?" != "0" ]; then
-                            note "Preparing archive of: ${name}"
-                            if [ ! -e "./${name}" ]; then
-                                ${TAR_BIN} -cJf "${name}" "./${element}"
-                            else
-                                note "Archive already exists. Skipping: ${name}"
-                            fi
+                        ${SSH_BIN} -p ${MAIN_PORT} ${MAIN_USER}@${mirror} "mkdir -p ${MAIN_SOFTWARE_PREFIX}/software/binary/${SYS}" >> "${LOG}" 2>&1
+                        note "Preparing archive of: ${name}"
+                        if [ ! -e "./${name}" ]; then
+                            ${TAR_BIN} -cJf "${name}" "./${element}"
+                        else
+                            note "Archive already exists. Skipping archive preparation for: ${name}"
+                        fi
 
-                            archive_sha1="NO-SHA"
-                            case "${SYSTEM_NAME}" in
-                                Darwin|Linux)
-                                    archive_sha1="$(${SHA_BIN} "${name}" | ${AWK_BIN} '{ print $1 }')"
-                                    ;;
+                        archive_sha1="NO-SHA"
+                        case "${SYSTEM_NAME}" in
+                            Darwin|Linux)
+                                archive_sha1="$(${SHA_BIN} "${name}" | ${AWK_BIN} '{ print $1 }')"
+                                ;;
 
-                                FreeBSD)
-                                    archive_sha1="$(${SHA_BIN} -q "${name}")"
-                                    ;;
-                            esac
+                            FreeBSD)
+                                archive_sha1="$(${SHA_BIN} -q "${name}")"
+                                ;;
+                        esac
 
-                            ${PRINTF_BIN} "${archive_sha1}" > "${name}.sha1"
-                            note "Archive sha: ${archive_sha1}"
+                        ${PRINTF_BIN} "${archive_sha1}" > "${name}.sha1"
+                        note "Archive sha: ${archive_sha1}"
 
-                            note "Sending archive to remote: ${address}"
-                            ${SCP_BIN} -P ${MAIN_PORT} ${name} ${address}/${name}.partial || def_error ${name}
-                            if [ "$?" = "0" ]; then
-                                ${SSH_BIN} -p ${MAIN_PORT} ${MAIN_USER}@${mirror} "cd ${MAIN_SOFTWARE_PREFIX}/software/binary/${SYS} && mv ${name}.partial ${name}"
-                            else
-                                error "Failed to send binary build for: ${name} to remote: ${mirror}"
-                            fi
+                        note "Sending archive to remote: ${address}"
+                        ${SCP_BIN} -P ${MAIN_PORT} ${name} ${address}/${name}.partial || def_error ${name}
+                        if [ "$?" = "0" ]; then
+                            ${SSH_BIN} -p ${MAIN_PORT} ${MAIN_USER}@${mirror} "cd ${MAIN_SOFTWARE_PREFIX}/software/binary/${SYS} && mv ${name}.partial ${name}"
                             ${SCP_BIN} -P ${MAIN_PORT} ${name}.sha1 ${address}/${name}.sha1 || def_error ${name}.sha1
                         else
-                            note "Already sent to remote: ${address}"
+                            error "Failed to send binary build for: ${name} to remote: ${mirror}"
                         fi
                     done
                     ${RM_BIN} -f "${name}"
@@ -587,7 +581,6 @@ if [ ! "$1" = "" ]; then
         }
         for software in ${dependencies}; do
             USE_BINBUILD=false ${SOFIN_BIN} get ${software} || def_error
-            FORCE=true ${SOFIN_BIN} wipe ${software} || def_error
             ${SOFIN_BIN} push ${software} || def_error
         done
         exit
