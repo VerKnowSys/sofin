@@ -149,13 +149,13 @@ usage_howto () {
     note "  ${cyan}outdated                             ${gray}-${green} lists outdated software"
     note "  ${cyan}build                                ${gray}-${green} does binary build from source for software specified as params and automatically sents it to binary repository"
     note "  ${cyan}push | binpush | send                ${gray}-${green} creates binary build from prebuilt software bundles name given as params (example: $(${BASENAME_BIN} ${SOFIN_BIN}) push Rubinius Vifm Curl)"
-    note "  ${cyan}wipe                                 ${gray}-${green} wipes binary build from respository (example: $(${BASENAME_BIN} ${SOFIN_BIN}) wipe Rubinius Vifm)"
+    note "  ${cyan}wipe                                 ${gray}-${green} wipes binary builds (matching given name) from binary respositories (example: $(${BASENAME_BIN} ${SOFIN_BIN}) wipe Rubinius Vifm)"
     note "  ${cyan}port                                 ${gray}-${green} gathers port of TheSS running service by service name"
     note "  ${cyan}setup                                ${gray}-${green} switches definitions repository/ branch from env value 'REPOSITORY' and 'BRANCH' (example: BRANCH=master REPOSITORY=/my/local/definitions/repo/ sofin setup)"
     note "  ${cyan}enable                               ${gray}-${green} enables Sofin developer environment (full environment stored in ~/.profile). It's the default"
     note "  ${cyan}disable                              ${gray}-${green} disables Sofin developer environment (only PATH, PKG_CONFIG_PATH and MANPATH written to ~/.profile)"
     note "  ${cyan}status                               ${gray}-${green} shows Sofin status"
-    note "  ${cyan}dev                                  ${gray}-${green} puts definition content on the fly. Second argument is definition name (no extension)"
+    note "  ${cyan}dev                                  ${gray}-${green} puts definition content on the fly. Second argument is (lowercase) definition name (no extension). (example: sofin dev rubinius)"
     note "  ${cyan}rebuild                              ${gray}-${green} rebuilds and pushes each software bundle that depends on definition given as a param. (example: $(${BASENAME_BIN} ${SOFIN_BIN}) rebuild openssl - will rebuild all bundles that have 'openssl' dependency)"
     exit
 }
