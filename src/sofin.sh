@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
 
 # config settings
-readonly VERSION="0.74.0"
+readonly VERSION="0.74.1"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -131,13 +131,13 @@ write_info_about_shell_configuration () {
 
 usage_howto () {
     note "Built in tasks:"
-    note "  ${cyan}install | get                        ${gray}-${green} installs software from list or from definition (example: $(${BASENAME_BIN} ${SOFIN_BIN}) install Ruby)"
+    note "  ${cyan}install | get | pick | choose | use  ${gray}-${green} installs software from list or from definition and switches exports for it (example: $(${BASENAME_BIN} ${SOFIN_BIN}) install Rubinius)"
     note "  ${cyan}dependencies | deps | local          ${gray}-${green} installs software from list defined in '${DEPENDENCIES_FILE}' file in current directory"
-    note "  ${cyan}uninstall | remove | delete          ${gray}-${green} removes an application or list (example: $(${BASENAME_BIN} ${SOFIN_BIN}) uninstall Ruby)"
+    note "  ${cyan}uninstall | remove | delete          ${gray}-${green} removes an application or list (example: $(${BASENAME_BIN} ${SOFIN_BIN}) uninstall Rubinius)"
     note "  ${cyan}list | installed                     ${gray}-${green} gives short list of installed software"
     note "  ${cyan}fulllist | fullinstalled             ${gray}-${green} gives detailed list with installed software including requirements"
     note "  ${cyan}available                            ${gray}-${green} lists available software"
-    note "  ${cyan}export | exp | exportapp             ${gray}-${green} adds given command to application exports (example: $(${BASENAME_BIN} ${SOFIN_BIN}) export rails Ruby)"
+    note "  ${cyan}export | exp | exportapp             ${gray}-${green} adds given command to application exports (example: $(${BASENAME_BIN} ${SOFIN_BIN}) export rails Rubinius)"
     note "  ${cyan}getshellvars | shellvars | vars      ${gray}-${green} returns shell variables for installed software"
     note "  ${cyan}log                                  ${gray}-${green} shows and watches log file (for debug messages and verbose info)"
     note "  ${cyan}reload | rehash                      ${gray}-${green} recreates shell vars and reloads current shell"
@@ -148,8 +148,8 @@ usage_howto () {
     note "  ${cyan}purge                                ${gray}-${green} cleans binbuilds cache, unpacked source content, logs, definitions, source cache and possible states"
     note "  ${cyan}outdated                             ${gray}-${green} lists outdated software"
     note "  ${cyan}build                                ${gray}-${green} does binary build from source for software specified as params and automatically sents it to binary repository"
-    note "  ${cyan}push | binpush                       ${gray}-${green} creates binary build from prebuilt software bundles name given as params (example: $(${BASENAME_BIN} ${SOFIN_BIN}) push Ruby Vifm Curl)"
-    note "  ${cyan}wipe                                 ${gray}-${green} wipes binary build from respository (example: $(${BASENAME_BIN} ${SOFIN_BIN}) wipe Ruby Vifm)"
+    note "  ${cyan}push | binpush | send                ${gray}-${green} creates binary build from prebuilt software bundles name given as params (example: $(${BASENAME_BIN} ${SOFIN_BIN}) push Rubinius Vifm Curl)"
+    note "  ${cyan}wipe                                 ${gray}-${green} wipes binary build from respository (example: $(${BASENAME_BIN} ${SOFIN_BIN}) wipe Rubinius Vifm)"
     note "  ${cyan}port                                 ${gray}-${green} gathers port of TheSS running service by service name"
     note "  ${cyan}setup                                ${gray}-${green} switches definitions repository/ branch from env value 'REPOSITORY' and 'BRANCH' (example: BRANCH=master REPOSITORY=/my/local/definitions/repo/ sofin setup)"
     note "  ${cyan}enable                               ${gray}-${green} enables Sofin developer environment (full environment stored in ~/.profile). It's the default"
@@ -474,7 +474,7 @@ if [ ! "$1" = "" ]; then
         ;;
 
 
-    install|get)
+    install|get|pick|choose|use)
         if [ "$2" = "" ]; then
             error "For \"$1\" application installation mode, second argument with at least one application name or list is required!"
         fi
@@ -506,7 +506,7 @@ if [ ! "$1" = "" ]; then
         ;;
 
 
-    push|binpush)
+    push|binpush|send)
         note "Preparing to push binary bundle: ${SOFIN_ARGS} from ${SOFTWARE_DIR} to binary repository."
         cd "${SOFTWARE_DIR}"
         for element in ${SOFIN_ARGS}; do
@@ -837,7 +837,7 @@ for application in ${APPLICATIONS}; do
             APP_NAME="$(${PRINTF_BIN} "${APP_NAME}" | ${CUT_BIN} -c1 | ${TR_BIN} '[a-z]' '[A-Z]')$(${PRINTF_BIN} "${APP_NAME}" | ${SED_BIN} 's/^[a-zA-Z]//')"
             # some additional convention check:
             if [ "${APP_NAME}" != "${specified}" ]; then
-                warn "You specified lowercase name of bundle, which is in contradiction to Sofin's convention (bundle - capitalized: f.e. \"Ruby\", dependencies and definitions - lowercase: f.e. \"yaml\")."
+                warn "You specified lowercase name of bundle, which is in contradiction to Sofin's convention (bundle - capitalized: f.e. \"Rubinius\", dependencies and definitions - lowercase: f.e. \"yaml\")."
             fi
             # if definition requires root privileges, throw an "exception":
             if [ "${REQUIRE_ROOT_ACCESS}" = "true" ]; then
