@@ -31,7 +31,7 @@ readonly reset='\033[0m'
 readonly DEBUG
 readonly TRACE
 
-readonly SOFIN_HEADER="Sofin v${VERSION} (c) 2o11-2o14 verknowsys.com"
+readonly SOFIN_HEADER="Sofin v${VERSION} (c) 2o11-2o15 verknowsys.com"
 readonly SOFIN_PROFILE="/etc/profile_sofin"
 readonly SOFIN_DISABLED_INDICATOR_FILE="${HOME}/.sofin-disabled"
 
