@@ -214,8 +214,8 @@ perform_clean () {
     fi
     note "Removing binary builds from ${BINBUILDS_CACHE_DIR}"
     ${RM_BIN} -rf "${BINBUILDS_CACHE_DIR}"
-    note "Removing logs: ${LOG}/sofin-*"
-    ${RM_BIN} -rf ${LOG}/sofin-*
+    note "Removing logs: ${LOG}*"
+    ${RM_BIN} -rf ${LOG}*
 }
 
 
@@ -272,13 +272,12 @@ if [ ! "$1" = "" ]; then
 
     log)
         shift
-        shift
         pattern="$*"
         if [ "${pattern}" = "" ]; then
-            ${TAIL_BIN} -n "${LOG_LINES_AMOUNT}" -F ${LOG}/sofin*
+            ${TAIL_BIN} -n ${LOG_LINES_AMOUNT} -F ${LOG}*
         else
             note "Pattern: ${pattern}"
-            ${TAIL_BIN} -n "${LOG_LINES_AMOUNT}" -F ${LOG}/sofin*${pattern}*
+            ${TAIL_BIN} -n ${LOG_LINES_AMOUNT} -F ${LOG}*${pattern}*
         fi
         ;;
 
@@ -536,12 +535,18 @@ if [ ! "$1" = "" ]; then
                         def_error () {
                             error "Error sending ${1} to ${address}/${1}"
                         }
-                        ${SSH_BIN} -p ${MAIN_PORT} ${MAIN_USER}@${mirror} "mkdir -p ${MAIN_SOFTWARE_PREFIX}/software/binary/${SYS}" >> "${LOG}" 2>&1
+                        ${SSH_BIN} -p ${MAIN_PORT} ${MAIN_USER}@${mirror} "mkdir -p ${MAIN_SOFTWARE_PREFIX}/software/binary/${SYS}" >> "${LOG}-${APP_NAME}" 2>&1
                         note "Preparing archive of: ${name}"
                         if [ ! -e "./${name}" ]; then
                             ${TAR_BIN} -cJf "${name}" "./${element}"
                         else
-                            note "Archive already exists. Skipping archive preparation for: ${name}"
+                            if [ ! -e "./${name}.sha1" ]; then
+                                note "No sha1 file found. Existing archive may be incomplete or damaged. Rebuilding.."
+                                ${RM_BIN} -f "${name}"
+                                ${TAR_BIN} -cJf "${name}" "./${element}"
+                            else
+                                note "Archive already exists. Skipping archive preparation for: ${name}"
+                            fi
                         fi
 
                         archive_sha1="NO-SHA"
@@ -748,7 +753,7 @@ if [ ! "$1" = "" ]; then
                 curr_dir="$(${PWD_BIN})"
                 cd "${SOFTWARE_DIR}${APP}${dir}"
                 ${MKDIR_BIN} -p "${SOFTWARE_DIR}${APP}/exports" # make sure exports dir already exists
-                ${LN_BIN} -vfs "..${dir}/${EXPORT}" "../exports/${EXPORT}" >> "$LOG"
+                ${LN_BIN} -vfs "..${dir}/${EXPORT}" "../exports/${EXPORT}" >> "${LOG}-${APP_NAME}"
                 cd "${curr_dir}"
                 exit
             else
@@ -904,7 +909,7 @@ for application in ${APPLICATIONS}; do
                 else
                     if [ ! -e "./${ARCHIVE_NAME}" ]; then
                         note "Trying binary build for: ${MIDDLE}/${APP_NAME}${APP_POSTFIX}-${APP_VERSION}"
-                        ${FETCH_BIN} "${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}.sha1" 2>>${LOG}-fetch
+                        ${FETCH_BIN} "${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}.sha1" 2>>${LOG}-${APP_NAME}
                         ${FETCH_BIN} "${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}"
 
                         # checking archive sha1 checksum
@@ -1272,7 +1277,7 @@ for application in ${APPLICATIONS}; do
                                 debug "Exporting ${PREFIX}${dir}${exp}"
                                 curr_dir="$(${PWD_BIN})"
                                 cd "${PREFIX}${dir}"
-                                ${LN_BIN} -vfs "..${dir}${exp}" "../exports/${exp}" >> "$LOG"
+                                ${LN_BIN} -vfs "..${dir}${exp}" "../exports/${exp}" >> "${LOG}-${APP_NAME}"
                                 cd "${curr_dir}"
                                 exp_elem="$(${BASENAME_BIN} ${PREFIX}${dir}${exp})"
                                 EXPORT_LIST="${EXPORT_LIST} ${exp_elem}"
