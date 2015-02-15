@@ -43,7 +43,7 @@ readonly DEFAULT_PATH="/bin:/usr/bin:/sbin:/usr/sbin"
 readonly DEFAULT_ARCHIVE_EXT=".txz"
 readonly DEPENDENCIES_FILE=".dependencies"
 readonly INSTALLED_MARK=".installed"
-readonly LOG_LINES_AMOUNT="1000"
+readonly LOG_LINES_AMOUNT=250
 
 # utils software from POSIX base system variables:
 PRINTF_BIN="/usr/bin/printf"
