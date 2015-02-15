@@ -278,18 +278,22 @@ SYSTEM_HOME_DIR="/SystemUsers/"
 CACHE_DIR="${SYSTEM_HOME_DIR}.cache/"
 BINBUILDS_CACHE_DIR="${CACHE_DIR}binbuilds/"
 DEFINITIONS_DIR="${CACHE_DIR}definitions/definitions/"
-LOG="${CACHE_DIR}install.log"
+LOG="${CACHE_DIR}/logs/sofin"
 LISTS_DIR="${CACHE_DIR}definitions/lists/"
 DEFAULTS="${DEFINITIONS_DIR}defaults.def"
 
 
 if [ "${USERNAME}" != "root" ]; then
     export CACHE_DIR="${HOME}/.cache/"
-    export LOG="${CACHE_DIR}install.log"
+    export LOG="${CACHE_DIR}/logs/sofin"
     export BINBUILDS_CACHE_DIR="${CACHE_DIR}binbuilds/"
     export DEFINITIONS_DIR="${CACHE_DIR}definitions/definitions/"
     export LISTS_DIR="${CACHE_DIR}definitions/lists/"
     export DEFAULTS="${DEFINITIONS_DIR}defaults.def"
+fi
+
+if [ ! -d "${CACHE_DIR}/logs" ]; then
+    ${MKDIR_BIN} -p ${CACHE_DIR}/logs
 fi
 
 # more values

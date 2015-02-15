@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
 
 # config settings
-readonly VERSION="0.74.1"
+readonly VERSION="0.76.0"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -101,12 +101,12 @@ update_definitions () {
         current_branch="$(${GIT_BIN} rev-parse --abbrev-ref HEAD)"
         if [ "${current_branch}" != "${BRANCH}" ]; then # use current_branch value if branch isn't matching default branch
             # ${GIT_BIN} stash save -a >> ${LOG} 2>&1
-            ${GIT_BIN} checkout -b "${current_branch}" >> ${LOG} 2>&1 || ${GIT_BIN} checkout "${current_branch}" >> ${LOG} 2>&1
-            ${GIT_BIN} pull origin "${current_branch}" >> ${LOG} && note "Updated branch ${current_branch} of repository ${REPOSITORY}" || error "Error occured: Update from branch: ${BRANCH} of repository ${REPOSITORY} wasn't possible."
+            ${GIT_BIN} checkout -b "${current_branch}" >> ${LOG}-definitions-update 2>&1 || ${GIT_BIN} checkout "${current_branch}" >> ${LOG}-definitions-update 2>&1
+            ${GIT_BIN} pull origin "${current_branch}" >> ${LOG}-definitions-update && note "Updated branch ${current_branch} of repository ${REPOSITORY}" || error "Error occured: Update from branch: ${BRANCH} of repository ${REPOSITORY} wasn't possible."
 
         else # else use default branch
-            ${GIT_BIN} checkout -b "${BRANCH}" >> ${LOG} 2>&1 || ${GIT_BIN} checkout "${BRANCH}" >> ${LOG} 2>&1
-            (${GIT_BIN} pull origin "${BRANCH}" >> ${LOG} && note "Updated branch ${BRANCH} of repository ${REPOSITORY}") || error "Error occured: Update from branch: ${BRANCH} of repository ${REPOSITORY} wasn't possible."
+            ${GIT_BIN} checkout -b "${BRANCH}" >> ${LOG}-definitions-update 2>&1 || ${GIT_BIN} checkout "${BRANCH}" >> ${LOG}-definitions-update 2>&1
+            (${GIT_BIN} pull origin "${BRANCH}" >> ${LOG}-definitions-update && note "Updated branch ${BRANCH} of repository ${REPOSITORY}") || error "Error occured: Update from branch: ${BRANCH} of repository ${REPOSITORY} wasn't possible."
 
         fi
 
@@ -114,11 +114,11 @@ update_definitions () {
         # clone definitions repository:
         cd "${CACHE_DIR}"
         note "Cloning repository ${REPOSITORY} from branch: ${BRANCH}"
-        ${RM_BIN} -rf definitions >> ${LOG} 2>&1 # if something is already here, wipe it out from cache
-        ${GIT_BIN} clone "${REPOSITORY}" definitions >> ${LOG} 2>&1 || error "Error occured: Cloning repository ${REPOSITORY} isn't possible. Make sure it's valid."
+        ${RM_BIN} -rf definitions >> ${LOG}-definitions-update 2>&1 # if something is already here, wipe it out from cache
+        ${GIT_BIN} clone "${REPOSITORY}" definitions >> ${LOG}-definitions-update 2>&1 || error "Error occured: Cloning repository ${REPOSITORY} isn't possible. Make sure it's valid."
         cd "${CACHE_DIR}definitions"
-        ${GIT_BIN} checkout -b "${BRANCH}" >> ${LOG} 2>&1
-        (${GIT_BIN} pull origin "${BRANCH}" && note "Updated branch ${BRANCH} of repository ${REPOSITORY}") || error "Error occured: Update from branch: ${BRANCH} of repository ${REPOSITORY} isn't possible. Make sure that given repository and branch are valid." # XXX: temporary >> ${LOG} 2>&1
+        ${GIT_BIN} checkout -b "${BRANCH}" >> ${LOG}-definitions-update 2>&1
+        (${GIT_BIN} pull origin "${BRANCH}" && note "Updated branch ${BRANCH} of repository ${REPOSITORY}") || error "Error occured: Update from branch: ${BRANCH} of repository ${REPOSITORY} isn't possible. Make sure that given repository and branch are valid."
     fi
 }
 
@@ -214,8 +214,8 @@ perform_clean () {
     fi
     note "Removing binary builds from ${BINBUILDS_CACHE_DIR}"
     ${RM_BIN} -rf "${BINBUILDS_CACHE_DIR}"
-    note "Removing log: ${LOG}"
-    ${RM_BIN} -rf "${LOG}"
+    note "Removing logs: ${LOG}/sofin-*"
+    ${RM_BIN} -rf ${LOG}/sofin-*
 }
 
 
@@ -271,7 +271,15 @@ if [ ! "$1" = "" ]; then
 
 
     log)
-        ${TAIL_BIN} -n "${LOG_LINES_AMOUNT}" -F "${LOG}"
+        shift
+        shift
+        pattern="$*"
+        if [ "${pattern}" = "" ]; then
+            ${TAIL_BIN} -n "${LOG_LINES_AMOUNT}" -F ${LOG}/sofin*
+        else
+            note "Pattern: ${pattern}"
+            ${TAIL_BIN} -n "${LOG_LINES_AMOUNT}" -F ${LOG}/sofin*${pattern}*
+        fi
         ;;
 
 
@@ -647,7 +655,7 @@ if [ ! "$1" = "" ]; then
                     SYS="${SYSTEM_NAME}-${FULL_SYSTEM_VERSION}-${SYSTEM_ARCH}"
                     system_path="${MAIN_SOFTWARE_PREFIX}/software/binary/${SYS}"
                     note "Wiping out remote (${mirror}) binary archives: ${name}*"
-                    ${SSH_BIN} -p ${MAIN_PORT} ${MAIN_USER}@${mirror} "${RM_BIN} -f ${system_path}/${name}* ${system_path}/${name}.sha1" >> "${LOG}" 2>&1
+                    ${SSH_BIN} -p ${MAIN_PORT} ${MAIN_USER}@${mirror} "${RM_BIN} -f ${system_path}/${name}* ${system_path}/${name}.sha1" >> "${LOG}-${APP_NAME}" 2>&1
                 done
             done
             note "Done."
@@ -680,7 +688,7 @@ if [ ! "$1" = "" ]; then
                     error "Czy Ty orzeszki?"
                 fi
                 debug "Removing software from: ${SOFTWARE_DIR}${APP_NAME}"
-                ${RM_BIN} -rfv "${SOFTWARE_DIR}${APP_NAME}" >> "${LOG}"
+                ${RM_BIN} -rfv "${SOFTWARE_DIR}${APP_NAME}" >> "${LOG}-${APP_NAME}"
             else
                 warn "Application: ${APP_NAME} not installed."
                 exit 1 # throw an error exit code
@@ -859,11 +867,23 @@ for application in ${APPLICATIONS}; do
 
             run () {
                 if [ ! -z "$1" ]; then
-                    if [ ! -e "${LOG}" ]; then
-                        ${TOUCH_BIN} "${LOG}"
+                    if [ ! -e "${LOG}-${APP_NAME}" ]; then
+                        ${TOUCH_BIN} "${LOG}-${APP_NAME}"
                     fi
                     debug "Running '$@' @ $(${DATE_BIN})"
-                    eval PATH="${PATH}" "$@" 1>> "${LOG}" 2>> "${LOG}"
+                    eval PATH="${PATH}" "$@" 1>> "${LOG}-${APP_NAME}" 2>> "${LOG}-${APP_NAME}"
+                    # NN="$!"
+                    # size=""
+                    # oldsize=""
+                    # progress="-"
+                    # while [ "$NN" != "0" ]; do
+                    #     size="$(stat -f '%z' ${LOG})"
+                    #     if [ "${oldsize}" != "${size}" ]; then
+                    #         progress="${size}"
+                    #     fi
+                    #     printf "\r${progress}\r"
+                    #     oldsize="$(stat -f '%z' ${LOG})"
+                    # done
                     check_command_result $?
                 else
                     error "Empty command to run?"
@@ -884,8 +904,8 @@ for application in ${APPLICATIONS}; do
                 else
                     if [ ! -e "./${ARCHIVE_NAME}" ]; then
                         note "Trying binary build for: ${MIDDLE}/${APP_NAME}${APP_POSTFIX}-${APP_VERSION}"
-                        ${FETCH_BIN} "${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}.sha1" 2>>${LOG}
-                        ${FETCH_BIN} "${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}" 2>>${LOG}
+                        ${FETCH_BIN} "${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}.sha1" 2>>${LOG}-fetch
+                        ${FETCH_BIN} "${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}"
 
                         # checking archive sha1 checksum
                         if [ -e "${ARCHIVE_NAME}" ]; then
@@ -914,7 +934,7 @@ for application in ${APPLICATIONS}; do
 
                     debug "ARCHIVE_NAME: ${ARCHIVE_NAME}"
                     if [ -e "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" ]; then # if exists, then checksum is ok
-                        ${TAR_BIN} xfJ "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" >> ${LOG} 2>&1
+                        ${TAR_BIN} xfJ "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" >> ${LOG}-${APP_NAME} 2>&1
                         if [ "$?" = "0" ]; then # if archive is valid
                             note "  ${NOTE_CHAR2} Binary bundle installed: ${APP_NAME}${APP_POSTFIX} with version: ${APP_VERSION}"
                             export DONT_BUILD_BUT_DO_EXPORTS="true"
@@ -1018,7 +1038,7 @@ for application in ${APPLICATIONS}; do
                                     warn "${NOTE_CHAR2} ${cur} vs ${APP_SHA}"
                                     warn "${NOTE_CHAR2} SHA sum mismatch. Removing corrupted file from cache: ${file}, and retrying."
                                     # remove corrupted file
-                                    ${RM_BIN} -v "${file}" >> "${LOG}"
+                                    ${RM_BIN} -f "${file}"
                                     # and restart script with same arguments:
                                     eval "${SOFIN_BIN} ${SOFIN_ARGS}"
                                     exit
@@ -1062,7 +1082,7 @@ for application in ${APPLICATIONS}; do
                                 for patch in ${patches_files}; do
                                     for level in 0 1 2 3 4 5; do
                                         debug "Trying to patch source with patch: ${patch} (p${level})"
-                                        ${PATCH_BIN} -p${level} -N -f -i "${patch}" >> "${LOG}" 2>> "${LOG}" # don't use run.. it may fail - we don't care
+                                        ${PATCH_BIN} -p${level} -N -f -i "${patch}" >> "${LOG}-${APP_NAME}-patch" 2>> "${LOG}-${APP_NAME}-patch" # don't use run.. it may fail - we don't care
                                         debug "Patching (p${level}) exit code: $?"
                                     done
                                 done
@@ -1074,7 +1094,7 @@ for application in ${APPLICATIONS}; do
                                     for platform_specific_patch in ${patches_files}; do
                                         for level in 0 1 2 3 4 5; do
                                             debug "Patching source code with pspatch: ${platform_specific_patch} (p${level})"
-                                            ${PATCH_BIN} -p${level} -N -f -i "${platform_specific_patch}" >> "${LOG}" 2>> "${LOG}"
+                                            ${PATCH_BIN} -p${level} -N -f -i "${platform_specific_patch}" >> "${LOG}-${APP_NAME}-patch" 2>> "${LOG}-${APP_NAME}-patch"
                                             debug "Patching (p${level}) exit code: $?"
                                         done
                                     done
@@ -1299,7 +1319,7 @@ for application in ${APPLICATIONS}; do
             ${CP_BIN} -R ${PREFIX}/bin/${APP_LOWERNAME} "${APP_BUNDLE_NAME}/exports/"
 
             for lib in $(${FIND_BIN} "${PREFIX}" -name '*.dylib' -type f); do
-                ${CP_BIN} -vf ${lib} ${APP_BUNDLE_NAME}/libs/ >> ${LOG} 2>&1
+                ${CP_BIN} -vf ${lib} ${APP_BUNDLE_NAME}/libs/ >> ${LOG}-${APP_NAME}-applebuild 2>&1
             done
 
             # if symlink exists, remove it.
@@ -1311,13 +1331,13 @@ for application in ${APPLICATIONS}; do
             ${CP_BIN} -R "${PREFIX}/lib/${APP_LOWERNAME}" "${APP_BUNDLE_NAME}/libs/"
 
             cd "${APP_BUNDLE_NAME}/Contents"
-            test -L MacOS || ${LN_BIN} -s ../exports MacOS >> ${LOG} 2>&1
+            test -L MacOS || ${LN_BIN} -s ../exports MacOS >> ${LOG}-${APP_NAME}-applebuild 2>&1
 
             note "Creating relative libraries search path"
             cd ${APP_BUNDLE_NAME}
 
             note "Processing exported binary: ${i}"
-            ${SOFIN_LIBBUNDLE_BIN} -x "${APP_BUNDLE_NAME}/Contents/MacOS/${APP_LOWERNAME}" >> ${LOG} 2>&1
+            ${SOFIN_LIBBUNDLE_BIN} -x "${APP_BUNDLE_NAME}/Contents/MacOS/${APP_LOWERNAME}" >> ${LOG}-${APP_NAME}-applebuild 2>&1
 
         fi
 
