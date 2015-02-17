@@ -1103,7 +1103,7 @@ for application in ${APPLICATIONS}; do
                                 for patch in ${patches_files}; do
                                     for level in 0 1 2 3 4 5; do
                                         debug "Trying to patch source with patch: ${patch} (p${level})"
-                                        ${PATCH_BIN} -p${level} -N -f -i "${patch}" >> "${LOG}-${APP_NAME}${APP_POSTFIX}-patch" 2>> "${LOG}-${APP_NAME}${APP_POSTFIX}-patch" # don't use run.. it may fail - we don't care
+                                        ${PATCH_BIN} -p${level} -N -f -i "${patch}" >> "${LOG}-${APP_NAME}${APP_POSTFIX}" 2>> "${LOG}-${APP_NAME}${APP_POSTFIX}" # don't use run.. it may fail - we don't care
                                         debug "Patching (p${level}) exit code: $?"
                                     done
                                 done
@@ -1115,7 +1115,7 @@ for application in ${APPLICATIONS}; do
                                     for platform_specific_patch in ${patches_files}; do
                                         for level in 0 1 2 3 4 5; do
                                             debug "Patching source code with pspatch: ${platform_specific_patch} (p${level})"
-                                            ${PATCH_BIN} -p${level} -N -f -i "${platform_specific_patch}" >> "${LOG}-${APP_NAME}${APP_POSTFIX}-patch" 2>> "${LOG}-${APP_NAME}${APP_POSTFIX}-patch"
+                                            ${PATCH_BIN} -p${level} -N -f -i "${platform_specific_patch}" >> "${LOG}-${APP_NAME}${APP_POSTFIX}" 2>> "${LOG}-${APP_NAME}${APP_POSTFIX}"
                                             debug "Patching (p${level}) exit code: $?"
                                         done
                                     done
