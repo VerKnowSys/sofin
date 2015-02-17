@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
 
 # config settings
-readonly VERSION="0.76.0"
+readonly VERSION="0.76.1"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -147,7 +147,8 @@ usage_howto () {
     note "  ${cyan}distclean                            ${gray}-${green} cleans binbuilds cache, unpacked source content, logs and definitions"
     note "  ${cyan}purge                                ${gray}-${green} cleans binbuilds cache, unpacked source content, logs, definitions, source cache and possible states"
     note "  ${cyan}outdated                             ${gray}-${green} lists outdated software"
-    note "  ${cyan}build                                ${gray}-${green} does binary build from source for software specified as params and automatically sents it to binary repository"
+    note "  ${cyan}build                                ${gray}-${green} does binary build from source for software specified as params"
+    note "  ${cyan}deploy                               ${gray}-${green} build + push"
     note "  ${cyan}push | binpush | send                ${gray}-${green} creates binary build from prebuilt software bundles name given as params (example: $(${BASENAME_BIN} ${SOFIN_BIN}) push Rubinius Vifm Curl)"
     note "  ${cyan}wipe                                 ${gray}-${green} wipes binary builds (matching given name) from binary respositories (example: $(${BASENAME_BIN} ${SOFIN_BIN}) wipe Rubinius Vifm)"
     note "  ${cyan}port                                 ${gray}-${green} gathers port of TheSS running service by service name"
@@ -588,7 +589,22 @@ if [ ! "$1" = "" ]; then
         update_definitions
         shift
         dependencies="$*"
-        note "Software bundles to be built and pushed to remote: ${dependencies}"
+        note "Software bundles to be built: ${dependencies}"
+        def_error () {
+            error "Failure in definition: ${software}. Report or fix the definition please!"
+        }
+        for software in ${dependencies}; do
+            USE_BINBUILD=false ${SOFIN_BIN} get ${software} || def_error
+        done
+        exit
+        ;;
+
+
+    deploy)
+        update_definitions
+        shift
+        dependencies="$*"
+        note "Software bundles to be built and deployed to remote: ${dependencies}"
         def_error () {
             error "Failure in definition: ${software}. Report or fix the definition please!"
         }
