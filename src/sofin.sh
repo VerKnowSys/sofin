@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
 
 # config settings
-readonly VERSION="0.76.3"
+readonly VERSION="0.76.4"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -1288,6 +1288,21 @@ for application in ${APPLICATIONS}; do
                 fi
             fi
 
+            debug "Doing app conflict resolve"
+            if [ ! -z "${APP_CONFLICTS_WITH}" ]; then
+                note "Resolving conflicts: ${APP_CONFLICTS_WITH}"
+                for app in ${APP_CONFLICTS_WITH}; do
+                    maybe_software="$(${FIND_BIN} ${SOFTWARE_DIR} -maxdepth 1 -type d -name ${app}\*)"
+                    for an_app in ${maybe_software}; do
+                        debug "Found conflicting app: ${an_app}"
+                        if [ -e "${an_app}/exports" ]; then
+                            note "Disabling exports for ${APP_NAME}${APP_POSTFIX}"
+                            ${MV_BIN} "${an_app}/exports" "${an_app}/exports-disabled"
+                        fi
+                    done
+                done
+            fi
+
             . "${DEFINITIONS_DIR}${application}.def"
             note "Exporting binaries: ${APP_EXPORTS} of prefix: ${PREFIX}"
             if [ -d "${PREFIX}/exports-disabled" ]; then # just bring back disabled exports
@@ -1312,22 +1327,6 @@ for application in ${APPLICATIONS}; do
                     done
                 done
             fi
-            debug "Doing app conflict resolve"
-            if [ ! -z "${APP_CONFLICTS_WITH}" ]; then
-                note "Resolving conflicts: ${APP_CONFLICTS_WITH}"
-                for app in ${APP_CONFLICTS_WITH}; do
-                    export apphome="${SOFTWARE_DIR}"
-                    an_app="${apphome}${app}"
-                    if [ -d "${an_app}" ]; then
-                        debug "Found conflicting app: ${an_app}"
-                        if [ -e "${an_app}/exports" ]; then
-                            note "Disabling exports for ${an_app}"
-                            ${MV_BIN} "${an_app}/exports" "${an_app}/exports-disabled"
-                        fi
-                    fi
-                done
-            fi
-
         done
 
         if [ ! -z "${APP_AFTER_EXPORT_CALLBACK}" ]; then
