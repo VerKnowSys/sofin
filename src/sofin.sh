@@ -881,7 +881,7 @@ for application in ${APPLICATIONS}; do
             # Capitalize:
             APP_NAME="${head}${tail}"
             # some additional convention check:
-            if [ "${APP_NAME}" != "${specified}" ]; then
+            if [ "${APP_NAME}" != "${specified}" -a "${APP_NAME}${APP_POSTFIX}" != "${specified}" ]; then
                 warn "You specified lowercase name of bundle, which is in contradiction to Sofin's convention (bundle - capitalized: f.e. \"Rubinius\", dependencies and definitions - lowercase: f.e. \"yaml\")."
             fi
             # if definition requires root privileges, throw an "exception":
