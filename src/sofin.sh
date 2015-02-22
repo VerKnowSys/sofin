@@ -872,9 +872,13 @@ for application in ${APPLICATIONS}; do
             . "${definition}"
             check_disabled "${DISABLE_ON}" # after which just check if it's not disabled
 
-            # fancy old style Capitalize
+            # export APP_POSTFIX="$(echo "${APP_VERSION}" | ${SED_BIN} 's/\.[0-9]*$//;s/\.//')"
+
             APP_LOWER="${APP_NAME}"
-            APP_NAME="$(${PRINTF_BIN} "${APP_NAME}" | ${CUT_BIN} -c1 | ${TR_BIN} '[a-z]' '[A-Z]')$(${PRINTF_BIN} "${APP_NAME}" | ${SED_BIN} 's/^[a-zA-Z]//')"
+            head="$(echo "${APP_NAME}" | ${SED_BIN} 's/\(.\)\(.*\)/\1/' | ${TR_BIN} '[a-z]' '[A-Z]')"
+            tail="$(echo "${APP_NAME}" | ${SED_BIN} 's/\(.\)\(.*\)/\2/')"
+            # Capitalize:
+            APP_NAME="${head}${tail}"
             # some additional convention check:
             if [ "${APP_NAME}" != "${specified}" ]; then
                 warn "You specified lowercase name of bundle, which is in contradiction to Sofin's convention (bundle - capitalized: f.e. \"Rubinius\", dependencies and definitions - lowercase: f.e. \"yaml\")."
