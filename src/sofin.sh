@@ -904,18 +904,6 @@ for application in ${APPLICATIONS}; do
                     fi
                     debug "Running '$@' @ $(${DATE_BIN})"
                     eval PATH="${PATH}" "$@" 1>> "${LOG}-${APP_NAME}${APP_POSTFIX}" 2>> "${LOG}-${APP_NAME}${APP_POSTFIX}"
-                    # NN="$!"
-                    # size=""
-                    # oldsize=""
-                    # progress="-"
-                    # while [ "$NN" != "0" ]; do
-                    #     size="$(stat -f '%z' ${LOG})"
-                    #     if [ "${oldsize}" != "${size}" ]; then
-                    #         progress="${size}"
-                    #     fi
-                    #     printf "\r${progress}\r"
-                    #     oldsize="$(stat -f '%z' ${LOG})"
-                    # done
                     check_command_result $?
                 else
                     error "Empty command to run?"
