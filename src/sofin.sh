@@ -701,6 +701,7 @@ if [ ! "$1" = "" ]; then
             debug "Removing applications: ${SOFIN_ARGS}"
         fi
 
+        err=0
         for app in $APPLICATIONS; do
             APP_NAME="$(${PRINTF_BIN} "${app}" | ${CUT_BIN} -c1 | ${TR_BIN} '[a-z]' '[A-Z]')$(${PRINTF_BIN} "${app}" | ${SED_BIN} 's/^[a-zA-Z]//')"
             if [ -d "${SOFTWARE_DIR}${APP_NAME}" ]; then
@@ -709,14 +710,14 @@ if [ ! "$1" = "" ]; then
                     error "Czy Ty orzeszki?"
                 fi
                 debug "Removing software from: ${SOFTWARE_DIR}${APP_NAME}"
-                ${RM_BIN} -rfv "${SOFTWARE_DIR}${APP_NAME}" >> "${LOG}-${APP_NAME}${APP_POSTFIX}"
+                ${RM_BIN} -rfv "${SOFTWARE_DIR}${APP_NAME}" >> "${LOG}-${APP_LOWER}${APP_POSTFIX}"
             else
                 warn "Application: ${APP_NAME} not installed."
-                exit 1 # throw an error exit code
+                err=1 # throw an error exit code after itering through list of applications to remove
             fi
             update_shell_vars ${USERNAME}
         done
-        exit
+        exit ${err}
         ;;
 
 
