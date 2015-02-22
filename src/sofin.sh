@@ -342,7 +342,7 @@ if [ ! "$1" = "" ]; then
         ;;
 
 
-    fullinstalled|fulllist)
+    fullinstalled|fulllist|full)
         note "Installed applications:"
         note
         if [ -d ${SOFTWARE_DIR} ]; then
@@ -482,7 +482,7 @@ if [ ! "$1" = "" ]; then
         ;;
 
 
-    install|get|pick|choose|use)
+    install|get|pick|choose|use|switch)
         if [ "$2" = "" ]; then
             error "For \"$1\" application installation mode, second argument with at least one application name or list is required!"
         fi
@@ -1017,7 +1017,7 @@ for application in ${APPLICATIONS}; do
 
                 if [ "${ALLOW}" = "1" ]; then
                     if [ -z "${APP_HTTP_PATH}" ]; then
-                        error "No source given for definition! Aborting"
+                        note "   ${NOTE_CHAR2} No source given for definition, it's only valid for meta bundles."
                     else
                         debug "Runtime SHA1: ${RUNTIME_SHA}"
                         export BUILD_DIR_ROOT="${CACHE_DIR}cache/${APP_NAME}${APP_POSTFIX}-${APP_VERSION}-${RUNTIME_SHA}/"
