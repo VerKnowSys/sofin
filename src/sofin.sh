@@ -846,8 +846,19 @@ for application in ${APPLICATIONS}; do
     application="$(${PRINTF_BIN} "${application}" | ${TR_BIN} '[A-Z]' '[a-z]')" # lowercase for case sensitive fs
     . "${DEFAULTS}"
     if [ ! -f "${DEFINITIONS_DIR}${application}.def" ]; then
-        warn "No such definition found: ${application}"
-        continue
+        warn "No such definition found: ${application}.def"
+        contents=""
+        maybe_version="$(${FIND_BIN} ${DEFINITIONS_DIR} -maxdepth 1 -name ${application}\*.def)"
+        for maybe in ${maybe_version}; do
+            elem="$(${BASENAME_BIN} ${maybe})"
+            head="$(echo "${elem}" | ${SED_BIN} 's/\(.\)\(.*\)/\1/' | ${TR_BIN} '[a-z]' '[A-Z]')"
+            tail="$(echo "${elem}" | ${SED_BIN} 's/\(.\)\(.*\)/\2/')"
+            contents="${contents}$(echo "${head}${tail}" | ${SED_BIN} 's/\..*//') "
+        done
+        if [ "${contents}" != "" ]; then
+            note "You may try some of these: ${contents}"
+        fi
+        exit
     fi
     . "${DEFINITIONS_DIR}${application}.def" # prevent installation of requirements of disabled application:
     check_disabled "${DISABLE_ON}" # after which just check if it's not disabled
