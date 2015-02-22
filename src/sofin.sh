@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
 
 # config settings
-readonly VERSION="0.76.1"
+readonly VERSION="0.76.2"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -1168,6 +1168,11 @@ for application in ${APPLICATIONS}; do
 
                                 cmake)
                                     run "${APP_CONFIGURE_SCRIPT} . -LH -DCMAKE_INSTALL_PREFIX=${PREFIX} -DCMAKE_BUILD_TYPE=Release -DSYSCONFDIR=${SOFTWARE_DATA_DIR} -DWITH_DEBUG=0 ${APP_CONFIGURE_ARGS}"
+                                    ;;
+
+                                void|meta|empty)
+                                    APP_MAKE_METHOD="true"
+                                    APP_INSTALL_METHOD="true"
                                     ;;
 
                                 *)
