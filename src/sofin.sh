@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
 
 # config settings
-readonly VERSION="0.76.2"
+readonly VERSION="0.76.3"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -847,7 +847,6 @@ for application in ${APPLICATIONS}; do
     application="$(${PRINTF_BIN} "${application}" | ${TR_BIN} '[A-Z]' '[a-z]')" # lowercase for case sensitive fs
     . "${DEFAULTS}"
     if [ ! -f "${DEFINITIONS_DIR}${application}.def" ]; then
-        warn "No such definition found: ${application}.def"
         contents=""
         maybe_version="$(${FIND_BIN} ${DEFINITIONS_DIR} -maxdepth 1 -name ${application}\*.def)"
         for maybe in ${maybe_version}; do
@@ -857,7 +856,9 @@ for application in ${APPLICATIONS}; do
             contents="${contents}$(echo "${head}${tail}" | ${SED_BIN} 's/\..*//') "
         done
         if [ "${contents}" != "" ]; then
-            note "You may try some of these: ${contents}"
+            warn "No such definition found: ${application}. Alternatives found: ${contents}"
+        else
+            warn "No such definition found: ${application}. No alternatives found."
         fi
         exit
     fi
