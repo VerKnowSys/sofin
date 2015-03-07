@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
 
 # config settings
-readonly VERSION="0.76.4"
+readonly VERSION="0.76.5"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
