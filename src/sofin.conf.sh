@@ -102,6 +102,7 @@ SSH_BIN="/usr/bin/ssh"
 DIFF_BIN="/usr/bin/diff"
 IFCONFIG_BIN="/sbin/ifconfig"
 INSTALL_BIN="/usr/bin/install"
+MKFIFO_BIN="/usr/bin/mkfifo"
 
 OS_VERSION=10
 if [ -x "${SOFIN_VERSION_UTILITY_BIN}" ]; then
