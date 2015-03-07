@@ -528,6 +528,9 @@ if [ ! "$1" = "" ]; then
                         # In FreeBSD 10 there's drill utility instead of dig
                         dig_query=$(${DIG_BIN} A ${MAIN_SOFTWARE_ADDRESS} | ${GREP_BIN} "^${MAIN_SOFTWARE_ADDRESS}" | ${AWK_BIN} '{print $5}')
                     fi
+                    if [ -z "${dig_query}" ]; then
+                        error "No mirrors found in address: ${MAIN_SOFTWARE_ADDRESS}"
+                    fi
                     debug "MIRROR: ${dig_query}"
                     for mirror in ${dig_query}; do
                         SYS="${SYSTEM_NAME}-${FULL_SYSTEM_VERSION}-${SYSTEM_ARCH}"
