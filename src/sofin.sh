@@ -1348,7 +1348,7 @@ for application in ${APPLICATIONS}; do
         fi
 
         if [ "${APP_CLEAN_USELESS}" = "true" ]; then
-            for dir in "/bin/" "/sbin/"; do
+            for dir in bin sbin libexec; do
                 if [ -d "${PREFIX}/${dir}" ]; then
                     ALL_BINS=$(${FIND_BIN} ${PREFIX}/${dir} -type lf)
                     debug "ALL_BINS: ${ALL_BINS}"
