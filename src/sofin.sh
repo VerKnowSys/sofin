@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
 
 # config settings
-readonly VERSION="0.78.1"
+readonly VERSION="0.78.2"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -1342,7 +1342,7 @@ for application in ${APPLICATIONS}; do
             for pattern in ${APP_USELESS}; do
                 debug "Pattern: ${pattern}"
                 if [ ! -z "${PREFIX}" ]; then
-                    ${RM_BIN} -rf ${PREFIX}/*${pattern}*
+                    ${RM_BIN} -rf ${PREFIX}/${pattern}
                 fi
             done
         fi
