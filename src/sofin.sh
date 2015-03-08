@@ -1350,7 +1350,7 @@ for application in ${APPLICATIONS}; do
         if [ "${APP_CLEAN_USELESS}" = "true" ]; then
             for dir in bin sbin libexec; do
                 if [ -d "${PREFIX}/${dir}" ]; then
-                    ALL_BINS=$(${FIND_BIN} ${PREFIX}/${dir} -type lf)
+                    ALL_BINS=$(${FIND_BIN} ${PREFIX}/${dir} -type f -or -type l)
                     debug "ALL_BINS: ${ALL_BINS}"
                     for file in ${ALL_BINS}; do
                         base="$(${BASENAME_BIN} ${file})"
