@@ -1339,7 +1339,7 @@ for application in ${APPLICATIONS}; do
 
         if [ ! -z "${APP_USELESS}" ]; then
             note "Performing cleanup of useless files"
-            for pattern in ${APP_USELESS}; do
+            for pattern in ${APP_USELESS} ${APP_DEFAULT_USELESS}; do
                 debug "Pattern: ${pattern}"
                 if [ ! -z "${PREFIX}" ]; then
                     ${RM_BIN} -rf ${PREFIX}/${pattern}
