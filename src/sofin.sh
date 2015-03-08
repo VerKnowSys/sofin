@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
 
 # config settings
-readonly VERSION="0.78.0"
+readonly VERSION="0.78.1"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -1359,6 +1359,33 @@ for application in ${APPLICATIONS}; do
                         else
                             ${RM_BIN} -f "${file}"
                         fi
+                    done
+                fi
+            done
+        fi
+
+        dirs_to_strip=""
+        case "${APP_STRIP}" in
+            all)
+                dirs_to_strip="${PREFIX}/bin ${PREFIX}/sbin ${PREFIX}/lib ${PREFIX}/libexec"
+                ;;
+            exports)
+                dirs_to_strip="${PREFIX}/bin ${PREFIX}/sbin ${PREFIX}/libexec"
+                ;;
+            libs)
+                dirs_to_strip="${PREFIX}/lib"
+                ;;
+            no)
+                ;;
+        esac
+        if [ "${APP_STRIP}" != "no" ]; then
+            note "Stripping files"
+            for strip in ${dirs_to_strip}; do
+                if [ -d "${strip}" ]; then
+                    files="$(${FIND_BIN} ${strip} -maxdepth 1 -type f)"
+                    debug "Files to strip: ${files}"
+                    for file in ${files}; do
+                        ${STRIP_BIN} ${file} > /dev/null 2>&1
                     done
                 fi
             done
