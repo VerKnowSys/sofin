@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
 
 # config settings
-readonly VERSION="0.78.3"
+readonly VERSION="0.78.4"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -1337,7 +1337,7 @@ for application in ${APPLICATIONS}; do
             run "${APP_AFTER_EXPORT_CALLBACK}"
         fi
 
-        if [ ! -z "${APP_USELESS}" ]; then
+        if [ "${APP_CLEAN_USELESS}" = "true" ]; then
             note "Performing cleanup of useless files"
             for pattern in ${APP_USELESS} ${APP_DEFAULT_USELESS}; do
                 debug "Pattern: ${pattern}"
@@ -1345,9 +1345,6 @@ for application in ${APPLICATIONS}; do
                     ${RM_BIN} -rf ${PREFIX}/${pattern}
                 fi
             done
-        fi
-
-        if [ "${APP_CLEAN_USELESS}" = "true" ]; then
             for dir in bin sbin libexec; do
                 if [ -d "${PREFIX}/${dir}" ]; then
                     ALL_BINS=$(${FIND_BIN} ${PREFIX}/${dir} -maxdepth 1 -type f -or -type l)
