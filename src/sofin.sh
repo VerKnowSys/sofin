@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
 
 # config settings
-readonly VERSION="0.76.5"
+readonly VERSION="0.78.0"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -1335,6 +1335,33 @@ for application in ${APPLICATIONS}; do
         if [ ! -z "${APP_AFTER_EXPORT_CALLBACK}" ]; then
             debug "Executing APP_AFTER_EXPORT_CALLBACK"
             run "${APP_AFTER_EXPORT_CALLBACK}"
+        fi
+
+        if [ ! -z "${APP_USELESS}" ]; then
+            note "Performing cleanup of useless files"
+            for pattern in ${APP_USELESS}; do
+                debug "Pattern: ${pattern}"
+                if [ ! -z "${PREFIX}" ]; then
+                    ${RM_BIN} -rf ${PREFIX}/*${pattern}*
+                fi
+            done
+        fi
+
+        if [ "${APP_CLEAN_USELESS}" = "true" ]; then
+            for dir in "/bin/" "/sbin/"; do
+                if [ -d ${PREFIX}/${dir} ]; then
+                    ALL_BINS=$(${FIND_BIN} ${PREFIX}/${dir} -type lf)
+                    debug "ALL_BINS: ${ALL_BINS}"
+                    for file in ${ALL_BINS}; do
+                        base="$(${BASENAME_BIN} ${file})"
+                        if [ -e ${PREFIX}/exports/${base} ]; then
+                            debug "Found export: ${base}"
+                        else
+                            ${RM_BIN} -f "${file}"
+                        fi
+                    done
+                fi
+            done
         fi
 
         if [ "${APP_APPLE_BUNDLE}" = "true" ]; then
