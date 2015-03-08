@@ -1349,12 +1349,12 @@ for application in ${APPLICATIONS}; do
 
         if [ "${APP_CLEAN_USELESS}" = "true" ]; then
             for dir in "/bin/" "/sbin/"; do
-                if [ -d ${PREFIX}/${dir} ]; then
+                if [ -d "${PREFIX}/${dir}" ]; then
                     ALL_BINS=$(${FIND_BIN} ${PREFIX}/${dir} -type lf)
                     debug "ALL_BINS: ${ALL_BINS}"
                     for file in ${ALL_BINS}; do
                         base="$(${BASENAME_BIN} ${file})"
-                        if [ -e ${PREFIX}/exports/${base} ]; then
+                        if [ -e "${PREFIX}/exports/${base}" ]; then
                             debug "Found export: ${base}"
                         else
                             ${RM_BIN} -f "${file}"
