@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
 
 # config settings
-readonly VERSION="0.78.2"
+readonly VERSION="0.78.3"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -1350,7 +1350,7 @@ for application in ${APPLICATIONS}; do
         if [ "${APP_CLEAN_USELESS}" = "true" ]; then
             for dir in bin sbin libexec; do
                 if [ -d "${PREFIX}/${dir}" ]; then
-                    ALL_BINS=$(${FIND_BIN} ${PREFIX}/${dir} -type f -or -type l)
+                    ALL_BINS=$(${FIND_BIN} ${PREFIX}/${dir} -maxdepth 1 -type f -or -type l)
                     debug "ALL_BINS: ${ALL_BINS}"
                     for file in ${ALL_BINS}; do
                         base="$(${BASENAME_BIN} ${file})"
