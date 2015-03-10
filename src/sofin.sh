@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
 
 # config settings
-readonly VERSION="0.78.6"
+readonly VERSION="0.78.7"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -1354,16 +1354,18 @@ for application in ${APPLICATIONS}; do
                             debug "Found export: ${base}"
                         else
                             # traverse through APP_USEFUL for file patterns required by software but not exported
+                            commit_removal=""
                             for is_useful in ${APP_USEFUL}; do
-                                what_i_find=$(${FIND_BIN} ${PREFIX} -name "$(${BASENAME_BIN} "${is_useful}")" 2>/dev/null)
-                                echo "${what_i_find}" | ${GREP_BIN} "${base}" >/dev/null 2>/dev/null
-                                if [ "$?" != "0" ]; then
-                                    debug "Removing useless file: ${file}"
-                                    ${RM_BIN} -f "${file}"
-                                else
-                                    debug "Leaving useful file intact: ${file}"
+                                echo "${file}" | ${GREP_BIN} "${is_useful}" >/dev/null 2>&1
+                                if [ "$?" = "0" ]; then
+                                    debug "Useful file left intact: ${file}"
+                                    commit_removal="no"
                                 fi
                             done
+                            if [ -z "${commit_removal}" ]; then
+                                debug "Removing useless file: ${file}"
+                                ${RM_BIN} -f "${file}"
+                            fi
                         fi
                     done
                 fi
