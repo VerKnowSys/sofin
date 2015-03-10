@@ -34,9 +34,23 @@ readonly TRACE
 readonly SOFIN_HEADER="Sofin v${VERSION} (c) 2o11-2o15 verknowsys.com"
 readonly SOFIN_PROFILE="/etc/profile_sofin"
 readonly SOFIN_DISABLED_INDICATOR_FILE="${HOME}/.sofin-disabled"
-
-DEFAULT_LDFLAGS="-fPIC -fPIE"
-DEFAULT_COMPILER_FLAGS="-Os -fPIC -fPIE -fno-strict-overflow -fstack-protector-all"
+readonly SOFTWARE_ROOT_DIR="/Software/"
+readonly SOFTWARE_DIR="/Software/"
+readonly CACHE_DIR="${HOME}/.cache/"
+readonly BINBUILDS_CACHE_DIR="${CACHE_DIR}binbuilds/"
+readonly DEFINITIONS_DIR="${CACHE_DIR}definitions/definitions/"
+readonly LOG="${CACHE_DIR}logs/sofin"
+readonly LISTS_DIR="${CACHE_DIR}definitions/lists/"
+readonly DEFAULTS="${DEFINITIONS_DIR}defaults.def"
+readonly BINBUILDS_CACHE_DIR
+readonly LOCK_FILE="${SOFTWARE_DIR}.sofin.lock"
+readonly MAIN_PORT="60022"
+readonly MAIN_USER="sofin"
+readonly MAIN_SOFTWARE_PREFIX="/Mirror"
+readonly MAIN_SOFTWARE_ADDRESS="software.verknowsys.com"
+readonly MAIN_SOURCE_REPOSITORY="http://${MAIN_SOFTWARE_ADDRESS}/source/"
+readonly MAIN_BINARY_REPOSITORY="http://${MAIN_SOFTWARE_ADDRESS}/binary/"
+readonly CCACHE_BIN_OPTIONAL="${SOFTWARE_ROOT_DIR}Ccache/exports/ccache"
 readonly DEFAULT_ID_OPTIONS="-un"
 readonly DEFAULT_MANPATH="/usr/share/man"
 readonly DEFAULT_PATH="/bin:/usr/bin:/sbin:/usr/sbin"
@@ -147,7 +161,8 @@ cecho () {
 debug () {
     if [ "${DEBUG}" = "true" ]; then
         cecho "# $1" ${magenta} # NOTE: this "#" is required for debug mode to work properly with generation of ~/.profile and /etc/profile_sofin files!
-    # else
+    else
+        cecho "# $1" ${magenta} >> ${LOG} 2>/dev/null
         # cecho " ~ $1" ${magenta} >> ${LOG}
     fi
 }
@@ -172,6 +187,8 @@ error () {
 # System specific configuration
 readonly SYSTEM_NAME="$(uname)"
 readonly SYSTEM_ARCH="$(uname -m)"
+DEFAULT_LDFLAGS="-fPIC -fPIE"
+DEFAULT_COMPILER_FLAGS="-Os -fPIC -fPIE -fno-strict-overflow -fstack-protector-all"
 
 
 case "${SYSTEM_NAME}" in
@@ -272,52 +289,9 @@ case "${SYSTEM_NAME}" in
 
 esac
 
-
-readonly SOFTWARE_ROOT_DIR="/Software/"
-SOFTWARE_DIR="/Software/"
-SYSTEM_HOME_DIR="/SystemUsers/"
-CACHE_DIR="${SYSTEM_HOME_DIR}.cache/"
-BINBUILDS_CACHE_DIR="${CACHE_DIR}binbuilds/"
-DEFINITIONS_DIR="${CACHE_DIR}definitions/definitions/"
-LOG="${CACHE_DIR}logs/sofin"
-LISTS_DIR="${CACHE_DIR}definitions/lists/"
-DEFAULTS="${DEFINITIONS_DIR}defaults.def"
-
-
-if [ "${USERNAME}" != "root" ]; then
-    export CACHE_DIR="${HOME}/.cache/"
-    export LOG="${CACHE_DIR}logs/sofin"
-    export BINBUILDS_CACHE_DIR="${CACHE_DIR}binbuilds/"
-    export DEFINITIONS_DIR="${CACHE_DIR}definitions/definitions/"
-    export LISTS_DIR="${CACHE_DIR}definitions/lists/"
-    export DEFAULTS="${DEFINITIONS_DIR}defaults.def"
-fi
-
 if [ ! -d "${CACHE_DIR}/logs" ]; then
     ${MKDIR_BIN} -p ${CACHE_DIR}/logs
 fi
-
-# more values
-readonly BINBUILDS_CACHE_DIR
-readonly SOFTWARE_DIR
-readonly LOCK_FILE="${SOFTWARE_DIR}.sofin.lock"
-readonly LOG
-readonly CACHE_DIR
-# readonly DEFINITIONS_DIR
-readonly LISTS_DIR
-readonly DEFAULTS
-readonly USERNAME
-readonly DEFAULT_LDFLAGS
-readonly DEFAULT_COMPILER_FLAGS
-readonly MAKE_OPTS
-readonly MAIN_PORT="60022"
-readonly MAIN_USER="sofin"
-readonly MAIN_SOFTWARE_PREFIX="/Mirror"
-readonly MAIN_SOFTWARE_ADDRESS="software.verknowsys.com"
-readonly MAIN_SOURCE_REPOSITORY="http://${MAIN_SOFTWARE_ADDRESS}/source/"
-readonly MAIN_BINARY_REPOSITORY="http://${MAIN_SOFTWARE_ADDRESS}/binary/"
-readonly CCACHE_BIN_OPTIONAL="${SOFTWARE_ROOT_DIR}Ccache/exports/ccache"
-
 
 # last repository cache setup:
 export REPOSITORY_CACHE_FILE="${CACHE_DIR}.last_repository.pos"
