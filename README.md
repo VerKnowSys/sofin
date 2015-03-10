@@ -62,6 +62,8 @@ USE_UPDATE=false sofin get Vim
 * Will skip checking for binary build for "Vifm" bundle.
 ```bash
 USE_BINBUILD=false sofin get Vifm
+# or just:
+# sofin build Vifm
 ```
 
 
