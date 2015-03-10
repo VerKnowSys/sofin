@@ -1358,13 +1358,14 @@ for application in ${APPLICATIONS}; do
                             for is_useful in ${APP_USEFUL}; do
                                 echo "${file}" | ${GREP_BIN} "${is_useful}" >/dev/null 2>&1
                                 if [ "$?" = "0" ]; then
-                                    debug "Useful file left intact: ${file}"
                                     commit_removal="no"
                                 fi
                             done
                             if [ -z "${commit_removal}" ]; then
                                 debug "Removing useless file: ${file}"
                                 ${RM_BIN} -f "${file}"
+                            else
+                                debug "Useful file left intact: ${file}"
                             fi
                         fi
                     done
