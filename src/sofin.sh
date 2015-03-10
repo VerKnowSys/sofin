@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
 
 # config settings
-readonly VERSION="0.78.7"
+readonly VERSION="0.80.0"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -91,6 +91,7 @@ update_definitions () {
         ${MKDIR_BIN} -p "${CACHE_DIR}/definitions"
         cd "${CACHE_DIR}/definitions"
         INITIAL_DEFINITIONS="${MAIN_SOURCE_REPOSITORY}initial-definitions${DEFAULT_ARCHIVE_EXT}"
+        debug "Fetching latest tarball with initial definitions from: ${INITIAL_DEFINITIONS}"
         ${FETCH_BIN} "${INITIAL_DEFINITIONS}"
         ${TAR_BIN} xf *${DEFAULT_ARCHIVE_EXT}
         ${RM_BIN} -vrf "$(${BASENAME_BIN} ${INITIAL_DEFINITIONS})"
@@ -100,11 +101,13 @@ update_definitions () {
         cd "${CACHE_DIR}definitions"
         current_branch="$(${GIT_BIN} rev-parse --abbrev-ref HEAD)"
         if [ "${current_branch}" != "${BRANCH}" ]; then # use current_branch value if branch isn't matching default branch
+            debug "Fetching branch: ${current_branch}"
             # ${GIT_BIN} stash save -a >> ${LOG} 2>&1
             ${GIT_BIN} checkout -b "${current_branch}" >> ${LOG}-definitions-update 2>&1 || ${GIT_BIN} checkout "${current_branch}" >> ${LOG}-definitions-update 2>&1
             ${GIT_BIN} pull origin "${current_branch}" >> ${LOG}-definitions-update && note "Updated branch ${current_branch} of repository ${REPOSITORY}" || error "Error occured: Update from branch: ${BRANCH} of repository ${REPOSITORY} wasn't possible."
 
         else # else use default branch
+            debug "Using default branch: ${BRANCH}"
             ${GIT_BIN} checkout -b "${BRANCH}" >> ${LOG}-definitions-update 2>&1 || ${GIT_BIN} checkout "${BRANCH}" >> ${LOG}-definitions-update 2>&1
             (${GIT_BIN} pull origin "${BRANCH}" >> ${LOG}-definitions-update && note "Updated branch ${BRANCH} of repository ${REPOSITORY}") || error "Error occured: Update from branch: ${BRANCH} of repository ${REPOSITORY} wasn't possible."
 
