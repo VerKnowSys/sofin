@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
 
 # config settings
-readonly VERSION="0.78.4"
+readonly VERSION="0.78.5"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -1307,29 +1307,28 @@ for application in ${APPLICATIONS}; do
             fi
 
             . "${DEFINITIONS_DIR}${application}.def"
-            note "Exporting binaries: ${APP_EXPORTS} of prefix: ${PREFIX}"
             if [ -d "${PREFIX}/exports-disabled" ]; then # just bring back disabled exports
                 debug "Moving ${PREFIX}/exports-disabled to ${PREFIX}/exports"
                 ${MV_BIN} "${PREFIX}/exports-disabled" "${PREFIX}/exports"
-            else
-                ${MKDIR_BIN} -p "${PREFIX}/exports"
-                EXPORT_LIST=""
-                for exp in ${APP_EXPORTS}; do
-                    for dir in "/bin/" "/sbin/" "/libexec/"; do
-                        if [ -f "${PREFIX}${dir}${exp}" ]; then # a file
-                            if [ -x "${PREFIX}${dir}${exp}" ]; then # and it's executable'
-                                debug "Exporting ${PREFIX}${dir}${exp}"
-                                curr_dir="$(${PWD_BIN})"
-                                cd "${PREFIX}${dir}"
-                                ${LN_BIN} -vfs "..${dir}${exp}" "../exports/${exp}" >> "${LOG}-${APP_NAME}${APP_POSTFIX}"
-                                cd "${curr_dir}"
-                                exp_elem="$(${BASENAME_BIN} ${PREFIX}${dir}${exp})"
-                                EXPORT_LIST="${EXPORT_LIST} ${exp_elem}"
-                            fi
-                        fi
-                    done
-                done
             fi
+            note "Exporting binaries: ${APP_EXPORTS} of prefix: ${PREFIX}"
+            ${MKDIR_BIN} -p "${PREFIX}/exports"
+            EXPORT_LIST=""
+            for exp in ${APP_EXPORTS}; do
+                for dir in "/bin/" "/sbin/" "/libexec/"; do
+                    if [ -f "${PREFIX}${dir}${exp}" ]; then # a file
+                        if [ -x "${PREFIX}${dir}${exp}" ]; then # and it's executable'
+                            debug "Exporting ${PREFIX}${dir}${exp}"
+                            curr_dir="$(${PWD_BIN})"
+                            cd "${PREFIX}${dir}"
+                            ${LN_BIN} -vfs "..${dir}${exp}" "../exports/${exp}" >> "${LOG}-${APP_NAME}${APP_POSTFIX}"
+                            cd "${curr_dir}"
+                            exp_elem="$(${BASENAME_BIN} ${PREFIX}${dir}${exp})"
+                            EXPORT_LIST="${EXPORT_LIST} ${exp_elem}"
+                        fi
+                    fi
+                done
+            done
         done
 
         if [ ! -z "${APP_AFTER_EXPORT_CALLBACK}" ]; then
