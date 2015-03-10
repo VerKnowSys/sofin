@@ -914,9 +914,9 @@ for application in ${APPLICATIONS}; do
                     if [ ! -e "${LOG}-${APP_NAME}${APP_POSTFIX}" ]; then
                         ${TOUCH_BIN} "${LOG}-${APP_NAME}${APP_POSTFIX}"
                     fi
-                    debug "Running '$@' @ $(${DATE_BIN})"
+                    debug "Running '$@' - $(${DATE_BIN} +%F-%H%M%S)"
                     eval PATH="${PATH}" "$@" 1>> "${LOG}-${APP_NAME}${APP_POSTFIX}" 2>> "${LOG}-${APP_NAME}${APP_POSTFIX}"
-                    check_command_result $?
+                    check_command_result $? "$@"
                 else
                     error "Empty command to run?"
                 fi

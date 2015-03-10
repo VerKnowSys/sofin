@@ -312,10 +312,11 @@ check_command_result () {
         exit 1
     fi
     if [ "$1" = "0" ]; then
-        debug "CORRECT"
+        shift
+        debug "Command successful: '$*'"
     else
-        error
-        error "FAILURE. Run $(${BASENAME_BIN} ${SOFIN_BIN}) log to see what went wrong."
+        shift
+        error "Command failure: '$*'. Run $(${BASENAME_BIN} ${SOFIN_BIN}) log to see what went wrong."
         exit 1
     fi
 }
