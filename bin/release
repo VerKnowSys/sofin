@@ -38,7 +38,7 @@ if [ "${USER}" = "dmilith" ]; then
     scp releases/sofin-${version}${DEFAULT_ARCHIVE_EXT} v:/home/dmilith/Web/Public/Sofin-releases 2>&1
     ssh sofin@v "source ~/.functions.sh && gather-source http://dmilith.verknowsys.com/Public/Sofin-releases/sofin-${version}${DEFAULT_ARCHIVE_EXT}"
     note "Creating initial-definitions snapshot"
-    git clone https://github.com/VerKnowSys/sofin-definitions.git
+    git clone ${DEFAULT_REPOSITORY}
     cd ./sofin-definitions
     tar cf ../releases/initial-definitions${DEFAULT_ARCHIVE_EXT} --exclude='*.tar.*' --exclude='sofin-*' --exclude='*.o' --exclude='.gitignore' --exclude='.Trashes' --exclude='.Spotlight-V100' --exclude='.VolumeIcon.icns' --exclude='.fseventsd' --exclude='.git' --exclude='releases' ./
     cd ..

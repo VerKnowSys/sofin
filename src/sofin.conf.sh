@@ -10,7 +10,7 @@ if [ "${TRACE}" = "" ]; then
 fi
 
 # setting up definitions repository
-readonly DEFAULT_REPOSITORY="http://github.com/VerKnowSys/sofin-definitions.git" # official sofin definitions repository
+readonly DEFAULT_REPOSITORY="https://verknowsys@bitbucket.org/verknowsys/sofin-definitions.git" # official sofin definitions repository
 # REPOSITORY is set after determining CACHE_DIR (L300)
 # and branch used
 if [ "${BRANCH}" = "" ]; then
