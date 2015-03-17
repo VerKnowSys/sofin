@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
 
 # config settings
-readonly VERSION="0.80.0"
+readonly VERSION="0.80.1"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -1447,8 +1447,11 @@ done
 update_shell_vars
 
 if [ ! -z "${SHELL_PID}" ]; then
-    note "All done. Reloading configuration of $(${BASENAME_BIN} "${SHELL}") with pid: ${SHELL_PID}."
-    ${KILL_BIN} -SIGUSR2 ${SHELL_PID}
+    pids=$(ps ax | ${GREP_BIN} -v grep | ${GREP_BIN} zsh | ${AWK_BIN} '{print $1;}')
+    note "All done. Reloading configuration of all $(${BASENAME_BIN} "${SHELL}") with pids: $(echo ${pids} | ${TR_BIN} '\n' ' ')"
+    for pid in ${pids}; do
+        ${KILL_BIN} -SIGUSR2 ${pid}
+    done
 else
     write_info_about_shell_configuration
 fi
