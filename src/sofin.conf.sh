@@ -117,6 +117,7 @@ DIFF_BIN="/usr/bin/diff"
 IFCONFIG_BIN="/sbin/ifconfig"
 INSTALL_BIN="/usr/bin/install"
 MKFIFO_BIN="/usr/bin/mkfifo"
+PS_BIN="/bin/ps"
 
 OS_VERSION=10
 if [ -x "${SOFIN_VERSION_UTILITY_BIN}" ]; then

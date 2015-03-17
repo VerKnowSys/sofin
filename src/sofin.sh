@@ -1447,7 +1447,7 @@ done
 update_shell_vars
 
 if [ ! -z "${SHELL_PID}" ]; then
-    pids=$(ps ax | ${GREP_BIN} -v grep | ${GREP_BIN} zsh | ${AWK_BIN} '{print $1;}')
+    pids=$(${PS_BIN} ax | ${GREP_BIN} -v grep | ${GREP_BIN} zsh | ${AWK_BIN} '{print $1;}')
     note "All done. Reloading configuration of all $(${BASENAME_BIN} "${SHELL}") with pids: $(echo ${pids} | ${TR_BIN} '\n' ' ')"
     for pid in ${pids}; do
         ${KILL_BIN} -SIGUSR2 ${pid}
