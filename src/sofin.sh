@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
 
 # config settings
-readonly VERSION="0.80.3"
+readonly VERSION="0.80.4"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -19,6 +19,7 @@ if [ "${TRACE}" = "true" ]; then
 fi
 
 SOFIN_ARGS=$*
+SOFIN_ARGS_FULL="${SOFIN_ARGS}"
 readonly SOFIN_ARGS="$(echo ${SOFIN_ARGS} | ${CUT_BIN} -d' ' -f2-)"
 
 check_definition_dir () {
@@ -1075,7 +1076,8 @@ for application in ${APPLICATIONS}; do
                                     # remove corrupted file
                                     ${RM_BIN} -f "${file}"
                                     # and restart script with same arguments:
-                                    eval "${SOFIN_BIN} ${SOFIN_ARGS}"
+                                    debug "Evaluating: ${SOFIN_BIN} ${SOFIN_ARGS_FULL}"
+                                    eval "${SOFIN_BIN} ${SOFIN_ARGS_FULL}"
                                     exit
                                 fi
                             fi
