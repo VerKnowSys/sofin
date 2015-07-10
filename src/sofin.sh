@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
 
 # config settings
-readonly VERSION="0.80.4"
+readonly VERSION="0.80.5"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -634,7 +634,9 @@ if [ ! "$1" = "" ]; then
         all_defs="$(${FIND_BIN} ${DEFINITIONS_DIR} -maxdepth 1 -type f -name '*.def')"
         to_rebuild=""
         for deps in ${all_defs}; do
-            ${GREP_BIN} -R "APP_REQ.*${dependency}" ${deps} >/dev/null 2>&1
+            . ${DEFAULTS}
+            . ${deps}
+            echo "${APP_REQUIREMENTS}" | ${GREP_BIN} "${dependency}" >/dev/null 2>&1
             if [ "$?" = "0" ]; then
                 dep="$(${BASENAME_BIN} "${deps}")"
                 rawname="$(${PRINTF_BIN} "${dep}" | ${SED_BIN} 's/\.def//g')"
