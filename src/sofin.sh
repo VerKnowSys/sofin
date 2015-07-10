@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
 
 # config settings
-readonly VERSION="0.80.5"
+readonly VERSION="0.80.6"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -878,6 +878,7 @@ for application in ${APPLICATIONS}; do
     check_disabled "${DISABLE_ON}" # after which just check if it's not disabled
     if [ ! "${ALLOW}" = "1" ]; then
         warn "Software: ${application} disabled on architecture: ${SYSTEM_NAME}-${FULL_SYSTEM_VERSION}-${SYSTEM_ARCH}"
+        ${RM_BIN} -rf "${PREFIX}"
     else
         for definition in ${DEFINITIONS_DIR}${application}.def; do
             export DONT_BUILD_BUT_DO_EXPORTS=""
