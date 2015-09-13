@@ -151,6 +151,10 @@ install_sofin () {
     ${CP_BIN} "src/sofin.sh" ${PREFIX}/usr/bin/sofin
     check_command_result $?
 
+    if [ ! -L "${PREFIX}/usr/bin/s" ]; then
+        ${LN_BIN} -s ${PREFIX}/usr/bin/sofin ${PREFIX}/usr/bin/s
+    fi
+
     sofin_version=$(${CAT_BIN} src/sofin.sh | ${GREP_BIN} VERSION= | ${AWK_BIN} '{print $2}')
     echo "Sofin ${sofin_version} installed"
 }
