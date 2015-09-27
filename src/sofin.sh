@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
 
 # config settings
-readonly VERSION="0.80.7"
+readonly VERSION="0.80.8"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -162,6 +162,8 @@ usage_howto () {
     note "  ${cyan}status                               ${gray}-${green} shows Sofin status"
     note "  ${cyan}dev                                  ${gray}-${green} puts definition content on the fly. Second argument is (lowercase) definition name (no extension). (example: sofin dev rubinius)"
     note "  ${cyan}rebuild                              ${gray}-${green} rebuilds and pushes each software bundle that depends on definition given as a param. (example: $(${BASENAME_BIN} ${SOFIN_BIN}) rebuild openssl - will rebuild all bundles that have 'openssl' dependency)"
+    note "  ${cyan}reset                               ${gray}-${green} resets local definitions repository"
+
     exit
 }
 
@@ -622,6 +624,12 @@ if [ ! "$1" = "" ]; then
         exit
         ;;
 
+
+    reset)
+        cd ${DEFINITIONS_DIR}
+        ${GIT_BIN} reset --hard
+        exit 0
+        ;;
 
     rebuild)
         update_definitions
