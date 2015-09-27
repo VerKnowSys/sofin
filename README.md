@@ -1,7 +1,7 @@
 # Sofin - SOFtware INstaller. Designed for BSD and Darwin.
 
 ## Author:
-* Daniel (dmilith) Dettlaff (dmilith at me dot com). I'm also on freenode IRC.
+* Daniel (dmilith) Dettlaff (@dmilith). I'm also on freenode IRC.
 
 
 ## Contributors:
@@ -149,12 +149,12 @@ space than it does with "old fasioned, system wide, shared software".
 ## Installation info (platform specific):
 
 ### FreeBSD specific:
-  - Install base 64bit system - I used 64bit FreeBSD 10.1 bootonly iso here.
+  - Install base 64bit system - I used 64bit FreeBSD 10.X bootonly iso here.
   - Fetch latest package from [this site](http://dmilith.verknowsys.com/Public/Sofin-releases/), unpack and run `bin/install` as root.
   - Start using sofin as regular user.
 
 ### Darwin/ Mac OS X specific:
-  - Install Mac OS X 10.9 or 10.10 (currently supported)
+  - Install Mac OS X 10.9, 10.10 or 10.11 (currently supported)
   - Fetch latest package from [this site](http://dmilith.verknowsys.com/Public/Sofin-releases/), unpack and run `bin/install` as root.
   - Start using sofin as regular user.
 
