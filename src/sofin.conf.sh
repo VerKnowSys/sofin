@@ -197,9 +197,9 @@ case "${SYSTEM_NAME}" in
     FreeBSD)
         # Default
         readonly FREEBSD_MINIMUM_VERSION="91"
-        cpus="$(${SYSCTL_BIN} kern.smp.cpus | ${AWK_BIN} '{printf $2}')"
+        export CPUS="$(${SYSCTL_BIN} kern.smp.cpus | ${AWK_BIN} '{printf $2}')"
         export CURL_BIN="/usr/bin/fetch -T 3 -o -"
-        export MAKE_OPTS="-j${cpus}"
+        export MAKE_OPTS="-j${CPUS}"
         if [ ${OS_VERSION} -lt ${FREEBSD_MINIMUM_VERSION} ]; then
             export USE_BINBUILD="false"
         fi
@@ -246,8 +246,8 @@ case "${SYSTEM_NAME}" in
         export SHA_BIN="/usr/bin/shasum"
         export SYSCTL_BIN="/usr/sbin/sysctl"
         export KLDLOAD_BIN="/sbin/kextload"
-        cpus=$(${SYSCTL_BIN} machdep.cpu.thread_count | ${AWK_BIN} '{printf $2}')
-        export MAKE_OPTS="-j${cpus}"
+        export CPUS=$(${SYSCTL_BIN} machdep.cpu.thread_count | ${AWK_BIN} '{printf $2}')
+        export MAKE_OPTS="-j${CPUS}"
         unset SERVICE_BIN # not necessary
 
         if [ ${OS_VERSION} -lt ${DARWIN_MINIMUM_VERSION} ]; then
@@ -278,7 +278,8 @@ case "${SYSTEM_NAME}" in
         export DEFAULT_LDFLAGS="-fPIC "
         export TEST_BIN="/usr/bin/test"
         export NPROC_BIN="/usr/bin/nproc"
-        export MAKE_OPTS="-j$(${NPROC_BIN})"
+        export CPUS="$(${NPROC_BIN})"
+        export MAKE_OPTS="-j${CPUS}"
         export AWK_BIN="/usr/bin/awk"
         if [ ${OS_VERSION} -lt ${GLIBC_MINIMUM_VERSION} ]; then
             export USE_BINBUILD="false"
