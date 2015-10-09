@@ -247,6 +247,9 @@ case "${SYSTEM_NAME}" in
         export PATCH_BIN="/usr/bin/patch -p0 "
         export DEFAULT_LDFLAGS="-fPIC" # -arch x86_64 fPIE isn't well supported on OSX, but it's not production anyway
         export DEFAULT_COMPILER_FLAGS="-Os -fPIC -fno-strict-overflow -fstack-protector-all" # -arch x86_64
+        if [ ! -z "${DEBUGBUILD}" ]; then
+            export DEFAULT_COMPILER_FLAGS="-O0 -g -fPIC -fno-strict-overflow -fstack-protector-all"
+        fi
         export SHA_BIN="/usr/bin/shasum"
         export SYSCTL_BIN="/usr/sbin/sysctl"
         export KLDLOAD_BIN="/sbin/kextload"
@@ -279,6 +282,9 @@ case "${SYSTEM_NAME}" in
         export BC_BIN="/usr/bin/bc"
         export CHOWN_BIN="/bin/chown"
         export DEFAULT_COMPILER_FLAGS="-Os -fPIC -fno-strict-overflow -fstack-protector-all"
+        if [ ! -z "${DEBUGBUILD}" ]; then
+            export DEFAULT_COMPILER_FLAGS="-O0 -ggdb -fPIC -fno-strict-overflow -fstack-protector-all"
+        fi
         export DEFAULT_LDFLAGS="-fPIC "
         export TEST_BIN="/usr/bin/test"
         export NPROC_BIN="/usr/bin/nproc"
