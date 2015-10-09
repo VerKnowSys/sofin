@@ -191,6 +191,10 @@ readonly SYSTEM_ARCH="$(uname -m)"
 DEFAULT_LDFLAGS="-fPIC -fPIE"
 DEFAULT_COMPILER_FLAGS="-Os -fPIC -fPIE -fno-strict-overflow -fstack-protector-all"
 
+if [ ! -z "${DEBUGBUILD}" ]; then
+    warn "Debug build enabled."
+    DEFAULT_COMPILER_FLAGS="-O0 -ggdb -fPIC -fPIE -fno-strict-overflow -fstack-protector-all"
+fi
 
 case "${SYSTEM_NAME}" in
 

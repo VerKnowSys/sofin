@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
 
 # config settings
-readonly VERSION="0.80.8"
+readonly VERSION="0.82.0"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -1407,16 +1407,20 @@ for application in ${APPLICATIONS}; do
                 ;;
         esac
         if [ "${APP_STRIP}" != "no" ]; then
-            note "Stripping files"
-            for strip in ${dirs_to_strip}; do
-                if [ -d "${strip}" ]; then
-                    files="$(${FIND_BIN} ${strip} -maxdepth 1 -type f)"
-                    debug "Files to strip: ${files}"
-                    for file in ${files}; do
-                        ${STRIP_BIN} ${file} > /dev/null 2>&1
-                    done
-                fi
-            done
+            if [ -z "${DEBUGBUILD}" ]; then
+                note "Stripping files"
+                for strip in ${dirs_to_strip}; do
+                    if [ -d "${strip}" ]; then
+                        files="$(${FIND_BIN} ${strip} -maxdepth 1 -type f)"
+                        debug "Files to strip: ${files}"
+                        for file in ${files}; do
+                            ${STRIP_BIN} ${file} > /dev/null 2>&1
+                        done
+                    fi
+                done
+            else
+                warn "Skipping symbols strip while debug build enabled."
+            fi
         fi
 
         if [ "${APP_APPLE_BUNDLE}" = "true" ]; then
