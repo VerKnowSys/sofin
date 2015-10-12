@@ -192,7 +192,6 @@ DEFAULT_LDFLAGS="-fPIC -fPIE"
 DEFAULT_COMPILER_FLAGS="-Os -fPIC -fPIE -fno-strict-overflow -fstack-protector-all"
 
 if [ ! -z "${DEBUGBUILD}" ]; then
-    warn "Debug build enabled."
     DEFAULT_COMPILER_FLAGS="-O0 -ggdb -fPIC -fPIE -fno-strict-overflow -fstack-protector-all"
 fi
 
