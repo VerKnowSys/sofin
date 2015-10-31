@@ -1210,13 +1210,11 @@ for application in ${APPLICATIONS}; do
                                 run "${APP_AFTER_CONFIGURE_CALLBACK}"
                             fi
 
-                            if [ "${APP_MAKE_METHOD}" != "true" ]; then
-                                note "   ${NOTE_CHAR2} Building requirement: $1"
-                                run "${APP_MAKE_METHOD}"
-                                if [ ! -z "${APP_AFTER_MAKE_CALLBACK}" ]; then
-                                    debug "Running after make callback"
-                                    run "${APP_AFTER_MAKE_CALLBACK}"
-                                fi
+                            note "   ${NOTE_CHAR2} Building requirement: $1"
+                            run "${APP_MAKE_METHOD}"
+                            if [ ! -z "${APP_AFTER_MAKE_CALLBACK}" ]; then
+                                debug "Running after make callback"
+                                run "${APP_AFTER_MAKE_CALLBACK}"
                             fi
 
                             note "   ${NOTE_CHAR2} Installing requirement: $1"
