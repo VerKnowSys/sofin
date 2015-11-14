@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
 
 # config settings
-readonly VERSION="0.82.0"
+readonly VERSION="0.84.0"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -496,10 +496,10 @@ if [ ! "$1" = "" ]; then
         # first of all, try using a list if exists:
         if [ -f "${LISTS_DIR}$2" ]; then
             export APPLICATIONS="$(${CAT_BIN} ${LISTS_DIR}$2 | ${TR_BIN} '\n' ' ')"
-            note "Processing software: ${APPLICATIONS}"
+            note "Processing software: ${APPLICATIONS} for architecture: ${SYSTEM_ARCH}"
         else
             export APPLICATIONS="$(echo ${SOFIN_ARGS})"
-            note "Processing software: ${SOFIN_ARGS}"
+            note "Processing software: ${SOFIN_ARGS} for architecture: ${SYSTEM_ARCH}"
         fi
         ;;
 
@@ -1034,8 +1034,10 @@ for application in ${APPLICATIONS}; do
                 export CXXFLAGS="-I${PREFIX}/include ${APP_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
                 export LDFLAGS="-L${PREFIX}/lib ${APP_LINKER_ARGS} ${DEFAULT_LDFLAGS}"
 
-                if [ "${SYSTEM_NAME}" != "Darwin" ]; then
-                    export LDFLAGS="${LDFLAGS} -Wl,-rpath=${PREFIX}/lib,--enable-new-dtags "
+                if [ -z "${APP_LINKER_NO_DTAGS}" ]; then
+                    if [ "${SYSTEM_NAME}" != "Darwin" ]; then # feature isn't required on Darwin
+                        export LDFLAGS="${LDFLAGS} -Wl,-rpath=${PREFIX}/lib,--enable-new-dtags"
+                    fi
                 fi
 
                 if [ "${ALLOW}" = "1" ]; then
