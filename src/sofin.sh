@@ -731,7 +731,7 @@ if [ ! "$1" = "" ]; then
 
                 debug "Looking for other installed versions that might be exported automatically.."
                 name="$(echo "${APP_NAME}" | ${SED_BIN} 's/[0-9]*//g')"
-                alternative="$(${FIND_BIN} ${SOFTWARE_DIR} -name "${name}*" | ${SED_BIN} 's/^.*\///g' | ${HEAD_BIN} -n1)"
+                alternative="$(${FIND_BIN} ${SOFTWARE_DIR} -maxdepth 1 -name "${name}*" | ${SED_BIN} 's/^.*\///g' | ${HEAD_BIN} -n1)"
                 if [ ! -z "${alternative}" ]; then
                     note "Automatically picking first available alternative: ${alternative}"
                     $0 install ${alternative}
