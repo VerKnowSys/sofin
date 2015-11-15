@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
 
 # config settings
-readonly VERSION="0.84.0"
+readonly VERSION="0.84.1"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -728,6 +728,14 @@ if [ ! "$1" = "" ]; then
                 fi
                 debug "Removing software from: ${SOFTWARE_DIR}${APP_NAME}"
                 ${RM_BIN} -rfv "${SOFTWARE_DIR}${APP_NAME}" >> "${LOG}-${APP_LOWER}${APP_POSTFIX}"
+
+                debug "Looking for other installed versions that might be exported automatically.."
+                name="$(echo "${APP_NAME}" | ${SED_BIN} 's/[0-9]*//g')"
+                alternative="$(${FIND_BIN} ${SOFTWARE_DIR} -name "${name}*" | ${SED_BIN} 's/^.*\///g' | ${HEAD_BIN} -n1)"
+                if [ ! -z "${alternative}" ]; then
+                    note "Automatically picking first available alternative: ${alternative}"
+                    $0 install ${alternative}
+                fi
             else
                 warn "Application: ${APP_NAME} not installed."
                 err=1 # throw an error exit code after itering through list of applications to remove
