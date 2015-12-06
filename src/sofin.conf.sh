@@ -5,8 +5,8 @@
 if [ "${DEBUG}" = "" ]; then
     export DEBUG="false"
 fi
-if [ "${TRACE}" = "" ]; then
-    export TRACE="false"
+if [ "${SOFIN_TRACE}" = "" ]; then
+    export SOFIN_TRACE="false"
 fi
 
 # setting up definitions repository
@@ -29,7 +29,7 @@ readonly white='\033[38;40m'
 readonly reset='\033[0m'
 
 readonly DEBUG
-readonly TRACE
+readonly SOFIN_TRACE
 
 readonly SOFIN_HEADER="Sofin v${VERSION} (c) 2o11-2o15 verknowsys.com"
 readonly SOFIN_PROFILE="/etc/profile_sofin"

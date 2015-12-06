@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
 
 # config settings
-readonly VERSION="0.84.1"
+readonly VERSION="0.84.2"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -14,7 +14,7 @@ else
     exit 1
 fi
 
-if [ "${TRACE}" = "true" ]; then
+if [ "${SOFIN_TRACE}" = "true" ]; then
     set -x
 fi
 
