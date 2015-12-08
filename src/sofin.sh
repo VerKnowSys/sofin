@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
 
 # config settings
-readonly VERSION="0.84.2"
+readonly VERSION="0.84.3"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -451,8 +451,10 @@ if [ ! "$1" = "" ]; then
         fi
 
         set_c_compiler CLANG
-        ${PRINTF_BIN} "# CC:\nexport CC='${CC}'\n\n"
-        ${PRINTF_BIN} "# CXX:\nexport CXX='${CXX}'\n\n"
+        A_CC="$(echo "${CC}" | ${SED_BIN} 's/ //')"
+        A_CXX="$(echo "${CXX}" | ${SED_BIN} 's/ //')"
+        ${PRINTF_BIN} "# CC:\nexport CC='${A_CC}'\n\n"
+        ${PRINTF_BIN} "# CXX:\nexport CXX='${A_CXX}'\n\n"
         ${PRINTF_BIN} "# CPP:\nexport CPP='${CPP}'\n\n"
 
         if [ -f "${SOFIN_DISABLED_INDICATOR_FILE}" ]; then # sofin disabled. Default system environment
