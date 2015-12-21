@@ -269,7 +269,7 @@ case "${SYSTEM_NAME}" in
         # only Debian 6 is supported a.t.m.
         readonly GLIBC_MINIMUM_VERSION="211"
         export CURL_BIN="/usr/bin/wget -qO -"
-        export FETCH_BIN="/usr/bin/wget -N"
+        export FETCH_BIN="/usr/bin/wget -N --no-check-certificate"
         export PATCH_BIN="/usr/bin/patch -p0 "
         export UNAME_BIN="/bin/uname"
         export KLDLOAD_BIN="/sbin/modprobe"
