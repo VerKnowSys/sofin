@@ -34,6 +34,7 @@ readonly SOFIN_TRACE
 readonly SOFIN_HEADER="Sofin v${VERSION} (c) 2o11-2o16 verknowsys.com"
 readonly SOFIN_PROFILE="/etc/profile_sofin"
 readonly SOFIN_DISABLED_INDICATOR_FILE="${HOME}/.sofin-disabled"
+readonly SERVICES_DIR="/Services"
 readonly SOFTWARE_ROOT_DIR="/Software/"
 readonly SOFTWARE_DIR="/Software/"
 readonly CACHE_DIR="${HOME}/.cache/"
@@ -118,6 +119,7 @@ IFCONFIG_BIN="/sbin/ifconfig"
 INSTALL_BIN="/usr/bin/install"
 MKFIFO_BIN="/usr/bin/mkfifo"
 PS_BIN="/bin/ps"
+DAEMON_BIN="/usr/bin/true"
 
 OS_VERSION=10
 if [ -x "${SOFIN_VERSION_UTILITY_BIN}" ]; then
@@ -226,6 +228,7 @@ case "${SYSTEM_NAME}" in
         export ZFS_BIN="/sbin/zfs"
         export PFCTL_BIN="/sbin/pfctl"
         export DIALOG_BIN="/usr/bin/dialog"
+        export DAEMON_BIN="/usr/sbin/daemon"
 
         # XXX: disable ssl verification of https://github.com which fails on FreeBSD by default.
         if [ -x "${GIT_BIN}" ]; then
