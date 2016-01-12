@@ -151,8 +151,13 @@ install_sofin () {
     ${CP_BIN} "src/sofin.sh" ${PREFIX}/usr/bin/sofin
     check_command_result $?
 
-    if [ ! -L "${PREFIX}/usr/bin/s" ]; then
-        ${LN_BIN} -s ${PREFIX}/usr/bin/sofin ${PREFIX}/usr/bin/s
+    if [ ! -L "/usr/bin/s" ]; then
+        ${RM_BIN} -f /usr/bin/s
+        ${LN_BIN} -s /usr/bin/sofin /usr/bin/s
+    fi
+    if [ ! -z "${PREFIX}" ]; then
+        ${RM_BIN} -f ${PREFIX}/usr/bin/s
+        ${LN_BIN} -s /usr/bin/sofin ${PREFIX}/usr/bin/s
     fi
 
     sofin_version=$(${CAT_BIN} src/sofin.sh | ${GREP_BIN} VERSION= | ${AWK_BIN} '{print $2}')
