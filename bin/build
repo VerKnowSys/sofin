@@ -148,20 +148,11 @@ install_sofin () {
     check_command_result $?
     ${CP_BIN} "bin/sofin-microseconds" ${PREFIX}/usr/bin/sofin-microseconds
     check_command_result $?
-    ${CP_BIN} "src/sofin.sh" ${PREFIX}/usr/bin/sofin
+    ${CP_BIN} "src/sofin.sh" ${PREFIX}/usr/bin/s
     check_command_result $?
 
-    if [ ! -L "/usr/bin/s" ]; then
-        ${RM_BIN} -f /usr/bin/s
-        ${LN_BIN} -s /usr/bin/sofin /usr/bin/s
-    fi
-    if [ ! -z "${PREFIX}" ]; then
-        ${RM_BIN} -f ${PREFIX}/usr/bin/s
-        ${LN_BIN} -s /usr/bin/sofin ${PREFIX}/usr/bin/s
-    fi
-
-    sofin_version=$(${CAT_BIN} src/sofin.sh | ${GREP_BIN} VERSION= | ${AWK_BIN} '{print $2}')
-    echo "Sofin ${sofin_version} installed"
+    sofin_version=$(${CAT_BIN} src/sofin.sh | ${GREP_BIN} VERSION= | ${AWK_BIN} '{print $2;}' | ${SED_BIN} -e 's#"##g;s#VERSION=##g')
+    echo "Sofin v${sofin_version} installed. Type \"s usage\" for usage info. Read https://bitbucket.org/verknowsys/sofin for more details."
 }
 
 

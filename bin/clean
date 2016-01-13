@@ -13,8 +13,6 @@ else
 fi
 
 note "Cleaning natives"
-${RM_BIN} -rf "bin/sofin-*"
-${RM_BIN} -rf "src/.*.o"
-
-note "Cleaning definitions"
-${RM_BIN} -rf "/Software/.cache/definitions"
+${RM_BIN} -vrf "bin/sofin-*"
+${RM_BIN} -vrf "src/.*.o"
+${RM_BIN} -vf "/usr/bin/sofin"
