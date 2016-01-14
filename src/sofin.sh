@@ -330,7 +330,7 @@ if [ ! "$1" = "" ]; then
         ;;
 
 
-    status)
+    stat|status)
         if [ -f ${SOFIN_DISABLED_INDICATOR_FILE} ]; then
             note "Sofin shell environment is: ${red}disabled${reset}"
         else
@@ -340,7 +340,7 @@ if [ ! "$1" = "" ]; then
         ;;
 
 
-    installed|list)
+    l|installed|list)
         debug "Listing software from ${SOFTWARE_DIR}"
         if [ -d ${SOFTWARE_DIR} ]; then
             ${FIND_BIN} ${SOFTWARE_DIR} -maxdepth 1 -mindepth 1 -type d  -not -name ".*" -exec ${BASENAME_BIN} {} \;
@@ -349,7 +349,7 @@ if [ ! "$1" = "" ]; then
         ;;
 
 
-    fullinstalled|fulllist|full)
+    f|fullinstalled|fulllist|full)
         note "Installed applications:"
         note
         if [ -d ${SOFTWARE_DIR} ]; then
@@ -491,7 +491,7 @@ if [ ! "$1" = "" ]; then
         ;;
 
 
-    install|get|pick|choose|use|switch)
+    i|install|get|pick|choose|use|switch)
         if [ "$2" = "" ]; then
             error "For \"$1\" application installation mode, second argument with at least one application name or list is required!"
         fi
@@ -523,7 +523,7 @@ if [ ! "$1" = "" ]; then
         ;;
 
 
-    push|binpush|send)
+    p|push|binpush|send)
         note "Preparing to push binary bundle: ${SOFIN_ARGS} from ${SOFTWARE_DIR} to binary repository."
         cd "${SOFTWARE_DIR}"
         for element in ${SOFIN_ARGS}; do
@@ -597,7 +597,7 @@ if [ ! "$1" = "" ]; then
         ;;
 
 
-    build)
+    b|build)
         update_definitions
         shift
         dependencies="$*"
@@ -612,7 +612,7 @@ if [ ! "$1" = "" ]; then
         ;;
 
 
-    deploy)
+    d|deploy)
         update_definitions
         shift
         dependencies="$*"
@@ -771,7 +771,7 @@ if [ ! "$1" = "" ]; then
         ;;
 
 
-    available)
+    avail|available)
         cd "${DEFINITIONS_DIR}"
         note "Available definitions:"
         ${LS_BIN} -m *def | ${SED_BIN} 's/\.def//g'
@@ -812,7 +812,7 @@ if [ ! "$1" = "" ]; then
         ;;
 
 
-    outdated)
+    old|outdated)
         update_definitions
         note "Definitions were updated to latest version."
         debug "Checking software from ${SOFTWARE_DIR}"
