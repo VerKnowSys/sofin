@@ -10,9 +10,6 @@ else
     exit 1
 fi
 
-if [ "${USER}" != "dmilith" ]; then
-    error "You should be dmilith, to do a release."
-fi
 bin/clean
 ${MKDIR_BIN} -p releases
 version="$(grep 'readonly VERSION=' src/sofin.sh | awk '{ gsub(/\"/, "", $2); gsub(/VERSION=/, "", $2); print $2; }')"
@@ -20,10 +17,10 @@ base_name="sofin-${version}"
 archive_name="${base_name}.txz"
 note "Preparing package: ${archive_name} with version: ${version}"
 
-tar --disable-copyfile --exclude='sofin-*' --exclude='*.o' --exclude='.gitignore' --exclude='.Trashes' --exclude='.Spotlight-V100' --exclude='.VolumeIcon.icns' --exclude='.fseventsd' --exclude='.git' -cJf releases/${archive_name} ./
+tar --disable-copyfile --exclude='sofin-*' --exclude='*.o' --exclude='.gitignore' --exclude='.Trashes' --exclude='.Spotlight-V100' --exclude='.VolumeIcon.icns' --exclude='.fseventsd' --exclude='.DS_Store' --exclude='.git' -cJf releases/${archive_name} ./
 mkdir -p releases/${base_name}
 mv releases/${archive_name} releases/${base_name}/
-cd releases/${base_name} > /dev/null
+cd releases/${base_name}
 tar xf ${archive_name}
 rm -f ${archive_name}
 cd ..
@@ -31,19 +28,27 @@ tar -cjf ${archive_name} ./${base_name}
 rm -rf ${base_name}
 cd ..
 
-# tar --disable-copyfile --exclude='.' --exclude='.git' --exclude='.gitignore' --exclude='releases' -cjf releases/${archive_name} ./
+if [ "${USER}" != "dmilith" ]; then
+    warn "You should be dmilith, to push a release."
+else
+    DEST_HOST="v"
+    DEST_PATH="/home/dmilith/Web/Public/Sofin-releases"
+    HTTP_PATH="http://dmilith.verknowsys.com/Public/Sofin-releases"
+    INITIALS="initial-definitions"
 
-if [ "${USER}" = "dmilith" ]; then
-    note "Pushing package to remote server"
-    scp releases/sofin-${version}${DEFAULT_ARCHIVE_EXT} v:/home/dmilith/Web/Public/Sofin-releases 2>&1
-    ssh sofin@v "source ~/.functions.sh && gather-source http://dmilith.verknowsys.com/Public/Sofin-releases/sofin-${version}${DEFAULT_ARCHIVE_EXT}"
-    note "Creating initial-definitions snapshot"
-    git clone ${DEFAULT_REPOSITORY}
+    note "Pushing package to remote server: "
+    scp releases/sofin-${version}${DEFAULT_ARCHIVE_EXT} "${DEST_HOST}:${DEST_PATH}" 2>&1
+    ssh sofin@${DEST_HOST} "source ~/.functions.sh && gather-source ${HTTP_PATH}/sofin-${version}${DEFAULT_ARCHIVE_EXT}"
+
+    note "Preparing snapshot: ${INITIALS} from repository: ${DEFAULT_REPOSITORY}"
+    git clone ${DEFAULT_REPOSITORY} 2>/dev/null
     cd ./sofin-definitions
-    tar cf ../releases/initial-definitions${DEFAULT_ARCHIVE_EXT} --exclude='*.tar.*' --exclude='sofin-*' --exclude='*.o' --exclude='.gitignore' --exclude='.Trashes' --exclude='.Spotlight-V100' --exclude='.VolumeIcon.icns' --exclude='.fseventsd' --exclude='.git' --exclude='releases' ./
+    tar cfJ ../releases/${INITIALS}${DEFAULT_ARCHIVE_EXT} --exclude='*.tar.*' --exclude='sofin-*' --exclude='*.o' --exclude='.gitignore' --exclude='.Trashes' --exclude='.Spotlight-V100' --exclude='.VolumeIcon.icns' --exclude='.fseventsd' --exclude='.git' --exclude='releases' --exclude='.DS_Store' ./ 2>/dev/null
     cd ..
-    note "Pushing initial-definitions snapshot to remote servers"
-    scp releases/initial-definitions${DEFAULT_ARCHIVE_EXT} v:/home/dmilith/Web/Public/Sofin-releases > /dev/null 2>&1
-    ssh sofin@v "rm /Mirror/software/source/initial-definitions${DEFAULT_ARCHIVE_EXT} ; source ~/.functions.sh && gather-source http://dmilith.verknowsys.com/Public/Sofin-releases/initial-definitions${DEFAULT_ARCHIVE_EXT}" # XXX: hacky
-    rm -rf ./sofin-definitions initial-definitions${DEFAULT_ARCHIVE_EXT}
+
+    note "Pushing snapshot to remote server(s)"
+    scp releases/${INITIALS}${DEFAULT_ARCHIVE_EXT} "${DEST_HOST}:${DEST_PATH}" 2>/dev/null
+    ssh sofin@${DEST_HOST} "rm /Mirror/software/source/${INITIALS}${DEFAULT_ARCHIVE_EXT} ; source ~/.functions.sh && gather-source ${HTTP_PATH}/${INITIALS}${DEFAULT_ARCHIVE_EXT}" 2>/dev/null
+    rm -rf ./sofin-definitions ${INITIALS}${DEFAULT_ARCHIVE_EXT}
+    note "Sofin v${version} deployed to: ${HTTP_PATH}"
 fi
