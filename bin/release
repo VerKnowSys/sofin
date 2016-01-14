@@ -5,8 +5,6 @@
 CONF_FILE="sofin.conf.sh"
 if [ -e "src/${CONF_FILE}" ]; then
     . "src/${CONF_FILE}"
-    note "Validating environment"
-    validate_env
 else
     echo "FATAL: No configuration file found: ${CONF_FILE}"
     exit 1
