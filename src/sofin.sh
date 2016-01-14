@@ -169,6 +169,7 @@ usage_howto () {
 
 
 update_shell_vars () {
+    # TODO: consider filtering debug messages to enable debug statements in early sofin code: | ${GREP_BIN} -v 'DEBUG:?'
     if [ "${USERNAME}" = "root" ]; then
         debug "Updating ${SOFIN_PROFILE} settings."
         ${PRINTF_BIN} "$(${SOFIN_BIN} getshellvars)" > "${SOFIN_PROFILE}"
@@ -331,9 +332,9 @@ if [ ! "$1" = "" ]; then
 
     status)
         if [ -f ${SOFIN_DISABLED_INDICATOR_FILE} ]; then
-            note "Sofin is disabled"
+            note "Sofin shell environment is: ${red}disabled${reset}"
         else
-            note "Sofin is enabled"
+            note "Sofin shell environment is: ${cyan}enabled${reset}"
         fi
         exit
         ;;
