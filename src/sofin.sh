@@ -1419,18 +1419,23 @@ for application in ${APPLICATIONS}; do
         esac
         if [ "${APP_STRIP}" != "no" ]; then
             if [ -z "${DEBUGBUILD}" ]; then
-                note "Stripping files"
+                number="0"
                 for strip in ${dirs_to_strip}; do
                     if [ -d "${strip}" ]; then
                         files="$(${FIND_BIN} ${strip} -maxdepth 1 -type f)"
-                        debug "Files to strip: ${files}"
+                        num="$(echo "${files}" | ${WC_BIN} -l 2>/dev/null | ${SED_BIN} 's/ //g' 2>/dev/null)"
+                        if [ ! -z "${num}" ]; then
+                            number="${number} + ${num}"
+                        fi
                         for file in ${files}; do
                             ${STRIP_BIN} ${file} > /dev/null 2>&1
                         done
                     fi
                 done
+                result="$(echo "${number}" | bc)"
+                note "${result} files were stripped."
             else
-                warn "Skipping symbols strip while debug build enabled."
+                warn "Debug build is enabled. Strip skipped."
             fi
         fi
 
