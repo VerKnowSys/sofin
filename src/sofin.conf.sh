@@ -188,8 +188,8 @@ error () {
 
 
 # System specific configuration
-readonly SYSTEM_NAME="$(uname)"
-readonly SYSTEM_ARCH="$(uname -m)"
+export readonly SYSTEM_NAME="$(uname)"
+export readonly SYSTEM_ARCH="$(uname -m)"
 DEFAULT_LDFLAGS="-fPIC -fPIE"
 DEFAULT_COMPILER_FLAGS="-Os -fPIC -fPIE -fno-strict-overflow -fstack-protector-all"
 
