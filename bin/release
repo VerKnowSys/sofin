@@ -10,7 +10,9 @@ else
     exit 1
 fi
 
-
+if [ "${USER}" != "dmilith" ]; then
+    error "You should be dmilith, to do a release."
+fi
 bin/clean
 ${MKDIR_BIN} -p releases
 version="$(grep 'readonly VERSION=' src/sofin.sh | awk '{ gsub(/\"/, "", $2); gsub(/VERSION=/, "", $2); print $2; }')"
