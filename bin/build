@@ -148,6 +148,7 @@ install_sofin () {
     check_command_result $?
     ${CP_BIN} "bin/sofin-microseconds" ${PREFIX}/usr/bin/sofin-microseconds
     check_command_result $?
+    ${RM_BIN} -f ${PREFIX}/usr/bin/s
     ${CP_BIN} "src/sofin.sh" ${PREFIX}/usr/bin/s
     check_command_result $?
 
