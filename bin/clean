@@ -13,6 +13,4 @@ else
 fi
 
 note "Cleaning natives"
-${RM_BIN} -vrf "bin/sofin-*"
-${RM_BIN} -vrf "src/.*.o"
-${RM_BIN} -vf "/usr/bin/sofin"
+${RM_BIN} -f bin/sofin-* src/.*.o /usr/bin/sofin
