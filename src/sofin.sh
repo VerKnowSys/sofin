@@ -36,13 +36,13 @@ check_definition_dir () {
 
 check_requirements () {
     if [ "${APPLICATIONS}" = "" ]; then
-        error "Empty applications list!"
+        error "No input given! You may want to try this: '${SOFIN_BIN} help'"
     fi
     if [ "${SYSTEM_NAME}" != "Darwin" ]; then
         if [ -d "/usr/local" ]; then
-            files="$(${FIND_BIN} /usr/local -type f | ${WC_BIN} -l | ${SED_BIN} -e 's/^ *//g;s/ *$//g' )"
+            files="$(${FIND_BIN} /usr/local -maxdepth 3 -type f | ${WC_BIN} -l | ${SED_BIN} -e 's/^ *//g;s/ *$//g' )"
             if [ "${files}" != "0" ]; then
-                warn "/usr/local has been found, and contains ${files} file(s)"
+                warn "/usr/local has been found, and contains ${files}+ file(s)"
             fi
         fi
     fi
@@ -131,7 +131,6 @@ update_definitions () {
 
 
 write_info_about_shell_configuration () {
-    note
     warn "SHELL_PID is not set. Sofin auto-reload function is temporarely disabled."
 }
 
@@ -609,7 +608,7 @@ if [ ! "$1" = "" ]; then
                     dig_query="$(${DIG_BIN} +short ${MAIN_SOFTWARE_ADDRESS} A)"
                     if [ ${OS_VERSION} -gt 93 ]; then
                         # In FreeBSD 10 there's drill utility instead of dig
-                        dig_query=$(${DIG_BIN} A ${MAIN_SOFTWARE_ADDRESS} | ${GREP_BIN} "^${MAIN_SOFTWARE_ADDRESS}" | ${AWK_BIN} '{print $5}')
+                        dig_query=$(${DIG_BIN} A ${MAIN_SOFTWARE_ADDRESS} | ${GREP_BIN} "^${MAIN_SOFTWARE_ADDRESS}" | ${AWK_BIN} '{print $5;}')
                     fi
                     if [ -z "${dig_query}" ]; then
                         error "No mirrors found in address: ${MAIN_SOFTWARE_ADDRESS}"
@@ -669,7 +668,6 @@ if [ ! "$1" = "" ]; then
         note "Done."
         exit
         ;;
-
 
     b|build)
         update_definitions
@@ -1334,13 +1332,13 @@ for application in ${APPLICATIONS}; do
                 fi
             }
 
-            if [ "${DONT_BUILD_BUT_DO_EXPORTS}" = "" ]; then
-                if [ "${APP_REQUIREMENTS}" = "" ]; then
+            if [ -z "${DONT_BUILD_BUT_DO_EXPORTS}" ]; then
+                if [ -z "${APP_REQUIREMENTS}" ]; then
                     note "Installing ${application} v${APP_VERSION}"
                 else
                     note "Installing ${application} v${APP_VERSION}, with requirements: ${APP_REQUIREMENTS}"
                 fi
-                export req_amount="$(${PRINTF_BIN} "${APP_REQUIREMENTS}" | ${WC_BIN} -w | ${AWK_BIN} '{print $1}')"
+                export req_amount="$(${PRINTF_BIN} "${APP_REQUIREMENTS}" | ${WC_BIN} -w | ${AWK_BIN} '{print $1;}')"
                 export req_amount="$(${PRINTF_BIN} "${req_amount} + 1\n" | ${BC_BIN})"
                 export req_all="${req_amount}"
                 for req in ${APP_REQUIREMENTS}; do
@@ -1373,7 +1371,7 @@ for application in ${APPLICATIONS}; do
                 note "${SUCCESS_CHAR} ${application} [${ver}]\n"
             }
 
-            if [ "${DONT_BUILD_BUT_DO_EXPORTS}" = "" ]; then
+            if [ -z "${DONT_BUILD_BUT_DO_EXPORTS}" ]; then
                 if [ -e "${PREFIX}/${application}${INSTALLED_MARK}" ]; then
                     if [ "${CHANGED}" = "true" ]; then
                         note "  ${application} (1 of ${req_all})"
