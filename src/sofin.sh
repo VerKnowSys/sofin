@@ -564,6 +564,27 @@ if [ ! "$1" = "" ]; then
         ;;
 
 
+    cont|continue)
+        update_definitions
+        shift
+        a_bundle_name="$1"
+        if [ -z "${a_bundle_name}" ]; then
+            error "No bundle name given to continue build. Aborted."
+        fi
+        an_uuid_dir=$(${FIND_BIN} ${CACHE_DIR}cache/ -mindepth 2 -maxdepth 2 -type d -iname "*${a_bundle_name}*" -printf '%T@ %p\n' | ${SORT_BIN} -k1 -n | ${TAIL_BIN} -n1 | ${AWK_BIN} '{print $2;}')
+        a_build_dir="$(${BASENAME_BIN} ${an_uuid_dir})"
+        if [ -z "${an_uuid_dir}" ]; then
+            error "No builds found to continue for bundle: '${a_bundle_name}'"
+        else
+            note "Found most recent build dir: '${a_build_dir}' for bundle: '${a_bundle_name}'"
+        fi
+        note "Continuing interrupted build.."
+        export APPLICATIONS="${a_bundle_name}"
+        export PREVIOUS_BUILD_DIR="${an_uuid_dir}"
+        export SOFIN_CONTINUE_BUILD="YES"
+        ;;
+
+
     i|install|get|pick|choose|use|switch)
         if [ "$2" = "" ]; then
             error "For \"$1\" application installation mode, second argument with at least one application name or list is required!"
@@ -1024,61 +1045,67 @@ for application in ${APPLICATIONS}; do
             ABSNAME="${APP_NAME}${APP_POSTFIX}-${APP_VERSION}"
             ${MKDIR_BIN} -p "${BINBUILDS_CACHE_DIR}${ABSNAME}" > /dev/null 2>&1
 
-            cd "${BINBUILDS_CACHE_DIR}${ABSNAME}/"
             MIDDLE="${SYSTEM_NAME}-${FULL_SYSTEM_VERSION}-${SYSTEM_ARCH}"
             ARCHIVE_NAME="${APP_NAME}${APP_POSTFIX}-${APP_VERSION}${DEFAULT_ARCHIVE_EXT}"
             INSTALLED_INDICATOR="${PREFIX}/${APP_LOWER}${APP_POSTFIX}.installed"
-            if [ ! -e "${INSTALLED_INDICATOR}" ]; then
-                if [ "${USE_BINBUILD}" = "false" ]; then
-                    note "   ${NOTE_CHAR2} Binary build check was skipped"
-                else
-                    if [ ! -e "./${ARCHIVE_NAME}" ]; then
-                        note "Trying binary build for: ${MIDDLE}/${APP_NAME}${APP_POSTFIX}-${APP_VERSION}"
-                        ${FETCH_BIN} "${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}.sha1" 2>>${LOG}-${APP_NAME}${APP_POSTFIX}
-                        ${FETCH_BIN} "${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}"
 
-                        # checking archive sha1 checksum
-                        if [ -e "${ARCHIVE_NAME}" ]; then
-                            case "${SYSTEM_NAME}" in
-                                Darwin|Linux)
-                                    export current_archive_sha1="$(${SHA_BIN} "${ARCHIVE_NAME}" | ${AWK_BIN} '{print $1;}')"
-                                    ;;
-
-                                FreeBSD)
-                                    export current_archive_sha1="$(${SHA_BIN} -q "${ARCHIVE_NAME}")"
-                                    ;;
-                            esac
-                        fi
-                        current_sha_file="${ARCHIVE_NAME}.sha1"
-                        if [ -e "${current_sha_file}" ]; then
-                            export sha1_value="$(${CAT_BIN} ${current_sha_file})"
-                        fi
-
-                        debug "${current_archive_sha1} vs ${sha1_value}"
-                        if [ "${current_archive_sha1}" != "${sha1_value}" ]; then
-                            ${RM_BIN} -f ${ARCHIVE_NAME}
-                            ${RM_BIN} -f ${ARCHIVE_NAME}.sha1
-                        fi
-                    fi
-                    cd "${SOFTWARE_ROOT_DIR}"
-
-                    debug "ARCHIVE_NAME: ${ARCHIVE_NAME}"
-                    if [ -e "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" ]; then # if exists, then checksum is ok
-                        ${TAR_BIN} xfJ "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" >> ${LOG}-${APP_NAME}${APP_POSTFIX} 2>&1
-                        if [ "$?" = "0" ]; then # if archive is valid
-                            note "  ${NOTE_CHAR2} Binary bundle installed: ${APP_NAME}${APP_POSTFIX} with version: ${APP_VERSION}"
-                            export DONT_BUILD_BUT_DO_EXPORTS="true"
-                        else
-                            debug "  ${NOTE_CHAR2} No binary bundle available for ${APP_NAME}${APP_POSTFIX}"
-                            ${RM_BIN} -fr "${BINBUILDS_CACHE_DIR}${ABSNAME}"
-                        fi
+            if [ "${SOFIN_CONTINUE_BUILD}" != "YES" ]; then # normal build by default
+                if [ ! -e "${INSTALLED_INDICATOR}" ]; then
+                    if [ "${USE_BINBUILD}" = "false" ]; then
+                        note "   ${NOTE_CHAR2} Binary build check was skipped"
                     else
-                        debug "  ${NOTE_CHAR2} Binary build checksum doesn't match for: ${ABSNAME}"
+                        if [ ! -e "./${ARCHIVE_NAME}" ]; then
+                            note "Trying binary build for: ${MIDDLE}/${APP_NAME}${APP_POSTFIX}-${APP_VERSION}"
+                            ${FETCH_BIN} "${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}.sha1" 2>>${LOG}-${APP_NAME}${APP_POSTFIX}
+                            ${FETCH_BIN} "${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}"
+
+                            # checking archive sha1 checksum
+                            if [ -e "${ARCHIVE_NAME}" ]; then
+                                case "${SYSTEM_NAME}" in
+                                    Darwin|Linux)
+                                        export current_archive_sha1="$(${SHA_BIN} "${ARCHIVE_NAME}" | ${AWK_BIN} '{print $1;}')"
+                                        ;;
+
+                                    FreeBSD)
+                                        export current_archive_sha1="$(${SHA_BIN} -q "${ARCHIVE_NAME}")"
+                                        ;;
+                                esac
+                            fi
+                            current_sha_file="${ARCHIVE_NAME}.sha1"
+                            if [ -e "${current_sha_file}" ]; then
+                                export sha1_value="$(${CAT_BIN} ${current_sha_file})"
+                            fi
+
+                            debug "${current_archive_sha1} vs ${sha1_value}"
+                            if [ "${current_archive_sha1}" != "${sha1_value}" ]; then
+                                ${RM_BIN} -f ${ARCHIVE_NAME}
+                                ${RM_BIN} -f ${ARCHIVE_NAME}.sha1
+                            fi
+                        fi
+                        cd "${SOFTWARE_ROOT_DIR}"
+
+                        debug "ARCHIVE_NAME: ${ARCHIVE_NAME}"
+                        if [ -e "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" ]; then # if exists, then checksum is ok
+                            ${TAR_BIN} xfJ "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" >> ${LOG}-${APP_NAME}${APP_POSTFIX} 2>&1
+                            if [ "$?" = "0" ]; then # if archive is valid
+                                note "  ${NOTE_CHAR2} Binary bundle installed: ${APP_NAME}${APP_POSTFIX} with version: ${APP_VERSION}"
+                                export DONT_BUILD_BUT_DO_EXPORTS="true"
+                            else
+                                debug "  ${NOTE_CHAR2} No binary bundle available for ${APP_NAME}${APP_POSTFIX}"
+                                ${RM_BIN} -fr "${BINBUILDS_CACHE_DIR}${ABSNAME}"
+                            fi
+                        else
+                            debug "  ${NOTE_CHAR2} Binary build checksum doesn't match for: ${ABSNAME}"
+                        fi
                     fi
+                else
+                    note "Software already installed: ${APP_NAME}${APP_POSTFIX} with version: $(cat ${INSTALLED_INDICATOR})"
+                    export DONT_BUILD_BUT_DO_EXPORTS="true"
                 fi
-            else
-                note "Software already installed: ${APP_NAME}${APP_POSTFIX} with version: $(cat ${INSTALLED_INDICATOR})"
-                export DONT_BUILD_BUT_DO_EXPORTS="true"
+
+            else # continue build!
+                note "Continuing build in: '${PREVIOUS_BUILD_DIR}'"
+                cd "${PREVIOUS_BUILD_DIR}"
             fi
 
             execute_process () {
