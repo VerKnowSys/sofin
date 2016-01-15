@@ -1162,76 +1162,73 @@ for application in ${APPLICATIONS}; do
                     if [ -z "${APP_HTTP_PATH}" ]; then
                         note "   ${NOTE_CHAR2} No source given for definition, it's only valid for meta bundles."
                     else
-                        debug "Runtime SHA1: ${RUNTIME_SHA}"
-                        export BUILD_DIR_ROOT="${CACHE_DIR}cache/${APP_NAME}${APP_POSTFIX}-${APP_VERSION}-${RUNTIME_SHA}/"
-                        ${MKDIR_BIN} -p "${BUILD_DIR_ROOT}"
                         CUR_DIR="$(${PWD_BIN})"
-                        cd "${BUILD_DIR_ROOT}"
 
-                        for bd in ${BUILD_DIR_ROOT}/*; do
-                            if [ -d "${bd}" ]; then
-                                debug "Unpacked source code found in build dir. Removing: ${bd}"
-                                if [ "${bd}" != "/" ]; then # it's better to be safe than sorry
-                                    ${RM_BIN} -rf "${bd}"
+                        if [ "${SOFIN_CONTINUE_BUILD}" != "YES"  ]; then
+                            debug "Runtime SHA1: ${RUNTIME_SHA}"
+                            export BUILD_DIR_ROOT="${CACHE_DIR}cache/${APP_NAME}${APP_POSTFIX}-${APP_VERSION}-${RUNTIME_SHA}/"
+                            ${MKDIR_BIN} -p "${BUILD_DIR_ROOT}"
+                            cd "${BUILD_DIR_ROOT}"
+                            for bd in ${BUILD_DIR_ROOT}/*; do
+                                if [ -d "${bd}" ]; then
+                                    debug "Unpacked source code found in build dir. Removing: '${bd}'"
+                                    if [ "${bd}" != "/" ]; then # it's better to be safe than sorry
+                                        ${RM_BIN} -rf "${bd}"
+                                    fi
                                 fi
-                            fi
-                        done
+                            done
+                            if [ -z "${APP_GIT_MODE}" ]; then # Standard http tarball method:
+                                if [ ! -e ${BUILD_DIR_ROOT}/../$(${BASENAME_BIN} ${APP_HTTP_PATH}) ]; then
+                                    note "   ${NOTE_CHAR2} Fetching requirement source from: ${APP_HTTP_PATH}"
+                                    run "${FETCH_BIN} ${APP_HTTP_PATH}"
+                                    ${MV_BIN} $(${BASENAME_BIN} ${APP_HTTP_PATH}) ${BUILD_DIR_ROOT}/..
+                                fi
 
-                        if [ "${APP_GIT_MODE}" = "" ]; then
-                            # Standard http tarball method:
-                            if [ ! -e ${BUILD_DIR_ROOT}/../$(${BASENAME_BIN} ${APP_HTTP_PATH}) ]; then
-                                note "   ${NOTE_CHAR2} Fetching requirement source from: ${APP_HTTP_PATH}"
-                                run "${FETCH_BIN} ${APP_HTTP_PATH}"
-                                ${MV_BIN} $(${BASENAME_BIN} ${APP_HTTP_PATH}) ${BUILD_DIR_ROOT}/..
-                            fi
-
-                            file="${BUILD_DIR_ROOT}/../$(${BASENAME_BIN} ${APP_HTTP_PATH})"
-                            debug "Build dir: ${BUILD_DIR_ROOT}, file: ${file}"
-                            if [ "${APP_SHA}" = "" ]; then
-                                error "${NOTE_CHAR2} Missing SHA sum for source: ${file}."
-                            else
-                                case "${SYSTEM_NAME}" in
-                                    Darwin|Linux)
-                                        export cur="$(${SHA_BIN} ${file} | ${AWK_BIN} '{print $1}')"
-                                        ;;
-
-                                    FreeBSD)
-                                        export cur="$(${SHA_BIN} -q ${file})"
-                                        ;;
-                                esac
-                                if [ "${cur}" = "${APP_SHA}" ]; then
-                                    debug "${NOTE_CHAR2} SHA sum match in file: ${file}"
+                                file="${BUILD_DIR_ROOT}/../$(${BASENAME_BIN} ${APP_HTTP_PATH})"
+                                debug "Build dir: ${BUILD_DIR_ROOT}, file: ${file}"
+                                if [ "${APP_SHA}" = "" ]; then
+                                    error "${NOTE_CHAR2} Missing SHA sum for source: ${file}."
                                 else
-                                    warn "${NOTE_CHAR2} ${cur} vs ${APP_SHA}"
-                                    warn "${NOTE_CHAR2} SHA sum mismatch. Removing corrupted file from cache: ${file}, and retrying."
-                                    # remove corrupted file
-                                    ${RM_BIN} -f "${file}"
-                                    # and restart script with same arguments:
-                                    debug "Evaluating: ${SOFIN_BIN} ${SOFIN_ARGS_FULL}"
-                                    eval "${SOFIN_BIN} ${SOFIN_ARGS_FULL}"
-                                    exit
+                                    case "${SYSTEM_NAME}" in
+                                        Darwin|Linux)
+                                            export cur="$(${SHA_BIN} ${file} | ${AWK_BIN} '{print $1;}')"
+                                            ;;
+
+                                        FreeBSD)
+                                            export cur="$(${SHA_BIN} -q ${file})"
+                                            ;;
+                                    esac
+                                    if [ "${cur}" = "${APP_SHA}" ]; then
+                                        debug "${NOTE_CHAR2} Bundle checksum is fine."
+                                    else
+                                        warn "${NOTE_CHAR2} ${cur} vs ${APP_SHA}"
+                                        warn "${NOTE_CHAR2} Bundle checksum mismatch detected!"
+                                        warn "${NOTE_CHAR2} Removing corrupted file from cache: '${file}' and retrying."
+                                        # remove corrupted file
+                                        ${RM_BIN} -f "${file}"
+                                        # and restart script with same arguments:
+                                        debug "Evaluating: ${SOFIN_BIN} ${SOFIN_ARGS_FULL}"
+                                        eval "${SOFIN_BIN} ${SOFIN_ARGS_FULL}"
+                                        exit
+                                    fi
                                 fi
+
+                                note "   ${NOTE_CHAR2} Unpacking source code of: ${APP_NAME}"
+                                debug "Build dir root: ${BUILD_DIR_ROOT}"
+                                run "${TAR_BIN} xf ${file}"
+
+                            else
+                                # git method
+                                note "   ${NOTE_CHAR2} Fetching requirement source from git repository: ${APP_HTTP_PATH}"
+                                run "${GIT_BIN} clone ${APP_HTTP_PATH} ${APP_NAME}${APP_VERSION}"
                             fi
 
-                            note "   ${NOTE_CHAR2} Unpacking source code of: ${APP_NAME}"
-                            debug "Build dir root: ${BUILD_DIR_ROOT}"
-                            run "${TAR_BIN} xf ${file}"
-
-                        else
-                            # git method
-                            note "   ${NOTE_CHAR2} Fetching requirement source from git repository: ${APP_HTTP_PATH}"
-                            run "${GIT_BIN} clone ${APP_HTTP_PATH} ${APP_NAME}${APP_VERSION}"
-                        fi
-
-                        export BUILD_DIR="$(${FIND_BIN} ${BUILD_DIR_ROOT}/* -maxdepth 0 -type d -name "*${APP_VERSION}*")"
-                        debug "Build Dir Core before: '${BUILD_DIR}'"
-                        if [ "${BUILD_DIR}" = "" ]; then
-                            export BUILD_DIR=$(${FIND_BIN} ${BUILD_DIR_ROOT}/* -maxdepth 0 -type d) # try any dir instead
-                        fi
-                        debug "Build Dir Core after: '${BUILD_DIR}'"
-                        for dir in ${BUILD_DIR}; do
-                            debug "Changing dir to: ${dir}/${APP_SOURCE_DIR_POSTFIX}"
-                            cd "${dir}/${APP_SOURCE_DIR_POSTFIX}"
+                            export BUILD_DIR="$(${FIND_BIN} ${BUILD_DIR_ROOT}/* -maxdepth 0 -type d -name "*${APP_VERSION}*")"
+                            if [ -z "${BUILD_DIR}" ]; then
+                                export BUILD_DIR=$(${FIND_BIN} ${BUILD_DIR_ROOT}/* -maxdepth 0 -type d) # try any dir instead
+                            fi
+                            cd "${BUILD_DIR}"
+                            debug "Switched to build dir: '${BUILD_DIR}'"
 
                             if [ "${APP_GIT_CHECKOUT}" != "" ]; then
                                 note "   ${NOTE_CHAR2} Checking out: ${APP_GIT_CHECKOUT}"
@@ -1324,36 +1321,42 @@ for application in ${APPLICATIONS}; do
                                     ;;
 
                             esac
-
                             if [ ! -z "${APP_AFTER_CONFIGURE_CALLBACK}" ]; then
                                 debug "Running after configure callback"
                                 run "${APP_AFTER_CONFIGURE_CALLBACK}"
                             fi
 
-                            note "   ${NOTE_CHAR2} Building requirement: $1"
-                            run "${APP_MAKE_METHOD}"
-                            if [ ! -z "${APP_AFTER_MAKE_CALLBACK}" ]; then
-                                debug "Running after make callback"
-                                run "${APP_AFTER_MAKE_CALLBACK}"
-                            fi
+                        else # in "continue-build" mode, we reuse current cache dir..
+                            export BUILD_DIR_ROOT="${PREVIOUS_BUILD_DIR}"
+                            export BUILD_DIR="${PREVIOUS_BUILD_DIR}"
+                            cd "${BUILD_DIR}"
+                        fi
 
-                            note "   ${NOTE_CHAR2} Installing requirement: $1"
-                            run "${APP_INSTALL_METHOD}"
-                            if [ ! "${APP_AFTER_INSTALL_CALLBACK}" = "" ]; then
-                                debug "After install callback: ${APP_AFTER_INSTALL_CALLBACK}"
-                                run "${APP_AFTER_INSTALL_CALLBACK}"
-                            fi
+                        # and common part between normal and continue modes:
+                        note "   ${NOTE_CHAR2} Building requirement: $1"
+                        run "${APP_MAKE_METHOD}"
+                        if [ ! -z "${APP_AFTER_MAKE_CALLBACK}" ]; then
+                            debug "Running after make callback"
+                            run "${APP_AFTER_MAKE_CALLBACK}"
+                        fi
 
-                            debug "Marking as installed '$1' in: ${PREFIX}"
-                            ${TOUCH_BIN} "${PREFIX}/$1${INSTALLED_MARK}"
-                            debug "Writing version: ${APP_VERSION} of app: '${APP_NAME}' installed in: ${PREFIX}"
-                            ${PRINTF_BIN} "${APP_VERSION}" > "${PREFIX}/$1${INSTALLED_MARK}"
-                        done
+                        note "   ${NOTE_CHAR2} Installing requirement: $1"
+                        run "${APP_INSTALL_METHOD}"
+                        if [ ! "${APP_AFTER_INSTALL_CALLBACK}" = "" ]; then
+                            debug "After install callback: ${APP_AFTER_INSTALL_CALLBACK}"
+                            run "${APP_AFTER_INSTALL_CALLBACK}"
+                        fi
+
+                        debug "Marking as installed '$1' in: ${PREFIX}"
+                        ${TOUCH_BIN} "${PREFIX}/$1${INSTALLED_MARK}"
+                        debug "Writing version: ${APP_VERSION} of app: '${APP_NAME}' installed in: ${PREFIX}"
+                        ${PRINTF_BIN} "${APP_VERSION}" > "${PREFIX}/$1${INSTALLED_MARK}"
+
                         if [ -z "${DEVEL}" ]; then # if devel mode not set
-                            debug "Removing build dirs: ${BUILD_DIR} and ${BUILD_DIR_ROOT}"
-                            ${RM_BIN} -rf "${BUILD_DIR}" "${BUILD_DIR_ROOT}"
+                            debug "Cleaning build dir: '${BUILD_DIR_ROOT}' of bundle: '${APP_NAME}${APP_POSTFIX}', after successful build."
+                            ${RM_BIN} -rf "${BUILD_DIR_ROOT}"
                         else
-                            debug "Leaving build dir cause in devel mode: ${BUILD_DIR_ROOT}"
+                            debug "Leaving build dir intact when working in devel mode. Last build dir: '${BUILD_DIR_ROOT}'"
                         fi
                         cd "${CUR_DIR}"
                     fi
