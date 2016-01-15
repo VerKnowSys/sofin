@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
 
 # config settings
-readonly VERSION="0.86.1"
+readonly VERSION="0.86.2"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -1063,13 +1063,15 @@ for application in ${APPLICATIONS}; do
                     if [ "${USE_BINBUILD}" = "false" ]; then
                         note "   ${NOTE_CHAR2} Binary build check was skipped"
                     else
-                        if [ ! -e "./${ARCHIVE_NAME}" ]; then
+                        if [ ! -e "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" ]; then
+                            cd ${BINBUILDS_CACHE_DIR}${ABSNAME}
                             note "Trying binary build for: ${MIDDLE}/${APP_NAME}${APP_POSTFIX}-${APP_VERSION}"
                             ${FETCH_BIN} "${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}.sha1" 2>>${LOG}-${APP_NAME}${APP_POSTFIX}
                             ${FETCH_BIN} "${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}"
 
                             # checking archive sha1 checksum
-                            if [ -e "${ARCHIVE_NAME}" ]; then
+                            if [ -e "./${ARCHIVE_NAME}" ]; then
+                                debug "Found binary build archive: ${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}"
                                 case "${SYSTEM_NAME}" in
                                     Darwin|Linux)
                                         export current_archive_sha1="$(${SHA_BIN} "${ARCHIVE_NAME}" | ${AWK_BIN} '{print $1;}')"
@@ -1079,23 +1081,26 @@ for application in ${APPLICATIONS}; do
                                         export current_archive_sha1="$(${SHA_BIN} -q "${ARCHIVE_NAME}")"
                                         ;;
                                 esac
+                                debug "current_archive_sha1: ${current_archive_sha1}"
                             fi
-                            current_sha_file="${ARCHIVE_NAME}.sha1"
+                            current_sha_file="${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}.sha1"
                             if [ -e "${current_sha_file}" ]; then
                                 export sha1_value="$(${CAT_BIN} ${current_sha_file})"
                             fi
 
-                            debug "${current_archive_sha1} vs ${sha1_value}"
+                            debug "Checking SHA1 match: ${current_archive_sha1} vs ${sha1_value}"
                             if [ "${current_archive_sha1}" != "${sha1_value}" ]; then
-                                ${RM_BIN} -f ${ARCHIVE_NAME}
-                                ${RM_BIN} -f ${ARCHIVE_NAME}.sha1
+                                debug "Checksums doesn't match, removing binary builds and proceeding into build phase"
+                                ${RM_BIN} -fv ${ARCHIVE_NAME}
+                                ${RM_BIN} -fv ${ARCHIVE_NAME}.sha1
                             fi
                         fi
                         cd "${SOFTWARE_ROOT_DIR}"
 
                         debug "ARCHIVE_NAME: ${ARCHIVE_NAME}"
+                        debug "Expecting to be existant: ${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}"
                         if [ -e "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" ]; then # if exists, then checksum is ok
-                            ${TAR_BIN} xfJ "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" >> ${LOG}-${APP_NAME}${APP_POSTFIX} 2>&1
+                            ${TAR_BIN} xJf "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" >> ${LOG}-${APP_NAME}${APP_POSTFIX} 2>&1
                             if [ "$?" = "0" ]; then # if archive is valid
                                 note "  ${NOTE_CHAR2} Binary bundle installed: ${APP_NAME}${APP_POSTFIX} with version: ${APP_VERSION}"
                                 export DONT_BUILD_BUT_DO_EXPORTS="true"
