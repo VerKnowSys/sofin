@@ -46,6 +46,9 @@ check_requirements () {
             fi
         fi
     fi
+    if [ ! -z "${DEBUGBUILD}" ]; then
+        warn "Debug build is enabled."
+    fi
 }
 
 
