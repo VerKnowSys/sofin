@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
 
 # config settings
-readonly VERSION="0.86.0"
+readonly VERSION="0.86.1"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -677,7 +677,7 @@ if [ ! "$1" = "" ]; then
                         note "Archive sha: ${archive_sha1}"
 
                         debug "Setting common access to archive files before we send them.."
-                        ${CHMOD_BIN} a+r "${name}"
+                        ${CHMOD_BIN} a+r "${name}" "${name}.sha1"
 
                         note "Sending archive: '${name}' to remote: '${address}'"
                         ${SCP_BIN} -P ${MAIN_PORT} ${name} ${address}/${name}.partial || def_error ${name}

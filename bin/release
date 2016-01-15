@@ -50,7 +50,7 @@ else
     cd ..
 
     note "Pushing snapshot to remote server(s)"
-    ${CHMOD_BIN} releases/${INITIALS}${DEFAULT_ARCHIVE_EXT}
+    ${CHMOD_BIN} a+r releases/${INITIALS}${DEFAULT_ARCHIVE_EXT}
     ${SCP_BIN} releases/${INITIALS}${DEFAULT_ARCHIVE_EXT} "${DEST_HOST}:${DEST_PATH}" 2>/dev/null
     ${SSH_BIN} ${DEST_USER}@${DEST_HOST} "${RM_BIN} /Mirror/software/source/${INITIALS}${DEFAULT_ARCHIVE_EXT} ; source ~/.functions.sh && gather-source ${HTTP_PATH}/${INITIALS}${DEFAULT_ARCHIVE_EXT}" 2>/dev/null
     ${RM_BIN} -rf ./sofin-definitions ${INITIALS}${DEFAULT_ARCHIVE_EXT}
