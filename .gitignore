@@ -8,3 +8,5 @@ src/.*.o
 .fseventsd
 .Spotlight-V100
 .VolumeIcon.icns
+.apdisk
+TheVolumeSettingsFolder
