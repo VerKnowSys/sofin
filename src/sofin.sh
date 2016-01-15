@@ -1477,7 +1477,7 @@ for application in ${APPLICATIONS}; do
                         done
                     fi
                 done
-                result="$(echo "${number}" | bc)"
+                result="$(echo "${number}" | ${BC_BIN})"
                 note "${result} files were stripped."
             else
                 warn "Debug build is enabled. Strip skipped."
