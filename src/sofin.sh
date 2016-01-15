@@ -1248,7 +1248,10 @@ for application in ${APPLICATIONS}; do
                                     for level in 0 1 2 3 4 5; do
                                         debug "Trying to patch source with patch: ${patch} (p${level})"
                                         ${PATCH_BIN} -p${level} -N -f -i "${patch}" >> "${LOG}-${APP_NAME}${APP_POSTFIX}" 2>> "${LOG}-${APP_NAME}${APP_POSTFIX}" # don't use run.. it may fail - we don't care
-                                        debug "Patching (p${level}) exit code: $?"
+                                        if [ "$?" = "0" ]; then # skip applying single patch if it already passed
+                                            debug "Patch: '${patch}' applied successfully!"
+                                            break;
+                                        fi
                                     done
                                 done
                                 pspatch_dir="${LIST_DIR}/${SYSTEM_NAME}"
@@ -1260,7 +1263,10 @@ for application in ${APPLICATIONS}; do
                                         for level in 0 1 2 3 4 5; do
                                             debug "Patching source code with pspatch: ${platform_specific_patch} (p${level})"
                                             ${PATCH_BIN} -p${level} -N -f -i "${platform_specific_patch}" >> "${LOG}-${APP_NAME}${APP_POSTFIX}" 2>> "${LOG}-${APP_NAME}${APP_POSTFIX}"
-                                            debug "Patching (p${level}) exit code: $?"
+                                            if [ "$?" = "0" ]; then # skip applying single patch if it already passed
+                                                debug "Patch: '${platform_specific_patch}' applied successfully!"
+                                                break;
+                                            fi
                                         done
                                     done
                                 fi
