@@ -215,18 +215,67 @@ unset DYLD_LIBRARY_PATH
 unset PKG_CONFIG_PATH
 
 
-perform_clean () {
-    note "Cleaning failed build directories in: ${CACHE_DIR}cache"
-    if [ -d "${CACHE_DIR}cache" ]; then
-        for i in $(${FIND_BIN} "${CACHE_DIR}cache" -maxdepth 1 -mindepth 1 -type d); do
-            note "Removing build directory: ${i}"
-            ${RM_BIN} -rf "${i}"
-        done
+clean_binbuilds () {
+    if [ -d "${BINBUILDS_CACHE_DIR}" ]; then
+        note "Removing binary builds from: ${BINBUILDS_CACHE_DIR}"
+        ${RM_BIN} -rf "${BINBUILDS_CACHE_DIR}" || error "Privileges problem in '${BINBUILDS_CACHE_DIR}'? All files should belong to '${USER}' there."
     fi
-    note "Removing binary builds from ${BINBUILDS_CACHE_DIR}"
-    ${RM_BIN} -rf "${BINBUILDS_CACHE_DIR}"
-    note "Removing logs: ${LOG}*"
-    ${RM_BIN} -rf ${LOG}*
+}
+
+
+clean_failbuilds () {
+    if [ -d "${CACHE_DIR}cache" ]; then
+        number="0"
+        note "Cleaning failed build directories from: ${CACHE_DIR}cache"
+        files=$(${FIND_BIN} "${CACHE_DIR}cache" -maxdepth 2 -mindepth 1 -type d)
+        num="$(echo "${files}" | ${WC_BIN} -l 2>/dev/null | ${SED_BIN} 's/ //g' 2>/dev/null)"
+        if [ ! -z "${num}" ]; then
+            number="${number} + ${num}"
+        fi
+        for i in ${files}; do
+            debug "Removing directory: ${i}"
+            ${RM_BIN} -rf "${i}" || error "Privileges problem while removing '${i}'? All files should belong to '${USER}' there."
+        done
+        result="$(echo "${number} - 1" | ${BC_BIN})"
+        note "${result} directories cleaned."
+    fi
+}
+
+
+clean_logs () {
+    if [ -d "${CACHE_DIR}logs" ]; then
+        note "Removing build logs"
+        ${RM_BIN} -f "${CACHE_DIR}logs" || error "Privileges problem in '${CACHE_DIR}logs'? All files should belong to '${USER}' there."
+    fi
+}
+
+
+clean_purge () {
+    if [ -d "${CACHE_DIR}" ]; then
+        note "Purging all caches from: ${CACHE_DIR}"
+        ${RM_BIN} -rf "${CACHE_DIR}" || error "Privileges problem in '${CACHE_DIR}'? All files should belong to '${USER}' there."
+    fi
+}
+
+
+perform_clean () {
+    case "$1" in
+        purge) # purge
+            clean_purge
+            ;;
+
+        dist) # distclean
+            note "Dist cleaning.."
+            clean_logs
+            clean_binbuilds
+            clean_failbuilds
+            ;;
+
+        *) # clean
+            clean_failbuilds
+            ;;
+    esac
+    exit
 }
 
 
@@ -295,23 +344,16 @@ if [ ! "$1" = "" ]; then
 
     clean)
         perform_clean
-        exit
         ;;
 
 
     distclean)
-        note "Performing dist-clean."
-        ${RM_BIN} -rf "${CACHE_DIR}definitions"
-        perform_clean
-        exit
+        perform_clean dist
         ;;
 
 
     purge)
-        note "Performing purge-clean."
-        perform_clean
-        ${RM_BIN} -rf "${CACHE_DIR}"
-        exit
+        perform_clean purge
         ;;
 
 
