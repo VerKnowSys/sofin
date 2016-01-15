@@ -670,13 +670,16 @@ if [ ! "$1" = "" ]; then
                         ${PRINTF_BIN} "${archive_sha1}" > "${name}.sha1"
                         note "Archive sha: ${archive_sha1}"
 
-                        note "Sending archive to remote: ${address}"
+                        debug "Setting common access to archive files before we send them.."
+                        ${CHMOD_BIN} a+r "${name}"
+
+                        note "Sending archive: '${name}' to remote: '${address}'"
                         ${SCP_BIN} -P ${MAIN_PORT} ${name} ${address}/${name}.partial || def_error ${name}
                         if [ "$?" = "0" ]; then
                             ${SSH_BIN} -p ${MAIN_PORT} ${MAIN_USER}@${mirror} "cd ${MAIN_SOFTWARE_PREFIX}/software/binary/${SYS} && mv ${name}.partial ${name}"
                             ${SCP_BIN} -P ${MAIN_PORT} ${name}.sha1 ${address}/${name}.sha1 || def_error ${name}.sha1
                         else
-                            error "Failed to send binary build for: ${name} to remote: ${mirror}"
+                            error "Failed to send binary build of: '${name}' to remote: '${mirror}'"
                         fi
                     done
                     ${RM_BIN} -f "${name}"
