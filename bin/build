@@ -91,16 +91,15 @@ update_env_files () {
 
 install_base () {
     build_natives
-
     if [ "${INSTALL}" = "YES" ]; then
-        check_root
-        ${RM_BIN} -rf "${PREFIX}/usr/bin/sofin"
-        # if [ "$(uname)" != "Darwin" ]; then
-        #     ${RM_BIN} -rf "/usr/bin/sofin-rpp"
-        # fi
-        ${RM_BIN} -rf "${PREFIX}/usr/bin/sofin-version-utility"
-        ${RM_BIN} -rf "${PREFIX}/usr/bin/sofin-microseconds"
-        ${RM_BIN} -rf "${PREFIX}/etc/${CONF_FILE}"
+        if [ "$(id -u)" = "0" ]; then
+            echo "Removing already installed Sofin files.."
+            ${RM_BIN} -f "${PREFIX}/usr/bin/s"
+            ${RM_BIN} -f "${PREFIX}/usr/bin/sofin"
+            ${RM_BIN} -f "${PREFIX}/usr/bin/sofin-version-utility"
+            ${RM_BIN} -f "${PREFIX}/usr/bin/sofin-microseconds"
+            ${RM_BIN} -f "${PREFIX}/etc/${CONF_FILE}"
+        fi
         install_sofin
     fi
 }
@@ -148,7 +147,6 @@ install_sofin () {
     check_command_result $?
     ${CP_BIN} "bin/sofin-microseconds" ${PREFIX}/usr/bin/sofin-microseconds
     check_command_result $?
-    ${RM_BIN} -f ${PREFIX}/usr/bin/s
     ${CP_BIN} "src/sofin.sh" ${PREFIX}/usr/bin/s
     check_command_result $?
 
