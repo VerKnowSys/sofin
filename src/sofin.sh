@@ -1536,20 +1536,24 @@ for application in ${APPLICATIONS}; do
         esac
         if [ "${APP_STRIP}" != "no" ]; then
             if [ -z "${DEBUGBUILD}" ]; then
-                number="0"
+                counter="0"
                 for strip in ${dirs_to_strip}; do
                     if [ -d "${strip}" ]; then
                         files="$(${FIND_BIN} ${strip} -maxdepth 1 -type f)"
-                        num="$(echo "${files}" | eval ${FILES_COUNT_GUARD})"
-                        if [ ! -z "${num}" ]; then
-                            number="${number} + ${num}"
-                        fi
                         for file in ${files}; do
                             ${STRIP_BIN} ${file} > /dev/null 2>&1
+                            if [ "$?" = "0" ]; then
+                                counter="${counter} + 1"
+                            else
+                                counter="${counter} - 1"
+                            fi
                         done
                     fi
                 done
-                result="$(echo "${number}" | ${BC_BIN})"
+                result="$(echo "${counter}" | ${BC_BIN})"
+                if [ "${result}" -lt "0" ]; then
+                    result="0"
+                fi
                 note "${result} files were stripped."
             else
                 warn "Debug build is enabled. Strip skipped."
