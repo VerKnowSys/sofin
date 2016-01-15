@@ -22,6 +22,11 @@ SOFIN_ARGS=$*
 SOFIN_ARGS_FULL="${SOFIN_ARGS}"
 readonly SOFIN_ARGS="$(echo ${SOFIN_ARGS} | ${CUT_BIN} -d' ' -f2-)"
 
+# Some lazy shortcuts..
+FILES_COUNT_GUARD="${WC_BIN} -l 2>/dev/null | ${SED_BIN} 's/ //g' 2>/dev/null"
+OLDEST_BUILD_DIR_GUARD="${SORT_BIN} -k1 -n 2>/dev/null | ${TAIL_BIN} -n1 2>/dev/null | ${CUT_BIN} -f2 -d' ' 2>/dev/null | ${SORT_BIN} -k1 -n 2>/dev/null | ${TAIL_BIN} -n1 2>/dev/null | ${CUT_BIN} -f2 -d' ' 2>/dev/null"
+
+
 check_definition_dir () {
     if [ ! -d "${SOFTWARE_DIR}" ]; then
         note "No ${SOFTWARE_DIR} found. Creating one."
@@ -227,7 +232,7 @@ clean_failbuilds () {
         number="0"
         note "Cleaning failed build directories from: ${CACHE_DIR}cache"
         files=$(${FIND_BIN} "${CACHE_DIR}cache" -maxdepth 2 -mindepth 1 -type d)
-        num="$(echo "${files}" | ${WC_BIN} -l 2>/dev/null | ${SED_BIN} 's/ //g' 2>/dev/null)"
+        num="$(echo "${files}" | eval ${FILES_COUNT_GUARD})"
         if [ ! -z "${num}" ]; then
             number="${number} + ${num}"
         fi
@@ -338,7 +343,7 @@ if [ ! "$1" = "" ]; then
             note "Seeking log files.."
             log_helper () {
                 files=$(${FIND_BIN} ${CACHE_DIR}logs -type f -iname "sofin*${pattern}*" 2>/dev/null)
-                num="$(echo "${files}" | ${WC_BIN} -l 2>/dev/null | ${SED_BIN} 's/ //g' 2>/dev/null)"
+                num="$(echo "${files}" | eval ${FILES_COUNT_GUARD})"
                 if [ -z "${num}" ]; then
                     num="0"
                 fi
@@ -486,8 +491,6 @@ if [ ! "$1" = "" ]; then
         if [ "${USERNAME}" != "root" ]; then
             process ${SOFTWARE_DIR}
         fi
-        # ${PRINTF_BIN} "# LD_LIBRARY_PATH:\n"
-        # ${PRINTF_BIN} "export LD_LIBRARY_PATH='${ldresult}'\n\n"
 
         # CFLAGS, CXXFLAGS:
         cflags="${CFLAGS} -fPIC ${DEFAULT_COMPILER_FLAGS}"
@@ -565,22 +568,24 @@ if [ ! "$1" = "" ]; then
 
 
     cont|continue)
-        update_definitions
         shift
         a_bundle_name="$1"
         if [ -z "${a_bundle_name}" ]; then
-            error "No bundle name given to continue build. Aborted."
+            error "No bundle name given to continue build. Aborted!"
         fi
-        an_uuid_dir=$(${FIND_BIN} ${CACHE_DIR}cache/ -mindepth 2 -maxdepth 2 -type d -iname "*${a_bundle_name}*" -printf '%T@ %p\n' | ${SORT_BIN} -k1 -n | ${TAIL_BIN} -n1 | ${AWK_BIN} '{print $2;}')
-        a_build_dir="$(${BASENAME_BIN} ${an_uuid_dir})"
-        if [ -z "${an_uuid_dir}" ]; then
-            error "No builds found to continue for bundle: '${a_bundle_name}'"
+        if [ "${SYSTEM_NAME}" = "Linux" ]; then # GNU guys have to be the unicorns..
+            export MOST_RECENT_DIR="$(${FIND_BIN} ${CACHE_DIR}cache/ -mindepth 2 -maxdepth 2 -type d -iname "*${a_bundle_name}*" -printf '%T@ %p\n' 2>/dev/null | eval ${OLDEST_BUILD_DIR_GUARD})"
         else
-            note "Found most recent build dir: '${a_build_dir}' for bundle: '${a_bundle_name}'"
+            export MOST_RECENT_DIR="$(${FIND_BIN} ${CACHE_DIR}cache/ -mindepth 2 -maxdepth 2 -type d -iname "*${a_bundle_name}*" -print 2>/dev/null | ${XARGS_BIN} ${STAT_BIN} -f"%m %N" 2>/dev/null | eval ${OLDEST_BUILD_DIR_GUARD})"
         fi
-        note "Continuing interrupted build.."
+        if [ ! -d "${MOST_RECENT_DIR}" ]; then
+            error "No build dir: '${MOST_RECENT_DIR}' found to continue bundle build of: '${a_bundle_name}'"
+        fi
+        a_build_dir="$(${BASENAME_BIN} ${MOST_RECENT_DIR})"
+        note "Found most recent build dir: '${a_build_dir}' for bundle: '${a_bundle_name}'."
+        note "Resuming interrupted build.."
         export APPLICATIONS="${a_bundle_name}"
-        export PREVIOUS_BUILD_DIR="${an_uuid_dir}"
+        export PREVIOUS_BUILD_DIR="${MOST_RECENT_DIR}"
         export SOFIN_CONTINUE_BUILD="YES"
         ;;
 
@@ -1448,14 +1453,14 @@ for application in ${APPLICATIONS}; do
             EXPORT_LIST=""
             for exp in ${APP_EXPORTS}; do
                 for dir in "/bin/" "/sbin/" "/libexec/"; do
-                    if [ -f "${PREFIX}${dir}${exp}" ]; then # a file
-                        if [ -x "${PREFIX}${dir}${exp}" ]; then # and it's executable'
-                            debug "Exporting ${PREFIX}${dir}${exp}"
-                            curr_dir="$(${PWD_BIN})"
+                    file_to_exp="${PREFIX}${dir}${exp}"
+                    if [ -f "${file_to_exp}" ]; then # a file
+                        if [ -x "${file_to_exp}" ]; then # and it's executable'
+                            curr_dir="$(${PWD_BIN} 2>/dev/null)"
                             cd "${PREFIX}${dir}"
                             ${LN_BIN} -vfs "..${dir}${exp}" "../exports/${exp}" >> "${LOG}-${APP_NAME}${APP_POSTFIX}"
                             cd "${curr_dir}"
-                            exp_elem="$(${BASENAME_BIN} ${PREFIX}${dir}${exp})"
+                            exp_elem="$(${BASENAME_BIN} ${file_to_exp})"
                             EXPORT_LIST="${EXPORT_LIST} ${exp_elem}"
                         fi
                     fi
@@ -1525,7 +1530,7 @@ for application in ${APPLICATIONS}; do
                 for strip in ${dirs_to_strip}; do
                     if [ -d "${strip}" ]; then
                         files="$(${FIND_BIN} ${strip} -maxdepth 1 -type f)"
-                        num="$(echo "${files}" | ${WC_BIN} -l 2>/dev/null | ${SED_BIN} 's/ //g' 2>/dev/null)"
+                        num="$(echo "${files}" | eval ${FILES_COUNT_GUARD})"
                         if [ ! -z "${num}" ]; then
                             number="${number} + ${num}"
                         fi
