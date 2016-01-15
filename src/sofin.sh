@@ -1242,11 +1242,11 @@ for application in ${APPLICATIONS}; do
 
                             LIST_DIR="${DEFINITIONS_DIR}patches/$1" # $1 is definition file name
                             if [ -d "${LIST_DIR}" ]; then
-                                note "   ${NOTE_CHAR2} Applying patches for: ${APP_NAME}${APP_POSTFIX}"
                                 patches_files="$(${FIND_BIN} ${LIST_DIR}/* -maxdepth 0 -type f)"
+                                note "   ${NOTE_CHAR2} Applying common patches for: ${APP_NAME}${APP_POSTFIX}"
                                 for patch in ${patches_files}; do
                                     for level in 0 1 2 3 4 5; do
-                                        debug "Trying to patch source with patch: ${patch} (p${level})"
+                                        debug "Trying to patch source with patch: ${patch}, level: ${level}"
                                         ${PATCH_BIN} -p${level} -N -f -i "${patch}" >> "${LOG}-${APP_NAME}${APP_POSTFIX}" 2>> "${LOG}-${APP_NAME}${APP_POSTFIX}" # don't use run.. it may fail - we don't care
                                         if [ "$?" = "0" ]; then # skip applying single patch if it already passed
                                             debug "Patch: '${patch}' applied successfully!"
