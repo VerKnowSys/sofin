@@ -307,25 +307,23 @@ if [ ! "$1" = "" ]; then
         ;;
 
     p|port)
-        # support for TheSS /SoftwareData:
+        # support for ServeD /Services:
         app="$2"
         if [ "$app" = "" ]; then
             error "Must specify service name!"
         fi
 
-        user_app_dir="${HOME}/SoftwareData/${app}"
-        user_port_file="${user_app_dir}/.ports/0"
-        if [ "${USERNAME}" = "root" ]; then
-            user_app_dir="/SystemUsers/SoftwareData/${app}"
-            user_port_file="${user_app_dir}/.ports/0"
-        fi
-        if [ -f "${user_port_file}" ]; then
-            printf "$(${CAT_BIN} ${user_port_file})\n"
-        else
-            error "No service port found with name: '${app}'"
-        fi
+        # user_app_dir="${SERVICES_DIR}${app}"
+        # user_port_file="${user_app_dir}/.ports/0"
+        # if [ "${USERNAME}" = "root" ]; then
+        #     user_app_dir="${SERVICES_DIR}${app}"
+        #     user_port_file="${user_app_dir}/.ports/0"
+        # fi
+        # if [ -f "${user_port_file}" ]; then
+        #     printf "$(${CAT_BIN} ${user_port_file})\n"
+        # else
 
-        exit
+        error "Not implemented (for now)"
         ;;
 
 
