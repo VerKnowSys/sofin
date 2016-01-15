@@ -55,7 +55,7 @@ readonly DEFAULT_PATH="/bin:/usr/bin:/sbin:/usr/sbin"
 readonly DEFAULT_ARCHIVE_EXT=".txz"
 readonly DEPENDENCIES_FILE=".dependencies"
 readonly INSTALLED_MARK=".installed"
-readonly LOG_LINES_AMOUNT=50
+readonly LOG_LINES_AMOUNT=20
 
 # utils software from POSIX base system variables:
 PRINTF_BIN="/usr/bin/printf"
@@ -117,6 +117,7 @@ INSTALL_BIN="/usr/bin/install"
 MKFIFO_BIN="/usr/bin/mkfifo"
 PS_BIN="/bin/ps"
 DAEMON_BIN="/usr/bin/true"
+STAT_BIN="/usr/bin/stat"
 
 OS_VERSION=10
 if [ -x "${SOFIN_VERSION_UTILITY_BIN}" ]; then
