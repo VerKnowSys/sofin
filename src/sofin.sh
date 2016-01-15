@@ -336,9 +336,38 @@ if [ ! "$1" = "" ]; then
         if [ "${pattern}" = "" ]; then
             ${TAIL_BIN} -n ${LOG_LINES_AMOUNT} -F ${LOG}*
         else
-            note "Pattern: ${pattern}"
-            ${TAIL_BIN} -n ${LOG_LINES_AMOUNT} -F ${LOG}*${pattern}*
+            note "Seeking log files.."
+            log_helper () {
+                files=$(${FIND_BIN} ${CACHE_DIR}logs -type f -iname "sofin*${pattern}*" 2>/dev/null)
+                num="$(echo "${files}" | ${WC_BIN} -l 2>/dev/null | ${SED_BIN} 's/ //g' 2>/dev/null)"
+                if [ -z "${num}" ]; then
+                    num="0"
+                fi
+                if [ -z "${files}" ]; then
+                    ${SLEEP_BIN} 2
+                    log_helper
+                else
+                    case ${num} in
+                        0)
+                            ${SLEEP_BIN} 2
+                            log_helper
+                            ;;
+
+                        1)
+                            note "Found '${num}' log file, that matches pattern: '${pattern}'. Attaching tail.."
+                            ${TAIL_BIN} -n ${LOG_LINES_AMOUNT} -F ${files}
+                            ;;
+
+                        *)
+                            note "Found '${num}' log files, that match pattern: '${pattern}'. Attaching tails.."
+                            ${TAIL_BIN} -n ${LOG_LINES_AMOUNT} -F ${files}
+                            ;;
+                    esac
+                fi
+            }
+            log_helper
         fi
+        exit
         ;;
 
 
