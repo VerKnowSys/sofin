@@ -40,7 +40,6 @@ readonly DEFINITIONS_DIR="${CACHE_DIR}definitions/definitions/"
 readonly LOG="${CACHE_DIR}logs/sofin"
 readonly LISTS_DIR="${CACHE_DIR}definitions/lists/"
 readonly DEFAULTS="${DEFINITIONS_DIR}defaults.def"
-readonly BINBUILDS_CACHE_DIR
 readonly LOCK_FILE="${SOFTWARE_DIR}.sofin.lock"
 readonly MAIN_PORT="60022"
 readonly MAIN_USER="sofin"
