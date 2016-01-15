@@ -159,6 +159,7 @@ usage_howto () {
     note "  ${cyan}purge                                ${gray}-${green} cleans binbuilds cache, unpacked source content, logs, definitions, source cache and possible states"
     note "  ${cyan}outdated                             ${gray}-${green} lists outdated software"
     note "  ${cyan}build                                ${gray}-${green} does binary build from source for software specified as params"
+    note "  ${cyan}continue Bundlename                  ${gray}-${green} continues build from \"make stage\" of bundle name, given as param (previous build dir reused)"
     note "  ${cyan}deploy                               ${gray}-${green} build + push"
     note "  ${cyan}push | binpush | send                ${gray}-${green} creates binary build from prebuilt software bundles name given as params (example: $(${BASENAME_BIN} ${SOFIN_BIN}) push Rubinius Vifm Curl)"
     note "  ${cyan}wipe                                 ${gray}-${green} wipes binary builds (matching given name) from binary respositories (example: $(${BASENAME_BIN} ${SOFIN_BIN}) wipe Rubinius Vifm)"
