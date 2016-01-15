@@ -188,13 +188,14 @@ error () {
 
 
 # System specific configuration
+export DEFAULT_LDFLAGS="-fPIC -fPIE"
 export readonly SYSTEM_NAME="$(uname)"
 export readonly SYSTEM_ARCH="$(uname -m)"
-DEFAULT_LDFLAGS="-fPIC -fPIE"
-DEFAULT_COMPILER_FLAGS="-Os -fPIC -fPIE -fno-strict-overflow -fstack-protector-all"
 
-if [ ! -z "${DEBUGBUILD}" ]; then
-    DEFAULT_COMPILER_FLAGS="-O0 -ggdb -fPIC -fPIE -fno-strict-overflow -fstack-protector-all"
+if [ -z "${DEBUGBUILD}" ]; then
+    export readonly DEFAULT_COMPILER_FLAGS="-Os -fPIC -fPIE -fno-strict-overflow -fstack-protector-all"
+else
+    export readonly DEFAULT_COMPILER_FLAGS="-O0 -ggdb -fPIC -fPIE -fno-strict-overflow -fstack-protector-all"
 fi
 
 case "${SYSTEM_NAME}" in
