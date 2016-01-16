@@ -14,7 +14,7 @@ else
     exit 1
 fi
 
-if [ "${SOFIN_TRACE}" = "true" ]; then
+if [ ! -z "${SOFIN_TRACE}" ]; then
     set -x
 fi
 
@@ -163,7 +163,7 @@ usage_howto () {
     note "  ${cyan}deploy                               ${gray}-${green} build + push"
     note "  ${cyan}push | binpush | send                ${gray}-${green} creates binary build from prebuilt software bundles name given as params (example: $(${BASENAME_BIN} ${SOFIN_BIN}) push Rubinius Vifm Curl)"
     note "  ${cyan}wipe                                 ${gray}-${green} wipes binary builds (matching given name) from binary respositories (example: $(${BASENAME_BIN} ${SOFIN_BIN}) wipe Rubinius Vifm)"
-    note "  ${cyan}port                                 ${gray}-${green} gathers port of TheSS running service by service name"
+    note "  ${cyan}port                                 ${gray}-${green} gathers port of ServeD running service by service name"
     note "  ${cyan}setup                                ${gray}-${green} switches definitions repository/ branch from env value 'REPOSITORY' and 'BRANCH' (example: BRANCH=master REPOSITORY=/my/local/definitions/repo/ sofin setup)"
     note "  ${cyan}enable                               ${gray}-${green} enables Sofin developer environment (full environment stored in ~/.profile). It's the default"
     note "  ${cyan}disable                              ${gray}-${green} disables Sofin developer environment (only PATH, PKG_CONFIG_PATH and MANPATH written to ~/.profile)"
@@ -231,7 +231,8 @@ clean_binbuilds () {
 clean_failbuilds () {
     if [ -d "${CACHE_DIR}cache" ]; then
         number="0"
-        note "Cleaning failed build directories from: ${CACHE_DIR}cache"
+        debug "Cleaning failed build directories from: '${CACHE_DIR}cache'"
+        note "Please note that these directories are base for 'continue' command."
         files=$(${FIND_BIN} "${CACHE_DIR}cache" -maxdepth 2 -mindepth 1 -type d)
         num="$(echo "${files}" | eval ${FILES_COUNT_GUARD})"
         if [ ! -z "${num}" ]; then
