@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
 
 # config settings
-readonly VERSION="0.86.2"
+readonly VERSION="0.86.3"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -1048,6 +1048,18 @@ for application in ${APPLICATIONS}; do
                 fi
             }
 
+            try () {
+                if [ ! -z "$1" ]; then
+                    if [ ! -e "${LOG}-${APP_NAME}${APP_POSTFIX}" ]; then
+                        ${TOUCH_BIN} "${LOG}-${APP_NAME}${APP_POSTFIX}"
+                    fi
+                    debug "Trying '$@' - $(${DATE_BIN} +%F-%H%M%S)"
+                    eval PATH="${PATH}" "$@" 1>> "${LOG}-${APP_NAME}${APP_POSTFIX}" 2>> "${LOG}-${APP_NAME}${APP_POSTFIX}"
+                else
+                    error "Trying empty command to run?"
+                fi
+            }
+
             # binary build of whole software bundle
             ABSNAME="${APP_NAME}${APP_POSTFIX}-${APP_VERSION}"
             ${MKDIR_BIN} -p "${BINBUILDS_CACHE_DIR}${ABSNAME}" > /dev/null 2>&1
@@ -1318,7 +1330,7 @@ for application in ${APPLICATIONS}; do
                                     ;;
 
                                 cmake)
-                                    run "${APP_CONFIGURE_SCRIPT} . -LH -DCMAKE_INSTALL_PREFIX=${PREFIX} -DCMAKE_BUILD_TYPE=Release -DSYSCONFDIR=${SOFTWARE_DATA_DIR} -DWITH_DEBUG=0 ${APP_CONFIGURE_ARGS}"
+                                    run "${APP_CONFIGURE_SCRIPT} . -LH -DCMAKE_INSTALL_PREFIX=${PREFIX} -DCMAKE_BUILD_TYPE=Release -DSYSCONFDIR=${SERVICE_DIR}/etc -DWITH_DEBUG=0 ${APP_CONFIGURE_ARGS}"
                                     ;;
 
                                 void|meta|empty)
@@ -1327,7 +1339,14 @@ for application in ${APPLICATIONS}; do
                                     ;;
 
                                 *)
-                                    run "${APP_CONFIGURE_SCRIPT} ${APP_CONFIGURE_ARGS} --prefix=${PREFIX}"
+                                    # By default try to configure software with these options:
+                                    #   --sysconfdir=${SERVICE_DIR}/etc
+                                    #   --localstatedir=${SERVICE_DIR}/var
+                                    #   --runstatedir=${SERVICE_DIR}/run
+                                    try "${APP_CONFIGURE_SCRIPT} ${APP_CONFIGURE_ARGS} --prefix=${PREFIX} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var --runstatedir=${SERVICE_DIR}/run" || \
+                                    try "${APP_CONFIGURE_SCRIPT} ${APP_CONFIGURE_ARGS} --prefix=${PREFIX} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var" || \
+                                    try "${APP_CONFIGURE_SCRIPT} ${APP_CONFIGURE_ARGS} --prefix=${PREFIX} --sysconfdir=${SERVICE_DIR}/etc" || \
+                                    run "${APP_CONFIGURE_SCRIPT} ${APP_CONFIGURE_ARGS} --prefix=${PREFIX}" # fallback
                                     ;;
 
                             esac
@@ -1557,7 +1576,7 @@ for application in ${APPLICATIONS}; do
                 if [ "${result}" -lt "0" ]; then
                     result="0"
                 fi
-                note "${result} files were stripped."
+                note "${result} files stripped."
             else
                 warn "Debug build is enabled. Strip skipped."
             fi
