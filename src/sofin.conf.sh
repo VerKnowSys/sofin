@@ -146,6 +146,9 @@ readonly NOTE_CHAR
 readonly ERROR_CHAR
 
 
+umask 027 # default, and should be global. New files created with chmod: 750 by default.
+
+
 # common functions
 # helpers
 
