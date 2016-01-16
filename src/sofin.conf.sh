@@ -117,6 +117,7 @@ MKFIFO_BIN="/usr/bin/mkfifo"
 PS_BIN="/bin/ps"
 DAEMON_BIN="/usr/bin/true"
 STAT_BIN="/usr/bin/stat"
+ZFS_BIN="/sbin/zfs"
 
 OS_VERSION=10
 if [ -x "${SOFIN_VERSION_UTILITY_BIN}" ]; then
@@ -189,6 +190,7 @@ error () {
 
 # System specific configuration
 export DEFAULT_LDFLAGS="-fPIC -fPIE"
+export DEFAULT_ZPOOL="zroot"
 export readonly SYSTEM_NAME="$(uname)"
 export readonly SYSTEM_ARCH="$(uname -m)"
 
@@ -226,7 +228,6 @@ case "${SYSTEM_NAME}" in
         export PW_BIN="/usr/sbin/pw"
         export CAP_MKDB_BIN="/usr/bin/cap_mkdb"
         export ZPOOL_BIN="/sbin/zpool"
-        export ZFS_BIN="/sbin/zfs"
         export PFCTL_BIN="/sbin/pfctl"
         export DIALOG_BIN="/usr/bin/dialog"
         export DAEMON_BIN="/usr/sbin/daemon"
@@ -256,8 +257,10 @@ case "${SYSTEM_NAME}" in
         export SHA_BIN="/usr/bin/shasum"
         export SYSCTL_BIN="/usr/sbin/sysctl"
         export KLDLOAD_BIN="/sbin/kextload"
-        export CPUS=$(${SYSCTL_BIN} machdep.cpu.thread_count | ${AWK_BIN} '{printf $2}')
+        export ZFS_BIN="/usr/local/bin/zfs"
+        export CPUS=$(${SYSCTL_BIN} machdep.cpu.thread_count | ${AWK_BIN} '{printf $2;}')
         export MAKE_OPTS="-j${CPUS}"
+        export DEFAULT_ZPOOL="Projects"
         unset SERVICE_BIN # not necessary
 
         if [ ${OS_VERSION} -lt ${DARWIN_MINIMUM_VERSION} ]; then
@@ -266,7 +269,7 @@ case "${SYSTEM_NAME}" in
 
         # runtime sha
         test -x "${SOFIN_MICROSECONDS_UTILITY_BIN}" && \
-        RUNTIME_SHA="$(${PRINTF_BIN} "$(${DATE_BIN})-$(${SOFIN_MICROSECONDS_UTILITY_BIN})" | ${SHA_BIN} | ${AWK_BIN} '{print $1}')"
+        RUNTIME_SHA="$(${PRINTF_BIN} "$(${DATE_BIN})-$(${SOFIN_MICROSECONDS_UTILITY_BIN})" | ${SHA_BIN} | ${AWK_BIN} '{print $1;}')"
         ;;
 
     Linux)
@@ -294,12 +297,13 @@ case "${SYSTEM_NAME}" in
         export CPUS="$(${NPROC_BIN})"
         export MAKE_OPTS="-j${CPUS}"
         export AWK_BIN="/usr/bin/awk"
+        export ZFS_BIN="/usr/sbin/zfs"
         if [ ${OS_VERSION} -lt ${GLIBC_MINIMUM_VERSION} ]; then
             export USE_BINBUILD="false"
         fi
         # runtime sha
         test -x "${SOFIN_MICROSECONDS_UTILITY_BIN}" && \
-        RUNTIME_SHA="$(${PRINTF_BIN} "$(${DATE_BIN})-$(${SOFIN_MICROSECONDS_UTILITY_BIN})" | ${SHA_BIN} | ${AWK_BIN} '{print $1}')"
+        RUNTIME_SHA="$(${PRINTF_BIN} "$(${DATE_BIN})-$(${SOFIN_MICROSECONDS_UTILITY_BIN})" | ${SHA_BIN} | ${AWK_BIN} '{print $1;}')"
         ;;
 
 esac
@@ -367,9 +371,12 @@ check_os () {
 
 # validate environment availability or crash
 validate_env () {
+    if [ -z "${ZFS_BIN}" ]; then
+        error "ZFS is required since Sofin 0.88"
+    fi
     env | ${GREP_BIN} '_BIN=/' | while IFS= read -r envvar
     do
-        var_value="$(${PRINTF_BIN} "${envvar}" | ${AWK_BIN} '{sub(/^[A-Z_]*=/, ""); print $1}')"
+        var_value="$(${PRINTF_BIN} "${envvar}" | ${AWK_BIN} '{sub(/^[A-Z_]*=/, ""); print $1;}')"
         if [ ! -x "${var_value}" ]; then
             error "Required binary is unavailable: ${envvar}"
             exit 1
