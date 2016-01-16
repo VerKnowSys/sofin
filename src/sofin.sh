@@ -1027,12 +1027,11 @@ for application in ${APPLICATIONS}; do
 
             # note "Preparing application: ${APP_NAME}${APP_POSTFIX} (${APP_FULL_NAME} v${APP_VERSION})"
             export PREFIX="${SOFTWARE_DIR}${APP_NAME}${APP_POSTFIX}"
-            export SOFTWARE_DATA_DIR="/User/SoftwareData/${APP_NAME}${APP_POSTFIX}"
-            if [ "${USERNAME}" != "root" ]; then
-                if [ "${APP_STANDALONE}" = "true" ]; then
-                    ${MKDIR_BIN} -p "${SOFTWARE_DATA_DIR}"
-                    ${CHMOD_BIN} 0711 "${SOFTWARE_DATA_DIR}"
-                fi
+            export SERVICE_DIR="${SERVICES_DIR}${APP_NAME}${APP_POSTFIX}"
+            if [ "${APP_STANDALONE}" = "true" ]; then
+                # TODO: create zfs dataset!
+                ${MKDIR_BIN} -p "${SERVICE_DIR}"
+                ${CHMOD_BIN} 0710 "${SERVICE_DIR}"
             fi
 
             run () {
@@ -1284,7 +1283,7 @@ for application in ${APPLICATIONS}; do
                             debug "-------------- PRE CONFIGURE SETTINGS DUMP --------------"
                             debug "Current DIR: $(${PWD_BIN})"
                             debug "PREFIX: ${PREFIX}"
-                            debug "SOFTWARE_DATA_DIR: ${SOFTWARE_DATA_DIR}"
+                            debug "SERVICE_DIR: ${SERVICE_DIR}"
                             debug "PATH: ${PATH}"
                             debug "CC: ${CC}"
                             debug "CXX: ${CXX}"
