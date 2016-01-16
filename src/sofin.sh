@@ -14,7 +14,7 @@ else
     exit 1
 fi
 
-if [ ! -z "${SOFIN_TRACE}" ]; then
+if [ "${SOFIN_TRACE}" = "YES" ]; then
     set -x
 fi
 
