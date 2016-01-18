@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
 
 # config settings
-readonly VERSION="0.88.1"
+readonly VERSION="0.88.2"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -1585,32 +1585,40 @@ for application in ${APPLICATIONS}; do
             fi
         fi
 
-        if [ "${SYSTEM_NAME}" != "Darwin" ]; then # disabled for now, since OSX finds more problems than they're
-            # Create a dataset for any existing dirs in Services dir that are not ZFS datasets.
-            note "Checking services dir for non-dataset directories in: ${SERVICES_DIR}"
-            for maybe_dataset in $(${FIND_BIN} ${SERVICES_DIR} -mindepth 1 -maxdepth 1 -type d -not -name '.*' -print 2>/dev/null | ${XARGS_BIN} ${BASENAME_BIN} 2>/dev/null); do
-                # find name of mount from default ZFS Services
-                no_ending_slash="$(echo "${SERVICES_DIR}" | ${SED_BIN} 's/\/$//')"
-                inner_dir="$(${ZFS_BIN} list -H 2>/dev/null | ${GREP_BIN} "${no_ending_slash}$" 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null | ${SED_BIN} 's/.*\///' 2>/dev/null)/"
-                certain_dataset="${SERVICES_DIR}${inner_dir}${maybe_dataset}"
-                certain_fileset="${SERVICES_DIR}${maybe_dataset}"
-                full_dataset_name="${DEFAULT_ZPOOL}${certain_dataset}"
-                debug "maybe_dataset: ${maybe_dataset}, inner_dir: ${inner_dir}, no_ending_slash: ${no_ending_slash}, expecting to exists: '${full_dataset_name}'"
-                # check dataset existence and create it if necessary
-                ${ZFS_BIN} list -H 2>/dev/null | ${GREP_BIN} "${full_dataset_name}" >/dev/null 2>&1
-                if [ "$?" != "0" ]; then
-                    note "Moving ${certain_fileset} to ${certain_fileset}-tmp" && \
-                    ${MV_BIN} "${certain_fileset}" "${certain_fileset}-tmp" && \
-                    note "Creating dataset: ${full_dataset_name}" && \
-                    ${ZFS_BIN} create "${full_dataset_name}" && \
-                    note "Copying ${certain_fileset}-tmp/ back to ${certain_fileset}" && \
-                    ${CP_BIN} -pRP "${certain_fileset}-tmp/" "${certain_fileset}" && \
-                    note "Cleaning ${certain_fileset}-tmp" && \
-                    ${RM_BIN} -rf "${certain_fileset}-tmp" && \
-                    note "Dataset moved successfully"
-                fi
-            done
-        fi
+        case ${SYSTEM_NAME} in
+            Darwin) # disabled for now, since OSX finds more problems than they're
+                ;;
+
+            Linux) # Not supported
+                ;;
+
+            *)
+                # Create a dataset for any existing dirs in Services dir that are not ZFS datasets.
+                note "Checking services dir for non-dataset directories in: ${SERVICES_DIR}"
+                for maybe_dataset in $(${FIND_BIN} ${SERVICES_DIR} -mindepth 1 -maxdepth 1 -type d -not -name '.*' -print 2>/dev/null | ${XARGS_BIN} ${BASENAME_BIN} 2>/dev/null); do
+                    # find name of mount from default ZFS Services
+                    no_ending_slash="$(echo "${SERVICES_DIR}" | ${SED_BIN} 's/\/$//')"
+                    inner_dir="$(${ZFS_BIN} list -H 2>/dev/null | ${GREP_BIN} "${no_ending_slash}$" 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null | ${SED_BIN} 's/.*\///' 2>/dev/null)/"
+                    certain_dataset="${SERVICES_DIR}${inner_dir}${maybe_dataset}"
+                    certain_fileset="${SERVICES_DIR}${maybe_dataset}"
+                    full_dataset_name="${DEFAULT_ZPOOL}${certain_dataset}"
+                    debug "maybe_dataset: ${maybe_dataset}, inner_dir: ${inner_dir}, no_ending_slash: ${no_ending_slash}, expecting to exists: '${full_dataset_name}'"
+                    # check dataset existence and create it if necessary
+                    ${ZFS_BIN} list -H 2>/dev/null | ${GREP_BIN} "${full_dataset_name}" >/dev/null 2>&1
+                    if [ "$?" != "0" ]; then
+                        note "Moving ${certain_fileset} to ${certain_fileset}-tmp" && \
+                        ${MV_BIN} "${certain_fileset}" "${certain_fileset}-tmp" && \
+                        note "Creating dataset: ${full_dataset_name}" && \
+                        ${ZFS_BIN} create "${full_dataset_name}" && \
+                        note "Copying ${certain_fileset}-tmp/ back to ${certain_fileset}" && \
+                        ${CP_BIN} -pRP "${certain_fileset}-tmp/" "${certain_fileset}" && \
+                        note "Cleaning ${certain_fileset}-tmp" && \
+                        ${RM_BIN} -rf "${certain_fileset}-tmp" && \
+                        note "Dataset moved successfully"
+                    fi
+                done
+                ;;
+        esac
 
         if [ "${APP_APPLE_BUNDLE}" = "true" ]; then
             APP_LOWERNAME="${APP_NAME}"

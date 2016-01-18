@@ -371,9 +371,6 @@ check_os () {
 
 # validate environment availability or crash
 validate_env () {
-    if [ -z "${ZFS_BIN}" ]; then
-        error "ZFS is required since Sofin 0.88"
-    fi
     env | ${GREP_BIN} '_BIN=/' | while IFS= read -r envvar
     do
         var_value="$(${PRINTF_BIN} "${envvar}" | ${AWK_BIN} '{sub(/^[A-Z_]*=/, ""); print $1;}')"
