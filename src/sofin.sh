@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
 
 # config settings
-readonly VERSION="0.88.0"
+readonly VERSION="0.88.1"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -1242,6 +1242,9 @@ for application in ${APPLICATIONS}; do
                             export BUILD_DIR="$(${FIND_BIN} ${BUILD_DIR_ROOT}/* -maxdepth 0 -type d -name "*${APP_VERSION}*")"
                             if [ -z "${BUILD_DIR}" ]; then
                                 export BUILD_DIR=$(${FIND_BIN} ${BUILD_DIR_ROOT}/* -maxdepth 0 -type d) # try any dir instead
+                            fi
+                            if [ ! -z "${APP_SOURCE_DIR_POSTFIX}" ]; then
+                                export BUILD_DIR="${BUILD_DIR}/${APP_SOURCE_DIR_POSTFIX}"
                             fi
                             cd "${BUILD_DIR}"
                             debug "Switched to build dir: '${BUILD_DIR}'"
