@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
 
 # config settings
-readonly VERSION="0.88.2"
+readonly VERSION="0.88.3"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -1342,14 +1342,19 @@ for application in ${APPLICATIONS}; do
                                     ;;
 
                                 *)
-                                    # By default try to configure software with these options:
-                                    #   --sysconfdir=${SERVICE_DIR}/etc
-                                    #   --localstatedir=${SERVICE_DIR}/var
-                                    #   --runstatedir=${SERVICE_DIR}/run
-                                    try "${APP_CONFIGURE_SCRIPT} ${APP_CONFIGURE_ARGS} --prefix=${PREFIX} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var --runstatedir=${SERVICE_DIR}/run" || \
-                                    try "${APP_CONFIGURE_SCRIPT} ${APP_CONFIGURE_ARGS} --prefix=${PREFIX} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var" || \
-                                    try "${APP_CONFIGURE_SCRIPT} ${APP_CONFIGURE_ARGS} --prefix=${PREFIX} --sysconfdir=${SERVICE_DIR}/etc" || \
-                                    run "${APP_CONFIGURE_SCRIPT} ${APP_CONFIGURE_ARGS} --prefix=${PREFIX}" # fallback
+                                    if [ "${SYSTEM_NAME}" = "Linux" ]; then
+                                        # NOTE: No /Services feature implemented for Linux.
+                                        run "${APP_CONFIGURE_SCRIPT} ${APP_CONFIGURE_ARGS} --prefix=${PREFIX}"
+                                    else
+                                        # NOTE: By default try to configure software with these options:
+                                        #   --sysconfdir=${SERVICE_DIR}/etc
+                                        #   --localstatedir=${SERVICE_DIR}/var
+                                        #   --runstatedir=${SERVICE_DIR}/run
+                                        try "${APP_CONFIGURE_SCRIPT} ${APP_CONFIGURE_ARGS} --prefix=${PREFIX} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var --runstatedir=${SERVICE_DIR}/run" || \
+                                        try "${APP_CONFIGURE_SCRIPT} ${APP_CONFIGURE_ARGS} --prefix=${PREFIX} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var" || \
+                                        try "${APP_CONFIGURE_SCRIPT} ${APP_CONFIGURE_ARGS} --prefix=${PREFIX} --sysconfdir=${SERVICE_DIR}/etc" || \
+                                        run "${APP_CONFIGURE_SCRIPT} ${APP_CONFIGURE_ARGS} --prefix=${PREFIX}" # only as a  fallback
+                                    fi
                                     ;;
 
                             esac
