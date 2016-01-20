@@ -15,6 +15,8 @@ if [ "${SYSTEM_NAME}" = "FreeBSD" ]; then
         note "Setting pageexec and mprotect to 1 for build purposes"
         sysctl hardening.pax.pageexec.status=1
         sysctl hardening.pax.mprotect.status=1
+        note "Loading Dtrace"
+        kldload dtraceall
     fi
 fi
 
