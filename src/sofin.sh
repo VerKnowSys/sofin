@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
 
 # config settings
-readonly VERSION="0.88.3"
+readonly VERSION="0.88.4"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -1346,14 +1346,22 @@ for application in ${APPLICATIONS}; do
                                         # NOTE: No /Services feature implemented for Linux.
                                         run "${APP_CONFIGURE_SCRIPT} ${APP_CONFIGURE_ARGS} --prefix=${PREFIX}"
                                     else
-                                        # NOTE: By default try to configure software with these options:
-                                        #   --sysconfdir=${SERVICE_DIR}/etc
-                                        #   --localstatedir=${SERVICE_DIR}/var
-                                        #   --runstatedir=${SERVICE_DIR}/run
-                                        try "${APP_CONFIGURE_SCRIPT} ${APP_CONFIGURE_ARGS} --prefix=${PREFIX} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var --runstatedir=${SERVICE_DIR}/run" || \
-                                        try "${APP_CONFIGURE_SCRIPT} ${APP_CONFIGURE_ARGS} --prefix=${PREFIX} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var" || \
-                                        try "${APP_CONFIGURE_SCRIPT} ${APP_CONFIGURE_ARGS} --prefix=${PREFIX} --sysconfdir=${SERVICE_DIR}/etc" || \
-                                        run "${APP_CONFIGURE_SCRIPT} ${APP_CONFIGURE_ARGS} --prefix=${PREFIX}" # only as a  fallback
+                                        # do a simple check for "configure" in APP_CONFIGURE_SCRIPT definition
+                                        # this way we can tell if we want to put configure options as params
+                                        echo "${APP_CONFIGURE_SCRIPT}" | ${GREP_BIN} "configure" >/dev/null 2>&1
+                                        if [ "$?" = "0" ]; then
+                                            # NOTE: By default try to configure software with these options:
+                                            #   --sysconfdir=${SERVICE_DIR}/etc
+                                            #   --localstatedir=${SERVICE_DIR}/var
+                                            #   --runstatedir=${SERVICE_DIR}/run
+                                            try "${APP_CONFIGURE_SCRIPT} ${APP_CONFIGURE_ARGS} --prefix=${PREFIX} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var --runstatedir=${SERVICE_DIR}/run" || \
+                                            try "${APP_CONFIGURE_SCRIPT} ${APP_CONFIGURE_ARGS} --prefix=${PREFIX} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var" || \
+                                            try "${APP_CONFIGURE_SCRIPT} ${APP_CONFIGURE_ARGS} --prefix=${PREFIX} --sysconfdir=${SERVICE_DIR}/etc" || \
+                                            run "${APP_CONFIGURE_SCRIPT} ${APP_CONFIGURE_ARGS} --prefix=${PREFIX}" # only as a  fallback
+
+                                        else # fallback again:
+                                            run "${APP_CONFIGURE_SCRIPT} ${APP_CONFIGURE_ARGS} --prefix=${PREFIX}"
+                                        fi
                                     fi
                                     ;;
 
