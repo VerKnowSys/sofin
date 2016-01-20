@@ -4,13 +4,22 @@ chmod 600 ~/.ssh/id_rsa
 
 . /etc/sofin.conf.sh
 
-set -e
+# set -e
 
 note "Checking remote machine connection (shouldn't take more than a second).."
 ssh sofin@verknowsys.com "uname -a"
 
+if [ "${SYSTEM_NAME}" = "FreeBSD" ]; then
+    ${UNAME_BIN} -a | ${GREP_BIN} "HBSD" >/dev/null 2>&1
+    if [ "$?" = "0" ]; then
+        note "Setting pageexec and mprotect to 1 for build purposes"
+        sysctl -v hardening.pax.pageexec.status=1
+        sysctl -v hardening.pax.mprotect.status=1
+    fi
+fi
 
 for software in $(cat software.list); do
+    note "________________________________"
     note "Processing software: ${software}"
     s rm ${software}
     s build ${software}
@@ -18,4 +27,5 @@ for software in $(cat software.list); do
         s push ${software}
         s rm ${software}
     fi
+    note "-------------------------------"
 done
