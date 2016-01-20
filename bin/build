@@ -151,7 +151,9 @@ install_sofin () {
     check_command_result $?
 
     sofin_version=$(${CAT_BIN} src/sofin.sh | ${GREP_BIN} VERSION= | ${AWK_BIN} '{print $2;}' | ${SED_BIN} -e 's#"##g;s#VERSION=##g')
-    echo "Sofin v${sofin_version} installed. Type \"s usage\" for usage info. Read https://bitbucket.org/verknowsys/sofin for more details."
+    echo "Sofin v${sofin_version} installed."
+    echo "Type \"s usage\" for help."
+    echo "Read https://bitbucket.org/verknowsys/sofin for more details."
 }
 
 
