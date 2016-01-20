@@ -55,6 +55,7 @@ readonly DEFAULT_ARCHIVE_EXT=".txz"
 readonly DEPENDENCIES_FILE=".dependencies"
 readonly INSTALLED_MARK=".installed"
 readonly LOG_LINES_AMOUNT=20
+readonly SERVICE_SNAPSHOT_POSTFIX="zfs-stream"
 
 # utils software from POSIX base system variables:
 PRINTF_BIN="/usr/bin/printf"
@@ -118,6 +119,7 @@ PS_BIN="/bin/ps"
 DAEMON_BIN="/usr/bin/true"
 STAT_BIN="/usr/bin/stat"
 ZFS_BIN="/sbin/zfs"
+XZ_BIN="/usr/bin/xz"
 
 OS_VERSION=10
 if [ -x "${SOFIN_VERSION_UTILITY_BIN}" ]; then
@@ -261,6 +263,7 @@ case "${SYSTEM_NAME}" in
         export CPUS=$(${SYSCTL_BIN} machdep.cpu.thread_count | ${AWK_BIN} '{printf $2;}')
         export MAKE_OPTS="-j${CPUS}"
         export DEFAULT_ZPOOL="Projects"
+        export XZ_BIN="/Software/Xz/exports/xz"
         unset SERVICE_BIN # not necessary
 
         if [ ${OS_VERSION} -lt ${DARWIN_MINIMUM_VERSION} ]; then

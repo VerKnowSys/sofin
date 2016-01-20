@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
 
 # config settings
-readonly VERSION="0.88.4"
+readonly VERSION="0.90.0"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -648,7 +648,32 @@ if [ ! "$1" = "" ]; then
                             error "Error sending ${1} to ${address}/${1}"
                         }
                         ${SSH_BIN} -p ${MAIN_PORT} ${MAIN_USER}@${mirror} "mkdir -p ${MAIN_SOFTWARE_PREFIX}/software/binary/${SYS}" >> "${LOG}-${APP_NAME}${APP_POSTFIX}" 2>&1
-                        note "Preparing archive of: ${name}"
+
+                        if [ "${SYSTEM_NAME}" = "FreeBSD" ]; then # NOTE: feature designed for FBSD.
+                            note "Preparing Service ZFS dataset for app: ${element}"
+                            inner_dir="$(${ZFS_BIN} list -H 2>/dev/null | ${GREP_BIN} "${element}$" 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null | ${SED_BIN} 's/.*Services\///;s/\/.*//' 2>/dev/null)/"
+                            certain_dataset="${SERVICES_DIR}${inner_dir}${element}"
+                            full_dataset_name="${DEFAULT_ZPOOL}${certain_dataset}"
+                            snap_file="${element}-${version_element}.${SERVICE_SNAPSHOT_POSTFIX}"
+                            final_snap_file="${snap_file}${DEFAULT_ARCHIVE_EXT}"
+                            snap_size="0"
+                            ${ZFS_BIN} list -H 2>/dev/null | ${GREP_BIN} "${element}$" >/dev/null 2>&1
+                            if [ "$?" = "0" ]; then # if dataset exists, unmount it, send to file, and remount back
+                                ${ZFS_BIN} umount ${full_dataset_name}
+                                ${ZFS_BIN} send ${full_dataset_name} | ${XZ_BIN} > ${final_snap_file} && \
+                                snap_size="$(${STAT_BIN} -f%z "${final_snap_file}")" && \
+                                ${ZFS_BIN} mount ${full_dataset_name} && \
+                                note "Snapshot created successfully: ${final_snap_file}"
+                            fi
+                            if [ "${snap_size}" = "0" ]; then
+                                ${RM_BIN} -f "${final_snap_file}"
+                                warn "No initial dataset for service: ${element}-${version_element}"
+                            else
+                                note "Initial dataset for service: ${element}-${version_element} (size: ${snap_size}) is ready."
+                            fi
+                        fi
+
+                        note "Preparing archives of: ${element}"
                         if [ ! -e "./${name}" ]; then
                             ${TAR_BIN} -cJf "${name}" "./${element}"
                         else
@@ -676,7 +701,7 @@ if [ ! "$1" = "" ]; then
                         note "Archive sha: ${archive_sha1}"
 
                         debug "Setting common access to archive files before we send them.."
-                        ${CHMOD_BIN} a+r "${name}" "${name}.sha1"
+                        ${CHMOD_BIN} a+r "${name}" "${name}.sha1" "${final_snap_file}"
 
                         note "Sending archive: '${name}' to remote: '${address}'"
                         ${SCP_BIN} -P ${MAIN_PORT} ${name} ${address}/${name}.partial || def_error ${name}
@@ -686,9 +711,22 @@ if [ ! "$1" = "" ]; then
                         else
                             error "Failed to send binary build of: '${name}' to remote: '${mirror}'"
                         fi
+
+                        if [ "${SYSTEM_NAME}" = "FreeBSD" ]; then # NOTE: feature designed for FBSD.
+                            if [ -f "${final_snap_file}" ]; then
+                                note "Sending service snapshot archive: '${final_snap_file}' to remote: '${address}'"
+                                ${SCP_BIN} -P ${MAIN_PORT} ${final_snap_file} ${address}/${final_snap_file}.partial || def_error ${final_snap_file}
+                                if [ "$?" = "0" ]; then
+                                    ${SSH_BIN} -p ${MAIN_PORT} ${MAIN_USER}@${mirror} "cd ${MAIN_SOFTWARE_PREFIX}/software/binary/${SYS} && mv ${final_snap_file}.partial ${final_snap_file}"
+                                else
+                                    error "Failed to send service snapshot archive to remote!"
+                                fi
+                            else
+                                note "No service snapshot for: ${element}"
+                            fi
+                        fi
                     done
-                    ${RM_BIN} -f "${name}"
-                    ${RM_BIN} -f "${name}.sha1"
+                    ${RM_BIN} -f "${name}" "${name}.sha1" "${final_snap_file}"
                 fi
             else
                 warn "Not found software named: ${element}!"
