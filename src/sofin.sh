@@ -651,7 +651,8 @@ if [ ! "$1" = "" ]; then
 
                         if [ "${SYSTEM_NAME}" = "FreeBSD" ]; then # NOTE: feature designed for FBSD.
                             note "Preparing Service ZFS dataset for app: ${element}"
-                            inner_dir="$(${ZFS_BIN} list -H 2>/dev/null | ${GREP_BIN} "${element}$" 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null | ${SED_BIN} 's/.*Services\///;s/\/.*//' 2>/dev/null)/"
+                            svcs_no_slashes="$(echo "${SERVICES_DIR}" | ${SED_BIN} 's/\///g')"
+                            inner_dir="$(${ZFS_BIN} list -H 2>/dev/null | ${GREP_BIN} "${element}$" 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null | ${SED_BIN} "s/.*${svcs_no_slashes}\///; s/\/.*//" 2>/dev/null)/"
                             certain_dataset="${SERVICES_DIR}${inner_dir}${element}"
                             full_dataset_name="${DEFAULT_ZPOOL}${certain_dataset}"
                             snap_file="${element}-${version_element}.${SERVICE_SNAPSHOT_POSTFIX}"
