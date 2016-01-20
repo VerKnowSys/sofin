@@ -120,6 +120,7 @@ DAEMON_BIN="/usr/bin/true"
 STAT_BIN="/usr/bin/stat"
 ZFS_BIN="/sbin/zfs"
 XZ_BIN="/usr/bin/xz"
+XZCAT_BIN="/usr/bin/xzcat"
 
 OS_VERSION=10
 if [ -x "${SOFIN_VERSION_UTILITY_BIN}" ]; then
@@ -264,6 +265,7 @@ case "${SYSTEM_NAME}" in
         export MAKE_OPTS="-j${CPUS}"
         export DEFAULT_ZPOOL="Projects"
         export XZ_BIN="/Software/Xz/exports/xz"
+        export XZCAT_BIN="/bin/cat"
         unset SERVICE_BIN # not necessary
 
         if [ ${OS_VERSION} -lt ${DARWIN_MINIMUM_VERSION} ]; then
