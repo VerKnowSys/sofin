@@ -699,9 +699,8 @@ if [ ! "$1" = "" ]; then
 
                         ${PRINTF_BIN} "${archive_sha1}" > "${name}.sha1"
                         note "Archive sha: ${archive_sha1}"
-
-                        debug "Setting common access to archive files before we send them.."
-                        ${CHMOD_BIN} a+r "${name}" "${name}.sha1" "${final_snap_file}"
+                        debug "Setting common access to archive files before we send them: ${name}, ${name}.sha1"
+                        ${CHMOD_BIN} a+r "${name}" "${name}.sha1"
 
                         note "Sending archive: '${name}' to remote: '${address}'"
                         ${SCP_BIN} -P ${MAIN_PORT} ${name} ${address}/${name}.partial || def_error ${name}
@@ -714,6 +713,8 @@ if [ ! "$1" = "" ]; then
 
                         if [ "${SYSTEM_NAME}" = "FreeBSD" ]; then # NOTE: feature designed for FBSD.
                             if [ -f "${final_snap_file}" ]; then
+                                debug "Setting common access to archive files before we send it: ${final_snap_file}"
+                                ${CHMOD_BIN} a+r "${final_snap_file}"
                                 note "Sending service snapshot archive: '${final_snap_file}' to remote: '${address}'"
                                 ${SCP_BIN} -P ${MAIN_PORT} ${final_snap_file} ${address}/${final_snap_file}.partial || def_error ${final_snap_file}
                                 if [ "$?" = "0" ]; then
