@@ -10,6 +10,10 @@ else
     exit 1
 fi
 
+readonly SOFIN_MIRROR="git@github.com:VerKnowSys/sofin.git"
+
+note "Pushing repo to: ${SOFIN_MIRROR}"
+${GIT_BIN} push --all "${SOFIN_MIRROR}" && \
 bin/clean
 ${MKDIR_BIN} -p releases
 version="$(grep 'readonly VERSION=' src/sofin.sh | awk '{ gsub(/\"/, "", $2); gsub(/VERSION=/, "", $2); print $2; }')"
