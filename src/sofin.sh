@@ -660,7 +660,7 @@ if [ ! "$1" = "" ]; then
                             snap_size="0"
                             ${ZFS_BIN} list -H 2>/dev/null | ${GREP_BIN} "${element}$" >/dev/null 2>&1
                             if [ "$?" = "0" ]; then # if dataset exists, unmount it, send to file, and remount back
-                                ${ZFS_BIN} umount ${full_dataset_name}
+                                ${ZFS_BIN} umount ${full_dataset_name} || def_error "ZFS umount ${full_dataset_name}. Dataset busy on build host? Not good :)"
                                 ${ZFS_BIN} send ${full_dataset_name} | ${XZ_BIN} > ${final_snap_file} && \
                                 snap_size="$(${STAT_BIN} -f%z "${final_snap_file}")" && \
                                 ${ZFS_BIN} mount ${full_dataset_name} && \
@@ -1655,19 +1655,39 @@ for application in ${APPLICATIONS}; do
                     certain_dataset="${SERVICES_DIR}${inner_dir}${maybe_dataset}"
                     certain_fileset="${SERVICES_DIR}${maybe_dataset}"
                     full_dataset_name="${DEFAULT_ZPOOL}${certain_dataset}"
-                    debug "maybe_dataset: ${maybe_dataset}, inner_dir: ${inner_dir}, no_ending_slash: ${no_ending_slash}, expecting to exists: '${full_dataset_name}'"
-                    # check dataset existence and create it if necessary
+                    snap_file="${maybe_dataset}-${APP_VERSION}.${SERVICE_SNAPSHOT_POSTFIX}"
+                    final_snap_file="${snap_file}${DEFAULT_ARCHIVE_EXT}"
+
+                    create_or_receive () {
+                        dataset_name="$1"
+                        remote_path="${MAIN_BINARY_REPOSITORY}${final_snap_file}"
+                        note "Seeking remote snapshot existence: ${remote_path}"
+                        ${FETCH_BIN} "${remote_path}" 2>> ${LOG}
+                        if [ "$?" = "0" ]; then
+                            debug "Snapshot fetched. Creating service dataset: ${dataset_name} from snapshot: ${final_snap_file}"
+                            ${XZCAT_BIN} "${final_snap_file}" | ${ZFS_BIN} receive -v "${dataset_name}" 2>/dev/null | ${TAIL_BIN} -n1 && \
+                            debug "Cleaning snapshot file: ${final_snap_file}, after successful receive." && \
+                            ${RM_BIN} -f "${final_snap_file}" && \
+                            note "Service dataset received: ${dataset_name}"
+                        else
+                            debug "Snapshot wasn't found. Creating empty dataset: ${dataset_name}"
+                            ${ZFS_BIN} create "${dataset_name}" 2>/dev/null && \
+                            note "Empty service dataset created: ${dataset_name}"
+                        fi
+                    }
+
+                    # check dataset existence and create/receive it if necessary
                     ${ZFS_BIN} list -H 2>/dev/null | ${GREP_BIN} "${full_dataset_name}" >/dev/null 2>&1
                     if [ "$?" != "0" ]; then
-                        note "Moving ${certain_fileset} to ${certain_fileset}-tmp" && \
+                        debug "Moving ${certain_fileset} to ${certain_fileset}-tmp" && \
                         ${MV_BIN} "${certain_fileset}" "${certain_fileset}-tmp" && \
-                        note "Creating dataset: ${full_dataset_name}" && \
-                        ${ZFS_BIN} create "${full_dataset_name}" && \
-                        note "Copying ${certain_fileset}-tmp/ back to ${certain_fileset}" && \
+                        debug "Creating dataset: ${full_dataset_name}" && \
+                        create_or_receive "${full_dataset_name}" && \
+                        debug "Copying ${certain_fileset}-tmp/ back to ${certain_fileset}" && \
                         ${CP_BIN} -pRP "${certain_fileset}-tmp/" "${certain_fileset}" && \
-                        note "Cleaning ${certain_fileset}-tmp" && \
+                        debug "Cleaning ${certain_fileset}-tmp" && \
                         ${RM_BIN} -rf "${certain_fileset}-tmp" && \
-                        note "Dataset moved successfully"
+                        note "Dataset created successfully for service: ${maybe_dataset}"
                     fi
                 done
                 ;;
