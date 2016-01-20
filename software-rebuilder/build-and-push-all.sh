@@ -13,8 +13,8 @@ if [ "${SYSTEM_NAME}" = "FreeBSD" ]; then
     ${UNAME_BIN} -a | ${GREP_BIN} "HBSD" >/dev/null 2>&1
     if [ "$?" = "0" ]; then
         note "Setting pageexec and mprotect to 1 for build purposes"
-        sysctl -v hardening.pax.pageexec.status=1
-        sysctl -v hardening.pax.mprotect.status=1
+        sysctl hardening.pax.pageexec.status=1
+        sysctl hardening.pax.mprotect.status=1
     fi
 fi
 
