@@ -111,6 +111,7 @@ SOFIN_VERSION_UTILITY_BIN="/usr/bin/sofin-version-utility"
 SOFIN_MICROSECONDS_UTILITY_BIN="/usr/bin/sofin-microseconds"
 SOFIN_LIBBUNDLE_BIN="/usr/bin/sofin-dylibbundler"
 GIT_BIN="/Software/Git/exports/git"
+RSYNC_BIN="/Software/Rsync-static/exports/rsync"
 SSH_BIN="/usr/bin/ssh"
 DIFF_BIN="/usr/bin/diff"
 IFCONFIG_BIN="/sbin/ifconfig"
@@ -267,6 +268,7 @@ case "${SYSTEM_NAME}" in
         export DEFAULT_ZPOOL="Projects"
         export XZ_BIN="/Software/Xz/exports/xz"
         export XZCAT_BIN="/bin/cat"
+        export RSYNC_BIN="/Software/Rsync/exports/rsync"
         unset SERVICE_BIN # not necessary
 
         if [ ${OS_VERSION} -lt ${DARWIN_MINIMUM_VERSION} ]; then
@@ -304,6 +306,7 @@ case "${SYSTEM_NAME}" in
         export MAKE_OPTS="-j${CPUS}"
         export AWK_BIN="/usr/bin/awk"
         export ZFS_BIN="/usr/sbin/zfs"
+        export RSYNC_BIN="/Software/Rsync/exports/rsync"
         if [ ${OS_VERSION} -lt ${GLIBC_MINIMUM_VERSION} ]; then
             export USE_BINBUILD="false"
         fi
