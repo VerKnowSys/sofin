@@ -15,9 +15,11 @@ for software in $(cat software.list); do
         exit 0
     fi
     note "________________________________"
+    note "Resetting Sofin definitions"
+    s reset
     note "Processing software: ${software}"
     s rm ${software}
     s deploy ${software} && \
     s rm ${software}
-    note "-------------------------------"
+    note "--------------------------------"
 done
