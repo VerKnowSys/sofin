@@ -700,13 +700,13 @@ if [ ! "$1" = "" ]; then
                         debug "Setting common access to archive files before we send them: ${name}, ${name}.sha1"
                         ${CHMOD_BIN} a+r "${name}" "${name}.sha1"
 
-                        note "Pushing archive #${archive_sha1} to remote: ${MAIN_BINARY_REPOSITORY}/${SYS}/${name}"
+                        note "Pushing archive #${archive_sha1} to remote: ${MAIN_BINARY_REPOSITORY}${SYS}/${name}"
                         ${SCP_BIN} -P ${MAIN_PORT} ${name} ${address}/${name}.partial || def_error ${name}
                         if [ "$?" = "0" ]; then
                             ${SSH_BIN} -p ${MAIN_PORT} ${MAIN_USER}@${mirror} "cd ${MAIN_SOFTWARE_PREFIX}/software/binary/${SYS} && mv ${name}.partial ${name}"
                             ${SCP_BIN} -P ${MAIN_PORT} ${name}.sha1 ${address}/${name}.sha1 || def_error ${name}.sha1
                         else
-                            error "Failed to push binary build of: '${name}' to remote: ${MAIN_BINARY_REPOSITORY}/${SYS}/${name}"
+                            error "Failed to push binary build of: '${name}' to remote: ${MAIN_BINARY_REPOSITORY}${SYS}/${name}"
                         fi
 
                         if [ "${SYSTEM_NAME}" = "FreeBSD" ]; then # NOTE: feature designed for FBSD.
@@ -718,7 +718,7 @@ if [ ! "$1" = "" ]; then
 
                                 debug "Setting common access to archive files before we send it: ${final_snap_file}"
                                 ${CHMOD_BIN} a+r "${final_snap_file}"
-                                note "Sending initial service archive to ${MAIN_COMMON_NAME} repository: ${MAIN_BINARY_REPOSITORY}/${MAIN_COMMON_NAME}/${final_snap_file}"
+                                note "Sending initial service archive to ${MAIN_COMMON_NAME} repository: ${MAIN_BINARY_REPOSITORY}${MAIN_COMMON_NAME}/${final_snap_file}"
 
                                 ${SCP_BIN} -P ${MAIN_PORT} ${final_snap_file} ${address}/${final_snap_file}.partial || def_error ${final_snap_file}
                                 if [ "$?" = "0" ]; then
@@ -1663,7 +1663,7 @@ for application in ${APPLICATIONS}; do
 
                     create_or_receive () {
                         dataset_name="$1"
-                        remote_path="${MAIN_BINARY_REPOSITORY}/${MAIN_COMMON_NAME}/${final_snap_file}"
+                        remote_path="${MAIN_BINARY_REPOSITORY}${MAIN_COMMON_NAME}/${final_snap_file}"
                         note "Seeking remote snapshot existence: ${remote_path}"
                         ${FETCH_BIN} "${remote_path}" 2>> ${LOG}
                         if [ "$?" = "0" ]; then
