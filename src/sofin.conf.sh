@@ -9,6 +9,9 @@ if [ "${SOFIN_TRACE}" = "" ]; then
     export SOFIN_TRACE="false"
 fi
 
+# Sofin version string:
+readonly VERSION="0.90.2"
+
 # setting up definitions repository
 readonly DEFAULT_REPOSITORY="https://verknowsys@bitbucket.org/verknowsys/sofin-definitions.git" # official sofin definitions repository
 # REPOSITORY is set after determining CACHE_DIR (L300)

@@ -1,9 +1,6 @@
 #!/bin/sh
 # @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
 
-# config settings
-readonly VERSION="0.90.1"
-
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
 if [ -e "${CONF_FILE}" ]; then
@@ -231,9 +228,9 @@ clean_binbuilds () {
 clean_failbuilds () {
     if [ -d "${CACHE_DIR}cache" ]; then
         number="0"
-        debug "Cleaning failed build directories from: '${CACHE_DIR}cache'"
-        note "Please note that these directories are base for 'continue' command."
+        note "Please note that cleaned build dirs are a requirement for 'continue' feature in Sofin"
         files=$(${FIND_BIN} "${CACHE_DIR}cache" -maxdepth 2 -mindepth 1 -type d)
+        debug "Cleaning failed build directories from: '${CACHE_DIR}cache': ${files}"
         num="$(echo "${files}" | eval ${FILES_COUNT_GUARD})"
         if [ ! -z "${num}" ]; then
             number="${number} + ${num}"
@@ -668,7 +665,7 @@ if [ ! "$1" = "" ]; then
                             fi
                             if [ "${snap_size}" = "0" ]; then
                                 ${RM_BIN} -f "${final_snap_file}"
-                                warn "No initial dataset for service: ${element}-${version_element}"
+                                note "Initial dataset for service: ${element}-${version_element} is unavailable"
                             fi
                         fi
 
@@ -718,7 +715,7 @@ if [ ! "$1" = "" ]; then
 
                                 debug "Setting common access to archive files before we send it: ${final_snap_file}"
                                 ${CHMOD_BIN} a+r "${final_snap_file}"
-                                note "Sending initial service archive to ${MAIN_COMMON_NAME} repository: ${MAIN_BINARY_REPOSITORY}${MAIN_COMMON_NAME}/${final_snap_file}"
+                                debug "Sending initial service stream to ${MAIN_COMMON_NAME} repository: ${MAIN_BINARY_REPOSITORY}${MAIN_COMMON_NAME}/${final_snap_file}"
 
                                 ${SCP_BIN} -P ${MAIN_PORT} ${final_snap_file} ${address}/${final_snap_file}.partial || def_error ${final_snap_file}
                                 if [ "$?" = "0" ]; then
@@ -727,7 +724,7 @@ if [ ! "$1" = "" ]; then
                                     error "Failed to send service snapshot archive to remote!"
                                 fi
                             else
-                                note "No service snapshot for: ${element}"
+                                note "No service stream available for: ${element}"
                             fi
                         fi
                     done
@@ -750,7 +747,7 @@ if [ ! "$1" = "" ]; then
             error "Failure in definition: ${software}. Report or fix the definition please!"
         }
         for software in ${dependencies}; do
-            USE_BINBUILD=false ${SOFIN_BIN} get ${software} || def_error
+            USE_UPDATE=false USE_BINBUILD=false ${SOFIN_BIN} install ${software} || def_error
         done
         exit
         ;;
@@ -764,8 +761,9 @@ if [ ! "$1" = "" ]; then
             error "Failure in definition: ${software}. Report or fix the definition please!"
         }
         for software in ${dependencies}; do
-            ${SOFIN_BIN} build ${software} || def_error
-            ${SOFIN_BIN} push ${software} || def_error
+            USE_UPDATE=false ${SOFIN_BIN} build ${software} || def_error && \
+            USE_UPDATE=false ${SOFIN_BIN} push ${software} || def_error && \
+            note "Software deployed: ${software}"
         done
         exit
         ;;
@@ -809,7 +807,7 @@ if [ ! "$1" = "" ]; then
                 continue
             fi
             ${SOFIN_BIN} remove ${software}
-            USE_BINBUILD=false ${SOFIN_BIN} get ${software} || def_error
+            USE_BINBUILD=false ${SOFIN_BIN} install ${software} || def_error
             FORCE=true ${SOFIN_BIN} wipe ${software} || def_error
             ${SOFIN_BIN} push ${software} || def_error
             # ${SOFIN_BIN} remove ${software} || def_error
@@ -1648,48 +1646,68 @@ for application in ${APPLICATIONS}; do
                 ;;
 
             *)
+                # count Sofin jobs. For more than one job available,
+                sofin_ps_list="$(${PS_BIN} axv 2>/dev/null | ${GREP_BIN} -v grep 2>/dev/null | ${GREP_BIN} "sh ${SOFIN_BIN} install [A-Z].*" 2>/dev/null)"
+                debug "Sofin ps list: $(echo "${sofin_ps_list}" | ${TR_BIN} '\n' ',' 2>/dev/null)"
+                sofins_all="$(echo "${sofin_ps_list}" | ${WC_BIN} -l 2>/dev/null | ${SED_BIN} 's/ //g' 2>/dev/null)"
+                sofins_running="$(echo "${sofins_all} - 1" | ${BC_BIN} 2>/dev/null)"
+                test -z "${sofins_running}" && sofins_running="0"
+                export jobs_in_parallel="NO"
+                if [ ${sofins_running} -gt 1 ]; then
+                    note "Exactly ${sofins_running} additional running Sofin found. Limiting jobs to current bundle only"
+                    export jobs_in_parallel="YES"
+                else
+                    note "Single (current) Sofin process found. Traversing through several datasets at once"
+                fi
+
                 # Create a dataset for any existing dirs in Services dir that are not ZFS datasets.
                 debug "Checking for non-dataset directories in: ${SERVICES_DIR}"
                 for maybe_dataset in $(${FIND_BIN} ${SERVICES_DIR} -mindepth 1 -maxdepth 1 -type d -not -name '.*' -print 2>/dev/null | ${XARGS_BIN} ${BASENAME_BIN} 2>/dev/null); do
-                    # find name of mount from default ZFS Services
-                    no_ending_slash="$(echo "${SERVICES_DIR}" | ${SED_BIN} 's/\/$//')"
-                    inner_dir="$(${ZFS_BIN} list -H 2>/dev/null | ${GREP_BIN} "${no_ending_slash}$" 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null | ${SED_BIN} 's/.*\///' 2>/dev/null)/"
-                    certain_dataset="${SERVICES_DIR}${inner_dir}${maybe_dataset}"
-                    certain_fileset="${SERVICES_DIR}${maybe_dataset}"
-                    full_dataset_name="${DEFAULT_ZPOOL}${certain_dataset}"
-                    snap_file="${maybe_dataset}-${APP_VERSION}.${SERVICE_SNAPSHOT_POSTFIX}"
-                    final_snap_file="${snap_file}${DEFAULT_ARCHIVE_EXT}"
+                    app_name_lowercase="$(echo "${maybe_dataset}" | ${TR_BIN} '[A-Z]' '[a-z]')"
+                    if [ "${app_name_lowercase}" = "${APP_NAME}${APP_POSTFIX}" -o ${jobs_in_parallel} = "NO" ]; then
+                        # find name of mount from default ZFS Services:
+                        no_ending_slash="$(echo "${SERVICES_DIR}" | ${SED_BIN} 's/\/$//')"
+                        inner_dir="$(${ZFS_BIN} list -H 2>/dev/null | ${GREP_BIN} "${no_ending_slash}$" 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null | ${SED_BIN} 's/.*\///' 2>/dev/null)/"
+                        certain_dataset="${SERVICES_DIR}${inner_dir}${maybe_dataset}"
+                        certain_fileset="${SERVICES_DIR}${maybe_dataset}"
+                        full_dataset_name="${DEFAULT_ZPOOL}${certain_dataset}"
+                        snap_file="${maybe_dataset}-${APP_VERSION}.${SERVICE_SNAPSHOT_POSTFIX}"
+                        final_snap_file="${snap_file}${DEFAULT_ARCHIVE_EXT}"
 
-                    create_or_receive () {
-                        dataset_name="$1"
-                        remote_path="${MAIN_BINARY_REPOSITORY}${MAIN_COMMON_NAME}/${final_snap_file}"
-                        note "Seeking remote snapshot existence: ${remote_path}"
-                        ${FETCH_BIN} "${remote_path}" 2>> ${LOG}
-                        if [ "$?" = "0" ]; then
-                            debug "Stream archive available. Creating service dataset: ${dataset_name} from file stream: ${final_snap_file}"
-                            ${XZCAT_BIN} "${final_snap_file}" | ${ZFS_BIN} receive -v "${dataset_name}" 2>/dev/null | ${TAIL_BIN} -n1 && \
-                            debug "Cleaning snapshot file: ${final_snap_file}, after successful receive." && \
-                            ${RM_BIN} -f "${final_snap_file}" && \
-                            note "Stream received successfully as: ${dataset_name}"
-                        else
-                            debug "Initial service dataset unavailable"
-                            ${ZFS_BIN} create "${dataset_name}" 2>/dev/null && \
-                            note "Created an empty service dataset"
+                        create_or_receive () {
+                            dataset_name="$1"
+                            remote_path="${MAIN_BINARY_REPOSITORY}${MAIN_COMMON_NAME}/${final_snap_file}"
+                            note "Seeking remote snapshot existence: ${remote_path}"
+                            ${FETCH_BIN} "${remote_path}" 2>> ${LOG}
+                            if [ "$?" = "0" ]; then
+                                debug "Stream archive available. Creating service dataset: ${dataset_name} from file stream: ${final_snap_file}"
+                                ${XZCAT_BIN} "${final_snap_file}" | ${ZFS_BIN} receive -v "${dataset_name}" 2>/dev/null | ${TAIL_BIN} -n1 && \
+                                debug "Cleaning snapshot file: ${final_snap_file}, after successful receive." && \
+                                ${RM_BIN} -f "${final_snap_file}" && \
+                                note "Stream received successfully as: ${dataset_name}"
+                            else
+                                debug "Initial service dataset unavailable"
+                                ${ZFS_BIN} create "${dataset_name}" 2>/dev/null && \
+                                note "Created an empty service dataset"
+                            fi
+                        }
+
+                        # check dataset existence and create/receive it if necessary
+                        ${ZFS_BIN} list -H 2>/dev/null | ${GREP_BIN} "${full_dataset_name}" >/dev/null 2>&1
+                        if [ "$?" != "0" ]; then
+                            debug "Moving ${certain_fileset} to ${certain_fileset}-tmp" && \
+                            ${MV_BIN} "${certain_fileset}" "${certain_fileset}-tmp" && \
+                            debug "Creating dataset: ${full_dataset_name}" && \
+                            create_or_receive "${full_dataset_name}" && \
+                            debug "Copying ${certain_fileset}-tmp/ back to ${certain_fileset}" && \
+                            ${CP_BIN} -pRP "${certain_fileset}-tmp/" "${certain_fileset}" && \
+                            debug "Cleaning ${certain_fileset}-tmp" && \
+                            ${RM_BIN} -rf "${certain_fileset}-tmp" && \
+                            note "Dataset created: ${full_dataset_name}"
                         fi
-                    }
 
-                    # check dataset existence and create/receive it if necessary
-                    ${ZFS_BIN} list -H 2>/dev/null | ${GREP_BIN} "${full_dataset_name}" >/dev/null 2>&1
-                    if [ "$?" != "0" ]; then
-                        debug "Moving ${certain_fileset} to ${certain_fileset}-tmp" && \
-                        ${MV_BIN} "${certain_fileset}" "${certain_fileset}-tmp" && \
-                        debug "Creating dataset: ${full_dataset_name}" && \
-                        create_or_receive "${full_dataset_name}" && \
-                        debug "Copying ${certain_fileset}-tmp/ back to ${certain_fileset}" && \
-                        ${CP_BIN} -pRP "${certain_fileset}-tmp/" "${certain_fileset}" && \
-                        debug "Cleaning ${certain_fileset}-tmp" && \
-                        ${RM_BIN} -rf "${certain_fileset}-tmp" && \
-                        note "Dataset created: ${full_dataset_name}"
+                    else # no name match
+                        debug "No match for: ${app_name_lowercase}"
                     fi
                 done
                 ;;
