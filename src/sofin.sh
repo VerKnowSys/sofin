@@ -435,7 +435,7 @@ if [ ! "$1" = "" ]; then
                 app_name="$(${BASENAME_BIN} ${app})"
                 note "Checking ${app_name}"
                 for req in $(${FIND_BIN} ${app} -maxdepth 1 -name *${INSTALLED_MARK} | ${SORT_BIN}); do
-                    pp="$(${PRINTF_BIN} "$(${BASENAME_BIN} ${req})" | ${SED_BIN} 's/\.installed//')"
+                    pp="$(${PRINTF_BIN} "$(${BASENAME_BIN} ${req})" | ${SED_BIN} "s/${INSTALLED_MARK}//")"
                     note "  ${pp} [$(${CAT_BIN} ${req})]"
                 done
                 lowercase="$(${PRINTF_BIN} "${app_name}" | ${TR_BIN} '[A-Z]' '[a-z]')"
@@ -629,7 +629,7 @@ if [ ! "$1" = "" ]; then
             if [ -d "${element}" ]; then
                 if [ ! -L "${element}" ]; then
                     lowercase_element="$(${PRINTF_BIN} "${element}" | ${TR_BIN} '[A-Z]' '[a-z]')"
-                    version_element="$(${CAT_BIN} ${element}/${lowercase_element}.installed)"
+                    version_element="$(${CAT_BIN} ${element}/${lowercase_element}${INSTALLED_MARK})"
                     name="${element}-${version_element}${DEFAULT_ARCHIVE_EXT}"
                     dig_query="$(${DIG_BIN} +short ${MAIN_SOFTWARE_ADDRESS} A)"
                     if [ ${OS_VERSION} -gt 93 ]; then
@@ -1109,7 +1109,7 @@ for application in ${APPLICATIONS}; do
 
             MIDDLE="${SYSTEM_NAME}-${FULL_SYSTEM_VERSION}-${SYSTEM_ARCH}"
             ARCHIVE_NAME="${APP_NAME}${APP_POSTFIX}-${APP_VERSION}${DEFAULT_ARCHIVE_EXT}"
-            INSTALLED_INDICATOR="${PREFIX}/${APP_LOWER}${APP_POSTFIX}.installed"
+            INSTALLED_INDICATOR="${PREFIX}/${APP_LOWER}${APP_POSTFIX}${INSTALLED_MARK}"
 
             if [ "${SOFIN_CONTINUE_BUILD}" != "YES" ]; then # normal build by default
                 if [ ! -e "${INSTALLED_INDICATOR}" ]; then
