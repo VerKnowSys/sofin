@@ -757,7 +757,6 @@ if [ ! "$1" = "" ]; then
 
 
     d|deploy)
-        update_definitions
         shift
         dependencies="$*"
         note "Software bundles to be built and deployed to remote: ${dependencies}"
@@ -765,7 +764,7 @@ if [ ! "$1" = "" ]; then
             error "Failure in definition: ${software}. Report or fix the definition please!"
         }
         for software in ${dependencies}; do
-            USE_BINBUILD=false ${SOFIN_BIN} get ${software} || def_error
+            ${SOFIN_BIN} build ${software} || def_error
             ${SOFIN_BIN} push ${software} || def_error
         done
         exit
