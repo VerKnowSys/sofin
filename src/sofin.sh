@@ -1650,7 +1650,7 @@ for application in ${APPLICATIONS}; do
 
             *)
                 # Create a dataset for any existing dirs in Services dir that are not ZFS datasets.
-                note "Checking services dir for non-dataset directories in: ${SERVICES_DIR}"
+                debug "Checking for non-dataset directories in: ${SERVICES_DIR}"
                 for maybe_dataset in $(${FIND_BIN} ${SERVICES_DIR} -mindepth 1 -maxdepth 1 -type d -not -name '.*' -print 2>/dev/null | ${XARGS_BIN} ${BASENAME_BIN} 2>/dev/null); do
                     # find name of mount from default ZFS Services
                     no_ending_slash="$(echo "${SERVICES_DIR}" | ${SED_BIN} 's/\/$//')"
