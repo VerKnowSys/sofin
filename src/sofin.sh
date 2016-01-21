@@ -591,7 +591,6 @@ if [ ! "$1" = "" ]; then
         if [ "$2" = "" ]; then
             error "For \"$1\" application installation mode, second argument with at least one application name or list is required!"
         fi
-        update_definitions
         # first of all, try using a list if exists:
         if [ -f "${LISTS_DIR}$2" ]; then
             export APPLICATIONS="$(${CAT_BIN} ${LISTS_DIR}$2 | ${TR_BIN} '\n' ' ')"
@@ -608,7 +607,6 @@ if [ ! "$1" = "" ]; then
         if [ "${USERNAME}" = "root" ]; then
             warn "Installation of project dependencies as root is immoral."
         fi
-        update_definitions
         cd "${LOCAL_DIR}"
         note "Looking for $(${PWD_BIN})/${DEPENDENCIES_FILE} file."
         if [ ! -e "$(${PWD_BIN})/${DEPENDENCIES_FILE}" ]; then
@@ -739,13 +737,13 @@ if [ ! "$1" = "" ]; then
         ;;
 
     b|build)
-        update_definitions
         shift
         dependencies="$*"
         note "Software bundles to be built: ${dependencies}"
         def_error () {
             error "Failure in definition: ${software}. Report or fix the definition please!"
         }
+        update_definitions
         for software in ${dependencies}; do
             USE_UPDATE=false USE_BINBUILD=false ${SOFIN_BIN} install ${software} || def_error
         done
@@ -760,6 +758,7 @@ if [ ! "$1" = "" ]; then
         def_error () {
             error "Failure in definition: ${software}. Report or fix the definition please!"
         }
+        update_definitions
         for software in ${dependencies}; do
             USE_UPDATE=false ${SOFIN_BIN} build ${software} || def_error && \
             USE_UPDATE=false ${SOFIN_BIN} push ${software} || def_error && \
@@ -772,6 +771,7 @@ if [ ! "$1" = "" ]; then
     reset)
         cd ${DEFINITIONS_DIR}
         ${GIT_BIN} reset --hard
+        update_definitions
         exit 0
         ;;
 
