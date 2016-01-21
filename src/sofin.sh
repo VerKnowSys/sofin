@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
 
 # config settings
-readonly VERSION="0.90.0"
+readonly VERSION="0.90.1"
 
 # load configuration from sofin.conf
 readonly CONF_FILE="/etc/sofin.conf.sh"
@@ -650,7 +650,7 @@ if [ ! "$1" = "" ]; then
                         ${SSH_BIN} -p ${MAIN_PORT} ${MAIN_USER}@${mirror} "mkdir -p ${MAIN_SOFTWARE_PREFIX}/software/binary/${SYS}" >> "${LOG}-${APP_NAME}${APP_POSTFIX}" 2>&1
 
                         if [ "${SYSTEM_NAME}" = "FreeBSD" ]; then # NOTE: feature designed for FBSD.
-                            note "Preparing Service ZFS dataset for app: ${element}"
+                            note "Preparing service dataset for: ${element}"
                             svcs_no_slashes="$(echo "${SERVICES_DIR}" | ${SED_BIN} 's/\///g')"
                             inner_dir="$(${ZFS_BIN} list -H 2>/dev/null | ${GREP_BIN} "${element}$" 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null | ${SED_BIN} "s/.*${svcs_no_slashes}\///; s/\/.*//" 2>/dev/null)/"
                             certain_dataset="${SERVICES_DIR}${inner_dir}${element}"
@@ -664,13 +664,11 @@ if [ ! "$1" = "" ]; then
                                 ${ZFS_BIN} send ${full_dataset_name} | ${XZ_BIN} > ${final_snap_file} && \
                                 snap_size="$(${STAT_BIN} -f%z "${final_snap_file}")" && \
                                 ${ZFS_BIN} mount ${full_dataset_name} && \
-                                note "Snapshot created successfully: ${final_snap_file}"
+                                note "Stream sent successfully to: ${final_snap_file}"
                             fi
                             if [ "${snap_size}" = "0" ]; then
                                 ${RM_BIN} -f "${final_snap_file}"
                                 warn "No initial dataset for service: ${element}-${version_element}"
-                            else
-                                note "Initial dataset for service: ${element}-${version_element} (size: ${snap_size}) is ready."
                             fi
                         fi
 
@@ -699,27 +697,32 @@ if [ ! "$1" = "" ]; then
                         esac
 
                         ${PRINTF_BIN} "${archive_sha1}" > "${name}.sha1"
-                        note "Archive sha: ${archive_sha1}"
                         debug "Setting common access to archive files before we send them: ${name}, ${name}.sha1"
                         ${CHMOD_BIN} a+r "${name}" "${name}.sha1"
 
-                        note "Sending archive: '${name}' to remote: '${address}'"
+                        note "Pushing archive #${archive_sha1} to remote: ${MAIN_BINARY_REPOSITORY}/${SYS}/${name}"
                         ${SCP_BIN} -P ${MAIN_PORT} ${name} ${address}/${name}.partial || def_error ${name}
                         if [ "$?" = "0" ]; then
                             ${SSH_BIN} -p ${MAIN_PORT} ${MAIN_USER}@${mirror} "cd ${MAIN_SOFTWARE_PREFIX}/software/binary/${SYS} && mv ${name}.partial ${name}"
                             ${SCP_BIN} -P ${MAIN_PORT} ${name}.sha1 ${address}/${name}.sha1 || def_error ${name}.sha1
                         else
-                            error "Failed to send binary build of: '${name}' to remote: '${mirror}'"
+                            error "Failed to push binary build of: '${name}' to remote: ${MAIN_BINARY_REPOSITORY}/${SYS}/${name}"
                         fi
 
                         if [ "${SYSTEM_NAME}" = "FreeBSD" ]; then # NOTE: feature designed for FBSD.
                             if [ -f "${final_snap_file}" ]; then
+                                system_path="${MAIN_SOFTWARE_PREFIX}/software/binary/${MAIN_COMMON_NAME}"
+                                address="${MAIN_USER}@${mirror}:${system_path}"
+
+                                ${SSH_BIN} -p ${MAIN_PORT} ${MAIN_USER}@${mirror} "cd ${MAIN_SOFTWARE_PREFIX}/software/binary; mkdir -p ${MAIN_COMMON_NAME} ; chmod 755 ${MAIN_COMMON_NAME}"
+
                                 debug "Setting common access to archive files before we send it: ${final_snap_file}"
                                 ${CHMOD_BIN} a+r "${final_snap_file}"
-                                note "Sending service snapshot archive: '${final_snap_file}' to remote: '${address}'"
+                                note "Sending initial service archive to ${MAIN_COMMON_NAME} repository: ${MAIN_BINARY_REPOSITORY}/${MAIN_COMMON_NAME}/${final_snap_file}"
+
                                 ${SCP_BIN} -P ${MAIN_PORT} ${final_snap_file} ${address}/${final_snap_file}.partial || def_error ${final_snap_file}
                                 if [ "$?" = "0" ]; then
-                                    ${SSH_BIN} -p ${MAIN_PORT} ${MAIN_USER}@${mirror} "cd ${MAIN_SOFTWARE_PREFIX}/software/binary/${SYS} && mv ${final_snap_file}.partial ${final_snap_file}"
+                                    ${SSH_BIN} -p ${MAIN_PORT} ${MAIN_USER}@${mirror} "cd ${MAIN_SOFTWARE_PREFIX}/software/binary/${MAIN_COMMON_NAME} && mv ${final_snap_file}.partial ${final_snap_file}"
                                 else
                                     error "Failed to send service snapshot archive to remote!"
                                 fi
@@ -1660,19 +1663,19 @@ for application in ${APPLICATIONS}; do
 
                     create_or_receive () {
                         dataset_name="$1"
-                        remote_path="${MAIN_BINARY_REPOSITORY}${final_snap_file}"
+                        remote_path="${MAIN_BINARY_REPOSITORY}/${MAIN_COMMON_NAME}/${final_snap_file}"
                         note "Seeking remote snapshot existence: ${remote_path}"
                         ${FETCH_BIN} "${remote_path}" 2>> ${LOG}
                         if [ "$?" = "0" ]; then
-                            debug "Snapshot fetched. Creating service dataset: ${dataset_name} from snapshot: ${final_snap_file}"
+                            debug "Stream archive available. Creating service dataset: ${dataset_name} from file stream: ${final_snap_file}"
                             ${XZCAT_BIN} "${final_snap_file}" | ${ZFS_BIN} receive -v "${dataset_name}" 2>/dev/null | ${TAIL_BIN} -n1 && \
                             debug "Cleaning snapshot file: ${final_snap_file}, after successful receive." && \
                             ${RM_BIN} -f "${final_snap_file}" && \
-                            note "Service dataset received: ${dataset_name}"
+                            note "Stream received successfully as: ${dataset_name}"
                         else
-                            debug "Snapshot wasn't found. Creating empty dataset: ${dataset_name}"
+                            debug "Initial service dataset unavailable"
                             ${ZFS_BIN} create "${dataset_name}" 2>/dev/null && \
-                            note "Empty service dataset created: ${dataset_name}"
+                            note "Created an empty service dataset"
                         fi
                     }
 
@@ -1687,7 +1690,7 @@ for application in ${APPLICATIONS}; do
                         ${CP_BIN} -pRP "${certain_fileset}-tmp/" "${certain_fileset}" && \
                         debug "Cleaning ${certain_fileset}-tmp" && \
                         ${RM_BIN} -rf "${certain_fileset}-tmp" && \
-                        note "Dataset created successfully for service: ${maybe_dataset}"
+                        note "Dataset created: ${full_dataset_name}"
                     fi
                 done
                 ;;
