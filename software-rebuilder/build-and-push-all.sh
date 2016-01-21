@@ -3,11 +3,12 @@
 chmod 600 ~/.ssh/id_rsa
 
 . /etc/sofin.conf.sh
-
-# set -e
+. /var/ServeD-OS/setup-buildhost
+setup_buildhost
 
 note "Checking remote machine connection (shouldn't take more than a second).."
 ssh sofin@verknowsys.com "uname -a"
+set +e
 
 for software in $(cat software.list); do
     if [ "${software}" = "------" ]; then
