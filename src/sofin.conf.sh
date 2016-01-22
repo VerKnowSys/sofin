@@ -2,15 +2,12 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
 #
 # global Sofin values:
-if [ "${DEBUG}" = "" ]; then
-    export DEBUG="false"
-fi
 if [ "${SOFIN_TRACE}" = "" ]; then
     export SOFIN_TRACE="false"
 fi
 
 # Sofin version string:
-readonly VERSION="0.90.2"
+readonly VERSION="0.90.3"
 
 # setting up definitions repository
 readonly DEFAULT_REPOSITORY="https://verknowsys@bitbucket.org/verknowsys/sofin-definitions.git" # official sofin definitions repository
@@ -58,7 +55,7 @@ readonly DEFAULT_PATH="/bin:/usr/bin:/sbin:/usr/sbin"
 readonly DEFAULT_ARCHIVE_EXT=".txz"
 readonly DEPENDENCIES_FILE=".dependencies"
 readonly INSTALLED_MARK=".installed"
-readonly LOG_LINES_AMOUNT=20
+readonly LOG_LINES_AMOUNT=10
 readonly SERVICE_SNAPSHOT_POSTFIX="zfs-stream"
 
 # utils software from POSIX base system variables:
@@ -171,11 +168,15 @@ cecho () {
 
 
 debug () {
-    if [ "${DEBUG}" = "true" ]; then
-        cecho "# $1" ${magenta} # NOTE: this "#" is required for debug mode to work properly with generation of ~/.profile and /etc/profile_sofin files!
+    if [ -z "${DEBUG}" ]; then
+        aname="$(echo "${APP_NAME}${APP_POSTFIX}" | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null)"
+        if [ ! -z "${aname}" ]; then
+            cecho "# $1" ${magenta} >> ${LOG}-${aname} 2>&1
+        else
+            cecho "# $1" ${magenta} >> ${LOG}-default 2>&1
+        fi
     else
-        cecho "# $1" ${magenta} >> ${LOG} 2>/dev/null
-        # cecho " ~ $1" ${magenta} >> ${LOG}
+        cecho "# $1" ${magenta} # NOTE: this "#" is required for debug mode to work properly with generation of ~/.profile and /etc/profile_sofin files!
     fi
 }
 

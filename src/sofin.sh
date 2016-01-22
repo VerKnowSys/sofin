@@ -79,15 +79,13 @@ set_c_compiler () {
                 export CPP="${BASE_COMPILER}/clang -E"
             fi
             ;;
-
     esac
-
 }
 
 
 update_definitions () {
     if [ "${USE_UPDATE}" = "false" ]; then
-        warn "Skipped definitions update."
+        debug "Definitions update skipped on demand"
         return
     fi
     note "${SOFIN_HEADER}"
@@ -226,18 +224,16 @@ clean_binbuilds () {
 clean_failbuilds () {
     if [ -d "${CACHE_DIR}cache" ]; then
         number="0"
-        note "Please note that cleaned build dirs are a requirement for 'continue' feature in Sofin"
         files=$(${FIND_BIN} "${CACHE_DIR}cache" -maxdepth 2 -mindepth 1 -type d)
-        debug "Cleaning failed build directories from: '${CACHE_DIR}cache': ${files}"
         num="$(echo "${files}" | eval ${FILES_COUNT_GUARD})"
         if [ ! -z "${num}" ]; then
-            number="${number} + ${num}"
+            number="${number} + ${num} - 1"
         fi
         for i in ${files}; do
             debug "Removing directory: ${i}"
             ${RM_BIN} -rf "${i}" || error "Privileges problem while removing '${i}'? All files should belong to '${USER}' there."
         done
-        result="$(echo "${number} - 1" | ${BC_BIN})"
+        result="$(echo "${number}" | ${BC_BIN})"
         note "${result} directories cleaned."
     fi
 }
@@ -682,7 +678,7 @@ if [ ! "$1" = "" ]; then
                         archive_sha1="NO-SHA"
                         case "${SYSTEM_NAME}" in
                             Darwin|Linux)
-                                archive_sha1="$(${SHA_BIN} "${name}" | ${AWK_BIN} '{ print $1 }')"
+                                archive_sha1="$(${SHA_BIN} "${name}" | ${AWK_BIN} '{print $1;}')"
                                 ;;
 
                             FreeBSD)
@@ -731,7 +727,6 @@ if [ ! "$1" = "" ]; then
                 warn "Not found software named: ${element}!"
             fi
         done
-        note "Done."
         exit
         ;;
 
@@ -761,7 +756,7 @@ if [ ! "$1" = "" ]; then
         for software in ${dependencies}; do
             USE_UPDATE=false ${SOFIN_BIN} build ${software} || def_error && \
             USE_UPDATE=false ${SOFIN_BIN} push ${software} || def_error && \
-            note "Software deployed: ${software}"
+            note "Software bundle deployed: ${software}"
         done
         exit
         ;;
@@ -829,7 +824,7 @@ if [ ! "$1" = "" ]; then
                 dig_query="$(${DIG_BIN} +short ${MAIN_SOFTWARE_ADDRESS} A)"
                 if [ ${OS_VERSION} -gt 93 ]; then
                     # In FreeBSD 10 there's drill utility instead of dig
-                    dig_query=$(${DIG_BIN} A ${MAIN_SOFTWARE_ADDRESS} | ${GREP_BIN} "^${MAIN_SOFTWARE_ADDRESS}" | ${AWK_BIN} '{print $5}')
+                    dig_query=$(${DIG_BIN} A ${MAIN_SOFTWARE_ADDRESS} | ${GREP_BIN} "^${MAIN_SOFTWARE_ADDRESS}" | ${AWK_BIN} '{print $5;}')
                 fi
                 debug "MIRROR: ${dig_query}"
                 for mirror in ${dig_query}; do
@@ -839,7 +834,6 @@ if [ ! "$1" = "" ]; then
                     ${SSH_BIN} -p ${MAIN_PORT} ${MAIN_USER}@${mirror} "${RM_BIN} -f ${system_path}/${name}* ${system_path}/${name}.sha1" >> "${LOG}-default" 2>&1
                 done
             done
-            note "Done."
         else
             note "Aborted."
         fi
@@ -1640,7 +1634,7 @@ for application in ${APPLICATIONS}; do
                 if [ "${result}" -lt "0" ]; then
                     result="0"
                 fi
-                note "${result} files stripped."
+                note "Cleaned useless files; ${result} files stripped"
             else
                 warn "Debug build is enabled. Strip skipped."
             fi
@@ -1662,10 +1656,10 @@ for application in ${APPLICATIONS}; do
                 test -z "${sofins_running}" && sofins_running="0"
                 export jobs_in_parallel="NO"
                 if [ ${sofins_running} -gt 1 ]; then
-                    note "Exactly ${sofins_running} additional running Sofin found. Limiting jobs to current bundle only"
+                    note "Exactly ${sofins_running} additional running Sofin found in background. Limiting jobs to current bundle only"
                     export jobs_in_parallel="YES"
                 else
-                    note "Single (current) Sofin process found. Traversing through several datasets at once"
+                    note "Traversing through several datasets at once, since single Sofin instance is running"
                 fi
 
                 # Create a dataset for any existing dirs in Services dir that are not ZFS datasets.
@@ -1696,7 +1690,7 @@ for application in ${APPLICATIONS}; do
                             else
                                 debug "Initial service dataset unavailable"
                                 ${ZFS_BIN} create "${dataset_name}" 2>/dev/null && \
-                                note "Created an empty service dataset"
+                                note "Created an empty service dataset for: ${dataset_name}"
                             fi
                         }
 
@@ -1711,7 +1705,7 @@ for application in ${APPLICATIONS}; do
                             ${CP_BIN} -pRP "${certain_fileset}-tmp/" "${certain_fileset}" && \
                             debug "Cleaning ${certain_fileset}-tmp" && \
                             ${RM_BIN} -rf "${certain_fileset}-tmp" && \
-                            note "Dataset created: ${full_dataset_name}"
+                            debug "Dataset created: ${full_dataset_name}"
                         fi
 
                     else # no name match
