@@ -18,6 +18,8 @@ fi
 SOFIN_ARGS=$*
 SOFIN_ARGS_FULL="${SOFIN_ARGS}"
 readonly SOFIN_ARGS="$(echo ${SOFIN_ARGS} | ${CUT_BIN} -d' ' -f2-)"
+readonly ALL_INSTALL_PHRASES="i|install|get|pick|choose|use|switch"
+readonly BUILD_AND_DEPLOY_PHRASES="b|build|d|deploy"
 
 # Some lazy shortcuts..
 FILES_COUNT_GUARD="${WC_BIN} -l 2>/dev/null | ${SED_BIN} 's/ //g' 2>/dev/null"
@@ -735,10 +737,13 @@ if [ ! "$1" = "" ]; then
         def_error () {
             error "Failure in definition: ${software}. Report or fix the definition please!"
         }
-        update_definitions
-        for software in ${dependencies}; do
-            USE_UPDATE=false USE_BINBUILD=false ${SOFIN_BIN} install ${software} || def_error
+        for dep in ${dependencies}; do
+            sofin_ps_list="$(${PS_BIN} axv 2>/dev/null | ${GREP_BIN} -v grep 2>/dev/null | ${EGREP_BIN} "sh ${SOFIN_BIN} (${ALL_INSTALL_PHRASES}|${BUILD_AND_DEPLOY_PHRASES}) ${dep}" 2>/dev/null)"
+            sofins_all="$(echo "${sofin_ps_list}" | ${WC_BIN} -l 2>/dev/null | ${SED_BIN} 's/ //g' 2>/dev/null)"
+            test ${sofins_all} -gt 2 && error "Bundle: ${dep} is in a middle of build process in background! Aborting."
         done
+        update_definitions
+        USE_UPDATE=false USE_BINBUILD=false ${SOFIN_BIN} install ${dependencies} || def_error
         exit
         ;;
 
@@ -750,9 +755,14 @@ if [ ! "$1" = "" ]; then
         def_error () {
             error "Failure in definition: ${software}. Report or fix the definition please!"
         }
+        for dep in ${dependencies}; do
+            sofin_ps_list="$(${PS_BIN} axv 2>/dev/null | ${GREP_BIN} -v grep 2>/dev/null | ${EGREP_BIN} "sh ${SOFIN_BIN} (${ALL_INSTALL_PHRASES}|${BUILD_AND_DEPLOY_PHRASES}) ${dep}" 2>/dev/null)"
+            sofins_all="$(echo "${sofin_ps_list}" | ${WC_BIN} -l 2>/dev/null | ${SED_BIN} 's/ //g' 2>/dev/null)"
+            test ${sofins_all} -gt 2 && error "Bundle: ${dep} is in a middle of build process in background! Aborting."
+        done
         update_definitions
         for software in ${dependencies}; do
-            USE_UPDATE=false ${SOFIN_BIN} build ${software} || def_error && \
+            USE_BINBUILD=false USE_UPDATE=false ${SOFIN_BIN} install ${software} || def_error && \
             USE_UPDATE=false ${SOFIN_BIN} push ${software} || def_error && \
             note "Software bundle deployed: ${software}"
         done
@@ -1645,7 +1655,7 @@ for application in ${APPLICATIONS}; do
 
             *)
                 # count Sofin jobs. For more than one job available,
-                sofin_ps_list="$(${PS_BIN} axv 2>/dev/null | ${GREP_BIN} -v grep 2>/dev/null | ${GREP_BIN} "sh ${SOFIN_BIN} install [A-Z].*" 2>/dev/null)"
+                sofin_ps_list="$(${PS_BIN} axv 2>/dev/null | ${GREP_BIN} -v grep 2>/dev/null | ${EGREP_BIN} "sh ${SOFIN_BIN} (${ALL_INSTALL_PHRASES}) [A-Z].*" 2>/dev/null)"
                 debug "Sofin ps list: $(echo "${sofin_ps_list}" | ${TR_BIN} '\n' ',' 2>/dev/null)"
                 sofins_all="$(echo "${sofin_ps_list}" | ${WC_BIN} -l 2>/dev/null | ${SED_BIN} 's/ //g' 2>/dev/null)"
                 sofins_running="$(echo "${sofins_all} - 1" | ${BC_BIN} 2>/dev/null)"
