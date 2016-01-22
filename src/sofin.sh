@@ -109,24 +109,22 @@ update_definitions () {
         if [ "${current_branch}" != "${BRANCH}" ]; then # use current_branch value if branch isn't matching default branch
             debug "Fetching branch: ${current_branch}"
             # ${GIT_BIN} stash save -a >> ${LOG} 2>&1
-            ${GIT_BIN} checkout -b "${current_branch}" >> ${LOG}-definitions-update 2>&1 || ${GIT_BIN} checkout "${current_branch}" >> ${LOG}-definitions-update 2>&1
-            ${GIT_BIN} pull origin "${current_branch}" >> ${LOG}-definitions-update && note "Updated branch ${current_branch} of repository ${REPOSITORY}" || error "Error occured: Update from branch: ${BRANCH} of repository ${REPOSITORY} wasn't possible."
+            ${GIT_BIN} checkout -b "${current_branch}" >> ${LOG}-default 2>&1 || ${GIT_BIN} checkout "${current_branch}" >> ${LOG}-default 2>&1
+            ${GIT_BIN} pull origin "${current_branch}" >> ${LOG}-default && note "Updated branch ${current_branch} of repository ${REPOSITORY}" || error "Error occured: Update from branch: ${BRANCH} of repository ${REPOSITORY} wasn't possible."
 
         else # else use default branch
             debug "Using default branch: ${BRANCH}"
-            ${GIT_BIN} checkout -b "${BRANCH}" >> ${LOG}-definitions-update 2>&1 || ${GIT_BIN} checkout "${BRANCH}" >> ${LOG}-definitions-update 2>&1
-            (${GIT_BIN} pull origin "${BRANCH}" >> ${LOG}-definitions-update && note "Updated branch ${BRANCH} of repository ${REPOSITORY}") || error "Error occured: Update from branch: ${BRANCH} of repository ${REPOSITORY} wasn't possible."
-
+            ${GIT_BIN} checkout -b "${BRANCH}" >> ${LOG}-default 2>&1 || ${GIT_BIN} checkout "${BRANCH}" >> ${LOG}-default 2>&1
+            (${GIT_BIN} pull origin "${BRANCH}" >> ${LOG}-default && note "Updated branch ${BRANCH} of repository ${REPOSITORY}") || error "Error occured: Update from branch: ${BRANCH} of repository ${REPOSITORY} wasn't possible."
         fi
-
     else
         # clone definitions repository:
         cd "${CACHE_DIR}"
-        note "Cloning repository ${REPOSITORY} from branch: ${BRANCH}"
-        ${RM_BIN} -rf definitions >> ${LOG}-definitions-update 2>&1 # if something is already here, wipe it out from cache
-        ${GIT_BIN} clone "${REPOSITORY}" definitions >> ${LOG}-definitions-update 2>&1 || error "Error occured: Cloning repository ${REPOSITORY} isn't possible. Make sure it's valid."
+        debug "Cloning repository ${REPOSITORY} from branch: ${BRANCH}"
+        ${RM_BIN} -rf definitions >> ${LOG}-default 2>&1 # if something is already here, wipe it out from cache
+        ${GIT_BIN} clone "${REPOSITORY}" definitions >> ${LOG}-default 2>&1 || error "Error occured: Cloning repository ${REPOSITORY} isn't possible. Make sure it's valid."
         cd "${CACHE_DIR}definitions"
-        ${GIT_BIN} checkout -b "${BRANCH}" >> ${LOG}-definitions-update 2>&1
+        ${GIT_BIN} checkout -b "${BRANCH}" >> ${LOG}-default 2>&1
         (${GIT_BIN} pull origin "${BRANCH}" && note "Updated branch ${BRANCH} of repository ${REPOSITORY}") || error "Error occured: Update from branch: ${BRANCH} of repository ${REPOSITORY} isn't possible. Make sure that given repository and branch are valid."
     fi
 }
@@ -642,7 +640,8 @@ if [ ! "$1" = "" ]; then
                         def_error () {
                             error "Error sending ${1} to ${address}/${1}"
                         }
-                        ${SSH_BIN} -p ${MAIN_PORT} ${MAIN_USER}@${mirror} "mkdir -p ${MAIN_SOFTWARE_PREFIX}/software/binary/${SYS}" >> "${LOG}-${APP_NAME}${APP_POSTFIX}" 2>&1
+                        aname="$(echo "${APP_NAME}${APP_POSTFIX}" | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null)"
+                        ${SSH_BIN} -p ${MAIN_PORT} ${MAIN_USER}@${mirror} "mkdir -p ${MAIN_SOFTWARE_PREFIX}/software/binary/${SYS}" >> "${LOG}-${aname}" 2>&1
 
                         if [ "${SYSTEM_NAME}" = "FreeBSD" ]; then # NOTE: feature designed for FBSD.
                             note "Preparing service dataset for: ${element}"
@@ -655,7 +654,7 @@ if [ ! "$1" = "" ]; then
                             snap_size="0"
                             ${ZFS_BIN} list -H 2>/dev/null | ${GREP_BIN} "${element}$" >/dev/null 2>&1
                             if [ "$?" = "0" ]; then # if dataset exists, unmount it, send to file, and remount back
-                                ${ZFS_BIN} umount ${full_dataset_name} || def_error "ZFS umount ${full_dataset_name}. Dataset busy on build host? Not good :)"
+                                ${ZFS_BIN} umount ${full_dataset_name} || error "ZFS umount ${full_dataset_name}. Dataset busy on build host? Not good :)"
                                 ${ZFS_BIN} send ${full_dataset_name} | ${XZ_BIN} > ${final_snap_file} && \
                                 snap_size="$(${STAT_BIN} -f%z "${final_snap_file}")" && \
                                 ${ZFS_BIN} mount ${full_dataset_name} && \
@@ -667,7 +666,7 @@ if [ ! "$1" = "" ]; then
                             fi
                         fi
 
-                        note "Preparing archives of: ${element}"
+                        note "Preparing ${element} archives.."
                         if [ ! -e "./${name}" ]; then
                             ${TAR_BIN} -cJf "${name}" "./${element}"
                         else
@@ -837,7 +836,7 @@ if [ ! "$1" = "" ]; then
                     SYS="${SYSTEM_NAME}-${FULL_SYSTEM_VERSION}-${SYSTEM_ARCH}"
                     system_path="${MAIN_SOFTWARE_PREFIX}/software/binary/${SYS}"
                     note "Wiping out remote (${mirror}) binary archives: ${name}*"
-                    ${SSH_BIN} -p ${MAIN_PORT} ${MAIN_USER}@${mirror} "${RM_BIN} -f ${system_path}/${name}* ${system_path}/${name}.sha1" >> "${LOG}-${APP_NAME}${APP_POSTFIX}" 2>&1
+                    ${SSH_BIN} -p ${MAIN_PORT} ${MAIN_USER}@${mirror} "${RM_BIN} -f ${system_path}/${name}* ${system_path}/${name}.sha1" >> "${LOG}-default" 2>&1
                 done
             done
             note "Done."
@@ -864,24 +863,24 @@ if [ ! "$1" = "" ]; then
 
         err=0
         for app in $APPLICATIONS; do
-            APP_NAME="$(${PRINTF_BIN} "${app}" | ${CUT_BIN} -c1 | ${TR_BIN} '[a-z]' '[A-Z]')$(${PRINTF_BIN} "${app}" | ${SED_BIN} 's/^[a-zA-Z]//')"
-            if [ -d "${SOFTWARE_DIR}${APP_NAME}" ]; then
-                note "Removing ${APP_NAME}"
-                if [ "${APP_NAME}" = "/" ]; then
+            given_app_name="$(${PRINTF_BIN} "${app}" | ${CUT_BIN} -c1 | ${TR_BIN} '[a-z]' '[A-Z]')$(${PRINTF_BIN} "${app}" | ${SED_BIN} 's/^[a-zA-Z]//')"
+            if [ -d "${SOFTWARE_DIR}${given_app_name}" ]; then
+                if [ "${given_app_name}" = "/" ]; then
                     error "Czy Ty orzeszki?"
                 fi
-                debug "Removing software from: ${SOFTWARE_DIR}${APP_NAME}"
-                ${RM_BIN} -rfv "${SOFTWARE_DIR}${APP_NAME}" >> "${LOG}-${APP_LOWER}${APP_POSTFIX}"
+                note "Removing software bundle: ${given_app_name}"
+                aname="$(echo "${APP_NAME}${APP_POSTFIX}" | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null)"
+                ${RM_BIN} -rfv "${SOFTWARE_DIR}${given_app_name}" >> "${LOG}-${aname}"
 
                 debug "Looking for other installed versions that might be exported automatically.."
-                name="$(echo "${APP_NAME}" | ${SED_BIN} 's/[0-9]*//g')"
+                name="$(echo "${given_app_name}" | ${SED_BIN} 's/[0-9]*//g')"
                 alternative="$(${FIND_BIN} ${SOFTWARE_DIR} -maxdepth 1 -name "${name}*" | ${SED_BIN} 's/^.*\///g' | ${HEAD_BIN} -n1)"
                 if [ ! -z "${alternative}" ]; then
                     note "Automatically picking first available alternative: ${alternative}"
                     $0 install ${alternative}
                 fi
             else
-                warn "Application: ${APP_NAME} not installed."
+                warn "Application: ${given_app_name} not installed."
                 err=1 # throw an error exit code after itering through list of applications to remove
             fi
             update_shell_vars ${USERNAME}
@@ -942,7 +941,8 @@ if [ ! "$1" = "" ]; then
                 curr_dir="$(${PWD_BIN})"
                 cd "${SOFTWARE_DIR}${APP}${dir}"
                 ${MKDIR_BIN} -p "${SOFTWARE_DIR}${APP}/exports" # make sure exports dir already exists
-                ${LN_BIN} -vfs "..${dir}/${EXPORT}" "../exports/${EXPORT}" >> "${LOG}-${APP_NAME}${APP_POSTFIX}"
+                aname="$(echo "${APP}" | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null)"
+                ${LN_BIN} -vfs "..${dir}/${EXPORT}" "../exports/${EXPORT}" >> "${LOG}-${aname}"
                 cd "${curr_dir}"
                 exit
             else
@@ -1077,26 +1077,28 @@ for application in ${APPLICATIONS}; do
 
             run () {
                 if [ ! -z "$1" ]; then
-                    if [ ! -e "${LOG}-${APP_NAME}${APP_POSTFIX}" ]; then
-                        ${TOUCH_BIN} "${LOG}-${APP_NAME}${APP_POSTFIX}"
+                    aname="$(echo "${APP_NAME}${APP_POSTFIX}" | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null)"
+                    if [ ! -e "${LOG}-${aname}" ]; then
+                        ${TOUCH_BIN} "${LOG}-${aname}"
                     fi
-                    debug "Running '$@' - $(${DATE_BIN} +%F-%H%M%S)"
-                    eval PATH="${PATH}" "$@" 1>> "${LOG}-${APP_NAME}${APP_POSTFIX}" 2>> "${LOG}-${APP_NAME}${APP_POSTFIX}"
+                    debug "$(${DATE_BIN} +%H%M%S-%s) run($@);"
+                    eval PATH="${PATH}" "$@" 1>> "${LOG}-${aname}" 2>> "${LOG}-${aname}"
                     check_command_result $? "$@"
                 else
-                    error "Empty command to run?"
+                    error "An empty command to run for: ${APP_NAME}?"
                 fi
             }
 
             try () {
                 if [ ! -z "$1" ]; then
-                    if [ ! -e "${LOG}-${APP_NAME}${APP_POSTFIX}" ]; then
-                        ${TOUCH_BIN} "${LOG}-${APP_NAME}${APP_POSTFIX}"
+                    aname="$(echo "${APP_NAME}${APP_POSTFIX}" | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null)"
+                    if [ ! -e "${LOG}-${aname}" ]; then
+                        ${TOUCH_BIN} "${LOG}-${aname}"
                     fi
-                    debug "Trying '$@' - $(${DATE_BIN} +%F-%H%M%S)"
-                    eval PATH="${PATH}" "$@" 1>> "${LOG}-${APP_NAME}${APP_POSTFIX}" 2>> "${LOG}-${APP_NAME}${APP_POSTFIX}"
+                    debug "$(${DATE_BIN} +%H%M%S-%s) try($@);"
+                    eval PATH="${PATH}" "$@" 1>> "${LOG}-${aname}" 2>> "${LOG}-${aname}"
                 else
-                    error "Trying empty command to run?"
+                    error "An empty command to run for: ${APP_NAME}?"
                 fi
             }
 
@@ -1113,10 +1115,11 @@ for application in ${APPLICATIONS}; do
                     if [ "${USE_BINBUILD}" = "false" ]; then
                         note "   ${NOTE_CHAR2} Binary build check was skipped"
                     else
+                        aname="$(echo "${APP_NAME}${APP_POSTFIX}" | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null)"
                         if [ ! -e "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" ]; then
                             cd ${BINBUILDS_CACHE_DIR}${ABSNAME}
                             note "Trying binary build for: ${MIDDLE}/${APP_NAME}${APP_POSTFIX}-${APP_VERSION}"
-                            ${FETCH_BIN} "${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}.sha1" 2>>${LOG}-${APP_NAME}${APP_POSTFIX}
+                            ${FETCH_BIN} "${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}.sha1" 2>>${LOG}-${aname}
                             ${FETCH_BIN} "${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}"
 
                             # checking archive sha1 checksum
@@ -1150,7 +1153,7 @@ for application in ${APPLICATIONS}; do
                         debug "ARCHIVE_NAME: ${ARCHIVE_NAME}"
                         debug "Expecting to be existant: ${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}"
                         if [ -e "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" ]; then # if exists, then checksum is ok
-                            ${TAR_BIN} xJf "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" >> ${LOG}-${APP_NAME}${APP_POSTFIX} 2>&1
+                            ${TAR_BIN} xJf "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" >> ${LOG}-${aname} 2>&1
                             if [ "$?" = "0" ]; then # if archive is valid
                                 note "  ${NOTE_CHAR2} Binary bundle installed: ${APP_NAME}${APP_POSTFIX} with version: ${APP_VERSION}"
                                 export DONT_BUILD_BUT_DO_EXPORTS="true"
@@ -1299,6 +1302,7 @@ for application in ${APPLICATIONS}; do
                                 run "${APP_AFTER_UNPACK_CALLBACK}"
                             fi
 
+                            aname="$(echo "${APP_NAME}${APP_POSTFIX}" | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null)"
                             LIST_DIR="${DEFINITIONS_DIR}patches/$1" # $1 is definition file name
                             if [ -d "${LIST_DIR}" ]; then
                                 patches_files="$(${FIND_BIN} ${LIST_DIR}/* -maxdepth 0 -type f)"
@@ -1306,7 +1310,7 @@ for application in ${APPLICATIONS}; do
                                 for patch in ${patches_files}; do
                                     for level in 0 1 2 3 4 5; do
                                         debug "Trying to patch source with patch: ${patch}, level: ${level}"
-                                        ${PATCH_BIN} -p${level} -N -f -i "${patch}" >> "${LOG}-${APP_NAME}${APP_POSTFIX}" 2>> "${LOG}-${APP_NAME}${APP_POSTFIX}" # don't use run.. it may fail - we don't care
+                                        ${PATCH_BIN} -p${level} -N -f -i "${patch}" >> "${LOG}-${aname}" 2>> "${LOG}-${aname}" # don't use run.. it may fail - we don't care
                                         if [ "$?" = "0" ]; then # skip applying single patch if it already passed
                                             debug "Patch: '${patch}' applied successfully!"
                                             break;
@@ -1321,7 +1325,7 @@ for application in ${APPLICATIONS}; do
                                     for platform_specific_patch in ${patches_files}; do
                                         for level in 0 1 2 3 4 5; do
                                             debug "Patching source code with pspatch: ${platform_specific_patch} (p${level})"
-                                            ${PATCH_BIN} -p${level} -N -f -i "${platform_specific_patch}" >> "${LOG}-${APP_NAME}${APP_POSTFIX}" 2>> "${LOG}-${APP_NAME}${APP_POSTFIX}"
+                                            ${PATCH_BIN} -p${level} -N -f -i "${platform_specific_patch}" >> "${LOG}-${aname}" 2>> "${LOG}-${aname}"
                                             if [ "$?" = "0" ]; then # skip applying single patch if it already passed
                                                 debug "Patch: '${platform_specific_patch}' applied successfully!"
                                                 break;
@@ -1536,24 +1540,29 @@ for application in ${APPLICATIONS}; do
                 debug "Moving ${PREFIX}/exports-disabled to ${PREFIX}/exports"
                 ${MV_BIN} "${PREFIX}/exports-disabled" "${PREFIX}/exports"
             fi
-            note "Exporting binaries: ${APP_EXPORTS} of prefix: ${PREFIX}"
-            ${MKDIR_BIN} -p "${PREFIX}/exports"
-            EXPORT_LIST=""
-            for exp in ${APP_EXPORTS}; do
-                for dir in "/bin/" "/sbin/" "/libexec/"; do
-                    file_to_exp="${PREFIX}${dir}${exp}"
-                    if [ -f "${file_to_exp}" ]; then # a file
-                        if [ -x "${file_to_exp}" ]; then # and it's executable'
-                            curr_dir="$(${PWD_BIN} 2>/dev/null)"
-                            cd "${PREFIX}${dir}"
-                            ${LN_BIN} -vfs "..${dir}${exp}" "../exports/${exp}" >> "${LOG}-${APP_NAME}${APP_POSTFIX}"
-                            cd "${curr_dir}"
-                            exp_elem="$(${BASENAME_BIN} ${file_to_exp})"
-                            EXPORT_LIST="${EXPORT_LIST} ${exp_elem}"
+            if [ -z "${APP_EXPORTS}" ]; then
+                note "Defined no binaries to export of prefix: ${PREFIX}"
+            else
+                aname="$(echo "${APP_NAME}${APP_POSTFIX}" | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null)"
+                note "Exporting binaries: ${APP_EXPORTS} of prefix: ${PREFIX}"
+                ${MKDIR_BIN} -p "${PREFIX}/exports"
+                EXPORT_LIST=""
+                for exp in ${APP_EXPORTS}; do
+                    for dir in "/bin/" "/sbin/" "/libexec/"; do
+                        file_to_exp="${PREFIX}${dir}${exp}"
+                        if [ -f "${file_to_exp}" ]; then # a file
+                            if [ -x "${file_to_exp}" ]; then # and it's executable'
+                                curr_dir="$(${PWD_BIN} 2>/dev/null)"
+                                cd "${PREFIX}${dir}"
+                                ${LN_BIN} -vfs "..${dir}${exp}" "../exports/${exp}" >> "${LOG}-${aname}"
+                                cd "${curr_dir}"
+                                exp_elem="$(${BASENAME_BIN} ${file_to_exp})"
+                                EXPORT_LIST="${EXPORT_LIST} ${exp_elem}"
+                            fi
                         fi
-                    fi
+                    done
                 done
-            done
+            fi
         done
 
         if [ ! -z "${APP_AFTER_EXPORT_CALLBACK}" ]; then
@@ -1562,7 +1571,6 @@ for application in ${APPLICATIONS}; do
         fi
 
         if [ "${APP_CLEAN_USELESS}" = "true" ]; then
-            note "Performing cleanup of useless files"
             for pattern in ${APP_USELESS} ${APP_DEFAULT_USELESS}; do
                 debug "Pattern: ${pattern}"
                 if [ ! -z "${PREFIX}" ]; then
@@ -1677,8 +1685,8 @@ for application in ${APPLICATIONS}; do
                         create_or_receive () {
                             dataset_name="$1"
                             remote_path="${MAIN_BINARY_REPOSITORY}${MAIN_COMMON_NAME}/${final_snap_file}"
-                            note "Seeking remote snapshot existence: ${remote_path}"
-                            ${FETCH_BIN} "${remote_path}" 2>> ${LOG}
+                            debug "Seeking remote snapshot existence: ${remote_path}"
+                            ${FETCH_BIN} "${remote_path}" 2>> ${LOG}-${app_name_lowercase}
                             if [ "$?" = "0" ]; then
                                 debug "Stream archive available. Creating service dataset: ${dataset_name} from file stream: ${final_snap_file}"
                                 ${XZCAT_BIN} "${final_snap_file}" | ${ZFS_BIN} receive -v "${dataset_name}" 2>/dev/null | ${TAIL_BIN} -n1 && \
@@ -1717,6 +1725,7 @@ for application in ${APPLICATIONS}; do
             APP_LOWERNAME="${APP_NAME}"
             APP_NAME="$(${PRINTF_BIN} "${APP_NAME}" | ${CUT_BIN} -c1 | ${TR_BIN} '[a-z]' '[A-Z]')$(${PRINTF_BIN} "${APP_NAME}" | ${SED_BIN} 's/^[a-zA-Z]//')"
             APP_BUNDLE_NAME="${PREFIX}.app"
+            aname="$(echo "${APP_NAME}${APP_POSTFIX}" | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null)"
             note "Creating Apple bundle: ${APP_NAME} in ${APP_BUNDLE_NAME}"
             ${MKDIR_BIN} -p "${APP_BUNDLE_NAME}/libs"
             ${MKDIR_BIN} -p "${APP_BUNDLE_NAME}/Contents"
@@ -1728,7 +1737,7 @@ for application in ${APPLICATIONS}; do
             ${CP_BIN} -R ${PREFIX}/bin/${APP_LOWERNAME} "${APP_BUNDLE_NAME}/exports/"
 
             for lib in $(${FIND_BIN} "${PREFIX}" -name '*.dylib' -type f); do
-                ${CP_BIN} -vf ${lib} ${APP_BUNDLE_NAME}/libs/ >> ${LOG}-${APP_NAME}${APP_POSTFIX}-applebuild 2>&1
+                ${CP_BIN} -vf ${lib} ${APP_BUNDLE_NAME}/libs/ >> ${LOG}-${aname} 2>&1
             done
 
             # if symlink exists, remove it.
@@ -1740,13 +1749,13 @@ for application in ${APPLICATIONS}; do
             ${CP_BIN} -R "${PREFIX}/lib/${APP_LOWERNAME}" "${APP_BUNDLE_NAME}/libs/"
 
             cd "${APP_BUNDLE_NAME}/Contents"
-            test -L MacOS || ${LN_BIN} -s ../exports MacOS >> ${LOG}-${APP_NAME}${APP_POSTFIX}-applebuild 2>&1
+            test -L MacOS || ${LN_BIN} -s ../exports MacOS >> ${LOG}-${aname} 2>&1
 
             note "Creating relative libraries search path"
             cd ${APP_BUNDLE_NAME}
 
             note "Processing exported binary: ${i}"
-            ${SOFIN_LIBBUNDLE_BIN} -x "${APP_BUNDLE_NAME}/Contents/MacOS/${APP_LOWERNAME}" >> ${LOG}-${APP_NAME}${APP_POSTFIX}-applebuild 2>&1
+            ${SOFIN_LIBBUNDLE_BIN} -x "${APP_BUNDLE_NAME}/Contents/MacOS/${APP_LOWERNAME}" >> ${LOG}-${aname} 2>&1
 
         fi
 
