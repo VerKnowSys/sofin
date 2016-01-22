@@ -930,12 +930,10 @@ if [ ! "$1" = "" ]; then
             debug "Testing ${dir} looking into: ${SOFTWARE_DIR}${APP}${dir}"
             if [ -e "${SOFTWARE_DIR}${APP}${dir}${EXPORT}" ]; then
                 note "Exporting binary: ${SOFTWARE_DIR}${APP}${dir}${EXPORT}"
-                curr_dir="$(${PWD_BIN})"
                 cd "${SOFTWARE_DIR}${APP}${dir}"
                 ${MKDIR_BIN} -p "${SOFTWARE_DIR}${APP}/exports" # make sure exports dir already exists
                 aname="$(echo "${APP}" | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null)"
                 ${LN_BIN} -vfs "..${dir}/${EXPORT}" "../exports/${EXPORT}" >> "${LOG}-${aname}"
-                cd "${curr_dir}"
                 exit
             else
                 debug "Not found: ${SOFTWARE_DIR}${APP}${dir}${EXPORT}"
@@ -1213,7 +1211,7 @@ for application in ${APPLICATIONS}; do
                     if [ -z "${APP_HTTP_PATH}" ]; then
                         note "   ${NOTE_CHAR2} No source given for definition, it's only valid for meta bundles."
                     else
-                        CUR_DIR="$(${PWD_BIN})"
+                        CUR_DIR="$(${PWD_BIN} 2>/dev/null)"
 
                         if [ "${SOFIN_CONTINUE_BUILD}" != "YES"  ]; then
                             debug "Runtime SHA1: ${RUNTIME_SHA}"
@@ -1333,7 +1331,7 @@ for application in ${APPLICATIONS}; do
                             fi
 
                             debug "-------------- PRE CONFIGURE SETTINGS DUMP --------------"
-                            debug "Current DIR: $(${PWD_BIN})"
+                            debug "Current DIR: $(${PWD_BIN} 2>/dev/null)"
                             debug "PREFIX: ${PREFIX}"
                             debug "SERVICE_DIR: ${SERVICE_DIR}"
                             debug "PATH: ${PATH}"
@@ -1439,7 +1437,7 @@ for application in ${APPLICATIONS}; do
                         else
                             debug "Leaving build dir intact when working in devel mode. Last build dir: '${BUILD_DIR_ROOT}'"
                         fi
-                        cd "${CUR_DIR}"
+                        cd "${CUR_DIR}" 2>/dev/null
                     fi
                 else
                     warn "   ${NOTE_CHAR2} Requirement: ${APP_NAME} disabled on architecture: ${SYSTEM_NAME}-${FULL_SYSTEM_VERSION}-${SYSTEM_ARCH}"
