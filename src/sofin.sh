@@ -597,17 +597,15 @@ if [ ! "$1" = "" ]; then
 
 
     deps|dependencies|local)
-        LOCAL_DIR="$(${PWD_BIN})/"
         if [ "${USERNAME}" = "root" ]; then
             warn "Installation of project dependencies as root is immoral."
         fi
-        cd "${LOCAL_DIR}"
-        note "Looking for $(${PWD_BIN})/${DEPENDENCIES_FILE} file."
-        if [ ! -e "$(${PWD_BIN})/${DEPENDENCIES_FILE}" ]; then
+        note "Looking for a dependencies list file: ${DEPENDENCIES_FILE} in current directory"
+        if [ ! -e "./${DEPENDENCIES_FILE}" ]; then
             error "Dependencies file not found!"
         fi
-        export APPLICATIONS="$(${CAT_BIN} ${LOCAL_DIR}${DEPENDENCIES_FILE} | ${TR_BIN} '\n' ' ')"
-        note "Installing dependencies: ${APPLICATIONS}\n"
+        export APPLICATIONS="$(${CAT_BIN} ./${DEPENDENCIES_FILE} | ${TR_BIN} '\n' ' ')"
+        note "Installing dependencies: ${APPLICATIONS}"
         ;;
 
 
