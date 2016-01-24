@@ -7,7 +7,7 @@ if [ "${SOFIN_TRACE}" = "" ]; then
 fi
 
 # Sofin version string:
-readonly VERSION="0.90.4"
+readonly SOFIN_VERSION="0.90.5"
 
 # setting up definitions repository
 readonly DEFAULT_REPOSITORY="https://verknowsys@bitbucket.org/verknowsys/sofin-definitions.git" # official sofin definitions repository
@@ -28,7 +28,7 @@ readonly gray='\033[37;40m'
 readonly white='\033[38;40m'
 readonly reset='\033[0m'
 
-readonly SOFIN_HEADER="Sofin v${VERSION} (c) 2o11-2o16 verknowsys.com"
+readonly SOFIN_HEADER="Sofin v${SOFIN_VERSION} (c) 2o11-2o16 verknowsys.com"
 readonly SOFIN_PROFILE="/etc/profile_sofin"
 readonly SOFIN_DISABLED_INDICATOR_FILE="${HOME}/.sofin-disabled"
 readonly SERVICES_DIR="/Services/"

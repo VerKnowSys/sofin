@@ -16,7 +16,7 @@ note "Pushing repo to: ${SOFIN_MIRROR}"
 ${GIT_BIN} push --all "${SOFIN_MIRROR}" && \
 bin/clean
 ${MKDIR_BIN} -p releases
-version="$(grep 'readonly VERSION=' src/sofin.conf.sh | awk '{ gsub(/\"/, "", $2); gsub(/VERSION=/, "", $2); print $2; }')"
+version="$(grep 'readonly SOFIN_VERSION=' src/sofin.conf.sh | awk '{ gsub(/\"/, "", $2); gsub(/SOFIN_VERSION=/, "", $2); print $2; }')"
 base_name="sofin-${version}"
 archive_name="${base_name}.txz"
 note "Preparing package: ${archive_name} with version: ${version}"
