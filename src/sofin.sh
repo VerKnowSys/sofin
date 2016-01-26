@@ -1526,13 +1526,13 @@ for application in ${APPLICATIONS}; do
 
             debug "Doing app conflict resolve"
             if [ ! -z "${APP_CONFLICTS_WITH}" ]; then
-                note "Resolving conflicts: ${APP_CONFLICTS_WITH}"
+                note "Resolving possible conflicts with: ${APP_CONFLICTS_WITH}"
                 for app in ${APP_CONFLICTS_WITH}; do
                     maybe_software="$(${FIND_BIN} ${SOFTWARE_DIR} -maxdepth 1 -type d -name ${app}\*)"
                     for an_app in ${maybe_software}; do
                         debug "Found conflicting app: ${an_app}"
                         if [ -e "${an_app}/exports" ]; then
-                            note "Disabling exports for ${APP_NAME}${APP_POSTFIX}"
+                            debug "Disabling exports for ${APP_NAME}${APP_POSTFIX}"
                             ${MV_BIN} "${an_app}/exports" "${an_app}/exports-disabled"
                         fi
                     done
