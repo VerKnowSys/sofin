@@ -198,10 +198,10 @@ error () {
 
 
 # System specific configuration
-export DEFAULT_LDFLAGS="-fPIC -fPIE"
 export DEFAULT_ZPOOL="zroot"
-export readonly SYSTEM_NAME="$(uname)"
-export readonly SYSTEM_ARCH="$(uname -m)"
+export DEFAULT_LDFLAGS="-fPIC -fPIE"
+export readonly SYSTEM_NAME="$(/usr/bin/uname -s)"
+export readonly SYSTEM_ARCH="$(/usr/bin/uname -m)"
 
 if [ -z "${DEBUGBUILD}" ]; then
     export readonly DEFAULT_COMPILER_FLAGS="-Os -fPIC -fPIE -fno-strict-overflow -fstack-protector-all"
