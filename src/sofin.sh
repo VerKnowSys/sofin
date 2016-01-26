@@ -863,9 +863,8 @@ if [ ! "$1" = "" ]; then
             debug "Removing applications: ${SOFIN_ARGS}"
         fi
 
-        err=0
         for app in $APPLICATIONS; do
-            given_app_name="$(${PRINTF_BIN} "${app}" | ${CUT_BIN} -c1 | ${TR_BIN} '[a-z]' '[A-Z]')$(${PRINTF_BIN} "${app}" | ${SED_BIN} 's/^[a-zA-Z]//')"
+            given_app_name="$(${PRINTF_BIN} "${app}" | ${CUT_BIN} -c1 | ${TR_BIN} '[a-z]' '[A-Z]')$(${PRINTF_BIN} "${app}" | ${SED_BIN} 's/^[a-zA-Z]//' 2>/dev/null)"
             if [ -d "${SOFTWARE_DIR}${given_app_name}" ]; then
                 if [ "${given_app_name}" = "/" ]; then
                     error "Czy Ty orzeszki?"
@@ -876,18 +875,23 @@ if [ ! "$1" = "" ]; then
 
                 debug "Looking for other installed versions that might be exported automatically.."
                 name="$(echo "${given_app_name}" | ${SED_BIN} 's/[0-9]*//g')"
-                alternative="$(${FIND_BIN} ${SOFTWARE_DIR} -maxdepth 1 -name "${name}*" | ${SED_BIN} 's/^.*\///g' | ${HEAD_BIN} -n1)"
-                if [ ! -z "${alternative}" ]; then
-                    note "Automatically picking first available alternative: ${alternative}"
-                    $0 install ${alternative}
+                alternative="$(${FIND_BIN} ${SOFTWARE_DIR} -maxdepth 1 -name "${name}*" 2>/dev/null | ${SED_BIN} 's/^.*\///g' 2>/dev/null | ${HEAD_BIN} -n1 2>/dev/null)"
+                alt_lower="$(echo "${alternative}" | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null)"
+                debug "Alt_lower: ${alt_lower}, full: ${SOFTWARE_DIR}${alternative}/${alt_lower}${INSTALLED_MARK}"
+                if [ ! -z "${alternative}" -a -f "${SOFTWARE_DIR}${alternative}/${alt_lower}${INSTALLED_MARK}" ]; then
+                    note "Automatically picking first alternative already installed: ${alternative}"
+                    export APPLICATIONS="${alternative}"
+                    continue
+                else
+                    update_shell_vars ${USERNAME}
+                    exit
                 fi
             else
                 warn "Application: ${given_app_name} not installed."
-                err=1 # throw an error exit code after itering through list of applications to remove
+                exit 1
             fi
-            update_shell_vars ${USERNAME}
         done
-        exit ${err}
+        debug "Continuing pick of first alternative: ${alternative}"
         ;;
 
 
