@@ -218,7 +218,7 @@ unset PKG_CONFIG_PATH
 clean_binbuilds () {
     if [ -d "${BINBUILDS_CACHE_DIR}" ]; then
         note "Removing binary builds from: ${BINBUILDS_CACHE_DIR}"
-        ${RM_BIN} -rf "${BINBUILDS_CACHE_DIR}" || error "Privileges problem in '${BINBUILDS_CACHE_DIR}'? All files should belong to '${USER}' there."
+        ${RM_BIN} -rf "${BINBUILDS_CACHE_DIR}" || warn "Privileges problem in '${BINBUILDS_CACHE_DIR}'? All files should belong to '${USER}' there."
     fi
 }
 
@@ -233,7 +233,7 @@ clean_failbuilds () {
         fi
         for i in ${files}; do
             debug "Removing directory: ${i}"
-            ${RM_BIN} -rf "${i}" || error "Privileges problem while removing '${i}'? All files should belong to '${USER}' there."
+            ${RM_BIN} -rf "${i}" || warn "Privileges problem while removing '${i}'? All files should belong to '${USER}' there."
         done
         result="$(echo "${number}" | ${BC_BIN})"
         note "${result} directories cleaned."
