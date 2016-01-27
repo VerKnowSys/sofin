@@ -598,6 +598,7 @@ if [ ! "$1" = "" ]; then
         if [ ! -d "${DEFINITIONS_DIR}" -o \
              ! -f "${DEFAULTS}" ]; then
             debug "Detected no valid definitions cache in: ${DEFINITIONS_DIR}"
+            clean_purge
             update_definitions
         fi
 
