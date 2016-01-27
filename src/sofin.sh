@@ -587,7 +587,21 @@ if [ ! "$1" = "" ]; then
         if [ "$2" = "" ]; then
             error "For \"$1\" application installation mode, second argument with at least one application name or list is required!"
         fi
-        # first of all, try using a list if exists:
+
+        # check for regular cache dirs for existence:
+        if [ ! -d "${CACHE_DIR}" -o \
+             ! -d "${BINBUILDS_CACHE_DIR}" -o \
+             ! -d "${LOGS_DIR}" ]; then
+             debug "Making dirs: ${CACHE_DIR}", "${BINBUILDS_CACHE_DIR}, ${LOGS_DIR}"
+             ${MKDIR_BIN} -p "${CACHE_DIR}" "${BINBUILDS_CACHE_DIR}" "${LOGS_DIR}"
+        fi
+        if [ ! -d "${DEFINITIONS_DIR}" -o \
+             ! -f "${DEFAULTS}" ]; then
+            debug "Detected no valid definitions cache in: ${DEFINITIONS_DIR}"
+            update_definitions
+        fi
+
+        # try a list - it will have priority if file exists:
         if [ -f "${LISTS_DIR}$2" ]; then
             export APPLICATIONS="$(${CAT_BIN} ${LISTS_DIR}$2 | ${TR_BIN} '\n' ' ')"
             note "Processing software: ${APPLICATIONS} for architecture: ${SYSTEM_ARCH}"
