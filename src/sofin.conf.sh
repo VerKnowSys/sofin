@@ -216,7 +216,7 @@ case "${SYSTEM_NAME}" in
     FreeBSD)
         # Default
         readonly FREEBSD_MINIMUM_VERSION="91"
-        export CPUS="$(${SYSCTL_BIN} kern.smp.cpus | ${AWK_BIN} '{printf $2}')"
+        export CPUS="$(${SYSCTL_BIN} kern.smp.cpus | ${AWK_BIN} '{printf $2;}')"
         export CURL_BIN="/usr/bin/fetch -T 3 -o -"
         export MAKE_OPTS="-j${CPUS}"
         if [ ${OS_VERSION} -lt ${FREEBSD_MINIMUM_VERSION} ]; then
