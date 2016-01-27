@@ -2,8 +2,8 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
 #
 # global Sofin values:
-if [ "${SOFIN_TRACE}" = "" ]; then
-    export SOFIN_TRACE="false"
+if [ -z "${SOFIN_TRACE}" ]; then
+    export SOFIN_TRACE="NO"
 fi
 
 # Sofin version string:
