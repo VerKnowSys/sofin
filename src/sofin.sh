@@ -91,6 +91,10 @@ update_definitions () {
         debug "Definitions update skipped on demand"
         return
     fi
+    if [ ! -d "${CACHE_DIR}" ]; then
+        debug "Creating non existing cache dir: ${CACHE_DIR}"
+        ${MKDIR_BIN} -p "${CACHE_DIR}"
+    fi
     note "${SOFIN_HEADER}"
     if [ ! -x "${GIT_BIN}" ]; then
         note "Installing initial definition list from tarball to cache dir: ${CACHE_DIR}"
