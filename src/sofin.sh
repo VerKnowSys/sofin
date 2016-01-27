@@ -109,22 +109,22 @@ update_definitions () {
         if [ "${current_branch}" != "${BRANCH}" ]; then # use current_branch value if branch isn't matching default branch
             debug "Fetching branch: ${current_branch}"
             # ${GIT_BIN} stash save -a >> ${LOG} 2>&1
-            ${GIT_BIN} checkout -b "${current_branch}" >> ${LOG}-default 2>&1 || ${GIT_BIN} checkout "${current_branch}" >> ${LOG}-default 2>&1
-            ${GIT_BIN} pull origin "${current_branch}" >> ${LOG}-default && note "Updated branch ${current_branch} of repository ${REPOSITORY}" || error "Error occured: Update from branch: ${BRANCH} of repository ${REPOSITORY} wasn't possible."
+            ${GIT_BIN} checkout -b "${current_branch}" >> ${LOG} 2>&1 || ${GIT_BIN} checkout "${current_branch}" >> ${LOG} 2>&1
+            ${GIT_BIN} pull origin "${current_branch}" >> ${LOG} && note "Updated branch ${current_branch} of repository ${REPOSITORY}" || error "Error occured: Update from branch: ${BRANCH} of repository ${REPOSITORY} wasn't possible."
 
         else # else use default branch
             debug "Using default branch: ${BRANCH}"
-            ${GIT_BIN} checkout -b "${BRANCH}" >> ${LOG}-default 2>&1 || ${GIT_BIN} checkout "${BRANCH}" >> ${LOG}-default 2>&1
-            (${GIT_BIN} pull origin "${BRANCH}" >> ${LOG}-default && note "Updated branch ${BRANCH} of repository ${REPOSITORY}") || error "Error occured: Update from branch: ${BRANCH} of repository ${REPOSITORY} wasn't possible."
+            ${GIT_BIN} checkout -b "${BRANCH}" >> ${LOG} 2>&1 || ${GIT_BIN} checkout "${BRANCH}" >> ${LOG} 2>&1
+            (${GIT_BIN} pull origin "${BRANCH}" >> ${LOG} && note "Updated branch ${BRANCH} of repository ${REPOSITORY}") || error "Error occured: Update from branch: ${BRANCH} of repository ${REPOSITORY} wasn't possible."
         fi
     else
         # clone definitions repository:
         cd "${CACHE_DIR}"
         debug "Cloning repository ${REPOSITORY} from branch: ${BRANCH}"
-        ${RM_BIN} -rf definitions >> ${LOG}-default 2>&1 # if something is already here, wipe it out from cache
-        ${GIT_BIN} clone "${REPOSITORY}" definitions >> ${LOG}-default 2>&1 || error "Error occured: Cloning repository ${REPOSITORY} isn't possible. Make sure it's valid."
+        ${RM_BIN} -rf definitions >> ${LOG} 2>&1 # if something is already here, wipe it out from cache
+        ${GIT_BIN} clone "${REPOSITORY}" definitions >> ${LOG} 2>&1 || error "Error occured: Cloning repository ${REPOSITORY} isn't possible. Make sure it's valid."
         cd "${CACHE_DIR}definitions"
-        ${GIT_BIN} checkout -b "${BRANCH}" >> ${LOG}-default 2>&1
+        ${GIT_BIN} checkout -b "${BRANCH}" >> ${LOG} 2>&1
         (${GIT_BIN} pull origin "${BRANCH}" && note "Updated branch ${BRANCH} of repository ${REPOSITORY}") || error "Error occured: Update from branch: ${BRANCH} of repository ${REPOSITORY} isn't possible. Make sure that given repository and branch are valid."
     fi
 }
@@ -853,7 +853,7 @@ if [ ! "$1" = "" ]; then
                     SYS="${SYSTEM_NAME}-${FULL_SYSTEM_VERSION}-${SYSTEM_ARCH}"
                     system_path="${MAIN_SOFTWARE_PREFIX}/software/binary/${SYS}"
                     note "Wiping out remote (${mirror}) binary archives: ${name}*"
-                    ${SSH_BIN} -p ${MAIN_PORT} ${MAIN_USER}@${mirror} "${RM_BIN} -f ${system_path}/${name}* ${system_path}/${name}.sha1" >> "${LOG}-default" 2>&1
+                    ${SSH_BIN} -p ${MAIN_PORT} ${MAIN_USER}@${mirror} "${RM_BIN} -f ${system_path}/${name}* ${system_path}/${name}.sha1" >> "${LOG}" 2>&1
                 done
             done
         else

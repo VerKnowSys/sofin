@@ -260,9 +260,10 @@ case "${SYSTEM_NAME}" in
         export FETCH_BIN="/usr/bin/curl --connect-timeout 3 -O"
         export PATCH_BIN="/usr/bin/patch -p0 "
         export DEFAULT_LDFLAGS="-fPIC" # -arch x86_64 fPIE isn't well supported on OSX, but it's not production anyway
-        export DEFAULT_COMPILER_FLAGS="-Os -fPIC -fno-strict-overflow -fstack-protector-all" # -arch x86_64
+        default_options="-fPIC -fno-strict-overflow -fstack-protector-all"
+        export DEFAULT_COMPILER_FLAGS="-Os ${default_options}"
         if [ ! -z "${DEBUGBUILD}" ]; then
-            export DEFAULT_COMPILER_FLAGS="-O0 -g -fPIC -fno-strict-overflow -fstack-protector-all"
+            export DEFAULT_COMPILER_FLAGS="-O0 -g ${default_options}"
         fi
         export SHA_BIN="/usr/bin/shasum"
         export SYSCTL_BIN="/usr/sbin/sysctl"
