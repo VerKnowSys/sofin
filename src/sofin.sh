@@ -98,7 +98,7 @@ update_definitions () {
         cd "${CACHE_DIR}/definitions"
         INITIAL_DEFINITIONS="${MAIN_SOURCE_REPOSITORY}initial-definitions${DEFAULT_ARCHIVE_EXT}"
         debug "Fetching latest tarball with initial definitions from: ${INITIAL_DEFINITIONS}"
-        ${FETCH_BIN} "${INITIAL_DEFINITIONS}"
+        retry "${FETCH_BIN} ${INITIAL_DEFINITIONS}"
         ${TAR_BIN} xf *${DEFAULT_ARCHIVE_EXT}
         ${RM_BIN} -vrf "$(${BASENAME_BIN} ${INITIAL_DEFINITIONS})"
         return
@@ -1159,8 +1159,8 @@ for application in ${APPLICATIONS}; do
                         if [ ! -e "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" ]; then
                             cd ${BINBUILDS_CACHE_DIR}${ABSNAME}
                             note "Trying binary build for: ${MIDDLE}/${APP_NAME}${APP_POSTFIX}-${APP_VERSION}"
-                            ${FETCH_BIN} "${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}.sha1" 2>>${LOG}-${aname}
-                            ${FETCH_BIN} "${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}"
+                            retry "${FETCH_BIN} ${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}.sha1"
+                            retry "${FETCH_BIN} ${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}"
 
                             # checking archive sha1 checksum
                             if [ -e "./${ARCHIVE_NAME}" ]; then
@@ -1279,8 +1279,8 @@ for application in ${APPLICATIONS}; do
                             if [ -z "${APP_GIT_MODE}" ]; then # Standard http tarball method:
                                 if [ ! -e ${BUILD_DIR_ROOT}/../$(${BASENAME_BIN} ${APP_HTTP_PATH}) ]; then
                                     note "   ${NOTE_CHAR2} Fetching requirement source from: ${APP_HTTP_PATH}"
-                                    run "${FETCH_BIN} ${APP_HTTP_PATH}"
                                     ${MV_BIN} $(${BASENAME_BIN} ${APP_HTTP_PATH}) ${BUILD_DIR_ROOT}/..
+                                    retry "${FETCH_BIN} ${APP_HTTP_PATH}"
                                 fi
 
                                 file="${BUILD_DIR_ROOT}/../$(${BASENAME_BIN} ${APP_HTTP_PATH})"
@@ -1726,7 +1726,7 @@ for application in ${APPLICATIONS}; do
                             dataset_name="$1"
                             remote_path="${MAIN_BINARY_REPOSITORY}${MAIN_COMMON_NAME}/${final_snap_file}"
                             debug "Seeking remote snapshot existence: ${remote_path}"
-                            ${FETCH_BIN} "${remote_path}" 2>> ${LOG}-${app_name_lowercase}
+                            retry "${FETCH_BIN} ${remote_path}"
                             if [ "$?" = "0" ]; then
                                 debug "Stream archive available. Creating service dataset: ${dataset_name} from file stream: ${final_snap_file}"
                                 ${XZCAT_BIN} "${final_snap_file}" | ${ZFS_BIN} receive -v "${dataset_name}" 2>/dev/null | ${TAIL_BIN} -n1 && \
