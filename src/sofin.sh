@@ -131,6 +131,23 @@ update_definitions () {
 }
 
 
+create_cache_directories () {
+    # check for regular cache dirs for existence:
+    if [ ! -d "${CACHE_DIR}" -o \
+         ! -d "${BINBUILDS_CACHE_DIR}" -o \
+         ! -d "${LOGS_DIR}" ]; then
+         debug "Making dirs: ${CACHE_DIR}", "${BINBUILDS_CACHE_DIR}, ${LOGS_DIR}"
+         ${MKDIR_BIN} -p "${CACHE_DIR}" "${BINBUILDS_CACHE_DIR}" "${LOGS_DIR}"
+    fi
+    if [ ! -d "${DEFINITIONS_DIR}" -o \
+         ! -f "${DEFAULTS}" ]; then
+        warn "Detected no valid definitions cache in: ${DEFINITIONS_DIR}."
+        clean_purge
+        update_definitions
+    fi
+}
+
+
 write_info_about_shell_configuration () {
     warn "SHELL_PID is not set. Sofin auto-reload function is temporarely disabled."
 }
@@ -243,9 +260,9 @@ clean_failbuilds () {
 
 
 clean_logs () {
-    if [ -d "${CACHE_DIR}logs" ]; then
-        note "Removing build logs"
-        ${RM_BIN} -f "${CACHE_DIR}logs" || error "Privileges problem in '${CACHE_DIR}logs'? All files should belong to '${USER}' there."
+    if [ -d "${LOGS_DIR}" ]; then
+        note "Removing build logs from: ${LOGS_DIR}"
+        ${RM_BIN} -rf "${LOGS_DIR}" || warn "Privileges problem in logs dir: '${LOGS_DIR}'? All files should belong to '${USER}' there."
     fi
 }
 
@@ -275,6 +292,7 @@ perform_clean () {
             clean_failbuilds
             ;;
     esac
+    create_cache_directories
     exit
 }
 
@@ -283,13 +301,14 @@ if [ ! "$1" = "" ]; then
     case $1 in
 
     dev)
-        test -d ${DEFINITIONS_DIR} || update_definitions
+        create_cache_directories
         note "Paste your definition below. Hit ctrl-d after a newline to commit"
         ${CAT_BIN} > ${DEFINITIONS_DIR}/${2}.def
         exit
         ;;
 
     s|setup)
+        create_cache_directories
         if [ -d "${REPOSITORY}" ]; then
             note "Changing repository to local directory: ${REPOSITORY}"
         else
@@ -329,6 +348,7 @@ if [ ! "$1" = "" ]; then
 
 
     log)
+        create_cache_directories
         shift
         pattern="$*"
         if [ "${pattern}" = "" ]; then
@@ -554,14 +574,13 @@ if [ ! "$1" = "" ]; then
                 ${PRINTF_BIN} "# PKG_CONFIG_PATH:\nexport PKG_CONFIG_PATH='${pkg_config_path}'\n\n"
             fi
             ${PRINTF_BIN} "# MANPATH:\nexport MANPATH='${manpath}'\n\n"
-
         fi
-
         exit
         ;;
 
 
     cont|continue)
+        create_cache_directories
         shift
         a_bundle_name="$1"
         if [ -z "${a_bundle_name}" ]; then
@@ -585,22 +604,9 @@ if [ ! "$1" = "" ]; then
 
 
     i|install|get|pick|choose|use|switch)
+        create_cache_directories
         if [ "$2" = "" ]; then
             error "For \"$1\" application installation mode, second argument with at least one application name or list is required!"
-        fi
-
-        # check for regular cache dirs for existence:
-        if [ ! -d "${CACHE_DIR}" -o \
-             ! -d "${BINBUILDS_CACHE_DIR}" -o \
-             ! -d "${LOGS_DIR}" ]; then
-             debug "Making dirs: ${CACHE_DIR}", "${BINBUILDS_CACHE_DIR}, ${LOGS_DIR}"
-             ${MKDIR_BIN} -p "${CACHE_DIR}" "${BINBUILDS_CACHE_DIR}" "${LOGS_DIR}"
-        fi
-        if [ ! -d "${DEFINITIONS_DIR}" -o \
-             ! -f "${DEFAULTS}" ]; then
-            debug "Detected no valid definitions cache in: ${DEFINITIONS_DIR}"
-            clean_purge
-            update_definitions
         fi
 
         # try a list - it will have priority if file exists:
@@ -615,6 +621,7 @@ if [ ! "$1" = "" ]; then
 
 
     deps|dependencies|local)
+        create_cache_directories
         if [ "${USERNAME}" = "root" ]; then
             warn "Installation of project dependencies as root is immoral."
         fi
@@ -628,6 +635,7 @@ if [ ! "$1" = "" ]; then
 
 
     p|push|binpush|send)
+        create_cache_directories
         note "Preparing to push binary bundle: ${SOFIN_ARGS} from ${SOFTWARE_DIR} to binary repository."
         cd "${SOFTWARE_DIR}"
         for element in ${SOFIN_ARGS}; do
@@ -747,6 +755,7 @@ if [ ! "$1" = "" ]; then
         ;;
 
     b|build)
+        create_cache_directories
         shift
         dependencies="$*"
         note "Software bundles to be built: ${dependencies}"
@@ -758,13 +767,14 @@ if [ ! "$1" = "" ]; then
             sofins_all="$(echo "${sofin_ps_list}" | ${WC_BIN} -l 2>/dev/null | ${SED_BIN} 's/ //g' 2>/dev/null)"
             test ${sofins_all} -gt 2 && error "Bundle: ${dep} is in a middle of build process in background! Aborting."
         done
-        update_definitions
+        # update_definitions
         USE_UPDATE=false USE_BINBUILD=false ${SOFIN_BIN} install ${dependencies} || def_error
         exit
         ;;
 
 
     d|deploy)
+        create_cache_directories
         shift
         dependencies="$*"
         note "Software bundles to be built and deployed to remote: ${dependencies}"
@@ -776,7 +786,7 @@ if [ ! "$1" = "" ]; then
             sofins_all="$(echo "${sofin_ps_list}" | ${WC_BIN} -l 2>/dev/null | ${SED_BIN} 's/ //g' 2>/dev/null)"
             test ${sofins_all} -gt 2 && error "Bundle: ${dep} is in a middle of build process in background! Aborting."
         done
-        update_definitions
+        # update_definitions
         for software in ${dependencies}; do
             USE_BINBUILD=false USE_UPDATE=false ${SOFIN_BIN} install ${software} || def_error && \
             USE_UPDATE=false ${SOFIN_BIN} push ${software} || def_error && \
@@ -787,6 +797,7 @@ if [ ! "$1" = "" ]; then
 
 
     reset)
+        create_cache_directories
         cd ${DEFINITIONS_DIR}
         ${GIT_BIN} reset --hard
         update_definitions
@@ -794,7 +805,7 @@ if [ ! "$1" = "" ]; then
         ;;
 
     rebuild)
-        update_definitions
+        create_cache_directories
         if [ "$2" = "" ]; then
             error "Missing second argument with library/software name."
         fi
@@ -974,7 +985,8 @@ if [ ! "$1" = "" ]; then
 
 
     old|outdated)
-        update_definitions
+        create_cache_directories
+        # update_definitions
         note "Definitions were updated to latest version."
         debug "Checking software from ${SOFTWARE_DIR}"
         if [ -d ${SOFTWARE_DIR} ]; then
