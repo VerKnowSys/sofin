@@ -324,19 +324,17 @@ case "${SYSTEM_NAME}" in
 
 esac
 
-if [ ! -d "${CACHE_DIR}/logs" ]; then
-    ${MKDIR_BIN} -p ${CACHE_DIR}/logs
-fi
-
 # last repository cache setup:
-export REPOSITORY_CACHE_FILE="${CACHE_DIR}.last_repository.pos"
-if [ "${REPOSITORY}" = "" ]; then # :this value is given by user as shell param
-    ${MKDIR_BIN} -p "${CACHE_DIR}"
-    if [ -f "${REPOSITORY_CACHE_FILE}" ]; then
-        export REPOSITORY="$(${CAT_BIN} ${REPOSITORY_CACHE_FILE})"
-    else
-        ${PRINTF_BIN} "${DEFAULT_REPOSITORY}\n" > ${REPOSITORY_CACHE_FILE}
-        export REPOSITORY="${DEFAULT_REPOSITORY}"
+if [ -d "${CACHE_DIR}" ]; then
+    export REPOSITORY_CACHE_FILE="${CACHE_DIR}.last_repository.pos"
+    if [ -z "${REPOSITORY}" ]; then # :this value is given by user as shell param
+        ${MKDIR_BIN} -p "${CACHE_DIR}"
+        if [ -f "${REPOSITORY_CACHE_FILE}" ]; then
+            export REPOSITORY="$(${CAT_BIN} ${REPOSITORY_CACHE_FILE})"
+        else
+            ${PRINTF_BIN} "${DEFAULT_REPOSITORY}\n" > ${REPOSITORY_CACHE_FILE}
+            export REPOSITORY="${DEFAULT_REPOSITORY}"
+        fi
     fi
 fi
 
