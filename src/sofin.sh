@@ -115,22 +115,22 @@ update_definitions () {
             debug "Fetching branch: ${current_branch}"
             # ${GIT_BIN} stash save -a >> ${LOG} 2>&1
             ${GIT_BIN} checkout -b "${current_branch}" >> ${LOG} 2>&1 || ${GIT_BIN} checkout "${current_branch}" >> ${LOG} 2>&1
-            ${GIT_BIN} pull origin "${current_branch}" >> ${LOG} && note "Updated branch ${current_branch} of repository ${REPOSITORY}" || error "Error occured: Update from branch: ${BRANCH} of repository ${REPOSITORY} wasn't possible."
+            retry ${GIT_BIN} pull origin "${current_branch}" >> ${LOG} && note "Updated branch ${current_branch} of repository ${REPOSITORY}" || error "Error occured: Update from branch: ${BRANCH} of repository ${REPOSITORY} wasn't possible."
 
         else # else use default branch
             debug "Using default branch: ${BRANCH}"
             ${GIT_BIN} checkout -b "${BRANCH}" >> ${LOG} 2>&1 || ${GIT_BIN} checkout "${BRANCH}" >> ${LOG} 2>&1
-            (${GIT_BIN} pull origin "${BRANCH}" >> ${LOG} && note "Updated branch ${BRANCH} of repository ${REPOSITORY}") || error "Error occured: Update from branch: ${BRANCH} of repository ${REPOSITORY} wasn't possible."
+            (retry ${GIT_BIN} pull origin "${BRANCH}" >> ${LOG} && note "Updated branch ${BRANCH} of repository ${REPOSITORY}") || error "Error occured: Update from branch: ${BRANCH} of repository ${REPOSITORY} wasn't possible."
         fi
     else
         # clone definitions repository:
         cd "${CACHE_DIR}"
         debug "Cloning repository ${REPOSITORY} from branch: ${BRANCH}"
         ${RM_BIN} -rf definitions >> ${LOG} 2>&1 # if something is already here, wipe it out from cache
-        ${GIT_BIN} clone "${REPOSITORY}" definitions >> ${LOG} 2>&1 || error "Error occured: Cloning repository ${REPOSITORY} isn't possible. Make sure it's valid."
+        retry ${GIT_BIN} clone "${REPOSITORY}" definitions >> ${LOG} 2>&1 || error "Error occured: Cloning repository ${REPOSITORY} isn't possible. Make sure it's valid."
         cd "${CACHE_DIR}definitions"
         ${GIT_BIN} checkout -b "${BRANCH}" >> ${LOG} 2>&1
-        (${GIT_BIN} pull origin "${BRANCH}" && note "Updated branch ${BRANCH} of repository ${REPOSITORY}") || error "Error occured: Update from branch: ${BRANCH} of repository ${REPOSITORY} isn't possible. Make sure that given repository and branch are valid."
+        (retry ${GIT_BIN} pull origin "${BRANCH}" && note "Updated branch ${BRANCH} of repository ${REPOSITORY}") || error "Error occured: Update from branch: ${BRANCH} of repository ${REPOSITORY} isn't possible. Make sure that given repository and branch are valid."
     fi
 }
 
@@ -1324,7 +1324,7 @@ for application in ${APPLICATIONS}; do
                             else
                                 # git method
                                 note "   ${NOTE_CHAR2} Fetching requirement source from git repository: ${APP_HTTP_PATH}"
-                                run "${GIT_BIN} clone ${APP_HTTP_PATH} ${APP_NAME}${APP_VERSION}"
+                                retry "${GIT_BIN} clone ${APP_HTTP_PATH} ${APP_NAME}${APP_VERSION}"
                             fi
 
                             export BUILD_DIR="$(${FIND_BIN} ${BUILD_DIR_ROOT}/* -maxdepth 0 -type d -name "*${APP_VERSION}*" 2>/dev/null)"
