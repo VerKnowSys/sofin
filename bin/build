@@ -77,19 +77,19 @@ build_natives () {
         note "C++ compiler available. Using: ${CXX}"
 
         ${CXX} ${CLANG_OPTIONS} -o bin/sofin-microseconds src/sofin_microseconds.cc && \
-        note "Sofin microseconds utility has been built" && \
+        note "Sofin microseconds utility has been successfully built" && \
         ${CXX} ${CLANG_OPTIONS} -o bin/sofin-version-utility src/sofin-version-utility.cc && \
-        note "Sofin version utility has been built" && \
+        note "Sofin version utility has been successfully built"
 
-        if [ "${SYSTEM_NAME}" = "Darwin" ]; then
-            ${CXX} ${CLANG_OPTIONS} -c -I./src/dylibbundler ./src/dylibbundler/Settings.cpp -o src/.Settings.o && \
-            ${CXX} ${CLANG_OPTIONS} -c -I./src/dylibbundler ./src/dylibbundler/DylibBundler.cpp -o src/.DylibBundler.o && \
-            ${CXX} ${CLANG_OPTIONS} -c -I./src/dylibbundler ./src/dylibbundler/Dependency.cpp -o src/.Dependency.o && \
-            ${CXX} ${CLANG_OPTIONS} -c -I./src/dylibbundler ./src/dylibbundler/main.cpp -o src/.main.o && \
-            ${CXX} ${CLANG_OPTIONS} -c -I./src/dylibbundler ./src/dylibbundler/Utils.cpp -o src/.Utils.o && \
-            ${CXX} ${CLANG_OPTIONS} -o bin/sofin-dylibbundler src/.Settings.o src/.DylibBundler.o src/.Dependency.o src/.main.o src/ .Utils.o && \
-            note "Dylib bundler has been built"
-        fi
+        # if [ "${SYSTEM_NAME}" = "Darwin" ]; then
+        #     ${CXX} ${CLANG_OPTIONS} -c -I./src/dylibbundler ./src/dylibbundler/Settings.cpp -o src/.Settings.o && \
+        #     ${CXX} ${CLANG_OPTIONS} -c -I./src/dylibbundler ./src/dylibbundler/DylibBundler.cpp -o src/.DylibBundler.o && \
+        #     ${CXX} ${CLANG_OPTIONS} -c -I./src/dylibbundler ./src/dylibbundler/Dependency.cpp -o src/.Dependency.o && \
+        #     ${CXX} ${CLANG_OPTIONS} -c -I./src/dylibbundler ./src/dylibbundler/main.cpp -o src/.main.o && \
+        #     ${CXX} ${CLANG_OPTIONS} -c -I./src/dylibbundler ./src/dylibbundler/Utils.cpp -o src/.Utils.o && \
+        #     ${CXX} ${CLANG_OPTIONS} -o bin/sofin-dylibbundler src/.Settings.o src/.DylibBundler.o src/.Dependency.o src/.main.o src/ .Utils.o && \
+        #     note "Dylib bundler has been built"
+        # fi
     else
         error "C++ compiler is required to continue"
         exit 1
@@ -103,9 +103,9 @@ install_sofin () {
         ${MKDIR_BIN} -p "${PREFIX}" "${PREFIX}/etc" "${PREFIX}/usr/bin"
     fi
     ${CP_BIN} -v "src/${CONF_FILE}" "${PREFIX}/etc/${CONF_FILE}" && \
-    if [ "${SYSTEM_NAME}" = "Darwin" ]; then
-        ${CP_BIN} -v "bin/sofin-dylibbundler" "${PREFIX}/usr/bin/sofin-dylibbundler"
-    fi
+    # if [ "${SYSTEM_NAME}" = "Darwin" ]; then
+    #     ${CP_BIN} -v "bin/sofin-dylibbundler" "${PREFIX}/usr/bin/sofin-dylibbundler"
+    # fi
     ${CP_BIN} -v "bin/sofin-version-utility" ${PREFIX}/usr/bin/sofin-version-utility && \
     ${CP_BIN} -v "bin/sofin-microseconds" ${PREFIX}/usr/bin/sofin-microseconds && \
     ${CP_BIN} -v "src/sofin.sh" ${PREFIX}/usr/bin/s && \
