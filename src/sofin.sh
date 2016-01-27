@@ -1108,6 +1108,27 @@ for application in ${APPLICATIONS}; do
                 fi
             }
 
+            retry () {
+                retries="***"
+                while [ ! -z "${retries}" ]; do
+                    if [ ! -z "$1" ]; then
+                        aname="$(echo "${APP_NAME}${APP_POSTFIX}" | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null)"
+                        if [ ! -e "${LOG}-${aname}" ]; then
+                            ${TOUCH_BIN} "${LOG}-${aname}"
+                        fi
+                        eval PATH="${PATH}" "$@" 1>> "${LOG}-${aname}" 2>> "${LOG}-${aname}"
+                        if [ "$?" = "0" ]; then
+                            return 0
+                        fi
+                    else
+                        error "An empty command to retry?"
+                    fi
+                    retries="$(echo "${retries}" | ${SED_BIN} 's/\*//' 2>/dev/null)"
+                    debug "Retries left: ${retries}"
+                done
+                error "All retries exhausted to launch commands: '$@'"
+            }
+
             try () {
                 if [ ! -z "$1" ]; then
                     aname="$(echo "${APP_NAME}${APP_POSTFIX}" | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null)"
