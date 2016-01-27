@@ -1,13 +1,11 @@
 #!/bin/sh
 # @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
 
-test -f src/sofin.conf.sh && . src/sofin.conf.sh
-test -f /etc/profile_sofin && . /etc/profile_sofin
+# CONF_FILE="sofin.conf.sh"
+# . "src/${CONF_FILE}"
 
-PREFIX="${PREFIX}" INSTALL="YES" bin/build
-if [ "$PURE" != "" ]; then
-    note "Pure mode"
-    REPOSITORY= sofin setup
-fi
+export PREFIX="${PREFIX}"
+export INSTALL="YES"
+. "bin/build"
 
-bin/clean
+install_base

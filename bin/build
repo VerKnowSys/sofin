@@ -4,14 +4,7 @@
 
 # load configuration from sofin.conf
 CONF_FILE="sofin.conf.sh"
-if [ -e "src/${CONF_FILE}" ]; then
-    . "src/${CONF_FILE}"
-    echo "Validating environment"
-    validate_env
-else
-    echo "FATAL: No configuration file found: ${CONF_FILE}"
-    exit 1
-fi
+. "src/${CONF_FILE}"
 
 # choose C compiler, if any
 export CXX="/usr/bin/g++"
@@ -46,16 +39,16 @@ update_env_files () {
     env_files="/etc/zshenv /etc/bashrc /etc/profile"
     for i in ${env_files}; do
         if [ -f "${i}" ]; then
-            ${GREP_BIN} -q "SHELL_PID" "${i}"
-            if [ $? -eq 0 ]; then
+            ${GREP_BIN} -q "SHELL_PID" "${i}" 2>/dev/null
+            if [ "$?" = "0" ]; then
                 continue
             else
-                echo "Updating environment file: ${i}"
+                note "Updating environment file: ${i}"
                 echo "${shell_configuration}" >> "${i}"
                 check_command_result $?
             fi
         else
-            echo "Creating environment file: ${i}"
+            note "Creating environment file: ${i}"
             echo "${shell_configuration}" >> "${i}"
             check_command_result $?
         fi
@@ -63,42 +56,16 @@ update_env_files () {
 }
 
 
-# create_user_symlinks () {
-#     if [ ! -d "${HOME_DIR}" ]; then
-#         echo "Creating ${HOME_DIR} directory."
-#         ${MKDIR_BIN} "${HOME_DIR}"
-#         check_command_result $?
-#     fi
-
-#     CWD="$(pwd)"
-#     cd /home
-
-#     for i in *; do
-#         uid="$(id -u $i 2>/dev/null)"
-#         if [ ! $uid ]; then
-#             continue
-#         fi
-#         if [ ! -L "${HOME_DIR}${uid}" ]; then
-#             echo "Creating symlink ${HOME_DIR}${uid} -> /home/${i}."
-#             ${LN_BIN} -s "/home/${i}" "${HOME_DIR}${uid}"
-#             check_command_result $?
-#         fi
-#     done
-
-#     cd "${CWD}"
-# }
-
-
 install_base () {
     build_natives
     if [ "${INSTALL}" = "YES" ]; then
-        if [ "$(id -u)" = "0" ]; then
-            echo "Removing already installed Sofin files.."
-            ${RM_BIN} -f "${PREFIX}/usr/bin/s"
-            ${RM_BIN} -f "${PREFIX}/usr/bin/sofin"
-            ${RM_BIN} -f "${PREFIX}/usr/bin/sofin-version-utility"
-            ${RM_BIN} -f "${PREFIX}/usr/bin/sofin-microseconds"
-            ${RM_BIN} -f "${PREFIX}/etc/${CONF_FILE}"
+        if [ "$(${ID_BIN} -u)" = "0" ]; then
+            note "Removing already installed Sofin files.."
+            ${RM_BIN} -fv "${PREFIX}/usr/bin/s"
+            ${RM_BIN} -fv "${PREFIX}/usr/bin/sofin"
+            ${RM_BIN} -fv "${PREFIX}/usr/bin/sofin-version-utility"
+            ${RM_BIN} -fv "${PREFIX}/usr/bin/sofin-microseconds"
+            ${RM_BIN} -fv "${PREFIX}/etc/${CONF_FILE}"
         fi
         install_sofin
     fi
@@ -107,24 +74,21 @@ install_base () {
 
 build_natives () {
     if [ -x "${CXX}" ]; then
-        echo "C++ compiler available. Using: ${CXX}"
+        note "C++ compiler available. Using: ${CXX}"
 
-        echo "Building sofin_microseconds"
-        ${CXX} ${CLANG_OPTIONS} -o bin/sofin-microseconds src/sofin_microseconds.cc
-        check_command_result $?
+        ${CXX} ${CLANG_OPTIONS} -o bin/sofin-microseconds src/sofin_microseconds.cc && \
+        note "Sofin microseconds utility has been built" && \
+        ${CXX} ${CLANG_OPTIONS} -o bin/sofin-version-utility src/sofin-version-utility.cc && \
+        note "Sofin version utility has been built" && \
 
-        echo "Building version utility"
-        ${CXX} ${CLANG_OPTIONS} -o bin/sofin-version-utility src/sofin-version-utility.cc
-        check_command_result $?
-
-        if [ "$(uname)" = "Darwin" ]; then
-            echo "Building dylibbundler"
-            ${CXX} ${CLANG_OPTIONS} -c -I./src/dylibbundler ./src/dylibbundler/Settings.cpp -o src/.Settings.o
-            ${CXX} ${CLANG_OPTIONS} -c -I./src/dylibbundler ./src/dylibbundler/DylibBundler.cpp -o src/.DylibBundler.o
-            ${CXX} ${CLANG_OPTIONS} -c -I./src/dylibbundler ./src/dylibbundler/Dependency.cpp -o src/.Dependency.o
-            ${CXX} ${CLANG_OPTIONS} -c -I./src/dylibbundler ./src/dylibbundler/main.cpp -o src/.main.o
-            ${CXX} ${CLANG_OPTIONS} -c -I./src/dylibbundler ./src/dylibbundler/Utils.cpp -o src/.Utils.o
-            ${CXX} ${CLANG_OPTIONS} -o bin/sofin-dylibbundler src/.Settings.o src/.DylibBundler.o src/.Dependency.o src/.main.o src/.Utils.o
+        if [ "${SYSTEM_NAME}" = "Darwin" ]; then
+            ${CXX} ${CLANG_OPTIONS} -c -I./src/dylibbundler ./src/dylibbundler/Settings.cpp -o src/.Settings.o && \
+            ${CXX} ${CLANG_OPTIONS} -c -I./src/dylibbundler ./src/dylibbundler/DylibBundler.cpp -o src/.DylibBundler.o && \
+            ${CXX} ${CLANG_OPTIONS} -c -I./src/dylibbundler ./src/dylibbundler/Dependency.cpp -o src/.Dependency.o && \
+            ${CXX} ${CLANG_OPTIONS} -c -I./src/dylibbundler ./src/dylibbundler/main.cpp -o src/.main.o && \
+            ${CXX} ${CLANG_OPTIONS} -c -I./src/dylibbundler ./src/dylibbundler/Utils.cpp -o src/.Utils.o && \
+            ${CXX} ${CLANG_OPTIONS} -o bin/sofin-dylibbundler src/.Settings.o src/.DylibBundler.o src/.Dependency.o src/.main.o src/ .Utils.o && \
+            note "Dylib bundler has been built"
         fi
     else
         error "C++ compiler is required to continue"
@@ -134,28 +98,19 @@ build_natives () {
 
 
 install_sofin () {
-    if [ "${PREFIX}" != "" ]; then
+    note "Putting Sofin files into place in prefix: ${PREFIX}"
+    if [ ! -z "${PREFIX}" ]; then
         ${MKDIR_BIN} -p "${PREFIX}" "${PREFIX}/etc" "${PREFIX}/usr/bin"
     fi
-    ${CP_BIN} "src/${CONF_FILE}" "${PREFIX}/etc/${CONF_FILE}"
-    check_command_result $?
-    if [ "$(uname)" = "Darwin" ]; then
-        ${CP_BIN} "bin/sofin-dylibbundler" "${PREFIX}/usr/bin/sofin-dylibbundler"
-        check_command_result $?
+    ${CP_BIN} -v "src/${CONF_FILE}" "${PREFIX}/etc/${CONF_FILE}" && \
+    if [ "${SYSTEM_NAME}" = "Darwin" ]; then
+        ${CP_BIN} -v "bin/sofin-dylibbundler" "${PREFIX}/usr/bin/sofin-dylibbundler"
     fi
-    ${CP_BIN} "bin/sofin-version-utility" ${PREFIX}/usr/bin/sofin-version-utility
-    check_command_result $?
-    ${CP_BIN} "bin/sofin-microseconds" ${PREFIX}/usr/bin/sofin-microseconds
-    check_command_result $?
-    ${CP_BIN} "src/sofin.sh" ${PREFIX}/usr/bin/s
-    check_command_result $?
-
-    sofin_version="$(grep 'readonly SOFIN_VERSION=' src/sofin.conf.sh 2>/dev/null | awk '{ gsub(/\"/, "", $2); gsub(/SOFIN_VERSION=/, "", $2); print $2; }' 2>/dev/null)"
-    echo "Sofin v${sofin_version} installed."
-    echo "Type \"s usage\" for help."
-    echo "Read https://bitbucket.org/verknowsys/sofin for more details."
+    ${CP_BIN} -v "bin/sofin-version-utility" ${PREFIX}/usr/bin/sofin-version-utility && \
+    ${CP_BIN} -v "bin/sofin-microseconds" ${PREFIX}/usr/bin/sofin-microseconds && \
+    ${CP_BIN} -v "src/sofin.sh" ${PREFIX}/usr/bin/s && \
+    sofin_version="$(${GREP_BIN} 'readonly SOFIN_VERSION=' /etc/sofin.conf.sh 2>/dev/null | ${AWK_BIN} '{ gsub(/\"/, "", $2); gsub(/SOFIN_VERSION=/, "", $2); print $2; }' 2>/dev/null)" && \
+    note "Sofin v${sofin_version} installed." && \
+    note "Type \"s usage\" for help." && \
+    note "Read https://bitbucket.org/verknowsys/sofin for more details."
 }
-
-
-update_env_files
-install_base
