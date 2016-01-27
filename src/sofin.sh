@@ -1709,10 +1709,14 @@ for application in ${APPLICATIONS}; do
                 fi
 
                 # Create a dataset for any existing dirs in Services dir that are not ZFS datasets.
-                debug "Checking for non-dataset directories in: ${SERVICES_DIR}"
-                for maybe_dataset in $(${FIND_BIN} ${SERVICES_DIR} -mindepth 1 -maxdepth 1 -type d -not -name '.*' -print 2>/dev/null | ${XARGS_BIN} ${BASENAME_BIN} 2>/dev/null); do
-                    app_name_lowercase="$(echo "${maybe_dataset}" | ${TR_BIN} '[A-Z]' '[a-z]')"
-                    if [ "${app_name_lowercase}" = "${APP_NAME}${APP_POSTFIX}" -o ${jobs_in_parallel} = "NO" ]; then
+                all_dirs="$(${FIND_BIN} ${SERVICES_DIR} -mindepth 1 -maxdepth 1 -type d -not -name '.*' -print 2>/dev/null | ${XARGS_BIN} ${BASENAME_BIN} 2>/dev/null)"
+                debug "Checking for non-dataset directories in ${SERVICES_DIR}: EOF:\n$(echo "${all_dirs}" | ${TR_BIN} '\n' ' ' 2>/dev/null)\nEOF\n"
+                full_bundle_name="$(${BASENAME_BIN} "${PREFIX}" 2>/dev/null)"
+                for maybe_dataset in ${all_dirs}; do
+                    debug "Normal name: ${full_bundle_name}"
+                    aname="$(echo "${full_bundle_name}" | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null)"
+                    app_name_lowercase="$(echo "${maybe_dataset}" | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null)"
+                    if [ "${app_name_lowercase}" = "${aname}" -o ${jobs_in_parallel} = "NO" ]; then
                         # find name of mount from default ZFS Services:
                         no_ending_slash="$(echo "${SERVICES_DIR}" | ${SED_BIN} 's/\/$//')"
                         inner_dir="$(${ZFS_BIN} list -H 2>/dev/null | ${GREP_BIN} "${no_ending_slash}$" 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null | ${SED_BIN} 's/.*\///' 2>/dev/null)/"
