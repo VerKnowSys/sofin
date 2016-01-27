@@ -17,7 +17,8 @@ fi
 
 SOFIN_ARGS=$*
 SOFIN_ARGS_FULL="${SOFIN_ARGS}"
-readonly SOFIN_ARGS="$(echo ${SOFIN_ARGS} | ${CUT_BIN} -d' ' -f2-)"
+SOFIN_ONLYNAME="$(${BASENAME_BIN} "${SOFIN_BIN}" 2>/dev/null)"
+readonly SOFIN_ARGS="$(echo ${SOFIN_ARGS} | ${CUT_BIN} -d' ' -f2- 2>/dev/null)"
 readonly ALL_INSTALL_PHRASES="i|install|get|pick|choose|use|switch"
 readonly BUILD_AND_DEPLOY_PHRASES="b|build|d|deploy"
 
@@ -44,7 +45,7 @@ check_requirements () {
     fi
     if [ "${SYSTEM_NAME}" != "Darwin" ]; then
         if [ -d "/usr/local" ]; then
-            files="$(${FIND_BIN} /usr/local -maxdepth 3 -type f | ${WC_BIN} -l | ${SED_BIN} -e 's/^ *//g;s/ *$//g' )"
+            files="$(${FIND_BIN} /usr/local -maxdepth 3 -type f 2>/dev/null | ${WC_BIN} -l 2>/dev/null | ${SED_BIN} -e 's/^ *//g;s/ *$//g' 2>/dev/null)"
             if [ "${files}" != "0" ]; then
                 warn "/usr/local has been found, and contains ${files}+ file(s)"
             fi
@@ -100,12 +101,12 @@ update_definitions () {
         debug "Fetching latest tarball with initial definitions from: ${INITIAL_DEFINITIONS}"
         retry "${FETCH_BIN} ${INITIAL_DEFINITIONS}"
         ${TAR_BIN} xf *${DEFAULT_ARCHIVE_EXT}
-        ${RM_BIN} -vrf "$(${BASENAME_BIN} ${INITIAL_DEFINITIONS})"
+        ${RM_BIN} -vrf "$(${BASENAME_BIN} ${INITIAL_DEFINITIONS} 2>/dev/null)"
         return
     fi
     if [ -d "${CACHE_DIR}definitions/.git" ]; then
         cd "${CACHE_DIR}definitions"
-        current_branch="$(${GIT_BIN} rev-parse --abbrev-ref HEAD)"
+        current_branch="$(${GIT_BIN} rev-parse --abbrev-ref HEAD 2>/dev/null)"
         if [ "${current_branch}" != "${BRANCH}" ]; then # use current_branch value if branch isn't matching default branch
             debug "Fetching branch: ${current_branch}"
             # ${GIT_BIN} stash save -a >> ${LOG} 2>&1
@@ -137,18 +138,18 @@ write_info_about_shell_configuration () {
 
 usage_howto () {
     note "Built in tasks:"
-    note "  ${cyan}install | get | pick | choose | use  ${gray}-${green} installs software from list or from definition and switches exports for it (example: $(${BASENAME_BIN} ${SOFIN_BIN}) install Rubinius)"
+    note "  ${cyan}install | get | pick | choose | use  ${gray}-${green} installs software from list or from definition and switches exports for it (example: ${SOFIN_ONLYNAME} install Rubinius)"
     note "  ${cyan}dependencies | deps | local          ${gray}-${green} installs software from list defined in '${DEPENDENCIES_FILE}' file in current directory"
-    note "  ${cyan}uninstall | remove | delete          ${gray}-${green} removes an application or list (example: $(${BASENAME_BIN} ${SOFIN_BIN}) uninstall Rubinius)"
+    note "  ${cyan}uninstall | remove | delete          ${gray}-${green} removes an application or list (example: ${SOFIN_ONLYNAME} uninstall Rubinius)"
     note "  ${cyan}list | installed                     ${gray}-${green} gives short list of installed software"
     note "  ${cyan}fulllist | fullinstalled             ${gray}-${green} gives detailed list with installed software including requirements"
     note "  ${cyan}available                            ${gray}-${green} lists available software"
-    note "  ${cyan}export | exp | exportapp             ${gray}-${green} adds given command to application exports (example: $(${BASENAME_BIN} ${SOFIN_BIN}) export rails Rubinius)"
+    note "  ${cyan}export | exp | exportapp             ${gray}-${green} adds given command to application exports (example: ${SOFIN_ONLYNAME} export rails Rubinius)"
     note "  ${cyan}getshellvars | shellvars | vars      ${gray}-${green} returns shell variables for installed software"
     note "  ${cyan}log                                  ${gray}-${green} shows and watches log file (for debug messages and verbose info)"
     note "  ${cyan}reload | rehash                      ${gray}-${green} recreates shell vars and reloads current shell"
     note "  ${cyan}update                               ${gray}-${green} only update definitions from remote repository and exit"
-    note "  ${cyan}ver | version                        ${gray}-${green} shows $(${BASENAME_BIN} ${SOFIN_BIN}) script version"
+    note "  ${cyan}ver | version                        ${gray}-${green} shows ${SOFIN_ONLYNAME} script version"
     note "  ${cyan}clean                                ${gray}-${green} cleans binbuilds cache, unpacked source content and logs"
     note "  ${cyan}distclean                            ${gray}-${green} cleans binbuilds cache, unpacked source content, logs and definitions"
     note "  ${cyan}purge                                ${gray}-${green} cleans binbuilds cache, unpacked source content, logs, definitions, source cache and possible states"
@@ -156,15 +157,15 @@ usage_howto () {
     note "  ${cyan}build                                ${gray}-${green} does binary build from source for software specified as params"
     note "  ${cyan}continue Bundlename                  ${gray}-${green} continues build from \"make stage\" of bundle name, given as param (previous build dir reused)"
     note "  ${cyan}deploy                               ${gray}-${green} build + push"
-    note "  ${cyan}push | binpush | send                ${gray}-${green} creates binary build from prebuilt software bundles name given as params (example: $(${BASENAME_BIN} ${SOFIN_BIN}) push Rubinius Vifm Curl)"
-    note "  ${cyan}wipe                                 ${gray}-${green} wipes binary builds (matching given name) from binary respositories (example: $(${BASENAME_BIN} ${SOFIN_BIN}) wipe Rubinius Vifm)"
+    note "  ${cyan}push | binpush | send                ${gray}-${green} creates binary build from prebuilt software bundles name given as params (example: ${SOFIN_ONLYNAME} push Rubinius Vifm Curl)"
+    note "  ${cyan}wipe                                 ${gray}-${green} wipes binary builds (matching given name) from binary respositories (example: ${SOFIN_ONLYNAME} wipe Rubinius Vifm)"
     note "  ${cyan}port                                 ${gray}-${green} gathers port of ServeD running service by service name"
     note "  ${cyan}setup                                ${gray}-${green} switches definitions repository/ branch from env value 'REPOSITORY' and 'BRANCH' (example: BRANCH=master REPOSITORY=/my/local/definitions/repo/ sofin setup)"
     note "  ${cyan}enable                               ${gray}-${green} enables Sofin developer environment (full environment stored in ~/.profile). It's the default"
     note "  ${cyan}disable                              ${gray}-${green} disables Sofin developer environment (only PATH, PKG_CONFIG_PATH and MANPATH written to ~/.profile)"
     note "  ${cyan}status                               ${gray}-${green} shows Sofin status"
     note "  ${cyan}dev                                  ${gray}-${green} puts definition content on the fly. Second argument is (lowercase) definition name (no extension). (example: sofin dev rubinius)"
-    note "  ${cyan}rebuild                              ${gray}-${green} rebuilds and pushes each software bundle that depends on definition given as a param. (example: $(${BASENAME_BIN} ${SOFIN_BIN}) rebuild openssl - will rebuild all bundles that have 'openssl' dependency)"
+    note "  ${cyan}rebuild                              ${gray}-${green} rebuilds and pushes each software bundle that depends on definition given as a param. (example: ${SOFIN_ONLYNAME} rebuild openssl - will rebuild all bundles that have 'openssl' dependency)"
     note "  ${cyan}reset                               ${gray}-${green} resets local definitions repository"
 
     exit
@@ -175,10 +176,10 @@ update_shell_vars () {
     # TODO: consider filtering debug messages to enable debug statements in early sofin code: | ${GREP_BIN} -v 'DEBUG:?'
     if [ "${USERNAME}" = "root" ]; then
         debug "Updating ${SOFIN_PROFILE} settings."
-        ${PRINTF_BIN} "$(${SOFIN_BIN} getshellvars)" > "${SOFIN_PROFILE}"
+        ${PRINTF_BIN} "$(${SOFIN_BIN} getshellvars 2>/dev/null)" > "${SOFIN_PROFILE}" 2>/dev/null
     else
         debug "Updating ${HOME}/.profile settings."
-        ${PRINTF_BIN} "$(${SOFIN_BIN} getshellvars ${USERNAME})" > "${HOME}/.profile"
+        ${PRINTF_BIN} "$(${SOFIN_BIN} getshellvars ${USERNAME} 2>/dev/null)" > "${HOME}/.profile" 2>/dev/null
     fi
 }
 
@@ -226,7 +227,7 @@ clean_binbuilds () {
 clean_failbuilds () {
     if [ -d "${CACHE_DIR}cache" ]; then
         number="0"
-        files=$(${FIND_BIN} "${CACHE_DIR}cache" -maxdepth 2 -mindepth 1 -type d)
+        files=$(${FIND_BIN} "${CACHE_DIR}cache" -maxdepth 2 -mindepth 1 -type d 2>/dev/null)
         num="$(echo "${files}" | eval ${FILES_COUNT_GUARD})"
         if [ ! -z "${num}" ]; then
             number="${number} + ${num} - 1"
@@ -235,7 +236,7 @@ clean_failbuilds () {
             debug "Removing directory: ${i}"
             ${RM_BIN} -rf "${i}" || warn "Privileges problem while removing '${i}'? All files should belong to '${USER}' there."
         done
-        result="$(echo "${number}" | ${BC_BIN})"
+        result="$(echo "${number}" | ${BC_BIN} 2>/dev/null)"
         note "${result} directories cleaned."
     fi
 }
@@ -425,16 +426,16 @@ if [ ! "$1" = "" ]; then
         note
         if [ -d ${SOFTWARE_DIR} ]; then
             for app in ${SOFTWARE_DIR}*; do
-                app_name="$(${BASENAME_BIN} ${app})"
+                app_name="$(${BASENAME_BIN} ${app} 2>/dev/null)"
                 note "Checking ${app_name}"
-                for req in $(${FIND_BIN} ${app} -maxdepth 1 -name *${INSTALLED_MARK} | ${SORT_BIN}); do
-                    pp="$(${PRINTF_BIN} "$(${BASENAME_BIN} ${req})" | ${SED_BIN} "s/${INSTALLED_MARK}//")"
-                    note "  ${pp} [$(${CAT_BIN} ${req})]"
+                for req in $(${FIND_BIN} ${app} -maxdepth 1 -name *${INSTALLED_MARK} 2>/dev/null | ${SORT_BIN} 2>/dev/null); do
+                    pp="$(${PRINTF_BIN} "$(${BASENAME_BIN} ${req} 2>/dev/null)" | ${SED_BIN} "s/${INSTALLED_MARK}//" 2>/dev/null)"
+                    note "  ${pp} [$(${CAT_BIN} ${req} 2>/dev/null)]"
                 done
-                lowercase="$(${PRINTF_BIN} "${app_name}" | ${TR_BIN} '[A-Z]' '[a-z]')"
+                lowercase="$(${PRINTF_BIN} "${app_name}" | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null)"
                 installed_file="${SOFTWARE_DIR}/${app_name}/${lowercase}${INSTALLED_MARK}"
                 if [ -e "${installed_file}" ]; then
-                    note "${SUCCESS_CHAR} ${app_name} [$(${CAT_BIN} ${installed_file})]\n"
+                    note "${SUCCESS_CHAR} ${app_name} [$(${CAT_BIN} ${installed_file} 2>/dev/null)]\n"
                 else
                     note "${SUCCESS_CHAR} ${app_name} [unknown]\n"
                 fi
@@ -521,8 +522,8 @@ if [ ! "$1" = "" ]; then
         fi
 
         set_c_compiler CLANG
-        A_CC="$(echo "${CC}" | ${SED_BIN} 's/ //')"
-        A_CXX="$(echo "${CXX}" | ${SED_BIN} 's/ //')"
+        A_CC="$(echo "${CC}" | ${SED_BIN} 's/ //' 2>/dev/null)"
+        A_CXX="$(echo "${CXX}" | ${SED_BIN} 's/ //' 2>/dev/null)"
         ${PRINTF_BIN} "# CC:\nexport CC='${A_CC}'\n\n"
         ${PRINTF_BIN} "# CXX:\nexport CXX='${A_CXX}'\n\n"
         ${PRINTF_BIN} "# CPP:\nexport CPP='${CPP}'\n\n"
@@ -574,7 +575,7 @@ if [ ! "$1" = "" ]; then
         if [ ! -d "${MOST_RECENT_DIR}" ]; then
             error "No build dir: '${MOST_RECENT_DIR}' found to continue bundle build of: '${a_bundle_name}'"
         fi
-        a_build_dir="$(${BASENAME_BIN} ${MOST_RECENT_DIR})"
+        a_build_dir="$(${BASENAME_BIN} ${MOST_RECENT_DIR} 2>/dev/null)"
         note "Found most recent build dir: '${a_build_dir}' for bundle: '${a_bundle_name}'."
         note "Resuming interrupted build.."
         export APPLICATIONS="${a_bundle_name}"
@@ -603,11 +604,11 @@ if [ ! "$1" = "" ]; then
         fi
 
         # try a list - it will have priority if file exists:
-        if [ -f "${LISTS_DIR}$2" ]; then
-            export APPLICATIONS="$(${CAT_BIN} ${LISTS_DIR}$2 | ${TR_BIN} '\n' ' ')"
+        if [ -f "${LISTS_DIR}${2}" ]; then
+            export APPLICATIONS="$(${CAT_BIN} ${LISTS_DIR}${2} 2>/dev/null | ${TR_BIN} '\n' ' ' 2>/dev/null)"
             note "Processing software: ${APPLICATIONS} for architecture: ${SYSTEM_ARCH}"
         else
-            export APPLICATIONS="$(echo ${SOFIN_ARGS})"
+            export APPLICATIONS="${SOFIN_ARGS}"
             note "Processing software: ${SOFIN_ARGS} for architecture: ${SYSTEM_ARCH}"
         fi
         ;;
@@ -621,7 +622,7 @@ if [ ! "$1" = "" ]; then
         if [ ! -e "./${DEPENDENCIES_FILE}" ]; then
             error "Dependencies file not found!"
         fi
-        export APPLICATIONS="$(${CAT_BIN} ./${DEPENDENCIES_FILE} | ${TR_BIN} '\n' ' ')"
+        export APPLICATIONS="$(${CAT_BIN} ./${DEPENDENCIES_FILE} 2>/dev/null | ${TR_BIN} '\n' ' ' 2>/dev/null)"
         note "Installing dependencies: ${APPLICATIONS}"
         ;;
 
@@ -632,13 +633,13 @@ if [ ! "$1" = "" ]; then
         for element in ${SOFIN_ARGS}; do
             if [ -d "${element}" ]; then
                 if [ ! -L "${element}" ]; then
-                    lowercase_element="$(${PRINTF_BIN} "${element}" | ${TR_BIN} '[A-Z]' '[a-z]')"
-                    version_element="$(${CAT_BIN} ${element}/${lowercase_element}${INSTALLED_MARK})"
+                    lowercase_element="$(${PRINTF_BIN} "${element}" | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null)"
+                    version_element="$(${CAT_BIN} ${element}/${lowercase_element}${INSTALLED_MARK} 2>/dev/null)"
                     name="${element}-${version_element}${DEFAULT_ARCHIVE_EXT}"
-                    dig_query="$(${DIG_BIN} +short ${MAIN_SOFTWARE_ADDRESS} A)"
+                    dig_query="$(${DIG_BIN} +short ${MAIN_SOFTWARE_ADDRESS} A 2>/dev/null)"
                     if [ ${OS_VERSION} -gt 93 ]; then
                         # In FreeBSD 10 there's drill utility instead of dig
-                        dig_query=$(${DIG_BIN} A ${MAIN_SOFTWARE_ADDRESS} | ${GREP_BIN} "^${MAIN_SOFTWARE_ADDRESS}" | ${AWK_BIN} '{print $5;}')
+                        dig_query=$(${DIG_BIN} A ${MAIN_SOFTWARE_ADDRESS} 2>/dev/null | ${GREP_BIN} "^${MAIN_SOFTWARE_ADDRESS}" 2>/dev/null | ${AWK_BIN} '{print $5;}' 2>/dev/null)
                     fi
                     if [ -z "${dig_query}" ]; then
                         error "No mirrors found in address: ${MAIN_SOFTWARE_ADDRESS}"
@@ -656,7 +657,7 @@ if [ ! "$1" = "" ]; then
 
                         if [ "${SYSTEM_NAME}" = "FreeBSD" ]; then # NOTE: feature designed for FBSD.
                             note "Preparing service dataset for: ${element}"
-                            svcs_no_slashes="$(echo "${SERVICES_DIR}" | ${SED_BIN} 's/\///g')"
+                            svcs_no_slashes="$(echo "${SERVICES_DIR}" | ${SED_BIN} 's/\///g' 2>/dev/null)"
                             inner_dir="$(${ZFS_BIN} list -H 2>/dev/null | ${GREP_BIN} "${element}$" 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null | ${SED_BIN} "s/.*${svcs_no_slashes}\///; s/\/.*//" 2>/dev/null)/"
                             certain_dataset="${SERVICES_DIR}${inner_dir}${element}"
                             full_dataset_name="${DEFAULT_ZPOOL}${certain_dataset}"
@@ -667,7 +668,7 @@ if [ ! "$1" = "" ]; then
                             if [ "$?" = "0" ]; then # if dataset exists, unmount it, send to file, and remount back
                                 ${ZFS_BIN} umount ${full_dataset_name} || error "ZFS umount ${full_dataset_name}. Dataset busy on build host? Not good :)"
                                 ${ZFS_BIN} send ${full_dataset_name} | ${XZ_BIN} > ${final_snap_file} && \
-                                snap_size="$(${STAT_BIN} -f%z "${final_snap_file}")" && \
+                                snap_size="$(${STAT_BIN} -f%z "${final_snap_file}" 2>/dev/null)" && \
                                 ${ZFS_BIN} mount ${full_dataset_name} && \
                                 note "Stream sent successfully to: ${final_snap_file}"
                             fi
@@ -693,11 +694,11 @@ if [ ! "$1" = "" ]; then
                         archive_sha1="NO-SHA"
                         case "${SYSTEM_NAME}" in
                             Darwin|Linux)
-                                archive_sha1="$(${SHA_BIN} "${name}" | ${AWK_BIN} '{print $1;}')"
+                                archive_sha1="$(${SHA_BIN} "${name}" 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)"
                                 ;;
 
                             FreeBSD)
-                                archive_sha1="$(${SHA_BIN} -q "${name}")"
+                                archive_sha1="$(${SHA_BIN} -q "${name}" 2>/dev/null)"
                                 ;;
                         esac
 
@@ -800,16 +801,16 @@ if [ ! "$1" = "" ]; then
         dependency="$2"
 
         # go to definitions dir, and gather software list that include given dependency:
-        all_defs="$(${FIND_BIN} ${DEFINITIONS_DIR} -maxdepth 1 -type f -name '*.def')"
+        all_defs="$(${FIND_BIN} ${DEFINITIONS_DIR} -maxdepth 1 -type f -name '*.def' 2>/dev/null)"
         to_rebuild=""
         for deps in ${all_defs}; do
             . ${DEFAULTS}
             . ${deps}
             echo "${APP_REQUIREMENTS}" | ${GREP_BIN} "${dependency}" >/dev/null 2>&1
             if [ "$?" = "0" ]; then
-                dep="$(${BASENAME_BIN} "${deps}")"
-                rawname="$(${PRINTF_BIN} "${dep}" | ${SED_BIN} 's/\.def//g')"
-                app_name="$(${PRINTF_BIN} "${rawname}" | ${CUT_BIN} -c1 | ${TR_BIN} '[a-z]' '[A-Z]')$(${PRINTF_BIN} "${rawname}" | ${SED_BIN} 's/^[a-zA-Z]//')"
+                dep="$(${BASENAME_BIN} "${deps}" 2>/dev/null)"
+                rawname="$(${PRINTF_BIN} "${dep}" | ${SED_BIN} 's/\.def//g' 2>/dev/null)"
+                app_name="$(${PRINTF_BIN} "${rawname}" | ${CUT_BIN} -c1 2>/dev/null | ${TR_BIN} '[a-z]' '[A-Z]' 2>/dev/null)$(${PRINTF_BIN} "${rawname}" | ${SED_BIN} 's/^[a-zA-Z]//' 2>/dev/null)"
                 to_rebuild="${app_name} ${to_rebuild}"
             fi
         done
@@ -842,12 +843,12 @@ if [ ! "$1" = "" ]; then
         if [ "${ANS}" = "YES" ]; then
             cd "${SOFTWARE_DIR}"
             for element in ${SOFIN_ARGS}; do
-                lowercase_element="$(${PRINTF_BIN} "${element}" | ${TR_BIN} '[A-Z]' '[a-z]')"
+                lowercase_element="$(${PRINTF_BIN} "${element}" | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null)"
                 name="${element}-"
-                dig_query="$(${DIG_BIN} +short ${MAIN_SOFTWARE_ADDRESS} A)"
+                dig_query="$(${DIG_BIN} +short ${MAIN_SOFTWARE_ADDRESS} A 2>/dev/null)"
                 if [ ${OS_VERSION} -gt 93 ]; then
                     # In FreeBSD 10 there's drill utility instead of dig
-                    dig_query=$(${DIG_BIN} A ${MAIN_SOFTWARE_ADDRESS} | ${GREP_BIN} "^${MAIN_SOFTWARE_ADDRESS}" | ${AWK_BIN} '{print $5;}')
+                    dig_query=$(${DIG_BIN} A ${MAIN_SOFTWARE_ADDRESS} 2>/dev/null | ${GREP_BIN} "^${MAIN_SOFTWARE_ADDRESS}" 2>/dev/null | ${AWK_BIN} '{print $5;}' 2>/dev/null)
                 fi
                 debug "MIRROR: ${dig_query}"
                 for mirror in ${dig_query}; do
@@ -871,15 +872,15 @@ if [ ! "$1" = "" ]; then
 
         # first look for a list with that name:
         if [ -e "${LISTS_DIR}${2}" ]; then
-            export APPLICATIONS="$(${CAT_BIN} ${LISTS_DIR}$2 | ${TR_BIN} '\n' ' ')"
+            export APPLICATIONS="$(${CAT_BIN} ${LISTS_DIR}${2} 2>/dev/null | ${TR_BIN} '\n' ' ' 2>/dev/null)"
             debug "Removing list of applications: ${APPLICATIONS}"
         else
-            export APPLICATIONS="$(echo ${SOFIN_ARGS})"
-            debug "Removing applications: ${SOFIN_ARGS}"
+            export APPLICATIONS="${SOFIN_ARGS}"
+            debug "Removing applications: ${APPLICATIONS}"
         fi
 
         for app in $APPLICATIONS; do
-            given_app_name="$(${PRINTF_BIN} "${app}" | ${CUT_BIN} -c1 | ${TR_BIN} '[a-z]' '[A-Z]')$(${PRINTF_BIN} "${app}" | ${SED_BIN} 's/^[a-zA-Z]//' 2>/dev/null)"
+            given_app_name="$(${PRINTF_BIN} "${app}" | ${CUT_BIN} -c1 2>/dev/null | ${TR_BIN} '[a-z]' '[A-Z]' 2>/dev/null)$(${PRINTF_BIN} "${app}" | ${SED_BIN} 's/^[a-zA-Z]//' 2>/dev/null)"
             if [ -d "${SOFTWARE_DIR}${given_app_name}" ]; then
                 if [ "${given_app_name}" = "/" ]; then
                     error "Czy Ty orzeszki?"
@@ -889,7 +890,7 @@ if [ ! "$1" = "" ]; then
                 ${RM_BIN} -rfv "${SOFTWARE_DIR}${given_app_name}" >> "${LOG}-${aname}"
 
                 debug "Looking for other installed versions that might be exported automatically.."
-                name="$(echo "${given_app_name}" | ${SED_BIN} 's/[0-9]*//g')"
+                name="$(echo "${given_app_name}" | ${SED_BIN} 's/[0-9]*//g' 2>/dev/null)"
                 alternative="$(${FIND_BIN} ${SOFTWARE_DIR} -maxdepth 1 -name "${name}*" 2>/dev/null | ${SED_BIN} 's/^.*\///g' 2>/dev/null | ${HEAD_BIN} -n1 2>/dev/null)"
                 alt_lower="$(echo "${alternative}" | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null)"
                 debug "Alt_lower: ${alt_lower}, full: ${SOFTWARE_DIR}${alternative}/${alt_lower}${INSTALLED_MARK}"
@@ -913,8 +914,8 @@ if [ ! "$1" = "" ]; then
     reload|rehash)
         if [ ! -z "${SHELL_PID}" ]; then
             update_shell_vars
-            pids=$(${PS_BIN} ax | ${GREP_BIN} -v grep | ${GREP_BIN} zsh | ${AWK_BIN} '{print $1;}')
-            note "Reloading configuration of all $(${BASENAME_BIN} "${SHELL}") with pids: $(echo ${pids} | ${TR_BIN} '\n' ' ')"
+            pids=$(${PS_BIN} ax 2>/dev/null | ${GREP_BIN} -v grep 2>/dev/null | ${GREP_BIN} zsh 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)
+            note "Reloading configuration of all $(${BASENAME_BIN} "${SHELL}" 2>/dev/null) with pids: $(echo ${pids} | ${TR_BIN} '\n' ' ' 2>/dev/null)"
             for pid in ${pids}; do
                 ${KILL_BIN} -SIGUSR2 ${pid}
             done
@@ -953,7 +954,7 @@ if [ ! "$1" = "" ]; then
             error "Missing third argument with source app is required!"
         fi
         EXPORT="$2"
-        APP="$(${PRINTF_BIN} "${3}" | ${CUT_BIN} -c1 | ${TR_BIN} '[a-z]' '[A-Z]')$(${PRINTF_BIN} "${3}" | ${SED_BIN} 's/^[a-zA-Z]//')"
+        APP="$(${PRINTF_BIN} "${3}" | ${CUT_BIN} -c1 2>/dev/null | ${TR_BIN} '[a-z]' '[A-Z]' 2>/dev/null)$(${PRINTF_BIN} "${3}" | ${SED_BIN} 's/^[a-zA-Z]//' 2>/dev/null)"
 
         for dir in "/bin/" "/sbin/" "/libexec/"; do
             debug "Testing ${dir} looking into: ${SOFTWARE_DIR}${APP}${dir}"
@@ -979,13 +980,13 @@ if [ ! "$1" = "" ]; then
         if [ -d ${SOFTWARE_DIR} ]; then
             for prefix in ${SOFTWARE_DIR}*; do
                 debug "Looking into: ${prefix}"
-                application="$(${BASENAME_BIN} "${prefix}" | ${TR_BIN} '[A-Z]' '[a-z]')" # lowercase for case sensitive fs
+                application="$(${BASENAME_BIN} "${prefix}" 2>/dev/null | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null)" # lowercase for case sensitive fs
 
                 if [ ! -f "${prefix}/${application}${INSTALLED_MARK}" ]; then
                     warn "Application: ${application} is not properly installed."
                     continue
                 fi
-                ver="$(${CAT_BIN} "${prefix}/${application}${INSTALLED_MARK}")"
+                ver="$(${CAT_BIN} "${prefix}/${application}${INSTALLED_MARK}" 2>/dev/null)"
 
                 if [ ! -f "${DEFINITIONS_DIR}${application}.def" ]; then
                     warn "No such definition found: ${application}"
@@ -1035,16 +1036,16 @@ PATH=${DEFAULT_PATH}
 
 for application in ${APPLICATIONS}; do
     specified="${application}" # store original value of user input
-    application="$(${PRINTF_BIN} "${application}" | ${TR_BIN} '[A-Z]' '[a-z]')" # lowercase for case sensitive fs
+    application="$(${PRINTF_BIN} "${application}" | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null)" # lowercase for case sensitive fs
     . "${DEFAULTS}"
     if [ ! -f "${DEFINITIONS_DIR}${application}.def" ]; then
         contents=""
-        maybe_version="$(${FIND_BIN} ${DEFINITIONS_DIR} -maxdepth 1 -name ${application}\*.def)"
+        maybe_version="$(${FIND_BIN} ${DEFINITIONS_DIR} -maxdepth 1 -name ${application}\*.def 2>/dev/null)"
         for maybe in ${maybe_version}; do
-            elem="$(${BASENAME_BIN} ${maybe})"
-            head="$(echo "${elem}" | ${SED_BIN} 's/\(.\)\(.*\)/\1/' | ${TR_BIN} '[a-z]' '[A-Z]')"
-            tail="$(echo "${elem}" | ${SED_BIN} 's/\(.\)\(.*\)/\2/')"
-            contents="${contents}$(echo "${head}${tail}" | ${SED_BIN} 's/\..*//') "
+            elem="$(${BASENAME_BIN} ${maybe} 2>/dev/null)"
+            head="$(echo "${elem}" | ${SED_BIN} 's/\(.\)\(.*\)/\1/' 2>/dev/null | ${TR_BIN} '[a-z]' '[A-Z]' 2>/dev/null)"
+            tail="$(echo "${elem}" | ${SED_BIN} 's/\(.\)\(.*\)/\2/' 2>/dev/null)"
+            contents="${contents}$(echo "${head}${tail}" | ${SED_BIN} 's/\..*//' 2>/dev/null) "
         done
         if [ "${contents}" != "" ]; then
             warn "No such definition found: ${application}. Alternatives found: ${contents}"
@@ -1069,8 +1070,8 @@ for application in ${APPLICATIONS}; do
             # export APP_POSTFIX="$(echo "${APP_VERSION}" | ${SED_BIN} 's/\.[0-9]*$//;s/\.//')"
 
             APP_LOWER="${APP_NAME}"
-            head="$(echo "${APP_NAME}" | ${SED_BIN} 's/\(.\)\(.*\)/\1/' | ${TR_BIN} '[a-z]' '[A-Z]')"
-            tail="$(echo "${APP_NAME}" | ${SED_BIN} 's/\(.\)\(.*\)/\2/')"
+            head="$(echo "${APP_NAME}" | ${SED_BIN} 's/\(.\)\(.*\)/\1/' 2>/dev/null | ${TR_BIN} '[a-z]' '[A-Z]' 2>/dev/null)"
+            tail="$(echo "${APP_NAME}" | ${SED_BIN} 's/\(.\)\(.*\)/\2/' 2>/dev/null)"
             # Capitalize:
             APP_NAME="${head}${tail}"
             # some additional convention check:
@@ -1100,7 +1101,7 @@ for application in ${APPLICATIONS}; do
                     if [ ! -e "${LOG}-${aname}" ]; then
                         ${TOUCH_BIN} "${LOG}-${aname}"
                     fi
-                    debug "$(${DATE_BIN} +%H%M%S-%s) run($@);"
+                    debug "$(${DATE_BIN} +%H%M%S-%s 2>/dev/null) run($@);"
                     eval PATH="${PATH}" "$@" 1>> "${LOG}-${aname}" 2>> "${LOG}-${aname}"
                     check_command_result $? "$@"
                 else
@@ -1135,7 +1136,7 @@ for application in ${APPLICATIONS}; do
                     if [ ! -e "${LOG}-${aname}" ]; then
                         ${TOUCH_BIN} "${LOG}-${aname}"
                     fi
-                    debug "$(${DATE_BIN} +%H%M%S-%s) try($@);"
+                    debug "$(${DATE_BIN} +%H%M%S-%s 2>/dev/null) try($@);"
                     eval PATH="${PATH}" "$@" 1>> "${LOG}-${aname}" 2>> "${LOG}-${aname}"
                 else
                     error "An empty command to run for: ${APP_NAME}?"
@@ -1167,18 +1168,18 @@ for application in ${APPLICATIONS}; do
                                 debug "Found binary build archive: ${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}"
                                 case "${SYSTEM_NAME}" in
                                     Darwin|Linux)
-                                        export current_archive_sha1="$(${SHA_BIN} "${ARCHIVE_NAME}" | ${AWK_BIN} '{print $1;}')"
+                                        export current_archive_sha1="$(${SHA_BIN} "${ARCHIVE_NAME}" 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)"
                                         ;;
 
                                     FreeBSD)
-                                        export current_archive_sha1="$(${SHA_BIN} -q "${ARCHIVE_NAME}")"
+                                        export current_archive_sha1="$(${SHA_BIN} -q "${ARCHIVE_NAME}" 2>/dev/null)"
                                         ;;
                                 esac
                                 debug "current_archive_sha1: ${current_archive_sha1}"
                             fi
                             current_sha_file="${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}.sha1"
                             if [ -e "${current_sha_file}" ]; then
-                                export sha1_value="$(${CAT_BIN} ${current_sha_file})"
+                                export sha1_value="$(${CAT_BIN} ${current_sha_file} 2>/dev/null)"
                             fi
 
                             debug "Checking SHA1 match: ${current_archive_sha1} vs ${sha1_value}"
@@ -1191,7 +1192,7 @@ for application in ${APPLICATIONS}; do
                         cd "${SOFTWARE_ROOT_DIR}"
 
                         debug "ARCHIVE_NAME: ${ARCHIVE_NAME}"
-                        debug "Expecting to be existant: ${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}"
+                        debug "Expecting binbuild to be available in: ${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}"
                         if [ -e "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" ]; then # if exists, then checksum is ok
                             ${TAR_BIN} xJf "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" >> ${LOG}-${aname} 2>&1
                             if [ "$?" = "0" ]; then # if archive is valid
@@ -1206,7 +1207,7 @@ for application in ${APPLICATIONS}; do
                         fi
                     fi
                 else
-                    note "Software already installed: ${APP_NAME}${APP_POSTFIX} with version: $(cat ${INSTALLED_INDICATOR})"
+                    note "Software already installed: ${APP_NAME}${APP_POSTFIX} with version: $(cat ${INSTALLED_INDICATOR} 2>/dev/null)"
                     export DONT_BUILD_BUT_DO_EXPORTS="true"
                 fi
 
@@ -1277,24 +1278,24 @@ for application in ${APPLICATIONS}; do
                                 fi
                             done
                             if [ -z "${APP_GIT_MODE}" ]; then # Standard http tarball method:
-                                if [ ! -e ${BUILD_DIR_ROOT}/../$(${BASENAME_BIN} ${APP_HTTP_PATH}) ]; then
+                                if [ ! -e ${BUILD_DIR_ROOT}/../$(${BASENAME_BIN} ${APP_HTTP_PATH} 2>/dev/null) ]; then
                                     note "   ${NOTE_CHAR2} Fetching requirement source from: ${APP_HTTP_PATH}"
-                                    ${MV_BIN} $(${BASENAME_BIN} ${APP_HTTP_PATH}) ${BUILD_DIR_ROOT}/..
                                     retry "${FETCH_BIN} ${APP_HTTP_PATH}"
+                                    ${MV_BIN} $(${BASENAME_BIN} ${APP_HTTP_PATH} 2>/dev/null) ${BUILD_DIR_ROOT}/..
                                 fi
 
-                                file="${BUILD_DIR_ROOT}/../$(${BASENAME_BIN} ${APP_HTTP_PATH})"
+                                file="${BUILD_DIR_ROOT}/../$(${BASENAME_BIN} ${APP_HTTP_PATH} 2>/dev/null)"
                                 debug "Build dir: ${BUILD_DIR_ROOT}, file: ${file}"
                                 if [ "${APP_SHA}" = "" ]; then
                                     error "${NOTE_CHAR2} Missing SHA sum for source: ${file}."
                                 else
                                     case "${SYSTEM_NAME}" in
                                         Darwin|Linux)
-                                            export cur="$(${SHA_BIN} ${file} | ${AWK_BIN} '{print $1;}')"
+                                            export cur="$(${SHA_BIN} ${file} 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)"
                                             ;;
 
                                         FreeBSD)
-                                            export cur="$(${SHA_BIN} -q ${file})"
+                                            export cur="$(${SHA_BIN} -q ${file} 2>/dev/null)"
                                             ;;
                                     esac
                                     if [ "${cur}" = "${APP_SHA}" ]; then
@@ -1322,9 +1323,9 @@ for application in ${APPLICATIONS}; do
                                 run "${GIT_BIN} clone ${APP_HTTP_PATH} ${APP_NAME}${APP_VERSION}"
                             fi
 
-                            export BUILD_DIR="$(${FIND_BIN} ${BUILD_DIR_ROOT}/* -maxdepth 0 -type d -name "*${APP_VERSION}*")"
+                            export BUILD_DIR="$(${FIND_BIN} ${BUILD_DIR_ROOT}/* -maxdepth 0 -type d -name "*${APP_VERSION}*" 2>/dev/null)"
                             if [ -z "${BUILD_DIR}" ]; then
-                                export BUILD_DIR=$(${FIND_BIN} ${BUILD_DIR_ROOT}/* -maxdepth 0 -type d) # try any dir instead
+                                export BUILD_DIR=$(${FIND_BIN} ${BUILD_DIR_ROOT}/* -maxdepth 0 -type d 2>/dev/null) # try any dir instead
                             fi
                             if [ ! -z "${APP_SOURCE_DIR_POSTFIX}" ]; then
                                 export BUILD_DIR="${BUILD_DIR}/${APP_SOURCE_DIR_POSTFIX}"
@@ -1345,7 +1346,7 @@ for application in ${APPLICATIONS}; do
                             aname="$(echo "${APP_NAME}${APP_POSTFIX}" | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null)"
                             LIST_DIR="${DEFINITIONS_DIR}patches/$1" # $1 is definition file name
                             if [ -d "${LIST_DIR}" ]; then
-                                patches_files="$(${FIND_BIN} ${LIST_DIR}/* -maxdepth 0 -type f)"
+                                patches_files="$(${FIND_BIN} ${LIST_DIR}/* -maxdepth 0 -type f 2>/dev/null)"
                                 note "   ${NOTE_CHAR2} Applying common patches for: ${APP_NAME}${APP_POSTFIX}"
                                 for patch in ${patches_files}; do
                                     for level in 0 1 2 3 4 5; do
@@ -1361,7 +1362,7 @@ for application in ${APPLICATIONS}; do
                                 debug "Checking psp dir: ${pspatch_dir}"
                                 if [ -d "${pspatch_dir}" ]; then
                                     note "   ${NOTE_CHAR2} Applying platform specific patches for: ${APP_NAME}${APP_POSTFIX}/${SYSTEM_NAME}"
-                                    patches_files="$(${FIND_BIN} ${pspatch_dir}/* -maxdepth 0 -type f)"
+                                    patches_files="$(${FIND_BIN} ${pspatch_dir}/* -maxdepth 0 -type f 2>/dev/null)"
                                     for platform_specific_patch in ${patches_files}; do
                                         for level in 0 1 2 3 4 5; do
                                             debug "Patching source code with pspatch: ${platform_specific_patch} (p${level})"
@@ -1413,7 +1414,7 @@ for application in ${APPLICATIONS}; do
                                     ;;
 
                                 posix)
-                                    run "./configure -prefix ${PREFIX} -cc $(${BASENAME_BIN} ${CC}) ${APP_CONFIGURE_ARGS}"
+                                    run "./configure -prefix ${PREFIX} -cc $(${BASENAME_BIN} ${CC} 2>/dev/null) ${APP_CONFIGURE_ARGS}"
                                     ;;
 
                                 cmake)
@@ -1505,8 +1506,8 @@ for application in ${APPLICATIONS}; do
                 else
                     note "Installing ${application} v${APP_VERSION}, with requirements: ${APP_REQUIREMENTS}"
                 fi
-                export req_amount="$(${PRINTF_BIN} "${APP_REQUIREMENTS}" | ${WC_BIN} -w | ${AWK_BIN} '{print $1;}')"
-                export req_amount="$(${PRINTF_BIN} "${req_amount} + 1\n" | ${BC_BIN})"
+                export req_amount="$(${PRINTF_BIN} "${APP_REQUIREMENTS}" | ${WC_BIN} -w 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)"
+                export req_amount="$(${PRINTF_BIN} "${req_amount} + 1\n" | ${BC_BIN} 2>/dev/null)"
                 export req_all="${req_amount}"
                 for req in ${APP_REQUIREMENTS}; do
                     if [ ! "${APP_USER_INFO}" = "" ]; then
@@ -1522,7 +1523,7 @@ for application in ${APPLICATIONS}; do
                             execute_process "${req}"
                         fi
                     fi
-                    export req_amount="$(${PRINTF_BIN} "${req_amount} - 1\n" | ${BC_BIN})"
+                    export req_amount="$(${PRINTF_BIN} "${req_amount} - 1\n" | ${BC_BIN} 2>/dev/null)"
                 done
             fi
 
@@ -1534,7 +1535,7 @@ for application in ${APPLICATIONS}; do
             }
 
             show_done () {
-                ver="$(${CAT_BIN} "${PREFIX}/${application}${INSTALLED_MARK}")"
+                ver="$(${CAT_BIN} "${PREFIX}/${application}${INSTALLED_MARK}" 2>/dev/null)"
                 note "${SUCCESS_CHAR} ${application} [${ver}]\n"
             }
 
@@ -1562,17 +1563,19 @@ for application in ${APPLICATIONS}; do
 
             debug "Doing app conflict resolve"
             if [ ! -z "${APP_CONFLICTS_WITH}" ]; then
+                disabled_exps=""
                 note "Resolving possible conflicts with: ${APP_CONFLICTS_WITH}"
                 for app in ${APP_CONFLICTS_WITH}; do
-                    maybe_software="$(${FIND_BIN} ${SOFTWARE_DIR} -maxdepth 1 -type d -name ${app}\*)"
+                    maybe_software="$(${FIND_BIN} ${SOFTWARE_DIR} -maxdepth 1 -type d -iname "${app}*" 2>/dev/null)"
                     for an_app in ${maybe_software}; do
-                        debug "Found conflicting app: ${an_app}"
                         if [ -e "${an_app}/exports" ]; then
-                            debug "Disabling exports for ${APP_NAME}${APP_POSTFIX}"
+                            debug "Disabling exports for ${an_app}"
                             ${MV_BIN} "${an_app}/exports" "${an_app}/exports-disabled"
+                            disabled_exps="${disabled_exp} ${an_app}"
                         fi
                     done
                 done
+                note "Disabled conflicting bundles: ${disabled_exps}"
             fi
 
             . "${DEFINITIONS_DIR}${application}.def"
@@ -1596,7 +1599,7 @@ for application in ${APPLICATIONS}; do
                                 cd "${PREFIX}${dir}"
                                 ${LN_BIN} -vfs "..${dir}${exp}" "../exports/${exp}" >> "${LOG}-${aname}"
                                 cd "${curr_dir}"
-                                exp_elem="$(${BASENAME_BIN} ${file_to_exp})"
+                                exp_elem="$(${BASENAME_BIN} ${file_to_exp} 2>/dev/null)"
                                 EXPORT_LIST="${EXPORT_LIST} ${exp_elem}"
                             fi
                         fi
@@ -1612,17 +1615,17 @@ for application in ${APPLICATIONS}; do
 
         if [ "${APP_CLEAN_USELESS}" = "true" ]; then
             for pattern in ${APP_USELESS} ${APP_DEFAULT_USELESS}; do
-                debug "Pattern: ${pattern}"
                 if [ ! -z "${PREFIX}" ]; then
+                    debug "Pattern: ${pattern}"
                     ${RM_BIN} -rf ${PREFIX}/${pattern}
                 fi
             done
             for dir in bin sbin libexec; do
                 if [ -d "${PREFIX}/${dir}" ]; then
-                    ALL_BINS=$(${FIND_BIN} ${PREFIX}/${dir} -maxdepth 1 -type f -or -type l)
-                    debug "ALL_BINS: ${ALL_BINS}"
+                    ALL_BINS=$(${FIND_BIN} ${PREFIX}/${dir} -maxdepth 1 -type f -or -type l 2>/dev/null)
+                    debug "ALL_BINS: $(echo "${ALL_BINS}" | ${TR_BIN} '\n' ' ' 2>/dev/null)"
                     for file in ${ALL_BINS}; do
-                        base="$(${BASENAME_BIN} ${file})"
+                        base="$(${BASENAME_BIN} ${file} 2>/dev/null)"
                         if [ -e "${PREFIX}/exports/${base}" ]; then
                             debug "Found export: ${base}"
                         else
@@ -1665,7 +1668,7 @@ for application in ${APPLICATIONS}; do
                 counter="0"
                 for strip in ${dirs_to_strip}; do
                     if [ -d "${strip}" ]; then
-                        files="$(${FIND_BIN} ${strip} -maxdepth 1 -type f)"
+                        files="$(${FIND_BIN} ${strip} -maxdepth 1 -type f 2>/dev/null)"
                         for file in ${files}; do
                             ${STRIP_BIN} ${file} > /dev/null 2>&1
                             if [ "$?" = "0" ]; then
@@ -1676,7 +1679,7 @@ for application in ${APPLICATIONS}; do
                         done
                     fi
                 done
-                result="$(echo "${counter}" | ${BC_BIN})"
+                result="$(echo "${counter}" | ${BC_BIN} 2>/dev/null)"
                 if [ "${result}" -lt "0" ]; then
                     result="0"
                 fi
@@ -1702,7 +1705,7 @@ for application in ${APPLICATIONS}; do
 
                 # count Sofin jobs. For more than one job available,
                 sofin_ps_list="$(${PS_BIN} axv 2>/dev/null | ${GREP_BIN} -v grep 2>/dev/null | ${EGREP_BIN} "sh ${SOFIN_BIN} (${ALL_INSTALL_PHRASES}) [A-Z].*" 2>/dev/null)"
-                debug "Sofin ps list: $(echo "${sofin_ps_list}" | ${TR_BIN} '\n' ',' 2>/dev/null)"
+                debug "Sofin ps list: $(echo "${sofin_ps_list}" | ${TR_BIN} '\n' ' ' 2>/dev/null)"
                 sofins_all="$(echo "${sofin_ps_list}" | ${WC_BIN} -l 2>/dev/null | ${SED_BIN} 's/ //g' 2>/dev/null)"
                 sofins_running="$(echo "${sofins_all} - 1" | ${BC_BIN} 2>/dev/null)"
                 test -z "${sofins_running}" && sofins_running="0"
@@ -1724,7 +1727,7 @@ for application in ${APPLICATIONS}; do
                     app_name_lowercase="$(echo "${maybe_dataset}" | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null)"
                     if [ "${app_name_lowercase}" = "${aname}" -o ${jobs_in_parallel} = "NO" ]; then
                         # find name of mount from default ZFS Services:
-                        no_ending_slash="$(echo "${SERVICES_DIR}" | ${SED_BIN} 's/\/$//')"
+                        no_ending_slash="$(echo "${SERVICES_DIR}" | ${SED_BIN} 's/\/$//' 2>/dev/null)"
                         inner_dir="$(${ZFS_BIN} list -H 2>/dev/null | ${GREP_BIN} "${no_ending_slash}$" 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null | ${SED_BIN} 's/.*\///' 2>/dev/null)/"
                         certain_dataset="${SERVICES_DIR}${inner_dir}${maybe_dataset}"
                         certain_fileset="${SERVICES_DIR}${maybe_dataset}"
@@ -1775,7 +1778,7 @@ for application in ${APPLICATIONS}; do
 
         if [ "${APP_APPLE_BUNDLE}" = "true" ]; then
             APP_LOWERNAME="${APP_NAME}"
-            APP_NAME="$(${PRINTF_BIN} "${APP_NAME}" | ${CUT_BIN} -c1 | ${TR_BIN} '[a-z]' '[A-Z]')$(${PRINTF_BIN} "${APP_NAME}" | ${SED_BIN} 's/^[a-zA-Z]//')"
+            APP_NAME="$(${PRINTF_BIN} "${APP_NAME}" | ${CUT_BIN} -c1 2>/dev/null | ${TR_BIN} '[a-z]' '[A-Z]' 2>/dev/null)$(${PRINTF_BIN} "${APP_NAME}" | ${SED_BIN} 's/^[a-zA-Z]//' 2>/dev/null)"
             APP_BUNDLE_NAME="${PREFIX}.app"
             aname="$(echo "${APP_NAME}${APP_POSTFIX}" | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null)"
             note "Creating Apple bundle: ${APP_NAME} in ${APP_BUNDLE_NAME}"
@@ -1788,7 +1791,7 @@ for application in ${APPLICATIONS}; do
             ${CP_BIN} -R ${PREFIX}/${APP_NAME}.app/Contents/* "${APP_BUNDLE_NAME}/Contents/"
             ${CP_BIN} -R ${PREFIX}/bin/${APP_LOWERNAME} "${APP_BUNDLE_NAME}/exports/"
 
-            for lib in $(${FIND_BIN} "${PREFIX}" -name '*.dylib' -type f); do
+            for lib in $(${FIND_BIN} "${PREFIX}" -name '*.dylib' -type f 2>/dev/null); do
                 ${CP_BIN} -vf ${lib} ${APP_BUNDLE_NAME}/libs/ >> ${LOG}-${aname} 2>&1
             done
 
@@ -1818,8 +1821,8 @@ done
 update_shell_vars
 
 if [ ! -z "${SHELL_PID}" ]; then
-    pids=$(${PS_BIN} ax | ${GREP_BIN} -v grep | ${GREP_BIN} zsh | ${AWK_BIN} '{print $1;}')
-    note "All done. Reloading configuration of all $(${BASENAME_BIN} "${SHELL}") with pids: $(echo ${pids} | ${TR_BIN} '\n' ' ')"
+    pids=$(${PS_BIN} ax 2>/dev/null | ${GREP_BIN} -v grep 2>/dev/null | ${GREP_BIN} zsh 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)
+    note "All done. Reloading configuration of all $(${BASENAME_BIN} "${SHELL}" 2>/dev/null) with pids: $(echo ${pids} | ${TR_BIN} '\n' ' ' 2>/dev/null)"
     for pid in ${pids}; do
         ${KILL_BIN} -SIGUSR2 ${pid}
     done
