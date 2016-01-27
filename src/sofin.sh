@@ -1741,8 +1741,9 @@ for application in ${APPLICATIONS}; do
                         }
 
                         # check dataset existence and create/receive it if necessary
-                        ${ZFS_BIN} list -H 2>/dev/null | ${GREP_BIN} "${full_dataset_name}" >/dev/null 2>&1
-                        if [ "$?" != "0" ]; then
+                        ds_mounted="$(${ZFS_BIN} get -H -o value mounted ${full_dataset_name} 2>/dev/null)"
+                        debug "Dataset: ${full_dataset_name} is mounted?: ${ds_mounted}"
+                        if [ "${ds_mounted}" != "yes" ]; then
                             debug "Moving ${certain_fileset} to ${certain_fileset}-tmp" && \
                             ${MV_BIN} "${certain_fileset}" "${certain_fileset}-tmp" && \
                             debug "Creating dataset: ${full_dataset_name}" && \
