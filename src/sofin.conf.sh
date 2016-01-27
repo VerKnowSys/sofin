@@ -7,7 +7,7 @@ if [ "${SOFIN_TRACE}" = "" ]; then
 fi
 
 # Sofin version string:
-readonly SOFIN_VERSION="0.90.6"
+readonly SOFIN_VERSION="0.90.7"
 
 # setting up definitions repository
 readonly DEFAULT_REPOSITORY="https://verknowsys@bitbucket.org/verknowsys/sofin-definitions.git" # official sofin definitions repository
