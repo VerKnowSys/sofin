@@ -788,11 +788,11 @@ if [ ! "$1" = "" ]; then
         done
         # update_definitions
         for software in ${dependencies}; do
-            USE_BINBUILD=false USE_UPDATE=false ${SOFIN_BIN} install ${software} || def_error && \
-            USE_UPDATE=false ${SOFIN_BIN} push ${software} || def_error && \
-            note "Software bundle deployed: ${software}"
+            ${SOFIN_BIN} build ${software} || def_error && \
+            ${SOFIN_BIN} push ${software} || def_error && \
+            note "Software bundle deployed successfully: ${software}"
         done
-        exit
+        exit 0
         ;;
 
 
