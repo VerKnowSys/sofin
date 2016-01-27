@@ -1694,6 +1694,12 @@ for application in ${APPLICATIONS}; do
                 ;;
 
             *)
+                # start from checking ${SERVICES_DIR}/Bundlename directory
+                if [ ! -d "${SERVICE_DIR}" ]; then
+                    ${MKDIR_BIN} -p "${SERVICE_DIR}" && \
+                    note "Prepared service directory in: ${SERVICE_DIR}"
+                fi
+
                 # count Sofin jobs. For more than one job available,
                 sofin_ps_list="$(${PS_BIN} axv 2>/dev/null | ${GREP_BIN} -v grep 2>/dev/null | ${EGREP_BIN} "sh ${SOFIN_BIN} (${ALL_INSTALL_PHRASES}) [A-Z].*" 2>/dev/null)"
                 debug "Sofin ps list: $(echo "${sofin_ps_list}" | ${TR_BIN} '\n' ',' 2>/dev/null)"
