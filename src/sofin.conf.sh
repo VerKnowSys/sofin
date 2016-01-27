@@ -128,10 +128,10 @@ XZCAT_BIN="/usr/bin/xzcat"
 
 OS_VERSION=10
 if [ -x "${SOFIN_VERSION_UTILITY_BIN}" ]; then
-    export OS_VERSION="$(echo $(${SOFIN_VERSION_UTILITY_BIN}) | ${AWK_BIN} '{ gsub(/\./, ""); print $1; }' )"
-    export FULL_SYSTEM_VERSION="$(${SOFIN_VERSION_UTILITY_BIN})"
+    export OS_VERSION="$(echo $(${SOFIN_VERSION_UTILITY_BIN} 2>/dev/null) | ${AWK_BIN} '{ gsub(/\./, ""); print $1; }' 2>/dev/null)"
+    export FULL_SYSTEM_VERSION="$(${SOFIN_VERSION_UTILITY_BIN} 2>/dev/null)"
 fi
-USERNAME="$(${ID_BIN} ${DEFAULT_ID_OPTIONS})"
+USERNAME="$(${ID_BIN} ${DEFAULT_ID_OPTIONS} 2>/dev/null)"
 
 TTY="false"
 SUCCESS_CHAR="V"
@@ -202,8 +202,8 @@ error () {
 # System specific configuration
 export DEFAULT_ZPOOL="zroot"
 export DEFAULT_LDFLAGS="-fPIC -fPIE"
-export readonly SYSTEM_NAME="$(uname -s)"
-export readonly SYSTEM_ARCH="$(uname -m)"
+export readonly SYSTEM_NAME="$(uname -s 2>/dev/null)"
+export readonly SYSTEM_ARCH="$(uname -m 2>/dev/null)"
 
 if [ -z "${DEBUGBUILD}" ]; then
     export readonly DEFAULT_COMPILER_FLAGS="-Os -fPIC -fPIE -fno-strict-overflow -fstack-protector-all"
@@ -216,7 +216,7 @@ case "${SYSTEM_NAME}" in
     FreeBSD)
         # Default
         readonly FREEBSD_MINIMUM_VERSION="91"
-        export CPUS="$(${SYSCTL_BIN} kern.smp.cpus | ${AWK_BIN} '{printf $2;}')"
+        export CPUS="$(${SYSCTL_BIN} kern.smp.cpus 2>/dev/null | ${AWK_BIN} '{printf $2;}' 2>/dev/null)"
         export CURL_BIN="/usr/bin/fetch -T 3 -o -"
         export MAKE_OPTS="-j${CPUS}"
         if [ ${OS_VERSION} -lt ${FREEBSD_MINIMUM_VERSION} ]; then
@@ -250,7 +250,7 @@ case "${SYSTEM_NAME}" in
 
         # runtime sha
         test -x "${SOFIN_MICROSECONDS_UTILITY_BIN}" && \
-        RUNTIME_SHA="$(${PRINTF_BIN} "$(${DATE_BIN})-$(${SOFIN_MICROSECONDS_UTILITY_BIN})" | ${SHA_BIN})"
+        RUNTIME_SHA="$(${PRINTF_BIN} "$(${DATE_BIN} 2>/dev/null)-$(${SOFIN_MICROSECONDS_UTILITY_BIN} 2>/dev/null)" | ${SHA_BIN} 2>/dev/null)"
         ;;
 
     Darwin)
@@ -270,7 +270,7 @@ case "${SYSTEM_NAME}" in
         export SYSCTL_BIN="/usr/sbin/sysctl"
         export KLDLOAD_BIN="/sbin/kextload"
         export ZFS_BIN="/usr/local/bin/zfs"
-        export CPUS=$(${SYSCTL_BIN} machdep.cpu.thread_count | ${AWK_BIN} '{printf $2;}')
+        export CPUS=$(${SYSCTL_BIN} machdep.cpu.thread_count 2>/dev/null | ${AWK_BIN} '{printf $2;}' 2>/dev/null)
         export MAKE_OPTS="-j${CPUS}"
         export DEFAULT_ZPOOL="Projects"
         export XZ_BIN="/Software/Xz/exports/xz"
@@ -284,7 +284,7 @@ case "${SYSTEM_NAME}" in
 
         # runtime sha
         test -x "${SOFIN_MICROSECONDS_UTILITY_BIN}" && \
-        RUNTIME_SHA="$(${PRINTF_BIN} "$(${DATE_BIN})-$(${SOFIN_MICROSECONDS_UTILITY_BIN})" | ${SHA_BIN} | ${AWK_BIN} '{print $1;}')"
+        RUNTIME_SHA="$(${PRINTF_BIN} "$(${DATE_BIN} 2>/dev/null)-$(${SOFIN_MICROSECONDS_UTILITY_BIN} 2>/dev/null)" | ${SHA_BIN} 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)"
         ;;
 
     Linux)
@@ -309,7 +309,7 @@ case "${SYSTEM_NAME}" in
         export DEFAULT_LDFLAGS="-fPIC "
         export TEST_BIN="/usr/bin/test"
         export NPROC_BIN="/usr/bin/nproc"
-        export CPUS="$(${NPROC_BIN})"
+        export CPUS="$(${NPROC_BIN} 2>/dev/null)"
         export MAKE_OPTS="-j${CPUS}"
         export AWK_BIN="/usr/bin/awk"
         export ZFS_BIN="/usr/sbin/zfs"
@@ -319,7 +319,7 @@ case "${SYSTEM_NAME}" in
         fi
         # runtime sha
         test -x "${SOFIN_MICROSECONDS_UTILITY_BIN}" && \
-        RUNTIME_SHA="$(${PRINTF_BIN} "$(${DATE_BIN})-$(${SOFIN_MICROSECONDS_UTILITY_BIN})" | ${SHA_BIN} | ${AWK_BIN} '{print $1;}')"
+        RUNTIME_SHA="$(${PRINTF_BIN} "$(${DATE_BIN} 2>/dev/null)-$(${SOFIN_MICROSECONDS_UTILITY_BIN} 2>/dev/null)" | ${SHA_BIN} 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)"
         ;;
 
 esac
@@ -330,7 +330,7 @@ if [ -d "${CACHE_DIR}" ]; then
     if [ -z "${REPOSITORY}" ]; then # :this value is given by user as shell param
         ${MKDIR_BIN} -p "${CACHE_DIR}"
         if [ -f "${REPOSITORY_CACHE_FILE}" ]; then
-            export REPOSITORY="$(${CAT_BIN} ${REPOSITORY_CACHE_FILE})"
+            export REPOSITORY="$(${CAT_BIN} ${REPOSITORY_CACHE_FILE} 2>/dev/null)"
         else
             ${PRINTF_BIN} "${DEFAULT_REPOSITORY}\n" > ${REPOSITORY_CACHE_FILE}
             export REPOSITORY="${DEFAULT_REPOSITORY}"
@@ -349,14 +349,14 @@ check_command_result () {
         debug "Command successful: '$*'"
     else
         shift
-        error "Command failure: '$*'. Run $(${BASENAME_BIN} ${SOFIN_BIN}) log to see what went wrong."
+        error "Command failure: '$*'. Run $(${BASENAME_BIN} ${SOFIN_BIN} 2>/dev/null) log to see what went wrong."
         exit 1
     fi
 }
 
 
 check_root () {
-    if [ "$(id -u)" != "0" ]; then
+    if [ "$(id -u 2>/dev/null)" != "0" ]; then
         error "This command should be run as root."
         exit 1
     fi
@@ -387,7 +387,7 @@ check_os () {
 validate_env () {
     env | ${GREP_BIN} '_BIN=/' | while IFS= read -r envvar
     do
-        var_value="$(${PRINTF_BIN} "${envvar}" | ${AWK_BIN} '{sub(/^[A-Z_]*=/, ""); print $1;}')"
+        var_value="$(${PRINTF_BIN} "${envvar}" | ${AWK_BIN} '{sub(/^[A-Z_]*=/, ""); print $1;}' 2>/dev/null)"
         if [ ! -x "${var_value}" ]; then
             error "Required binary is unavailable: ${envvar}"
             exit 1
