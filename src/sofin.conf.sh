@@ -175,7 +175,7 @@ debug () {
         if [ ! -z "${aname}" ]; then
             cecho "# $1" ${magenta} >> ${LOG}-${aname} 2>&1
         else
-            cecho "# $1" ${magenta} >> ${LOG}-default 2>&1
+            cecho "# $1" ${magenta} >> ${LOG} 2>&1
         fi
     else
         cecho "# $1" ${magenta} # NOTE: this "#" is required for debug mode to work properly with generation of ~/.profile and /etc/profile_sofin files!
