@@ -206,8 +206,7 @@ check_disabled () {
     export ALLOW="1"
     if [ ! "$1" = "" ]; then
         for disabled in ${1}; do
-            debug "Running system: ${SYSTEM_NAME}"
-            debug "DisableOn element: ${disabled}"
+            debug "Running system: ${SYSTEM_NAME}; disable_on element: ${disabled}"
             if [ "$SYSTEM_NAME" = "${disabled}" ]; then
                 export ALLOW="0"
             fi
