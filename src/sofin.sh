@@ -137,12 +137,11 @@ create_cache_directories () {
     if [ ! -d "${CACHE_DIR}" -o \
          ! -d "${BINBUILDS_CACHE_DIR}" -o \
          ! -d "${LOGS_DIR}" ]; then
-         debug "Making dirs: ${CACHE_DIR}", "${BINBUILDS_CACHE_DIR}, ${LOGS_DIR}"
          ${MKDIR_BIN} -p "${CACHE_DIR}" "${BINBUILDS_CACHE_DIR}" "${LOGS_DIR}"
     fi
     if [ ! -d "${DEFINITIONS_DIR}" -o \
          ! -f "${DEFAULTS}" ]; then
-        warn "Detected no valid definitions cache in: ${DEFINITIONS_DIR}."
+        note "No valid definitions cache found. Creating a new cache in: ${CACHE_DIR}"
         clean_purge
         update_definitions
     fi
