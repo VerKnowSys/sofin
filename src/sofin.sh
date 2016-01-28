@@ -1757,7 +1757,9 @@ for application in ${APPLICATIONS}; do
                             dataset_name="$1"
                             remote_path="${MAIN_BINARY_REPOSITORY}${MAIN_COMMON_NAME}/${final_snap_file}"
                             debug "Seeking remote snapshot existence: ${remote_path}"
-                            retry "${FETCH_BIN} ${remote_path}"
+                            try "${FETCH_BIN} ${remote_path}" || \
+                            try "${FETCH_BIN} ${remote_path}" || \
+                            try "${FETCH_BIN} ${remote_path}"
                             if [ "$?" = "0" ]; then
                                 debug "Stream archive available. Creating service dataset: ${dataset_name} from file stream: ${final_snap_file}"
                                 ${XZCAT_BIN} "${final_snap_file}" | ${ZFS_BIN} receive -v "${dataset_name}" 2>/dev/null | ${TAIL_BIN} -n1 && \
