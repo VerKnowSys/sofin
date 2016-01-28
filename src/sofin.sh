@@ -251,7 +251,7 @@ clean_failbuilds () {
         fi
         for i in ${files}; do
             debug "Removing directory: ${i}"
-            ${RM_BIN} -rf "${i}" || warn "Privileges problem in failbuilds dir: '${i}'? All files should belong to '${USER}' there."
+            ${RM_BIN} -rf "${i}" 2>/dev/null || warn "Privileges problem in failbuilds dir: '${i}'? All files should belong to '${USER}' there."
         done
         result="$(echo "${number}" | ${BC_BIN} 2>/dev/null)"
         note "${result} directories cleaned."
@@ -262,7 +262,7 @@ clean_failbuilds () {
 clean_logs () {
     if [ -d "${LOGS_DIR}" ]; then
         note "Removing build logs from: ${LOGS_DIR}"
-        ${RM_BIN} -rf "${LOGS_DIR}" || warn "Privileges problem in logs dir: '${LOGS_DIR}'? All files should belong to '${USER}' there."
+        ${RM_BIN} -rf "${LOGS_DIR}" 2>/dev/null || warn "Privileges problem in logs dir: '${LOGS_DIR}'? All files should belong to '${USER}' there."
     fi
 }
 
@@ -270,7 +270,7 @@ clean_logs () {
 clean_purge () {
     if [ -d "${CACHE_DIR}" ]; then
         note "Purging all caches from: ${CACHE_DIR}"
-        ${RM_BIN} -rf "${CACHE_DIR}" || error "Privileges problem in cache dir: '${CACHE_DIR}'? All files should belong to '${USER}' there."
+        ${RM_BIN} -rf "${CACHE_DIR}" 2>/dev/null || warn "Privileges problem in cache dir: '${CACHE_DIR}'? All files should belong to '${USER}' there."
     fi
 }
 
