@@ -38,7 +38,7 @@ readonly CACHE_DIR="${HOME}/.cache/"
 readonly BINBUILDS_CACHE_DIR="${CACHE_DIR}binbuilds/"
 readonly DEFINITIONS_DIR="${CACHE_DIR}definitions/definitions/"
 readonly LOGS_DIR="${CACHE_DIR}logs/"
-readonly LOG="${LOGS_DIR}sofin-default"
+readonly LOG="${LOGS_DIR}sofin"
 readonly LISTS_DIR="${CACHE_DIR}definitions/lists/"
 readonly DEFAULTS="${DEFINITIONS_DIR}defaults.def"
 readonly LOCK_FILE="${SOFTWARE_DIR}.sofin.lock"
@@ -172,10 +172,12 @@ cecho () {
 debug () {
     if [ -z "${DEBUG}" ]; then
         aname="$(echo "${APP_NAME}${APP_POSTFIX}" | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null)"
-        if [ ! -z "${aname}" ]; then
-            cecho "# $1" ${magenta} >> ${LOG}-${aname} 2>&1
-        else
-            cecho "# $1" ${magenta} >> ${LOG} 2>&1
+        if [ ! -z "${aname}" -a -d "${LOGS_DIR}" ]; then
+            cecho "# $1" ${magenta} >> "${LOG}-${aname}" 2>&1
+        elif [ -z "${aname}" -a -d "${LOGS_DIR}" ]; then
+            cecho "# $1" ${magenta} >> "${LOG}" 2>&1
+        elif [ ! -d "${LOGS_DIR}" ]; then
+            cecho "# $1" ${cyan}
         fi
     else
         cecho "# $1" ${magenta} # NOTE: this "#" is required for debug mode to work properly with generation of ~/.profile and /etc/profile_sofin files!
