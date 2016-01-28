@@ -733,10 +733,10 @@ if [ ! "$1" = "" ]; then
                         ${CHMOD_BIN} a+r "${name}" "${name}.sha1"
 
                         note "Pushing archive #${archive_sha1} to remote: ${MAIN_BINARY_REPOSITORY}${SYS}/${name}"
-                        ${SCP_BIN} -P ${MAIN_PORT} ${name} ${address}/${name}.partial || def_error ${name}
+                        retry "${SCP_BIN} -P ${MAIN_PORT} ${name} ${address}/${name}.partial" || def_error ${name}
                         if [ "$?" = "0" ]; then
                             ${SSH_BIN} -p ${MAIN_PORT} ${MAIN_USER}@${mirror} "cd ${MAIN_SOFTWARE_PREFIX}/software/binary/${SYS} && mv ${name}.partial ${name}"
-                            ${SCP_BIN} -P ${MAIN_PORT} ${name}.sha1 ${address}/${name}.sha1 || def_error ${name}.sha1
+                            retry "${SCP_BIN} -P ${MAIN_PORT} ${name}.sha1 ${address}/${name}.sha1" || def_error ${name}.sha1
                         else
                             error "Failed to push binary build of: '${name}' to remote: ${MAIN_BINARY_REPOSITORY}${SYS}/${name}"
                         fi
@@ -752,7 +752,7 @@ if [ ! "$1" = "" ]; then
                                 ${CHMOD_BIN} a+r "${final_snap_file}"
                                 debug "Sending initial service stream to ${MAIN_COMMON_NAME} repository: ${MAIN_BINARY_REPOSITORY}${MAIN_COMMON_NAME}/${final_snap_file}"
 
-                                ${SCP_BIN} -P ${MAIN_PORT} ${final_snap_file} ${address}/${final_snap_file}.partial || def_error ${final_snap_file}
+                                retry "${SCP_BIN} -P ${MAIN_PORT} ${final_snap_file} ${address}/${final_snap_file}.partial" || def_error ${final_snap_file}
                                 if [ "$?" = "0" ]; then
                                     ${SSH_BIN} -p ${MAIN_PORT} ${MAIN_USER}@${mirror} "cd ${MAIN_SOFTWARE_PREFIX}/software/binary/${MAIN_COMMON_NAME} && mv ${final_snap_file}.partial ${final_snap_file}"
                                 else
