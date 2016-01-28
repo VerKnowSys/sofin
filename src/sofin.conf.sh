@@ -7,7 +7,7 @@ if [ -z "${SOFIN_TRACE}" ]; then
 fi
 
 # Sofin version string:
-readonly SOFIN_VERSION="0.92.1"
+readonly SOFIN_VERSION="0.92.2"
 
 # setting up definitions repository
 readonly DEFAULT_REPOSITORY="https://verknowsys@bitbucket.org/verknowsys/sofin-definitions.git" # official sofin definitions repository
@@ -387,7 +387,7 @@ check_os () {
 
 # validate environment availability or crash
 validate_env () {
-    env | ${GREP_BIN} '_BIN=/' | while IFS= read -r envvar
+    env | ${GREP_BIN} '_BIN=/' 2>/dev/null | while IFS= read -r envvar
     do
         var_value="$(${PRINTF_BIN} "${envvar}" | ${AWK_BIN} '{sub(/^[A-Z_]*=/, ""); print $1;}' 2>/dev/null)"
         if [ ! -x "${var_value}" ]; then
