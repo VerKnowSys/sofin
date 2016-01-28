@@ -119,7 +119,8 @@ update_definitions () {
             (retry ${GIT_BIN} pull origin "${BRANCH}" >> ${LOG} && note "Updated branch ${BRANCH} of repository ${REPOSITORY}") || error "Error occured: Update from branch: ${BRANCH} of repository ${REPOSITORY} wasn't possible."
         fi
     else
-        # clone definitions repository:
+        # create cache; clone definitions repository:
+        ${MKDIR_BIN} -p "${CACHE_DIR}"
         cd "${CACHE_DIR}"
         debug "Cloning repository ${REPOSITORY} from branch: ${BRANCH}"
         ${RM_BIN} -rf definitions >> ${LOG} 2>&1 # if something is already here, wipe it out from cache
