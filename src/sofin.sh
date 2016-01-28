@@ -1110,12 +1110,17 @@ for application in ${APPLICATIONS}; do
             run () {
                 if [ ! -z "$1" ]; then
                     aname="$(echo "${APP_NAME}${APP_POSTFIX}" | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null)"
-                    if [ ! -e "${LOG}-${aname}" ]; then
-                        ${TOUCH_BIN} "${LOG}-${aname}"
+                    if [ ! -d "${LOGS_DIR}" ]; then
+                        ${MKDIR_BIN} -p "${LOGS_DIR}"
                     fi
-                    debug "$(${DATE_BIN} +%H%M%S-%s 2>/dev/null) run($@);"
-                    eval PATH="${PATH}" "$@" 1>> "${LOG}-${aname}" 2>> "${LOG}-${aname}"
-                    check_command_result $? "$@"
+                    debug "$(${DATE_BIN} +%H%M%S-%s 2>/dev/null) run('$@'); aname(${aname});"
+                    if [ -z "${aname}" ]; then
+                        eval PATH="${PATH}" "$@" >> "${LOG}" 2>&1
+                        check_command_result $? "$@"
+                    else
+                        eval PATH="${PATH}" "$@" >> "${LOG}-${aname}" 2>&1
+                        check_command_result $? "$@"
+                    fi
                 else
                     error "An empty command to run for: ${APP_NAME}?"
                 fi
@@ -1126,11 +1131,15 @@ for application in ${APPLICATIONS}; do
                 while [ ! -z "${retries}" ]; do
                     if [ ! -z "$1" ]; then
                         aname="$(echo "${APP_NAME}${APP_POSTFIX}" | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null)"
-                        if [ ! -e "${LOG}-${aname}" ]; then
-                            ${TOUCH_BIN} "${LOG}-${aname}"
+                        if [ ! -d "${LOGS_DIR}" ]; then
+                            ${MKDIR_BIN} -p "${LOGS_DIR}"
                         fi
-                        eval PATH="${PATH}" "$@" 1>> "${LOG}-${aname}" 2>> "${LOG}-${aname}"
-                        if [ "$?" = "0" ]; then
+                        debug "$(${DATE_BIN} +%H%M%S-%s 2>/dev/null) retry('$@')[${retries}]; aname(${aname});"
+                        if [ -z "${aname}" ]; then
+                            eval PATH="${PATH}" "$@" >> "${LOG}" 2>&1 && \
+                            return 0
+                        else
+                            eval PATH="${PATH}" "$@" >> "${LOG}-${aname}" 2>&1 && \
                             return 0
                         fi
                     else
@@ -1145,11 +1154,15 @@ for application in ${APPLICATIONS}; do
             try () {
                 if [ ! -z "$1" ]; then
                     aname="$(echo "${APP_NAME}${APP_POSTFIX}" | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null)"
-                    if [ ! -e "${LOG}-${aname}" ]; then
-                        ${TOUCH_BIN} "${LOG}-${aname}"
+                    if [ ! -d "${LOGS_DIR}" ]; then
+                        ${MKDIR_BIN} -p "${LOGS_DIR}"
                     fi
-                    debug "$(${DATE_BIN} +%H%M%S-%s 2>/dev/null) try($@);"
-                    eval PATH="${PATH}" "$@" 1>> "${LOG}-${aname}" 2>> "${LOG}-${aname}"
+                    debug "$(${DATE_BIN} +%H%M%S-%s 2>/dev/null) try('$@'); aname(${aname});"
+                    if [ -z "${aname}" ]; then
+                        eval PATH="${PATH}" "$@" >> "${LOG}" 2>&1
+                    else
+                        eval PATH="${PATH}" "$@" >> "${LOG}-${aname}" 2>&1
+                    fi
                 else
                     error "An empty command to run for: ${APP_NAME}?"
                 fi
