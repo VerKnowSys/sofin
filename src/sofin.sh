@@ -86,6 +86,26 @@ set_c_compiler () {
 }
 
 
+retry () {
+    retries="***"
+    while [ ! -z "${retries}" ]; do
+        if [ ! -z "$1" ]; then
+            debug "$(${DATE_BIN} +%H%M%S-%s 2>/dev/null) retry('$@')[${retries}];"
+            if [ ! -f "${LOG}" -o ! -d "${LOGS_DIR}" ]; then
+                ${MKDIR_BIN} -p "${LOGS_DIR}"
+            fi
+            eval PATH="${PATH}" "$@" >> "${LOG}" 2>&1 && \
+            return 0
+        else
+            error "An empty command to retry?"
+        fi
+        retries="$(echo "${retries}" | ${SED_BIN} 's/\*//' 2>/dev/null)"
+        debug "Retries left: ${retries}"
+    done
+    error "All retries exhausted for launch commands: '$@'"
+}
+
+
 update_definitions () {
     if [ "${USE_UPDATE}" = "false" ]; then
         debug "Definitions update skipped on demand"
@@ -113,7 +133,7 @@ update_definitions () {
             ${GIT_BIN} checkout -b "${current_branch}" >> ${LOG} 2>&1 || \
                 ${GIT_BIN} checkout "${current_branch}" >> ${LOG} 2>&1
 
-            (retry ${GIT_BIN} pull origin "${current_branch}" && \
+            (retry "${GIT_BIN} pull origin ${current_branch}" && \
              note "Updated branch: ${current_branch} of repository ${REPOSITORY}") || \
                 error "Error occured: Update from branch: ${BRANCH} of repository: ${REPOSITORY} wasn't possible."
 
@@ -122,7 +142,7 @@ update_definitions () {
             ${GIT_BIN} checkout -b "${BRANCH}" >> ${LOG} 2>&1 || \
                 ${GIT_BIN} checkout "${BRANCH}" >> ${LOG} 2>&1
 
-            (retry ${GIT_BIN} pull origin "${BRANCH}" && \
+            (retry "${GIT_BIN} pull origin ${BRANCH}" && \
              note "Updated branch: ${BRANCH} of repository: ${REPOSITORY}") || \
                 error "Error occured: Update from branch: ${BRANCH} of repository: ${REPOSITORY} wasn't possible."
         fi
@@ -133,10 +153,10 @@ update_definitions () {
         ${MKDIR_BIN} -p "${LOGS_DIR}"
         debug "Cloning repository: ${REPOSITORY} from branch: ${BRANCH}; LOGS_DIR: ${LOGS_DIR}, CACHE_DIR: ${CACHE_DIR}"
         ${RM_BIN} -rf definitions >> ${LOG} 2>&1 # if something is already here, wipe it out from cache
-        (retry ${GIT_BIN} clone "${REPOSITORY}" definitions) || error "Error occured: Cloning repository: ${REPOSITORY} isn't possible. Please make sure that given repository and branch are valid."
+        (retry "${GIT_BIN} clone ${REPOSITORY} definitions") || error "Error occured: Cloning repository: ${REPOSITORY} isn't possible. Please make sure that given repository and branch are valid."
         cd "${CACHE_DIR}definitions"
         ${GIT_BIN} checkout -b "${BRANCH}" >> ${LOG} 2>&1
-        (retry ${GIT_BIN} pull origin "${BRANCH}" && note "Updated branch: ${BRANCH} of repository: ${REPOSITORY}") || error "Error occured: Update from branch: ${BRANCH} of repository: ${REPOSITORY} isn't possible. Please make sure that given repository and branch are valid."
+        (retry "${GIT_BIN} pull origin ${BRANCH}" && note "Updated branch: ${BRANCH} of repository: ${REPOSITORY}") || error "Error occured: Update from branch: ${BRANCH} of repository: ${REPOSITORY} isn't possible. Please make sure that given repository and branch are valid."
     fi
 }
 
@@ -1132,31 +1152,6 @@ for application in ${APPLICATIONS}; do
                 else
                     error "An empty command to run for: ${APP_NAME}?"
                 fi
-            }
-
-            retry () {
-                retries="***"
-                while [ ! -z "${retries}" ]; do
-                    if [ ! -z "$1" ]; then
-                        aname="$(echo "${APP_NAME}${APP_POSTFIX}" | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null)"
-                        if [ ! -d "${LOGS_DIR}" ]; then
-                            ${MKDIR_BIN} -p "${LOGS_DIR}"
-                        fi
-                        debug "$(${DATE_BIN} +%H%M%S-%s 2>/dev/null) retry('$@')[${retries}]; aname(${aname});"
-                        if [ -z "${aname}" ]; then
-                            eval PATH="${PATH}" "$@" >> "${LOG}" 2>&1 && \
-                            return 0
-                        else
-                            eval PATH="${PATH}" "$@" >> "${LOG}-${aname}" 2>&1 && \
-                            return 0
-                        fi
-                    else
-                        error "An empty command to retry?"
-                    fi
-                    retries="$(echo "${retries}" | ${SED_BIN} 's/\*//' 2>/dev/null)"
-                    debug "Retries left: ${retries}"
-                done
-                error "All retries exhausted to launch commands: '$@'"
             }
 
             try () {
