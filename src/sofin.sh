@@ -209,7 +209,6 @@ usage_howto () {
     note "  ${cyan}push | binpush | send                ${gray}-${green} creates binary build from prebuilt software bundles name given as params (example: ${SOFIN_ONLYNAME} push Rubinius Vifm Curl)"
     note "  ${cyan}wipe                                 ${gray}-${green} wipes binary builds (matching given name) from binary respositories (example: ${SOFIN_ONLYNAME} wipe Rubinius Vifm)"
     note "  ${cyan}port                                 ${gray}-${green} gathers port of ServeD running service by service name"
-    note "  ${cyan}setup                                ${gray}-${green} switches definitions repository/ branch from env value 'REPOSITORY' and 'BRANCH' (example: BRANCH=master REPOSITORY=/my/local/definitions/repo/ sofin setup)"
     note "  ${cyan}enable                               ${gray}-${green} enables Sofin developer environment (full environment stored in ~/.profile). It's the default"
     note "  ${cyan}disable                              ${gray}-${green} disables Sofin developer environment (only PATH, PKG_CONFIG_PATH and MANPATH written to ~/.profile)"
     note "  ${cyan}status                               ${gray}-${green} shows Sofin status"
@@ -338,18 +337,6 @@ if [ ! "$1" = "" ]; then
         exit
         ;;
 
-    s|setup)
-        create_cache_directories
-        if [ -d "${REPOSITORY}" ]; then
-            note "Changing repository to local directory: ${REPOSITORY}"
-        else
-            note "Changing repository to: ${REPOSITORY}"
-        fi
-        ${PRINTF_BIN} "${REPOSITORY}\n" > "${REPOSITORY_CACHE_FILE}" # print repository name to cache file
-        ${RM_BIN} -rf "${CACHE_DIR}/definitions" # wipe out current definitions from cache
-        update_definitions # get repository specified by user
-        exit
-        ;;
 
     p|port)
         # support for ServeD /Services:

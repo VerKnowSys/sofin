@@ -1,20 +1,21 @@
 # NOTE: this file is SH shell script
 # @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
 #
+
+# Sofin version string:
+readonly SOFIN_VERSION="0.92.3"
+
+# setting up definitions repository
+if [ -z "${BRANCH}" ]; then
+    export BRANCH="stable"
+fi
+if [ -z "${REPOSITORY}" ]; then
+    export REPOSITORY="https://verknowsys@bitbucket.org/verknowsys/sofin-definitions.git" # main sofin definitions repository
+fi
+
 # global Sofin values:
 if [ -z "${SOFIN_TRACE}" ]; then
     export SOFIN_TRACE="NO"
-fi
-
-# Sofin version string:
-readonly SOFIN_VERSION="0.92.2"
-
-# setting up definitions repository
-readonly DEFAULT_REPOSITORY="https://verknowsys@bitbucket.org/verknowsys/sofin-definitions.git" # official sofin definitions repository
-# REPOSITORY is set after determining CACHE_DIR (L300)
-# and branch used
-if [ "${BRANCH}" = "" ]; then
-    export BRANCH="stable"
 fi
 
 # ANSI color definitions
@@ -325,20 +326,6 @@ case "${SYSTEM_NAME}" in
         ;;
 
 esac
-
-# last repository cache setup:
-if [ -d "${CACHE_DIR}" ]; then
-    export REPOSITORY_CACHE_FILE="${CACHE_DIR}.last_repository.pos"
-    if [ -z "${REPOSITORY}" ]; then # :this value is given by user as shell param
-        ${MKDIR_BIN} -p "${CACHE_DIR}"
-        if [ -f "${REPOSITORY_CACHE_FILE}" ]; then
-            export REPOSITORY="$(${CAT_BIN} ${REPOSITORY_CACHE_FILE} 2>/dev/null)"
-        else
-            ${PRINTF_BIN} "${DEFAULT_REPOSITORY}\n" > ${REPOSITORY_CACHE_FILE}
-            export REPOSITORY="${DEFAULT_REPOSITORY}"
-        fi
-    fi
-fi
 
 
 check_command_result () {
