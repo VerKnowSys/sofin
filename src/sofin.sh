@@ -103,7 +103,7 @@ retry () {
         retries="$(echo "${retries}" | ${SED_BIN} 's/\*//' 2>/dev/null)"
         debug "Retries left: ${retries}"
     done
-    error "All retries exhausted for launch commands: '$@'"
+    error "All retries exhausted for launch command: '$@'"
 }
 
 
@@ -116,11 +116,11 @@ update_definitions () {
     if [ ! -x "${GIT_BIN}" ]; then
         note "Installing initial definition list from tarball to cache dir: ${CACHE_DIR}"
         ${RM_BIN} -rf "${CACHE_DIR}definitions"
-        ${MKDIR_BIN} -p "${CACHE_DIR}definitions"
+        ${MKDIR_BIN} -p "${LOGS_DIR}" "${CACHE_DIR}definitions"
         cd "${CACHE_DIR}definitions"
         INITIAL_DEFINITIONS="${MAIN_SOURCE_REPOSITORY}initial-definitions${DEFAULT_ARCHIVE_EXT}"
         debug "Fetching latest tarball with initial definitions from: ${INITIAL_DEFINITIONS}"
-        retry "${FETCH_BIN} ${INITIAL_DEFINITIONS}"
+        retry "${FETCH_BIN} ${INITIAL_DEFINITIONS}" && \
         ${TAR_BIN} xf *${DEFAULT_ARCHIVE_EXT} && \
         ${RM_BIN} -vrf "$(${BASENAME_BIN} ${INITIAL_DEFINITIONS} 2>/dev/null)"
         return
@@ -130,7 +130,6 @@ update_definitions () {
         current_branch="$(${GIT_BIN} rev-parse --abbrev-ref HEAD 2>/dev/null)"
         if [ "${current_branch}" != "${BRANCH}" ]; then # use current_branch value if branch isn't matching default branch
             debug "Checking out branch: ${current_branch}"
-            # ${GIT_BIN} stash save -a >> ${LOG} 2>&1
             ${GIT_BIN} checkout -b "${current_branch}" >> ${LOG} 2>&1 || \
                 ${GIT_BIN} checkout "${current_branch}" >> ${LOG} 2>&1
 
@@ -154,10 +153,13 @@ update_definitions () {
         ${MKDIR_BIN} -p "${LOGS_DIR}"
         debug "Cloning repository: ${REPOSITORY} from branch: ${BRANCH}; LOGS_DIR: ${LOGS_DIR}, CACHE_DIR: ${CACHE_DIR}"
         ${RM_BIN} -rf definitions >> ${LOG} 2>&1 # if something is already here, wipe it out from cache
-        (retry "${GIT_BIN} clone ${REPOSITORY} definitions") || error "Error occured: Cloning repository: ${REPOSITORY} isn't possible. Please make sure that given repository and branch are valid."
+        retry "${GIT_BIN} clone ${REPOSITORY} definitions" || \
+            error "Error occured: Cloning repository: ${REPOSITORY} isn't possible. Please make sure that given repository and branch are valid."
         cd "${CACHE_DIR}definitions"
         ${GIT_BIN} checkout -b "${BRANCH}" >> ${LOG} 2>&1
-        (retry "${GIT_BIN} pull origin ${BRANCH}" && note "Updated branch: ${BRANCH} of repository: ${REPOSITORY}") || error "Error occured: Update from branch: ${BRANCH} of repository: ${REPOSITORY} isn't possible. Please make sure that given repository and branch are valid."
+        retry "${GIT_BIN} pull origin ${BRANCH}" && \
+        note "Updated branch: ${BRANCH} of repository: ${REPOSITORY}" || \
+            error "Error occured: Update from branch: ${BRANCH} of repository: ${REPOSITORY} isn't possible. Please make sure that given repository and branch are valid."
     fi
 }
 
