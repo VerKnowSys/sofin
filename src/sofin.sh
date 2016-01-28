@@ -114,9 +114,9 @@ update_definitions () {
     note "${SOFIN_HEADER}"
     if [ ! -x "${GIT_BIN}" ]; then
         note "Installing initial definition list from tarball to cache dir: ${CACHE_DIR}"
-        ${RM_BIN} -rf "${CACHE_DIR}/definitions"
-        ${MKDIR_BIN} -p "${CACHE_DIR}/definitions"
-        cd "${CACHE_DIR}/definitions"
+        ${RM_BIN} -rf "${CACHE_DIR}definitions"
+        ${MKDIR_BIN} -p "${CACHE_DIR}definitions"
+        cd "${CACHE_DIR}definitions"
         INITIAL_DEFINITIONS="${MAIN_SOURCE_REPOSITORY}initial-definitions${DEFAULT_ARCHIVE_EXT}"
         debug "Fetching latest tarball with initial definitions from: ${INITIAL_DEFINITIONS}"
         retry "${FETCH_BIN} ${INITIAL_DEFINITIONS}"
