@@ -127,6 +127,7 @@ ZFS_BIN="/sbin/zfs"
 XZ_BIN="/usr/bin/xz"
 XZCAT_BIN="/usr/bin/xzcat"
 SEQ_BIN="/usr/bin/seq"
+CHFLAGS_BIN="/bin/chflags"
 
 OS_VERSION=10
 if [ -x "${SOFIN_VERSION_UTILITY_BIN}" ]; then
@@ -294,6 +295,7 @@ case "${SYSTEM_NAME}" in
     Linux)
         # only Debian 6 is supported a.t.m.
         readonly GLIBC_MINIMUM_VERSION="211"
+        export CHFLAGS_BIN="/usr/bin/chattr"
         export CURL_BIN="/usr/bin/wget -qO -"
         export FETCH_BIN="/usr/bin/wget -N --no-check-certificate"
         export PATCH_BIN="/usr/bin/patch -p0 "
