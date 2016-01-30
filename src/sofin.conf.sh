@@ -126,6 +126,7 @@ STAT_BIN="/usr/bin/stat"
 ZFS_BIN="/sbin/zfs"
 XZ_BIN="/usr/bin/xz"
 XZCAT_BIN="/usr/bin/xzcat"
+SEQ_BIN="/usr/bin/seq"
 
 OS_VERSION=10
 if [ -x "${SOFIN_VERSION_UTILITY_BIN}" ]; then
