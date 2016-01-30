@@ -29,11 +29,11 @@ OLDEST_BUILD_DIR_GUARD="${SORT_BIN} -k1 -n 2>/dev/null | ${TAIL_BIN} -n1 2>/dev/
 
 check_definition_dir () {
     if [ ! -d "${SOFTWARE_DIR}" ]; then
-        note "No ${SOFTWARE_DIR} found. Creating one."
+        debug "No ${SOFTWARE_DIR} found. Creating one."
         "${MKDIR_BIN}" -p "${SOFTWARE_DIR}"
     fi
     if [ ! -d "${CACHE_DIR}" ]; then
-        note "No cache folder found. Creating one at: ${CACHE_DIR}"
+        debug "No cache folder found. Creating one at: ${CACHE_DIR}"
         "${MKDIR_BIN}" -p "${CACHE_DIR}"
     fi
 }
