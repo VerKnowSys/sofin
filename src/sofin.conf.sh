@@ -128,6 +128,7 @@ XZ_BIN="/usr/bin/xz"
 XZCAT_BIN="/usr/bin/xzcat"
 SEQ_BIN="/usr/bin/seq"
 CHFLAGS_BIN="/bin/chflags"
+LOGGER_BIN="/usr/bin/logger"
 
 OS_VERSION=10
 if [ -x "${SOFIN_VERSION_UTILITY_BIN}" ]; then
@@ -180,7 +181,7 @@ debug () {
         elif [ -z "${aname}" -a -d "${LOGS_DIR}" ]; then
             cecho "# $1" ${magenta} >> "${LOG}" 2>&1
         elif [ ! -d "${LOGS_DIR}" ]; then
-            cecho "# $1" ${cyan}
+            ${LOGGER_BIN} "# ${cyan} $1"
         fi
     else
         cecho "# $1" ${magenta} # NOTE: this "#" is required for debug mode to work properly with generation of ~/.profile and /etc/profile_sofin files!
