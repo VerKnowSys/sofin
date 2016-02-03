@@ -920,12 +920,16 @@ if [ ! "$1" = "" ]; then
 
                 debug "Looking for other installed versions that might be exported automatically.."
                 name="$(echo "${given_app_name}" | ${SED_BIN} 's/[0-9]*//g' 2>/dev/null)"
-                alternative="$(${FIND_BIN} ${SOFTWARE_DIR} -maxdepth 1 -name "${name}*" 2>/dev/null | ${SED_BIN} 's/^.*\///g' 2>/dev/null | ${HEAD_BIN} -n1 2>/dev/null)"
+                alternative="$(${FIND_BIN} ${SOFTWARE_DIR} -maxdepth 1 -name "${name}*" -not -name "${given_app_name}" 2>/dev/null | ${SED_BIN} 's/^.*\///g' 2>/dev/null | ${HEAD_BIN} -n1 2>/dev/null)"
                 alt_lower="$(echo "${alternative}" | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null)"
-                debug "Alt_lower: ${alt_lower}, full: ${SOFTWARE_DIR}${alternative}/${alt_lower}${INSTALLED_MARK}"
+                debug "Alternative: ${alternative}, Given: ${given_app_name}, Alt_lower: ${alt_lower}, full: ${SOFTWARE_DIR}${alternative}/${alt_lower}${INSTALLED_MARK}"
                 if [ ! -z "${alternative}" -a -f "${SOFTWARE_DIR}${alternative}/${alt_lower}${INSTALLED_MARK}" ]; then
                     note "Automatically picking first alternative already installed: ${alternative}"
                     export APPLICATIONS="${alternative}"
+                    continue
+                elif [ -z "${alternative}" ]; then
+                    debug "No alternative: ${alternative} != ${given_app_name}"
+                    export APPLICATIONS=""
                     continue
                 fi
             else
@@ -1579,7 +1583,7 @@ for application in ${APPLICATIONS}; do
             debug "Doing app conflict resolve"
             if [ ! -z "${APP_CONFLICTS_WITH}" ]; then
                 disabled_exps=""
-                note "Resolving possible conflicts with: ${APP_CONFLICTS_WITH}"
+                note "  ${NOTE_CHAR2} Resolving possible conflicts with: ${APP_CONFLICTS_WITH}"
                 for app in ${APP_CONFLICTS_WITH}; do
                     maybe_software="$(${FIND_BIN} ${SOFTWARE_DIR} -maxdepth 1 -type d -iname "${app}*" 2>/dev/null)"
                     for an_app in ${maybe_software}; do
@@ -1590,7 +1594,7 @@ for application in ${APPLICATIONS}; do
                         fi
                     done
                 done
-                note "Disabled conflicting bundles: ${disabled_exps}"
+                note "  ${NOTE_CHAR2} Disabled conflicting bundles:${disabled_exps}"
             fi
 
             . "${DEFINITIONS_DIR}${application}.def"
@@ -1599,10 +1603,10 @@ for application in ${APPLICATIONS}; do
                 ${MV_BIN} "${PREFIX}/exports-disabled" "${PREFIX}/exports"
             fi
             if [ -z "${APP_EXPORTS}" ]; then
-                note "Defined no binaries to export of prefix: ${PREFIX}"
+                note "  ${NOTE_CHAR2} Defined no binaries to export of prefix: ${PREFIX}"
             else
                 aname="$(echo "${APP_NAME}${APP_POSTFIX}" | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null)"
-                note "Exporting binaries: ${APP_EXPORTS} of prefix: ${PREFIX}"
+                note "  ${NOTE_CHAR2} Exporting binaries: ${APP_EXPORTS} of prefix: ${PREFIX}"
                 ${MKDIR_BIN} -p "${PREFIX}/exports"
                 EXPORT_LIST=""
                 for exp in ${APP_EXPORTS}; do
@@ -1698,9 +1702,9 @@ for application in ${APPLICATIONS}; do
                 if [ "${result}" -lt "0" ]; then
                     result="0"
                 fi
-                note "Cleaned useless files; ${result} files stripped"
+                note "  ${NOTE_CHAR2} Cleaned useless files; ${result} files stripped"
             else
-                warn "Debug build is enabled. Strip skipped."
+                warn "  ${NOTE_CHAR2} Debug build is enabled. Strip skipped."
             fi
         fi
 
@@ -1715,7 +1719,7 @@ for application in ${APPLICATIONS}; do
                 # start from checking ${SERVICES_DIR}/Bundlename directory
                 if [ ! -d "${SERVICE_DIR}" ]; then
                     ${MKDIR_BIN} -p "${SERVICE_DIR}" && \
-                    note "Prepared service directory in: ${SERVICE_DIR}"
+                    note "  ${NOTE_CHAR2} Prepared service directory in: ${SERVICE_DIR}"
                 fi
 
                 # count Sofin jobs. For more than one job available,
@@ -1729,7 +1733,7 @@ for application in ${APPLICATIONS}; do
                     note "Exactly ${sofins_running} additional running Sofin found in background. Limiting jobs to current bundle only"
                     export jobs_in_parallel="YES"
                 else
-                    note "Traversing through several datasets at once, since single Sofin instance is running"
+                    note "  ${NOTE_CHAR2} Traversing through several datasets at once, since single Sofin instance is running"
                 fi
 
                 # Create a dataset for any existing dirs in Services dir that are not ZFS datasets.
@@ -1763,11 +1767,11 @@ for application in ${APPLICATIONS}; do
                                 ${ZFS_BIN} rename ${dataset_name}@--head-- @origin && \
                                 debug "Cleaning snapshot file: ${final_snap_file}, after successful receive." && \
                                 ${RM_BIN} -f "${final_snap_file}" && \
-                                note "Stream received successfully as: ${dataset_name}"
+                                note "  ${NOTE_CHAR2} Stream received successfully as: ${dataset_name}"
                             else
                                 debug "Initial service dataset unavailable"
                                 ${ZFS_BIN} create "${dataset_name}" 2>/dev/null && \
-                                note "Created an empty service dataset for: ${dataset_name}"
+                                note "  ${NOTE_CHAR2} Created an empty service dataset for: ${dataset_name}"
                             fi
                         }
 
@@ -1798,7 +1802,7 @@ for application in ${APPLICATIONS}; do
             APP_NAME="$(${PRINTF_BIN} "${APP_NAME}" | ${CUT_BIN} -c1 2>/dev/null | ${TR_BIN} '[a-z]' '[A-Z]' 2>/dev/null)$(${PRINTF_BIN} "${APP_NAME}" | ${SED_BIN} 's/^[a-zA-Z]//' 2>/dev/null)"
             APP_BUNDLE_NAME="${PREFIX}.app"
             aname="$(echo "${APP_NAME}${APP_POSTFIX}" | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null)"
-            note "Creating Apple bundle: ${APP_NAME} in ${APP_BUNDLE_NAME}"
+            note "  ${NOTE_CHAR2} Creating Apple bundle: ${APP_NAME} in ${APP_BUNDLE_NAME}"
             ${MKDIR_BIN} -p "${APP_BUNDLE_NAME}/libs"
             ${MKDIR_BIN} -p "${APP_BUNDLE_NAME}/Contents"
             ${MKDIR_BIN} -p "${APP_BUNDLE_NAME}/Contents/Resources/${APP_LOWERNAME}"
@@ -1823,10 +1827,10 @@ for application in ${APPLICATIONS}; do
             cd "${APP_BUNDLE_NAME}/Contents"
             test -L MacOS || ${LN_BIN} -s ../exports MacOS >> ${LOG}-${aname} 2>&1
 
-            note "Creating relative libraries search path"
+            note "  ${NOTE_CHAR2} Creating relative libraries search path"
             cd ${APP_BUNDLE_NAME}
 
-            note "Processing exported binary: ${i}"
+            note "  ${NOTE_CHAR2} Processing exported binary: ${i}"
             ${SOFIN_LIBBUNDLE_BIN} -x "${APP_BUNDLE_NAME}/Contents/MacOS/${APP_LOWERNAME}" >> ${LOG}-${aname} 2>&1
 
         fi

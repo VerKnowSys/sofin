@@ -3,7 +3,7 @@
 #
 
 # Sofin version string:
-readonly SOFIN_VERSION="0.92.5"
+readonly SOFIN_VERSION="0.92.6"
 
 # setting up definitions repository
 if [ -z "${BRANCH}" ]; then
