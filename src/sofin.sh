@@ -369,7 +369,9 @@ if [ ! "$1" = "" ]; then
         create_cache_directories
         shift
         pattern="$*"
-        if [ "${pattern}" = "" ]; then
+        if [ "${pattern}" = "-" -o "${pattern}" = "sofin" ]; then
+            ${TAIL_BIN} -n ${LOG_LINES_AMOUNT} -F ${LOG}
+        elif [ "${pattern}" = "" ]; then
             ${TAIL_BIN} -n ${LOG_LINES_AMOUNT} -F ${LOG}*
         else
             note "Seeking log files.."
