@@ -41,7 +41,7 @@ check_definition_dir () {
 
 check_requirements () {
     if [ "${APPLICATIONS}" = "" ]; then
-        error "No input given! You may want to try this: '${SOFIN_BIN} help'"
+        exit
     fi
     if [ "${SYSTEM_NAME}" != "Darwin" ]; then
         if [ -d "/usr/local" ]; then
@@ -927,16 +927,13 @@ if [ ! "$1" = "" ]; then
                     note "Automatically picking first alternative already installed: ${alternative}"
                     export APPLICATIONS="${alternative}"
                     continue
-                else
-                    update_shell_vars ${USERNAME}
-                    exit
                 fi
             else
                 warn "Application: ${given_app_name} not installed."
-                exit 1
+                export APPLICATIONS=""
+                continue
             fi
         done
-        debug "Continuing pick of first alternative: ${alternative}"
         ;;
 
 
