@@ -114,7 +114,7 @@ update_definitions () {
     fi
     note "${SOFIN_HEADER}"
     if [ ! -x "${GIT_BIN}" ]; then
-        note "Installing initial definition list from tarball to cache dir: ${CACHE_DIR}"
+        note "Installing initial definition list from tarball to cache dir: ${cyan}${CACHE_DIR}"
         ${RM_BIN} -rf "${CACHE_DIR}definitions"
         ${MKDIR_BIN} -p "${LOGS_DIR}" "${CACHE_DIR}definitions"
         cd "${CACHE_DIR}definitions"
@@ -134,7 +134,7 @@ update_definitions () {
                 ${GIT_BIN} checkout "${current_branch}" >> ${LOG} 2>&1
 
             (retry "${GIT_BIN} pull origin ${current_branch}" && \
-             note "Updated branch: ${current_branch} of repository ${REPOSITORY}") || \
+             note "Updated branch: ${cyan}${current_branch} ${green}of repository: ${cyan}${REPOSITORY}") || \
                 error "Error occured: Update from branch: ${BRANCH} of repository: ${REPOSITORY} wasn't possible."
 
         else # else use default branch
@@ -143,7 +143,7 @@ update_definitions () {
                 ${GIT_BIN} checkout "${BRANCH}" >> ${LOG} 2>&1
 
             (retry "${GIT_BIN} pull origin ${BRANCH}" && \
-             note "Updated branch: ${BRANCH} of repository: ${REPOSITORY}") || \
+             note "Updated branch: ${cyan}${BRANCH} ${green}of repository: ${cyan}${REPOSITORY}") || \
                 error "Error occured: Update from branch: ${BRANCH} of repository: ${REPOSITORY} wasn't possible."
         fi
     else
@@ -158,7 +158,7 @@ update_definitions () {
         cd "${CACHE_DIR}definitions"
         ${GIT_BIN} checkout -b "${BRANCH}" >> ${LOG} 2>&1
         retry "${GIT_BIN} pull origin ${BRANCH}" && \
-        note "Updated branch: ${BRANCH} of repository: ${REPOSITORY}" || \
+        note "Updated branch: ${cyan}${BRANCH} ${green}of repository: ${cyan}${REPOSITORY}" || \
             error "Error occured: Update from branch: ${BRANCH} of repository: ${REPOSITORY} isn't possible. Please make sure that given repository and branch are valid."
     fi
 }
@@ -173,7 +173,7 @@ create_cache_directories () {
     fi
     if [ ! -d "${DEFINITIONS_DIR}" -o \
          ! -f "${DEFAULTS}" ]; then
-        note "No valid definitions cache found. Creating a new cache in: ${CACHE_DIR}"
+        note "No valid definitions cache found. Creating a new cache in: ${cyan}${CACHE_DIR}"
         clean_purge
         update_definitions
     fi
@@ -265,7 +265,7 @@ unset PKG_CONFIG_PATH
 
 clean_binbuilds () {
     if [ -d "${BINBUILDS_CACHE_DIR}" ]; then
-        note "Removing binary builds from: ${BINBUILDS_CACHE_DIR}"
+        note "Removing binary builds from: ${cyan}${BINBUILDS_CACHE_DIR}"
         ${RM_BIN} -rf "${BINBUILDS_CACHE_DIR}" || warn "Privileges problem in '${BINBUILDS_CACHE_DIR}'? All files should belong to '${USER}' there."
     fi
 }
@@ -284,14 +284,14 @@ clean_failbuilds () {
             ${RM_BIN} -rf "${i}" 2>/dev/null || warn "Privileges problem in failbuilds dir: '${i}'? All files should belong to '${USER}' there."
         done
         result="$(echo "${number}" | ${BC_BIN} 2>/dev/null)"
-        note "${result} directories cleaned."
+        note "${cyan}${result} ${green}directories cleaned."
     fi
 }
 
 
 clean_logs () {
     if [ -d "${LOGS_DIR}" ]; then
-        note "Removing build logs from: ${LOGS_DIR}"
+        note "Removing build logs from: ${cyan}${LOGS_DIR}"
         ${RM_BIN} -rf "${LOGS_DIR}" 2>/dev/null || warn "Privileges problem in logs dir: '${LOGS_DIR}'? All files should belong to '${USER}' there."
     fi
 }
@@ -299,7 +299,7 @@ clean_logs () {
 
 clean_purge () {
     if [ -d "${CACHE_DIR}" ]; then
-        note "Purging all caches from: ${CACHE_DIR}"
+        note "Purging all caches from: ${cyan}${CACHE_DIR}"
         ${RM_BIN} -rf "${CACHE_DIR}" 2>/dev/null || warn "Privileges problem in cache dir: '${CACHE_DIR}'? All files should belong to '${USER}' there."
     fi
 }
@@ -392,12 +392,12 @@ if [ ! "$1" = "" ]; then
                             ;;
 
                         1)
-                            note "Found '${num}' log file, that matches pattern: '${pattern}'. Attaching tail.."
+                            note "Found ${cyan}${num}${green} log file, that matches pattern: ${cyan}${pattern}${green}. Attaching tail.."
                             ${TAIL_BIN} -n ${LOG_LINES_AMOUNT} -F ${files}
                             ;;
 
                         *)
-                            note "Found '${num}' log files, that match pattern: '${pattern}'. Attaching tails.."
+                            note "Found ${cyan}${num}${green} log files, that match pattern: ${cyan}${pattern}${green}. Attaching tails.."
                             ${TAIL_BIN} -n ${LOG_LINES_AMOUNT} -F ${files}
                             ;;
                     esac
@@ -462,23 +462,22 @@ if [ ! "$1" = "" ]; then
 
 
     f|fullinstalled|fulllist|full)
-        note "Installed applications:"
-        note
+        note "Installed applications (with dependencies):"
         if [ -d ${SOFTWARE_DIR} ]; then
             for app in ${SOFTWARE_DIR}*; do
+                note
                 app_name="$(${BASENAME_BIN} ${app} 2>/dev/null)"
-                note "Checking ${app_name}"
-                for req in $(${FIND_BIN} ${app} -maxdepth 1 -name *${INSTALLED_MARK} 2>/dev/null | ${SORT_BIN} 2>/dev/null); do
-                    pp="$(${PRINTF_BIN} "$(${BASENAME_BIN} ${req} 2>/dev/null)" | ${SED_BIN} "s/${INSTALLED_MARK}//" 2>/dev/null)"
-                    note "  ${pp} [$(${CAT_BIN} ${req} 2>/dev/null)]"
-                done
                 lowercase="$(${PRINTF_BIN} "${app_name}" | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null)"
                 installed_file="${SOFTWARE_DIR}/${app_name}/${lowercase}${INSTALLED_MARK}"
                 if [ -e "${installed_file}" ]; then
-                    note "${SUCCESS_CHAR} ${app_name} [$(${CAT_BIN} ${installed_file} 2>/dev/null)]\n"
+                    note "${SUCCESS_CHAR} ${app_name}"
                 else
-                    note "${SUCCESS_CHAR} ${app_name} [unknown]\n"
+                    note "${red}${ERROR_CHAR} ${app_name} ${reset}[${red}!${reset}]"
                 fi
+                for req in $(${FIND_BIN} ${app} -maxdepth 1 -name *${INSTALLED_MARK} 2>/dev/null | ${SORT_BIN} 2>/dev/null); do
+                    pp="$(${PRINTF_BIN} "$(${BASENAME_BIN} ${req} 2>/dev/null)" | ${SED_BIN} "s/${INSTALLED_MARK}//" 2>/dev/null)"
+                    note "   ${NOTE_CHAR2} ${green}${pp} ${reset}[${cyan}$(${CAT_BIN} ${req} 2>/dev/null)${reset}]"
+                done
             done
         fi
         exit
@@ -615,7 +614,7 @@ if [ ! "$1" = "" ]; then
             error "No build dir: '${MOST_RECENT_DIR}' found to continue bundle build of: '${a_bundle_name}'"
         fi
         a_build_dir="$(${BASENAME_BIN} ${MOST_RECENT_DIR} 2>/dev/null)"
-        note "Found most recent build dir: '${a_build_dir}' for bundle: '${a_bundle_name}'."
+        note "Found most recent build dir: ${cyan}${a_build_dir}${green} for bundle: ${cyan}${a_bundle_name}${green}"
         note "Resuming interrupted build.."
         export APPLICATIONS="${a_bundle_name}"
         export PREVIOUS_BUILD_DIR="${MOST_RECENT_DIR}"
@@ -632,10 +631,10 @@ if [ ! "$1" = "" ]; then
         # try a list - it will have priority if file exists:
         if [ -f "${LISTS_DIR}${2}" ]; then
             export APPLICATIONS="$(${CAT_BIN} ${LISTS_DIR}${2} 2>/dev/null | ${TR_BIN} '\n' ' ' 2>/dev/null)"
-            note "Processing software: ${APPLICATIONS} for architecture: ${SYSTEM_ARCH}"
+            note "Processing software: ${cyan}${APPLICATIONS} ${green}for architecture: ${cyan}${SYSTEM_ARCH}"
         else
             export APPLICATIONS="${SOFIN_ARGS}"
-            note "Processing software: ${SOFIN_ARGS} for architecture: ${SYSTEM_ARCH}"
+            note "Processing software: ${cyan}${SOFIN_ARGS} ${green}for architecture: ${cyan}${SYSTEM_ARCH}"
         fi
         ;;
 
@@ -643,20 +642,20 @@ if [ ! "$1" = "" ]; then
     deps|dependencies|local)
         create_cache_directories
         if [ "${USERNAME}" = "root" ]; then
-            warn "Installation of project dependencies as root is immoral."
+            warn "Installation of project dependencies as root is immoral"
         fi
-        note "Looking for a dependencies list file: ${DEPENDENCIES_FILE} in current directory"
+        note "Looking for a dependencies list file: ${cyan}${DEPENDENCIES_FILE}${green} in current directory"
         if [ ! -e "./${DEPENDENCIES_FILE}" ]; then
             error "Dependencies file not found!"
         fi
         export APPLICATIONS="$(${CAT_BIN} ./${DEPENDENCIES_FILE} 2>/dev/null | ${TR_BIN} '\n' ' ' 2>/dev/null)"
-        note "Installing dependencies: ${APPLICATIONS}"
+        note "Installing dependencies: ${cyan}${APPLICATIONS}"
         ;;
 
 
     p|push|binpush|send)
         create_cache_directories
-        note "Preparing to push binary bundle: ${SOFIN_ARGS} from ${SOFTWARE_DIR} to binary repository."
+        note "Preparing to push binary bundle: ${cyan}${SOFIN_ARGS}${green} from ${cyan}${SOFTWARE_DIR}${green} to binary repository."
         cd "${SOFTWARE_DIR}"
         for element in ${SOFIN_ARGS}; do
             if [ -d "${element}" ]; then
@@ -684,7 +683,7 @@ if [ ! "$1" = "" ]; then
                         ${SSH_BIN} -p ${MAIN_PORT} ${MAIN_USER}@${mirror} "mkdir -p ${MAIN_SOFTWARE_PREFIX}/software/binary/${SYS}" >> "${LOG}-${aname}" 2>&1
 
                         if [ "${SYSTEM_NAME}" = "FreeBSD" ]; then # NOTE: feature designed for FBSD.
-                            note "Preparing service dataset for: ${element}"
+                            note "Preparing service dataset for: ${cyan}${element}"
                             svcs_no_slashes="$(echo "${SERVICES_DIR}" | ${SED_BIN} 's/\///g' 2>/dev/null)"
                             inner_dir="$(${ZFS_BIN} list -H 2>/dev/null | ${GREP_BIN} "${element}$" 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null | ${SED_BIN} "s/.*${svcs_no_slashes}\///; s/\/.*//" 2>/dev/null)/"
                             certain_dataset="${SERVICES_DIR}${inner_dir}${element}"
@@ -698,15 +697,15 @@ if [ ! "$1" = "" ]; then
                                 ${ZFS_BIN} send ${full_dataset_name} | ${XZ_BIN} > ${final_snap_file} && \
                                 snap_size="$(${STAT_BIN} -f%z "${final_snap_file}" 2>/dev/null)" && \
                                 ${ZFS_BIN} mount ${full_dataset_name} && \
-                                note "Stream sent successfully to: ${final_snap_file}"
+                                note "Stream sent successfully to: ${cyan}${final_snap_file}"
                             fi
                             if [ "${snap_size}" = "0" ]; then
                                 ${RM_BIN} -f "${final_snap_file}"
-                                note "Initial dataset for service: ${element}-${version_element} is unavailable"
+                                note "Initial dataset for service: ${cyan}${element}-${version_element}${green} is unavailable"
                             fi
                         fi
 
-                        note "Preparing ${element} archives.."
+                        note "Preparing ${cyan}${element}${green} archives.."
                         if [ ! -e "./${name}" ]; then
                             ${TAR_BIN} -cJf "${name}" "./${element}"
                         else
@@ -715,7 +714,7 @@ if [ ! "$1" = "" ]; then
                                 ${RM_BIN} -f "${name}"
                                 ${TAR_BIN} -cJf "${name}" "./${element}"
                             else
-                                note "Archive already exists. Skipping archive preparation for: ${name}"
+                                note "Archive already exists. Skipping archive preparation for: ${cyan}${name}"
                             fi
                         fi
 
@@ -734,7 +733,7 @@ if [ ! "$1" = "" ]; then
                         debug "Setting common access to archive files before we send them: ${name}, ${name}.sha1"
                         ${CHMOD_BIN} a+r "${name}" "${name}.sha1"
 
-                        note "Pushing archive #${archive_sha1} to remote: ${MAIN_BINARY_REPOSITORY}${SYS}/${name}"
+                        note "Pushing archive #${cyan}${archive_sha1}${green} to remote: ${cyan}${MAIN_BINARY_REPOSITORY}${SYS}/${name}"
                         retry "${SCP_BIN} -P ${MAIN_PORT} ${name} ${address}/${name}.partial" || def_error ${name}
                         if [ "$?" = "0" ]; then
                             ${SSH_BIN} -p ${MAIN_PORT} ${MAIN_USER}@${mirror} "cd ${MAIN_SOFTWARE_PREFIX}/software/binary/${SYS} && mv ${name}.partial ${name}"
@@ -761,7 +760,7 @@ if [ ! "$1" = "" ]; then
                                     error "Failed to send service snapshot archive to remote!"
                                 fi
                             else
-                                note "No service stream available for: ${element}"
+                                note "No service stream available for: ${cyan}${element}"
                             fi
                         fi
                     done
@@ -778,14 +777,14 @@ if [ ! "$1" = "" ]; then
         create_cache_directories
         shift
         dependencies="$*"
-        note "Software bundles to be built: ${dependencies}"
+        note "Software bundles to be built: ${cyan}${dependencies}"
         def_error () {
-            error "Failure in definition: ${software}. Report or fix the definition please!"
+            error "Failure in definition: ${cyan}${software}${red}. Report or fix the definition please!"
         }
         for dep in ${dependencies}; do
             sofin_ps_list="$(${PS_BIN} axv 2>/dev/null | ${GREP_BIN} -v grep 2>/dev/null | ${EGREP_BIN} "sh ${SOFIN_BIN} (${ALL_INSTALL_PHRASES}|${BUILD_AND_DEPLOY_PHRASES}) ${dep}" 2>/dev/null)"
             sofins_all="$(echo "${sofin_ps_list}" | ${WC_BIN} -l 2>/dev/null | ${SED_BIN} 's/ //g' 2>/dev/null)"
-            test ${sofins_all} -gt 2 && error "Bundle: ${dep} is in a middle of build process in background! Aborting."
+            test ${sofins_all} -gt 2 && error "Bundle: ${cyan}${dep}${green} is in a middle of build process in background! Aborting."
         done
         # update_definitions
         USE_UPDATE=false USE_BINBUILD=false ${SOFIN_BIN} install ${dependencies} || def_error
@@ -797,9 +796,9 @@ if [ ! "$1" = "" ]; then
         create_cache_directories
         shift
         dependencies="$*"
-        note "Software bundles to be built and deployed to remote: ${dependencies}"
+        note "Software bundles to be built and deployed to remote: ${cyan}${dependencies}"
         def_error () {
-            error "Failure in definition: ${software}. Report or fix the definition please!"
+            error "Failure in definition: ${cyan}${software}${red}. Report or fix the definition please!"
         }
         for dep in ${dependencies}; do
             sofin_ps_list="$(${PS_BIN} axv 2>/dev/null | ${GREP_BIN} -v grep 2>/dev/null | ${EGREP_BIN} "sh ${SOFIN_BIN} (${ALL_INSTALL_PHRASES}|${BUILD_AND_DEPLOY_PHRASES}) ${dep}" 2>/dev/null)"
@@ -810,7 +809,8 @@ if [ ! "$1" = "" ]; then
         for software in ${dependencies}; do
             USE_BINBUILD=false ${SOFIN_BIN} install ${software} || def_error && \
             ${SOFIN_BIN} push ${software} || def_error && \
-            note "Software bundle deployed successfully: ${software}"
+            note "Software bundle deployed successfully: ${cyan}${software}"
+            note "______________________________________________________________"
         done
         exit 0
         ;;
@@ -850,16 +850,15 @@ if [ ! "$1" = "" ]; then
             error "Failure in definition: ${software}. Report or fix the definition please!"
         }
 
-        note "Will rebuild, wipe and push these bundles: ${to_rebuild}"
+        note "Will rebuild, wipe and push these bundles: ${cyan}${to_rebuild}"
         for software in ${to_rebuild}; do
-            if [ "${software}" = "Git" ]; then
+            if [ "${software}" = "Git" -o "${software}" = "Zsh" -o "${software}" = "Rsync" -o "${software}" = "Rsync-static" ]; then
                 continue
             fi
             ${SOFIN_BIN} remove ${software}
             USE_BINBUILD=false ${SOFIN_BIN} install ${software} || def_error
             FORCE=true ${SOFIN_BIN} wipe ${software} || def_error
             ${SOFIN_BIN} push ${software} || def_error
-            # ${SOFIN_BIN} remove ${software} || def_error
         done
         exit
         ;;
@@ -868,7 +867,7 @@ if [ ! "$1" = "" ]; then
     wipe)
         ANS="YES"
         if [ "${FORCE}" != "true" ]; then
-            note "Are you sure you want to wipe binary bundles: ${SOFIN_ARGS} from binary repository ${MAIN_BINARY_REPOSITORY}? (YES to confirm)"
+            note "Are you sure you want to wipe binary bundles: ${cyan}${SOFIN_ARGS} ${green}from binary repository: ${cyan}${MAIN_BINARY_REPOSITORY}${green}? (YES to confirm)"
             read ANS
         fi
         if [ "${ANS}" = "YES" ]; then
@@ -885,7 +884,7 @@ if [ ! "$1" = "" ]; then
                 for mirror in ${dig_query}; do
                     SYS="${SYSTEM_NAME}-${FULL_SYSTEM_VERSION}-${SYSTEM_ARCH}"
                     system_path="${MAIN_SOFTWARE_PREFIX}/software/binary/${SYS}"
-                    note "Wiping out remote (${mirror}) binary archives: ${name}*"
+                    note "Wiping out remote: ${cyan}${mirror} ${green}binary archives: ${cyan}${name}*"
                     ${SSH_BIN} -p ${MAIN_PORT} ${MAIN_USER}@${mirror} "${RM_BIN} -f ${system_path}/${name}* ${system_path}/${name}.sha1" >> "${LOG}" 2>&1
                 done
             done
@@ -916,7 +915,7 @@ if [ ! "$1" = "" ]; then
                 if [ "${given_app_name}" = "/" ]; then
                     error "Czy Ty orzeszki?"
                 fi
-                note "Removing software bundle: ${given_app_name}"
+                note "Removing software bundle: ${cyan}${given_app_name}"
                 aname="$(echo "${APP_NAME}${APP_POSTFIX}" | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null)"
                 ${RM_BIN} -rfv "${SOFTWARE_DIR}${given_app_name}" >> "${LOG}-${aname}"
 
@@ -926,7 +925,7 @@ if [ ! "$1" = "" ]; then
                 alt_lower="$(echo "${alternative}" | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null)"
                 debug "Alternative: ${alternative}, Given: ${given_app_name}, Alt_lower: ${alt_lower}, full: ${SOFTWARE_DIR}${alternative}/${alt_lower}${INSTALLED_MARK}"
                 if [ ! -z "${alternative}" -a -f "${SOFTWARE_DIR}${alternative}/${alt_lower}${INSTALLED_MARK}" ]; then
-                    note "Automatically picking first alternative already installed: ${alternative}"
+                    note "Automatically picking first alternative already installed: ${cyan}${alternative}"
                     export APPLICATIONS="${alternative}"
                     continue
                 elif [ -z "${alternative}" ]; then
@@ -935,7 +934,7 @@ if [ ! "$1" = "" ]; then
                     continue
                 fi
             else
-                warn "Application: ${given_app_name} not installed."
+                warn "Application: ${cyan}${given_app_name} ${yellow}not installed."
                 export APPLICATIONS=""
                 continue
             fi
@@ -947,7 +946,7 @@ if [ ! "$1" = "" ]; then
         if [ ! -z "${SHELL_PID}" ]; then
             update_shell_vars
             pids=$(${PS_BIN} ax 2>/dev/null | ${GREP_BIN} -v grep 2>/dev/null | ${GREP_BIN} zsh 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)
-            note "Reloading configuration of all $(${BASENAME_BIN} "${SHELL}" 2>/dev/null) with pids: $(echo ${pids} | ${TR_BIN} '\n' ' ' 2>/dev/null)"
+            note "Reloading configuration of all ${cyan}$(${BASENAME_BIN} "${SHELL}" 2>/dev/null) ${green}with pids: $(echo ${pids} | ${TR_BIN} '\n' ' ' 2>/dev/null)"
             for pid in ${pids}; do
                 ${KILL_BIN} -SIGUSR2 ${pid}
             done
@@ -991,7 +990,7 @@ if [ ! "$1" = "" ]; then
         for dir in "/bin/" "/sbin/" "/libexec/"; do
             debug "Testing ${dir} looking into: ${SOFTWARE_DIR}${APP}${dir}"
             if [ -e "${SOFTWARE_DIR}${APP}${dir}${EXPORT}" ]; then
-                note "Exporting binary: ${SOFTWARE_DIR}${APP}${dir}${EXPORT}"
+                note "Exporting binary: ${cyan}${SOFTWARE_DIR}${APP}${dir}${EXPORT}"
                 cd "${SOFTWARE_DIR}${APP}${dir}"
                 ${MKDIR_BIN} -p "${SOFTWARE_DIR}${APP}/exports" # make sure exports dir already exists
                 aname="$(echo "${APP}" | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null)"
@@ -1175,12 +1174,12 @@ for application in ${APPLICATIONS}; do
             if [ "${SOFIN_CONTINUE_BUILD}" != "YES" ]; then # normal build by default
                 if [ ! -e "${INSTALLED_INDICATOR}" ]; then
                     if [ "${USE_BINBUILD}" = "false" ]; then
-                        note "   ${NOTE_CHAR2} Binary build check was skipped"
+                        debug "   ${NOTE_CHAR2} Binary build check was skipped"
                     else
                         aname="$(echo "${APP_NAME}${APP_POSTFIX}" | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null)"
                         if [ ! -e "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" ]; then
                             cd ${BINBUILDS_CACHE_DIR}${ABSNAME}
-                            note "Trying binary build for: ${MIDDLE}/${APP_NAME}${APP_POSTFIX}-${APP_VERSION}"
+                            note "Trying binary build for: ${cyan}${MIDDLE}/${APP_NAME}${APP_POSTFIX}-${APP_VERSION}"
                             retry "${FETCH_BIN} ${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}.sha1"
                             retry "${FETCH_BIN} ${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}"
 
@@ -1212,15 +1211,14 @@ for application in ${APPLICATIONS}; do
                         fi
                         cd "${SOFTWARE_ROOT_DIR}"
 
-                        debug "ARCHIVE_NAME: ${ARCHIVE_NAME}"
-                        debug "Expecting binbuild to be available in: ${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}"
+                        debug "ARCHIVE_NAME: ${ARCHIVE_NAME}. Expecting binbuild to be available in: ${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}"
                         if [ -e "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" ]; then # if exists, then checksum is ok
                             ${TAR_BIN} xJf "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" >> ${LOG}-${aname} 2>&1
                             if [ "$?" = "0" ]; then # if archive is valid
-                                note "  ${NOTE_CHAR2} Binary bundle installed: ${APP_NAME}${APP_POSTFIX} with version: ${APP_VERSION}"
+                                note "  ${NOTE_CHAR2} Binary bundle installed: ${cyan}${APP_NAME}${APP_POSTFIX} ${green}with version: ${APP_VERSION}"
                                 export DONT_BUILD_BUT_DO_EXPORTS="true"
                             else
-                                debug "  ${NOTE_CHAR2} No binary bundle available for ${APP_NAME}${APP_POSTFIX}"
+                                debug "  ${NOTE_CHAR2} No binary bundle available for: ${cyan}${APP_NAME}${APP_POSTFIX}"
                                 ${RM_BIN} -fr "${BINBUILDS_CACHE_DIR}${ABSNAME}"
                             fi
                         else
@@ -1228,12 +1226,12 @@ for application in ${APPLICATIONS}; do
                         fi
                     fi
                 else
-                    note "Software already installed: ${APP_NAME}${APP_POSTFIX} with version: $(cat ${INSTALLED_INDICATOR} 2>/dev/null)"
+                    note "Software already installed: ${cyan}${APP_NAME}${APP_POSTFIX} ${green}with version: ${cyan}$(${CAT_BIN} ${INSTALLED_INDICATOR} 2>/dev/null)"
                     export DONT_BUILD_BUT_DO_EXPORTS="true"
                 fi
 
             else # continue build!
-                note "Continuing build in: '${PREVIOUS_BUILD_DIR}'"
+                note "Continuing build in: ${cyan}${PREVIOUS_BUILD_DIR}"
                 cd "${PREVIOUS_BUILD_DIR}"
             fi
 
@@ -1244,7 +1242,7 @@ for application in ${APPLICATIONS}; do
                 req_definition_file="${DEFINITIONS_DIR}${1}.def"
                 debug "Checking requirement: $1 file: $req_definition_file"
                 if [ ! -e "${req_definition_file}" ]; then
-                    error "Cannot fetch definition ${req_definition_file}! Aborting!"
+                    error "Cannot fetch definition: ${cyan}${req_definition_file}${red}! Aborting!"
                 fi
 
                 . "${DEFAULTS}" # load definition and check for current version
@@ -1253,7 +1251,7 @@ for application in ${APPLICATIONS}; do
                 check_disabled "${DISABLE_ON}" # check requirement for disabled state:
 
                 if [ ! -z "${FORCE_GNU_COMPILER}" ]; then # force GNU compiler usage on definition side:
-                    warn "   ${NOTE_CHAR2} GNU compiler set for: ${APP_NAME}"
+                    warn "   ${NOTE_CHAR2} GNU compiler set for: ${cyan}${APP_NAME}"
                     set_c_compiler GNU
                 else
                     set_c_compiler CLANG # look for bundled compiler:
@@ -1281,7 +1279,7 @@ for application in ${APPLICATIONS}; do
 
                 if [ "${ALLOW}" = "1" ]; then
                     if [ -z "${APP_HTTP_PATH}" ]; then
-                        note "   ${NOTE_CHAR2} No source given for definition, it's only valid for meta bundles."
+                        note "   ${NOTE_CHAR2} No source given for definition (${cyan}APP_HTTP_PATH=\"\"${green}), it's only valid for meta bundles (${cyan}APP_CONFIGURE_SCRIPT=\"meta\" ${green}special)"
                     else
                         CUR_DIR="$(${PWD_BIN} 2>/dev/null)"
 
@@ -1300,7 +1298,7 @@ for application in ${APPLICATIONS}; do
                             done
                             if [ -z "${APP_GIT_MODE}" ]; then # Standard http tarball method:
                                 if [ ! -e ${BUILD_DIR_ROOT}/../$(${BASENAME_BIN} ${APP_HTTP_PATH} 2>/dev/null) ]; then
-                                    note "   ${NOTE_CHAR2} Fetching requirement source from: ${APP_HTTP_PATH}"
+                                    note "   ${NOTE_CHAR2} Fetching requirement source from: ${cyan}${APP_HTTP_PATH}"
                                     retry "${FETCH_BIN} ${APP_HTTP_PATH}"
                                     ${MV_BIN} $(${BASENAME_BIN} ${APP_HTTP_PATH} 2>/dev/null) ${BUILD_DIR_ROOT}/..
                                 fi
@@ -1334,13 +1332,13 @@ for application in ${APPLICATIONS}; do
                                     fi
                                 fi
 
-                                note "   ${NOTE_CHAR2} Unpacking source code of: ${APP_NAME}"
+                                note "   ${NOTE_CHAR2} Unpacking source code of: ${cyan}${APP_NAME}"
                                 debug "Build dir root: ${BUILD_DIR_ROOT}"
                                 run "${TAR_BIN} xf ${file}"
 
                             else
                                 # git method
-                                note "   ${NOTE_CHAR2} Fetching requirement source from git repository: ${APP_HTTP_PATH}"
+                                note "   ${NOTE_CHAR2} Fetching requirement source from git repository: ${cyan}${APP_HTTP_PATH}"
                                 retry "${GIT_BIN} clone ${APP_HTTP_PATH} ${APP_NAME}${APP_VERSION}"
                             fi
 
@@ -1355,7 +1353,7 @@ for application in ${APPLICATIONS}; do
                             debug "Switched to build dir: '${BUILD_DIR}'"
 
                             if [ "${APP_GIT_CHECKOUT}" != "" ]; then
-                                note "   ${NOTE_CHAR2} Checking out: ${APP_GIT_CHECKOUT}"
+                                note "   ${NOTE_CHAR2} Checking out: ${cyan}${APP_GIT_CHECKOUT}"
                                 run "${GIT_BIN} checkout ${APP_GIT_CHECKOUT}"
                             fi
 
@@ -1368,7 +1366,7 @@ for application in ${APPLICATIONS}; do
                             LIST_DIR="${DEFINITIONS_DIR}patches/$1" # $1 is definition file name
                             if [ -d "${LIST_DIR}" ]; then
                                 patches_files="$(${FIND_BIN} ${LIST_DIR}/* -maxdepth 0 -type f 2>/dev/null)"
-                                note "   ${NOTE_CHAR2} Applying common patches for: ${APP_NAME}${APP_POSTFIX}"
+                                note "   ${NOTE_CHAR2} Applying common patches for: ${cyan}${APP_NAME}${APP_POSTFIX}"
                                 for patch in ${patches_files}; do
                                     for level in 0 1 2 3 4 5; do
                                         debug "Trying to patch source with patch: ${patch}, level: ${level}"
@@ -1382,7 +1380,7 @@ for application in ${APPLICATIONS}; do
                                 pspatch_dir="${LIST_DIR}/${SYSTEM_NAME}"
                                 debug "Checking psp dir: ${pspatch_dir}"
                                 if [ -d "${pspatch_dir}" ]; then
-                                    note "   ${NOTE_CHAR2} Applying platform specific patches for: ${APP_NAME}${APP_POSTFIX}/${SYSTEM_NAME}"
+                                    note "   ${NOTE_CHAR2} Applying platform specific patches for: ${cyan}${APP_NAME}${APP_POSTFIX}/${SYSTEM_NAME}"
                                     patches_files="$(${FIND_BIN} ${pspatch_dir}/* -maxdepth 0 -type f 2>/dev/null)"
                                     for platform_specific_patch in ${patches_files}; do
                                         for level in 0 1 2 3 4 5; do
@@ -1415,21 +1413,21 @@ for application in ${APPLICATIONS}; do
                             debug "LDFLAGS: ${LDFLAGS}"
                             debug "LD_LIBRARY_PATH: ${LD_LIBRARY_PATH}"
 
-                            note "   ${NOTE_CHAR2} Configuring: $1, version: ${APP_VERSION}"
+                            note "   ${NOTE_CHAR2} Configuring: ${cyan}$1${green}, version: ${cyan}${APP_VERSION}"
                             case "${APP_CONFIGURE_SCRIPT}" in
 
                                 ignore)
-                                    note "   ${NOTE_CHAR2} Ignored configuration of definition: $1"
+                                    note "   ${NOTE_CHAR2} Ignored configuration of definition: ${cyan}$1"
                                     ;;
 
                                 no-conf)
-                                    note "   ${NOTE_CHAR2} No configuration for definition: $1"
+                                    note "   ${NOTE_CHAR2} No configuration for definition: ${cyan}$1"
                                     export APP_MAKE_METHOD="${APP_MAKE_METHOD} PREFIX=${PREFIX}"
                                     export APP_INSTALL_METHOD="${APP_INSTALL_METHOD} PREFIX=${PREFIX}"
                                     ;;
 
                                 binary)
-                                    note "   ${NOTE_CHAR2} Prebuilt definition of: $1"
+                                    note "   ${NOTE_CHAR2} Prebuilt definition of: ${cyan}$1"
                                     export APP_MAKE_METHOD="true"
                                     export APP_INSTALL_METHOD="true"
                                     ;;
@@ -1484,14 +1482,14 @@ for application in ${APPLICATIONS}; do
                         fi
 
                         # and common part between normal and continue modes:
-                        note "   ${NOTE_CHAR2} Building requirement: $1"
+                        note "   ${NOTE_CHAR2} Building requirement: ${cyan}$1"
                         run "${APP_MAKE_METHOD}"
                         if [ ! -z "${APP_AFTER_MAKE_CALLBACK}" ]; then
                             debug "Running after make callback"
                             run "${APP_AFTER_MAKE_CALLBACK}"
                         fi
 
-                        note "   ${NOTE_CHAR2} Installing requirement: $1"
+                        note "   ${NOTE_CHAR2} Installing requirement: ${cyan}$1"
                         run "${APP_INSTALL_METHOD}"
                         if [ ! "${APP_AFTER_INSTALL_CALLBACK}" = "" ]; then
                             debug "After install callback: ${APP_AFTER_INSTALL_CALLBACK}"
@@ -1512,20 +1510,20 @@ for application in ${APPLICATIONS}; do
                         cd "${CUR_DIR}" 2>/dev/null
                     fi
                 else
-                    warn "   ${NOTE_CHAR2} Requirement: ${APP_NAME} disabled on architecture: ${SYSTEM_NAME}-${FULL_SYSTEM_VERSION}-${SYSTEM_ARCH}"
+                    warn "   ${NOTE_CHAR2} Requirement: ${cyan}${APP_NAME} ${yellow}disabled on: ${cyan}${SYSTEM_NAME}"
                     if [ ! -d "${PREFIX}" ]; then # case when disabled requirement is first on list of dependencies
                         ${MKDIR_BIN} -p "${PREFIX}"
                     fi
                     ${TOUCH_BIN} "${PREFIX}/${req}${INSTALLED_MARK}"
-                    ${PRINTF_BIN} "system-version" > "${PREFIX}/${req}${INSTALLED_MARK}"
+                    ${PRINTF_BIN} "os-default" > "${PREFIX}/${req}${INSTALLED_MARK}"
                 fi
             }
 
             if [ -z "${DONT_BUILD_BUT_DO_EXPORTS}" ]; then
                 if [ -z "${APP_REQUIREMENTS}" ]; then
-                    note "Installing ${application} v${APP_VERSION}"
+                    note "Installing: ${cyan}${application} ${green}v${cyan}${APP_VERSION}"
                 else
-                    note "Installing ${application} v${APP_VERSION}, with requirements: ${APP_REQUIREMENTS}"
+                    note "Installing: ${cyan}${application} ${green}v${cyan}${APP_VERSION}${green}, with requirements: ${cyan}${APP_REQUIREMENTS}"
                 fi
                 export req_amount="$(${PRINTF_BIN} "${APP_REQUIREMENTS}" | ${WC_BIN} -w 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)"
                 export req_amount="$(${PRINTF_BIN} "${req_amount} + 1\n" | ${BC_BIN} 2>/dev/null)"
@@ -1535,10 +1533,10 @@ for application in ${APPLICATIONS}; do
                         warn "${APP_USER_INFO}"
                     fi
                     if [ -z "${req}" ]; then
-                        note "  No requirements required."
+                        note "  No requirements"
                         break
                     else
-                        note "  ${req} (${req_amount} of ${req_all} remaining)"
+                        note "  ${req} (${cyan}${req_amount}${green} of ${cyan}${req_all}${green} remaining)"
                         if [ ! -e "${PREFIX}/${req}${INSTALLED_MARK}" ]; then
                             export CHANGED="true"
                             execute_process "${req}"
@@ -1557,35 +1555,35 @@ for application in ${APPLICATIONS}; do
 
             show_done () {
                 ver="$(${CAT_BIN} "${PREFIX}/${application}${INSTALLED_MARK}" 2>/dev/null)"
-                note "${SUCCESS_CHAR} ${application} [${ver}]\n"
+                note "${SUCCESS_CHAR} ${application} [${cyan}${ver}${green}]\n"
             }
 
             if [ -z "${DONT_BUILD_BUT_DO_EXPORTS}" ]; then
                 if [ -e "${PREFIX}/${application}${INSTALLED_MARK}" ]; then
                     if [ "${CHANGED}" = "true" ]; then
-                        note "  ${application} (1 of ${req_all})"
-                        note "   ${NOTE_CHAR2} App dependencies changed. Rebuilding ${application}"
+                        note "  ${application} (${cyan}1${green} of ${cyan}${req_all}${green})"
+                        note "   ${NOTE_CHAR2} App dependencies changed. Rebuilding: ${cyan}${application}"
                         execute_process "${application}"
                         unset CHANGED
                         mark
                         show_done
                     else
-                        note "  ${application} (1 of ${req_all})"
+                        note "  ${application} (${cyan}1${green} of ${cyan}${req_all}${green})"
                         show_done
                         debug "${SUCCESS_CHAR} ${application} current: ${ver}, definition: [${APP_VERSION}] Ok."
                     fi
                 else
-                    note "  ${application} (1 of ${req_all})"
+                    note "  ${application} (${cyan}1${green} of ${cyan}${req_all}${green})"
                     execute_process "${application}"
                     mark
-                    note "${SUCCESS_CHAR} ${application} [${APP_VERSION}]\n"
+                    note "${SUCCESS_CHAR} ${application} [${cyan}${APP_VERSION}${green}]\n"
                 fi
             fi
 
             debug "Doing app conflict resolve"
             if [ ! -z "${APP_CONFLICTS_WITH}" ]; then
                 disabled_exps=""
-                note "  ${NOTE_CHAR2} Resolving possible conflicts with: ${APP_CONFLICTS_WITH}"
+                debug "  ${NOTE_CHAR2} Resolving possible conflicts with: ${APP_CONFLICTS_WITH}"
                 for app in ${APP_CONFLICTS_WITH}; do
                     maybe_software="$(${FIND_BIN} ${SOFTWARE_DIR} -maxdepth 1 -type d -iname "${app}*" 2>/dev/null)"
                     for an_app in ${maybe_software}; do
@@ -1596,7 +1594,7 @@ for application in ${APPLICATIONS}; do
                         fi
                     done
                 done
-                note "  ${NOTE_CHAR2} Disabled conflicting bundles:${disabled_exps}"
+                note "  ${NOTE_CHAR2} Disabled conflicting bundles:${cyan}${disabled_exps}"
             fi
 
             . "${DEFINITIONS_DIR}${application}.def"
@@ -1605,10 +1603,10 @@ for application in ${APPLICATIONS}; do
                 ${MV_BIN} "${PREFIX}/exports-disabled" "${PREFIX}/exports"
             fi
             if [ -z "${APP_EXPORTS}" ]; then
-                note "  ${NOTE_CHAR2} Defined no binaries to export of prefix: ${PREFIX}"
+                note "  ${NOTE_CHAR2} Defined no binaries to export of prefix: ${cyan}${PREFIX}"
             else
                 aname="$(echo "${APP_NAME}${APP_POSTFIX}" | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null)"
-                note "  ${NOTE_CHAR2} Exporting binaries: ${APP_EXPORTS} of prefix: ${PREFIX}"
+                note "  ${NOTE_CHAR2} Exporting binaries: ${cyan}${APP_EXPORTS}${green}, of prefix: ${cyan}${PREFIX}"
                 ${MKDIR_BIN} -p "${PREFIX}/exports"
                 EXPORT_LIST=""
                 for exp in ${APP_EXPORTS}; do
@@ -1704,7 +1702,7 @@ for application in ${APPLICATIONS}; do
                 if [ "${result}" -lt "0" ]; then
                     result="0"
                 fi
-                note "  ${NOTE_CHAR2} Cleaned useless files; ${result} files stripped"
+                note "  ${NOTE_CHAR2} Clean complete. ${cyan}${result} ${green}files stripped"
             else
                 warn "  ${NOTE_CHAR2} Debug build is enabled. Strip skipped."
             fi
@@ -1721,7 +1719,7 @@ for application in ${APPLICATIONS}; do
                 # start from checking ${SERVICES_DIR}/Bundlename directory
                 if [ ! -d "${SERVICE_DIR}" ]; then
                     ${MKDIR_BIN} -p "${SERVICE_DIR}" && \
-                    note "  ${NOTE_CHAR2} Prepared service directory in: ${SERVICE_DIR}"
+                    note "  ${NOTE_CHAR2} Prepared service directory in: ${cyan}${SERVICE_DIR}"
                 fi
 
                 # count Sofin jobs. For more than one job available,
@@ -1775,14 +1773,14 @@ for application in ${APPLICATIONS}; do
                             try "${FETCH_BIN} ${remote_path}"
                             if [ "$?" = "0" ]; then
                                 debug "Stream archive available. Creating service dataset: ${dataset_name} from file stream: ${final_snap_file}"
-                                note "  ${NOTE_CHAR2} Dataset ${dataset_name} $(${XZCAT_BIN} "${final_snap_file}" | ${ZFS_BIN} receive -v "${dataset_name}" 2>/dev/null | ${TAIL_BIN} -n1)"
+                                note "  ${NOTE_CHAR2} Dataset: ${cyan}${dataset_name} ${green}$(${XZCAT_BIN} "${final_snap_file}" | ${ZFS_BIN} receive -v "${dataset_name}" 2>/dev/null | ${TAIL_BIN} -n1)"
                                 ${ZFS_BIN} rename ${dataset_name}@--head-- @origin && \
                                 debug "Cleaning snapshot file: ${final_snap_file}, after successful receive"
                                 ${RM_BIN} -f "${final_snap_file}"
                             else
                                 debug "Initial service dataset unavailable"
                                 ${ZFS_BIN} create "${dataset_name}" 2>/dev/null && \
-                                note "  ${NOTE_CHAR2} Created an empty service dataset for: ${dataset_name}"
+                                note "  ${NOTE_CHAR2} Created an empty service dataset for: ${cyan}${dataset_name}"
                             fi
                         }
 
@@ -1813,7 +1811,7 @@ for application in ${APPLICATIONS}; do
             APP_NAME="$(${PRINTF_BIN} "${APP_NAME}" | ${CUT_BIN} -c1 2>/dev/null | ${TR_BIN} '[a-z]' '[A-Z]' 2>/dev/null)$(${PRINTF_BIN} "${APP_NAME}" | ${SED_BIN} 's/^[a-zA-Z]//' 2>/dev/null)"
             APP_BUNDLE_NAME="${PREFIX}.app"
             aname="$(echo "${APP_NAME}${APP_POSTFIX}" | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null)"
-            note "  ${NOTE_CHAR2} Creating Apple bundle: ${APP_NAME} in ${APP_BUNDLE_NAME}"
+            note "  ${NOTE_CHAR2} Creating Apple bundle: ${cyan}${APP_NAME} ${green}in: ${cyan}${APP_BUNDLE_NAME}"
             ${MKDIR_BIN} -p "${APP_BUNDLE_NAME}/libs"
             ${MKDIR_BIN} -p "${APP_BUNDLE_NAME}/Contents"
             ${MKDIR_BIN} -p "${APP_BUNDLE_NAME}/Contents/Resources/${APP_LOWERNAME}"
@@ -1841,7 +1839,7 @@ for application in ${APPLICATIONS}; do
             note "  ${NOTE_CHAR2} Creating relative libraries search path"
             cd ${APP_BUNDLE_NAME}
 
-            note "  ${NOTE_CHAR2} Processing exported binary: ${i}"
+            note "  ${NOTE_CHAR2} Processing exported binary: ${cyan}${i}"
             ${SOFIN_LIBBUNDLE_BIN} -x "${APP_BUNDLE_NAME}/Contents/MacOS/${APP_LOWERNAME}" >> ${LOG}-${aname} 2>&1
 
         fi
@@ -1854,7 +1852,7 @@ update_shell_vars
 
 if [ ! -z "${SHELL_PID}" ]; then
     pids=$(${PS_BIN} ax 2>/dev/null | ${GREP_BIN} -v grep 2>/dev/null | ${GREP_BIN} zsh 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)
-    note "All done. Reloading configuration of all $(${BASENAME_BIN} "${SHELL}" 2>/dev/null) with pids: $(echo ${pids} | ${TR_BIN} '\n' ' ' 2>/dev/null)"
+    note "Reloading configuration of all ${cyan}$(${BASENAME_BIN} "${SHELL}" 2>/dev/null) ${green}with pids: ${cyan}$(echo ${pids} | ${TR_BIN} '\n' ' ' 2>/dev/null)"
     for pid in ${pids}; do
         ${KILL_BIN} -SIGUSR2 ${pid}
     done

@@ -3,7 +3,7 @@
 #
 
 # Sofin version string:
-readonly SOFIN_VERSION="0.92.6"
+readonly SOFIN_VERSION="0.94.0"
 
 # setting up definitions repository
 if [ -z "${BRANCH}" ]; then
@@ -29,7 +29,7 @@ readonly gray='\033[37;40m'
 readonly white='\033[38;40m'
 readonly reset='\033[0m'
 
-readonly SOFIN_HEADER="Sofin v${SOFIN_VERSION} (c) 2o11-2o16 verknowsys.com"
+readonly SOFIN_HEADER="Sofin v${cyan}${SOFIN_VERSION} ${green}(c) 2o11-2o16 verknowsys.com"
 readonly SOFIN_PROFILE="/etc/profile_sofin"
 readonly SOFIN_DISABLED_INDICATOR_FILE="${HOME}/.sofin-disabled"
 readonly SERVICES_DIR="/Services/"
@@ -342,7 +342,7 @@ check_command_result () {
         debug "Command successful: '$*'"
     else
         shift
-        error "Command failure: '$*'. Run $(${BASENAME_BIN} ${SOFIN_BIN} 2>/dev/null) log to see what went wrong."
+        error "Command failure: '$*'. Run ${cyan}$(${BASENAME_BIN} ${SOFIN_BIN} 2>/dev/null) log yodef${green}, to see what went wrong"
         exit 1
     fi
 }
@@ -382,7 +382,7 @@ validate_env () {
     do
         var_value="$(${PRINTF_BIN} "${envvar}" | ${AWK_BIN} '{sub(/^[A-Z_]*=/, ""); print $1;}' 2>/dev/null)"
         if [ ! -x "${var_value}" ]; then
-            error "Required binary is unavailable: ${envvar}"
+            error "Required binary is unavailable: ${cyan}${envvar}"
             exit 1
         fi
     done || exit 1
