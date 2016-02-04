@@ -1748,8 +1748,18 @@ for application in ${APPLICATIONS}; do
                     app_name_lowercase="$(echo "${maybe_dataset}" | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null)"
                     if [ "${app_name_lowercase}" = "${aname}" -o ${jobs_in_parallel} = "NO" ]; then
                         # find name of mount from default ZFS Services:
-                        no_ending_slash="$(echo "${SERVICES_DIR}" | ${SED_BIN} 's/\/$//' 2>/dev/null)"
-                        inner_dir="$(${ZFS_BIN} list -H 2>/dev/null | ${GREP_BIN} "${no_ending_slash}$" 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null | ${SED_BIN} 's/.*\///' 2>/dev/null)/"
+                        inner_dir=""
+                        if [ "${USERNAME}" = "root" ]; then
+                            inner_dir="root/"
+                        else
+                            # NOTE: In ServeD-OS there's only 1 inner dir name that's also the cell name
+                            no_ending_slash="$(echo "${SERVICES_DIR}" | ${SED_BIN} 's/\/$//' 2>/dev/null)"
+                            inner_dir="$(${ZFS_BIN} list -H 2>/dev/null | ${EGREP_BIN} "${no_ending_slash}$" 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null | ${SED_BIN} 's/.*\///' 2>/dev/null)/"
+                            if [ -z "${inner_dir}" ]; then
+                                warn "Falling back with inner dir name to current user name: ${USERNAME}/"
+                                inner_dir="${USERNAME}/"
+                            fi
+                        fi
                         certain_dataset="${SERVICES_DIR}${inner_dir}${maybe_dataset}"
                         certain_fileset="${SERVICES_DIR}${maybe_dataset}"
                         full_dataset_name="${DEFAULT_ZPOOL}${certain_dataset}"
