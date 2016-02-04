@@ -208,7 +208,6 @@ usage_howto () {
     note "  ${cyan}deploy                               ${gray}-${green} build + push"
     note "  ${cyan}push | binpush | send                ${gray}-${green} creates binary build from prebuilt software bundles name given as params (example: ${SOFIN_ONLYNAME} push Rubinius Vifm Curl)"
     note "  ${cyan}wipe                                 ${gray}-${green} wipes binary builds (matching given name) from binary respositories (example: ${SOFIN_ONLYNAME} wipe Rubinius Vifm)"
-    note "  ${cyan}port                                 ${gray}-${green} gathers port of ServeD running service by service name"
     note "  ${cyan}enable                               ${gray}-${green} enables Sofin developer environment (full environment stored in ~/.profile). It's the default"
     note "  ${cyan}disable                              ${gray}-${green} disables Sofin developer environment (only PATH, PKG_CONFIG_PATH and MANPATH written to ~/.profile)"
     note "  ${cyan}status                               ${gray}-${green} shows Sofin status"
@@ -335,27 +334,6 @@ if [ ! "$1" = "" ]; then
         note "Paste your definition below. Hit ctrl-d after a newline to commit"
         ${CAT_BIN} > ${DEFINITIONS_DIR}/${2}.def
         exit
-        ;;
-
-
-    p|port)
-        # support for ServeD /Services:
-        app="$2"
-        if [ "$app" = "" ]; then
-            error "Must specify service name!"
-        fi
-
-        # user_app_dir="${SERVICES_DIR}${app}"
-        # user_port_file="${user_app_dir}/.ports/0"
-        # if [ "${USERNAME}" = "root" ]; then
-        #     user_app_dir="${SERVICES_DIR}${app}"
-        #     user_port_file="${user_app_dir}/.ports/0"
-        # fi
-        # if [ -f "${user_port_file}" ]; then
-        #     printf "$(${CAT_BIN} ${user_port_file})\n"
-        # else
-
-        error "Not implemented (for now)"
         ;;
 
 
