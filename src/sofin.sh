@@ -1179,9 +1179,11 @@ for application in ${APPLICATIONS}; do
                         aname="$(echo "${APP_NAME}${APP_POSTFIX}" | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null)"
                         if [ ! -e "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" ]; then
                             cd ${BINBUILDS_CACHE_DIR}${ABSNAME}
-                            note "Trying binary build for: ${cyan}${MIDDLE}/${APP_NAME}${APP_POSTFIX}-${APP_VERSION}"
-                            retry "${FETCH_BIN} ${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}.sha1"
-                            retry "${FETCH_BIN} ${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}"
+                            try "${FETCH_BIN} ${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}.sha1" || \
+                            try "${FETCH_BIN} ${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}.sha1" || \
+                            try "${FETCH_BIN} ${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}" || \
+                            try "${FETCH_BIN} ${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}" || \
+                                note "No binary build available for: ${cyan}${MIDDLE}/${APP_NAME}${APP_POSTFIX}-${APP_VERSION}"
 
                             # checking archive sha1 checksum
                             if [ -e "./${ARCHIVE_NAME}" ]; then
