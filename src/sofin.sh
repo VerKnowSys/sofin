@@ -1786,7 +1786,7 @@ for application in ${APPLICATIONS}; do
                             debug "Creating dataset: ${full_dataset_name}" && \
                             create_or_receive "${full_dataset_name}" && \
                             debug "Copying ${certain_fileset}-tmp/ back to ${certain_fileset}" && \
-                            ${CP_BIN} -pRP "${certain_fileset}-tmp/" "${certain_fileset}" && \
+                            ${CP_BIN} -RP "${certain_fileset}-tmp/" "${certain_fileset}" && \
                             debug "Cleaning ${certain_fileset}-tmp" && \
                             ${RM_BIN} -rf "${certain_fileset}-tmp" && \
                             debug "Dataset created: ${full_dataset_name}"
