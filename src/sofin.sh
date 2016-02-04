@@ -1765,11 +1765,10 @@ for application in ${APPLICATIONS}; do
                             try "${FETCH_BIN} ${remote_path}"
                             if [ "$?" = "0" ]; then
                                 debug "Stream archive available. Creating service dataset: ${dataset_name} from file stream: ${final_snap_file}"
-                                ${XZCAT_BIN} "${final_snap_file}" | ${ZFS_BIN} receive -v "${dataset_name}" 2>/dev/null | ${TAIL_BIN} -n1 && \
+                                note "  ${NOTE_CHAR2} Dataset ${dataset_name} $(${XZCAT_BIN} "${final_snap_file}" | ${ZFS_BIN} receive -v "${dataset_name}" 2>/dev/null | ${TAIL_BIN} -n1)"
                                 ${ZFS_BIN} rename ${dataset_name}@--head-- @origin && \
-                                debug "Cleaning snapshot file: ${final_snap_file}, after successful receive." && \
-                                ${RM_BIN} -f "${final_snap_file}" && \
-                                note "  ${NOTE_CHAR2} Stream received successfully as: ${dataset_name}"
+                                debug "Cleaning snapshot file: ${final_snap_file}, after successful receive"
+                                ${RM_BIN} -f "${final_snap_file}"
                             else
                                 debug "Initial service dataset unavailable"
                                 ${ZFS_BIN} create "${dataset_name}" 2>/dev/null && \
