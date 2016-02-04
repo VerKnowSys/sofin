@@ -453,9 +453,9 @@ if [ ! "$1" = "" ]; then
 
 
     l|installed|list)
-        debug "Listing software from ${SOFTWARE_DIR}"
+        debug "Listing installed software alphabetically:"
         if [ -d ${SOFTWARE_DIR} ]; then
-            ${FIND_BIN} ${SOFTWARE_DIR} -maxdepth 1 -mindepth 1 -type d  -not -name ".*" -exec ${BASENAME_BIN} {} \;
+            ${FIND_BIN} ${SOFTWARE_DIR} -maxdepth 1 -mindepth 1 -type d  -not -name ".*" -print 2>/dev/null | ${XARGS_BIN} ${BASENAME_BIN} 2>/dev/null | ${SORT_BIN} 2>/dev/null
         fi
         exit
         ;;
