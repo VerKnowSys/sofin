@@ -121,7 +121,7 @@ update_definitions () {
         INITIAL_DEFINITIONS="${MAIN_SOURCE_REPOSITORY}initial-definitions${DEFAULT_ARCHIVE_EXT}"
         debug "Fetching latest tarball with initial definitions from: ${INITIAL_DEFINITIONS}"
         retry "${FETCH_BIN} ${INITIAL_DEFINITIONS}" && \
-        ${TAR_BIN} xf *${DEFAULT_ARCHIVE_EXT} && \
+        ${TAR_BIN} xvf *${DEFAULT_ARCHIVE_EXT} >> ${LOG} 2>&1 && \
         ${RM_BIN} -vrf "$(${BASENAME_BIN} ${INITIAL_DEFINITIONS} 2>/dev/null)"
         return
     fi
@@ -132,19 +132,28 @@ update_definitions () {
             debug "Checking out branch: ${current_branch}"
             ${GIT_BIN} checkout -b "${current_branch}" >> ${LOG} 2>&1 || \
                 ${GIT_BIN} checkout "${current_branch}" >> ${LOG} 2>&1
+            ${GIT_BIN} pull origin ${current_branch} >> ${LOG} 2>&1 && \
+            note "Updated branch: ${cyan}${current_branch} ${green}of repository: ${cyan}${REPOSITORY}" && \
+            return
 
-            (retry "${GIT_BIN} pull origin ${current_branch}" && \
-             note "Updated branch: ${cyan}${current_branch} ${green}of repository: ${cyan}${REPOSITORY}") || \
-                error "Error occured: Update from branch: ${BRANCH} of repository: ${REPOSITORY} wasn't possible."
+            note "${red}Error occured: Update from branch: ${BRANCH} of repository: ${REPOSITORY} wasn't possible. Log below:${reset}"
+            ${TAIL_BIN} -n${LOG_LINES_AMOUNT_ON_ERR} ${LOG} 2>/dev/null
+            note "_________________________________________________________"
+            exit 1
 
         else # else use default branch
             debug "Using default branch: ${BRANCH}"
             ${GIT_BIN} checkout -b "${BRANCH}" >> ${LOG} 2>&1 || \
                 ${GIT_BIN} checkout "${BRANCH}" >> ${LOG} 2>&1
 
-            (retry "${GIT_BIN} pull origin ${BRANCH}" && \
-             note "Updated branch: ${cyan}${BRANCH} ${green}of repository: ${cyan}${REPOSITORY}") || \
-                error "Error occured: Update from branch: ${BRANCH} of repository: ${REPOSITORY} wasn't possible."
+            ${GIT_BIN} pull origin ${BRANCH} >> ${LOG} 2>&1 && \
+            note "Updated branch: ${cyan}${BRANCH} ${green}of repository: ${cyan}${REPOSITORY}" && \
+            return
+
+            note "${red}Error occured: Update from branch: ${BRANCH} of repository: ${REPOSITORY} wasn't possible. Log below:${reset}"
+            ${TAIL_BIN} -n${LOG_LINES_AMOUNT_ON_ERR} ${LOG} 2>/dev/null
+            note "_________________________________________________________"
+            exit 1
         fi
     else
         # create cache; clone definitions repository:
@@ -153,13 +162,20 @@ update_definitions () {
         ${MKDIR_BIN} -p "${LOGS_DIR}"
         debug "Cloning repository: ${REPOSITORY} from branch: ${BRANCH}; LOGS_DIR: ${LOGS_DIR}, CACHE_DIR: ${CACHE_DIR}"
         ${RM_BIN} -rf definitions >> ${LOG} 2>&1 # if something is already here, wipe it out from cache
-        retry "${GIT_BIN} clone ${REPOSITORY} definitions" || \
-            error "Error occured: Cloning repository: ${REPOSITORY} isn't possible. Please make sure that given repository and branch are valid."
-        cd "${CACHE_DIR}definitions"
-        ${GIT_BIN} checkout -b "${BRANCH}" >> ${LOG} 2>&1
-        retry "${GIT_BIN} pull origin ${BRANCH}" && \
-        note "Updated branch: ${cyan}${BRANCH} ${green}of repository: ${cyan}${REPOSITORY}" || \
+        ${GIT_BIN} clone ${REPOSITORY} definitions >> ${LOG} 2>&1 || \
             error "Error occured: Update from branch: ${BRANCH} of repository: ${REPOSITORY} isn't possible. Please make sure that given repository and branch are valid."
+        cd "${CACHE_DIR}definitions"
+        ${GIT_BIN} checkout -b "${current_branch}" >> ${LOG} 2>&1 || \
+            ${GIT_BIN} checkout "${current_branch}" >> ${LOG} 2>&1
+
+        ${GIT_BIN} pull origin "${BRANCH}" >> ${LOG} 2>&1 && \
+        note "Updated branch: ${cyan}${BRANCH} ${green}of repository: ${cyan}${REPOSITORY}" && \
+        return
+
+        note "${red}Error occured: Update from branch: ${BRANCH} of repository: ${REPOSITORY} wasn't possible. Log below:${reset}"
+        ${TAIL_BIN} -n${LOG_LINES_AMOUNT_ON_ERR} ${LOG} 2>/dev/null
+        note "_________________________________________________________"
+        exit 1
     fi
 }
 
@@ -791,7 +807,7 @@ if [ ! "$1" = "" ]; then
             USE_BINBUILD=false ${SOFIN_BIN} install ${software} || def_error && \
             ${SOFIN_BIN} push ${software} || def_error && \
             note "Software bundle deployed successfully: ${cyan}${software}"
-            note "______________________________________________________________"
+            note "_________________________________________________________"
         done
         exit 0
         ;;
@@ -1198,14 +1214,14 @@ for application in ${APPLICATIONS}; do
                         if [ -e "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" ]; then # if exists, then checksum is ok
                             ${TAR_BIN} xJf "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" >> ${LOG}-${aname} 2>&1
                             if [ "$?" = "0" ]; then # if archive is valid
-                                note "  ${NOTE_CHAR2} Binary bundle installed: ${cyan}${APP_NAME}${APP_POSTFIX} ${green}with version: ${APP_VERSION}"
+                                note "  ${NOTE_CHAR2} Binary bundle installed: ${cyan}${APP_NAME}${APP_POSTFIX} ${green}with version: ${cyan}${APP_VERSION}"
                                 export DONT_BUILD_BUT_DO_EXPORTS="true"
                             else
                                 debug "  ${NOTE_CHAR2} No binary bundle available for: ${cyan}${APP_NAME}${APP_POSTFIX}"
                                 ${RM_BIN} -fr "${BINBUILDS_CACHE_DIR}${ABSNAME}"
                             fi
                         else
-                            debug "  ${NOTE_CHAR2} Binary build checksum doesn't match for: ${ABSNAME}"
+                            debug "  ${NOTE_CHAR2} Binary build checksum doesn't match for: ${cyan}${ABSNAME}"
                         fi
                     fi
                 else
@@ -1322,7 +1338,12 @@ for application in ${APPLICATIONS}; do
                             else
                                 # git method
                                 note "   ${NOTE_CHAR2} Fetching requirement source from git repository: ${cyan}${APP_HTTP_PATH}"
-                                retry "${GIT_BIN} clone ${APP_HTTP_PATH} ${APP_NAME}${APP_VERSION}"
+                                try "${GIT_BIN} clone ${APP_HTTP_PATH} ${APP_NAME}${APP_VERSION}" || \
+                                try "${GIT_BIN} clone ${APP_HTTP_PATH} ${APP_NAME}${APP_VERSION}" || \
+                                note "${red}Definitions were not updated. Below displaying ${cyan}${LOG_LINES_AMOUNT_ON_ERR}${green} lines of internal log:${reset}" && \
+                                ${TAIL_BIN} -n${LOG_LINES_AMOUNT_ON_ERR} ${LOG} 2>/dev/null && \
+                                note "_________________________________________________________"
+                                exit 1
                             fi
 
                             export BUILD_DIR="$(${FIND_BIN} ${BUILD_DIR_ROOT}/* -maxdepth 0 -type d -name "*${APP_VERSION}*" 2>/dev/null)"
@@ -1382,7 +1403,6 @@ for application in ${APPLICATIONS}; do
                                 debug "Running after patch callback"
                                 run "${APP_AFTER_PATCH_CALLBACK}"
                             fi
-
                             debug "-------------- PRE CONFIGURE SETTINGS DUMP --------------"
                             debug "Current DIR: $(${PWD_BIN} 2>/dev/null)"
                             debug "PREFIX: ${PREFIX}"
@@ -1713,7 +1733,7 @@ for application in ${APPLICATIONS}; do
                 test -z "${sofins_running}" && sofins_running="0"
                 export jobs_in_parallel="NO"
                 if [ ${sofins_running} -gt 1 ]; then
-                    note "Exactly ${sofins_running} additional running Sofin found in background. Limiting jobs to current bundle only"
+                    note "${cyan}${sofins_running} ${green}additional running Sofins found in background. Limiting jobs to current bundle only"
                     export jobs_in_parallel="YES"
                 else
                     note "  ${NOTE_CHAR2} Traversing through several datasets at once, since single Sofin instance is running"
