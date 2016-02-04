@@ -331,6 +331,9 @@ if [ ! "$1" = "" ]; then
 
     dev)
         create_cache_directories
+        if [ -z "${2}" ]; then
+            error "No definition file name specified."
+        fi
         note "Paste your definition below. Hit ctrl-d after a newline to commit"
         ${CAT_BIN} > ${DEFINITIONS_DIR}/${2}.def
         exit
