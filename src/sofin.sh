@@ -1000,7 +1000,7 @@ if [ ! "$1" = "" ]; then
                 debug "Not found: ${SOFTWARE_DIR}${APP}${dir}${EXPORT}"
             fi
         done
-        exit 1
+        error "Nothing to export"
         ;;
 
 
