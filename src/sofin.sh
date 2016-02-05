@@ -20,7 +20,7 @@ SOFIN_ARGS_FULL="${SOFIN_ARGS}"
 SOFIN_ONLYNAME="$(${BASENAME_BIN} "${SOFIN_BIN}" 2>/dev/null)"
 readonly SOFIN_ARGS="$(echo ${SOFIN_ARGS} | ${CUT_BIN} -d' ' -f2- 2>/dev/null)"
 readonly ALL_INSTALL_PHRASES="i|install|get|pick|choose|use|switch"
-readonly BUILD_AND_DEPLOY_PHRASES="b|build|d|deploy"
+readonly BUILD_DEPLOY_AND_PUSH_PHRASES="b|build|d|deploy|p|push|binpush|send"
 
 # Some lazy shortcuts..
 FILES_COUNT_GUARD="${WC_BIN} -l 2>/dev/null | ${SED_BIN} 's/ //g' 2>/dev/null"
@@ -339,6 +339,19 @@ perform_clean () {
 }
 
 
+fail_on_background_sofin_job () {
+    dep=$*
+    debug "Checking for background jobs of: ${dep}"
+    sofin_ps_list="$(${PS_BIN} ${PS_DEFAULT_OPTS} 2>/dev/null | ${GREP_BIN} -v grep 2>/dev/null | ${EGREP_BIN} "sh ${SOFIN_BIN} (${BUILD_DEPLOY_AND_PUSH_PHRASES}) ${dep}" 2>/dev/null)"
+    debug "pslist: ${sofin_ps_list}"
+    sofins_all="$(echo "${sofin_ps_list}" | ${WC_BIN} -l 2>/dev/null | ${SED_BIN} 's/ //g' 2>/dev/null)"
+    debug "sofins_all: ${sofin_ps_list}"
+    test ${sofins_all} -gt 2 && \
+        error "Found currently processing jobs, for software bundle: ${cyan}${dep}${red}. Task aborted"
+    unset dep sofin_ps_list sofins_all
+}
+
+
 if [ ! "$1" = "" ]; then
     case $1 in
 
@@ -650,7 +663,8 @@ if [ ! "$1" = "" ]; then
 
     p|push|binpush|send)
         create_cache_directories
-        note "Preparing to push binary bundle: ${cyan}${SOFIN_ARGS}${green} from ${cyan}${SOFTWARE_DIR}${green} to binary repository."
+        fail_on_background_sofin_job ${SOFIN_ARGS}
+        note "Pushing binary bundle: ${cyan}${SOFIN_ARGS}${green} to remote: ${cyan}${MAIN_BINARY_REPOSITORY}"
         cd "${SOFTWARE_DIR}"
         for element in ${SOFIN_ARGS}; do
             if [ -d "${element}" ]; then
@@ -776,17 +790,12 @@ if [ ! "$1" = "" ]; then
     b|build)
         create_cache_directories
         shift
-        dependencies="$*"
+        dependencies=$*
         note "Software bundles to be built: ${cyan}${dependencies}"
         def_error () {
             error "Failure in definition: ${cyan}${software}${red}. Report or fix the definition please!"
         }
-        for dep in ${dependencies}; do
-            sofin_ps_list="$(${PS_BIN} axv 2>/dev/null | ${GREP_BIN} -v grep 2>/dev/null | ${EGREP_BIN} "sh ${SOFIN_BIN} (${ALL_INSTALL_PHRASES}|${BUILD_AND_DEPLOY_PHRASES}) ${dep}" 2>/dev/null)"
-            sofins_all="$(echo "${sofin_ps_list}" | ${WC_BIN} -l 2>/dev/null | ${SED_BIN} 's/ //g' 2>/dev/null)"
-            test ${sofins_all} -gt 2 && error "Bundle: ${cyan}${dep}${green} is in a middle of build process in background! Aborting."
-        done
-        # update_definitions
+        fail_on_background_sofin_job ${dependencies}
         USE_UPDATE=false USE_BINBUILD=false ${SOFIN_BIN} install ${dependencies} || def_error
         exit
         ;;
@@ -795,22 +804,16 @@ if [ ! "$1" = "" ]; then
     d|deploy)
         create_cache_directories
         shift
-        dependencies="$*"
+        dependencies=$*
         note "Software bundles to be built and deployed to remote: ${cyan}${dependencies}"
         def_error () {
             error "Failure in definition: ${cyan}${software}${red}. Report or fix the definition please!"
         }
-        for dep in ${dependencies}; do
-            sofin_ps_list="$(${PS_BIN} axv 2>/dev/null | ${GREP_BIN} -v grep 2>/dev/null | ${EGREP_BIN} "sh ${SOFIN_BIN} (${ALL_INSTALL_PHRASES}|${BUILD_AND_DEPLOY_PHRASES}) ${dep}" 2>/dev/null)"
-            sofins_all="$(echo "${sofin_ps_list}" | ${WC_BIN} -l 2>/dev/null | ${SED_BIN} 's/ //g' 2>/dev/null)"
-            test ${sofins_all} -gt 2 && error "Bundle: ${dep} is in a middle of build process in background! Aborting."
-        done
-        # update_definitions
+        fail_on_background_sofin_job ${dependencies}
         for software in ${dependencies}; do
             USE_BINBUILD=false ${SOFIN_BIN} install ${software} || def_error && \
             ${SOFIN_BIN} push ${software} || def_error && \
             note "Software bundle deployed successfully: ${cyan}${software}"
-            note "_________________________________________________________"
         done
         exit 0
         ;;
