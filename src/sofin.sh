@@ -121,7 +121,7 @@ update_definitions () {
         INITIAL_DEFINITIONS="${MAIN_SOURCE_REPOSITORY}initial-definitions${DEFAULT_ARCHIVE_EXT}"
         debug "Fetching latest tarball with initial definitions from: ${INITIAL_DEFINITIONS}"
         retry "${FETCH_BIN} ${INITIAL_DEFINITIONS}" && \
-        ${TAR_BIN} xvf *${DEFAULT_ARCHIVE_EXT} >> ${LOG} 2>&1 && \
+        ${TAR_BIN} -xJ --use-compress-program="${XZ_BIN} -T${CPUS}" -f *${DEFAULT_ARCHIVE_EXT} >> ${LOG} 2>&1 && \
         ${RM_BIN} -vrf "$(${BASENAME_BIN} ${INITIAL_DEFINITIONS} 2>/dev/null)"
         return
     fi
@@ -704,12 +704,17 @@ if [ ! "$1" = "" ]; then
 
                         note "Preparing ${cyan}${element}${green} archives.."
                         if [ ! -e "./${name}" ]; then
-                            ${TAR_BIN} -cJf "${name}" "./${element}"
+                            ${TAR_BIN} -cJ --use-compress-program="${XZ_BIN} --threads=${CPUS}" -f "${name}" "./${element}" 2>> ${LOG} || \
+                            ${TAR_BIN} -cJf "${name}" "./${element}" 2>> ${LOG} || \
+                            error "Failed to create archives for: ${cyan}${element}${green}"
                         else
                             if [ ! -e "./${name}.sha1" ]; then
-                                note "No sha1 file found. Existing archive may be incomplete or damaged. Rebuilding.."
+                                debug "Found sha-less archive. It may be incomplete or damaged. Rebuilding.."
                                 ${RM_BIN} -f "${name}"
-                                ${TAR_BIN} -cJf "${name}" "./${element}"
+                                ${TAR_BIN} -cJ --use-compress-program="${XZ_BIN} --threads=${CPUS}" -f "${name}" "./${element}" 2>> ${LOG} || \
+                                ${TAR_BIN} -cJf "${name}" "./${element}" 2>> ${LOG} || \
+                                error "Failed to create archives for: ${cyan}${element}${green}"
+                                debug "Bundle archive created successfully"
                             else
                                 note "Archive already exists. Skipping archive preparation for: ${cyan}${name}"
                             fi
@@ -1212,7 +1217,8 @@ for application in ${APPLICATIONS}; do
 
                         debug "ARCHIVE_NAME: ${ARCHIVE_NAME}. Expecting binbuild to be available in: ${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}"
                         if [ -e "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" ]; then # if exists, then checksum is ok
-                            ${TAR_BIN} xJf "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" >> ${LOG}-${aname} 2>&1
+                            ${TAR_BIN} -xJ --use-compress-program="${XZ_BIN} --threads=${CPUS}" -f "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" >> ${LOG}-${aname} 2>&1 || \
+                            ${TAR_BIN} -xJf "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" >> ${LOG}-${aname} 2>&1
                             if [ "$?" = "0" ]; then # if archive is valid
                                 note "  ${NOTE_CHAR2} Binary bundle installed: ${cyan}${APP_NAME}${APP_POSTFIX} ${green}with version: ${cyan}${APP_VERSION}"
                                 export DONT_BUILD_BUT_DO_EXPORTS="true"
@@ -1333,7 +1339,8 @@ for application in ${APPLICATIONS}; do
 
                                 note "   ${NOTE_CHAR2} Unpacking source code of: ${cyan}${APP_NAME}"
                                 debug "Build dir root: ${BUILD_DIR_ROOT}"
-                                run "${TAR_BIN} xf ${file}"
+                                try "${TAR_BIN} -xJ --use-compress-program='${XZ_BIN} -T${CPUS}' -f ${file}" || \
+                                run "${TAR_BIN} -xJf ${file}"
 
                             else
                                 # git method
@@ -1733,10 +1740,10 @@ for application in ${APPLICATIONS}; do
                 test -z "${sofins_running}" && sofins_running="0"
                 export jobs_in_parallel="NO"
                 if [ ${sofins_running} -gt 1 ]; then
-                    note "${cyan}${sofins_running} ${green}additional running Sofins found in background. Limiting jobs to current bundle only"
+                    note "  ${NOTE_CHAR2} Found: ${cyan}${sofins_running}${green} running Sofin instances in background. Parallel jobs not allowed"
                     export jobs_in_parallel="YES"
                 else
-                    note "  ${NOTE_CHAR2} Traversing through several datasets at once, since single Sofin instance is running"
+                    note "  ${NOTE_CHAR2} Traversing through several datasets at once, since only current Sofin instance found running"
                 fi
 
                 # Create a dataset for any existing dirs in Services dir that are not ZFS datasets.
