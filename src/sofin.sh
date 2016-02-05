@@ -361,7 +361,7 @@ if [ ! "$1" = "" ]; then
             error "No definition file name specified."
         fi
         note "Paste your definition below. Hit ctrl-d after a newline to commit"
-        ${CAT_BIN} > ${DEFINITIONS_DIR}/${2}.def
+        ${CAT_BIN} > ${DEFINITIONS_DIR}/${2}.def 2>/dev/null
         exit
         ;;
 
