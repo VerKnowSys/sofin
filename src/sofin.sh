@@ -1156,9 +1156,9 @@ for application in ${APPLICATIONS}; do
                     fi
                     debug "$(${DATE_BIN} +%H%M%S-%s 2>/dev/null) try('$@'); aname(${aname});"
                     if [ -z "${aname}" ]; then
-                        eval PATH="${PATH}" "$@" >> "${LOG}" 2>&1
+                        eval PATH="${PATH}" "$@" >> "${LOG}" 2>> "${LOG}"
                     else
-                        eval PATH="${PATH}" "$@" >> "${LOG}-${aname}" 2>&1
+                        eval PATH="${PATH}" "$@" >> "${LOG}-${aname}" 2>> "${LOG}-${aname}"
                     fi
                 else
                     error "An empty command to run for: ${APP_NAME}?"
@@ -1344,10 +1344,10 @@ for application in ${APPLICATIONS}; do
 
                             else
                                 # git method
-                                note "   ${NOTE_CHAR2} Fetching requirement source from git repository: ${cyan}${APP_HTTP_PATH}"
+                                note "   ${NOTE_CHAR2} Fetching requirement source from git repository: ${cyan}${APP_HTTP_PATH}${reset}"
                                 try "${GIT_BIN} clone ${APP_HTTP_PATH} ${APP_NAME}${APP_VERSION}" || \
                                 try "${GIT_BIN} clone ${APP_HTTP_PATH} ${APP_NAME}${APP_VERSION}" || \
-                                note "${red}Definitions were not updated. Below displaying ${cyan}${LOG_LINES_AMOUNT_ON_ERR}${green} lines of internal log:${reset}" && \
+                                note "\n${red}Definitions were not updated. Below displaying ${cyan}${LOG_LINES_AMOUNT_ON_ERR}${green} lines of internal log:${reset}" && \
                                 ${TAIL_BIN} -n${LOG_LINES_AMOUNT_ON_ERR} ${LOG} 2>/dev/null && \
                                 note "_________________________________________________________"
                                 exit 1
