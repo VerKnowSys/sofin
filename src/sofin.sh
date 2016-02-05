@@ -678,7 +678,7 @@ if [ ! "$1" = "" ]; then
                         dig_query=$(${DIG_BIN} A ${MAIN_SOFTWARE_ADDRESS} 2>/dev/null | ${GREP_BIN} "^${MAIN_SOFTWARE_ADDRESS}" 2>/dev/null | ${AWK_BIN} '{print $5;}' 2>/dev/null)
                     fi
                     if [ -z "${dig_query}" ]; then
-                        error "No mirrors found in address: ${MAIN_SOFTWARE_ADDRESS}"
+                        error "No mirrors found in address: ${cyan}${MAIN_SOFTWARE_ADDRESS}"
                     fi
                     debug "MIRROR: ${dig_query}"
                     for mirror in ${dig_query}; do
@@ -686,13 +686,12 @@ if [ ! "$1" = "" ]; then
                         system_path="${MAIN_SOFTWARE_PREFIX}/software/binary/${SYS}"
                         address="${MAIN_USER}@${mirror}:${system_path}"
                         def_error () {
-                            error "Error sending ${1} to ${address}/${1}"
+                            error "Error sending ${cyan}${1}${red} to: ${cyan}${address}/${1}"
                         }
                         aname="$(echo "${APP_NAME}${APP_POSTFIX}" | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null)"
-                        ${SSH_BIN} -p ${MAIN_PORT} ${MAIN_USER}@${mirror} "mkdir -p ${MAIN_SOFTWARE_PREFIX}/software/binary/${SYS}" >> "${LOG}-${aname}" 2>&1
+                        ${SSH_BIN} -p ${MAIN_PORT} ${MAIN_USER}@${mirror} "${MKDIR_BIN} -p ${MAIN_SOFTWARE_PREFIX}/software/binary/${SYS}" >> "${LOG}-${aname}" 2>&1
 
                         if [ "${SYSTEM_NAME}" = "FreeBSD" ]; then # NOTE: feature designed for FBSD.
-                            note "Preparing service dataset for: ${cyan}${element}"
                             svcs_no_slashes="$(echo "${SERVICES_DIR}" | ${SED_BIN} 's/\///g' 2>/dev/null)"
                             inner_dir="$(${ZFS_BIN} list -H 2>/dev/null | ${GREP_BIN} "${element}$" 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null | ${SED_BIN} "s/.*${svcs_no_slashes}\///; s/\/.*//" 2>/dev/null)/"
                             certain_dataset="${SERVICES_DIR}${inner_dir}${element}"
@@ -700,6 +699,7 @@ if [ ! "$1" = "" ]; then
                             snap_file="${element}-${version_element}.${SERVICE_SNAPSHOT_POSTFIX}"
                             final_snap_file="${snap_file}${DEFAULT_ARCHIVE_EXT}"
                             snap_size="0"
+                            note "Preparing service dataset for: ${cyan}${element}${green} in: ${cyan}${full_dataset_name}"
                             ${ZFS_BIN} list -H 2>/dev/null | ${GREP_BIN} "${element}$" >/dev/null 2>&1
                             if [ "$?" = "0" ]; then # if dataset exists, unmount it, send to file, and remount back
                                 ${ZFS_BIN} umount ${full_dataset_name} || error "ZFS umount ${full_dataset_name}. Dataset busy on build host? Not good :)"
@@ -714,7 +714,7 @@ if [ ! "$1" = "" ]; then
                             fi
                         fi
 
-                        note "Preparing ${cyan}${element}${green} archives.."
+                        note "Building bundle archive of: ${cyan}${element}${green} (using: ${cyan}${CPUS}${green} CPUs)"
                         if [ ! -e "./${name}" ]; then
                             ${TAR_BIN} -cJ --use-compress-program="${XZ_BIN} --threads=${CPUS}" -f "${name}" "./${element}" 2>> ${LOG} || \
                             ${TAR_BIN} -cJf "${name}" "./${element}" 2>> ${LOG} || \
@@ -726,9 +726,9 @@ if [ ! "$1" = "" ]; then
                                 ${TAR_BIN} -cJ --use-compress-program="${XZ_BIN} --threads=${CPUS}" -f "${name}" "./${element}" 2>> ${LOG} || \
                                 ${TAR_BIN} -cJf "${name}" "./${element}" 2>> ${LOG} || \
                                 error "Failed to create archives for: ${cyan}${element}${green}"
-                                debug "Bundle archive created successfully"
+                                debug "Archived bundle is ready for deployment"
                             else
-                                note "Archive already exists. Skipping archive preparation for: ${cyan}${name}"
+                                note "Archived bundle already exists"
                             fi
                         fi
 
@@ -747,13 +747,14 @@ if [ ! "$1" = "" ]; then
                         debug "Setting common access to archive files before we send them: ${name}, ${name}.sha1"
                         ${CHMOD_BIN} a+r "${name}" "${name}.sha1"
 
-                        note "Pushing archive #${cyan}${archive_sha1}${green} to remote: ${cyan}${MAIN_BINARY_REPOSITORY}${SYS}/${name}"
+                        shortsha="$(echo "${archive_sha1}" | ${CUT_BIN} -c -16 2>/dev/null)…"
+                        note "Pushing archive #${cyan}${shortsha}${green} to remote repository.."
                         retry "${SCP_BIN} -P ${MAIN_PORT} ${name} ${address}/${name}.partial" || def_error ${name}
                         if [ "$?" = "0" ]; then
-                            ${SSH_BIN} -p ${MAIN_PORT} ${MAIN_USER}@${mirror} "cd ${MAIN_SOFTWARE_PREFIX}/software/binary/${SYS} && mv ${name}.partial ${name}"
+                            ${SSH_BIN} -p ${MAIN_PORT} ${MAIN_USER}@${mirror} "cd ${MAIN_SOFTWARE_PREFIX}/software/binary/${SYS} && ${MV_BIN} ${name}.partial ${name}"
                             retry "${SCP_BIN} -P ${MAIN_PORT} ${name}.sha1 ${address}/${name}.sha1" || def_error ${name}.sha1
                         else
-                            error "Failed to push binary build of: '${name}' to remote: ${MAIN_BINARY_REPOSITORY}${SYS}/${name}"
+                            error "Failed to push binary build of: ${cyan}${name}${red} to remote: ${cyan}${MAIN_BINARY_REPOSITORY}${SYS}/${name}"
                         fi
 
                         if [ "${SYSTEM_NAME}" = "FreeBSD" ]; then # NOTE: feature designed for FBSD.
@@ -761,7 +762,7 @@ if [ ! "$1" = "" ]; then
                                 system_path="${MAIN_SOFTWARE_PREFIX}/software/binary/${MAIN_COMMON_NAME}"
                                 address="${MAIN_USER}@${mirror}:${system_path}"
 
-                                ${SSH_BIN} -p ${MAIN_PORT} ${MAIN_USER}@${mirror} "cd ${MAIN_SOFTWARE_PREFIX}/software/binary; mkdir -p ${MAIN_COMMON_NAME} ; chmod 755 ${MAIN_COMMON_NAME}"
+                                ${SSH_BIN} -p ${MAIN_PORT} ${MAIN_USER}@${mirror} "cd ${MAIN_SOFTWARE_PREFIX}/software/binary; ${MKDIR_BIN} -p ${MAIN_COMMON_NAME} ; ${CHMOD_BIN} 755 ${MAIN_COMMON_NAME}"
 
                                 debug "Setting common access to archive files before we send it: ${final_snap_file}"
                                 ${CHMOD_BIN} a+r "${final_snap_file}"
@@ -769,7 +770,7 @@ if [ ! "$1" = "" ]; then
 
                                 retry "${SCP_BIN} -P ${MAIN_PORT} ${final_snap_file} ${address}/${final_snap_file}.partial" || def_error ${final_snap_file}
                                 if [ "$?" = "0" ]; then
-                                    ${SSH_BIN} -p ${MAIN_PORT} ${MAIN_USER}@${mirror} "cd ${MAIN_SOFTWARE_PREFIX}/software/binary/${MAIN_COMMON_NAME} && mv ${final_snap_file}.partial ${final_snap_file}"
+                                    ${SSH_BIN} -p ${MAIN_PORT} ${MAIN_USER}@${mirror} "cd ${MAIN_SOFTWARE_PREFIX}/software/binary/${MAIN_COMMON_NAME} && ${MV_BIN} ${final_snap_file}.partial ${final_snap_file}"
                                 else
                                     error "Failed to send service snapshot archive to remote!"
                                 fi
@@ -948,7 +949,7 @@ if [ ! "$1" = "" ]; then
     reload|rehash)
         if [ ! -z "${SHELL_PID}" ]; then
             update_shell_vars
-            pids=$(${PS_BIN} ax 2>/dev/null | ${GREP_BIN} -v grep 2>/dev/null | ${GREP_BIN} zsh 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)
+            pids=$(${PS_BIN} ${PS_DEFAULT_OPTS} 2>/dev/null | ${GREP_BIN} -v grep 2>/dev/null | ${GREP_BIN} zsh 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)
             note "Reloading configuration of all ${cyan}$(${BASENAME_BIN} "${SHELL}" 2>/dev/null) ${green}with pids: $(echo ${pids} | ${TR_BIN} '\n' ' ' 2>/dev/null)"
             for pid in ${pids}; do
                 ${KILL_BIN} -SIGUSR2 ${pid}
@@ -1288,8 +1289,7 @@ for application in ${APPLICATIONS}; do
                         note "   ${NOTE_CHAR2} No source given for definition (${cyan}APP_HTTP_PATH=\"\"${green}), it's only valid for meta bundles (${cyan}APP_CONFIGURE_SCRIPT=\"meta\" ${green}special)"
                     else
                         CUR_DIR="$(${PWD_BIN} 2>/dev/null)"
-
-                        if [ "${SOFIN_CONTINUE_BUILD}" != "YES"  ]; then
+                        if [ -z "${SOFIN_CONTINUE_BUILD}" ]; then
                             debug "Runtime SHA1: ${RUNTIME_SHA}"
                             export BUILD_DIR_ROOT="${CACHE_DIR}cache/${APP_NAME}${APP_POSTFIX}-${APP_VERSION}-${RUNTIME_SHA}/"
                             ${MKDIR_BIN} -p "${BUILD_DIR_ROOT}"
@@ -1345,7 +1345,7 @@ for application in ${APPLICATIONS}; do
 
                             else
                                 # git method
-                                note "   ${NOTE_CHAR2} Fetching requirement source from git repository: ${cyan}${APP_HTTP_PATH}${reset}"
+                                note "   ${NOTE_CHAR2} Fetching source from git repository: ${cyan}${APP_HTTP_PATH}${reset}"
                                 try "${GIT_BIN} clone ${APP_HTTP_PATH} ${APP_NAME}${APP_VERSION}" || \
                                 try "${GIT_BIN} clone ${APP_HTTP_PATH} ${APP_NAME}${APP_VERSION}" || \
                                 note "\n${red}Definitions were not updated. Below displaying ${cyan}${LOG_LINES_AMOUNT_ON_ERR}${green} lines of internal log:${reset}" && \
@@ -1734,17 +1734,17 @@ for application in ${APPLICATIONS}; do
                 fi
 
                 # count Sofin jobs. For more than one job available,
-                sofin_ps_list="$(${PS_BIN} axv 2>/dev/null | ${GREP_BIN} -v grep 2>/dev/null | ${EGREP_BIN} "sh ${SOFIN_BIN} (${ALL_INSTALL_PHRASES}) [A-Z].*" 2>/dev/null)"
+                sofin_ps_list="$(${PS_BIN} ${PS_DEFAULT_OPTS} 2>/dev/null | ${GREP_BIN} -v grep 2>/dev/null | ${EGREP_BIN} "sh ${SOFIN_BIN} (${ALL_INSTALL_PHRASES}) [A-Z].*" 2>/dev/null)"
                 debug "Sofin ps list: $(echo "${sofin_ps_list}" | ${TR_BIN} '\n' ' ' 2>/dev/null)"
                 sofins_all="$(echo "${sofin_ps_list}" | ${WC_BIN} -l 2>/dev/null | ${SED_BIN} 's/ //g' 2>/dev/null)"
                 sofins_running="$(echo "${sofins_all} - 1" | ${BC_BIN} 2>/dev/null)"
                 test -z "${sofins_running}" && sofins_running="0"
                 export jobs_in_parallel="NO"
                 if [ ${sofins_running} -gt 1 ]; then
-                    note "  ${NOTE_CHAR2} Found: ${cyan}${sofins_running}${green} running Sofin instances in background. Parallel jobs not allowed"
+                    note "  ${NOTE_CHAR2} Found: ${cyan}${sofins_running}${green} running Sofin instances. Parallel jobs not allowed"
                     export jobs_in_parallel="YES"
                 else
-                    note "  ${NOTE_CHAR2} Traversing through several datasets at once, since only current Sofin instance found running"
+                    note "  ${NOTE_CHAR2} Parallel jobs allowed. Traversing several datasets at once.."
                 fi
 
                 # Create a dataset for any existing dirs in Services dir that are not ZFS datasets.
@@ -1752,7 +1752,6 @@ for application in ${APPLICATIONS}; do
                 debug "Checking for non-dataset directories in ${SERVICES_DIR}: EOF:\n$(echo "${all_dirs}" | ${TR_BIN} '\n' ' ' 2>/dev/null)\nEOF\n"
                 full_bundle_name="$(${BASENAME_BIN} "${PREFIX}" 2>/dev/null)"
                 for maybe_dataset in ${all_dirs}; do
-                    debug "Normal name: ${full_bundle_name}"
                     aname="$(echo "${full_bundle_name}" | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null)"
                     app_name_lowercase="$(echo "${maybe_dataset}" | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null)"
                     if [ "${app_name_lowercase}" = "${aname}" -o ${jobs_in_parallel} = "NO" ]; then
@@ -1862,8 +1861,9 @@ done
 update_shell_vars
 
 if [ ! -z "${SHELL_PID}" ]; then
-    pids=$(${PS_BIN} ax 2>/dev/null | ${GREP_BIN} -v grep 2>/dev/null | ${GREP_BIN} zsh 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)
-    note "Reloading configuration of all ${cyan}$(${BASENAME_BIN} "${SHELL}" 2>/dev/null) ${green}with pids: ${cyan}$(echo ${pids} | ${TR_BIN} '\n' ' ' 2>/dev/null)"
+    pids=$(${PS_BIN} ${PS_DEFAULT_OPTS} 2>/dev/null | ${GREP_BIN} -v grep 2>/dev/null | ${GREP_BIN} 'zsh' 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)
+    note "Reloading ${cyan}$(${BASENAME_BIN} "${SHELL}" 2>/dev/null)${green} configurations. Sent USR2 signal to pids:"
+    note "${cyan}$(echo ${pids} | ${TR_BIN} '\n' ' ' 2>/dev/null)${reset}"
     for pid in ${pids}; do
         ${KILL_BIN} -SIGUSR2 ${pid}
     done
