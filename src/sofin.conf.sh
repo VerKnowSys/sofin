@@ -3,7 +3,7 @@
 #
 
 # Sofin version string:
-readonly SOFIN_VERSION="0.94.3"
+readonly SOFIN_VERSION="0.94.4"
 
 # setting up definitions repository
 if [ -z "${BRANCH}" ]; then
@@ -60,6 +60,7 @@ readonly INSTALLED_MARK=".installed"
 readonly LOG_LINES_AMOUNT=10
 readonly LOG_LINES_AMOUNT_ON_ERR=8
 readonly SERVICE_SNAPSHOT_POSTFIX="zfs-stream"
+readonly PS_DEFAULT_OPTS="-axS"
 
 # utils software from POSIX base system variables:
 PRINTF_BIN="/usr/bin/printf"

@@ -1185,9 +1185,18 @@ for application in ${APPLICATIONS}; do
                             cd ${BINBUILDS_CACHE_DIR}${ABSNAME}
                             try "${FETCH_BIN} ${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}.sha1" || \
                             try "${FETCH_BIN} ${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}.sha1"
-                            try "${FETCH_BIN} ${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}" || \
-                            try "${FETCH_BIN} ${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}" || \
+                            if [ "$?" = "0" ]; then
+                                try "${FETCH_BIN} ${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}" || \
+                                try "${FETCH_BIN} ${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}" && \
+                                try "${FETCH_BIN} ${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}"
+                                if [ "$?" = "0" ]; then
+                                    debug "Fetched: ${ARCHIVE_NAME}"
+                                else
+                                    error "Failure fetching binary build. Please check your network connection"
+                                fi
+                            else
                                 note "No binary build available for: ${cyan}${MIDDLE}/${APP_NAME}${APP_POSTFIX}-${APP_VERSION}"
+                            fi
 
                             # checking archive sha1 checksum
                             if [ -e "./${ARCHIVE_NAME}" ]; then
@@ -1348,10 +1357,14 @@ for application in ${APPLICATIONS}; do
                                 note "   ${NOTE_CHAR2} Fetching source from git repository: ${cyan}${APP_HTTP_PATH}${reset}"
                                 try "${GIT_BIN} clone ${APP_HTTP_PATH} ${APP_NAME}${APP_VERSION}" || \
                                 try "${GIT_BIN} clone ${APP_HTTP_PATH} ${APP_NAME}${APP_VERSION}" || \
-                                note "\n${red}Definitions were not updated. Below displaying ${cyan}${LOG_LINES_AMOUNT_ON_ERR}${green} lines of internal log:${reset}" && \
-                                ${TAIL_BIN} -n${LOG_LINES_AMOUNT_ON_ERR} ${LOG} 2>/dev/null && \
-                                note "_________________________________________________________"
-                                exit 1
+                                try "${GIT_BIN} clone ${APP_HTTP_PATH} ${APP_NAME}${APP_VERSION}"
+                                if [ "$?" = "0" ]; then
+                                    debug "Fetched repository: ${APP_NAME}${APP_VERSION}"
+                                else
+                                    note "\n${red}Definitions were not updated. Below displaying ${cyan}${LOG_LINES_AMOUNT_ON_ERR}${green} lines of internal log:${reset}"
+                                    ${TAIL_BIN} -n${LOG_LINES_AMOUNT_ON_ERR} ${LOG} 2>/dev/null
+                                    error "_________________________________________________________"
+                                fi
                             fi
 
                             export BUILD_DIR="$(${FIND_BIN} ${BUILD_DIR_ROOT}/* -maxdepth 0 -type d -name "*${APP_VERSION}*" 2>/dev/null)"
