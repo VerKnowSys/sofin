@@ -138,8 +138,7 @@ update_definitions () {
 
             note "${red}Error occured: Update from branch: ${BRANCH} of repository: ${REPOSITORY} wasn't possible. Log below:${reset}"
             ${TAIL_BIN} -n${LOG_LINES_AMOUNT_ON_ERR} ${LOG} 2>/dev/null
-            note "_________________________________________________________"
-            exit 1
+            error "_________________________________________________________"
 
         else # else use default branch
             debug "Using default branch: ${BRANCH}"
@@ -152,8 +151,7 @@ update_definitions () {
 
             note "${red}Error occured: Update from branch: ${BRANCH} of repository: ${REPOSITORY} wasn't possible. Log below:${reset}"
             ${TAIL_BIN} -n${LOG_LINES_AMOUNT_ON_ERR} ${LOG} 2>/dev/null
-            note "_________________________________________________________"
-            exit 1
+            error "_________________________________________________________"
         fi
     else
         # create cache; clone definitions repository:
@@ -174,8 +172,7 @@ update_definitions () {
 
         note "${red}Error occured: Update from branch: ${BRANCH} of repository: ${REPOSITORY} wasn't possible. Log below:${reset}"
         ${TAIL_BIN} -n${LOG_LINES_AMOUNT_ON_ERR} ${LOG} 2>/dev/null
-        note "_________________________________________________________"
-        exit 1
+        error "_________________________________________________________"
     fi
 }
 
