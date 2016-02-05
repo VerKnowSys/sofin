@@ -714,21 +714,21 @@ if [ ! "$1" = "" ]; then
                             fi
                         fi
 
-                        note "Building bundle archive of: ${cyan}${element}${green} (using: ${cyan}${CPUS}${green} CPUs)"
+                        note "Building bundle archive of: ${cyan}${element}${green} (using: ${cyan}${CPUS}${green} threads)"
                         if [ ! -e "./${name}" ]; then
                             ${TAR_BIN} -cJ --use-compress-program="${XZ_BIN} --threads=${CPUS}" -f "${name}" "./${element}" 2>> ${LOG} || \
                             ${TAR_BIN} -cJf "${name}" "./${element}" 2>> ${LOG} || \
                             error "Failed to create archives for: ${cyan}${element}${green}"
                         else
                             if [ ! -e "./${name}.sha1" ]; then
-                                debug "Found sha-less archive. It may be incomplete or damaged. Rebuilding.."
+                                debug "Found sha-less archive. It may be incomplete or damaged. Rebuilding (using: ${cyan}${CPUS}${green} threads)"
                                 ${RM_BIN} -f "${name}"
                                 ${TAR_BIN} -cJ --use-compress-program="${XZ_BIN} --threads=${CPUS}" -f "${name}" "./${element}" 2>> ${LOG} || \
                                 ${TAR_BIN} -cJf "${name}" "./${element}" 2>> ${LOG} || \
                                 error "Failed to create archives for: ${cyan}${element}${green}"
                                 debug "Archived bundle is ready for deployment"
                             else
-                                note "Archived bundle already exists"
+                                note "Archived bundle already exists and it's ready for deployment"
                             fi
                         fi
 
@@ -1347,7 +1347,7 @@ for application in ${APPLICATIONS}; do
                                     fi
                                 fi
 
-                                note "   ${NOTE_CHAR2} Unpacking source code of: ${cyan}${APP_NAME}"
+                                note "   ${NOTE_CHAR2} Unpacking source code of: ${cyan}${APP_NAME} (using: ${cyan}${CPUS}${green} threads)"
                                 debug "Build dir root: ${BUILD_DIR_ROOT}"
                                 try "${TAR_BIN} -xJ --use-compress-program='${XZ_BIN} -T${CPUS}' -f ${file}" || \
                                 run "${TAR_BIN} -xJf ${file}"
