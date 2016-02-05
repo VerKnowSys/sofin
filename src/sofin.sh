@@ -19,8 +19,8 @@ SOFIN_ARGS=$*
 SOFIN_ARGS_FULL="${SOFIN_ARGS}"
 SOFIN_ONLYNAME="$(${BASENAME_BIN} "${SOFIN_BIN}" 2>/dev/null)"
 readonly SOFIN_ARGS="$(echo ${SOFIN_ARGS} | ${CUT_BIN} -d' ' -f2- 2>/dev/null)"
-readonly ALL_INSTALL_PHRASES="i|install|get|pick|choose|use|switch"
-readonly BUILD_DEPLOY_AND_PUSH_PHRASES="b|build|d|deploy|p|push|binpush|send"
+readonly ALL_INSTALL_PHRASES="i|install|get|pick|choose|use|switch|p|push|binpush|send"
+readonly BUILD_DEPLOY_PHRASES="b|build|d|deploy"
 
 # Some lazy shortcuts..
 FILES_COUNT_GUARD="${WC_BIN} -l 2>/dev/null | ${SED_BIN} 's/ //g' 2>/dev/null"
