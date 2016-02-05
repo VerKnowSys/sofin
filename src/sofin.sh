@@ -1183,7 +1183,7 @@ for application in ${APPLICATIONS}; do
                         if [ ! -e "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" ]; then
                             cd ${BINBUILDS_CACHE_DIR}${ABSNAME}
                             try "${FETCH_BIN} ${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}.sha1" || \
-                            try "${FETCH_BIN} ${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}.sha1" || \
+                            try "${FETCH_BIN} ${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}.sha1"
                             try "${FETCH_BIN} ${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}" || \
                             try "${FETCH_BIN} ${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}" || \
                                 note "No binary build available for: ${cyan}${MIDDLE}/${APP_NAME}${APP_POSTFIX}-${APP_VERSION}"
