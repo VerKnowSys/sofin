@@ -370,7 +370,7 @@ if [ ! "$1" = "" ]; then
         ;;
 
 
-    hack)
+    hack|h)
         create_cache_directories
         if [ -z "${2}" ]; then
             error "No pattern specified"
