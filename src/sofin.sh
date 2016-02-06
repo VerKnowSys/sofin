@@ -340,14 +340,16 @@ perform_clean () {
 
 
 fail_on_background_sofin_job () {
-    dep=$*
-    debug "Checking for background jobs of: ${dep}"
-    sofin_ps_list="$(${PS_BIN} ${PS_DEFAULT_OPTS} 2>/dev/null | ${GREP_BIN} -v grep 2>/dev/null | ${EGREP_BIN} "sh ${SOFIN_BIN} (${BUILD_DEPLOY_AND_PUSH_PHRASES}) ${dep}" 2>/dev/null)"
-    debug "pslist: ${sofin_ps_list}"
-    sofins_all="$(echo "${sofin_ps_list}" | ${WC_BIN} -l 2>/dev/null | ${SED_BIN} 's/ //g' 2>/dev/null)"
-    debug "sofins_all: ${sofin_ps_list}"
-    test ${sofins_all} -gt 2 && \
-        error "Found currently processing jobs, for software bundle: ${cyan}${dep}${red}. Task aborted"
+    deps=$*
+    for dep in ${deps}; do
+        debug "Checking for background jobs of: ${dep}"
+        sofin_ps_list="$(${PS_BIN} ${PS_DEFAULT_OPTS} 2>/dev/null | ${GREP_BIN} -v grep 2>/dev/null | ${EGREP_BIN} "sh ${SOFIN_BIN} (${BUILD_DEPLOY_PHRASES}) ${dep}" 2>/dev/null)"
+        debug "pslist: ${sofin_ps_list}"
+        sofins_all="$(echo "${sofin_ps_list}" | ${WC_BIN} -l 2>/dev/null | ${SED_BIN} 's/ //g' 2>/dev/null)"
+        debug "sofins_all: ${sofin_ps_list}"
+        test ${sofins_all} -gt 2 && \
+            error "Found currently processing jobs, for software bundle: ${cyan}${dep}${red}. Task aborted"
+    done
     unset dep sofin_ps_list sofins_all
 }
 
