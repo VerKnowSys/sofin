@@ -3,7 +3,7 @@
 #
 
 # Sofin version string:
-readonly SOFIN_VERSION="0.94.4"
+readonly SOFIN_VERSION="0.96.0"
 
 # setting up definitions repository
 if [ -z "${BRANCH}" ]; then
@@ -214,7 +214,7 @@ export readonly SYSTEM_NAME="$(uname -s 2>/dev/null)"
 export readonly SYSTEM_ARCH="$(uname -m 2>/dev/null)"
 
 if [ -z "${DEBUGBUILD}" ]; then
-    export readonly DEFAULT_COMPILER_FLAGS="-Os -fPIC -fPIE -fno-strict-overflow -fstack-protector-all"
+    export readonly DEFAULT_COMPILER_FLAGS="-O2 -fPIC -fPIE -fno-strict-overflow -fstack-protector-all"
 else
     export readonly DEFAULT_COMPILER_FLAGS="-O0 -ggdb -fPIC -fPIE -fno-strict-overflow -fstack-protector-all"
 fi
