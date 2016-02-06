@@ -1393,6 +1393,7 @@ for application in ${APPLICATIONS}; do
                             LIST_DIR="${DEFINITIONS_DIR}patches/$1" # $1 is definition file name
                             if [ -d "${LIST_DIR}" ]; then
                                 patches_files="$(${FIND_BIN} ${LIST_DIR}/* -maxdepth 0 -type f 2>/dev/null)"
+                                ${TEST_BIN} ! -z "${patches_files}" && \
                                 note "   ${NOTE_CHAR2} Applying common patches for: ${cyan}${APP_NAME}${APP_POSTFIX}"
                                 for patch in ${patches_files}; do
                                     for level in 0 1 2 3 4 5; do
@@ -1409,6 +1410,7 @@ for application in ${APPLICATIONS}; do
                                 if [ -d "${pspatch_dir}" ]; then
                                     note "   ${NOTE_CHAR2} Applying platform specific patches for: ${cyan}${APP_NAME}${APP_POSTFIX}/${SYSTEM_NAME}"
                                     patches_files="$(${FIND_BIN} ${pspatch_dir}/* -maxdepth 0 -type f 2>/dev/null)"
+                                    ${TEST_BIN} ! -z "${patches_files}" && \
                                     for platform_specific_patch in ${patches_files}; do
                                         for level in 0 1 2 3 4 5; do
                                             debug "Patching source code with pspatch: ${platform_specific_patch} (p${level})"
