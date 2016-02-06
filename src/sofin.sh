@@ -1171,7 +1171,7 @@ for application in ${APPLICATIONS}; do
 
             # binary build of whole software bundle
             ABSNAME="${APP_NAME}${APP_POSTFIX}-${APP_VERSION}"
-            ${MKDIR_BIN} -p "${BINBUILDS_CACHE_DIR}${ABSNAME}" > /dev/null 2>&1
+            ${MKDIR_BIN} -p "${BINBUILDS_CACHE_DIR}${ABSNAME}"
 
             MIDDLE="${SYSTEM_NAME}-${FULL_SYSTEM_VERSION}-${SYSTEM_ARCH}"
             ARCHIVE_NAME="${APP_NAME}${APP_POSTFIX}-${APP_VERSION}${DEFAULT_ARCHIVE_EXT}"
@@ -1180,7 +1180,7 @@ for application in ${APPLICATIONS}; do
             if [ "${SOFIN_CONTINUE_BUILD}" != "YES" ]; then # normal build by default
                 if [ ! -e "${INSTALLED_INDICATOR}" ]; then
                     if [ "${USE_BINBUILD}" = "false" ]; then
-                        debug "   ${NOTE_CHAR2} Binary build check was skipped"
+                        debug "Binary build check was skipped"
                     else
                         aname="$(echo "${APP_NAME}${APP_POSTFIX}" | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null)"
                         if [ ! -e "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" ]; then
@@ -1244,7 +1244,7 @@ for application in ${APPLICATIONS}; do
                         fi
                     fi
                 else
-                    note "Software already installed: ${cyan}${APP_NAME}${APP_POSTFIX} ${green}with version: ${cyan}$(${CAT_BIN} ${INSTALLED_INDICATOR} 2>/dev/null)"
+                    note "${cyan}${APP_NAME}${APP_POSTFIX}${green} bundle is installed: v${cyan}$(${CAT_BIN} ${INSTALLED_INDICATOR} 2>/dev/null)"
                     export DONT_BUILD_BUT_DO_EXPORTS="true"
                 fi
 
@@ -1632,7 +1632,7 @@ for application in ${APPLICATIONS}; do
                 note "  ${NOTE_CHAR2} Defined no binaries to export of prefix: ${cyan}${PREFIX}"
             else
                 aname="$(echo "${APP_NAME}${APP_POSTFIX}" | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null)"
-                note "  ${NOTE_CHAR2} Exporting binaries: ${cyan}${APP_EXPORTS}${green}, of prefix: ${cyan}${PREFIX}"
+                note "Exporting binaries: ${cyan}${APP_EXPORTS}${green}, of prefix: ${cyan}${PREFIX}"
                 ${MKDIR_BIN} -p "${PREFIX}/exports"
                 EXPORT_LIST=""
                 for exp in ${APP_EXPORTS}; do
@@ -1728,9 +1728,9 @@ for application in ${APPLICATIONS}; do
                 if [ "${result}" -lt "0" ]; then
                     result="0"
                 fi
-                note "  ${NOTE_CHAR2} Clean complete. ${cyan}${result} ${green}files stripped"
+                note "Clean completed, ${cyan}${result}${green} files were stripped"
             else
-                warn "  ${NOTE_CHAR2} Debug build is enabled. Strip skipped."
+                warn "Debug build is enabled. Strip skipped"
             fi
         fi
 
@@ -1745,7 +1745,7 @@ for application in ${APPLICATIONS}; do
                 # start from checking ${SERVICES_DIR}/Bundlename directory
                 if [ ! -d "${SERVICE_DIR}" ]; then
                     ${MKDIR_BIN} -p "${SERVICE_DIR}" && \
-                    note "  ${NOTE_CHAR2} Prepared service directory in: ${cyan}${SERVICE_DIR}"
+                    note "Prepared service directory in: ${cyan}${SERVICE_DIR}"
                 fi
 
                 # count Sofin jobs. For more than one job available,
@@ -1756,10 +1756,10 @@ for application in ${APPLICATIONS}; do
                 test -z "${sofins_running}" && sofins_running="0"
                 export jobs_in_parallel="NO"
                 if [ ${sofins_running} -gt 1 ]; then
-                    note "  ${NOTE_CHAR2} Found: ${cyan}${sofins_running}${green} running Sofin instances. Parallel jobs not allowed"
+                    note "Found: ${cyan}${sofins_running}${green} running Sofin instances. Parallel jobs not allowed"
                     export jobs_in_parallel="YES"
                 else
-                    note "  ${NOTE_CHAR2} Parallel jobs allowed. Traversing several datasets at once.."
+                    note "Parallel jobs allowed. Traversing several datasets at once.."
                 fi
 
                 # Create a dataset for any existing dirs in Services dir that are not ZFS datasets.
@@ -1798,14 +1798,14 @@ for application in ${APPLICATIONS}; do
                             try "${FETCH_BIN} ${remote_path}"
                             if [ "$?" = "0" ]; then
                                 debug "Stream archive available. Creating service dataset: ${dataset_name} from file stream: ${final_snap_file}"
-                                note "  ${NOTE_CHAR2} Dataset: ${cyan}${dataset_name} ${green}$(${XZCAT_BIN} "${final_snap_file}" | ${ZFS_BIN} receive -v "${dataset_name}" 2>/dev/null | ${TAIL_BIN} -n1)"
+                                note "Dataset: ${cyan}${dataset_name} ${green}$(${XZCAT_BIN} "${final_snap_file}" | ${ZFS_BIN} receive -v "${dataset_name}" 2>/dev/null | ${TAIL_BIN} -n1)"
                                 ${ZFS_BIN} rename ${dataset_name}@--head-- @origin && \
                                 debug "Cleaning snapshot file: ${final_snap_file}, after successful receive"
                                 ${RM_BIN} -f "${final_snap_file}"
                             else
                                 debug "Initial service dataset unavailable"
                                 ${ZFS_BIN} create "${dataset_name}" 2>/dev/null && \
-                                note "  ${NOTE_CHAR2} Created an empty service dataset for: ${cyan}${dataset_name}"
+                                note "Created an empty service dataset for: ${cyan}${dataset_name}"
                             fi
                         }
 
@@ -1836,7 +1836,7 @@ for application in ${APPLICATIONS}; do
             APP_NAME="$(${PRINTF_BIN} "${APP_NAME}" | ${CUT_BIN} -c1 2>/dev/null | ${TR_BIN} '[a-z]' '[A-Z]' 2>/dev/null)$(${PRINTF_BIN} "${APP_NAME}" | ${SED_BIN} 's/^[a-zA-Z]//' 2>/dev/null)"
             APP_BUNDLE_NAME="${PREFIX}.app"
             aname="$(echo "${APP_NAME}${APP_POSTFIX}" | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null)"
-            note "  ${NOTE_CHAR2} Creating Apple bundle: ${cyan}${APP_NAME} ${green}in: ${cyan}${APP_BUNDLE_NAME}"
+            note "Creating Apple bundle: ${cyan}${APP_NAME} ${green}in: ${cyan}${APP_BUNDLE_NAME}"
             ${MKDIR_BIN} -p "${APP_BUNDLE_NAME}/libs"
             ${MKDIR_BIN} -p "${APP_BUNDLE_NAME}/Contents"
             ${MKDIR_BIN} -p "${APP_BUNDLE_NAME}/Contents/Resources/${APP_LOWERNAME}"
@@ -1861,10 +1861,10 @@ for application in ${APPLICATIONS}; do
             cd "${APP_BUNDLE_NAME}/Contents"
             test -L MacOS || ${LN_BIN} -s ../exports MacOS >> ${LOG}-${aname} 2>&1
 
-            note "  ${NOTE_CHAR2} Creating relative libraries search path"
+            note "Creating relative libraries search path"
             cd ${APP_BUNDLE_NAME}
 
-            note "  ${NOTE_CHAR2} Processing exported binary: ${cyan}${i}"
+            note "Processing exported binary: ${cyan}${i}"
             ${SOFIN_LIBBUNDLE_BIN} -x "${APP_BUNDLE_NAME}/Contents/MacOS/${APP_LOWERNAME}" >> ${LOG}-${aname} 2>&1
 
         fi
