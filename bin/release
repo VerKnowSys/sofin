@@ -10,11 +10,18 @@ else
     exit 1
 fi
 
+readonly SOFIN_ORIGIN="git@bitbucket.org:verknowsys/sofin.git"
 readonly SOFIN_MIRROR="git@github.com:VerKnowSys/sofin.git"
 
-note "Pushing repo to: ${SOFIN_MIRROR}"
-${GIT_BIN} push --all "${SOFIN_MIRROR}" && \
-${GIT_BIN} push --tags "${SOFIN_MIRROR}" && \
+note "Pulling from origin and mirror.."
+${GIT_BIN} pull "${SOFIN_ORIGIN}"
+${GIT_BIN} pull "${SOFIN_MIRROR}"
+
+note "Pushing repo to origin: ${SOFIN_ORIGIN} and mirror: ${SOFIN_MIRROR}"
+${GIT_BIN} push --all "${SOFIN_ORIGIN}" >/dev/null && \
+${GIT_BIN} push --tags "${SOFIN_ORIGIN}" >/dev/null && \
+${GIT_BIN} push --all "${SOFIN_MIRROR}" >/dev/null && \
+${GIT_BIN} push --tags "${SOFIN_MIRROR}" >/dev/null && \
 bin/clean
 ${MKDIR_BIN} -p releases
 version="$(grep 'readonly SOFIN_VERSION=' src/sofin.conf.sh | awk '{ gsub(/\"/, "", $2); gsub(/SOFIN_VERSION=/, "", $2); print $2; }')"
