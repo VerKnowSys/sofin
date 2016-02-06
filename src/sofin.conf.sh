@@ -344,7 +344,7 @@ check_command_result () {
         debug "Command successful: '$*'"
     else
         shift
-        error "Command failure: '$*'. Run ${cyan}$(${BASENAME_BIN} ${SOFIN_BIN} 2>/dev/null) log yodef${green}, to see what went wrong"
+        error "Command failure: '$*'. Run ${cyan}$(${BASENAME_BIN} ${SOFIN_BIN} 2>/dev/null) log your-def${red}, to see what went wrong"
         exit 1
     fi
 }
