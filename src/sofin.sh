@@ -388,10 +388,24 @@ if [ ! "$1" = "" ]; then
         for dir in ${all_dirs}; do
             note
             warn "_________________________________________________________"
-            warn "Exit that shell to continue with next build dir!"
+            warn "Quit viever/ Exit that shell, to continue with next build dir"
+            warn "Sofin will now traverse through build logs, looking for errors.."
+
             currdir="$(${PWD_BIN} 2>/dev/null)"
             cd "${dir}"
-            eval "cd ${dir} && ${ZSH_BIN} --login"
+
+            found_any=""
+            log_viewer="${LESS_BIN} ${LESS_DEFAULT_OPTIONS} +/error:"
+            for logfile in config.log build.log CMakeFiles/CMakeError.log CMakeFiles/CMakeOutput.log; do
+                if [ -f "${logfile}" ]; then
+                    found_any="yes"
+                    eval "cd ${dir} && ${ZSH_BIN} --login -c '${log_viewer} ${logfile} || exit'"
+                fi
+            done
+            if [ -z "${found_any}" ]; then
+                note "Entering build dir.."
+                eval "cd ${dir} && ${ZSH_BIN} --login"
+            fi
             cd "${currdir}"
             warn "---------------------------------------------------------"
         done
