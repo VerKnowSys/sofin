@@ -1549,7 +1549,7 @@ for application in ${APPLICATIONS}; do
 
             if [ -z "${DONT_BUILD_BUT_DO_EXPORTS}" ]; then
                 if [ -z "${APP_REQUIREMENTS}" ]; then
-                    note "Installing: ${cyan}${application} ${green}v${cyan}${APP_VERSION}"
+                    note "Installing: ${cyan}${application} ${green}v${cyan}${APP_VERSION}${green} (${APP_FULL_NAME})"
                 else
                     note "Installing: ${cyan}${application} ${green}v${cyan}${APP_VERSION}${green}, with requirements: ${cyan}${APP_REQUIREMENTS}"
                 fi
