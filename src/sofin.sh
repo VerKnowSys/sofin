@@ -95,7 +95,7 @@ retry () {
                 ${MKDIR_BIN} -p "${LOGS_DIR}"
             fi
             gitroot="$(${BASENAME_BIN} $(${BASENAME_BIN} ${GIT_BIN}))"
-            eval PATH="/bin:/usr/bin:${gitroot}/bin:${gitroot}/libexec/git-core" "$@" >> "${LOG}" 2>&1 && \
+            eval PATH="/bin:/usr/bin:${gitroot}/bin:${gitroot}/libexec/git-core" "$@" >> "${LOG}" 2>> "${LOG}" && \
             return 0
         else
             error "An empty command to retry?"
