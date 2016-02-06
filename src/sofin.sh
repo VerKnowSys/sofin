@@ -227,6 +227,7 @@ usage_howto () {
     note "  ${cyan}dev                                  ${gray}-${green} puts definition content on the fly. Second argument is (lowercase) definition name (no extension). (example: sofin dev rubinius)"
     note "  ${cyan}rebuild                              ${gray}-${green} rebuilds and pushes each software bundle that depends on definition given as a param. (example: ${SOFIN_ONLYNAME} rebuild openssl - will rebuild all bundles that have 'openssl' dependency)"
     note "  ${cyan}reset                               ${gray}-${green} resets local definitions repository"
+    note "  ${cyan}diff                                ${gray}-${green} displays changes in current definitions cache. Accepts any part of definition name"
 
     exit
 }
@@ -364,6 +365,33 @@ if [ ! "$1" = "" ]; then
         fi
         note "Paste your definition below. Hit ctrl-d after a newline to commit"
         ${CAT_BIN} > ${DEFINITIONS_DIR}/${2}.def 2>/dev/null
+        exit
+        ;;
+
+
+
+    diffs|diff)
+        create_cache_directories
+        defname="${2}"
+        # if specified a file name, make sure it's named properly:
+        ${EGREP_BIN} '\.def$' "${defname}" >/dev/null 2>&1 || \
+            defname="${defname}.def"
+        beauty_defn="${cyan}${defname}${green}"
+
+        cd ${DEFINITIONS_DIR}
+        if [ -f "./${defname}" ]; then
+            debug "Checking status for untracked files.."
+            ${GIT_BIN} status --short "${defname}" 2>/dev/null | ${EGREP_BIN} '\?\?' >/dev/null 2>&1
+            if [ "$?" = "0" ]; then # found "??" which means file is untracked..
+                note "No diff available for definition: ${beauty_defn} (currently untracked)"
+            else
+                note "Showing detailed modifications of defintion: ${beauty_defn}"
+            fi
+            ${GIT_BIN} status -vv --long "${defname}" 2>/dev/null
+        else
+            note "Showing all modifications from current defintions cache"
+            ${GIT_BIN} status --short 2>/dev/null
+        fi
         exit
         ;;
 
