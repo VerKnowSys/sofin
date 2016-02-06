@@ -1349,7 +1349,7 @@ for application in ${APPLICATIONS}; do
                                     fi
                                 fi
 
-                                note "   ${NOTE_CHAR2} Unpacking source code of: ${cyan}${APP_NAME} (using: ${cyan}${CPUS}${green} threads)"
+                                note "   ${NOTE_CHAR2} Unpacking source code of: ${cyan}${APP_NAME}${green} (using: ${cyan}${CPUS}${green} threads)"
                                 debug "Build dir root: ${BUILD_DIR_ROOT}"
                                 try "${TAR_BIN} -xJ --use-compress-program='${XZ_BIN} -T${CPUS}' -f ${file}" || \
                                 run "${TAR_BIN} -xJf ${file}"
