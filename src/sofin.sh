@@ -121,7 +121,7 @@ update_definitions () {
         INITIAL_DEFINITIONS="${MAIN_SOURCE_REPOSITORY}initial-definitions${DEFAULT_ARCHIVE_EXT}"
         debug "Fetching latest tarball with initial definitions from: ${INITIAL_DEFINITIONS}"
         retry "${FETCH_BIN} ${INITIAL_DEFINITIONS}" && \
-        ${TAR_BIN} -xJ --use-compress-program="${XZ_BIN} -T${CPUS}" -f *${DEFAULT_ARCHIVE_EXT} >> ${LOG} 2>&1 && \
+        ${TAR_BIN} -xJf *${DEFAULT_ARCHIVE_EXT} >> ${LOG} 2>&1 && \
         ${RM_BIN} -vrf "$(${BASENAME_BIN} ${INITIAL_DEFINITIONS} 2>/dev/null)"
         return
     fi
@@ -1288,8 +1288,7 @@ for application in ${APPLICATIONS}; do
 
                         debug "ARCHIVE_NAME: ${ARCHIVE_NAME}. Expecting binbuild to be available in: ${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}"
                         if [ -e "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" ]; then # if exists, then checksum is ok
-                            ${TAR_BIN} -xJ --use-compress-program="${XZ_BIN} --threads=${CPUS}" -f "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" >> ${LOG}-${aname} 2>&1 || \
-                            ${TAR_BIN} -xJf "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" >> ${LOG}-${aname} 2>&1
+                            ${TAR_BIN} -xJf "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" >> "${LOG}-${aname}" 2>> "${LOG}-${aname}"
                             if [ "$?" = "0" ]; then # if archive is valid
                                 note "  ${NOTE_CHAR2} Binary bundle installed: ${cyan}${APP_NAME}${APP_POSTFIX} ${green}with version: ${cyan}${APP_VERSION}"
                                 export DONT_BUILD_BUT_DO_EXPORTS="true"
@@ -1407,9 +1406,9 @@ for application in ${APPLICATIONS}; do
                                     fi
                                 fi
 
-                                note "   ${NOTE_CHAR2} Unpacking source code of: ${cyan}${APP_NAME}${green} (using: ${cyan}${CPUS}${green} threads)"
+                                note "   ${NOTE_CHAR2} Unpacking source code of: ${cyan}${APP_NAME}${green}"
                                 debug "Build dir root: ${BUILD_DIR_ROOT}"
-                                try "${TAR_BIN} -xJ --use-compress-program='${XZ_BIN} -T${CPUS}' -f ${file}" || \
+                                try "${TAR_BIN} -xJf ${file}" || \
                                 run "${TAR_BIN} -xJf ${file}"
 
                             else
