@@ -228,6 +228,7 @@ usage_howto () {
     note "  ${cyan}rebuild                              ${gray}-${green} rebuilds and pushes each software bundle that depends on definition given as a param. (example: ${SOFIN_ONLYNAME} rebuild openssl - will rebuild all bundles that have 'openssl' dependency)"
     note "  ${cyan}reset                               ${gray}-${green} resets local definitions repository"
     note "  ${cyan}diff                                ${gray}-${green} displays changes in current definitions cache. Accepts any part of definition name"
+    note "  ${cyan}hack                                ${gray}-${green} hack through build dirs matching pattern given as param"
 
     exit
 }
@@ -368,6 +369,35 @@ if [ ! "$1" = "" ]; then
         exit
         ;;
 
+
+    hack)
+        create_cache_directories
+        if [ -z "${2}" ]; then
+            error "No pattern specified"
+        fi
+        pattern="${2}"
+        beauty_pat="${cyan}*${pattern}*${green}"
+        all_dirs=$(${FIND_BIN} ${CACHE_DIR}cache -type d -mindepth 2 -iname "*${pattern}*" 2>/dev/null)
+        amount="$(echo "${all_dirs}" | ${WC_BIN} -l 2>/dev/null | ${TR_BIN} -d '\t|\r|\ ' 2>/dev/null)"
+        ${TEST_BIN} -z "${amount}" && amount="0"
+        if [ -z "${all_dirs}" ]; then
+            error "No matching build dirs found for pattern: ${beauty_pat}"
+        else
+            note "Sofin will now walk through: ${cyan}${amount}${green} build dirs in: ${cyan}${CACHE_DIR}cache${green}, that matches pattern: ${beauty_pat}"
+        fi
+        for dir in ${all_dirs}; do
+            note
+            warn "_________________________________________________________"
+            warn "Exit that shell to continue with next build dir!"
+            currdir="$(${PWD_BIN} 2>/dev/null)"
+            cd "${dir}"
+            eval "cd ${dir} && ${ZSH_BIN} --login"
+            cd "${currdir}"
+            warn "---------------------------------------------------------"
+        done
+        note "Hack process finished for pattern: ${beauty_pat}"
+        exit
+        ;;
 
 
     diffs|diff)
