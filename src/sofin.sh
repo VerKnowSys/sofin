@@ -854,7 +854,7 @@ if [ ! "$1" = "" ]; then
         dependencies=$*
         note "Software bundles to be built: ${cyan}${dependencies}"
         def_error () {
-            error "Failure in definition: ${cyan}${software}${red}. Report or fix the definition please!"
+            error "Failure in build process. Report or fix the definition please!"
         }
         fail_on_background_sofin_job ${dependencies}
         USE_UPDATE=false USE_BINBUILD=false ${SOFIN_BIN} install ${dependencies} || def_error
@@ -868,7 +868,7 @@ if [ ! "$1" = "" ]; then
         dependencies=$*
         note "Software bundles to be built and deployed to remote: ${cyan}${dependencies}"
         def_error () {
-            error "Failure in definition: ${cyan}${software}${red}. Report or fix the definition please!"
+            error "Failure in deploy. Report or fix the definition please!"
         }
         for software in ${dependencies}; do
             fail_on_background_sofin_job ${software}
