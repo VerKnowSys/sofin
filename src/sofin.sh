@@ -1355,18 +1355,38 @@ for application in ${APPLICATIONS}; do
                                 run "${TAR_BIN} -xJf ${file}"
 
                             else
-                                # git method
-                                note "   ${NOTE_CHAR2} Fetching source from git repository: ${cyan}${APP_HTTP_PATH}${reset}"
-                                try "${GIT_BIN} clone ${APP_HTTP_PATH} ${APP_NAME}${APP_VERSION}" || \
-                                try "${GIT_BIN} clone ${APP_HTTP_PATH} ${APP_NAME}${APP_VERSION}" || \
-                                try "${GIT_BIN} clone ${APP_HTTP_PATH} ${APP_NAME}${APP_VERSION}"
+                                # git method:
+                                # .cache/git-cache => git bare repos
+                                ${MKDIR_BIN} -p ${GIT_CACHE_DIR}
+                                app_cache_dir="${GIT_CACHE_DIR}${APP_NAME}${APP_VERSION}.git"
+                                note "   ${NOTE_CHAR2} Fetching git repository: ${cyan}${APP_HTTP_PATH}${reset}"
+                                try "${GIT_BIN} clone --depth 1 --bare ${APP_HTTP_PATH} ${app_cache_dir}" || \
+                                try "${GIT_BIN} clone --depth 1 --bare ${APP_HTTP_PATH} ${app_cache_dir}" || \
+                                try "${GIT_BIN} clone --depth 1 --bare ${APP_HTTP_PATH} ${app_cache_dir}"
                                 if [ "$?" = "0" ]; then
-                                    debug "Fetched repository: ${APP_NAME}${APP_VERSION}"
+                                    debug "Fetched bare repository: ${APP_NAME}${APP_VERSION}"
                                 else
-                                    note "\n${red}Definitions were not updated. Below displaying ${cyan}${LOG_LINES_AMOUNT_ON_ERR}${green} lines of internal log:${reset}"
-                                    ${TAIL_BIN} -n${LOG_LINES_AMOUNT_ON_ERR} ${LOG} 2>/dev/null
-                                    error "_________________________________________________________"
+                                    if [ ! -d "${app_cache_dir}/branches" -a ! -f "${app_cache_dir}/config" ]; then
+                                        note "\n${red}Definitions were not updated. Below displaying ${cyan}${LOG_LINES_AMOUNT_ON_ERR}${green} lines of internal log:${reset}"
+                                        ${TAIL_BIN} -n${LOG_LINES_AMOUNT_ON_ERR} ${LOG} 2>/dev/null
+                                        error "_________________________________________________________"
+                                    else
+                                        current="$(${PWD_BIN} 2>/dev/null)"
+                                        debug "Trying to update existing bare repository cache in: ${app_cache_dir}"
+                                        cd "${app_cache_dir}"
+                                        try "${GIT_BIN} fetch origin ${APP_GIT_CHECKOUT}" || \
+                                        try "${GIT_BIN} fetch origin ${APP_GIT_CHECKOUT}" || \
+                                        warn "Failed to fetch an update from bare repository: ${cyan}${app_cache_dir}"
+                                        # for empty APP_VERSION it will fill it with first 16 chars of repository HEAD SHA1:
+                                        if [ -z "${APP_VERSION}" ]; then
+                                            APP_VERSION="$(${GIT_BIN} rev-parse HEAD 2>/dev/null | ${CUT_BIN} -c -16 2>/dev/null)"
+                                        fi
+                                        cd "${current}"
+                                    fi
                                 fi
+                                # bare repository is already cloned, so we just clone from it now..
+                                run "${GIT_BIN} clone ${app_cache_dir} ${APP_NAME}${APP_VERSION}" && \
+                                debug "Cloned git respository from git bare cache repository"
                             fi
 
                             export BUILD_DIR="$(${FIND_BIN} ${BUILD_DIR_ROOT}/* -maxdepth 0 -type d -name "*${APP_VERSION}*" 2>/dev/null)"
