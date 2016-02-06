@@ -272,7 +272,7 @@ case "${SYSTEM_NAME}" in
         export PATCH_BIN="/usr/bin/patch -p0 "
         export DEFAULT_LDFLAGS="-fPIC" # -arch x86_64 fPIE isn't well supported on OSX, but it's not production anyway
         default_options="-fPIC -fno-strict-overflow -fstack-protector-all"
-        export DEFAULT_COMPILER_FLAGS="-Os ${default_options}"
+        export DEFAULT_COMPILER_FLAGS="-O2 ${default_options}"
         if [ ! -z "${DEBUGBUILD}" ]; then
             export DEFAULT_COMPILER_FLAGS="-O0 -g ${default_options}"
         fi
@@ -313,7 +313,7 @@ case "${SYSTEM_NAME}" in
         export EGREP_BIN="/bin/egrep"
         export BC_BIN="/usr/bin/bc"
         export CHOWN_BIN="/bin/chown"
-        export DEFAULT_COMPILER_FLAGS="-Os -fPIC -fno-strict-overflow -fstack-protector-all"
+        export DEFAULT_COMPILER_FLAGS="-O2 -fPIC -fno-strict-overflow -fstack-protector-all"
         if [ ! -z "${DEBUGBUILD}" ]; then
             export DEFAULT_COMPILER_FLAGS="-O0 -ggdb -fPIC -fno-strict-overflow -fstack-protector-all"
         fi
