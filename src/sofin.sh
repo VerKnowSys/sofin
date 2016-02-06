@@ -641,10 +641,10 @@ if [ ! "$1" = "" ]; then
         # try a list - it will have priority if file exists:
         if [ -f "${LISTS_DIR}${2}" ]; then
             export APPLICATIONS="$(${CAT_BIN} ${LISTS_DIR}${2} 2>/dev/null | ${TR_BIN} '\n' ' ' 2>/dev/null)"
-            note "Processing software: ${cyan}${APPLICATIONS} ${green}for architecture: ${cyan}${SYSTEM_ARCH}"
+            debug "Processing software: ${cyan}${APPLICATIONS} ${green}for architecture: ${cyan}${SYSTEM_ARCH}"
         else
             export APPLICATIONS="${SOFIN_ARGS}"
-            note "Processing software: ${cyan}${SOFIN_ARGS} ${green}for architecture: ${cyan}${SYSTEM_ARCH}"
+            debug "Processing software: ${cyan}${SOFIN_ARGS} ${green}for architecture: ${cyan}${SYSTEM_ARCH}"
         fi
         ;;
 
@@ -1549,9 +1549,9 @@ for application in ${APPLICATIONS}; do
 
             if [ -z "${DONT_BUILD_BUT_DO_EXPORTS}" ]; then
                 if [ -z "${APP_REQUIREMENTS}" ]; then
-                    note "Installing: ${cyan}${application} ${green}v${cyan}${APP_VERSION}${green} (${APP_FULL_NAME})"
+                    note "Installing: ${cyan}${APP_FULL_NAME}${green}, version: ${cyan}${APP_VERSION}${green}"
                 else
-                    note "Installing: ${cyan}${application} ${green}v${cyan}${APP_VERSION}${green}, with requirements: ${cyan}${APP_REQUIREMENTS}"
+                    note "Installing: ${cyan}${APP_FULL_NAME}${green}, version: ${cyan}${APP_VERSION}${green}, with requirements: ${cyan}${APP_REQUIREMENTS}"
                 fi
                 export req_amount="$(${PRINTF_BIN} "${APP_REQUIREMENTS}" | ${WC_BIN} -w 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)"
                 export req_amount="$(${PRINTF_BIN} "${req_amount} + 1\n" | ${BC_BIN} 2>/dev/null)"
