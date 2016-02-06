@@ -62,7 +62,7 @@ readonly LOG_LINES_AMOUNT=10
 readonly LOG_LINES_AMOUNT_ON_ERR=8
 readonly SERVICE_SNAPSHOT_POSTFIX="zfs-stream"
 readonly PS_DEFAULT_OPTS="-axS"
-readonly LESS_DEFAULT_OPTIONS="--hilite-search -N -M -R --follow-name"
+readonly LESS_DEFAULT_OPTIONS="--hilite-search -K -N -M -R --follow-name -c"
 readonly MOST_DEFAULT_OPTIONS="-c -s +s +u"
 
 # utils software from POSIX base system variables:
