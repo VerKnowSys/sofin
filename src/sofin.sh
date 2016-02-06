@@ -812,8 +812,8 @@ if [ ! "$1" = "" ]; then
         def_error () {
             error "Failure in definition: ${cyan}${software}${red}. Report or fix the definition please!"
         }
-        fail_on_background_sofin_job ${dependencies}
         for software in ${dependencies}; do
+            fail_on_background_sofin_job ${software}
             USE_BINBUILD=false ${SOFIN_BIN} install ${software} || def_error && \
             ${SOFIN_BIN} push ${software} || def_error && \
             note "Software bundle deployed successfully: ${cyan}${software}"
