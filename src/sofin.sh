@@ -1721,7 +1721,9 @@ for application in ${APPLICATIONS}; do
                         fi
                     done
                 done
-                note "  ${NOTE_CHAR2} Disabled conflicting bundles:${cyan}${disabled_exps}"
+                if [ ! -z "${disabled_exps}" ]; then
+                    note "Disabled conflicting bundles:${cyan}${disabled_exps}"
+                fi
             fi
 
             . "${DEFINITIONS_DIR}${application}.def"
