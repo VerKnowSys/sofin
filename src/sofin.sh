@@ -713,10 +713,10 @@ if [ ! "$1" = "" ]; then
         # try a list - it will have priority if file exists:
         if [ -f "${LISTS_DIR}${2}" ]; then
             export APPLICATIONS="$(${CAT_BIN} ${LISTS_DIR}${2} 2>/dev/null | ${TR_BIN} '\n' ' ' 2>/dev/null)"
-            debug "Processing software: ${cyan}${APPLICATIONS} ${green}for architecture: ${cyan}${SYSTEM_ARCH}"
+            debug "Processing software: ${cyan}${APPLICATIONS}${magenta} for architecture: ${cyan}${SYSTEM_ARCH}"
         else
             export APPLICATIONS="${SOFIN_ARGS}"
-            debug "Processing software: ${cyan}${SOFIN_ARGS} ${green}for architecture: ${cyan}${SYSTEM_ARCH}"
+            debug "Processing software: ${cyan}${SOFIN_ARGS}${magenta} for architecture: ${cyan}${SYSTEM_ARCH}"
         fi
         ;;
 
@@ -1346,7 +1346,7 @@ for application in ${APPLICATIONS}; do
                     set_c_compiler CLANG # look for bundled compiler:
                 fi
 
-                if [ "${APP_NO_CCACHE}" = "" ]; then # ccache is supported by default but it's optional
+                if [ -z "${APP_NO_CCACHE}" ]; then # ccache is supported by default but it's optional
                     if [ -x "${CCACHE_BIN_OPTIONAL}" ]; then # check for CCACHE availability
                         export CC="${CCACHE_BIN_OPTIONAL} ${CC}"
                         export CXX="${CCACHE_BIN_OPTIONAL} ${CXX}"
