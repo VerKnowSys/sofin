@@ -1480,7 +1480,7 @@ for application in ${APPLICATIONS}; do
 
                             if [ "${APP_GIT_CHECKOUT}" != "" ]; then
                                 note "   ${NOTE_CHAR2} Checking out: ${cyan}${APP_GIT_CHECKOUT}"
-                                run "${GIT_BIN} checkout ${APP_GIT_CHECKOUT}"
+                                run "${GIT_BIN} checkout -b ${APP_GIT_CHECKOUT}"
                             fi
 
                             if [ ! -z "${APP_AFTER_UNPACK_CALLBACK}" ]; then
