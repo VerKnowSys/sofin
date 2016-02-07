@@ -377,7 +377,7 @@ if [ ! "$1" = "" ]; then
         fi
         pattern="${2}"
         beauty_pat="${cyan}*${pattern}*${green}"
-        all_dirs=$(${FIND_BIN} ${CACHE_DIR}cache -type d -mindepth 2 -iname "*${pattern}*" 2>/dev/null)
+        all_dirs=$(${FIND_BIN} ${CACHE_DIR}cache -type d -mindepth 2 -maxdepth 2 -iname "*${pattern}*" 2>/dev/null)
         amount="$(echo "${all_dirs}" | ${WC_BIN} -l 2>/dev/null | ${TR_BIN} -d '\t|\r|\ ' 2>/dev/null)"
         ${TEST_BIN} -z "${amount}" && amount="0"
         if [ -z "${all_dirs}" ]; then
