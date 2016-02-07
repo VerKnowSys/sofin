@@ -219,10 +219,11 @@ export DEFAULT_LDFLAGS="-fPIC -fPIE"
 export readonly SYSTEM_NAME="$(uname -s 2>/dev/null)"
 export readonly SYSTEM_ARCH="$(uname -m 2>/dev/null)"
 
+export CROSS_PLATFORM_COMPILER_FLAGS="-fPIC -fno-strict-overflow -fstack-protector-all"
 if [ -z "${DEBUGBUILD}" ]; then
-    export readonly DEFAULT_COMPILER_FLAGS="-O2 -fPIC -fPIE -fno-strict-overflow -fstack-protector-all"
+    export readonly DEFAULT_COMPILER_FLAGS="-w -O2 -fPIE ${CROSS_PLATFORM_COMPILER_FLAGS}"
 else
-    export readonly DEFAULT_COMPILER_FLAGS="-O0 -ggdb -fPIC -fPIE -fno-strict-overflow -fstack-protector-all"
+    export readonly DEFAULT_COMPILER_FLAGS="-O0 -ggdb ${CROSS_PLATFORM_COMPILER_FLAGS}"
 fi
 
 case "${SYSTEM_NAME}" in
@@ -231,7 +232,7 @@ case "${SYSTEM_NAME}" in
         # Golden linker support:
         if [ -x "/usr/bin/ld.gold" -a -f "/usr/lib/LLVMgold.so" ]; then
             export CROSS_PLATFORM_COMPILER_FLAGS="-Wl,-fuse-ld=gold ${CROSS_PLATFORM_COMPILER_FLAGS}"
-            export DEFAULT_LDFLAGS="${DEFAULT_LDFLAGS} -Wl,-fuse-ld=gold -fPIE"
+            export DEFAULT_LDFLAGS="${DEFAULT_LDFLAGS} -Wl,-fuse-ld=gold"
         fi
 
         # Defaults:
