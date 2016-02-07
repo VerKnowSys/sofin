@@ -81,6 +81,12 @@ set_c_compiler () {
             if [ ! -x "${CPP}" ]; then # fallback for systems with clang without standalone preprocessor binary:
                 export CPP="${BASE_COMPILER}/clang -E"
             fi
+
+            # Gold linker support:
+            if [ -x "/usr/bin/ld.gold" -a -f "/usr/lib/LLVMgold.so" ]; then
+                export LD="/usr/bin/ld --plugin /usr/lib/LLVMgold.so"
+                export NM="/usr/bin/nm --plugin /usr/lib/LLVMgold.so"
+            fi
             ;;
     esac
 }

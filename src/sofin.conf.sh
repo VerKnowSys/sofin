@@ -228,7 +228,13 @@ fi
 case "${SYSTEM_NAME}" in
 
     FreeBSD)
-        # Default
+        # Golden linker support:
+        if [ -x "/usr/bin/ld.gold" -a -f "/usr/lib/LLVMgold.so" ]; then
+            export CROSS_PLATFORM_COMPILER_FLAGS="-Wl,-fuse-ld=gold ${CROSS_PLATFORM_COMPILER_FLAGS}"
+            export DEFAULT_LDFLAGS="${DEFAULT_LDFLAGS} -Wl,-fuse-ld=gold -fPIE"
+        fi
+
+        # Defaults:
         readonly FREEBSD_MINIMUM_VERSION="91"
         export CPUS="$(${SYSCTL_BIN} kern.smp.cpus 2>/dev/null | ${AWK_BIN} '{printf $2;}' 2>/dev/null)"
         export CURL_BIN="/usr/bin/fetch -T 3 -o -"
