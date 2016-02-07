@@ -1368,8 +1368,8 @@ for application in ${APPLICATIONS}; do
 
                 if [ -z "${APP_LINKER_NO_DTAGS}" ]; then
                     if [ "${SYSTEM_NAME}" != "Darwin" ]; then # feature isn't required on Darwin
-                        export CFLAGS="${CFLAGS} -w -Wl,-rpath=${PREFIX}/lib,--enable-new-dtags"
-                        export CXXFLAGS="${CXXFLAGS} -w -Wl,-rpath=${PREFIX}/lib,--enable-new-dtags"
+                        export CFLAGS="${CFLAGS} -Wl,-rpath=${PREFIX}/lib,--enable-new-dtags"
+                        export CXXFLAGS="${CXXFLAGS} -Wl,-rpath=${PREFIX}/lib,--enable-new-dtags"
                         export LDFLAGS="${LDFLAGS} -Wl,-rpath=${PREFIX}/lib,--enable-new-dtags"
                     fi
                 fi
