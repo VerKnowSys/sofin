@@ -1430,9 +1430,9 @@ for application in ${APPLICATIONS}; do
 
                                 note "   ${NOTE_CHAR2} Unpacking source code of: ${cyan}${APP_NAME}${green}"
                                 debug "Build dir root: ${BUILD_DIR_ROOT}"
-                                try "${TAR_BIN} -xJf ${file}" || \
-                                run "${TAR_BIN} -xJf ${file}"
-
+                                try "${TAR_BIN} -xf ${file}" || \
+                                try "${TAR_BIN} -xfj ${file}" || \
+                                run "${TAR_BIN} -xfJ ${file}"
                             else
                                 # git method:
                                 # .cache/git-cache => git bare repos
