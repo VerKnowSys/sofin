@@ -169,8 +169,8 @@ update_definitions () {
         ${GIT_BIN} clone ${REPOSITORY} definitions >> ${LOG} 2>&1 || \
             error "Error occured: Update from branch: ${BRANCH} of repository: ${REPOSITORY} isn't possible. Please make sure that given repository and branch are valid."
         cd "${CACHE_DIR}definitions"
-        ${GIT_BIN} checkout -b "${current_branch}" >> ${LOG} 2>&1 || \
-            ${GIT_BIN} checkout "${current_branch}" >> ${LOG} 2>&1
+        ${GIT_BIN} checkout -b "${BRANCH}" >> ${LOG} 2>&1 || \
+            ${GIT_BIN} checkout "${BRANCH}" >> ${LOG} 2>&1
 
         ${GIT_BIN} pull origin "${BRANCH}" >> ${LOG} 2>&1 && \
         note "Updated branch: ${cyan}${BRANCH} ${green}of repository: ${cyan}${REPOSITORY}" && \
