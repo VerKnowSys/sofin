@@ -1340,16 +1340,27 @@ for application in ${APPLICATIONS}; do
                     error "Cannot fetch definition: ${cyan}${req_definition_file}${red}! Aborting!"
                 fi
 
+                debug "Setting up default system compiler"
+                set_c_compiler CLANG # look for bundled compiler:
+
                 . "${DEFAULTS}" # load definition and check for current version
                 . "${req_definition_file}"
-                # check_current "${APP_VERSION}" "${APP_CURRENT_VERSION}"
                 check_disabled "${DISABLE_ON}" # check requirement for disabled state:
 
                 if [ ! -z "${FORCE_GNU_COMPILER}" ]; then # force GNU compiler usage on definition side:
                     warn "   ${NOTE_CHAR2} GNU compiler set for: ${cyan}${APP_NAME}"
                     set_c_compiler GNU
-                else
-                    set_c_compiler CLANG # look for bundled compiler:
+                fi
+
+                # Golden linker causes troubles with some build systems like Qt, so we give option to disable it:
+                if [ "${APP_NO_GOLDEN_LINKER}" = "YES" ]; then
+                    CROSS_PLATFORM_COMPILER_FLAGS="-fPIC -fno-strict-overflow -fstack-protector-all"
+                    DEFAULT_LDFLAGS="-fPIC -fPIE"
+                    unset NM
+                    unset LD
+                    unset CFLAGS
+                    unset CXXFLAGS
+                    unset LDFLAGS
                 fi
 
                 if [ -z "${APP_NO_CCACHE}" ]; then # ccache is supported by default but it's optional
