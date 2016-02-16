@@ -290,13 +290,13 @@ case "${SYSTEM_NAME}" in
         export SHA_BIN="/usr/bin/shasum"
         export SYSCTL_BIN="/usr/sbin/sysctl"
         export KLDLOAD_BIN="/sbin/kextload"
-        export ZFS_BIN="/usr/local/bin/zfs"
+        export ZFS_BIN="/usr/bin/true"
+        export RSYNC_BIN="/usr/bin/rsync"
         export CPUS=$(${SYSCTL_BIN} machdep.cpu.thread_count 2>/dev/null | ${AWK_BIN} '{printf $2;}' 2>/dev/null)
         export MAKE_OPTS="-j${CPUS}"
         export DEFAULT_ZPOOL="Projects"
         export XZ_BIN="/Software/Xz/exports/xz"
         export XZCAT_BIN="/bin/cat"
-        export RSYNC_BIN="/Software/Rsync/exports/rsync"
         unset SERVICE_BIN # not necessary
 
         if [ ${OS_VERSION} -lt ${DARWIN_MINIMUM_VERSION} ]; then
