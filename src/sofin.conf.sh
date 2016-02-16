@@ -3,7 +3,7 @@
 #
 
 # Sofin version string:
-readonly SOFIN_VERSION="0.96.6"
+readonly SOFIN_VERSION="0.96.7"
 
 # setting up definitions repository
 if [ -z "${BRANCH}" ]; then
@@ -324,9 +324,9 @@ case "${SYSTEM_NAME}" in
         export EGREP_BIN="/bin/egrep"
         export BC_BIN="/usr/bin/bc"
         export CHOWN_BIN="/bin/chown"
-        export DEFAULT_COMPILER_FLAGS="-O2 -fPIC -fno-strict-overflow -fstack-protector-all"
+        export DEFAULT_COMPILER_FLAGS="-O2 -mno-avx -fPIC -fno-strict-overflow -fstack-protector-all"
         if [ ! -z "${DEBUGBUILD}" ]; then
-            export DEFAULT_COMPILER_FLAGS="-O0 -ggdb -fPIC -fno-strict-overflow -fstack-protector-all"
+            export DEFAULT_COMPILER_FLAGS="-O0 -mno-avx -ggdb -fPIC -fno-strict-overflow -fstack-protector-all"
         fi
         export DEFAULT_LDFLAGS="-fPIC "
         export TEST_BIN="/usr/bin/test"
