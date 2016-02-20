@@ -310,6 +310,11 @@ case "${SYSTEM_NAME}" in
 
     Linux)
         # only Debian 6 is supported a.t.m.
+        # Golden linker support without LLVM plugin:
+        if [ -x "/usr/bin/ld.gold" ]; then
+            export CROSS_PLATFORM_COMPILER_FLAGS="-Wl,-fuse-ld=gold ${CROSS_PLATFORM_COMPILER_FLAGS}"
+            export DEFAULT_LDFLAGS="${DEFAULT_LDFLAGS} -Wl,-fuse-ld=gold"
+        fi
         readonly GLIBC_MINIMUM_VERSION="211"
         export CHFLAGS_BIN="/usr/bin/chattr"
         export CURL_BIN="/usr/bin/wget -qO -"
