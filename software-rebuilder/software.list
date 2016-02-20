@@ -50,6 +50,7 @@ Openldap
 Openssl
 Openvpn
 Percona-server55
+Perl
 Php55
 Php56
 Php70
@@ -73,6 +74,7 @@ Rrdtool
 Ruby20
 Ruby21
 Ruby22
+Ruby23
 Rust
 Sdl2
 Siege
