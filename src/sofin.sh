@@ -827,6 +827,13 @@ if [ ! "$1" = "" ]; then
                         debug "Setting common access to archive files before we send them: ${name}, ${name}.sha1"
                         ${CHMOD_BIN} a+r "${name}" "${name}.sha1"
 
+                        if [ "${SYSTEM_NAME}" = "Linux" ]; then
+                            debug "Performing Linux specific additional copy of binary bundle"
+                            ${MKDIR_BIN} -p /tmp/sofin-bundles/
+                            ${CP_BIN} ${name} /tmp/sofin-bundles/
+                            ${CP_BIN} ${name}.sha1 /tmp/sofin-bundles/
+                        fi
+
                         shortsha="$(echo "${archive_sha1}" | ${CUT_BIN} -c -16 2>/dev/null)…"
                         note "Pushing archive #${cyan}${shortsha}${green} to remote repository.."
                         retry "${SCP_BIN} -P ${MAIN_PORT} ${name} ${address}/${name}.partial" || def_error ${name}
