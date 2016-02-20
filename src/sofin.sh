@@ -1746,7 +1746,8 @@ for application in ${APPLICATIONS}; do
                 note "  ${NOTE_CHAR2} Defined no binaries to export of prefix: ${cyan}${PREFIX}"
             else
                 aname="$(echo "${APP_NAME}${APP_POSTFIX}" | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null)"
-                note "Exporting binaries: ${cyan}${APP_EXPORTS}${green}, of prefix: ${cyan}${PREFIX}"
+                amount="$(echo "${APP_EXPORTS}" | ${WC_BIN} -w 2>/dev/null | ${TR_BIN} -d '\t|\r|\ ' 2>/dev/null)"
+                note "Exporting ${cyan}${amount}${green} binaries of prefix: ${cyan}${PREFIX}"
                 ${MKDIR_BIN} -p "${PREFIX}/exports"
                 EXPORT_LIST=""
                 for exp in ${APP_EXPORTS}; do
