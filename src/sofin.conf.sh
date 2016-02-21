@@ -219,9 +219,9 @@ export DEFAULT_LDFLAGS="-fPIC -fPIE"
 export readonly SYSTEM_NAME="$(uname -s 2>/dev/null)"
 export readonly SYSTEM_ARCH="$(uname -m 2>/dev/null)"
 
-export CROSS_PLATFORM_COMPILER_FLAGS="-fPIC -fno-strict-overflow -fstack-protector-all"
+export CROSS_PLATFORM_COMPILER_FLAGS="-w -fPIC -fno-strict-overflow -fstack-protector-all"
 if [ -z "${DEBUGBUILD}" ]; then
-    export readonly DEFAULT_COMPILER_FLAGS="-w -O2 -fPIE ${CROSS_PLATFORM_COMPILER_FLAGS}"
+    export readonly DEFAULT_COMPILER_FLAGS="-O2 -fPIE ${CROSS_PLATFORM_COMPILER_FLAGS}"
 else
     export readonly DEFAULT_COMPILER_FLAGS="-O0 -ggdb ${CROSS_PLATFORM_COMPILER_FLAGS}"
 fi
@@ -282,10 +282,9 @@ case "${SYSTEM_NAME}" in
         export FETCH_BIN="/usr/bin/curl --connect-timeout 3 -O"
         export PATCH_BIN="/usr/bin/patch -p0 "
         export DEFAULT_LDFLAGS="-fPIC" # -arch x86_64 fPIE isn't well supported on OSX, but it's not production anyway
-        default_options="-fPIC -fno-strict-overflow -fstack-protector-all"
-        export DEFAULT_COMPILER_FLAGS="-O2 ${default_options}"
+        export DEFAULT_COMPILER_FLAGS="-w -O2 -fPIC -fno-strict-overflow -fstack-protector-all"
         if [ ! -z "${DEBUGBUILD}" ]; then
-            export DEFAULT_COMPILER_FLAGS="-O0 -g ${default_options}"
+            export DEFAULT_COMPILER_FLAGS="${DEFAULT_COMPILER_FLAGS} -O0 -g"
         fi
         export SHA_BIN="/usr/bin/shasum"
         export SYSCTL_BIN="/usr/sbin/sysctl"
@@ -325,7 +324,7 @@ case "${SYSTEM_NAME}" in
         export BC_BIN="/usr/bin/bc"
         export CHOWN_BIN="/bin/chown"
         export DEFAULT_LDFLAGS="-fPIC"
-        export DEFAULT_COMPILER_FLAGS="-O2 -mno-avx -fPIC -fno-strict-overflow -fstack-protector-all"
+        export DEFAULT_COMPILER_FLAGS="-w -O2 -mno-avx -fPIC -fno-strict-overflow -fstack-protector-all"
         if [ ! -z "${DEBUGBUILD}" ]; then
             export DEFAULT_COMPILER_FLAGS="-O0 -mno-avx -ggdb -fPIC -fno-strict-overflow -fstack-protector-all"
         fi
