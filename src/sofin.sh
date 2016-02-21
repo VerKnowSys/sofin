@@ -286,7 +286,7 @@ unset PKG_CONFIG_PATH
 clean_binbuilds () {
     if [ -d "${BINBUILDS_CACHE_DIR}" ]; then
         note "Removing binary builds from: ${cyan}${BINBUILDS_CACHE_DIR}"
-        ${RM_BIN} -rf "${BINBUILDS_CACHE_DIR}" || warn "Privileges problem in '${BINBUILDS_CACHE_DIR}'? All files should belong to '${USER}' there."
+        ${FIND_BIN} "${BINBUILDS_CACHE_DIR}" -delete 2>/dev/null
     fi
 }
 
@@ -301,7 +301,7 @@ clean_failbuilds () {
         fi
         for i in ${files}; do
             debug "Removing directory: ${i}"
-            ${RM_BIN} -rf "${i}" 2>/dev/null || warn "Privileges problem in failbuilds dir: '${i}'? All files should belong to '${USER}' there."
+            ${FIND_BIN} "${i}" -delete 2>/dev/null
         done
         result="$(echo "${number}" | ${BC_BIN} 2>/dev/null)"
         note "${cyan}${result} ${green}directories cleaned."
@@ -312,7 +312,7 @@ clean_failbuilds () {
 clean_logs () {
     if [ -d "${LOGS_DIR}" ]; then
         note "Removing build logs from: ${cyan}${LOGS_DIR}"
-        ${RM_BIN} -rf "${LOGS_DIR}" 2>/dev/null || warn "Privileges problem in logs dir: '${LOGS_DIR}'? All files should belong to '${USER}' there."
+        ${FIND_BIN} "${LOGS_DIR}" -delete 2>/dev/null
     fi
 }
 
@@ -320,7 +320,7 @@ clean_logs () {
 clean_purge () {
     if [ -d "${CACHE_DIR}" ]; then
         note "Purging all caches from: ${cyan}${CACHE_DIR}"
-        ${RM_BIN} -rf "${CACHE_DIR}" 2>/dev/null || warn "Privileges problem in cache dir: '${CACHE_DIR}'? All files should belong to '${USER}' there."
+        ${FIND_BIN} "${CACHE_DIR}" -delete 2>/dev/null
     fi
 }
 
