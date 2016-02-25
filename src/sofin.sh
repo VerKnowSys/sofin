@@ -1634,6 +1634,11 @@ for application in ${APPLICATIONS}; do
                             run "${APP_AFTER_MAKE_CALLBACK}"
                         fi
 
+                        debug "Cleaning man dir from previous dependencies, we want to install man pages that belong to LAST requirement which is app bundle itself"
+                        for place in man share/man share/info share/doc share/docs; do
+                            ${FIND_BIN} "${PREFIX}/${place}" -delete 2>/dev/null
+                        done
+
                         note "   ${NOTE_CHAR2} Installing requirement: ${cyan}$1"
                         run "${APP_INSTALL_METHOD}"
                         if [ ! "${APP_AFTER_INSTALL_CALLBACK}" = "" ]; then
