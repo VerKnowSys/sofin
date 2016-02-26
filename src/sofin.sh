@@ -1036,7 +1036,7 @@ if [ ! "$1" = "" ]; then
     reload|rehash)
         update_shell_vars
         if [ ! -z "${SHELL_PID}" ]; then
-            pids=$(${PS_BIN} ${PS_DEFAULT_OPTS} 2>/dev/null | ${GREP_BIN} -v grep 2>/dev/null | ${GREP_BIN} zsh 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)
+            pids=$(${PS_BIN} ${PS_DEFAULT_OPTS} 2>/dev/null | ${GREP_BIN} -v grep 2>/dev/null | ${EGREP_BIN} "\d ${ZSH_BIN}" 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)
             note "Reloading configuration of all ${cyan}$(${BASENAME_BIN} "${SHELL}" 2>/dev/null) ${green}with pids: $(echo ${pids} | ${TR_BIN} '\n' ' ' 2>/dev/null)"
             for pid in ${pids}; do
                 ${KILL_BIN} -SIGUSR2 ${pid}
