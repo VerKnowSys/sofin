@@ -18,11 +18,13 @@ Ghostscript
 Gmake
 Gnupg
 Gnutls
-Go
+Go15
+Go16
 Grafana
 GraphicsMagick
 Httpd
 Httpd22
+Icecast
 ImageMagick
 Influxdb
 Krb
