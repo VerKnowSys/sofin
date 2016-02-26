@@ -13,11 +13,6 @@ if [ -z "${REPOSITORY}" ]; then
     export REPOSITORY="https://verknowsys@bitbucket.org/verknowsys/sofin-definitions.git" # main sofin definitions repository
 fi
 
-# global Sofin values:
-if [ "${SOFIN_TRACE}" = "YES" ]; then
-    export SOFIN_TRACE="NO"
-fi
-
 # ANSI color definitions
 readonly red='\033[31;40m'
 readonly green='\033[32;40m'
