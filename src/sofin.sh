@@ -1486,8 +1486,8 @@ for application in ${APPLICATIONS}; do
                                         debug "Trying to update existing bare repository cache in: ${app_cache_dir}"
                                         cd "${app_cache_dir}"
                                         try "${GIT_BIN} fetch origin ${APP_GIT_CHECKOUT}" || \
-                                        try "${GIT_BIN} fetch origin ${APP_GIT_CHECKOUT}" || \
-                                        warn "Failed to fetch an update from bare repository: ${cyan}${app_cache_dir}"
+                                        try "${GIT_BIN} fetch origin" || \
+                                        warn "   ${WARN_CHAR} Failed to fetch an update from bare repository: ${cyan}${app_cache_dir}"
                                         # for empty APP_VERSION it will fill it with first 16 chars of repository HEAD SHA1:
                                         if [ -z "${APP_VERSION}" ]; then
                                             APP_VERSION="$(${GIT_BIN} rev-parse HEAD 2>/dev/null | ${CUT_BIN} -c -16 2>/dev/null)"
