@@ -1045,7 +1045,7 @@ if [ ! "$1" = "" ]; then
                     continue
                 fi
             else
-                warn "Application: ${cyan}${given_app_name} ${yellow}not installed."
+                warn "Bundle: ${cyan}${given_app_name}${yellow} not installed."
                 export APPLICATIONS=""
                 continue
             fi
@@ -1107,24 +1107,22 @@ if [ ! "$1" = "" ]; then
         ;;
 
 
-    old|outdated)
+    old|out|outdated|rusk)
         create_cache_directories
         # update_definitions
         note "Definitions were updated to latest version."
         debug "Checking software from ${SOFTWARE_DIR}"
         if [ -d ${SOFTWARE_DIR} ]; then
-            for prefix in ${SOFTWARE_DIR}*; do
-                debug "Looking into: ${prefix}"
+            for prefix in $(${FIND_BIN} ${SOFTWARE_DIR} -mindepth 1 -maxdepth 1 -type d 2>/dev/null); do
                 application="$(${BASENAME_BIN} "${prefix}" 2>/dev/null | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null)" # lowercase for case sensitive fs
 
                 if [ ! -f "${prefix}/${application}${INSTALLED_MARK}" ]; then
-                    warn "Application: ${application} is not properly installed."
+                    warn "Bundle: ${cyan}${application}${yellow} is not yet installed or damaged."
                     continue
                 fi
                 ver="$(${CAT_BIN} "${prefix}/${application}${INSTALLED_MARK}" 2>/dev/null)"
-
                 if [ ! -f "${DEFINITIONS_DIR}${application}.def" ]; then
-                    warn "No such definition found: ${application}"
+                    warn "No such bundle found: ${cyan}${application}"
                     continue
                 fi
                 . "${DEFINITIONS_DIR}${application}.def"
@@ -1133,7 +1131,7 @@ if [ ! "$1" = "" ]; then
                     if [ ! "${1}" = "" ]; then
                         if [ ! "${2}" = "" ]; then
                             if [ ! "${1}" = "${2}" ]; then
-                                warn "${application}: version ${2} available in definition, but installed: ${1}"
+                                warn "Bundle: ${cyan}${application}${yellow}, version: ${cyan}${2}${yellow} is definied, but installed version is: ${cyan}${1}"
                                 export outdated=YES
                             fi
                         fi
@@ -1147,7 +1145,7 @@ if [ ! "$1" = "" ]; then
         if [ "${outdated}" = "YES" ]; then
             exit 1
         else
-            note "No outdated installed software found."
+            note "All installed bundles looks recent"
             exit
         fi
         ;;
