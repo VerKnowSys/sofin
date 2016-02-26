@@ -199,6 +199,23 @@ create_cache_directories () {
 }
 
 
+reload_zsh_shells () {
+    if [ ! -z "${SHELL_PID}" ]; then
+        pattern="zsh"
+        if [ "${SYSTEM_NAME}" = "Darwin" ]; then
+            pattern="\d ${ZSH_BIN}" # NOTE: this fixes issue with SIGUSR2 signal sent to iTerm
+        fi
+        pids=$(${PS_BIN} ${PS_DEFAULT_OPTS} 2>/dev/null | ${GREP_BIN} -v grep 2>/dev/null | ${EGREP_BIN} "${pattern}" 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)
+        note "Reloading all ${cyan}$(${BASENAME_BIN} "${SHELL}" 2>/dev/null)${green} shells: ${cyan}$(echo ${pids} | ${TR_BIN} '\n' ' ' 2>/dev/null)"
+        for pid in ${pids}; do
+            ${KILL_BIN} -SIGUSR2 ${pid}
+        done
+    else
+        write_info_about_shell_configuration
+    fi
+}
+
+
 write_info_about_shell_configuration () {
     warn "SHELL_PID is not set. Sofin auto-reload function is temporarely disabled."
 }
@@ -1035,15 +1052,7 @@ if [ ! "$1" = "" ]; then
 
     reload|rehash)
         update_shell_vars
-        if [ ! -z "${SHELL_PID}" ]; then
-            pids=$(${PS_BIN} ${PS_DEFAULT_OPTS} 2>/dev/null | ${GREP_BIN} -v grep 2>/dev/null | ${EGREP_BIN} "\d ${ZSH_BIN}" 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)
-            note "Reloading configuration of all ${cyan}$(${BASENAME_BIN} "${SHELL}" 2>/dev/null) ${green}with pids: $(echo ${pids} | ${TR_BIN} '\n' ' ' 2>/dev/null)"
-            for pid in ${pids}; do
-                ${KILL_BIN} -SIGUSR2 ${pid}
-            done
-        else
-            write_info_about_shell_configuration
-        fi
+        reload_zsh_shells
         exit
         ;;
 
@@ -2001,17 +2010,6 @@ done
 
 
 update_shell_vars
-
-if [ ! -z "${SHELL_PID}" ]; then
-    pids=$(${PS_BIN} ${PS_DEFAULT_OPTS} 2>/dev/null | ${GREP_BIN} -v grep 2>/dev/null | ${GREP_BIN} 'zsh' 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)
-    note "Reloading ${cyan}$(${BASENAME_BIN} "${SHELL}" 2>/dev/null)${green} configurations. Sent USR2 signal to pids:"
-    note "${cyan}$(echo ${pids} | ${TR_BIN} '\n' ' ' 2>/dev/null)${reset}"
-    for pid in ${pids}; do
-        ${KILL_BIN} -SIGUSR2 ${pid}
-    done
-else
-    write_info_about_shell_configuration
-fi
-
+reload_zsh_shells
 
 exit
