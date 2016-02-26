@@ -21,6 +21,7 @@ for software in $(cat software.list); do
     note "Processing software: ${software}"
     s rm ${software}
     s deploy ${software} && \
-    s rm ${software}
+    s rm ${software} && \
+    sed -i '' -e "/${software}/d" software.list
     note "--------------------------------"
 done
