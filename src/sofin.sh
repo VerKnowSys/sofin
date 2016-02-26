@@ -1204,16 +1204,14 @@ for application in ${APPLICATIONS}; do
             . "${definition}"
             check_disabled "${DISABLE_ON}" # after which just check if it's not disabled
 
-            # export APP_POSTFIX="$(echo "${APP_VERSION}" | ${SED_BIN} 's/\.[0-9]*$//;s/\.//')"
-
-            APP_LOWER="${APP_NAME}"
+            APP_LOWER="${APP_NAME}${APP_POSTFIX}"
             head="$(echo "${APP_NAME}" | ${SED_BIN} 's/\(.\)\(.*\)/\1/' 2>/dev/null | ${TR_BIN} '[a-z]' '[A-Z]' 2>/dev/null)"
             tail="$(echo "${APP_NAME}" | ${SED_BIN} 's/\(.\)\(.*\)/\2/' 2>/dev/null)"
             # Capitalize:
             APP_NAME="${head}${tail}"
             # some additional convention check:
             if [ "${APP_NAME}" != "${specified}" -a "${APP_NAME}${APP_POSTFIX}" != "${specified}" ]; then
-                warn "You specified lowercase name of bundle, which is in contradiction to Sofin's convention (bundle - capitalized: f.e. \"Rubinius\", dependencies and definitions - lowercase: f.e. \"yaml\")."
+                warn "You specified lowercase name of bundle: ${cyan}${specified}${yellow}, which is in contradiction to Sofin's convention (bundle - capitalized: f.e. \"Rust\", dependencies and definitions - lowercase: f.e. \"yaml\")."
             fi
             # if definition requires root privileges, throw an "exception":
             if [ "${REQUIRE_ROOT_ACCESS}" = "YES" ]; then
@@ -1273,7 +1271,7 @@ for application in ${APPLICATIONS}; do
 
             MIDDLE="${SYSTEM_NAME}-${FULL_SYSTEM_VERSION}-${SYSTEM_ARCH}"
             ARCHIVE_NAME="${APP_NAME}${APP_POSTFIX}-${APP_VERSION}${DEFAULT_ARCHIVE_EXT}"
-            INSTALLED_INDICATOR="${PREFIX}/${APP_LOWER}${APP_POSTFIX}${INSTALLED_MARK}"
+            INSTALLED_INDICATOR="${PREFIX}/${APP_LOWER}${INSTALLED_MARK}"
 
             if [ "${SOFIN_CONTINUE_BUILD}" != "YES" ]; then # normal build by default
                 if [ ! -e "${INSTALLED_INDICATOR}" ]; then
@@ -1576,7 +1574,7 @@ for application in ${APPLICATIONS}; do
                             case "${APP_CONFIGURE_SCRIPT}" in
 
                                 ignore)
-                                    note "   ${NOTE_CHAR2} Ignored configuration of definition: ${cyan}$1"
+                                    note "   ${NOTE_CHAR2} Configuration skipped for definition: ${cyan}$1"
                                     ;;
 
                                 no-conf)
