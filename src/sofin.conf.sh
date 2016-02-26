@@ -3,7 +3,7 @@
 #
 
 # Sofin version string:
-readonly SOFIN_VERSION="0.98.2"
+readonly SOFIN_VERSION="0.98.3"
 
 # setting up definitions repository
 if [ -z "${BRANCH}" ]; then
@@ -14,7 +14,7 @@ if [ -z "${REPOSITORY}" ]; then
 fi
 
 # global Sofin values:
-if [ -z "${SOFIN_TRACE}" ]; then
+if [ "${SOFIN_TRACE}" = "YES" ]; then
     export SOFIN_TRACE="NO"
 fi
 
@@ -145,14 +145,14 @@ if [ -x "${SOFIN_VERSION_UTILITY_BIN}" ]; then
 fi
 USERNAME="$(${ID_BIN} ${DEFAULT_ID_OPTIONS} 2>/dev/null)"
 
-TTY="false"
+TTY="NO"
 SUCCESS_CHAR="V"
 WARN_CHAR="*"
 NOTE_CHAR=">"
 ERROR_CHAR="#"
 NOTE_CHAR2="-"
 if [ -t 1 ]; then
-    TTY="true"
+    TTY="YES"
     SUCCESS_CHAR="√"
     WARN_CHAR="•"
     NOTE_CHAR="»"
@@ -173,7 +173,7 @@ umask 027 # default, and should be global. New files created with chmod: 750 by 
 # helpers
 
 cecho () {
-    if [ "${TTY}" = "true" ]; then # if it's terminal then use colors
+    if [ "${TTY}" = "YES" ]; then # if it's terminal then use colors
         ${PRINTF_BIN} "${2}${1}${reset}\n"
     else
         ${PRINTF_BIN} "${1}\n"
@@ -241,7 +241,7 @@ case "${SYSTEM_NAME}" in
         export CURL_BIN="/usr/bin/fetch -T 3 -o -"
         export MAKE_OPTS="-j${CPUS}"
         if [ ${OS_VERSION} -lt ${FREEBSD_MINIMUM_VERSION} ]; then
-            export USE_BINBUILD="false"
+            export USE_BINBUILD=NO
         fi
 
         if [ ${OS_VERSION} -gt 93 ]; then
@@ -299,7 +299,7 @@ case "${SYSTEM_NAME}" in
         unset SERVICE_BIN # not necessary
 
         if [ ${OS_VERSION} -lt ${DARWIN_MINIMUM_VERSION} ]; then
-            export USE_BINBUILD="false"
+            export USE_BINBUILD=NO
         fi
 
         # runtime sha
@@ -342,7 +342,7 @@ case "${SYSTEM_NAME}" in
         export ZFS_BIN="/usr/sbin/zfs"
         export RSYNC_BIN="/Software/Rsync/exports/rsync"
         if [ ${OS_VERSION} -lt ${GLIBC_MINIMUM_VERSION} ]; then
-            export USE_BINBUILD="false"
+            export USE_BINBUILD=NO
         fi
         # runtime sha
         test -x "${SOFIN_MICROSECONDS_UTILITY_BIN}" && \

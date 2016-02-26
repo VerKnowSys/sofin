@@ -11,7 +11,7 @@ else
     exit 1
 fi
 
-if [ "${SOFIN_TRACE}" = "YES" ]; then
+if [ ! -z "${SOFIN_TRACE}" ]; then
     set -x
 fi
 
@@ -114,7 +114,7 @@ retry () {
 
 
 update_definitions () {
-    if [ "${USE_UPDATE}" = "false" ]; then
+    if [ ! -z "${USE_UPDATE}" ]; then
         debug "Definitions update skipped on demand"
         return
     fi
@@ -723,7 +723,7 @@ if [ ! "$1" = "" ]; then
         note "Resuming interrupted build.."
         export APPLICATIONS="${a_bundle_name}"
         export PREVIOUS_BUILD_DIR="${MOST_RECENT_DIR}"
-        export SOFIN_CONTINUE_BUILD="YES"
+        export SOFIN_CONTINUE_BUILD=YES
         ;;
 
 
@@ -902,8 +902,8 @@ if [ ! "$1" = "" ]; then
         }
         fail_on_background_sofin_job ${dependencies}
 
-        export USE_UPDATE=false
-        export USE_BINBUILD=false
+        export USE_UPDATE=NO
+        export USE_BINBUILD=NO
         export APPLICATIONS="${dependencies}"
         ;;
 
@@ -918,7 +918,7 @@ if [ ! "$1" = "" ]; then
         }
         for software in ${dependencies}; do
             fail_on_background_sofin_job ${software}
-            USE_BINBUILD=false ${SOFIN_BIN} install ${software} || def_error && \
+            USE_BINBUILD=NO ${SOFIN_BIN} install ${software} || def_error && \
             ${SOFIN_BIN} push ${software} || def_error && \
             note "Software bundle deployed successfully: ${cyan}${software}"
             note "${SEPARATOR}"
@@ -967,8 +967,8 @@ if [ ! "$1" = "" ]; then
                 continue
             fi
             ${SOFIN_BIN} remove ${software}
-            USE_BINBUILD=false ${SOFIN_BIN} install ${software} || def_error
-            FORCE=true ${SOFIN_BIN} wipe ${software} || def_error
+            USE_BINBUILD=NO ${SOFIN_BIN} install ${software} || def_error
+            FORCE=YES ${SOFIN_BIN} wipe ${software} || def_error
             ${SOFIN_BIN} push ${software} || def_error
         done
         exit
@@ -977,7 +977,7 @@ if [ ! "$1" = "" ]; then
 
     wipe)
         ANS="YES"
-        if [ "${FORCE}" != "true" ]; then
+        if [ "${FORCE}" != "YES" ]; then
             note "Are you sure you want to wipe binary bundles: ${cyan}${SOFIN_ARGS} ${green}from binary repository: ${cyan}${MAIN_BINARY_REPOSITORY}${green}? (YES to confirm)"
             read ANS
         fi
@@ -1134,7 +1134,7 @@ if [ ! "$1" = "" ]; then
                         if [ ! "${2}" = "" ]; then
                             if [ ! "${1}" = "${2}" ]; then
                                 warn "${application}: version ${2} available in definition, but installed: ${1}"
-                                export outdated="true"
+                                export outdated=YES
                             fi
                         fi
                     fi
@@ -1144,7 +1144,7 @@ if [ ! "$1" = "" ]; then
             done
         fi
 
-        if [ "${outdated}" = "true" ]; then
+        if [ "${outdated}" = "YES" ]; then
             exit 1
         else
             note "No outdated installed software found."
@@ -1196,7 +1196,7 @@ for application in ${APPLICATIONS}; do
         ${RM_BIN} -rf "${PREFIX}"
     else
         for definition in ${DEFINITIONS_DIR}${application}.def; do
-            export DONT_BUILD_BUT_DO_EXPORTS=""
+            unset DONT_BUILD_BUT_DO_EXPORTS
             debug "Reading definition: ${definition}"
             . "${DEFAULTS}"
             . "${definition}"
@@ -1214,7 +1214,7 @@ for application in ${APPLICATIONS}; do
                 warn "You specified lowercase name of bundle, which is in contradiction to Sofin's convention (bundle - capitalized: f.e. \"Rubinius\", dependencies and definitions - lowercase: f.e. \"yaml\")."
             fi
             # if definition requires root privileges, throw an "exception":
-            if [ "${REQUIRE_ROOT_ACCESS}" = "true" ]; then
+            if [ "${REQUIRE_ROOT_ACCESS}" = "YES" ]; then
                 if [ "${USERNAME}" != "root" ]; then
                     warn "Definition requires root priviledges to install: ${APP_NAME}. Wont install."
                     break
@@ -1224,8 +1224,7 @@ for application in ${APPLICATIONS}; do
             # note "Preparing application: ${APP_NAME}${APP_POSTFIX} (${APP_FULL_NAME} v${APP_VERSION})"
             export PREFIX="${SOFTWARE_DIR}${APP_NAME}${APP_POSTFIX}"
             export SERVICE_DIR="${SERVICES_DIR}${APP_NAME}${APP_POSTFIX}"
-            if [ "${APP_STANDALONE}" = "true" ]; then
-                # TODO: create zfs dataset!
+            if [ ! -z "${APP_STANDALONE}" ]; then
                 ${MKDIR_BIN} -p "${SERVICE_DIR}"
                 ${CHMOD_BIN} 0710 "${SERVICE_DIR}"
             fi
@@ -1276,7 +1275,7 @@ for application in ${APPLICATIONS}; do
 
             if [ "${SOFIN_CONTINUE_BUILD}" != "YES" ]; then # normal build by default
                 if [ ! -e "${INSTALLED_INDICATOR}" ]; then
-                    if [ "${USE_BINBUILD}" = "false" ]; then
+                    if [ ! -z "${USE_BINBUILD}" ]; then
                         debug "Binary build check was skipped"
                     else
                         aname="$(echo "${APP_NAME}${APP_POSTFIX}" | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null)"
@@ -1330,7 +1329,7 @@ for application in ${APPLICATIONS}; do
                             ${TAR_BIN} -xJf "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" >> "${LOG}-${aname}" 2>> "${LOG}-${aname}"
                             if [ "$?" = "0" ]; then # if archive is valid
                                 note "Software bundle installed: ${cyan}${APP_NAME}${APP_POSTFIX}${green}, with version: ${cyan}${APP_VERSION}"
-                                export DONT_BUILD_BUT_DO_EXPORTS="true"
+                                export DONT_BUILD_BUT_DO_EXPORTS=YES
                             else
                                 debug "  ${NOTE_CHAR2} No binary bundle available for: ${cyan}${APP_NAME}${APP_POSTFIX}"
                                 ${RM_BIN} -fr "${BINBUILDS_CACHE_DIR}${ABSNAME}"
@@ -1341,7 +1340,7 @@ for application in ${APPLICATIONS}; do
                     fi
                 else
                     note "${cyan}${APP_NAME}${APP_POSTFIX}${green} bundle is installed: v${cyan}$(${CAT_BIN} ${INSTALLED_INDICATOR} 2>/dev/null)"
-                    export DONT_BUILD_BUT_DO_EXPORTS="true"
+                    export DONT_BUILD_BUT_DO_EXPORTS=YES
                 fi
 
             else # continue build!
@@ -1372,7 +1371,8 @@ for application in ${APPLICATIONS}; do
                 fi
 
                 # Golden linker causes troubles with some build systems like Qt, so we give option to disable it:
-                if [ "${APP_NO_GOLDEN_LINKER}" = "YES" ]; then
+                if [ ! -z "${APP_NO_GOLDEN_LINKER}" ]; then
+                    debug "Trying to disable golden linker.."
                     CROSS_PLATFORM_COMPILER_FLAGS="-fPIC -fno-strict-overflow -fstack-protector-all"
                     DEFAULT_LDFLAGS="-fPIC -fPIE"
                     unset NM
@@ -1700,7 +1700,7 @@ for application in ${APPLICATIONS}; do
                     else
                         note "  ${req} (${cyan}${req_amount}${green} of ${cyan}${req_all}${green} remaining)"
                         if [ ! -e "${PREFIX}/${req}${INSTALLED_MARK}" ]; then
-                            export CHANGED="true"
+                            export CHANGED=YES
                             execute_process "${req}"
                         fi
                     fi
@@ -1722,7 +1722,7 @@ for application in ${APPLICATIONS}; do
 
             if [ -z "${DONT_BUILD_BUT_DO_EXPORTS}" ]; then
                 if [ -e "${PREFIX}/${application}${INSTALLED_MARK}" ]; then
-                    if [ "${CHANGED}" = "true" ]; then
+                    if [ "${CHANGED}" = "YES" ]; then
                         note "  ${application} (${cyan}1${green} of ${cyan}${req_all}${green})"
                         note "   ${NOTE_CHAR2} App dependencies changed. Rebuilding: ${cyan}${application}"
                         execute_process "${application}"
@@ -1797,7 +1797,7 @@ for application in ${APPLICATIONS}; do
             run "${APP_AFTER_EXPORT_CALLBACK}"
         fi
 
-        if [ "${APP_CLEAN_USELESS}" = "true" ]; then
+        if [ "${APP_CLEAN_USELESS}" = "YES" ]; then
             for pattern in ${APP_USELESS} ${APP_DEFAULT_USELESS}; do
                 if [ ! -z "${PREFIX}" ]; then
                     debug "Pattern: ${pattern}"
@@ -1970,7 +1970,7 @@ for application in ${APPLICATIONS}; do
                 ;;
         esac
 
-        if [ "${APP_APPLE_BUNDLE}" = "true" ]; then
+        if [ ! -z "${APP_APPLE_BUNDLE}" ]; then
             APP_LOWERNAME="${APP_NAME}"
             APP_NAME="$(${PRINTF_BIN} "${APP_NAME}" | ${CUT_BIN} -c1 2>/dev/null | ${TR_BIN} '[a-z]' '[A-Z]' 2>/dev/null)$(${PRINTF_BIN} "${APP_NAME}" | ${SED_BIN} 's/^[a-zA-Z]//' 2>/dev/null)"
             APP_BUNDLE_NAME="${PREFIX}.app"
