@@ -901,8 +901,10 @@ if [ ! "$1" = "" ]; then
             error "Failure in build process. Report or fix the definition please!"
         }
         fail_on_background_sofin_job ${dependencies}
-        USE_UPDATE=false USE_BINBUILD=false ${SOFIN_BIN} install ${dependencies} || def_error
-        exit
+
+        export USE_UPDATE=false
+        export USE_BINBUILD=false
+        export APPLICATIONS="${dependencies}"
         ;;
 
 
