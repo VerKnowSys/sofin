@@ -206,10 +206,13 @@ reload_zsh_shells () {
             pattern="\d ${ZSH_BIN}" # NOTE: this fixes issue with SIGUSR2 signal sent to iTerm
         fi
         pids=$(${PS_BIN} ${PS_DEFAULT_OPTS} 2>/dev/null | ${GREP_BIN} -v grep 2>/dev/null | ${EGREP_BIN} "${pattern}" 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)
-        note "Reloading all ${cyan}$(${BASENAME_BIN} "${SHELL}" 2>/dev/null)${green} shells: ${cyan}$(echo ${pids} | ${TR_BIN} '\n' ' ' 2>/dev/null)"
+        wishlist=""
         for pid in ${pids}; do
-            ${KILL_BIN} -SIGUSR2 ${pid}
+            wishlist="${wishlist}${pid} "
         done
+        ${KILL_BIN} -SIGUSR2 ${wishlist} && \
+        note "All running ${cyan}$(${BASENAME_BIN} "${SHELL}" 2>/dev/null)${green} sessions: ${cyan}${wishlist}${green}were reloaded successfully"
+        unset wishlist pids
     else
         write_info_about_shell_configuration
     fi
@@ -217,7 +220,8 @@ reload_zsh_shells () {
 
 
 write_info_about_shell_configuration () {
-    warn "SHELL_PID is not set. Sofin auto-reload function is temporarely disabled."
+    warn "${cyan}SHELL_PID${green} has no value (normally contains pid of current shell)"
+    warn "Shell auto reload function is disabled for this session"
 }
 
 
