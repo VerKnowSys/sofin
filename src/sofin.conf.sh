@@ -3,7 +3,7 @@
 #
 
 # Sofin version string:
-readonly SOFIN_VERSION="0.98.1"
+readonly SOFIN_VERSION="0.98.2"
 
 # setting up definitions repository
 if [ -z "${BRANCH}" ]; then
@@ -164,7 +164,7 @@ readonly SUCCESS_CHAR
 readonly WARN_CHAR
 readonly NOTE_CHAR
 readonly ERROR_CHAR
-
+readonly SEPARATOR="_________________________________________________________"
 
 umask 027 # default, and should be global. New files created with chmod: 750 by default.
 

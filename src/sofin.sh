@@ -144,7 +144,7 @@ update_definitions () {
 
             note "${red}Error occured: Update from branch: ${BRANCH} of repository: ${REPOSITORY} wasn't possible. Log below:${reset}"
             ${TAIL_BIN} -n${LOG_LINES_AMOUNT_ON_ERR} ${LOG} 2>/dev/null
-            error "_________________________________________________________"
+            error "${SEPARATOR}"
 
         else # else use default branch
             debug "Using default branch: ${BRANCH}"
@@ -157,7 +157,7 @@ update_definitions () {
 
             note "${red}Error occured: Update from branch: ${BRANCH} of repository: ${REPOSITORY} wasn't possible. Log below:${reset}"
             ${TAIL_BIN} -n${LOG_LINES_AMOUNT_ON_ERR} ${LOG} 2>/dev/null
-            error "_________________________________________________________"
+            error "${SEPARATOR}"
         fi
     else
         # create cache; clone definitions repository:
@@ -178,7 +178,7 @@ update_definitions () {
 
         note "${red}Error occured: Update from branch: ${BRANCH} of repository: ${REPOSITORY} wasn't possible. Log below:${reset}"
         ${TAIL_BIN} -n${LOG_LINES_AMOUNT_ON_ERR} ${LOG} 2>/dev/null
-        error "_________________________________________________________"
+        error "${SEPARATOR}"
     fi
 }
 
@@ -410,7 +410,7 @@ if [ ! "$1" = "" ]; then
         fi
         for dir in ${all_dirs}; do
             note
-            warn "_________________________________________________________"
+            warn "${SEPARATOR}"
             warn "Quit viever/ Exit that shell, to continue with next build dir"
             warn "Sofin will now traverse through build logs, looking for errors.."
 
@@ -921,6 +921,7 @@ if [ ! "$1" = "" ]; then
             USE_BINBUILD=false ${SOFIN_BIN} install ${software} || def_error && \
             ${SOFIN_BIN} push ${software} || def_error && \
             note "Software bundle deployed successfully: ${cyan}${software}"
+            note "${SEPARATOR}"
         done
         exit 0
         ;;
@@ -1477,7 +1478,7 @@ for application in ${APPLICATIONS}; do
                                     if [ ! -d "${app_cache_dir}/branches" -a ! -f "${app_cache_dir}/config" ]; then
                                         note "\n${red}Definitions were not updated. Below displaying ${cyan}${LOG_LINES_AMOUNT_ON_ERR}${green} lines of internal log:${reset}"
                                         ${TAIL_BIN} -n${LOG_LINES_AMOUNT_ON_ERR} ${LOG} 2>/dev/null
-                                        error "_________________________________________________________"
+                                        error "${SEPARATOR}"
                                     else
                                         current="$(${PWD_BIN} 2>/dev/null)"
                                         debug "Trying to update existing bare repository cache in: ${app_cache_dir}"
