@@ -601,7 +601,7 @@ if [ ! "$1" = "" ]; then
                 fi
             done
         }
-        process ${SOFTWARE_ROOT_DIR}
+        process ${SOFTWARE_DIR}
         if [ "${USERNAME}" != "root" ]; then
             process ${SOFTWARE_DIR}
         fi
@@ -625,7 +625,7 @@ if [ ! "$1" = "" ]; then
                 fi
             done
         }
-        process ${SOFTWARE_ROOT_DIR}
+        process ${SOFTWARE_DIR}
         if [ "${USERNAME}" != "root" ]; then
             process ${SOFTWARE_DIR}
         fi
@@ -640,7 +640,7 @@ if [ ! "$1" = "" ]; then
                 fi
             done
         }
-        process ${SOFTWARE_ROOT_DIR}
+        process ${SOFTWARE_DIR}
         if [ "${USERNAME}" != "root" ]; then
             process ${SOFTWARE_DIR}
         fi
@@ -660,7 +660,7 @@ if [ ! "$1" = "" ]; then
                 fi
             done
         }
-        process ${SOFTWARE_ROOT_DIR}
+        process ${SOFTWARE_DIR}
         if [ "${USERNAME}" != "root" ]; then
             process ${SOFTWARE_DIR}
         fi
@@ -1322,7 +1322,7 @@ for application in ${APPLICATIONS}; do
                                 ${RM_BIN} -fv ${ARCHIVE_NAME}.sha1
                             fi
                         fi
-                        cd "${SOFTWARE_ROOT_DIR}"
+                        cd "${SOFTWARE_DIR}"
 
                         debug "ARCHIVE_NAME: ${ARCHIVE_NAME}. Expecting binbuild to be available in: ${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}"
                         if [ -e "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" ]; then # if exists, then checksum is ok
