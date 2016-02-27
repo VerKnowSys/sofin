@@ -319,9 +319,9 @@ case "${SYSTEM_NAME}" in
         export BC_BIN="/usr/bin/bc"
         export CHOWN_BIN="/bin/chown"
         export DEFAULT_LDFLAGS="-fPIC"
-        export DEFAULT_COMPILER_FLAGS="-w -O2 -fPIC -mno-avx ${COMMON_SAFE_CC_FLAGS}"
+        export DEFAULT_COMPILER_FLAGS="-w -O2 -fPIC -mno-avx -fno-strict-overflow -fstack-protector-all"
         if [ ! -z "${DEBUGBUILD}" ]; then
-            export DEFAULT_COMPILER_FLAGS="-O0 -fPIC -mno-avx -ggdb ${COMMON_SAFE_CC_FLAGS}"
+            export DEFAULT_COMPILER_FLAGS="-O0 -fPIC -mno-avx -ggdb -fno-strict-overflow -fstack-protector-all"
         fi
         # Golden linker support without LLVM plugin:
         if [ -x "/usr/bin/ld.gold" ]; then
