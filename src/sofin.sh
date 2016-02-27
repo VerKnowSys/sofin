@@ -505,8 +505,8 @@ if [ ! "$1" = "" ]; then
                             ;;
 
                         *)
-                            note "Found ${cyan}${num}${green} log files, that match pattern: ${cyan}${pattern}${green}. Attaching tails.."
-                            ${TAIL_BIN} -n ${LOG_LINES_AMOUNT} -F ${files}
+                            note "Found ${cyan}${num}${green} log files, that match pattern: ${cyan}${pattern}${green}. Attaching to all available files.."
+                            ${TAIL_BIN} -F ${files}
                             ;;
                     esac
                 fi
