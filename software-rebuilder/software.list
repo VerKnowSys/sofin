@@ -13,6 +13,8 @@ Dhcp
 Dovecot
 Elixir
 Exim
+Fontconfig
+Freetype
 Gd
 Ghostscript
 Gmake
@@ -27,6 +29,7 @@ Httpd22
 Icecast
 ImageMagick
 Influxdb
+Jam
 Krb
 Lame
 Libgs
