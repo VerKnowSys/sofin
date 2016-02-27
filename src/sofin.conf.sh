@@ -3,7 +3,7 @@
 #
 
 # Sofin version string:
-readonly SOFIN_VERSION="0.98.5"
+readonly SOFIN_VERSION="0.98.6"
 
 # setting up definitions repository
 if [ -z "${BRANCH}" ]; then
@@ -212,8 +212,9 @@ export DEFAULT_ZPOOL="zroot"
 export DEFAULT_LDFLAGS="-fPIC -fPIE"
 export readonly SYSTEM_NAME="$(uname -s 2>/dev/null)"
 export readonly SYSTEM_ARCH="$(uname -m 2>/dev/null)"
+export readonly COMMON_SAFE_CC_FLAGS="-ffast-math -fno-strict-overflow -fstack-protector-all"
 
-export CROSS_PLATFORM_COMPILER_FLAGS="-w -fPIC -ffast-math -fno-strict-overflow -fstack-protector-all"
+export CROSS_PLATFORM_COMPILER_FLAGS="-fPIC ${COMMON_SAFE_CC_FLAGS}"
 if [ -z "${DEBUGBUILD}" ]; then
     export DEFAULT_COMPILER_FLAGS="-O2 -fPIE ${CROSS_PLATFORM_COMPILER_FLAGS}"
 else
@@ -276,9 +277,9 @@ case "${SYSTEM_NAME}" in
         export FETCH_BIN="/usr/bin/curl --connect-timeout 3 -O"
         export PATCH_BIN="/usr/bin/patch -p0 "
         export DEFAULT_LDFLAGS="-fPIC" # -arch x86_64 fPIE isn't well supported on OSX, but it's not production anyway
-        export DEFAULT_COMPILER_FLAGS="-w -O2 -ffast-math -fPIC -fno-strict-overflow -fstack-protector-all"
+        export DEFAULT_COMPILER_FLAGS="-w -O2 -fPIC ${COMMON_SAFE_CC_FLAGS}"
         if [ ! -z "${DEBUGBUILD}" ]; then
-            export DEFAULT_COMPILER_FLAGS="${DEFAULT_COMPILER_FLAGS} -O0 -g"
+            export DEFAULT_COMPILER_FLAGS="-O0 -g -fPIC ${COMMON_SAFE_CC_FLAGS}"
         fi
         export SHA_BIN="/usr/bin/shasum"
         export SYSCTL_BIN="/usr/sbin/sysctl"
@@ -318,9 +319,9 @@ case "${SYSTEM_NAME}" in
         export BC_BIN="/usr/bin/bc"
         export CHOWN_BIN="/bin/chown"
         export DEFAULT_LDFLAGS="-fPIC"
-        export DEFAULT_COMPILER_FLAGS="-w -O2 -mno-avx -ffast-math -fPIC -fno-strict-overflow -fstack-protector-all"
+        export DEFAULT_COMPILER_FLAGS="-w -O2 -fPIC -mno-avx ${COMMON_SAFE_CC_FLAGS}"
         if [ ! -z "${DEBUGBUILD}" ]; then
-            export DEFAULT_COMPILER_FLAGS="-O0 -mno-avx -ggdb -fPIC -fno-strict-overflow -fstack-protector-all"
+            export DEFAULT_COMPILER_FLAGS="-O0 -fPIC -mno-avx -ggdb ${COMMON_SAFE_CC_FLAGS}"
         fi
         # Golden linker support without LLVM plugin:
         if [ -x "/usr/bin/ld.gold" ]; then
