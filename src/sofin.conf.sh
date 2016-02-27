@@ -3,7 +3,7 @@
 #
 
 # Sofin version string:
-readonly SOFIN_VERSION="0.98.4"
+readonly SOFIN_VERSION="0.98.5"
 
 # setting up definitions repository
 if [ -z "${BRANCH}" ]; then
@@ -213,7 +213,7 @@ export DEFAULT_LDFLAGS="-fPIC -fPIE"
 export readonly SYSTEM_NAME="$(uname -s 2>/dev/null)"
 export readonly SYSTEM_ARCH="$(uname -m 2>/dev/null)"
 
-export CROSS_PLATFORM_COMPILER_FLAGS="-w -fPIC -fno-strict-overflow -fstack-protector-all"
+export CROSS_PLATFORM_COMPILER_FLAGS="-w -fPIC -ffast-math -fno-strict-overflow -fstack-protector-all"
 if [ -z "${DEBUGBUILD}" ]; then
     export DEFAULT_COMPILER_FLAGS="-O2 -fPIE ${CROSS_PLATFORM_COMPILER_FLAGS}"
 else
