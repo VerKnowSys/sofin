@@ -1382,6 +1382,14 @@ for application in ${APPLICATIONS}; do
                     unset LDFLAGS
                 fi
 
+                if [ ! -z "${APP_NO_FAST_MATH}" ]; then
+                    debug "Trying to disable fast math option"
+                    CROSS_PLATFORM_COMPILER_FLAGS="$(echo "${CROSS_PLATFORM_COMPILER_FLAGS}" | ${SED_BIN} -e 's/-ffast-math//' 2>/dev/null)"
+                    DEFAULT_COMPILER_FLAGS="$(echo "${DEFAULT_COMPILER_FLAGS}" | ${SED_BIN} -e 's/-ffast-math//' 2>/dev/null)"
+                    CFLAGS="$(echo "${CFLAGS}" | ${SED_BIN} -e 's/-ffast-math//' 2>/dev/null)"
+                    CXXFLAGS="$(echo "${CXXFLAGS}" | ${SED_BIN} -e 's/-ffast-math//' 2>/dev/null)"
+                fi
+
                 if [ -z "${APP_NO_CCACHE}" ]; then # ccache is supported by default but it's optional
                     if [ -x "${CCACHE_BIN_OPTIONAL}" ]; then # check for CCACHE availability
                         export CC="${CCACHE_BIN_OPTIONAL} ${CC}"
