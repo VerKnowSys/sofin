@@ -13,6 +13,8 @@ Courier
 Cups
 Curl
 Dar
+Db
+Db47
 Dhcp
 Dovecot
 Elixir
@@ -50,6 +52,7 @@ Nasm
 Ncmpc
 Nginx
 Nmap
+Node010
 Node012
 Node41
 Node42
@@ -110,7 +113,6 @@ Vim
 Xz
 Yasm
 Zabbix
-Zeromq
-zeromq3
+Zeromq4
 Znc
 ------
