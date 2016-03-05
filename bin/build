@@ -12,11 +12,10 @@ if [ -x "/usr/bin/clang++" ]; then
     export CXX="/usr/bin/clang++"
 fi
 if [ ! -x "${CXX}" ]; then
-    error "C++ compiler is required to install Sofin"
-    exit 1
+    error "C++ compiler is required to compile Sofin utilities"
 fi
 
-readonly CLANG_OPTIONS="-Os -fPIC -fPIE"
+readonly CLANG_OPTIONS="-Os -fPIC -fPIE -fno-strict-overflow -fstack-protector-all"
 
 shell_configuration=$(${CAT_BIN} <<EOF
 if [ "\$(${ID_BIN} -u)" = "0" ]; then
@@ -60,12 +59,12 @@ install_base () {
     build_natives
     if [ "${INSTALL}" = "YES" ]; then
         if [ "$(${ID_BIN} -u)" = "0" ]; then
-            note "Removing already installed Sofin files.."
-            ${RM_BIN} -fv "${PREFIX}/usr/bin/s"
-            ${RM_BIN} -fv "${PREFIX}/usr/bin/sofin"
-            ${RM_BIN} -fv "${PREFIX}/usr/bin/sofin-version-utility"
-            ${RM_BIN} -fv "${PREFIX}/usr/bin/sofin-microseconds"
-            ${RM_BIN} -fv "${PREFIX}/etc/${CONF_FILE}"
+            ${RM_BIN} -fv "${PREFIX}usr/bin/s" && \
+            ${RM_BIN} -fv "${PREFIX}usr/bin/sofin" && \
+            ${RM_BIN} -fv "${PREFIX}usr/bin/sofin-version-utility" && \
+            ${RM_BIN} -fv "${PREFIX}usr/bin/sofin-microseconds" && \
+            ${RM_BIN} -fv "${PREFIX}etc/${CONF_FILE}" && \
+            debug "Old Sofin files were wiped out"
         fi
         install_sofin
     fi
@@ -74,43 +73,34 @@ install_base () {
 
 build_natives () {
     if [ -x "${CXX}" ]; then
-        note "C++ compiler available. Using: ${CXX}"
-
+        debug "C++ compiler available. Using: $(distinct n ${CXX})"
         ${CXX} ${CLANG_OPTIONS} -o bin/sofin-microseconds src/sofin_microseconds.cc && \
-        note "Sofin microseconds utility has been successfully built" && \
+        note "$(distinct n "Microseconds since '70 utility") has been successfully built" && \
         ${CXX} ${CLANG_OPTIONS} -o bin/sofin-version-utility src/sofin-version-utility.cc && \
-        note "Sofin version utility has been successfully built"
-
-        # if [ "${SYSTEM_NAME}" = "Darwin" ]; then
-        #     ${CXX} ${CLANG_OPTIONS} -c -I./src/dylibbundler ./src/dylibbundler/Settings.cpp -o src/.Settings.o && \
-        #     ${CXX} ${CLANG_OPTIONS} -c -I./src/dylibbundler ./src/dylibbundler/DylibBundler.cpp -o src/.DylibBundler.o && \
-        #     ${CXX} ${CLANG_OPTIONS} -c -I./src/dylibbundler ./src/dylibbundler/Dependency.cpp -o src/.Dependency.o && \
-        #     ${CXX} ${CLANG_OPTIONS} -c -I./src/dylibbundler ./src/dylibbundler/main.cpp -o src/.main.o && \
-        #     ${CXX} ${CLANG_OPTIONS} -c -I./src/dylibbundler ./src/dylibbundler/Utils.cpp -o src/.Utils.o && \
-        #     ${CXX} ${CLANG_OPTIONS} -o bin/sofin-dylibbundler src/.Settings.o src/.DylibBundler.o src/.Dependency.o src/.main.o src/ .Utils.o && \
-        #     note "Dylib bundler has been built"
-        # fi
+        note "$(distinct n "Cross platform version check utility") has been successfully built"
     else
         error "C++ compiler is required to continue"
-        exit 1
     fi
 }
 
 
 install_sofin () {
-    note "Putting Sofin files into place in prefix: ${PREFIX}"
     if [ ! -z "${PREFIX}" ]; then
-        ${MKDIR_BIN} -p "${PREFIX}" "${PREFIX}/etc" "${PREFIX}/usr/bin"
+        for a_path in "${PREFIX}" "${PREFIX}etc" "${PREFIX}usr/bin"; do
+            ${MKDIR_BIN} -p "${a_path}" || error "Privileges sanity check failure!\
+No owner privileges for current user: $(distinct e ${USER}), found for path: $(distinct e ${a_path})\
+Sofin requires read + write access for that path"
+        done
+    else
+        PREFIX="/"
     fi
-    ${CP_BIN} -v "src/${CONF_FILE}" "${PREFIX}/etc/${CONF_FILE}" && \
-    # if [ "${SYSTEM_NAME}" = "Darwin" ]; then
-    #     ${CP_BIN} -v "bin/sofin-dylibbundler" "${PREFIX}/usr/bin/sofin-dylibbundler"
-    # fi
-    ${CP_BIN} -v "bin/sofin-version-utility" ${PREFIX}/usr/bin/sofin-version-utility && \
-    ${CP_BIN} -v "bin/sofin-microseconds" ${PREFIX}/usr/bin/sofin-microseconds && \
-    ${CP_BIN} -v "src/sofin.sh" ${PREFIX}/usr/bin/s && \
-    sofin_version="$(${GREP_BIN} 'readonly SOFIN_VERSION=' /etc/sofin.conf.sh 2>/dev/null | ${AWK_BIN} '{ gsub(/\"/, "", $2); gsub(/SOFIN_VERSION=/, "", $2); print $2; }' 2>/dev/null)" && \
-    note "Sofin v${sofin_version} installed." && \
-    note "Type \"s usage\" for help." && \
-    note "Read https://bitbucket.org/verknowsys/sofin for more details."
+    note "Installing to prefix: $(distinct n ${PREFIX})"
+    note "$(distinct n $(${INSTALL_BIN} -v "bin/sofin-version-utility" "${PREFIX}usr/bin"))" && \
+    note "$(distinct n $(${INSTALL_BIN} -v "bin/sofin-microseconds" "${PREFIX}usr/bin"))" && \
+    note "$(distinct n $(${INSTALL_BIN} -v "bin/sofin-microseconds" "${PREFIX}usr/bin"))" && \
+    note "$(distinct n $(${INSTALL_BIN} -v "src/${CONF_FILE}" "${PREFIX}etc/s.conf"))" && \
+    note "$(distinct n $(${INSTALL_BIN} -v "src/sofin.sh" "${PREFIX}usr/bin/s"))" && \
+    note "$(distinct n Sof)tware $(distinct n In)staller, version: $(distinct n "${SOFIN_VERSION}") was installed successfully." && \
+    note "Type: $(distinct n "s usage") for help." && \
+    note "Read: $(distinct n "https://bitbucket.org/verknowsys/sofin") for more details."
 }
