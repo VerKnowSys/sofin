@@ -2,7 +2,7 @@
 
 chmod 600 ~/.ssh/id_rsa
 
-. /etc/sofin.conf.sh
+. /etc/s.conf
 . /var/ServeD-OS/setup-buildhost
 setup_buildhost
 
