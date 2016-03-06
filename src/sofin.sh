@@ -1034,10 +1034,10 @@ if [ ! "$1" = "" ]; then
         # first look for a list with that name:
         if [ -e "${LISTS_DIR}${2}" ]; then
             export APPLICATIONS="$(${CAT_BIN} ${LISTS_DIR}${2} 2>/dev/null | ${TR_BIN} '\n' ' ' 2>/dev/null)"
-            debug "Removing list of applications: ${APPLICATIONS}"
+            debug "Removing list of applications: $(distinct d ${APPLICATIONS})"
         else
             export APPLICATIONS="${SOFIN_ARGS}"
-            debug "Removing applications: ${APPLICATIONS}"
+            debug "Removing applications: $(distinct d ${APPLICATIONS})"
         fi
 
         for app in $APPLICATIONS; do
@@ -1054,13 +1054,13 @@ if [ ! "$1" = "" ]; then
                 name="$(echo "${given_app_name}" | ${SED_BIN} 's/[0-9]*//g' 2>/dev/null)"
                 alternative="$(${FIND_BIN} ${SOFTWARE_DIR} -maxdepth 1 -type d -name "${name}*" -not -name "${given_app_name}" 2>/dev/null | ${SED_BIN} 's/^.*\///g' 2>/dev/null | ${HEAD_BIN} -n1 2>/dev/null)"
                 alt_lower="$(lowercase ${alternative})"
-                debug "Alternative: ${alternative}, Given: ${given_app_name}, Alt_lower: ${alt_lower}, full: ${SOFTWARE_DIR}${alternative}/${alt_lower}${INSTALLED_MARK}"
+                debug "Alternative: $(distinct d ${alternative}), Given: $(distinct d ${given_app_name}), Alt_lower: $(distinct d ${alt_lower}), full: $(distinct d ${SOFTWARE_DIR}${alternative}/${alt_lower}${INSTALLED_MARK})"
                 if [ ! -z "${alternative}" -a -f "${SOFTWARE_DIR}${alternative}/${alt_lower}${INSTALLED_MARK}" ]; then
                     note "Automatically picking first alternative already installed: $(distinct n ${alternative})"
                     export APPLICATIONS="${alternative}"
                     continue
                 elif [ -z "${alternative}" ]; then
-                    debug "No alternative: ${alternative} != ${given_app_name}"
+                    debug "No alternative: $(distinct d ${alternative}) != $(distinct d ${given_app_name})"
                     export APPLICATIONS=""
                     continue
                 fi
