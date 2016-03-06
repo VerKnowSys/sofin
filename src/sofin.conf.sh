@@ -431,6 +431,27 @@ Thanks to $(distinct n verknowsys.com) and $(distinct n others)"
 }
 
 
+capitalize () {
+    name="$1"
+    if [ -z "${name}" ]; then
+        error "Empty application name given for function: $(distinct e "capitalize()")"
+    fi
+    _head="$(${PRINTF_BIN} "${name}" 2>/dev/null | ${CUT_BIN} -c1 2>/dev/null | ${TR_BIN} '[a-z]' '[A-Z]' 2>/dev/null)"
+    _tail="$(${PRINTF_BIN} "${name}" 2>/dev/null | ${SED_BIN} 's/^[a-zA-Z]//' 2>/dev/null)"
+    ${PRINTF_BIN} "${_head}${_tail}"
+    unset _head _tail
+}
+
+
+lowercase () {
+    name="$1"
+    if [ -z "${name}" ]; then
+        error "Empty application name given for function: $(distinct e "lowercase()")"
+    fi
+    ${PRINTF_BIN} "${name}" 2>/dev/null | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null
+}
+
+
 fill () {
     _char="${1}"
     if [ -z "${_char}" ]; then
