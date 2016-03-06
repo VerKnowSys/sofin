@@ -390,6 +390,13 @@ check_command_result () {
         shift
         error "Command failure: '$*'. Run ${cyan}$(${BASENAME_BIN} ${SOFIN_BIN} 2>/dev/null) log your-def${red}, to see what went wrong"
         exit 1
+
+
+def_error () {
+    if [ -z "${2}" ]; then
+        error "Failed action for: $(distinct e $1). Report it if necessary on: $(distinct e "${DEFAULT_ISSUE_REPORT_SITE}") or fix definition please!"
+    else
+        error "${2}. Report it if necessary on: $(distinct e "${DEFAULT_ISSUE_REPORT_SITE}") or fix definition please!"
     fi
 }
 
