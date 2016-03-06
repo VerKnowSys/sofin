@@ -24,7 +24,45 @@ readonly gray='\033[37;40m'
 readonly white='\033[38;40m'
 readonly reset='\033[0m'
 
-readonly SOFIN_HEADER="Sofin v${cyan}${SOFIN_VERSION} ${green}(c) 2o11-2o16 verknowsys.com"
+TTY="NO"
+SUCCESS_CHAR="V"
+WARN_CHAR="*"
+NOTE_CHAR=">"
+ERROR_CHAR="#"
+NOTE_CHAR2="-"
+SEPARATOR_CHAR="_"
+if [ -t 1 ]; then
+    TTY="YES"
+    SUCCESS_CHAR="√"
+    WARN_CHAR="•"
+    NOTE_CHAR="→"
+    NOTE_CHAR2="»"
+    ERROR_CHAR="✘"
+    SEPARATOR_CHAR="┈"
+fi
+export DISTINCT_COLOUR="${cyan}"
+export TTY
+export readonly SUCCESS_CHAR
+export readonly WARN_CHAR
+export readonly NOTE_CHAR
+export readonly ERROR_CHAR
+export readonly SEPARATOR_CHAR
+
+
+warn () {
+    cecho "$1" ${yellow}
+}
+
+
+note () {
+    cecho "$1" ${green}
+}
+
+
+error () {
+    cecho "${ERROR_CHAR} $1" ${red}
+    exit 1
+}
 
 
 distinct () {
@@ -56,6 +94,8 @@ distinct () {
             ;;
     esac
 }
+
+readonly DEFAULT_ISSUE_REPORT_SITE="https://bitbucket.org/verknowsys/sofin/issues"
 readonly SOFIN_PROFILE="/etc/profile_sofin"
 readonly SOFIN_DISABLED_INDICATOR_FILE="${HOME}/.sofin-disabled"
 readonly SERVICES_DIR="/Services/"
@@ -163,33 +203,14 @@ SEQ_BIN="/usr/bin/seq"
 CHFLAGS_BIN="/bin/chflags"
 LOGGER_BIN="/usr/bin/logger"
 
-OS_VERSION=10
+export OS_VERSION=11 # NOTE: default fallback version if no sofin version utility is available
 if [ -x "${SOFIN_VERSION_UTILITY_BIN}" ]; then
     export OS_VERSION="$(echo $(${SOFIN_VERSION_UTILITY_BIN} 2>/dev/null) | ${AWK_BIN} '{ gsub(/\./, ""); print $1; }' 2>/dev/null)"
     export FULL_SYSTEM_VERSION="$(${SOFIN_VERSION_UTILITY_BIN} 2>/dev/null)"
 fi
-USERNAME="$(${ID_BIN} ${DEFAULT_ID_OPTIONS} 2>/dev/null)"
+readonly USERNAME="$(${ID_BIN} ${DEFAULT_ID_OPTIONS} 2>/dev/null)"
+readonly SOFIN_BIN_SHORT="$(${BASENAME_BIN} ${SOFIN_BIN} 2>/dev/null)"
 
-TTY="NO"
-SUCCESS_CHAR="V"
-WARN_CHAR="*"
-NOTE_CHAR=">"
-ERROR_CHAR="#"
-NOTE_CHAR2="-"
-if [ -t 1 ]; then
-    TTY="YES"
-    SUCCESS_CHAR="√"
-    WARN_CHAR="•"
-    NOTE_CHAR="»"
-    NOTE_CHAR2="→"
-    ERROR_CHAR="✘"
-fi
-readonly TTY
-readonly SUCCESS_CHAR
-readonly WARN_CHAR
-readonly NOTE_CHAR
-readonly ERROR_CHAR
-readonly SEPARATOR="_________________________________________________________"
 
 umask 027 # default, and should be global. New files created with chmod: 750 by default.
 
@@ -219,22 +240,6 @@ debug () {
     else
         cecho "# $1" ${magenta} # NOTE: this "#" is required for debug mode to work properly with generation of ~/.profile and /etc/profile_sofin files!
     fi
-}
-
-
-warn () {
-    cecho "$1" ${yellow}
-}
-
-
-note () {
-    cecho "$1" ${green}
-}
-
-
-error () {
-    cecho "${ERROR_CHAR} $1" ${red}
-    exit 1
 }
 
 
@@ -380,16 +385,17 @@ esac
 
 check_command_result () {
     if [ -z "$1" ]; then
-        error "No param given for check_command_result()!"
-        exit 1
+        error "Empty command given for: $(distinct e "check_command_result()")!"
     fi
     if [ "$1" = "0" ]; then
         shift
-        debug "Command successful: '$*'"
+        debug "Command successful: '$(distinct d "$*")'"
     else
         shift
-        error "Command failure: '$*'. Run ${cyan}$(${BASENAME_BIN} ${SOFIN_BIN} 2>/dev/null) log your-def${red}, to see what went wrong"
-        exit 1
+        error "Action failed: '$(distinct e "$*")'.
+Might try this: $(distinct e $(${BASENAME_BIN} ${SOFIN_BIN} 2>/dev/null) log defname), to see what went wrong"
+    fi
+}
 
 
 os_tripple () {
@@ -501,7 +507,7 @@ validate_env () {
     do
         var_value="$(${PRINTF_BIN} "${envvar}" | ${AWK_BIN} '{sub(/^[A-Z_]*=/, ""); print $1;}' 2>/dev/null)"
         if [ ! -x "${var_value}" ]; then
-            error "Required binary is unavailable: ${cyan}${envvar}"
+            error "Required binary is unavailable: $(distinct e ${envvar})"
             exit 1
         fi
     done || exit 1
