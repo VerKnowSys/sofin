@@ -865,12 +865,14 @@ if [ ! "$1" = "" ]; then
 
                         shortsha="$(${CAT_BIN} "${name}.sha1" 2>/dev/null | ${CUT_BIN} -c -16 2>/dev/null)…"
                         note "Pushing archive #$(distinct n ${shortsha}) to remote repository.."
-                        retry "${SCP_BIN} -P ${MAIN_PORT} ${name} ${address}/${name}.partial" || def_error "${name}" "Error sending: $(distinct e "${1}") bundle to: $(distinct e "${address}/${1}")"
+                        retry "${SCP_BIN} -P ${MAIN_PORT} ${name} ${address}/${name}.partial" || \
+                            def_error "${name}" "Error sending: $(distinct e "${1}") bundle to: $(distinct e "${address}/${1}")"
                         if [ "$?" = "0" ]; then
                             ${SSH_BIN} -p ${MAIN_PORT} ${MAIN_USER}@${mirror} "cd ${MAIN_SOFTWARE_PREFIX}/software/binary/${OS_TRIPPLE} && ${MV_BIN} ${name}.partial ${name}"
-                            retry "${SCP_BIN} -P ${MAIN_PORT} ${name}.sha1 ${address}/${name}.sha1" || def_error ${name}.sha1 "Error sending: $(distinct e ${name}.sha1) file to: $(distinct e "${address}/${1}")"
+                            retry "${SCP_BIN} -P ${MAIN_PORT} ${name}.sha1 ${address}/${name}.sha1" || \
+                                def_error ${name}.sha1 "Error sending: $(distinct e ${name}.sha1) file to: $(distinct e "${address}/${1}")"
                         else
-                            error "Failed to push binary build of: $(distinct e ${name}) to remote: $(distinct n ${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${name})"
+                            error "Failed to push binary build of: $(distinct e ${name}) to remote: $(distinct e ${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${name})"
                         fi
 
                         if [ "${SYSTEM_NAME}" = "FreeBSD" ]; then # NOTE: feature designed for FBSD.
@@ -900,7 +902,7 @@ if [ ! "$1" = "" ]; then
                     ${RM_BIN} -f "${name}" "${name}.sha1" "${final_snap_file}"
                 fi
             else
-                warn "Not found software: ${element}!"
+                warn "Not found software: $(distinct w ${element})!"
             fi
         done
         exit
@@ -911,9 +913,6 @@ if [ ! "$1" = "" ]; then
         shift
         dependencies=$*
         note "Software bundles to be built: $(distinct n ${dependencies})"
-        def_error () {
-            error "Failure in build process. Report or fix the definition please!"
-        }
         fail_on_background_sofin_job ${dependencies}
 
         export USE_UPDATE=NO
@@ -929,8 +928,10 @@ if [ ! "$1" = "" ]; then
         note "Software bundles to be built and deployed to remote: $(distinct n ${dependencies})"
         for software in ${dependencies}; do
             fail_on_background_sofin_job ${software}
-            USE_BINBUILD=NO ${SOFIN_BIN} install ${software} || def_error "${software}" && \
-            ${SOFIN_BIN} push ${software} || def_error "${software}" && \
+            USE_BINBUILD=NO ${SOFIN_BIN} install ${software} || \
+                def_error "${software}" "Installation failure" && \
+            ${SOFIN_BIN} push ${software} || \
+                def_error "${software}" "Push failure" && \
             note "Software bundle deployed successfully: $(distinct n ${software})"
             note "$(fill)"
         done
@@ -980,9 +981,12 @@ if [ ! "$1" = "" ]; then
                 continue
             fi
             ${SOFIN_BIN} remove ${software}
-            USE_BINBUILD=NO ${SOFIN_BIN} install ${software} || def_error "${software}"
-            USE_FORCE=YES ${SOFIN_BIN} wipe ${software} || def_error "${software}"
-            ${SOFIN_BIN} push ${software} || def_error "${software}"
+            USE_BINBUILD=NO ${SOFIN_BIN} install ${software} || \
+                def_error "${software}" "Installation failed"
+            USE_FORCE=YES ${SOFIN_BIN} wipe ${software} || \
+                def_error "${software}" "Wipe failed"
+            ${SOFIN_BIN} push ${software} || \
+                def_error "${software}" "Push failed"
         done
         exit
         ;;
