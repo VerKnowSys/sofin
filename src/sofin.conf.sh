@@ -25,6 +25,37 @@ readonly white='\033[38;40m'
 readonly reset='\033[0m'
 
 readonly SOFIN_HEADER="Sofin v${cyan}${SOFIN_VERSION} ${green}(c) 2o11-2o16 verknowsys.com"
+
+
+distinct () {
+    msg_type="${1}"
+    shift
+    content="$*"
+    if [ -z "${msg_type}" ]; then
+        error "No message type given as first param for: ${DISTINCT_COLOUR}distinct()${red}!"
+    fi
+    case ${msg_type} in
+        n|note)
+            printf "${DISTINCT_COLOUR}${content}${green}"
+            ;;
+
+        d|debug)
+            printf "${DISTINCT_COLOUR}${content}${magenta}"
+            ;;
+
+        w|warn)
+            printf "${DISTINCT_COLOUR}${content}${yellow}"
+            ;;
+
+        e|error)
+            printf "${DISTINCT_COLOUR}${content}${red}"
+            ;;
+
+        *)
+            printf "${msg_type}${content}${reset}"
+            ;;
+    esac
+}
 readonly SOFIN_PROFILE="/etc/profile_sofin"
 readonly SOFIN_DISABLED_INDICATOR_FILE="${HOME}/.sofin-disabled"
 readonly SERVICES_DIR="/Services/"
