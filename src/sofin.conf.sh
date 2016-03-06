@@ -392,6 +392,11 @@ check_command_result () {
         exit 1
 
 
+os_tripple () {
+    ${PRINTF_BIN} "${SYSTEM_NAME}-${FULL_SYSTEM_VERSION}-${SYSTEM_ARCH}"
+}
+
+
 def_error () {
     if [ -z "${2}" ]; then
         error "Failed action for: $(distinct e $1). Report it if necessary on: $(distinct e "${DEFAULT_ISSUE_REPORT_SITE}") or fix definition please!"
