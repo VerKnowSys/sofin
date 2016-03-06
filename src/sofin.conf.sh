@@ -368,6 +368,22 @@ check_root () {
         error "This command should be run as root."
         exit 1
     fi
+fill () {
+    _char="${1}"
+    if [ -z "${_char}" ]; then
+        _char="${SEPARATOR_CHAR}"
+    fi
+    _times=${2}
+    if [ -z "${_times}" ]; then
+        _times=80
+    fi
+    _buf=""
+    for i in $(${SEQ_BIN} 1 ${_times} 2>/dev/null); do
+        _buf="${_buf}${_char}"
+    done
+    ${PRINTF_BIN} "${_buf}"
+    unset _times _buf
+}
 }
 
 
