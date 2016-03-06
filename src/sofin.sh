@@ -818,14 +818,14 @@ if [ ! "$1" = "" ]; then
                             if [ ! -e "./${name}" ]; then
                                 ${TAR_BIN} -cJ --use-compress-program="${XZ_BIN} --threads=${CPUS}" -f "${name}" "./${element}" 2>> ${LOG} && \
                                     note "Bundle archive of: $(distinct n ${element}) (using: $(distinct n ${CPUS}) threads) has been built." && \
-                                    break
+                                    return
                                 ${TAR_BIN} -cJf "${name}" "./${element}" 2>> ${LOG} && \
                                     note "Bundle archive of: $(distinct n ${element}) has been built." && \
-                                    break
+                                    return
                                 error "Failed to create archives for: $(distinct e ${element})"
                             else
                                 if [ ! -e "./${name}.sha1" ]; then
-                                    debug "Found sha-less archive. It may be incomplete or damaged. Rebuilding (using: $(distinct d ${CPUS}) threads)"
+                                    debug "Found sha-less archive. It may be incomplete or damaged. Rebuilding.."
                                     ${RM_BIN} -f "${name}"
                                     ${TAR_BIN} -cJ --use-compress-program="${XZ_BIN} --threads=${CPUS}" -f "${name}" "./${element}" 2>> ${LOG} || \
                                     ${TAR_BIN} -cJf "${name}" "./${element}" 2>> ${LOG} || \
