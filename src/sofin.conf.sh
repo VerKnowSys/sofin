@@ -384,6 +384,10 @@ fill () {
     ${PRINTF_BIN} "${_buf}"
     unset _times _buf
 }
+
+
+sofin_processes () {
+    ${PS_BIN} ${PS_DEFAULT_OPTS} 2>/dev/null | ${EGREP_BIN} -v "(grep|$$)" 2>/dev/null
 }
 
 
