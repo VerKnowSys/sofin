@@ -1192,9 +1192,8 @@ for application in ${APPLICATIONS}; do
         maybe_version="$(${FIND_BIN} ${DEFINITIONS_DIR} -maxdepth 1 -name ${application}\*.def 2>/dev/null)"
         for maybe in ${maybe_version}; do
             elem="$(${BASENAME_BIN} ${maybe} 2>/dev/null)"
-            head="$(echo "${elem}" | ${SED_BIN} 's/\(.\)\(.*\)/\1/' 2>/dev/null | ${TR_BIN} '[a-z]' '[A-Z]' 2>/dev/null)"
-            tail="$(echo "${elem}" | ${SED_BIN} 's/\(.\)\(.*\)/\2/' 2>/dev/null)"
-            contents="${contents}$(echo "${head}${tail}" | ${SED_BIN} 's/\..*//' 2>/dev/null) "
+            cap_elem="$(capitalize "${elem}")"
+            contents="${contents}$(echo "${cap_elem}" | ${SED_BIN} 's/\..*//' 2>/dev/null) "
         done
         if [ "${contents}" != "" ]; then
             warn "No such definition found: $(distinct w ${application}). Alternatives found: $(distinct w ${contents})"
