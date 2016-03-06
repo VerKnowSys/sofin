@@ -406,10 +406,6 @@ def_error () {
 }
 
 
-check_root () {
-    if [ "$(id -u 2>/dev/null)" != "0" ]; then
-        error "This command should be run as root."
-        exit 1
 file_checksum () {
     name="$1"
     if [ -z "${name}" ]; then
