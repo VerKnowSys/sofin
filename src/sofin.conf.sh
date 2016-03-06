@@ -423,6 +423,14 @@ file_checksum () {
 }
 
 
+sofin_header () {
+    ${PRINTF_BIN} "
+$(distinct n 'Sof')tware $(distinct n 'In')staller, version: $(distinct n ${SOFIN_VERSION})\n\
+(c) 2o11-2o16 by: Daniel ($(distinct n dmilith)) Dettlaff\n\
+Thanks to $(distinct n verknowsys.com) and $(distinct n others)"
+}
+
+
 fill () {
     _char="${1}"
     if [ -z "${_char}" ]; then
