@@ -1263,14 +1263,14 @@ for application in ${APPLICATIONS}; do
                     if [ ! -d "${LOGS_DIR}" ]; then
                         ${MKDIR_BIN} -p "${LOGS_DIR}"
                     fi
-                    debug "$(${DATE_BIN} +%H%M%S-%s 2>/dev/null) try('$@'); aname(${aname});"
+                    debug "$(${DATE_BIN} +%s 2>/dev/null) try('$(distinct d $@)')"
                     if [ -z "${aname}" ]; then
                         eval PATH="${PATH}" "$@" >> "${LOG}" 2>> "${LOG}"
                     else
                         eval PATH="${PATH}" "$@" >> "${LOG}-${aname}" 2>> "${LOG}-${aname}"
                     fi
                 else
-                    error "An empty command to run for: ${APP_NAME}?"
+                    error "An empty command to run for: $(distinct e ${APP_NAME})?"
                 fi
             }
 
@@ -1308,7 +1308,7 @@ for application in ${APPLICATIONS}; do
                             if [ -e "./${ARCHIVE_NAME}" ]; then
                                 note "Found binary build archive: $(distinct n "${ARCHIVE_NAME}")"
                                 current_archive_sha1="$(file_checksum "${ARCHIVE_NAME}")"
-                                debug "current_archive_sha1: ${current_archive_sha1}"
+                                debug "current_archive_sha1: $(distinct d ${current_archive_sha1})"
                             else
                                 error "No bundle archive found?"
                             fi
@@ -1326,7 +1326,7 @@ for application in ${APPLICATIONS}; do
                         fi
                         cd "${SOFTWARE_DIR}"
 
-                        debug "ARCHIVE_NAME: ${ARCHIVE_NAME}. Expecting binbuild to be available in: ${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}"
+                        debug "ARCHIVE_NAME: $(distinct d ${ARCHIVE_NAME}). Expecting binbuild to be available in: $(distinct d ${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME})"
                         if [ -e "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" ]; then # if exists, then checksum is ok
                             ${TAR_BIN} -xJf "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" >> "${LOG}-${aname}" 2>> "${LOG}-${aname}"
                             if [ "$?" = "0" ]; then # if archive is valid
@@ -1366,20 +1366,19 @@ for application in ${APPLICATIONS}; do
                 fi
 
                 debug "Setting up default system compiler"
-                set_c_compiler CLANG # look for bundled compiler:
+                set_c_compiler CLANG
 
                 . "${DEFAULTS}" # load definition and check for current version
                 . "${req_definition_file}"
                 check_disabled "${DISABLE_ON}" # check requirement for disabled state:
 
                 if [ ! -z "${FORCE_GNU_COMPILER}" ]; then # force GNU compiler usage on definition side:
-                    warn "   ${WARN_CHAR} GNU compiler set for: $(distinct n ${APP_NAME})"
-                    set_c_compiler GNU
+                    error "   ${WARN_CHAR} GNU compiler support was dropped. Try using $(distinct e Gcc) instead)"
                 fi
 
                 # Golden linker causes troubles with some build systems like Qt, so we give option to disable it:
                 if [ ! -z "${APP_NO_GOLDEN_LINKER}" ]; then
-                    debug "Trying to disable golden linker.."
+                    debug "Removing explicit golden linker params.."
                     CROSS_PLATFORM_COMPILER_FLAGS="-fPIC -fno-strict-overflow -fstack-protector-all"
                     DEFAULT_LDFLAGS="-fPIC -fPIE"
                     unset NM
@@ -1435,7 +1434,7 @@ for application in ${APPLICATIONS}; do
                             cd "${BUILD_DIR_ROOT}"
                             for bd in ${BUILD_DIR_ROOT}/*; do
                                 if [ -d "${bd}" ]; then
-                                    debug "Unpacked source code found in build dir. Removing: '${bd}'"
+                                    debug "Unpacked source code found in build dir. Removing: $(distinct d ${bd})"
                                     if [ "${bd}" != "/" ]; then # it's better to be safe than sorry
                                         ${RM_BIN} -rf "${bd}"
                                     fi
@@ -1449,36 +1448,28 @@ for application in ${APPLICATIONS}; do
                                 fi
 
                                 file="${BUILD_DIR_ROOT}/../$(${BASENAME_BIN} ${APP_HTTP_PATH} 2>/dev/null)"
-                                debug "Build dir: ${BUILD_DIR_ROOT}, file: ${file}"
+                                debug "Build dir: $(distinct d ${BUILD_DIR_ROOT}), file: $(distinct d ${file})"
                                 if [ "${APP_SHA}" = "" ]; then
-                                    error "${NOTE_CHAR} Missing SHA sum for source: ${file}."
+                                    error "Missing SHA sum for source: $(distinct e ${file})!"
                                 else
-                                    case "${SYSTEM_NAME}" in
-                                        Darwin|Linux)
-                                            export cur="$(${SHA_BIN} ${file} 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)"
-                                            ;;
-
-                                        FreeBSD)
-                                            export cur="$(${SHA_BIN} -q ${file} 2>/dev/null)"
-                                            ;;
-                                    esac
-                                    if [ "${cur}" = "${APP_SHA}" ]; then
-                                        debug "${NOTE_CHAR} Bundle checksum is fine."
+                                    file_checksum="$(file_checksum ${file})"
+                                    if [ "${file_checksum}" = "${APP_SHA}" ]; then
+                                        debug "Bundle checksum is fine"
                                     else
-                                        warn "${WARN_CHAR} ${cur} vs ${APP_SHA}"
                                         warn "${WARN_CHAR} Bundle checksum mismatch detected!"
-                                        warn "${WARN_CHAR} Removing corrupted file from cache: '${file}' and retrying."
+                                        warn "${WARN_CHAR} $(distinct w ${file_checksum}) vs $(distinct w ${APP_SHA})"
+                                        warn "${WARN_CHAR} Removing corrupted file from cache: $(distinct w ${file}) and retrying.."
                                         # remove corrupted file
                                         ${RM_BIN} -f "${file}"
                                         # and restart script with same arguments:
-                                        debug "Evaluating: ${SOFIN_BIN} ${SOFIN_ARGS_FULL}"
+                                        debug "Evaluating: $(distinct d "${SOFIN_BIN} ${SOFIN_ARGS_FULL}")"
                                         eval "${SOFIN_BIN} ${SOFIN_ARGS_FULL}"
                                         exit
                                     fi
                                 fi
 
                                 note "   ${NOTE_CHAR} Unpacking source code of: $(distinct n ${APP_NAME})"
-                                debug "Build dir root: ${BUILD_DIR_ROOT}"
+                                debug "Build dir root: $(distinct d ${BUILD_DIR_ROOT})"
                                 try "${TAR_BIN} -xf ${file}" || \
                                 try "${TAR_BIN} -xfj ${file}" || \
                                 run "${TAR_BIN} -xfJ ${file}"
@@ -1492,7 +1483,7 @@ for application in ${APPLICATIONS}; do
                                 try "${GIT_BIN} clone --depth 1 --bare ${APP_HTTP_PATH} ${app_cache_dir}" || \
                                 try "${GIT_BIN} clone --depth 1 --bare ${APP_HTTP_PATH} ${app_cache_dir}"
                                 if [ "$?" = "0" ]; then
-                                    debug "Fetched bare repository: ${APP_NAME}${APP_VERSION}"
+                                    debug "Fetched bare repository: $(distinct d ${APP_NAME}${APP_VERSION})"
                                 else
                                     if [ ! -d "${app_cache_dir}/branches" -a ! -f "${app_cache_dir}/config" ]; then
                                         note "\n${red}Definitions were not updated. Below displaying $(distinct n ${LOG_LINES_AMOUNT_ON_ERR}) lines of internal log:${reset}"
@@ -1500,11 +1491,11 @@ for application in ${APPLICATIONS}; do
                                         note "$(fill)"
                                     else
                                         current="$(${PWD_BIN} 2>/dev/null)"
-                                        debug "Trying to update existing bare repository cache in: ${app_cache_dir}"
+                                        debug "Trying to update existing bare repository cache in: $(distinct d ${app_cache_dir})"
                                         cd "${app_cache_dir}"
                                         try "${GIT_BIN} fetch origin ${APP_GIT_CHECKOUT}" || \
                                         try "${GIT_BIN} fetch origin" || \
-                                        warn "   ${WARN_CHAR} Failed to fetch an update from bare repository: $(distinct n ${app_cache_dir})"
+                                        warn "   ${WARN_CHAR} Failed to fetch an update from bare repository: $(distinct w ${app_cache_dir})"
                                         # for empty APP_VERSION it will fill it with first 16 chars of repository HEAD SHA1:
                                         if [ -z "${APP_VERSION}" ]; then
                                             APP_VERSION="$(${GIT_BIN} rev-parse HEAD 2>/dev/null | ${CUT_BIN} -c -16 2>/dev/null)"
@@ -1525,7 +1516,7 @@ for application in ${APPLICATIONS}; do
                                 export BUILD_DIR="${BUILD_DIR}/${APP_SOURCE_DIR_POSTFIX}"
                             fi
                             cd "${BUILD_DIR}"
-                            debug "Switched to build dir: '${BUILD_DIR}'"
+                            debug "Switched to build dir: $(distinct d ${BUILD_DIR})"
 
                             if [ "${APP_GIT_CHECKOUT}" != "" ]; then
                                 note "   ${NOTE_CHAR} Checking out: $(distinct n ${APP_GIT_CHECKOUT})"
@@ -1533,7 +1524,7 @@ for application in ${APPLICATIONS}; do
                             fi
 
                             if [ ! -z "${APP_AFTER_UNPACK_CALLBACK}" ]; then
-                                debug "Running after unpack callback"
+                                debug "Running after unpack callback: $(distinct d "${APP_AFTER_UNPACK_CALLBACK}")"
                                 run "${APP_AFTER_UNPACK_CALLBACK}"
                             fi
 
@@ -1545,26 +1536,26 @@ for application in ${APPLICATIONS}; do
                                 note "   ${NOTE_CHAR} Applying common patches for: $(distinct n ${APP_NAME}${APP_POSTFIX})"
                                 for patch in ${patches_files}; do
                                     for level in 0 1 2 3 4 5; do
-                                        debug "Trying to patch source with patch: ${patch}, level: ${level}"
+                                        debug "Trying to patch source with patch: $(distinct d ${patch}), level: $(distinct d ${level})"
                                         ${PATCH_BIN} -p${level} -N -f -i "${patch}" >> "${LOG}-${aname}" 2>> "${LOG}-${aname}" # don't use run.. it may fail - we don't care
                                         if [ "$?" = "0" ]; then # skip applying single patch if it already passed
-                                            debug "Patch: '${patch}' applied successfully!"
+                                            debug "Patch: $(distinct d ${patch}) applied successfully!"
                                             break;
                                         fi
                                     done
                                 done
                                 pspatch_dir="${LIST_DIR}/${SYSTEM_NAME}"
-                                debug "Checking psp dir: ${pspatch_dir}"
+                                debug "Checking psp dir: $(distinct d ${pspatch_dir})"
                                 if [ -d "${pspatch_dir}" ]; then
                                     note "   ${NOTE_CHAR} Applying platform specific patches for: $(distinct n ${APP_NAME}${APP_POSTFIX}/${SYSTEM_NAME})"
                                     patches_files="$(${FIND_BIN} ${pspatch_dir}/* -maxdepth 0 -type f 2>/dev/null)"
                                     ${TEST_BIN} ! -z "${patches_files}" && \
                                     for platform_specific_patch in ${patches_files}; do
                                         for level in 0 1 2 3 4 5; do
-                                            debug "Patching source code with pspatch: ${platform_specific_patch} (p${level})"
+                                            debug "Patching source code with pspatch: $(distinct d ${platform_specific_patch}) (p$(distinct d ${level}))"
                                             ${PATCH_BIN} -p${level} -N -f -i "${platform_specific_patch}" >> "${LOG}-${aname}" 2>> "${LOG}-${aname}"
                                             if [ "$?" = "0" ]; then # skip applying single patch if it already passed
-                                                debug "Patch: '${platform_specific_patch}' applied successfully!"
+                                                debug "Patch: $(distinct d ${platform_specific_patch}) applied successfully!"
                                                 break;
                                             fi
                                         done
@@ -1573,7 +1564,7 @@ for application in ${APPLICATIONS}; do
                             fi
 
                             if [ ! -z "${APP_AFTER_PATCH_CALLBACK}" ]; then
-                                debug "Running after patch callback"
+                                debug "Running after patch callback: $(distinct d "${APP_AFTER_PATCH_CALLBACK}")"
                                 run "${APP_AFTER_PATCH_CALLBACK}"
                             fi
                             debug "-------------- PRE CONFIGURE SETTINGS DUMP --------------"
@@ -1647,7 +1638,7 @@ for application in ${APPLICATIONS}; do
 
                             esac
                             if [ ! -z "${APP_AFTER_CONFIGURE_CALLBACK}" ]; then
-                                debug "Running after configure callback"
+                                debug "Running after configure callback: $(distinct d "${APP_AFTER_CONFIGURE_CALLBACK}")"
                                 run "${APP_AFTER_CONFIGURE_CALLBACK}"
                             fi
 
@@ -1661,7 +1652,7 @@ for application in ${APPLICATIONS}; do
                         note "   ${NOTE_CHAR} Building requirement: $(distinct n $1)"
                         run "${APP_MAKE_METHOD}"
                         if [ ! -z "${APP_AFTER_MAKE_CALLBACK}" ]; then
-                            debug "Running after make callback"
+                            debug "Running after make callback: $(distinct d "${APP_AFTER_MAKE_CALLBACK}")"
                             run "${APP_AFTER_MAKE_CALLBACK}"
                         fi
 
@@ -1673,25 +1664,25 @@ for application in ${APPLICATIONS}; do
                         note "   ${NOTE_CHAR} Installing requirement: $(distinct n $1)"
                         run "${APP_INSTALL_METHOD}"
                         if [ ! "${APP_AFTER_INSTALL_CALLBACK}" = "" ]; then
-                            debug "After install callback: ${APP_AFTER_INSTALL_CALLBACK}"
+                            debug "After install callback: $(distinct d "${APP_AFTER_INSTALL_CALLBACK}")"
                             run "${APP_AFTER_INSTALL_CALLBACK}"
                         fi
 
-                        debug "Marking as installed '$1' in: ${PREFIX}"
+                        debug "Marking $(distinct d $1) as installed in: $(distinct d ${PREFIX})"
                         ${TOUCH_BIN} "${PREFIX}/$1${INSTALLED_MARK}"
-                        debug "Writing version: ${APP_VERSION} of app: '${APP_NAME}' installed in: ${PREFIX}"
+                        debug "Writing version: $(distinct d ${APP_VERSION}) of software: $(distinct d ${APP_NAME}) installed in: $(distinct d ${PREFIX})"
                         ${PRINTF_BIN} "${APP_VERSION}" > "${PREFIX}/$1${INSTALLED_MARK}"
 
                         if [ -z "${DEVEL}" ]; then # if devel mode not set
-                            debug "Cleaning build dir: '${BUILD_DIR_ROOT}' of bundle: '${APP_NAME}${APP_POSTFIX}', after successful build."
+                            debug "Cleaning build dir: $(distinct d ${BUILD_DIR_ROOT}) of bundle: $(distinct d ${APP_NAME}${APP_POSTFIX}), after successful build."
                             ${RM_BIN} -rf "${BUILD_DIR_ROOT}"
                         else
-                            debug "Leaving build dir intact when working in devel mode. Last build dir: '${BUILD_DIR_ROOT}'"
+                            debug "Leaving build dir intact when working in devel mode. Last build dir: $(distinct d ${BUILD_DIR_ROOT})"
                         fi
                         cd "${CUR_DIR}" 2>/dev/null
                     fi
                 else
-                    warn "   ${WARN_CHAR} Requirement: $(distinct w ${APP_NAME})disabled on: $(distinct n ${SYSTEM_NAME})"
+                    warn "   ${WARN_CHAR} Requirement: $(distinct w ${APP_NAME}) disabled on: $(distinct w ${SYSTEM_NAME})"
                     if [ ! -d "${PREFIX}" ]; then # case when disabled requirement is first on list of dependencies
                         ${MKDIR_BIN} -p "${PREFIX}"
                     fi
@@ -1728,9 +1719,9 @@ for application in ${APPLICATIONS}; do
             fi
 
             mark () {
-                debug "Marking definition: ${application} installed"
+                debug "Marking definition: $(distinct d ${application}) as installed"
                 ${TOUCH_BIN} "${PREFIX}/${application}${INSTALLED_MARK}"
-                debug "Writing version: ${APP_VERSION} of app: '${application}' installed in: ${PREFIX}"
+                debug "Writing version: $(distinct d ${APP_VERSION}) of software: $(distinct d ${application}) installed in: $(distinct d ${PREFIX})"
                 ${PRINTF_BIN} "${APP_VERSION}" > "${PREFIX}/${application}${INSTALLED_MARK}"
             }
 
@@ -1751,7 +1742,7 @@ for application in ${APPLICATIONS}; do
                     else
                         note "  ${application} ($(distinct n 1) of $(distinct n ${req_all}))"
                         show_done
-                        debug "${SUCCESS_CHAR} ${application} current: ${ver}, definition: [${APP_VERSION}] Ok."
+                        debug "${SUCCESS_CHAR} $(distinct d ${application}) current: $(distinct d ${ver}), definition: [$(distinct d ${APP_VERSION})] Ok."
                     fi
                 else
                     note "  ${application} ($(distinct n 1) of $(distinct n ${req_all}))"
@@ -1763,7 +1754,7 @@ for application in ${APPLICATIONS}; do
 
             debug "Doing app conflict resolve"
             if [ ! -z "${APP_CONFLICTS_WITH}" ]; then
-                debug "  ${NOTE_CHAR} Resolving possible conflicts with: ${APP_CONFLICTS_WITH}"
+                debug "Resolving possible conflicts with: $(distinct d ${APP_CONFLICTS_WITH})"
                 for app in ${APP_CONFLICTS_WITH}; do
                     maybe_software="$(${FIND_BIN} ${SOFTWARE_DIR} -maxdepth 1 -type d -iname "${app}*" 2>/dev/null)"
                     for an_app in ${maybe_software}; do
@@ -1781,7 +1772,7 @@ for application in ${APPLICATIONS}; do
 
             . "${DEFINITIONS_DIR}${application}.def"
             if [ -d "${PREFIX}/exports-disabled" ]; then # just bring back disabled exports
-                debug "Moving ${PREFIX}/exports-disabled to ${PREFIX}/exports"
+                debug "Moving $(distinct d ${PREFIX}/exports-disabled) to $(distinct d ${PREFIX}/exports)"
                 ${MV_BIN} "${PREFIX}/exports-disabled" "${PREFIX}/exports"
             fi
             if [ -z "${APP_EXPORTS}" ]; then
@@ -1906,7 +1897,7 @@ for application in ${APPLICATIONS}; do
 
                 # count Sofin jobs. For more than one job available,
                 sofin_ps_list="$(sofin_processes | ${EGREP_BIN} "sh ${SOFIN_BIN} (${ALL_INSTALL_PHRASES}) [A-Z].*" 2>/dev/null)"
-                debug "Sofin ps list: $(echo "${sofin_ps_list}" | ${TR_BIN} '\n' ' ' 2>/dev/null)"
+                debug "Sofin ps list: $(distinct d $(echo "${sofin_ps_list}" | ${TR_BIN} '\n' ' ' 2>/dev/null))"
                 sofins_all="$(echo "${sofin_ps_list}" | ${WC_BIN} -l 2>/dev/null | ${SED_BIN} 's/ //g' 2>/dev/null)"
                 sofins_running="$(echo "${sofins_all} - 1" | ${BC_BIN} 2>/dev/null)"
                 test -z "${sofins_running}" && sofins_running="0"
@@ -1920,7 +1911,7 @@ for application in ${APPLICATIONS}; do
 
                 # Create a dataset for any existing dirs in Services dir that are not ZFS datasets.
                 all_dirs="$(${FIND_BIN} ${SERVICES_DIR} -mindepth 1 -maxdepth 1 -type d -not -name '.*' -print 2>/dev/null | ${XARGS_BIN} ${BASENAME_BIN} 2>/dev/null)"
-                debug "Checking for non-dataset directories in ${SERVICES_DIR}: EOF:\n$(echo "${all_dirs}" | ${TR_BIN} '\n' ' ' 2>/dev/null)\nEOF\n"
+                debug "Checking for non-dataset directories in $(distinct d ${SERVICES_DIR}): EOF:\n$(echo "${all_dirs}" | ${TR_BIN} '\n' ' ' 2>/dev/null)\nEOF\n"
                 full_bundle_name="$(${BASENAME_BIN} "${PREFIX}" 2>/dev/null)"
                 for maybe_dataset in ${all_dirs}; do
                     aname="$(lowercase ${full_bundle_name})"
@@ -1948,15 +1939,15 @@ for application in ${APPLICATIONS}; do
                         create_or_receive () {
                             dataset_name="$1"
                             remote_path="${MAIN_BINARY_REPOSITORY}${MAIN_COMMON_NAME}/${final_snap_file}"
-                            debug "Seeking remote snapshot existence: ${remote_path}"
+                            debug "Seeking remote snapshot existence: $(distinct d ${remote_path})"
                             try "${FETCH_BIN} ${remote_path}" || \
                             try "${FETCH_BIN} ${remote_path}" || \
                             try "${FETCH_BIN} ${remote_path}"
                             if [ "$?" = "0" ]; then
-                                debug "Stream archive available. Creating service dataset: ${dataset_name} from file stream: ${final_snap_file}"
+                                debug "Stream archive available. Creating service dataset: $(distinct d ${dataset_name}) from file stream: $(distinct d ${final_snap_file})"
                                 note "Dataset: $(distinct n ${dataset_name} )$(${XZCAT_BIN} "${final_snap_file}" | ${ZFS_BIN} receive -v "${dataset_name}" 2>/dev/null | ${TAIL_BIN} -n1)"
                                 ${ZFS_BIN} rename ${dataset_name}@--head-- @origin && \
-                                debug "Cleaning snapshot file: ${final_snap_file}, after successful receive"
+                                debug "Cleaning snapshot file: $(distinct d ${final_snap_file}), after successful receive"
                                 ${RM_BIN} -f "${final_snap_file}"
                             else
                                 debug "Initial service dataset unavailable"
@@ -1967,21 +1958,21 @@ for application in ${APPLICATIONS}; do
 
                         # check dataset existence and create/receive it if necessary
                         ds_mounted="$(${ZFS_BIN} get -H -o value mounted ${full_dataset_name} 2>/dev/null)"
-                        debug "Dataset: ${full_dataset_name} is mounted?: ${ds_mounted}"
+                        debug "Dataset: $(distinct d ${full_dataset_name}) is mounted?: $(distinct d ${ds_mounted})"
                         if [ "${ds_mounted}" != "yes" ]; then
-                            debug "Moving ${certain_fileset} to ${certain_fileset}-tmp" && \
+                            debug "Moving $(distinct d ${certain_fileset}) to $(distinct d ${certain_fileset}-tmp)" && \
                             ${MV_BIN} "${certain_fileset}" "${certain_fileset}-tmp" && \
-                            debug "Creating dataset: ${full_dataset_name}" && \
+                            debug "Creating dataset: $(distinct d ${full_dataset_name})" && \
                             create_or_receive "${full_dataset_name}" && \
-                            debug "Copying ${certain_fileset}-tmp/ back to ${certain_fileset}" && \
+                            debug "Copying $(distinct d ${certain_fileset}-tmp/) back to $(distinct d ${certain_fileset})" && \
                             ${CP_BIN} -RP "${certain_fileset}-tmp/" "${certain_fileset}" && \
-                            debug "Cleaning ${certain_fileset}-tmp" && \
+                            debug "Cleaning $(distinct d ${certain_fileset}-tmp)" && \
                             ${RM_BIN} -rf "${certain_fileset}-tmp" && \
-                            debug "Dataset created: ${full_dataset_name}"
+                            debug "Dataset created: $(distinct d ${full_dataset_name})"
                         fi
 
                     else # no name match
-                        debug "No match for: ${app_name_lowercase}"
+                        debug "No match for: $(distinct d ${app_name_lowercase})"
                     fi
                 done
                 ;;
@@ -1993,15 +1984,9 @@ for application in ${APPLICATIONS}; do
             APP_BUNDLE_NAME="${PREFIX}.app"
             aname="$(lowercase ${APP_NAME}${APP_POSTFIX})"
             note "Creating Apple bundle: $(distinct n ${APP_NAME} )in: $(distinct n ${APP_BUNDLE_NAME})"
-            ${MKDIR_BIN} -p "${APP_BUNDLE_NAME}/libs"
-            ${MKDIR_BIN} -p "${APP_BUNDLE_NAME}/Contents"
-            ${MKDIR_BIN} -p "${APP_BUNDLE_NAME}/Contents/Resources/${APP_LOWERNAME}"
-            ${MKDIR_BIN} -p "${APP_BUNDLE_NAME}/exports"
-            ${MKDIR_BIN} -p "${APP_BUNDLE_NAME}/share"
-
+            ${MKDIR_BIN} -p "${APP_BUNDLE_NAME}/libs" "${APP_BUNDLE_NAME}/Contents" "${APP_BUNDLE_NAME}/Contents/Resources/${APP_LOWERNAME}" "${APP_BUNDLE_NAME}/exports" "${APP_BUNDLE_NAME}/share"
             ${CP_BIN} -R ${PREFIX}/${APP_NAME}.app/Contents/* "${APP_BUNDLE_NAME}/Contents/"
             ${CP_BIN} -R ${PREFIX}/bin/${APP_LOWERNAME} "${APP_BUNDLE_NAME}/exports/"
-
             for lib in $(${FIND_BIN} "${PREFIX}" -name '*.dylib' -type f 2>/dev/null); do
                 ${CP_BIN} -vf ${lib} ${APP_BUNDLE_NAME}/libs/ >> ${LOG}-${aname} 2>&1
             done
@@ -2016,13 +2001,10 @@ for application in ${APPLICATIONS}; do
 
             cd "${APP_BUNDLE_NAME}/Contents"
             test -L MacOS || ${LN_BIN} -s ../exports MacOS >> ${LOG}-${aname} 2>&1
-
-            note "Creating relative libraries search path"
+            debug "Creating relative libraries search path"
             cd ${APP_BUNDLE_NAME}
-
             note "Processing exported binary: $(distinct n ${i})"
             ${SOFIN_LIBBUNDLE_BIN} -x "${APP_BUNDLE_NAME}/Contents/MacOS/${APP_LOWERNAME}" >> ${LOG}-${aname} 2>&1
-
         fi
 
     fi
