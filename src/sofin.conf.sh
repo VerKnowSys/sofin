@@ -410,7 +410,23 @@ check_root () {
     if [ "$(id -u 2>/dev/null)" != "0" ]; then
         error "This command should be run as root."
         exit 1
+file_checksum () {
+    name="$1"
+    if [ -z "${name}" ]; then
+        error "Empty file name given for function: $(distinct e "file_checksum()")"
     fi
+    case ${SYSTEM_NAME} in
+        Darwin|Linux)
+            ${PRINTF_BIN} "$(${SHA_BIN} "${name}" 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)"
+            ;;
+
+        FreeBSD)
+            ${PRINTF_BIN} "$(${SHA_BIN} -q "${name}" 2>/dev/null)"
+            ;;
+    esac
+}
+
+
 fill () {
     _char="${1}"
     if [ -z "${_char}" ]; then
