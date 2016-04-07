@@ -428,9 +428,7 @@ file_checksum () {
 
 
 sofin_header () {
-    ${PRINTF_BIN} "
-$(distinct n 'Sof')tware $(distinct n 'In')staller, version: $(distinct n ${SOFIN_VERSION})\n\
-(c) 2o11-2o16 by: Daniel ($(distinct n dmilith)) Dettlaff. Thanks to $(distinct n verknowsys.com) and $(distinct n others)\n\
+    ${PRINTF_BIN} "$(distinct n 'Sof')tware $(distinct n 'In')staller v$(distinct n ${SOFIN_VERSION}) -- (c) 2o11-2o16 -- Daniel ($(distinct n dmilith)) Dettlaff\n\
 "
 }
 
