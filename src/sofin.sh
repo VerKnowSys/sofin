@@ -324,7 +324,7 @@ clean_failbuilds () {
             ${FIND_BIN} "${i}" -delete 2>/dev/null
         done
         result="$(echo "${number}" | ${BC_BIN} 2>/dev/null)"
-        note "$(distinct n ${result} )directories cleaned."
+        note "$(distinct n ${result}) directories cleaned."
     fi
 }
 
