@@ -368,7 +368,7 @@ case "${SYSTEM_NAME}" in
         export CPUS="$(${NPROC_BIN} 2>/dev/null)"
         export MAKE_OPTS="-j${CPUS}"
         export AWK_BIN="/usr/bin/awk"
-        export ZFS_BIN="/usr/bin/true"
+        export ZFS_BIN="/bin/true"
         export RSYNC_BIN="/Software/Rsync/exports/rsync"
         if [ ${OS_VERSION} -lt ${GLIBC_MINIMUM_VERSION} ]; then
             export USE_BINBUILD=NO
