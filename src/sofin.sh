@@ -1604,7 +1604,8 @@ for application in ${APPLICATIONS}; do
                                     ;;
 
                                 cmake)
-                                    run "${APP_CONFIGURE_SCRIPT} . -LH -DCMAKE_INSTALL_PREFIX=${PREFIX} -DCMAKE_BUILD_TYPE=Release -DSYSCONFDIR=${SERVICE_DIR}/etc -DWITH_DEBUG=0 ${APP_CONFIGURE_ARGS}"
+                                    test -z "${APP_CMAKE_BUILD_DIR}" && APP_CMAKE_BUILD_DIR="." # default - cwd
+                                    run "${APP_CONFIGURE_SCRIPT} ${APP_CMAKE_BUILD_DIR} -LH -DCMAKE_INSTALL_PREFIX=${PREFIX} -DCMAKE_BUILD_TYPE=Release -DSYSCONFDIR=${SERVICE_DIR}/etc -DWITH_DEBUG=0 -DLLVM_PARALLEL_COMPILE_JOBS=${CPUS} -DLLVM_PARALLEL_LINK_JOBS=${CPUS} -DCMAKE_C_FLAGS=\"${CFLAGS}\" -DCMAKE_CXX_FLAGS=\"${CXXFLAGS}\" ${APP_CONFIGURE_ARGS}"
                                     ;;
 
                                 void|meta|empty)
