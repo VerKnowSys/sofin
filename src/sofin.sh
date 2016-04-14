@@ -1441,26 +1441,27 @@ for application in ${APPLICATIONS}; do
                                 fi
                             done
                             if [ -z "${APP_GIT_MODE}" ]; then # Standard http tarball method:
+                                debug "APP_HTTP_PATH: ${APP_HTTP_PATH} base: $(${BASENAME_BIN} ${APP_HTTP_PATH})"
                                 if [ ! -e ${BUILD_DIR_ROOT}/../$(${BASENAME_BIN} ${APP_HTTP_PATH} 2>/dev/null) ]; then
                                     note "   ${NOTE_CHAR} Fetching requirement source from: $(distinct n ${APP_HTTP_PATH})"
                                     retry "${FETCH_BIN} ${APP_HTTP_PATH}"
                                     ${MV_BIN} $(${BASENAME_BIN} ${APP_HTTP_PATH} 2>/dev/null) ${BUILD_DIR_ROOT}/..
                                 fi
 
-                                file="${BUILD_DIR_ROOT}/../$(${BASENAME_BIN} ${APP_HTTP_PATH} 2>/dev/null)"
-                                debug "Build dir: $(distinct d ${BUILD_DIR_ROOT}), file: $(distinct d ${file})"
-                                if [ "${APP_SHA}" = "" ]; then
-                                    error "Missing SHA sum for source: $(distinct e ${file})!"
+                                dest_file="${BUILD_DIR_ROOT}/../$(${BASENAME_BIN} ${APP_HTTP_PATH} 2>/dev/null)"
+                                debug "Build dir: $(distinct d ${BUILD_DIR_ROOT}), file: $(distinct d ${dest_file})"
+                                if [ -z "${APP_SHA}" ]; then
+                                    error "Missing SHA sum for source: $(distinct e ${dest_file})!"
                                 else
-                                    file_checksum="$(file_checksum ${file})"
-                                    if [ "${file_checksum}" = "${APP_SHA}" ]; then
+                                    a_file_checksum="$(file_checksum ${dest_file})"
+                                    if [ "${a_file_checksum}" = "${APP_SHA}" ]; then
                                         debug "Bundle checksum is fine"
                                     else
                                         warn "${WARN_CHAR} Bundle checksum mismatch detected!"
-                                        warn "${WARN_CHAR} $(distinct w ${file_checksum}) vs $(distinct w ${APP_SHA})"
-                                        warn "${WARN_CHAR} Removing corrupted file from cache: $(distinct w ${file}) and retrying.."
+                                        warn "${WARN_CHAR} $(distinct w ${a_file_checksum}) vs $(distinct w ${APP_SHA})"
+                                        warn "${WARN_CHAR} Removing corrupted file from cache: $(distinct w ${dest_file}) and retrying.."
                                         # remove corrupted file
-                                        ${RM_BIN} -f "${file}"
+                                        ${RM_BIN} -f "${dest_file}"
                                         # and restart script with same arguments:
                                         debug "Evaluating: $(distinct d "${SOFIN_BIN} ${SOFIN_ARGS_FULL}")"
                                         eval "${SOFIN_BIN} ${SOFIN_ARGS_FULL}"
@@ -1470,9 +1471,9 @@ for application in ${APPLICATIONS}; do
 
                                 note "   ${NOTE_CHAR} Unpacking source code of: $(distinct n ${APP_NAME})"
                                 debug "Build dir root: $(distinct d ${BUILD_DIR_ROOT})"
-                                try "${TAR_BIN} -xf ${file}" || \
-                                try "${TAR_BIN} -xfj ${file}" || \
-                                run "${TAR_BIN} -xfJ ${file}"
+                                try "${TAR_BIN} -xf ${dest_file}" || \
+                                try "${TAR_BIN} -xfj ${dest_file}" || \
+                                run "${TAR_BIN} -xfJ ${dest_file}"
                             else
                                 # git method:
                                 # .cache/git-cache => git bare repos
