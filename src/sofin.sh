@@ -1396,7 +1396,7 @@ for application in ${APPLICATIONS}; do
                     CXXFLAGS="$(echo "${CXXFLAGS}" | ${SED_BIN} -e 's/-ffast-math//' 2>/dev/null)"
                 fi
 
-                if [ -z "${APP_NO_CCACHE}" ]; then # ccache is supported by default but it's optional
+                if [ ! -z "${APP_NO_CCACHE}" ]; then # ccache is supported by default but it's optional
                     if [ -x "${CCACHE_BIN_OPTIONAL}" ]; then # check for CCACHE availability
                         export CC="${CCACHE_BIN_OPTIONAL} ${CC}"
                         export CXX="${CCACHE_BIN_OPTIONAL} ${CXX}"
@@ -1410,7 +1410,7 @@ for application in ${APPLICATIONS}; do
                 export CXXFLAGS="-I${PREFIX}/include ${APP_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
                 export LDFLAGS="-L${PREFIX}/lib ${APP_LINKER_ARGS} ${DEFAULT_LDFLAGS}"
 
-                if [ -z "${APP_LINKER_NO_DTAGS}" ]; then
+                if [ ! -z "${APP_LINKER_NO_DTAGS}" ]; then
                     if [ "${SYSTEM_NAME}" != "Darwin" ]; then # feature isn't required on Darwin
                         export CFLAGS="${CFLAGS} -Wl,-rpath=${PREFIX}/lib,--enable-new-dtags"
                         export CXXFLAGS="${CXXFLAGS} -Wl,-rpath=${PREFIX}/lib,--enable-new-dtags"
