@@ -247,7 +247,7 @@ export DEFAULT_ZPOOL="zroot"
 export DEFAULT_LDFLAGS="-fPIC -fPIE"
 export readonly SYSTEM_NAME="$(uname -s 2>/dev/null)"
 export readonly SYSTEM_ARCH="$(uname -m 2>/dev/null)"
-export readonly COMMON_SAFE_CC_FLAGS="-ffast-math -fno-strict-overflow -fstack-protector-all"
+export readonly COMMON_SAFE_CC_FLAGS="-w -ffast-math -fno-strict-overflow -fstack-protector-all"
 
 export CROSS_PLATFORM_COMPILER_FLAGS="-fPIC ${COMMON_SAFE_CC_FLAGS}"
 if [ -z "${DEBUGBUILD}" ]; then
@@ -312,7 +312,7 @@ case "${SYSTEM_NAME}" in
         export FETCH_BIN="/usr/bin/curl --connect-timeout 3 -O"
         export PATCH_BIN="/usr/bin/patch -p0 "
         export DEFAULT_LDFLAGS="-fPIC" # -arch x86_64 fPIE isn't well supported on OSX, but it's not production anyway
-        export DEFAULT_COMPILER_FLAGS="-w -O2 -fPIC ${COMMON_SAFE_CC_FLAGS}"
+        export DEFAULT_COMPILER_FLAGS="-O2 -fPIC ${COMMON_SAFE_CC_FLAGS}"
         if [ ! -z "${DEBUGBUILD}" ]; then
             export DEFAULT_COMPILER_FLAGS="-O0 -g -fPIC ${COMMON_SAFE_CC_FLAGS}"
         fi
