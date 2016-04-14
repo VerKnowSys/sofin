@@ -1410,7 +1410,7 @@ for application in ${APPLICATIONS}; do
                 export CXXFLAGS="-I${PREFIX}/include ${APP_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
                 export LDFLAGS="-L${PREFIX}/lib ${APP_LINKER_ARGS} ${DEFAULT_LDFLAGS}"
 
-                if [ ! -z "${APP_LINKER_NO_DTAGS}" ]; then
+                if [ -z "${APP_LINKER_NO_DTAGS}" ]; then
                     if [ "${SYSTEM_NAME}" != "Darwin" ]; then # feature isn't required on Darwin
                         export CFLAGS="${CFLAGS} -Wl,-rpath=${PREFIX}/lib,--enable-new-dtags"
                         export CXXFLAGS="${CXXFLAGS} -Wl,-rpath=${PREFIX}/lib,--enable-new-dtags"
