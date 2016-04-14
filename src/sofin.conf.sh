@@ -373,6 +373,15 @@ case "${SYSTEM_NAME}" in
         if [ ${OS_VERSION} -lt ${GLIBC_MINIMUM_VERSION} ]; then
             export USE_BINBUILD=NO
         fi
+
+        ${GREP_BIN} 'CentOS release 6.7' /etc/centos-release >/dev/null 2>&1
+        if [ "$?" = "0" ]; then
+            # Centos 6.7 specific changes
+            export BASENAME_BIN="/bin/basename"
+            export RSYNC_BIN="/usr/bin/rsync"
+            export TOUCH_BIN="/bin/touch"
+        fi
+
         # runtime sha
         test -x "${SOFIN_MICROSECONDS_UTILITY_BIN}" && \
         RUNTIME_SHA="$(${PRINTF_BIN} "$(${DATE_BIN} 2>/dev/null)-$(${SOFIN_MICROSECONDS_UTILITY_BIN} 2>/dev/null)" | ${SHA_BIN} 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)"
