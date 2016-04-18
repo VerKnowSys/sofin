@@ -374,9 +374,8 @@ case "${SYSTEM_NAME}" in
             export USE_BINBUILD=NO
         fi
 
-        ${GREP_BIN} 'CentOS release' /etc/centos-release >/dev/null 2>&1
-        if [ "$?" = "0" ]; then
-            # Centos 6.7 specific changes
+        if [ -f /etc/centos-release -o -f /etc/redhat-release ]; then
+            # Centos specific changes
             export BASENAME_BIN="/bin/basename"
             export TOUCH_BIN="/bin/touch"
         fi
