@@ -378,6 +378,14 @@ case "${SYSTEM_NAME}" in
             # Centos specific changes
             export BASENAME_BIN="/bin/basename"
             export TOUCH_BIN="/bin/touch"
+
+            #
+            # For Centos 5.x:
+            #
+            # export DEFAULT_COMPILER_FLAGS="-w -O2 -fPIC"
+            # if [ ! -z "${DEBUGBUILD}" ]; then
+            #     export DEFAULT_COMPILER_FLAGS="-O0 -fPIC -ggdb"
+            # fi
         fi
 
         # runtime sha
