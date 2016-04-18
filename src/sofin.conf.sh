@@ -369,7 +369,7 @@ case "${SYSTEM_NAME}" in
         export MAKE_OPTS="-j${CPUS}"
         export AWK_BIN="/usr/bin/awk"
         export ZFS_BIN="/bin/true"
-        export RSYNC_BIN="/Software/Rsync/exports/rsync"
+        export RSYNC_BIN="/usr/bin/rsync"
         if [ ${OS_VERSION} -lt ${GLIBC_MINIMUM_VERSION} ]; then
             export USE_BINBUILD=NO
         fi
@@ -378,7 +378,6 @@ case "${SYSTEM_NAME}" in
         if [ "$?" = "0" ]; then
             # Centos 6.7 specific changes
             export BASENAME_BIN="/bin/basename"
-            export RSYNC_BIN="/usr/bin/rsync"
             export TOUCH_BIN="/bin/touch"
         fi
 
