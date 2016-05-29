@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
 
 # load configuration from sofin.conf
-CONF_FILE="sofin.conf.sh"
+CONF_FILE="s.conf.sh"
 if [ -e "src/${CONF_FILE}" ]; then
     . "src/${CONF_FILE}"
 else
@@ -24,7 +24,7 @@ ${GIT_BIN} push --all "${SOFIN_MIRROR}" >/dev/null && \
 ${GIT_BIN} push --tags "${SOFIN_MIRROR}" >/dev/null && \
 bin/clean
 ${MKDIR_BIN} -p releases
-version="$(grep 'readonly SOFIN_VERSION=' src/sofin.conf.sh | awk '{ gsub(/\"/, "", $2); gsub(/SOFIN_VERSION=/, "", $2); print $2; }')"
+version="$(grep 'readonly SOFIN_VERSION=' src/s.conf.sh | awk '{ gsub(/\"/, "", $2); gsub(/SOFIN_VERSION=/, "", $2); print $2; }')"
 base_name="sofin-${version}"
 archive_name="${base_name}.txz"
 note "Preparing package: ${archive_name} with version: ${version}"

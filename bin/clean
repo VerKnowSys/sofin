@@ -2,7 +2,7 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
 
 # load configuration from sofin.conf
-CONF_FILE="sofin.conf.sh"
+CONF_FILE="s.conf.sh"
 if [ -e "src/${CONF_FILE}" ]; then
     . "src/${CONF_FILE}"
     note "Validating environment"

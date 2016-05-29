@@ -3,7 +3,7 @@
 
 
 # load configuration from sofin.conf
-CONF_FILE="sofin.conf.sh"
+CONF_FILE="s.conf.sh"
 . "src/${CONF_FILE}"
 
 # choose C compiler, if any
@@ -63,8 +63,8 @@ install_base () {
             ${RM_BIN} -fv "${PREFIX}usr/bin/sofin" && \
             ${RM_BIN} -fv "${PREFIX}usr/bin/sofin-version-utility" && \
             ${RM_BIN} -fv "${PREFIX}usr/bin/sofin-microseconds" && \
-            ${RM_BIN} -fv "${PREFIX}etc/${CONF_FILE}" && \
-            debug "Old Sofin files were wiped out"
+            ${RM_BIN} -fv "${PREFIX}etc/s.conf" && \
+            note "Preinstallation cleanup completed"
         fi
         install_sofin
     fi
