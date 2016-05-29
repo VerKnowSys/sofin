@@ -1,9 +1,6 @@
 #!/bin/sh
 # @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
 
-CONF_FILE="s.conf.sh"
-. "src/${CONF_FILE}"
-
 export PREFIX="${PREFIX}"
 export INSTALL="YES"
 . "bin/build"
