@@ -15,7 +15,7 @@ if [ ! -x "${CXX}" ]; then
     error "C++ compiler is required to compile Sofin utilities"
 fi
 
-readonly CLANG_OPTIONS="-Os -fPIC -fPIE -fno-strict-overflow -fstack-protector-all"
+readonly CLANG_OPTIONS="-O2 -fPIC -fPIE -fno-strict-overflow -fstack-protector-all"
 
 shell_configuration=$(${CAT_BIN} <<EOF
 if [ "\$(${ID_BIN} -u)" = "0" ]; then
