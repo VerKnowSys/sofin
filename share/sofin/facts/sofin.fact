@@ -36,6 +36,7 @@ LESS_DEFAULT_OPTIONS="--hilite-search -K -N -M -R --follow-name -c"
 MOST_DEFAULT_OPTIONS="-c -s +s +u"
 SOFIN_BIN_SHORT="$(${BASENAME_BIN} ${SOFIN_BIN} 2>/dev/null)"
 DISTINCT_COLOUR="${cyan}"
+DEFAULT_SSH_OPTS="-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
 
 # Some lazy stuff:
 FILES_COUNT_GUARD="${WC_BIN} -l 2>/dev/null | ${SED_BIN} 's/ //g' 2>/dev/null"

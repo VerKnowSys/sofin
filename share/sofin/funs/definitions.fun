@@ -193,7 +193,7 @@ push_binbuild () {
                     system_path="${MAIN_SOFTWARE_PREFIX}/software/binary/${OS_TRIPPLE}"
                     address="${MAIN_USER}@${mirror}:${system_path}"
                     aname="$(lowercase ${APP_NAME}${APP_POSTFIX})"
-                    ${SSH_BIN} -p "${MAIN_PORT}" "${MAIN_USER}@${mirror}" \
+                    ${SSH_BIN} ${DEFAULT_SSH_OPTS} -p "${MAIN_PORT}" "${MAIN_USER}@${mirror}" \
                         "${MKDIR_BIN} -p ${MAIN_SOFTWARE_PREFIX}/software/binary/${OS_TRIPPLE}" >> "${LOG}-${aname}" 2>> "${LOG}-${aname}"
 
                     if [ "${SYSTEM_NAME}" = "FreeBSD" ]; then # NOTE: feature designed for FBSD.
@@ -443,7 +443,7 @@ wipe_remote_archives () {
             for mirror in ${dig_query}; do
                 system_path="${MAIN_SOFTWARE_PREFIX}/software/binary/$(os_tripple)"
                 note "Wiping out remote: $(distinct n ${mirror}) binary archives: $(distinct n "${name}")"
-                ${SSH_BIN} -p ${MAIN_PORT} "${MAIN_USER}@${mirror}" \
+                ${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} "${MAIN_USER}@${mirror}" \
                     "${FIND_BIN} ${system_path} -iname '${name}' -delete" >> "${LOG}" 2>> "${LOG}"
             done
         done
