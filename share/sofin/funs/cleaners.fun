@@ -58,5 +58,4 @@ perform_clean () {
             ;;
     esac
     create_cache_directories
-    exit
 }

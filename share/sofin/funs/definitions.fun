@@ -325,7 +325,6 @@ push_binbuild () {
             warn "Not found software: $(distinct w ${element})!"
         fi
     done
-    exit
 }
 
 
@@ -343,7 +342,6 @@ deploy_binbuild () {
         note "Software bundle deployed successfully: $(distinct n ${software})"
         note "$(fill)"
     done
-    exit
 }
 
 
@@ -358,7 +356,6 @@ reset_definitions () {
             debug "Removed untracked file: $(distinct d "${untracked_file}")"
     done
     update_definitions
-    exit
 }
 
 
@@ -390,7 +387,6 @@ remove_application () {
             name="$(echo "${given_app_name}" | ${SED_BIN} 's/[0-9]*//g' 2>/dev/null)"
             alternative="$(${FIND_BIN} ${SOFTWARE_DIR} -maxdepth 1 -type d -name "${name}*" -not -name "${given_app_name}" 2>/dev/null | ${SED_BIN} 's/^.*\///g' 2>/dev/null | ${HEAD_BIN} -n1 2>/dev/null)"
             alt_lower="$(lowercase ${alternative})"
-            debug "Alternative: $(distinct d ${alternative}), Given: $(distinct d ${given_app_name}), Alt_lower: $(distinct d ${alt_lower}), full: $(distinct d ${SOFTWARE_DIR}${alternative}/${alt_lower}${INSTALLED_MARK})"
             if [ ! -z "${alternative}" -a -f "${SOFTWARE_DIR}${alternative}/${alt_lower}${INSTALLED_MARK}" ]; then
                 note "Automatically picking first alternative already installed: $(distinct n ${alternative})"
                 export APPLICATIONS="${alternative}"
@@ -406,7 +402,6 @@ remove_application () {
             continue
         fi
     done
-    exit
 }
 
 
@@ -419,7 +414,6 @@ available_definitions () {
     cd "${LISTS_DIR}"
     note "Available lists:"
     ${LS_BIN} -m * | ${SED_BIN} 's/\.def//g'
-    exit
 }
 
 
@@ -473,7 +467,6 @@ show_outdated () {
         exit 1
     else
         note "All installed bundles looks recent"
-        exit
     fi
 }
 
@@ -507,7 +500,6 @@ wipe_remote_archives () {
     else
         error "Aborted remote wipe of: $(distinct e "${SOFIN_ARGS}")"
     fi
-    exit
 }
 
 
@@ -1141,7 +1133,6 @@ hack_definition () {
         warn "---------------------------------------------------------"
     done
     note "Hack process finished for pattern: ${beauty_pat}"
-    exit
 }
 
 
@@ -1180,7 +1171,6 @@ rebuild_application () {
         ${SOFIN_BIN} push ${software} || \
             def_error "${software}" "Push failed"
     done
-    exit
 }
 
 
@@ -1288,4 +1278,142 @@ after_install_callback () {
         debug "After install callback: $(distinct d "${APP_AFTER_INSTALL_CALLBACK}")"
         run "${APP_AFTER_INSTALL_CALLBACK}"
     fi
+}
+
+
+build_all () {
+    # Update definitions and perform more checks
+    check_requirements
+
+    PATH=${DEFAULT_PATH}
+    for application in ${APPLICATIONS}; do
+        specified="${application}" # store original value of user input
+        application="$(lowercase ${application})"
+        load_defaults
+        validate_alternatives "${application}"
+        load_defs "${application}" # prevent installation of requirements of disabled application:
+        check_disabled "${DISABLE_ON}" # after which just check if it's not disabled
+        if [ ! "${ALLOW}" = "1" ]; then
+            warn "Bundle: $(distinct w ${application}) disabled on architecture: $(distinct w $(os_tripple))"
+            ${FIND_BIN} ${PREFIX} -delete >> ${LOG} 2>> ${LOG}
+        else
+            for definition in ${DEFINITIONS_DIR}${application}.def; do
+                unset DONT_BUILD_BUT_DO_EXPORTS
+                debug "Reading definition: $(distinct d ${definition})"
+                load_defaults
+                load_defs "${definition}"
+                check_disabled "${DISABLE_ON}" # after which just check if it's not disabled
+
+                APP_LOWER="${APP_NAME}${APP_POSTFIX}"
+                APP_NAME="$(capitalize ${APP_NAME})"
+                # some additional convention check:
+                if [ "${APP_NAME}" != "${specified}" -a \
+                     "${APP_NAME}${APP_POSTFIX}" != "${specified}" ]; then
+                    warn "You specified lowercase name of bundle: $(distinct w ${specified}), which is in contradiction to Sofin's convention (bundle - capitalized: f.e. 'Rust', dependencies and definitions - lowercase: f.e. 'yaml')."
+                fi
+                # if definition requires root privileges, throw an "exception":
+                if [ ! -z "${REQUIRE_ROOT_ACCESS}" ]; then
+                    if [ "${USERNAME}" != "root" ]; then
+                        warn "Definition requires superuser priviledges: $(distinct w ${APP_NAME}). Installation aborted."
+                        break
+                    fi
+                fi
+
+                export PREFIX="${SOFTWARE_DIR}${APP_NAME}${APP_POSTFIX}"
+                export SERVICE_DIR="${SERVICES_DIR}${APP_NAME}${APP_POSTFIX}"
+                if [ ! -z "${APP_STANDALONE}" ]; then
+                    ${MKDIR_BIN} -p "${SERVICE_DIR}"
+                    ${CHMOD_BIN} 0710 "${SERVICE_DIR}"
+                fi
+
+                # binary build of whole software bundle
+                ABSNAME="${APP_NAME}${APP_POSTFIX}-${APP_VERSION}"
+                ${MKDIR_BIN} -p "${BINBUILDS_CACHE_DIR}${ABSNAME}"
+
+                ARCHIVE_NAME="${APP_NAME}${APP_POSTFIX}-${APP_VERSION}${DEFAULT_ARCHIVE_EXT}"
+                INSTALLED_INDICATOR="${PREFIX}/${APP_LOWER}${INSTALLED_MARK}"
+
+                if [ "${SOFIN_CONTINUE_BUILD}" = "YES" ]; then # normal build by default
+                    note "Continuing build in: $(distinct n ${PREVIOUS_BUILD_DIR})"
+                    cd "${PREVIOUS_BUILD_DIR}"
+                else
+                    if [ ! -e "${INSTALLED_INDICATOR}" ]; then
+                        try_fetch_binbuild
+                    else
+                        already_installed_version="$(${CAT_BIN} ${INSTALLED_INDICATOR} 2>/dev/null)"
+                        if [ "${APP_VERSION}" = "${already_installed_version}" ]; then
+                            note "$(distinct n ${APP_NAME}${APP_POSTFIX}) bundle is installed with version: $(distinct n ${already_installed_version})"
+                        else
+                            warn "$(distinct w ${APP_NAME}${APP_POSTFIX}) bundle is installed with version: $(distinct w ${already_installed_version}), but newer version is defined: $(distinct w "${APP_VERSION}")"
+                        fi
+                        export DONT_BUILD_BUT_DO_EXPORTS=YES
+                    fi
+                fi
+
+                if [ -z "${DONT_BUILD_BUT_DO_EXPORTS}" ]; then
+                    if [ -z "${APP_REQUIREMENTS}" ]; then
+                        note "Installing: $(distinct n ${APP_FULL_NAME}), version: $(distinct n ${APP_VERSION})"
+                    else
+                        note "Installing: $(distinct n ${APP_FULL_NAME}), version: $(distinct n ${APP_VERSION}), with requirements: $(distinct n ${APP_REQUIREMENTS})"
+                    fi
+                    export req_amount="$(${PRINTF_BIN} "${APP_REQUIREMENTS}" | ${WC_BIN} -w 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)"
+                    export req_amount="$(${PRINTF_BIN} "${req_amount} + 1\n" | ${BC_BIN} 2>/dev/null)"
+                    export req_all="${req_amount}"
+                    for req in ${APP_REQUIREMENTS}; do
+                        if [ ! -z "${APP_USER_INFO}" ]; then
+                            warn "${APP_USER_INFO}"
+                        fi
+                        if [ -z "${req}" ]; then
+                            note "No additional requirements defined"
+                            break
+                        else
+                            note "  ${req} ($(distinct n ${req_amount}) of $(distinct n ${req_all}) remaining)"
+                            if [ ! -e "${PREFIX}/${req}${INSTALLED_MARK}" ]; then
+                                export CHANGED=YES
+                                execute_process "${req}"
+                            fi
+                        fi
+                        export req_amount="$(${PRINTF_BIN} "${req_amount} - 1\n" | ${BC_BIN} 2>/dev/null)"
+                    done
+                fi
+
+                if [ -z "${DONT_BUILD_BUT_DO_EXPORTS}" ]; then
+                    if [ -e "${PREFIX}/${application}${INSTALLED_MARK}" ]; then
+                        if [ "${CHANGED}" = "YES" ]; then
+                            note "  ${application} ($(distinct n 1) of $(distinct n ${req_all}))"
+                            note "   ${NOTE_CHAR} App dependencies changed. Rebuilding: $(distinct n ${application})"
+                            execute_process "${application}"
+                            unset CHANGED
+                            mark
+                            show_done
+                        else
+                            note "  ${application} ($(distinct n 1) of $(distinct n ${req_all}))"
+                            show_done
+                            debug "${SUCCESS_CHAR} $(distinct d ${application}) current: $(distinct d ${ver}), definition: [$(distinct d ${APP_VERSION})] Ok."
+                        fi
+                    else
+                        note "  ${application} ($(distinct n 1) of $(distinct n ${req_all}))"
+                        execute_process "${application}"
+                        mark
+                        note "${SUCCESS_CHAR} ${application} [$(distinct n ${APP_VERSION})]\n"
+                    fi
+                fi
+
+                conflict_resolve
+                load_defs "${application}"
+                export_binaries
+            done
+
+            after_export_callback
+
+            clean_useless
+            strip_bundle_files
+            manage_datasets
+            create_apple_bundle_if_necessary
+        fi
+    done
+
+    debug "Post build_all tasks.."
+    update_shell_vars
+    reload_zsh_shells
 }

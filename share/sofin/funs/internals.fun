@@ -29,8 +29,6 @@ usage_howto () {
     note "  $(distinct n "reset                               ") resets local definitions repository"
     note "  $(distinct n "diff                                ") displays changes in current definitions cache. Accepts any part of definition name"
     note "  $(distinct n "hack                                ") hack through build dirs matching pattern given as param"
-
-    exit
 }
 
 
@@ -160,7 +158,6 @@ get_shell_vars () {
         fi
         ${PRINTF_BIN} "# MANPATH:\nexport MANPATH='${manpath}'\n\n"
     fi
-    exit
 }
 
 
@@ -183,7 +180,6 @@ list_bundles_full () {
             done
         done
     fi
-    exit
 }
 
 
@@ -209,7 +205,6 @@ show_diff () {
         note "Showing all modifications from current defintions cache"
         ${GIT_BIN} status --short 2>/dev/null
     fi
-    exit
 }
 
 
@@ -220,7 +215,6 @@ develop () {
     fi
     note "Paste your definition below. Hit ctrl-d after a newline to commit"
     ${CAT_BIN} > ${DEFINITIONS_DIR}/${2}.def 2>/dev/null
-    exit
 }
 
 
@@ -229,7 +223,6 @@ enable_sofin_env () {
     update_shell_vars
     note "Enabled Sofin environment. Reloading shell"
     ${KILL_BIN} -SIGUSR2 ${SHELL_PID}
-    exit
 }
 
 
@@ -238,7 +231,6 @@ disable_sofin_env () {
     update_shell_vars
     note "Disabled Sofin environment. Reloading shell"
     ${KILL_BIN} -SIGUSR2 ${SHELL_PID}
-    exit
 }
 
 
@@ -248,7 +240,6 @@ sofin_status () {
     else
         note "Sofin shell environment is: $(distinct n enabled${reset})"
     fi
-    exit
 }
 
 
@@ -258,7 +249,6 @@ list_bundles_alphabetic () {
         ${FIND_BIN} ${SOFTWARE_DIR} -maxdepth 1 -mindepth 1 -type d  -not -name ".*" -print 2>/dev/null | \
         ${SED_BIN} -e 's#/.*/##' 2>/dev/null | ${SORT_BIN} 2>/dev/null
     fi
-    exit
 }
 
 

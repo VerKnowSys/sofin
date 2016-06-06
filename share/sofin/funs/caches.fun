@@ -56,5 +56,4 @@ show_logs () {
         note "Seeking log files.."
         log_helper
     fi
-    exit
 }
