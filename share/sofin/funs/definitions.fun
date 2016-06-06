@@ -458,7 +458,7 @@ show_outdated () {
                 warn "No such bundle found: $(distinct w ${application})"
                 continue
             fi
-            . "${DEFINITIONS_DIR}${application}.def"
+            load_defs "${application}"
             check_version "${ver}" "${APP_VERSION}"
         done
     fi
@@ -516,8 +516,8 @@ execute_process () {
     debug "Setting up default system compiler"
     set_c_compiler CLANG
 
-    . "${DEFAULTS}" # load definition and check for current version
-    . "${req_definition_file}"
+    load_defaults
+    load_defs "${req_definition_file}"
     check_disabled "${DISABLE_ON}" # check requirement for disabled state:
 
     if [ ! -z "${FORCE_GNU_COMPILER}" ]; then # force GNU compiler usage on definition side:
