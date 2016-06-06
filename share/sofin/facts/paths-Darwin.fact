@@ -1,0 +1,29 @@
+# OSX specific configuration
+DARWIN_MINIMUM_VERSION="124"
+GIT_BIN="/usr/bin/git"
+CURL_BIN="/usr/bin/curl"
+FETCH_BIN="/usr/bin/curl --connect-timeout 3 -O"
+PATCH_BIN="/usr/bin/patch -p0 "
+DEFAULT_LDFLAGS="-fPIC" # -arch x86_64 fPIE isn't well supported on OSX, but it's not production anyway
+DEFAULT_COMPILER_FLAGS="-O2 -fPIC ${COMMON_SAFE_CC_FLAGS}"
+if [ ! -z "${DEBUGBUILD}" ]; then
+    DEFAULT_COMPILER_FLAGS="-O0 -g -fPIC ${COMMON_SAFE_CC_FLAGS}"
+fi
+SHA_BIN="/usr/bin/shasum"
+SYSCTL_BIN="/usr/sbin/sysctl"
+KLDLOAD_BIN="/sbin/kextload"
+ZFS_BIN="/usr/bin/true"
+RSYNC_BIN="/usr/bin/rsync"
+CPUS=$(${SYSCTL_BIN} machdep.cpu.thread_count 2>/dev/null | ${AWK_BIN} '{printf $2;}' 2>/dev/null)
+MAKE_OPTS="-j${CPUS}"
+DEFAULT_ZPOOL="Projects"
+XZCAT_BIN="/bin/cat"
+unset SERVICE_BIN # not necessary
+
+if [ ${OS_VERSION} -lt ${DARWIN_MINIMUM_VERSION} ]; then
+    USE_BINBUILD=NO
+fi
+
+# runtime sha
+test -x "${SOFIN_MICROSECONDS_UTILITY_BIN}" && \
+RUNTIME_SHA="$(${PRINTF_BIN} "$(${DATE_BIN} 2>/dev/null)-$(${SOFIN_MICROSECONDS_UTILITY_BIN} 2>/dev/null)" | ${SHA_BIN} 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)"

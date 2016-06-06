@@ -1,0 +1,20 @@
+# System specific configuration
+
+USERNAME="$(${ID_BIN} ${DEFAULT_ID_OPTIONS} 2>/dev/null)"
+if [ -z "${USERNAME}" ]; then
+    echo "${red}FATAL: \$USERNAME environment variable, requires a value!"
+    exit 1
+fi
+
+SYSTEM_NAME="$(uname -s 2>/dev/null)"
+SYSTEM_ARCH="$(uname -m 2>/dev/null)"
+if [ -z "${SYSTEM_NAME}" -o -z "${SYSTEM_ARCH}" ]; then
+    echo "${red}FATAL: \$SYSTEM_NAME and \$SYSTEM_ARCH environment variables, require a value!"
+    exit 1
+fi
+
+OS_VERSION=11 # NOTE: default fallback version if no sofin version utility is available
+if [ -x "${SOFIN_VERSION_UTILITY_BIN}" ]; then
+    OS_VERSION="$(echo $(${SOFIN_VERSION_UTILITY_BIN} 2>/dev/null) | ${AWK_BIN} '{ gsub(/\./, ""); print $1; }' 2>/dev/null)"
+    FULL_SYSTEM_VERSION="$(${SOFIN_VERSION_UTILITY_BIN} 2>/dev/null)"
+fi

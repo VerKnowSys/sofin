@@ -1,0 +1,28 @@
+# ANSI color definitions
+red='\033[31;40m'
+green='\033[32;40m'
+yellow='\033[33;40m'
+blue='\033[34;40m'
+magenta='\033[35;40m'
+cyan='\033[36;40m'
+gray='\033[37;40m'
+white='\033[38;40m'
+reset='\033[0m'
+
+TTY="NO"
+SUCCESS_CHAR="V"
+WARN_CHAR="*"
+NOTE_CHAR=">"
+ERROR_CHAR="#"
+NOTE_CHAR2="-"
+SEPARATOR_CHAR="_"
+if [ -t 1 ]; then
+    TTY="YES"
+    SUCCESS_CHAR="√"
+    WARN_CHAR="•"
+    NOTE_CHAR="→"
+    NOTE_CHAR2="»"
+    ERROR_CHAR="✘"
+    SEPARATOR_CHAR="┈"
+fi
+
