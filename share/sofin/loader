@@ -1,30 +1,31 @@
+load_facts () {
+    for fact in $*; do
+        . share/sofin/facts/${fact} || . /usr/share/sofin/facts/${fact}
+    done
+}
+
+
+load_funs () {
+    for fun in $*; do
+        . share/sofin/funs/${fun} || . /usr/share/sofin/funs/${fun}
+    done
+}
+
+
 load_sofin () {
-    pfix="$1"
+    # loading facts
+    load_facts paths.fact shell.fact sofin.fact system.fact build.fact
+    load_facts paths-${SYSTEM_NAME}.fact
 
-    # echo "- Facts"
-    . ${pfix}share/sofin/facts/paths.fact
-    . ${pfix}share/sofin/facts/shell.fact
-    . ${pfix}share/sofin/facts/sofin.fact
-    . ${pfix}share/sofin/facts/system.fact
-    . ${pfix}share/sofin/facts/paths-${SYSTEM_NAME}.fact
-    . ${pfix}share/sofin/facts/build.fact
+    # loading funs
+    load_funs core.fun validations.fun commons.fun envs.fun internals.fun cleaners.fun caches.fun definitions.fun
 
-    # echo "- Funs"
-    . ${pfix}share/sofin/funs/core.fun
-    . ${pfix}share/sofin/funs/validations.fun
-    . ${pfix}share/sofin/funs/commons.fun
-    . ${pfix}share/sofin/funs/envs.fun
-    . ${pfix}share/sofin/funs/internals.fun
-    . ${pfix}share/sofin/funs/cleaners.fun
-    . ${pfix}share/sofin/funs/caches.fun
-    . ${pfix}share/sofin/funs/definitions.fun
-
-    # initial tasks
+    # initial validations
     setup_default_branch
     setup_default_repository
-    env_reset
     check_os
     check_definition_dir
+    env_reset
 }
 
 load_sofin
