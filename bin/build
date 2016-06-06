@@ -3,8 +3,7 @@
 
 
 # load configuration from sofin.conf
-CONF_FILE="s.conf.sh"
-. "src/${CONF_FILE}"
+. share/sofin/loader || . /usr/share/sofin/loader
 
 # choose C compiler, if any
 export CXX="/usr/bin/g++"
@@ -38,7 +37,7 @@ update_env_files () {
     env_files="/etc/zshenv /etc/bashrc /etc/profile"
     for i in ${env_files}; do
         if [ -f "${i}" ]; then
-            ${GREP_BIN} -q "SHELL_PID" "${i}" 2>/dev/null
+            ${GREP_BIN} -q "SHELL_PID" "${i}" >/dev/null 2>&1
             if [ "$?" = "0" ]; then
                 continue
             else
@@ -63,7 +62,6 @@ install_base () {
             ${RM_BIN} -fv "${PREFIX}usr/bin/sofin" && \
             ${RM_BIN} -fv "${PREFIX}usr/bin/sofin-version-utility" && \
             ${RM_BIN} -fv "${PREFIX}usr/bin/sofin-microseconds" && \
-            ${RM_BIN} -fv "${PREFIX}etc/s.conf" && \
             note "Preinstallation cleanup completed"
         fi
         install_sofin
@@ -95,10 +93,9 @@ Sofin requires read + write access for that path"
         PREFIX="/"
     fi
     note "Installing to prefix: $(distinct n ${PREFIX})"
+    note "$(distinct n $(${CP_BIN} -v -R "share/sofin" "${PREFIX}usr/share/"))" && \
     note "$(distinct n $(${INSTALL_BIN} -v "bin/sofin-version-utility" "${PREFIX}usr/bin"))" && \
     note "$(distinct n $(${INSTALL_BIN} -v "bin/sofin-microseconds" "${PREFIX}usr/bin"))" && \
-    note "$(distinct n $(${INSTALL_BIN} -v "bin/sofin-microseconds" "${PREFIX}usr/bin"))" && \
-    note "$(distinct n $(${INSTALL_BIN} -v "src/${CONF_FILE}" "${PREFIX}etc/s.conf"))" && \
     note "$(distinct n $(${INSTALL_BIN} -v "src/sofin.sh" "${PREFIX}usr/bin/s"))" && \
     note "$(distinct n Sof)tware $(distinct n In)staller, version: $(distinct n "${SOFIN_VERSION}") was installed successfully." && \
     note "Type: $(distinct n "s usage") for help." && \
