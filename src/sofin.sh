@@ -1,7 +1,7 @@
 #!/bin/sh
 # @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
 
-. share/sofin/loader || . /usr/share/sofin/loader
+. /usr/share/sofin/loader
 
 SOFIN_ARGS_FULL="$*"
 SOFIN_ARGS="$(echo ${SOFIN_ARGS_FULL} | ${CUT_BIN} -d' ' -f2- 2>/dev/null)"
