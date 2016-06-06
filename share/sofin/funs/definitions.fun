@@ -226,48 +226,14 @@ push_binbuild () {
                     ${CHMOD_BIN} a+r "${name}" "${name}.sha1" && \
                         debug "Set read access for archives: $(distinct d ${name}), $(distinct d ${name}.sha1) before we send them to public remote"
 
-                    if [ "${SYSTEM_NAME}" = "Linux" ]; then
-                        debug "Performing Linux specific additional copy of binary bundle"
-                        ${MKDIR_BIN} -p /tmp/sofin-bundles/
-                        ${CP_BIN} ${name} /tmp/sofin-bundles/
-                        ${CP_BIN} ${name}.sha1 /tmp/sofin-bundles/
-                    fi
+                    note "Performing a copy of binary bundle to: ${BINBUILDS_CACHE_DIR}"
+                    ${MKDIR_BIN} -p ${BINBUILDS_CACHE_DIR}
+                    run "${CP_BIN} -v ${name} ${BINBUILDS_CACHE_DIR}"
+                    run "${CP_BIN} -v ${name}.sha1 ${BINBUILDS_CACHE_DIR}"
 
-                    shortsha="$(${CAT_BIN} "${name}.sha1" 2>/dev/null | ${CUT_BIN} -c -16 2>/dev/null)…"
-                    note "Pushing archive #$(distinct n ${shortsha}) to remote repository.."
-                    retry "${SCP_BIN} -P ${MAIN_PORT} ${name} ${address}/${name}.partial" || \
-                        def_error "${name}" "Error sending: $(distinct e "${1}") bundle to: $(distinct e "${address}/${1}")"
-                    if [ "$?" = "0" ]; then
-                        ${SSH_BIN} -p ${MAIN_PORT} ${MAIN_USER}@${mirror} "cd ${MAIN_SOFTWARE_PREFIX}/software/binary/${OS_TRIPPLE} && ${MV_BIN} ${name}.partial ${name}"
-                        retry "${SCP_BIN} -P ${MAIN_PORT} ${name}.sha1 ${address}/${name}.sha1" || \
-                            def_error ${name}.sha1 "Error sending: $(distinct e ${name}.sha1) file to: $(distinct e "${address}/${1}")"
-                    else
-                        error "Failed to push binary build of: $(distinct e ${name}) to remote: $(distinct e ${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${name})"
-                    fi
+                    push_binary_archive
+                    push_service_stream_archive
 
-                    if [ "${SYSTEM_NAME}" = "FreeBSD" ]; then # NOTE: feature designed for FBSD.
-                        if [ -f "${final_snap_file}" ]; then
-                            system_path="${MAIN_SOFTWARE_PREFIX}/software/binary/${MAIN_COMMON_NAME}"
-                            address="${MAIN_USER}@${mirror}:${system_path}"
-
-                            ${SSH_BIN} -p ${MAIN_PORT} "${MAIN_USER}@${mirror}" \
-                                "cd ${MAIN_SOFTWARE_PREFIX}/software/binary; ${MKDIR_BIN} -p ${MAIN_COMMON_NAME} ; ${CHMOD_BIN} 755 ${MAIN_COMMON_NAME}"
-
-                            debug "Setting common access to archive files before we send it: $(distinct d ${final_snap_file})"
-                            ${CHMOD_BIN} a+r "${final_snap_file}"
-                            debug "Sending initial service stream to $(distinct d ${MAIN_COMMON_NAME}) repository: $(distinct d ${MAIN_BINARY_REPOSITORY}${MAIN_COMMON_NAME}/${final_snap_file})"
-
-                            retry "${SCP_BIN} -P ${MAIN_PORT} ${final_snap_file} ${address}/${final_snap_file}.partial"
-                            if [ "$?" = "0" ]; then
-                                ${SSH_BIN} -p ${MAIN_PORT} "${MAIN_USER}@${mirror}" \
-                                    "cd ${MAIN_SOFTWARE_PREFIX}/software/binary/${MAIN_COMMON_NAME} && ${MV_BIN} ${final_snap_file}.partial ${final_snap_file}"
-                            else
-                                error "Failed to send service snapshot archive file: $(distinct e "${final_snap_file}") to remote host: $(distinct e "${MAIN_USER}@${mirror}")!"
-                            fi
-                        else
-                            note "No service stream available for: $(distinct n ${element})"
-                        fi
-                    fi
                 done
                 ${RM_BIN} -f "${name}" "${name}.sha1" "${final_snap_file}"
             fi
@@ -1371,4 +1337,46 @@ dump_debug_info () {
     debug "LDFLAGS: ${LDFLAGS}"
     debug "LD_LIBRARY_PATH: ${LD_LIBRARY_PATH}"
     debug "-------------- PRE CONFIGURE SETTINGS DUMP ENDS ---------"
+}
+
+
+push_binary_archive () {
+    shortsha="$(${CAT_BIN} "${name}.sha1" 2>/dev/null | ${CUT_BIN} -c -16 2>/dev/null)…"
+    note "Pushing archive #$(distinct n ${shortsha}) to remote repository.."
+    retry "${SCP_BIN} ${DEFAULT_SSH_OPTS} -P ${MAIN_PORT} ${name} ${address}/${name}.partial" || \
+        def_error "${name}" "Error sending: $(distinct e "${1}") bundle to: $(distinct e "${address}/${1}")"
+    if [ "$?" = "0" ]; then
+        ${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} ${MAIN_USER}@${mirror} "cd ${MAIN_SOFTWARE_PREFIX}/software/binary/${OS_TRIPPLE} && ${MV_BIN} ${name}.partial ${name}"
+        retry "${SCP_BIN} ${DEFAULT_SSH_OPTS} -P ${MAIN_PORT} ${name}.sha1 ${address}/${name}.sha1" || \
+            def_error ${name}.sha1 "Error sending: $(distinct e ${name}.sha1) file to: $(distinct e "${address}/${1}")"
+    else
+        error "Failed to push binary build of: $(distinct e ${name}) to remote: $(distinct e ${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${name})"
+    fi
+}
+
+
+push_service_stream_archive () {
+    if [ "${SYSTEM_NAME}" = "FreeBSD" ]; then # NOTE: feature designed for FBSD.
+        if [ -f "${final_snap_file}" ]; then
+            system_path="${MAIN_SOFTWARE_PREFIX}/software/binary/${MAIN_COMMON_NAME}"
+            address="${MAIN_USER}@${mirror}:${system_path}"
+
+            ${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} "${MAIN_USER}@${mirror}" \
+                "cd ${MAIN_SOFTWARE_PREFIX}/software/binary; ${MKDIR_BIN} -p ${MAIN_COMMON_NAME} ; ${CHMOD_BIN} 755 ${MAIN_COMMON_NAME}"
+
+            debug "Setting common access to archive files before we send it: $(distinct d ${final_snap_file})"
+            ${CHMOD_BIN} a+r "${final_snap_file}"
+            debug "Sending initial service stream to $(distinct d ${MAIN_COMMON_NAME}) repository: $(distinct d ${MAIN_BINARY_REPOSITORY}${MAIN_COMMON_NAME}/${final_snap_file})"
+
+            retry "${SCP_BIN} ${DEFAULT_SSH_OPTS} -P ${MAIN_PORT} ${final_snap_file} ${address}/${final_snap_file}.partial"
+            if [ "$?" = "0" ]; then
+                ${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} "${MAIN_USER}@${mirror}" \
+                    "cd ${MAIN_SOFTWARE_PREFIX}/software/binary/${MAIN_COMMON_NAME} && ${MV_BIN} ${final_snap_file}.partial ${final_snap_file}"
+            else
+                error "Failed to send service snapshot archive file: $(distinct e "${final_snap_file}") to remote host: $(distinct e "${MAIN_USER}@${mirror}")!"
+            fi
+        else
+            note "No service stream available for: $(distinct n ${element})"
+        fi
+    fi
 }
