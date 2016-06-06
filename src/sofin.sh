@@ -264,68 +264,15 @@ for application in ${APPLICATIONS}; do
             ABSNAME="${APP_NAME}${APP_POSTFIX}-${APP_VERSION}"
             ${MKDIR_BIN} -p "${BINBUILDS_CACHE_DIR}${ABSNAME}"
 
-            MIDDLE="$(os_tripple)"
             ARCHIVE_NAME="${APP_NAME}${APP_POSTFIX}-${APP_VERSION}${DEFAULT_ARCHIVE_EXT}"
             INSTALLED_INDICATOR="${PREFIX}/${APP_LOWER}${INSTALLED_MARK}"
 
-            if [ "${SOFIN_CONTINUE_BUILD}" != "YES" ]; then # normal build by default
+            if [ "${SOFIN_CONTINUE_BUILD}" = "YES" ]; then # normal build by default
+                note "Continuing build in: $(distinct n ${PREVIOUS_BUILD_DIR})"
+                cd "${PREVIOUS_BUILD_DIR}"
+            else
                 if [ ! -e "${INSTALLED_INDICATOR}" ]; then
-                    if [ ! -z "${USE_BINBUILD}" ]; then
-                        debug "Binary build check was skipped"
-                    else
-                        aname="$(lowercase ${APP_NAME}${APP_POSTFIX})"
-                        confirm () {
-                            debug "Fetched archive: $(distinct d ${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME})"
-                        }
-                        if [ ! -e "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" ]; then
-                            cd ${BINBUILDS_CACHE_DIR}${ABSNAME}
-                            try "${FETCH_BIN} ${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}.sha1" || \
-                                try "${FETCH_BIN} ${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}.sha1"
-                            if [ "$?" = "0" ]; then
-                                $(try "${FETCH_BIN} ${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}" && confirm) || \
-                                $(try "${FETCH_BIN} ${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}" && confirm) || \
-                                $(try "${FETCH_BIN} ${MAIN_BINARY_REPOSITORY}${MIDDLE}/${ARCHIVE_NAME}" && confirm) || \
-                                error "Failure fetching available binary build for: $(distinct e "${ARCHIVE_NAME}"). Please check your DNS / Network setup!"
-                            else
-                                note "No binary build available for: $(distinct n ${MIDDLE}/${APP_NAME}${APP_POSTFIX}-${APP_VERSION})"
-                            fi
-
-                            # checking archive sha1 checksum
-                            if [ -e "./${ARCHIVE_NAME}" ]; then
-                                note "Found binary build archive: $(distinct n "${ARCHIVE_NAME}")"
-                                current_archive_sha1="$(file_checksum "${ARCHIVE_NAME}")"
-                                debug "current_archive_sha1: $(distinct d ${current_archive_sha1})"
-                            else
-                                error "No bundle archive found?"
-                            fi
-                            current_sha_file="${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}.sha1"
-                            if [ -e "${current_sha_file}" ]; then
-                                export sha1_value="$(${CAT_BIN} ${current_sha_file} 2>/dev/null)"
-                            fi
-
-                            debug "Checking SHA1 match: $(distinct d ${current_archive_sha1}) vs $(distinct d ${sha1_value})"
-                            if [ "${current_archive_sha1}" != "${sha1_value}" ]; then
-                                debug "Bundle archive checksum doesn't match, removing binary builds and proceeding into build phase"
-                                ${RM_BIN} -fv ${ARCHIVE_NAME}
-                                ${RM_BIN} -fv ${ARCHIVE_NAME}.sha1
-                            fi
-                        fi
-                        cd "${SOFTWARE_DIR}"
-
-                        debug "ARCHIVE_NAME: $(distinct d ${ARCHIVE_NAME}). Expecting binbuild to be available in: $(distinct d ${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME})"
-                        if [ -e "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" ]; then # if exists, then checksum is ok
-                            ${TAR_BIN} -xJf "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" >> "${LOG}-${aname}" 2>> "${LOG}-${aname}"
-                            if [ "$?" = "0" ]; then # if archive is valid
-                                note "Software bundle installed: $(distinct n ${APP_NAME}${APP_POSTFIX}), with version: $(distinct n ${APP_VERSION})"
-                                export DONT_BUILD_BUT_DO_EXPORTS=YES
-                            else
-                                debug "  ${NOTE_CHAR} No binary bundle available for: $(distinct n ${APP_NAME}${APP_POSTFIX})"
-                                ${RM_BIN} -fr "${BINBUILDS_CACHE_DIR}${ABSNAME}"
-                            fi
-                        else
-                            debug "Binary build checksum doesn't match for: $(distinct n ${ABSNAME})"
-                        fi
-                    fi
+                    try_fetch_binbuild
                 else
                     already_installed_version="$(${CAT_BIN} ${INSTALLED_INDICATOR} 2>/dev/null)"
                     if [ "${APP_VERSION}" = "${already_installed_version}" ]; then
@@ -335,10 +282,6 @@ for application in ${APPLICATIONS}; do
                     fi
                     export DONT_BUILD_BUT_DO_EXPORTS=YES
                 fi
-
-            else # continue build!
-                note "Continuing build in: $(distinct n ${PREVIOUS_BUILD_DIR})"
-                cd "${PREVIOUS_BUILD_DIR}"
             fi
 
             if [ -z "${DONT_BUILD_BUT_DO_EXPORTS}" ]; then
@@ -395,10 +338,7 @@ for application in ${APPLICATIONS}; do
             export_binaries
         done
 
-        if [ ! -z "${APP_AFTER_EXPORT_CALLBACK}" ]; then
-            debug "Executing APP_AFTER_EXPORT_CALLBACK: $(distinct d "${APP_AFTER_EXPORT_CALLBACK}")"
-            run "${APP_AFTER_EXPORT_CALLBACK}"
-        fi
+        after_export_callback
 
         clean_useless
         strip_bundle_files

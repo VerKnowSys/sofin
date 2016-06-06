@@ -680,10 +680,7 @@ execute_process () {
                     run "${GIT_BIN} checkout -b ${APP_GIT_CHECKOUT}"
                 fi
 
-                if [ ! -z "${APP_AFTER_UNPACK_CALLBACK}" ]; then
-                    debug "Running after unpack callback: $(distinct d "${APP_AFTER_UNPACK_CALLBACK}")"
-                    run "${APP_AFTER_UNPACK_CALLBACK}"
-                fi
+                after_update_callback
 
                 aname="$(lowercase ${APP_NAME}${APP_POSTFIX})"
                 LIST_DIR="${DEFINITIONS_DIR}patches/$1" # $1 is definition file name
@@ -720,10 +717,8 @@ execute_process () {
                     fi
                 fi
 
-                if [ ! -z "${APP_AFTER_PATCH_CALLBACK}" ]; then
-                    debug "Running after patch callback: $(distinct d "${APP_AFTER_PATCH_CALLBACK}")"
-                    run "${APP_AFTER_PATCH_CALLBACK}"
-                fi
+                after_patch_callback
+
                 debug "-------------- PRE CONFIGURE SETTINGS DUMP --------------"
                 debug "Current DIR: $(${PWD_BIN} 2>/dev/null)"
                 debug "PREFIX: ${PREFIX}"
@@ -796,10 +791,8 @@ execute_process () {
                         ;;
 
                 esac
-                if [ ! -z "${APP_AFTER_CONFIGURE_CALLBACK}" ]; then
-                    debug "Running after configure callback: $(distinct d "${APP_AFTER_CONFIGURE_CALLBACK}")"
-                    run "${APP_AFTER_CONFIGURE_CALLBACK}"
-                fi
+
+                after_configure_callback
 
             else # in "continue-build" mode, we reuse current cache dir..
                 export BUILD_DIR_ROOT="${PREVIOUS_BUILD_DIR}"
@@ -810,10 +803,7 @@ execute_process () {
             # and common part between normal and continue modes:
             note "   ${NOTE_CHAR} Building requirement: $(distinct n $1)"
             run "${APP_MAKE_METHOD}"
-            if [ ! -z "${APP_AFTER_MAKE_CALLBACK}" ]; then
-                debug "Running after make callback: $(distinct d "${APP_AFTER_MAKE_CALLBACK}")"
-                run "${APP_AFTER_MAKE_CALLBACK}"
-            fi
+            after_make_callback
 
             debug "Cleaning man dir from previous dependencies, we want to install man pages that belong to LAST requirement which is app bundle itself"
             for place in man share/man share/info share/doc share/docs; do
@@ -822,10 +812,7 @@ execute_process () {
 
             note "   ${NOTE_CHAR} Installing requirement: $(distinct n $1)"
             run "${APP_INSTALL_METHOD}"
-            if [ ! "${APP_AFTER_INSTALL_CALLBACK}" = "" ]; then
-                debug "After install callback: $(distinct d "${APP_AFTER_INSTALL_CALLBACK}")"
-                run "${APP_AFTER_INSTALL_CALLBACK}"
-            fi
+            after_install_callback
 
             debug "Marking $(distinct d $1) as installed in: $(distinct d ${PREFIX})"
             ${TOUCH_BIN} "${PREFIX}/$1${INSTALLED_MARK}"
@@ -1196,3 +1183,109 @@ rebuild_application () {
     exit
 }
 
+
+try_fetch_binbuild () {
+    if [ ! -z "${USE_BINBUILD}" ]; then
+        debug "Binary build check was skipped"
+    else
+        aname="$(lowercase ${APP_NAME}${APP_POSTFIX})"
+        confirm () {
+            debug "Fetched archive: $(distinct d ${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME})"
+        }
+        if [ ! -e "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" ]; then
+            cd ${BINBUILDS_CACHE_DIR}${ABSNAME}
+            try "${FETCH_BIN} ${MAIN_BINARY_REPOSITORY}$(os_tripple)/${ARCHIVE_NAME}.sha1" || \
+                try "${FETCH_BIN} ${MAIN_BINARY_REPOSITORY}$(os_tripple)/${ARCHIVE_NAME}.sha1"
+            if [ "$?" = "0" ]; then
+                $(try "${FETCH_BIN} ${MAIN_BINARY_REPOSITORY}$(os_tripple)/${ARCHIVE_NAME}" && confirm) || \
+                $(try "${FETCH_BIN} ${MAIN_BINARY_REPOSITORY}$(os_tripple)/${ARCHIVE_NAME}" && confirm) || \
+                $(try "${FETCH_BIN} ${MAIN_BINARY_REPOSITORY}$(os_tripple)/${ARCHIVE_NAME}" && confirm) || \
+                error "Failure fetching available binary build for: $(distinct e "${ARCHIVE_NAME}"). Please check your DNS / Network setup!"
+            else
+                note "No binary build available for: $(distinct n $(os_tripple)/${APP_NAME}${APP_POSTFIX}-${APP_VERSION})"
+            fi
+
+            # checking archive sha1 checksum
+            if [ -e "./${ARCHIVE_NAME}" ]; then
+                note "Found binary build archive: $(distinct n "${ARCHIVE_NAME}")"
+                current_archive_sha1="$(file_checksum "${ARCHIVE_NAME}")"
+                debug "current_archive_sha1: $(distinct d ${current_archive_sha1})"
+            else
+                error "No bundle archive found?"
+            fi
+            current_sha_file="${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}.sha1"
+            if [ -e "${current_sha_file}" ]; then
+                export sha1_value="$(${CAT_BIN} ${current_sha_file} 2>/dev/null)"
+            fi
+
+            debug "Checking SHA1 match: $(distinct d ${current_archive_sha1}) vs $(distinct d ${sha1_value})"
+            if [ "${current_archive_sha1}" != "${sha1_value}" ]; then
+                debug "Bundle archive checksum doesn't match, removing binary builds and proceeding into build phase"
+                ${RM_BIN} -fv ${ARCHIVE_NAME}
+                ${RM_BIN} -fv ${ARCHIVE_NAME}.sha1
+            fi
+        fi
+        cd "${SOFTWARE_DIR}"
+        debug "ARCHIVE_NAME: $(distinct d ${ARCHIVE_NAME}). Expecting binbuild to be available in: $(distinct d ${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME})"
+        if [ -e "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" ]; then # if exists, then checksum is ok
+            ${TAR_BIN} -xJf "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" >> "${LOG}-${aname}" 2>> "${LOG}-${aname}"
+            if [ "$?" = "0" ]; then # if archive is valid
+                note "Software bundle installed: $(distinct n ${APP_NAME}${APP_POSTFIX}), with version: $(distinct n ${APP_VERSION})"
+                export DONT_BUILD_BUT_DO_EXPORTS=YES
+            else
+                debug "  ${NOTE_CHAR} No binary bundle available for: $(distinct n ${APP_NAME}${APP_POSTFIX})"
+                ${RM_BIN} -fr "${BINBUILDS_CACHE_DIR}${ABSNAME}"
+            fi
+        else
+            debug "Binary build checksum doesn't match for: $(distinct n ${ABSNAME})"
+        fi
+    fi
+}
+
+
+after_update_callback () {
+    if [ ! -z "${APP_AFTER_UNPACK_CALLBACK}" ]; then
+        debug "Running after unpack callback: $(distinct d "${APP_AFTER_UNPACK_CALLBACK}")"
+        run "${APP_AFTER_UNPACK_CALLBACK}"
+    fi
+}
+
+
+after_export_callback () {
+    if [ ! -z "${APP_AFTER_EXPORT_CALLBACK}" ]; then
+        debug "Executing APP_AFTER_EXPORT_CALLBACK: $(distinct d "${APP_AFTER_EXPORT_CALLBACK}")"
+        run "${APP_AFTER_EXPORT_CALLBACK}"
+    fi
+}
+
+
+after_patch_callback () {
+    if [ ! -z "${APP_AFTER_PATCH_CALLBACK}" ]; then
+        debug "Running after patch callback: $(distinct d "${APP_AFTER_PATCH_CALLBACK}")"
+        run "${APP_AFTER_PATCH_CALLBACK}"
+    fi
+}
+
+
+after_configure_callback () {
+    if [ ! -z "${APP_AFTER_CONFIGURE_CALLBACK}" ]; then
+        debug "Running after configure callback: $(distinct d "${APP_AFTER_CONFIGURE_CALLBACK}")"
+        run "${APP_AFTER_CONFIGURE_CALLBACK}"
+    fi
+}
+
+
+after_make_callback () {
+    if [ ! -z "${APP_AFTER_MAKE_CALLBACK}" ]; then
+        debug "Running after make callback: $(distinct d "${APP_AFTER_MAKE_CALLBACK}")"
+        run "${APP_AFTER_MAKE_CALLBACK}"
+    fi
+}
+
+
+after_install_callback () {
+    if [ ! "${APP_AFTER_INSTALL_CALLBACK}" = "" ]; then
+        debug "After install callback: $(distinct d "${APP_AFTER_INSTALL_CALLBACK}")"
+        run "${APP_AFTER_INSTALL_CALLBACK}"
+    fi
+}
