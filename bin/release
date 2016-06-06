@@ -7,8 +7,8 @@ readonly SOFIN_ORIGIN="git@bitbucket.org:verknowsys/sofin.git"
 readonly SOFIN_MIRROR="git@github.com:VerKnowSys/sofin.git"
 
 note "Pulling from origin and mirror.."
-${GIT_BIN} pull "${SOFIN_ORIGIN}"
-${GIT_BIN} pull "${SOFIN_MIRROR}"
+${GIT_BIN} pull "${SOFIN_ORIGIN}" >/dev/null
+${GIT_BIN} pull "${SOFIN_MIRROR}" >/dev/null
 
 note "Pushing repo to origin: ${SOFIN_ORIGIN} and mirror: ${SOFIN_MIRROR}"
 ${GIT_BIN} push --all "${SOFIN_ORIGIN}" >/dev/null && \
@@ -17,7 +17,10 @@ ${GIT_BIN} push --all "${SOFIN_MIRROR}" >/dev/null && \
 ${GIT_BIN} push --tags "${SOFIN_MIRROR}" >/dev/null && \
 bin/clean
 ${MKDIR_BIN} -p releases
-version="$(grep 'readonly SOFIN_VERSION=' src/s.conf.sh | awk '{ gsub(/\"/, "", $2); gsub(/SOFIN_VERSION=/, "", $2); print $2; }')"
+version="$(${GREP_BIN} 'SOFIN_VERSION=' share/sofin/facts/sofin.fact | ${AWK_BIN} '{ gsub(/\"/, "", $1); gsub(/SOFIN_VERSION=/, "", $1); print $1; }')"
+if [ -z "${version}" ]; then
+    error "Fail: Empty version."
+fi
 base_name="sofin-${version}"
 archive_name="${base_name}.txz"
 note "Preparing package: ${archive_name} with version: ${version}"
