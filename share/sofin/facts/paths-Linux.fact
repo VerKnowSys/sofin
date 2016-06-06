@@ -29,7 +29,6 @@ CPUS="$(${NPROC_BIN} 2>/dev/null)"
 MAKE_OPTS="-j${CPUS}"
 AWK_BIN="/usr/bin/awk"
 ZFS_BIN="/bin/true"
-RSYNC_BIN="/usr/bin/rsync"
 if [ ${OS_VERSION} -lt ${GLIBC_MINIMUM_VERSION} ]; then
     USE_BINBUILD=NO
 fi

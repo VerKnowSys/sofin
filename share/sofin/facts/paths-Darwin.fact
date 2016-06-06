@@ -13,7 +13,6 @@ SHA_BIN="/usr/bin/shasum"
 SYSCTL_BIN="/usr/sbin/sysctl"
 KLDLOAD_BIN="/sbin/kextload"
 ZFS_BIN="/usr/bin/true"
-RSYNC_BIN="/usr/bin/rsync"
 CPUS=$(${SYSCTL_BIN} machdep.cpu.thread_count 2>/dev/null | ${AWK_BIN} '{printf $2;}' 2>/dev/null)
 MAKE_OPTS="-j${CPUS}"
 DEFAULT_ZPOOL="Projects"
