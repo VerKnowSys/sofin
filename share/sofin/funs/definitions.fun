@@ -1115,8 +1115,8 @@ try_fetch_binbuild () {
             debug "Checking SHA1 match: $(distinct d ${current_archive_sha1}) vs $(distinct d ${sha1_value})"
             if [ "${current_archive_sha1}" != "${sha1_value}" ]; then
                 debug "Bundle archive checksum doesn't match, removing binary builds and proceeding into build phase"
-                ${RM_BIN} -fv ${ARCHIVE_NAME}
-                ${RM_BIN} -fv ${ARCHIVE_NAME}.sha1
+                ${RM_BIN} -fv ${ARCHIVE_NAME} >> ${LOG} 2>> ${LOG}
+                ${RM_BIN} -fv ${ARCHIVE_NAME}.sha1 >> ${LOG} 2>> ${LOG}
             fi
         fi
         cd "${SOFTWARE_DIR}"
