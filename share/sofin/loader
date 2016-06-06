@@ -1,0 +1,31 @@
+load_facts () {
+    for fact in $*; do
+        . /usr/share/sofin/facts/${fact}
+    done
+}
+
+
+load_funs () {
+    for fun in $*; do
+        . /usr/share/sofin/funs/${fun}
+    done
+}
+
+
+load_sofin () {
+    # loading facts
+    load_facts paths.fact shell.fact sofin.fact system.fact build.fact
+    load_facts paths-${SYSTEM_NAME}.fact
+
+    # loading funs
+    load_funs core.fun validations.fun commons.fun envs.fun internals.fun cleaners.fun caches.fun definitions.fun
+
+    # initial validations
+    setup_default_branch
+    setup_default_repository
+    check_os
+    check_definition_dir
+    env_reset
+}
+
+load_sofin
