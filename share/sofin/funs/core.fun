@@ -1,14 +1,3 @@
-load_config () {
-    if [ -e "${CONF_FILE}" ]; then
-        . "${CONF_FILE}"
-        validate_env
-    else
-        echo "${red}FATAL: No configuration file found: ${CONF_FILE}. Sofin isn't installed properly."
-        exit 1
-    fi
-}
-
-
 env_reset () {
     # unset conflicting environment variables
     unset LDFLAGS
