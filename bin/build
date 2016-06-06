@@ -3,7 +3,15 @@
 
 
 # load configuration from sofin.conf
-. share/sofin/loader || . /usr/share/sofin/loader
+. share/sofin/facts/paths.fact
+. share/sofin/facts/shell.fact
+. share/sofin/facts/sofin.fact
+. share/sofin/facts/system.fact
+
+# loading funs
+. share/sofin/funs/core.fun
+. share/sofin/funs/commons.fun
+
 
 # choose C compiler, if any
 export CXX="/usr/bin/g++"
