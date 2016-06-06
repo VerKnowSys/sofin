@@ -121,3 +121,18 @@ try () {
         error "An empty command to run for: $(distinct e ${APP_NAME})?"
     fi
 }
+
+
+setup_default_branch () {
+    # setting up definitions repository
+    if [ -z "${BRANCH}" ]; then
+        BRANCH="stable"
+    fi
+}
+
+
+setup_default_repository () {
+    if [ -z "${REPOSITORY}" ]; then
+        REPOSITORY="https://verknowsys@bitbucket.org/verknowsys/sofin-definitions.git" # main sofin definitions repository
+    fi
+}

@@ -27,21 +27,6 @@ load_defaults () {
 }
 
 
-setup_default_branch () {
-    # setting up definitions repository
-    if [ -z "${BRANCH}" ]; then
-        BRANCH="stable"
-    fi
-}
-
-
-setup_default_repository () {
-    if [ -z "${REPOSITORY}" ]; then
-        REPOSITORY="https://verknowsys@bitbucket.org/verknowsys/sofin-definitions.git" # main sofin definitions repository
-    fi
-}
-
-
 store_checksum_bundle () {
     if [ -z "${name}" ]; then
         error "Empty archive name in function: $(distinct e "store_checksum_bundle()")!"
@@ -161,41 +146,6 @@ check_disabled () {
             fi
         done
     fi
-}
-
-
-set_c_compiler () {
-    case $1 in
-        GNU)
-            BASE_COMPILER="/usr/bin"
-            export CC="${BASE_COMPILER}/gcc ${APP_COMPILER_ARGS}"
-            export CXX="${BASE_COMPILER}/g++ ${APP_COMPILER_ARGS}"
-            export CPP="${BASE_COMPILER}/cpp"
-            ;;
-
-        CLANG)
-            BASE_COMPILER="${SOFTWARE_DIR}Clang/exports"
-            if [ ! -f "${BASE_COMPILER}/clang" ]; then
-                export BASE_COMPILER="/usr/bin"
-                if [ ! -x "${BASE_COMPILER}/clang" ]; then
-                    set_c_compiler GNU # fallback to gcc on system without any clang version
-                    return
-                fi
-            fi
-            export CC="${BASE_COMPILER}/clang ${APP_COMPILER_ARGS}"
-            export CXX="${BASE_COMPILER}/clang++ ${APP_COMPILER_ARGS}"
-            export CPP="${BASE_COMPILER}/clang-cpp"
-            if [ ! -x "${CPP}" ]; then # fallback for systems with clang without standalone preprocessor binary:
-                export CPP="${BASE_COMPILER}/clang -E"
-            fi
-
-            # Gold linker support:
-            if [ -x "/usr/bin/ld.gold" -a -f "/usr/lib/LLVMgold.so" ]; then
-                export LD="/usr/bin/ld --plugin /usr/lib/LLVMgold.so"
-                export NM="/usr/bin/nm --plugin /usr/lib/LLVMgold.so"
-            fi
-            ;;
-    esac
 }
 
 
@@ -710,19 +660,7 @@ execute_process () {
                 fi
 
                 after_patch_callback
-
-                debug "-------------- PRE CONFIGURE SETTINGS DUMP --------------"
-                debug "Current DIR: $(${PWD_BIN} 2>/dev/null)"
-                debug "PREFIX: ${PREFIX}"
-                debug "SERVICE_DIR: ${SERVICE_DIR}"
-                debug "PATH: ${PATH}"
-                debug "CC: ${CC}"
-                debug "CXX: ${CXX}"
-                debug "CPP: ${CPP}"
-                debug "CXXFLAGS: ${CXXFLAGS}"
-                debug "CFLAGS: ${CFLAGS}"
-                debug "LDFLAGS: ${LDFLAGS}"
-                debug "LD_LIBRARY_PATH: ${LD_LIBRARY_PATH}"
+                dump_debug_info
 
                 note "   ${NOTE_CHAR} Configuring: $(distinct n $1), version: $(distinct n ${APP_VERSION})"
                 case "${APP_CONFIGURE_SCRIPT}" in
@@ -1416,4 +1354,21 @@ build_all () {
     debug "Post build_all tasks.."
     update_shell_vars
     reload_zsh_shells
+}
+
+
+dump_debug_info () {
+    debug "-------------- PRE CONFIGURE SETTINGS DUMP --------------"
+    debug "Current DIR: $(${PWD_BIN} 2>/dev/null)"
+    debug "PREFIX: ${PREFIX}"
+    debug "SERVICE_DIR: ${SERVICE_DIR}"
+    debug "PATH: ${PATH}"
+    debug "CC: ${CC}"
+    debug "CXX: ${CXX}"
+    debug "CPP: ${CPP}"
+    debug "CXXFLAGS: ${CXXFLAGS}"
+    debug "CFLAGS: ${CFLAGS}"
+    debug "LDFLAGS: ${LDFLAGS}"
+    debug "LD_LIBRARY_PATH: ${LD_LIBRARY_PATH}"
+    debug "-------------- PRE CONFIGURE SETTINGS DUMP ENDS ---------"
 }
