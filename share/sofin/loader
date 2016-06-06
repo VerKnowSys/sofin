@@ -1,13 +1,13 @@
 load_facts () {
     for fact in $*; do
-        . share/sofin/facts/${fact} || . /usr/share/sofin/facts/${fact}
+        . /usr/share/sofin/facts/${fact}
     done
 }
 
 
 load_funs () {
     for fun in $*; do
-        . share/sofin/funs/${fun} || . /usr/share/sofin/funs/${fun}
+        . /usr/share/sofin/funs/${fun}
     done
 }
 
