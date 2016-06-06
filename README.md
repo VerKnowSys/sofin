@@ -33,7 +33,6 @@ customizable software for HardenedBSD/FreeBSD servers. Darwin (Mac OS X) support
 * Sofin is designed to not touch any part of system. The only exception is /etc/profile_sofin created on installation.
 * By default Sofin verbosity is limited to minimum. More detailed information is written to LOG file (located in ~/.cache/install.log. Quick access to them by `s log`)
 * Exports. Each app has own ROOT_DIR/exports/ with symlinks to exported binaries. Exported binaries are just simple symlinks used to generate PATH environment variable.
-* Sofin has own configuration file: [s.conf](https://github.com/VerKnowSys/sofin/blob/stable/src/s.conf) which is SH script itself.
 * Supports custom callbacks executed in order as follows:
   - APP_AFTER_UNPACK_CALLBACK (executed after software unpack process)
   - APP_AFTER_PATCH_CALLBACK (executed after software patch process)
