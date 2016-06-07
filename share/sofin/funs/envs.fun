@@ -2,8 +2,8 @@ set_c_compiler () {
     case $1 in
         GNU)
             BASE_COMPILER="/usr/bin"
-            export CC="${BASE_COMPILER}/gcc ${APP_COMPILER_ARGS}"
-            export CXX="${BASE_COMPILER}/g++ ${APP_COMPILER_ARGS}"
+            export CC="$(echo "${BASE_COMPILER}/gcc ${APP_COMPILER_ARGS}" | ${SED_BIN} 's/ *$//' 2>/dev/null)"
+            export CXX="$(echo "${BASE_COMPILER}/g++ ${APP_COMPILER_ARGS}" | ${SED_BIN} 's/ *$//' 2>/dev/null)"
             export CPP="${BASE_COMPILER}/cpp"
             ;;
 
@@ -16,8 +16,8 @@ set_c_compiler () {
                     return
                 fi
             fi
-            export CC="${BASE_COMPILER}/clang ${APP_COMPILER_ARGS}"
-            export CXX="${BASE_COMPILER}/clang++ ${APP_COMPILER_ARGS}"
+            export CC="$(echo "${BASE_COMPILER}/clang ${APP_COMPILER_ARGS}" | ${SED_BIN} 's/ *$//' 2>/dev/null)"
+            export CXX="$(echo "${BASE_COMPILER}/clang++ ${APP_COMPILER_ARGS}" | ${SED_BIN} 's/ *$//' 2>/dev/null)"
             export CPP="${BASE_COMPILER}/clang-cpp"
             if [ ! -x "${CPP}" ]; then # fallback for systems with clang without standalone preprocessor binary:
                 export CPP="${BASE_COMPILER}/clang -E"
