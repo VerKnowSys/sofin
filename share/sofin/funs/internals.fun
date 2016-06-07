@@ -176,7 +176,7 @@ list_bundles_full () {
             fi
             for req in $(${FIND_BIN} ${app} -maxdepth 1 -name *${INSTALLED_MARK} 2>/dev/null | ${SORT_BIN} 2>/dev/null); do
                 pp="$(${PRINTF_BIN} "$(${BASENAME_BIN} ${req} 2>/dev/null)" | ${SED_BIN} "s/${INSTALLED_MARK}//" 2>/dev/null)"
-                note "   ${NOTE_CHAR} ${pp} $(distinct lightgray "[")$(distinct n $(${CAT_BIN} ${req} 2>/dev/null))$(distinct lightgray "]")"
+                note "   ${NOTE_CHAR} ${pp} $(distinct "${gray}" "[")$(distinct n $(${CAT_BIN} ${req} 2>/dev/null))$(distinct "${gray}" "]")"
             done
         done
     fi
