@@ -1343,11 +1343,11 @@ dump_debug_info () {
 push_binary_archive () {
     shortsha="$(${CAT_BIN} "${name}.sha1" 2>/dev/null | ${CUT_BIN} -c -16 2>/dev/null)…"
     note "Pushing archive #$(distinct n ${shortsha}) to remote repository.."
-    retry "${SCP_BIN} ${DEFAULT_SSH_OPTS} -P ${MAIN_PORT} ${name} ${address}/${name}.partial" || \
+    retry "${SCP_BIN} ${DEFAULT_SSH_OPTS} -P ${MAIN_PORT} ${name} ${address}/${name}.partial 2>> ${LOG}" || \
         def_error "${name}" "Error sending: $(distinct e "${1}") bundle to: $(distinct e "${address}/${1}")"
     if [ "$?" = "0" ]; then
         ${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} ${MAIN_USER}@${mirror} "cd ${MAIN_SOFTWARE_PREFIX}/software/binary/${OS_TRIPPLE} && ${MV_BIN} ${name}.partial ${name}"
-        retry "${SCP_BIN} ${DEFAULT_SSH_OPTS} -P ${MAIN_PORT} ${name}.sha1 ${address}/${name}.sha1" || \
+        retry "${SCP_BIN} ${DEFAULT_SSH_OPTS} -P ${MAIN_PORT} ${name}.sha1 ${address}/${name}.sha1 2>> ${LOG}" || \
             def_error ${name}.sha1 "Error sending: $(distinct e ${name}.sha1) file to: $(distinct e "${address}/${1}")"
     else
         error "Failed to push binary build of: $(distinct e ${name}) to remote: $(distinct e ${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${name})"
@@ -1368,7 +1368,7 @@ push_service_stream_archive () {
             ${CHMOD_BIN} a+r "${final_snap_file}"
             debug "Sending initial service stream to $(distinct d ${MAIN_COMMON_NAME}) repository: $(distinct d ${MAIN_BINARY_REPOSITORY}${MAIN_COMMON_NAME}/${final_snap_file})"
 
-            retry "${SCP_BIN} ${DEFAULT_SSH_OPTS} -P ${MAIN_PORT} ${final_snap_file} ${address}/${final_snap_file}.partial"
+            retry "${SCP_BIN} ${DEFAULT_SSH_OPTS} -P ${MAIN_PORT} ${final_snap_file} ${address}/${final_snap_file}.partial 2>> ${LOG}"
             if [ "$?" = "0" ]; then
                 ${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} "${MAIN_USER}@${mirror}" \
                     "cd ${MAIN_SOFTWARE_PREFIX}/software/binary/${MAIN_COMMON_NAME} && ${MV_BIN} ${final_snap_file}.partial ${final_snap_file}"
