@@ -5,8 +5,10 @@ if [ -x "/usr/bin/ld.gold" -a -f "/usr/lib/LLVMgold.so" ]; then
 fi
 
 # Defaults:
+DEFAULT_ZPOOL="zroot"
 FREEBSD_MINIMUM_VERSION="91"
 CPUS="$(${SYSCTL_BIN} kern.smp.cpus 2>/dev/null | ${AWK_BIN} '{printf $2;}' 2>/dev/null)"
+FETCH_BIN="/usr/bin/fetch -T 3 -a"
 CURL_BIN="/usr/bin/fetch -T 3 -o -"
 MAKE_OPTS="-j${CPUS}"
 if [ ${OS_VERSION} -lt ${FREEBSD_MINIMUM_VERSION} ]; then
@@ -32,6 +34,9 @@ ZPOOL_BIN="/sbin/zpool"
 PFCTL_BIN="/sbin/pfctl"
 DIALOG_BIN="/usr/bin/dialog"
 DAEMON_BIN="/usr/sbin/daemon"
+MERGEMASTER_BIN="/usr/sbin/mergemaster"
+KLDLOAD_BIN="/sbin/kldload"
+MDMFS_BIN="/sbin/mdmfs"
 
 # XXX: disable ssl verification of https://github.com which fails on FreeBSD by default.
 if [ -x "${GIT_BIN}" ]; then
