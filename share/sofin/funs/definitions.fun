@@ -823,14 +823,15 @@ manage_datasets () {
                     ds_mounted="$(${ZFS_BIN} get -H -o value mounted ${full_dataset_name} 2>/dev/null)"
                     debug "Dataset: $(distinct d ${full_dataset_name}) is mounted?: $(distinct d ${ds_mounted})"
                     if [ "${ds_mounted}" != "yes" ]; then
-                        debug "Moving $(distinct d ${certain_fileset}) to $(distinct d ${certain_fileset}-tmp)" && \
-                        ${MV_BIN} "${certain_fileset}" "${certain_fileset}-tmp" && \
-                        debug "Creating dataset: $(distinct d ${full_dataset_name})" && \
-                        create_or_receive "${full_dataset_name}" && \
-                        debug "Copying $(distinct d ${certain_fileset}-tmp/) back to $(distinct d ${certain_fileset})" && \
-                        ${CP_BIN} -RP "${certain_fileset}-tmp/" "${certain_fileset}" && \
-                        debug "Cleaning $(distinct d ${certain_fileset}-tmp)" && \
-                        ${RM_BIN} -rf "${certain_fileset}-tmp" && \
+                        debug "Moving $(distinct d ${certain_fileset}) to $(distinct d ${certain_fileset}-tmp)"
+                        ${RM_BIN} -f "${certain_fileset}-tmp"
+                        ${MV_BIN} -f "${certain_fileset}" "${certain_fileset}-tmp"
+                        debug "Creating dataset: $(distinct d ${full_dataset_name})"
+                        create_or_receive "${full_dataset_name}"
+                        debug "Copying $(distinct d "${certain_fileset}-tmp/") back to $(distinct d ${certain_fileset})"
+                        ${CP_BIN} -RP "${certain_fileset}-tmp/" "${certain_fileset}"
+                        debug "Cleaning $(distinct d "${certain_fileset}-tmp/")"
+                        ${RM_BIN} -rf "${certain_fileset}-tmp"
                         debug "Dataset created: $(distinct d ${full_dataset_name})"
                     fi
 
