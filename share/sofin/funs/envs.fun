@@ -1,4 +1,5 @@
 setup_sofin_compiler () {
+    debug "Setting up default system compiler"
     case $1 in
         GNU)
             BASE_COMPILER="/usr/bin"
@@ -7,7 +8,7 @@ setup_sofin_compiler () {
             export CPP="${BASE_COMPILER}/cpp"
             ;;
 
-        CLANG)
+        *)
             BASE_COMPILER="${SOFTWARE_DIR}Clang/exports"
             if [ ! -f "${BASE_COMPILER}/clang" ]; then
                 export BASE_COMPILER="/usr/bin"

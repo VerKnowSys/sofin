@@ -433,8 +433,7 @@ execute_process () {
     load_defs "${req_definition_file}"
     check_disabled "${DISABLE_ON}" # check requirement for disabled state:
 
-    debug "Setting up default system compiler"
-    setup_sofin_compiler CLANG
+    setup_sofin_compiler
 
     if [ ! -z "${FORCE_GNU_COMPILER}" ]; then # force GNU compiler usage on definition side:
         error "   ${WARN_CHAR} GNU compiler support was dropped. Try using $(distinct e Gcc) instead)"
