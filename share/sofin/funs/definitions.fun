@@ -429,27 +429,15 @@ execute_process () {
         error "Cannot fetch definition: $(distinct e ${req_definition_file})! Aborting!"
     fi
 
-    debug "Setting up default system compiler"
-    set_c_compiler CLANG
-
     load_defaults
     load_defs "${req_definition_file}"
     check_disabled "${DISABLE_ON}" # check requirement for disabled state:
 
+    debug "Setting up default system compiler"
+    setup_sofin_compiler CLANG
+
     if [ ! -z "${FORCE_GNU_COMPILER}" ]; then # force GNU compiler usage on definition side:
         error "   ${WARN_CHAR} GNU compiler support was dropped. Try using $(distinct e Gcc) instead)"
-    fi
-
-    # Golden linker causes troubles with some build systems like Qt, so we give option to disable it:
-    if [ ! -z "${APP_NO_GOLDEN_LINKER}" ]; then
-        debug "Removing explicit golden linker params.."
-        CROSS_PLATFORM_COMPILER_FLAGS="-fPIC -fno-strict-overflow -fstack-protector-all"
-        DEFAULT_LDFLAGS="-fPIC -fPIE"
-        unset NM
-        unset LD
-        unset CFLAGS
-        unset CXXFLAGS
-        unset LDFLAGS
     fi
 
     if [ ! -z "${APP_NO_FAST_MATH}" ]; then

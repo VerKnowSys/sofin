@@ -1,9 +1,3 @@
-# Golden linker support:
-if [ -x "/usr/bin/ld.gold" -a -f "/usr/lib/LLVMgold.so" ]; then
-    CROSS_PLATFORM_COMPILER_FLAGS="-Wl,-fuse-ld=gold ${CROSS_PLATFORM_COMPILER_FLAGS}"
-    DEFAULT_LDFLAGS="${DEFAULT_LDFLAGS} -Wl,-fuse-ld=gold"
-fi
-
 # Defaults:
 DEFAULT_ZPOOL="zroot"
 FREEBSD_MINIMUM_VERSION="91"

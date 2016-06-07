@@ -18,11 +18,6 @@ DEFAULT_COMPILER_FLAGS="-w -O2 -fPIC -mno-avx -fno-strict-overflow -fstack-prote
 if [ ! -z "${DEBUGBUILD}" ]; then
     DEFAULT_COMPILER_FLAGS="-O0 -fPIC -mno-avx -ggdb -fno-strict-overflow -fstack-protector-all"
 fi
-# Golden linker support without LLVM plugin:
-if [ -x "/usr/bin/ld.gold" ]; then
-    CROSS_PLATFORM_COMPILER_FLAGS="-fPIC"
-    DEFAULT_LDFLAGS="${DEFAULT_LDFLAGS} -fuse-ld=gold"
-fi
 TEST_BIN="/usr/bin/test"
 NPROC_BIN="/usr/bin/nproc"
 CPUS="$(${NPROC_BIN} 2>/dev/null)"

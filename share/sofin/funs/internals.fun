@@ -124,7 +124,7 @@ get_shell_vars () {
         process ${SOFTWARE_DIR}
     fi
 
-    set_c_compiler CLANG
+    setup_sofin_compiler CLANG
     A_CC="$(echo "${CC}" | ${SED_BIN} 's/ //' 2>/dev/null)"
     A_CXX="$(echo "${CXX}" | ${SED_BIN} 's/ //' 2>/dev/null)"
     ${PRINTF_BIN} "# CC:\nexport CC='${A_CC}'\n\n"

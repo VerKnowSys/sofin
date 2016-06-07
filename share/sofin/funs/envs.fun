@@ -1,4 +1,4 @@
-set_c_compiler () {
+setup_sofin_compiler () {
     case $1 in
         GNU)
             BASE_COMPILER="/usr/bin"
@@ -12,7 +12,7 @@ set_c_compiler () {
             if [ ! -f "${BASE_COMPILER}/clang" ]; then
                 export BASE_COMPILER="/usr/bin"
                 if [ ! -x "${BASE_COMPILER}/clang" ]; then
-                    set_c_compiler GNU # fallback to gcc on system without any clang version
+                    setup_sofin_compiler GNU # fallback to gcc on system without any clang version
                     return
                 fi
             fi
@@ -23,10 +23,32 @@ set_c_compiler () {
                 export CPP="${BASE_COMPILER}/clang -E"
             fi
 
-            # Gold linker support:
-            if [ -x "/usr/bin/ld.gold" -a -f "/usr/lib/LLVMgold.so" ]; then
-                export LD="/usr/bin/ld --plugin /usr/lib/LLVMgold.so"
-                export NM="/usr/bin/nm --plugin /usr/lib/LLVMgold.so"
+            # Golden linker support:
+            if [ -z "${APP_NO_GOLDEN_LINKER}" ]; then # Golden linker enabled by default
+                case "${SYSTEM_NAME}" in
+                    FreeBSD)
+                        if [ -x "/usr/bin/ld.gold" -a -f "/usr/lib/LLVMgold.so" ]; then
+                            CROSS_PLATFORM_COMPILER_FLAGS="-Wl,-fuse-ld=gold ${CROSS_PLATFORM_COMPILER_FLAGS}"
+                            DEFAULT_LDFLAGS="${DEFAULT_LDFLAGS} -Wl,-fuse-ld=gold"
+                            export LD="/usr/bin/ld --plugin /usr/lib/LLVMgold.so"
+                            export NM="/usr/bin/nm --plugin /usr/lib/LLVMgold.so"
+                        fi
+                        ;;
+
+                    Linux)
+                        # Golden linker support without LLVM plugin:
+                        if [ -x "/usr/bin/ld.gold" ]; then
+                            CROSS_PLATFORM_COMPILER_FLAGS="-fPIC"
+                            DEFAULT_LDFLAGS="${DEFAULT_LDFLAGS} -fuse-ld=gold"
+                            unset NM LD
+                        fi
+                        ;;
+                esac
+            else # Golden linker causes troubles with some build systems like Qt, so we give option to disable it
+                debug "Removing explicit golden linker params.."
+                CROSS_PLATFORM_COMPILER_FLAGS="-fPIC -fno-strict-overflow -fstack-protector-all"
+                DEFAULT_LDFLAGS="-fPIC -fPIE"
+                unset NM LD
             fi
             ;;
     esac
