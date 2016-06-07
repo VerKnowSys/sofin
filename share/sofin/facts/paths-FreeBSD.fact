@@ -38,5 +38,5 @@ if [ -x "${GIT_BIN}" ]; then
 fi
 
 # runtime sha
-test -x "${SOFIN_MICROSECONDS_UTILITY_BIN}" && \
+${TEST_BIN} -x "${SOFIN_MICROSECONDS_UTILITY_BIN}" && \
 RUNTIME_SHA="$(${PRINTF_BIN} "$(${DATE_BIN} 2>/dev/null)-$(${SOFIN_MICROSECONDS_UTILITY_BIN} 2>/dev/null)" | ${SHA_BIN} 2>/dev/null)"
