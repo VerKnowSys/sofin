@@ -6,8 +6,8 @@ if [ -z "${USERNAME}" ]; then
     exit 1
 fi
 
-SYSTEM_NAME="$(uname -s 2>/dev/null)"
-SYSTEM_ARCH="$(uname -m 2>/dev/null)"
+SYSTEM_NAME="$(${UNAME_BIN} -s 2>/dev/null)"
+SYSTEM_ARCH="$(${UNAME_BIN} -m 2>/dev/null)"
 if [ -z "${SYSTEM_NAME}" -o -z "${SYSTEM_ARCH}" ]; then
     echo "${red}FATAL: \$SYSTEM_NAME and \$SYSTEM_ARCH environment variables, require a value!"
     exit 1
