@@ -23,36 +23,69 @@ setup_sofin_compiler () {
             if [ ! -x "${CPP}" ]; then # fallback for systems with clang without standalone preprocessor binary:
                 export CPP="${BASE_COMPILER}/clang -E"
             fi
-
-            # Golden linker support:
-            if [ -z "${APP_NO_GOLDEN_LINKER}" ]; then # Golden linker enabled by default
-                case "${SYSTEM_NAME}" in
-                    FreeBSD)
-                        if [ -x "/usr/bin/ld.gold" -a -f "/usr/lib/LLVMgold.so" ]; then
-                            CROSS_PLATFORM_COMPILER_FLAGS="-Wl,-fuse-ld=gold ${CROSS_PLATFORM_COMPILER_FLAGS}"
-                            DEFAULT_LDFLAGS="${DEFAULT_LDFLAGS} -Wl,-fuse-ld=gold"
-                            export LD="/usr/bin/ld --plugin /usr/lib/LLVMgold.so"
-                            export NM="/usr/bin/nm --plugin /usr/lib/LLVMgold.so"
-                        fi
-                        ;;
-
-                    Linux)
-                        # Golden linker support without LLVM plugin:
-                        if [ -x "/usr/bin/ld.gold" ]; then
-                            CROSS_PLATFORM_COMPILER_FLAGS="-fPIC"
-                            DEFAULT_LDFLAGS="${DEFAULT_LDFLAGS} -fuse-ld=gold"
-                            unset NM LD
-                        fi
-                        ;;
-                esac
-            else # Golden linker causes troubles with some build systems like Qt, so we give option to disable it
-                debug "Removing explicit golden linker params.."
-                CROSS_PLATFORM_COMPILER_FLAGS="-fPIC -fno-strict-overflow -fstack-protector-all"
-                DEFAULT_LDFLAGS="-fPIC -fPIE"
-                unset NM LD
-            fi
             ;;
     esac
+
+    # Support for other definition options
+    if [ ! -z "${FORCE_GNU_COMPILER}" ]; then # force GNU compiler usage on definition side:
+        error "   ${WARN_CHAR} GNU compiler support was dropped. Try using $(distinct e Gcc) instead)"
+    fi
+
+    if [ ! -z "${APP_NO_FAST_MATH}" ]; then
+        debug "Trying to disable fast math option"
+        CROSS_PLATFORM_COMPILER_FLAGS="$(echo "${CROSS_PLATFORM_COMPILER_FLAGS}" | ${SED_BIN} -e 's/-ffast-math//' 2>/dev/null)"
+        DEFAULT_COMPILER_FLAGS="$(echo "${DEFAULT_COMPILER_FLAGS}" | ${SED_BIN} -e 's/-ffast-math//' 2>/dev/null)"
+        CFLAGS="$(echo "${CFLAGS}" | ${SED_BIN} -e 's/-ffast-math//' 2>/dev/null)"
+        CXXFLAGS="$(echo "${CXXFLAGS}" | ${SED_BIN} -e 's/-ffast-math//' 2>/dev/null)"
+    fi
+
+    if [ ! -z "${APP_NO_CCACHE}" ]; then # ccache is supported by default but it's optional
+        if [ -x "${CCACHE_BIN_OPTIONAL}" ]; then # check for CCACHE availability
+            export CC="${CCACHE_BIN_OPTIONAL} ${CC}"
+            export CXX="${CCACHE_BIN_OPTIONAL} ${CXX}"
+            export CPP="${CCACHE_BIN_OPTIONAL} ${CPP}"
+        fi
+    fi
+
+    if [ -z "${APP_NO_GOLDEN_LINKER}" ]; then # Golden linker enabled by default
+        case "${SYSTEM_NAME}" in
+            FreeBSD)
+                if [ -x "/usr/bin/ld.gold" -a -f "/usr/lib/LLVMgold.so" ]; then
+                    CROSS_PLATFORM_COMPILER_FLAGS="-Wl,-fuse-ld=gold ${CROSS_PLATFORM_COMPILER_FLAGS}"
+                    DEFAULT_LDFLAGS="${DEFAULT_LDFLAGS} -Wl,-fuse-ld=gold"
+                    export LD="/usr/bin/ld --plugin /usr/lib/LLVMgold.so"
+                    export NM="/usr/bin/nm --plugin /usr/lib/LLVMgold.so"
+                fi
+                ;;
+
+            Linux)
+                # Golden linker support without LLVM plugin:
+                if [ -x "/usr/bin/ld.gold" ]; then
+                    CROSS_PLATFORM_COMPILER_FLAGS="-fPIC"
+                    DEFAULT_LDFLAGS="${DEFAULT_LDFLAGS} -fuse-ld=gold"
+                    unset NM LD
+                fi
+                ;;
+        esac
+    else # Golden linker causes troubles with some build systems like Qt, so we give option to disable it
+        debug "Removing explicit golden linker params.."
+        CROSS_PLATFORM_COMPILER_FLAGS="-fPIC -fno-strict-overflow -fstack-protector-all"
+        DEFAULT_LDFLAGS="-fPIC -fPIE"
+        unset NM LD
+    fi
+
+    # export LD_LIBRARY_PATH="${PREFIX}/lib:${PREFIX}/libexec:/usr/lib:/lib"
+    export CFLAGS="-I${PREFIX}/include ${APP_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
+    export CXXFLAGS="-I${PREFIX}/include ${APP_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
+    export LDFLAGS="-L${PREFIX}/lib ${APP_LINKER_ARGS} ${DEFAULT_LDFLAGS}"
+
+    if [ -z "${APP_LINKER_NO_DTAGS}" ]; then
+        if [ "${SYSTEM_NAME}" != "Darwin" ]; then # feature isn't required on Darwin
+            export CFLAGS="${CFLAGS} -Wl,-rpath=${PREFIX}/lib,--enable-new-dtags"
+            export CXXFLAGS="${CXXFLAGS} -Wl,-rpath=${PREFIX}/lib,--enable-new-dtags"
+            export LDFLAGS="${LDFLAGS} -Wl,-rpath=${PREFIX}/lib,--enable-new-dtags"
+        fi
+    fi
 }
 
 
