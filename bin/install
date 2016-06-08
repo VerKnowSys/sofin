@@ -6,3 +6,4 @@ export INSTALL="YES"
 . "bin/build"
 
 install_base
+update_env_files
