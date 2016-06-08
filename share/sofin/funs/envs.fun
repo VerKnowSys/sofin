@@ -126,14 +126,7 @@ setup_sofin_compiler () {
 
 
 update_shell_vars () {
-    # TODO: consider filtering debug messages to enable debug statements in early sofin code: | ${GREP_BIN} -v 'DEBUG:?'
-    if [ "${USERNAME}" = "root" ]; then
-        debug "Updating ${SOFIN_PROFILE} settings."
-        ${PRINTF_BIN} "$(${SOFIN_BIN} getshellvars 2>/dev/null)" > "${SOFIN_PROFILE}" 2>/dev/null
-    else
-        debug "Updating ${HOME}/.profile settings."
-        ${PRINTF_BIN} "$(${SOFIN_BIN} getshellvars ${USERNAME} 2>/dev/null)" > "${HOME}/.profile" 2>/dev/null
-    fi
+    ${PRINTF_BIN} "$(${SOFIN_BIN} getshellvars 2>/dev/null)" > ${SOFIN_PROFILE} 2>>${LOG}
 }
 
 
