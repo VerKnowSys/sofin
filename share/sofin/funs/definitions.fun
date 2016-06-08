@@ -27,6 +27,11 @@ load_defaults () {
 }
 
 
+inherit () {
+    . ${DEFINITIONS_DIR}${1}.def
+}
+
+
 store_checksum_bundle () {
     if [ -z "${name}" ]; then
         error "Empty archive name in function: $(distinct e "store_checksum_bundle()")!"
