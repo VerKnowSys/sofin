@@ -27,7 +27,7 @@ fail_on_background_sofin_job () {
     deps=$*
     for dep in ${deps}; do
         debug "Checking for background jobs of: $(distinct d ${dep})"
-        sofin_ps_list="$(sofin_processes | ${EGREP_BIN} "sh ${SOFIN_BIN} (${BUILD_DEPLOY_PHRASES}) ${dep}" 2>/dev/null)"
+        sofin_ps_list="$(all_processes | ${EGREP_BIN} "sh ${SOFIN_BIN} (${BUILD_DEPLOY_PHRASES}) ${dep}" 2>/dev/null)"
         debug "pslist: ${sofin_ps_list}"
         sofins_all="$(echo "${sofin_ps_list}" 2>/dev/null | ${WC_BIN} -l 2>/dev/null | ${SED_BIN} 's/ //g' 2>/dev/null)"
         debug "sofins_all: ${sofin_ps_list}"

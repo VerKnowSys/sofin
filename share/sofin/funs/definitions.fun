@@ -781,7 +781,7 @@ manage_datasets () {
             fi
 
             # count Sofin jobs. For more than one job available,
-            sofin_ps_list="$(sofin_processes | ${EGREP_BIN} "sh ${SOFIN_BIN} (${ALL_INSTALL_PHRASES}) [A-Z].*" 2>/dev/null)"
+            sofin_ps_list="$(all_processes | ${EGREP_BIN} "sh ${SOFIN_BIN} (${ALL_INSTALL_PHRASES}) [A-Z].*" 2>/dev/null)"
             debug "Sofin ps list: $(distinct d $(echo "${sofin_ps_list}" | ${TR_BIN} '\n' ' ' 2>/dev/null))"
             sofins_all="$(echo "${sofin_ps_list}" | ${WC_BIN} -l 2>/dev/null | ${SED_BIN} 's/ //g' 2>/dev/null)"
             sofins_running="$(echo "${sofins_all} - 1" | ${BC_BIN} 2>/dev/null)"

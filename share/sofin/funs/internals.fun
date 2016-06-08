@@ -44,7 +44,7 @@ sofin_header () {
 }
 
 
-sofin_processes () {
+all_processes () {
     ${PS_BIN} ${PS_DEFAULT_OPTS} 2>/dev/null | ${EGREP_BIN} -v "(grep|$$)" 2>/dev/null
 }
 

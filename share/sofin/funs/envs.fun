@@ -136,7 +136,7 @@ reload_zsh_shells () {
         if [ "${SYSTEM_NAME}" = "Darwin" ]; then
             pattern="\d ${ZSH_BIN}" # NOTE: this fixes issue with SIGUSR2 signal sent to iTerm
         fi
-        pids=$(sofin_processes | ${EGREP_BIN} "${pattern}" 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)
+        pids=$(all_processes | ${EGREP_BIN} "${pattern}" 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)
         wishlist=""
         for pid in ${pids}; do
             wishlist="${wishlist}${pid} "
