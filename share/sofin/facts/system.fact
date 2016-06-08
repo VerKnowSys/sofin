@@ -1,6 +1,6 @@
 # System specific configuration
 
-USERNAME="$(${ID_BIN} ${DEFAULT_ID_OPTIONS} 2>/dev/null)"
+USERNAME="$(${ID_BIN} -un 2>/dev/null)"
 if [ -z "${USERNAME}" ]; then
     echo "${red}FATAL: \$USERNAME environment variable, requires a value!"
     exit 1
