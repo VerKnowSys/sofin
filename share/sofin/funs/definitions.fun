@@ -1176,7 +1176,7 @@ build_all () {
                 if [ ! -z "${REQUIRE_ROOT_ACCESS}" ]; then
                     if [ "${USERNAME}" != "root" ]; then
                         warn "Definition requires superuser priviledges: $(distinct w ${APP_NAME}). Installation aborted."
-                        break
+                        return
                     fi
                 fi
 
