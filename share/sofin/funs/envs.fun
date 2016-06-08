@@ -58,12 +58,6 @@ setup_sofin_compiler () {
         error "   ${WARN_CHAR} GNU compiler support was dropped. Try using $(distinct e Gcc) instead)"
     fi
 
-    if [ ! -z "${APP_NO_FAST_MATH}" ]; then
-        debug "Disabling 'fast-math' compiler option"
-        CFLAGS="$(echo "${CFLAGS}" | ${SED_BIN} -e 's/-ffast-math//' 2>/dev/null)"
-        CXXFLAGS="$(echo "${CXXFLAGS}" | ${SED_BIN} -e 's/-ffast-math//' 2>/dev/null)"
-    fi
-
     if [ ! -z "${APP_NO_CCACHE}" ]; then # ccache is supported by default but it's optional
         if [ -x "${CCACHE_BIN_OPTIONAL}" ]; then # check for CCACHE availability
             export CC="${CCACHE_BIN_OPTIONAL} ${CC}"
@@ -115,6 +109,12 @@ setup_sofin_compiler () {
             CXXFLAGS="${CXXFLAGS} -Wl,-rpath=${PREFIX}/lib,--enable-new-dtags"
             LDFLAGS="${LDFLAGS} -Wl,-rpath=${PREFIX}/lib,--enable-new-dtags"
         fi
+    fi
+
+    if [ ! -z "${APP_NO_FAST_MATH}" ]; then
+        debug "Disabling 'fast-math' compiler option"
+        CFLAGS="$(echo "${CFLAGS}" | ${SED_BIN} -e 's/-ffast-math//' 2>/dev/null)"
+        CXXFLAGS="$(echo "${CXXFLAGS}" | ${SED_BIN} -e 's/-ffast-math//' 2>/dev/null)"
     fi
 
     export CFLAGS
