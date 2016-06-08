@@ -1303,7 +1303,7 @@ push_binary_archive () {
     retry "${SCP_BIN} ${DEFAULT_SSH_OPTS} -P ${MAIN_PORT} ${name} ${address}/${name}.partial 2>> ${LOG}" || \
         def_error "${name}" "Error sending: $(distinct e "${1}") bundle to: $(distinct e "${address}/${1}")"
     if [ "$?" = "0" ]; then
-        ${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} ${MAIN_USER}@${mirror} "cd ${MAIN_SOFTWARE_PREFIX}/software/binary/${OS_TRIPPLE} && ${MV_BIN} ${name}.partial ${name}"
+        ${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} ${MAIN_USER}@${mirror} "cd ${MAIN_SOFTWARE_PREFIX}/software/binary/${OS_TRIPPLE} && ${MV_BIN} ${name}.partial ${name}" 2>> ${LOG}
         retry "${SCP_BIN} ${DEFAULT_SSH_OPTS} -P ${MAIN_PORT} ${name}.sha1 ${address}/${name}.sha1 2>> ${LOG}" || \
             def_error ${name}.sha1 "Error sending: $(distinct e ${name}.sha1) file to: $(distinct e "${address}/${1}")"
     else
@@ -1319,7 +1319,7 @@ push_service_stream_archive () {
             address="${MAIN_USER}@${mirror}:${system_path}"
 
             ${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} "${MAIN_USER}@${mirror}" \
-                "cd ${MAIN_SOFTWARE_PREFIX}/software/binary; ${MKDIR_BIN} -p ${MAIN_COMMON_NAME} ; ${CHMOD_BIN} 755 ${MAIN_COMMON_NAME}"
+                "cd ${MAIN_SOFTWARE_PREFIX}/software/binary; ${MKDIR_BIN} -p ${MAIN_COMMON_NAME} ; ${CHMOD_BIN} 755 ${MAIN_COMMON_NAME}" 2>> ${LOG}
 
             debug "Setting common access to archive files before we send it: $(distinct d ${final_snap_file})"
             ${CHMOD_BIN} a+r "${final_snap_file}"
@@ -1328,7 +1328,7 @@ push_service_stream_archive () {
             retry "${SCP_BIN} ${DEFAULT_SSH_OPTS} -P ${MAIN_PORT} ${final_snap_file} ${address}/${final_snap_file}.partial 2>> ${LOG}"
             if [ "$?" = "0" ]; then
                 ${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} "${MAIN_USER}@${mirror}" \
-                    "cd ${MAIN_SOFTWARE_PREFIX}/software/binary/${MAIN_COMMON_NAME} && ${MV_BIN} ${final_snap_file}.partial ${final_snap_file}"
+                    "cd ${MAIN_SOFTWARE_PREFIX}/software/binary/${MAIN_COMMON_NAME} && ${MV_BIN} ${final_snap_file}.partial ${final_snap_file}" 2>> ${LOG}
             else
                 error "Failed to send service snapshot archive file: $(distinct e "${final_snap_file}") to remote host: $(distinct e "${MAIN_USER}@${mirror}")!"
             fi
