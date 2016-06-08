@@ -1,18 +1,18 @@
 setup_sofin_compiler () {
+
+    COMMON_FLAGS="-fPIC"
+    COMMON_COMPILER_FLAGS="${COMMON_FLAGS} -w -fno-strict-overflow -fstack-protector-all"
+    DEFAULT_LDFLAGS="${COMMON_FLAGS}"
+    DEFAULT_COMPILER_FLAGS="${COMMON_COMPILER_FLAGS}"
+
     case "${SYSTEM_NAME}" in
         FreeBSD)
-            DEFAULT_LDFLAGS="-fPIC -fPIE"
-            DEFAULT_COMPILER_FLAGS="-w -fPIC -fPIE -ffast-math -fno-strict-overflow -fstack-protector-all"
+            DEFAULT_COMPILER_FLAGS="${DEFAULT_COMPILER_FLAGS} -fPIE"
+            DEFAULT_LDFLAGS="${DEFAULT_LDFLAGS} -fPIE"
             ;;
 
         Linux)
-            DEFAULT_LDFLAGS="-fPIC"
-            DEFAULT_COMPILER_FLAGS="-w -mno-avx -fPIC -ffast-math -fno-strict-overflow -fstack-protector-all"
-            ;;
-
-        Darwin)
-            DEFAULT_LDFLAGS="-fPIC"
-            DEFAULT_COMPILER_FLAGS="-w -fPIC -fno-strict-overflow -fstack-protector-all"
+            DEFAULT_COMPILER_FLAGS="${DEFAULT_COMPILER_FLAGS} -mno-avx" # XXX: old Xeons case :)
             ;;
     esac
 
@@ -38,31 +38,31 @@ setup_sofin_compiler () {
         *)
             BASE_COMPILER="${SOFTWARE_DIR}Clang/exports"
             if [ ! -f "${BASE_COMPILER}/clang" ]; then
-                export BASE_COMPILER="/usr/bin"
+                BASE_COMPILER="/usr/bin"
                 if [ ! -x "${BASE_COMPILER}/clang" ]; then
                     setup_sofin_compiler GNU # fallback to gcc on system without any clang version
                     return
                 fi
             fi
-            export CC="$(echo "${BASE_COMPILER}/clang ${APP_COMPILER_ARGS}" | ${SED_BIN} 's/ *$//' 2>/dev/null)"
-            export CXX="$(echo "${BASE_COMPILER}/clang++ ${APP_COMPILER_ARGS}" | ${SED_BIN} 's/ *$//' 2>/dev/null)"
-            export CPP="${BASE_COMPILER}/clang-cpp"
+            CC="$(echo "${BASE_COMPILER}/clang ${APP_COMPILER_ARGS}" | ${SED_BIN} 's/ *$//' 2>/dev/null)"
+            CXX="$(echo "${BASE_COMPILER}/clang++ ${APP_COMPILER_ARGS}" | ${SED_BIN} 's/ *$//' 2>/dev/null)"
+            CPP="${BASE_COMPILER}/clang-cpp"
             if [ ! -x "${CPP}" ]; then # fallback for systems with clang without standalone preprocessor binary:
-                export CPP="${BASE_COMPILER}/clang -E"
+                CPP="${BASE_COMPILER}/clang -E"
             fi
             ;;
     esac
 
     # Support for other definition options
     if [ ! -z "${FORCE_GNU_COMPILER}" ]; then # force GNU compiler usage on definition side:
-        error "   ${WARN_CHAR} GNU compiler support was dropped. Try using $(distinct e Gcc) instead)"
+        error "Support for GNU compiler was recently dropped. Try using $(distinct e Gcc) instead)?"
     fi
 
     if [ ! -z "${APP_NO_CCACHE}" ]; then # ccache is supported by default but it's optional
         if [ -x "${CCACHE_BIN_OPTIONAL}" ]; then # check for CCACHE availability
-            export CC="${CCACHE_BIN_OPTIONAL} ${CC}"
-            export CXX="${CCACHE_BIN_OPTIONAL} ${CXX}"
-            export CPP="${CCACHE_BIN_OPTIONAL} ${CPP}"
+            CC="${CCACHE_BIN_OPTIONAL} ${CC}"
+            CXX="${CCACHE_BIN_OPTIONAL} ${CXX}"
+            CPP="${CCACHE_BIN_OPTIONAL} ${CPP}"
         fi
     fi
 
@@ -122,6 +122,9 @@ setup_sofin_compiler () {
     export LDFLAGS
     export LD
     export NM
+    export CC
+    export CXX
+    export CPP
 }
 
 
