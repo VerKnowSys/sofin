@@ -24,17 +24,10 @@ if [ ! -x "${CXX}" ]; then
 fi
 
 shell_configuration=$(${CAT_BIN} <<EOF
-if [ "\$(${ID_BIN} -u)" = "0" ]; then
-    if [ -e "/etc/profile_sofin" ]; then
-        . /etc/profile_sofin
-    fi
-    trap "source /etc/profile_sofin" USR2
-else
-    if [ -e \$HOME/.profile ]; then
-        . \$HOME/.profile
-    fi
-    trap "source \$HOME/.profile" USR2
+if [ -e \$HOME/.profile ]; then
+    source \$HOME/.profile
 fi
+trap "source \$HOME/.profile" USR2
 export SHELL_PID="\$\$"
 EOF
 )
