@@ -1,5 +1,27 @@
 setup_sofin_compiler () {
-    # export LD_LIBRARY_PATH="${PREFIX}/lib:${PREFIX}/libexec:/usr/lib:/lib"
+    case "${SYSTEM_NAME}" in
+        FreeBSD)
+            DEFAULT_LDFLAGS="-fPIC -fPIE"
+            DEFAULT_COMPILER_FLAGS="-w -fPIC -fPIE -ffast-math -fno-strict-overflow -fstack-protector-all"
+            ;;
+
+        Linux)
+            DEFAULT_LDFLAGS="-fPIC"
+            DEFAULT_COMPILER_FLAGS="-w -mno-avx -fPIC -ffast-math -fno-strict-overflow -fstack-protector-all"
+            ;;
+
+        Darwin)
+            DEFAULT_LDFLAGS="-fPIC"
+            DEFAULT_COMPILER_FLAGS="-w -fPIC -fno-strict-overflow -fstack-protector-all"
+            ;;
+    esac
+
+    if [ "YES" = "${DEBUGBUILD}" ]; then
+        DEFAULT_COMPILER_FLAGS="${DEFAULT_COMPILER_FLAGS} -O0 -ggdb"
+    else
+        DEFAULT_COMPILER_FLAGS="${DEFAULT_COMPILER_FLAGS} -O2"
+    fi
+
     CFLAGS="-I${PREFIX}/include ${APP_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
     CXXFLAGS="-I${PREFIX}/include ${APP_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
     LDFLAGS="-L${PREFIX}/lib ${APP_LINKER_ARGS} ${DEFAULT_LDFLAGS}"
@@ -37,9 +59,7 @@ setup_sofin_compiler () {
     fi
 
     if [ ! -z "${APP_NO_FAST_MATH}" ]; then
-        debug "Trying to disable fast math option"
-        CROSS_PLATFORM_COMPILER_FLAGS="$(echo "${CROSS_PLATFORM_COMPILER_FLAGS}" | ${SED_BIN} -e 's/-ffast-math//' 2>/dev/null)"
-        DEFAULT_COMPILER_FLAGS="$(echo "${DEFAULT_COMPILER_FLAGS}" | ${SED_BIN} -e 's/-ffast-math//' 2>/dev/null)"
+        debug "Disabling 'fast-math' compiler option"
         CFLAGS="$(echo "${CFLAGS}" | ${SED_BIN} -e 's/-ffast-math//' 2>/dev/null)"
         CXXFLAGS="$(echo "${CXXFLAGS}" | ${SED_BIN} -e 's/-ffast-math//' 2>/dev/null)"
     fi
@@ -56,37 +76,40 @@ setup_sofin_compiler () {
         case "${SYSTEM_NAME}" in
             FreeBSD)
                 if [ -x "/usr/bin/ld.gold" -a -f "/usr/lib/LLVMgold.so" ]; then
-                    DEFAULT_COMPILER_FLAGS="-Wl,-fuse-ld=gold ${CROSS_PLATFORM_COMPILER_FLAGS}"
+                    DEFAULT_COMPILER_FLAGS="${DEFAULT_COMPILER_FLAGS} -Wl,-fuse-ld=gold"
                     DEFAULT_LDFLAGS="${DEFAULT_LDFLAGS} -Wl,-fuse-ld=gold"
-                    export LD="/usr/bin/ld --plugin /usr/lib/LLVMgold.so"
-                    export NM="/usr/bin/nm --plugin /usr/lib/LLVMgold.so"
+                    CFLAGS="-I${PREFIX}/include ${APP_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
+                    CXXFLAGS="-I${PREFIX}/include ${APP_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
+                    LDFLAGS="-L${PREFIX}/lib ${APP_LINKER_ARGS} ${DEFAULT_LDFLAGS}"
+                    LD="/usr/bin/ld --plugin /usr/lib/LLVMgold.so"
+                    NM="/usr/bin/nm --plugin /usr/lib/LLVMgold.so"
                 fi
                 ;;
 
             Linux)
                 # Golden linker support without LLVM plugin:
                 if [ -x "/usr/bin/ld.gold" ]; then
-                    CROSS_PLATFORM_COMPILER_FLAGS="-fPIC"
                     ${GREP_BIN} '7\.' /etc/debian_version >/dev/null 2>&1
                     if [ "$?" != "0" ]; then
-                        DEFAULT_LDFLAGS="${CROSS_PLATFORM_COMPILER_FLAGS} -fuse-ld=gold"
-                        DEFAULT_COMPILER_FLAGS="${CROSS_PLATFORM_COMPILER_FLAGS} -Wl,-fuse-ld=gold"
+                        DEFAULT_COMPILER_FLAGS="${DEFAULT_COMPILER_FLAGS} -Wl,-fuse-ld=gold"
+                        DEFAULT_LDFLAGS="${DEFAULT_LDFLAGS} -fuse-ld=gold"
                     else
-                        DEFAULT_LDFLAGS="${CROSS_PLATFORM_COMPILER_FLAGS}"
+                        DEFAULT_LDFLAGS="${DEFAULT_LDFLAGS}"
                     fi
-                    LDFLAGS="${DEFAULT_LDFLAGS}"
+                    CFLAGS="-I${PREFIX}/include ${APP_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
+                    CXXFLAGS="-I${PREFIX}/include ${APP_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
+                    LDFLAGS="-L${PREFIX}/lib ${APP_LINKER_ARGS} ${DEFAULT_LDFLAGS}"
                     unset NM LD
                 fi
                 ;;
         esac
     else # Golden linker causes troubles with some build systems like Qt, so we give option to disable it
         debug "Not using golden linker"
-        DEFAULT_COMPILER_FLAGS="-fPIC -fno-strict-overflow -fstack-protector-all"
-        DEFAULT_LDFLAGS="-fPIC"
         unset NM LD
     fi
 
     if [ -z "${APP_LINKER_NO_DTAGS}" ]; then
+        debug "Using dtags linker information"
         if [ "${SYSTEM_NAME}" != "Darwin" ]; then # feature isn't required on Darwin
             CFLAGS="${CFLAGS} -Wl,-rpath=${PREFIX}/lib,--enable-new-dtags"
             CXXFLAGS="${CXXFLAGS} -Wl,-rpath=${PREFIX}/lib,--enable-new-dtags"
@@ -97,6 +120,8 @@ setup_sofin_compiler () {
     export CFLAGS
     export CXXFLAGS
     export LDFLAGS
+    export LD
+    export NM
 }
 
 
