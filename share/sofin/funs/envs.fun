@@ -111,10 +111,10 @@ setup_sofin_compiler () {
         fi
     fi
 
-    if [ ! -z "${APP_NO_FAST_MATH}" ]; then
-        debug "Disabling 'fast-math' compiler option"
-        CFLAGS="$(echo "${CFLAGS}" | ${SED_BIN} -e 's/-ffast-math//' 2>/dev/null)"
-        CXXFLAGS="$(echo "${CXXFLAGS}" | ${SED_BIN} -e 's/-ffast-math//' 2>/dev/null)"
+    if [ -z "${APP_NO_FAST_MATH}" ]; then
+        debug "Enabling 'fast-math' compiler option"
+        CFLAGS="${CFLAGS} -ffast-math"
+        CXXFLAGS="${CXXFLAGS} -ffast-math"
     fi
 
     export CFLAGS
