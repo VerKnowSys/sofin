@@ -14,7 +14,7 @@ load_funs () {
 
 load_sofin () {
     # loading facts
-    load_facts paths.fact paths-OS_TYPE.fact system.fact shell.fact sofin.fact build.fact
+    load_facts paths.fact paths-OS_TYPE.fact system.fact shell.fact sofin.fact
 
     # loading funs
     load_funs core.fun validations.fun commons.fun envs.fun internals.fun cleaners.fun caches.fun definitions.fun
