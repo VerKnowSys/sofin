@@ -4,6 +4,7 @@
 
 # load configuration from sofin.conf
 . share/sofin/facts/paths.fact
+. share/sofin/facts/paths-$(uname).fact
 . share/sofin/facts/shell.fact
 . share/sofin/facts/sofin.fact
 . share/sofin/facts/system.fact
