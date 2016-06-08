@@ -1,29 +1,30 @@
 #/bin/sh
 
-chmod 600 ~/.ssh/id_rsa
+. /usr/share/sofin/loader
 
-. /etc/s.conf
+${CHMOD_BIN} 600 ~/.ssh/id_rsa
 . /var/ServeD-OS/setup-buildhost
 setup_buildhost
 
-test ! -x /Software/Ccache/bin/ccache || s i Ccache
+${TEST_BIN} ! -x /Software/Ccache/bin/ccache || ${SOFIN_BIN} i Ccache
 
 note "Checking remote machine connection (shouldn't take more than a second).."
-ssh sofin@verknowsys.com "uname -a"
+${SSH_BIN} sofin@verknowsys.com "uname -a"
+
 set +e
 
-for software in $(cat software.list); do
+for software in $(${CAT_BIN} software.list); do
     if [ "${software}" = "------" ]; then
         note "Finished task."
-        exit 0
+        exit
     fi
     note "________________________________"
     note "Resetting Sofin definitions"
-    s reset
+    ${SOFIN_BIN} reset
     note "Processing software: ${software}"
-    s rm ${software}
-    s deploy ${software} && \
-    s rm ${software} && \
-    sed -i '' -e "/${software}/d" software.list
+    ${SOFIN_BIN} rm ${software}
+    ${SOFIN_BIN} deploy ${software} && \
+    ${SOFIN_BIN} rm ${software} && \
+    ${SED_BIN} -i '' -e "/${software}/d" software.list
     note "--------------------------------"
 done
