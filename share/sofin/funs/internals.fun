@@ -275,7 +275,7 @@ create_or_receive () {
     try "${FETCH_BIN} ${remote_path}"
     if [ "$?" = "0" ]; then
         debug "Stream archive available. Creating service dataset: $(distinct d ${dataset_name}) from file stream: $(distinct d ${final_snap_file})"
-        note "Dataset: $(distinct n ${dataset_name} )$(${XZCAT_BIN} "${final_snap_file}" | ${ZFS_BIN} receive -v "${dataset_name}" 2>/dev/null | ${TAIL_BIN} -n1)"
+        note "Dataset: $(distinct n ${dataset_name}) - $(${XZCAT_BIN} "${final_snap_file}" | ${ZFS_BIN} receive -v "${dataset_name}" 2>/dev/null | ${TAIL_BIN} -n1)"
         ${ZFS_BIN} rename ${dataset_name}@--head-- @origin >> ${LOG} 2>> ${LOG} && \
         debug "Cleaning snapshot file: $(distinct d ${final_snap_file}), after successful receive"
         ${RM_BIN} -f "${final_snap_file}"
