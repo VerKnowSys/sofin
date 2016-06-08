@@ -25,6 +25,7 @@ DAEMON_BIN="/usr/sbin/daemon"
 MERGEMASTER_BIN="/usr/sbin/mergemaster"
 KLDLOAD_BIN="/sbin/kldload"
 MDMFS_BIN="/sbin/mdmfs"
+LIMITS_BIN="/usr/bin/limits"
 
 # XXX: disable ssl verification of https://github.com which fails on FreeBSD by default.
 if [ -x "${GIT_BIN}" ]; then
