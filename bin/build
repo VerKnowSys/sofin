@@ -8,7 +8,6 @@
 . share/sofin/facts/system.fact
 . share/sofin/facts/shell.fact
 . share/sofin/facts/sofin.fact
-. share/sofin/facts/build.fact
 
 # loading funs
 . share/sofin/funs/core.fun
