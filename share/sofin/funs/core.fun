@@ -1,5 +1,6 @@
 env_reset () {
     # unset conflicting environment variables
+    debug "env_reset()"
     unset LDFLAGS
     unset CFLAGS
     unset CXXFLAGS
