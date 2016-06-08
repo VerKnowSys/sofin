@@ -62,7 +62,13 @@ setup_sofin_compiler () {
                 # Golden linker support without LLVM plugin:
                 if [ -x "/usr/bin/ld.gold" ]; then
                     CROSS_PLATFORM_COMPILER_FLAGS="-fPIC"
-                    DEFAULT_LDFLAGS="${DEFAULT_LDFLAGS} -fuse-ld=gold"
+
+                    ${GREP_BIN} '7\.' /etc/debian_version >/dev/null 2>&1
+                    if [ "$?" = "0" ]; then
+                        warn "Golden linker disabled on debian 7"
+                    else
+                        DEFAULT_LDFLAGS="${DEFAULT_LDFLAGS} -fuse-ld=gold"
+                    fi
                     unset NM LD
                 fi
                 ;;
