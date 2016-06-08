@@ -1021,7 +1021,7 @@ rebuild_application () {
 
     note "Will rebuild, wipe and push these bundles: $(distinct n ${to_rebuild})"
     for software in ${to_rebuild}; do
-        if [ "${software}" = "Git" -o "${software}" = "Zsh" -o "${software}" = "Rsync" -o "${software}" = "Rsync-static" ]; then
+        if [ "${software}" = "Git" -o "${software}" = "Zsh" ]; then
             continue
         fi
         ${SOFIN_BIN} remove ${software}
