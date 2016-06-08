@@ -5,9 +5,10 @@
 # load configuration from sofin.conf
 . share/sofin/facts/paths.fact
 . share/sofin/facts/paths-$(uname).fact
+. share/sofin/facts/system.fact
 . share/sofin/facts/shell.fact
 . share/sofin/facts/sofin.fact
-. share/sofin/facts/system.fact
+. share/sofin/facts/build.fact
 
 # loading funs
 . share/sofin/funs/core.fun
@@ -22,8 +23,6 @@ fi
 if [ ! -x "${CXX}" ]; then
     error "C++ compiler is required to compile Sofin utilities"
 fi
-
-readonly CLANG_OPTIONS="-O2 -fPIC -fPIE -fno-strict-overflow -fstack-protector-all"
 
 shell_configuration=$(${CAT_BIN} <<EOF
 if [ "\$(${ID_BIN} -u)" = "0" ]; then
@@ -81,9 +80,9 @@ install_base () {
 build_natives () {
     if [ -x "${CXX}" ]; then
         debug "C++ compiler available. Using: $(distinct n ${CXX})"
-        ${CXX} ${CLANG_OPTIONS} -o bin/sofin-microseconds src/sofin_microseconds.cc && \
+        ${CXX} ${DEFAULT_COMPILER_FLAGS} -o bin/sofin-microseconds src/sofin_microseconds.cc && \
         note "$(distinct n "Microseconds since '70 utility") has been successfully built" && \
-        ${CXX} ${CLANG_OPTIONS} -o bin/sofin-version-utility src/sofin-version-utility.cc && \
+        ${CXX} ${DEFAULT_COMPILER_FLAGS} -o bin/sofin-version-utility src/sofin-version-utility.cc && \
         note "$(distinct n "Cross platform version check utility") has been successfully built"
     else
         error "C++ compiler is required to continue"
