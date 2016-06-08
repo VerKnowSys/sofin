@@ -64,9 +64,7 @@ setup_sofin_compiler () {
                     CROSS_PLATFORM_COMPILER_FLAGS="-fPIC"
 
                     ${GREP_BIN} '7\.' /etc/debian_version >/dev/null 2>&1
-                    if [ "$?" = "0" ]; then
-                        warn "Golden linker disabled on debian 7"
-                    else
+                    if [ "$?" != "0" ]; then
                         DEFAULT_LDFLAGS="${DEFAULT_LDFLAGS} -fuse-ld=gold"
                     fi
                     unset NM LD
