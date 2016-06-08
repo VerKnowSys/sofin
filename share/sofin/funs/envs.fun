@@ -58,7 +58,7 @@ setup_sofin_compiler () {
         error "Support for GNU compiler was recently dropped. Try using $(distinct e Gcc) instead)?"
     fi
 
-    if [ ! -z "${APP_NO_CCACHE}" ]; then # ccache is supported by default but it's optional
+    if [ -z "${APP_NO_CCACHE}" ]; then # ccache is supported by default but it's optional
         if [ -x "${CCACHE_BIN_OPTIONAL}" ]; then # check for CCACHE availability
             CC="${CCACHE_BIN_OPTIONAL} ${CC}"
             CXX="${CCACHE_BIN_OPTIONAL} ${CXX}"
