@@ -9,6 +9,7 @@ else
     DEFAULT_COMPILER_FLAGS="-O0 -ggdb ${CROSS_PLATFORM_COMPILER_FLAGS}"
 fi
 
+OS_VERSION=11 # NOTE: default fallback version if no sofin version utility is available
 DEFAULT_ISSUE_REPORT_SITE="https://bitbucket.org/verknowsys/sofin/issues"
 SOFIN_PROFILE="/etc/profile_sofin"
 SOFIN_DISABLED_INDICATOR_FILE="${HOME}/.sofin-disabled"
