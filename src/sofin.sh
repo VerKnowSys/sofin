@@ -7,6 +7,7 @@ SOFIN_ARGS_FULL="$*"
 SOFIN_ARGS="$(echo ${SOFIN_ARGS_FULL} | ${CUT_BIN} -d' ' -f2- 2>/dev/null)"
 SOFIN_COMMAND_ARG="${1}"
 
+env_reset
 if [ ! -z "${SOFIN_COMMAND_ARG}" ]; then
     case ${SOFIN_COMMAND_ARG} in
 
