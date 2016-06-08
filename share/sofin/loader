@@ -24,7 +24,6 @@ load_sofin () {
     setup_default_repository
     check_os
     check_definition_dir
-    env_reset
 }
 
 load_sofin
