@@ -69,7 +69,7 @@ setup_sofin_compiler () {
     if [ -z "${APP_NO_GOLDEN_LINKER}" ]; then # Golden linker enabled by default
         case "${SYSTEM_NAME}" in
             FreeBSD)
-                if [ -x "/usr/bin/ld.gold" -a -f "/usr/lib/LLVMgold.so" ]; then
+                if [ -x "${GOLD_BIN}" -a -f "/usr/lib/LLVMgold.so" ]; then
                     DEFAULT_COMPILER_FLAGS="${DEFAULT_COMPILER_FLAGS} -Wl,-fuse-ld=gold"
                     DEFAULT_LDFLAGS="${DEFAULT_LDFLAGS} -Wl,-fuse-ld=gold"
                     CFLAGS="-I${PREFIX}/include ${APP_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
@@ -82,7 +82,7 @@ setup_sofin_compiler () {
 
             Linux)
                 # Golden linker support without LLVM plugin:
-                if [ -x "/usr/bin/ld.gold" ]; then
+                if [ -x "${GOLD_BIN}" ]; then
                     ${GREP_BIN} '7\.' /etc/debian_version >/dev/null 2>&1
                     if [ "$?" != "0" ]; then
                         DEFAULT_COMPILER_FLAGS="${DEFAULT_COMPILER_FLAGS} -Wl,-fuse-ld=gold"
