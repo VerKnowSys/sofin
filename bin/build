@@ -109,5 +109,5 @@ Sofin requires read + write access for that path"
     note "$(distinct n Sof)tware $(distinct n In)staller, version: $(distinct n "${SOFIN_VERSION}") was installed successfully." && \
     note "Type: $(distinct n "s usage") for help." && \
     note "Read: $(distinct n "https://bitbucket.org/verknowsys/sofin") for more details." && \
-    ${SED_BIN} -i '' -e "s#OS_TYPE#$(uname)#" ${PREFIX}usr/share/sofin/loader
+    ${SED_BIN} -i '' -e "s#OS_TYPE#$(uname)#" ${PREFIX}usr/share/sofin/loader 2>/dev/null
 }
