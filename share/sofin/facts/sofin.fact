@@ -1,14 +1,5 @@
 SOFIN_VERSION="1.0.0ßo2"
 
-DEFAULT_LDFLAGS="-fPIC -fPIE"
-COMMON_SAFE_CC_FLAGS="-w -ffast-math -fno-strict-overflow -fstack-protector-all"
-CROSS_PLATFORM_COMPILER_FLAGS="-fPIC ${COMMON_SAFE_CC_FLAGS}"
-if [ -z "${DEBUGBUILD}" ]; then
-    DEFAULT_COMPILER_FLAGS="-O2 -fPIE ${CROSS_PLATFORM_COMPILER_FLAGS}"
-else
-    DEFAULT_COMPILER_FLAGS="-O0 -ggdb ${CROSS_PLATFORM_COMPILER_FLAGS}"
-fi
-
 DEFAULT_ISSUE_REPORT_SITE="https://bitbucket.org/verknowsys/sofin/issues"
 SOFIN_PROFILE="/etc/profile_sofin"
 SOFIN_DISABLED_INDICATOR_FILE="${HOME}/.sofin-disabled"

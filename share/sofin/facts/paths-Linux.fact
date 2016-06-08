@@ -14,11 +14,6 @@ GREP_BIN="/bin/grep"
 EGREP_BIN="/bin/egrep"
 BC_BIN="/usr/bin/bc"
 CHOWN_BIN="/bin/chown"
-DEFAULT_LDFLAGS="-fPIC"
-DEFAULT_COMPILER_FLAGS="-w -O2 -fPIC -mno-avx -fno-strict-overflow -fstack-protector-all"
-if [ ! -z "${DEBUGBUILD}" ]; then
-    DEFAULT_COMPILER_FLAGS="-O0 -fPIC -mno-avx -ggdb -fno-strict-overflow -fstack-protector-all"
-fi
 TEST_BIN="/usr/bin/test"
 NPROC_BIN="/usr/bin/nproc"
 CPUS="$(${NPROC_BIN} 2>/dev/null)"

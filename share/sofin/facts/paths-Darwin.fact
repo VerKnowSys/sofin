@@ -5,11 +5,6 @@ GIT_BIN="/usr/bin/git"
 CURL_BIN="/usr/bin/curl"
 FETCH_BIN="/usr/bin/curl --connect-timeout 3 -O"
 PATCH_BIN="/usr/bin/patch -p0 "
-DEFAULT_LDFLAGS="-fPIC" # -arch x86_64 fPIE isn't well supported on OSX, but it's not production anyway
-DEFAULT_COMPILER_FLAGS="-O2 -fPIC ${COMMON_SAFE_CC_FLAGS}"
-if [ ! -z "${DEBUGBUILD}" ]; then
-    DEFAULT_COMPILER_FLAGS="-O0 -g -fPIC ${COMMON_SAFE_CC_FLAGS}"
-fi
 SHA_BIN="/usr/bin/shasum"
 SYSCTL_BIN="/usr/sbin/sysctl"
 KLDLOAD_BIN="/sbin/kextload"
