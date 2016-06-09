@@ -13,6 +13,7 @@ CPUS=$(${SYSCTL_BIN} machdep.cpu.thread_count 2>/dev/null | ${AWK_BIN} '{printf 
 MAKE_OPTS="-j${CPUS}"
 DEFAULT_ZPOOL="Projects"
 XZCAT_BIN="/bin/cat"
+PGREP_BIN="/usr/bin/pgrep"
 unset SERVICE_BIN # not necessary
 
 # runtime sha

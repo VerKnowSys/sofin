@@ -20,6 +20,7 @@ CPUS="$(${NPROC_BIN} 2>/dev/null)"
 MAKE_OPTS="-j${CPUS}"
 AWK_BIN="/usr/bin/awk"
 ZFS_BIN="/bin/true"
+PGREP_BIN="/usr/bin/pgrep"
 
 if [ -f /etc/centos-release -o -f /etc/redhat-release ]; then
     # Centos specific changes
