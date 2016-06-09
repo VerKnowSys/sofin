@@ -26,15 +26,13 @@ validate_env () {
 fail_on_background_sofin_job () {
     deps=$*
     for dep in ${deps}; do
-        debug "Checking for background jobs of: $(distinct d ${dep})"
-        sofin_ps_list="$(all_processes | ${EGREP_BIN} "sh ${SOFIN_BIN} (${BUILD_DEPLOY_PHRASES}) ${dep}" 2>/dev/null)"
-        debug "pslist: ${sofin_ps_list}"
-        sofins_all="$(echo "${sofin_ps_list}" 2>/dev/null | ${WC_BIN} -l 2>/dev/null | ${SED_BIN} 's/ //g' 2>/dev/null)"
-        debug "sofins_all: ${sofin_ps_list}"
-        test ${sofins_all} -gt 2 && \
-            error "Found currently processing jobs, for software bundle: $(distinct e ${dep}). Task aborted"
+        warn "Checking for background jobs of: $(distinct d ${dep})"
+        installing="$(processes_installing ${dep})"
+        if [ ! -z "${installing}" ]; then
+            error "Found currently processing jobs of bundle: $(distinct e ${dep}). Task aborted"
+        fi
     done
-    unset dep sofin_ps_list sofins_all
+    unset dep installing sofins_all
 }
 
 
