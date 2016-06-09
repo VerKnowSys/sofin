@@ -92,7 +92,7 @@ run () {
             ${MKDIR_BIN} -p "${LOGS_DIR}"
         fi
         debug "tStamp: $(${DATE_BIN} +%s 2>/dev/null)\
-            Launching action: '$(distinct d $@)', for: $(distinct d ${aname})"
+            Launching action: '$(distinct d $@)')"
         if [ -z "${aname}" ]; then
             eval PATH="${PATH}" "$@" >> "${LOG}" 2>&1
             check_command_result $? "$@"
