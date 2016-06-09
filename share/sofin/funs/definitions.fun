@@ -197,7 +197,7 @@ push_binbuild () {
                     OS_TRIPPLE="$(os_tripple)"
                     system_path="${MAIN_SOFTWARE_PREFIX}/software/binary/${OS_TRIPPLE}"
                     address="${MAIN_USER}@${mirror}:${system_path}"
-                    aname="$(lowercase ${APP_NAME}${APP_POSTFIX})"
+                    aname="$(lowercase ${element})"
                     ${SSH_BIN} ${DEFAULT_SSH_OPTS} -p "${MAIN_PORT}" "${MAIN_USER}@${mirror}" \
                         "${MKDIR_BIN} -p ${MAIN_SOFTWARE_PREFIX}/software/binary/${OS_TRIPPLE}" >> "${LOG}-${aname}" 2>> "${LOG}-${aname}"
 
