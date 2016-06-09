@@ -44,6 +44,3 @@ OLDEST_BUILD_DIR_GUARD="${SORT_BIN} -k1 -n 2>/dev/null | ${TAIL_BIN} -n1 2>/dev/
 if [ ! -z "${SOFIN_TRACE}" ]; then
     set -x
 fi
-
-ALL_INSTALL_PHRASES="i|install|get|pick|choose|use|switch|p|push|binpush|send"
-BUILD_DEPLOY_PHRASES="b|build|d|deploy"
