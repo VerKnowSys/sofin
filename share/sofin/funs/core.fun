@@ -33,7 +33,7 @@ debug () {
             ${LOGGER_BIN} "# ${cyan} $1"
         fi
     else
-        cecho "# $1" ${magenta} # NOTE: this "#" is required for debug mode to work properly with generation of ~/.profile and /etc/profile_sofin files!
+        cecho "# $1" ${magenta} # NOTE: this "#" is required for debug mode to work properly with generation of ~/.profile
     fi
 }
 

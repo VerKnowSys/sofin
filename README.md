@@ -30,7 +30,7 @@ customizable software for HardenedBSD/FreeBSD servers. Darwin (Mac OS X) support
 * Software bundling. Every application is bundled separately with all dependencies in own "root directory". The only external dependencies used by Sofin are those from base system. No other external dependencies allowed at all.
 * Supports basic "marking" of status of installed applications/ dependencies to resume broken/ failed/ interrupted installation.
 * You may feel safe upgrading only *one* software bundle without headache of "how it affects rest of my software". No application bundle will affect any other. Ever.
-* Sofin is designed to not touch any part of system. The only exception is /etc/profile_sofin created on installation.
+* Sofin is designed to not touch any part of system.
 * By default Sofin verbosity is limited to minimum. More detailed information is written to LOG file (located in ~/.cache/install.log. Quick access to them by `s log`)
 * Exports. Each app has own ROOT_DIR/exports/ with symlinks to exported binaries. Exported binaries are just simple symlinks used to generate PATH environment variable.
 * Supports custom callbacks executed in order as follows:
