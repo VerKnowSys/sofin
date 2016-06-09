@@ -231,10 +231,10 @@ push_binbuild () {
                     ${CHMOD_BIN} a+r "${name}" "${name}.sha1" && \
                         debug "Set read access for archives: $(distinct d ${name}), $(distinct d ${name}.sha1) before we send them to public remote"
 
-                    note "Performing a copy of binary bundle to: ${BINBUILDS_CACHE_DIR}"
-                    ${MKDIR_BIN} -p ${BINBUILDS_CACHE_DIR}
-                    run "${CP_BIN} -v ${name} ${BINBUILDS_CACHE_DIR}"
-                    run "${CP_BIN} -v ${name}.sha1 ${BINBUILDS_CACHE_DIR}"
+                    note "Performing a copy of binary bundle to: $(distinct n ${BINBUILDS_CACHE_DIR}${element}-${version_element})"
+                    ${MKDIR_BIN} -p ${BINBUILDS_CACHE_DIR}${element}-${version_element}
+                    run "${CP_BIN} -v ${name} ${BINBUILDS_CACHE_DIR}${element}-${version_element}/"
+                    run "${CP_BIN} -v ${name}.sha1 ${BINBUILDS_CACHE_DIR}${element}-${version_element}/"
 
                     push_binary_archive
                     push_service_stream_archive
