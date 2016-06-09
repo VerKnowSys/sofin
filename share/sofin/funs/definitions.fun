@@ -856,15 +856,19 @@ clean_useless () {
                     if [ ! -z "${PREFIX}" -a \
                            -z "${APP_USEFUL}" ]; then # TODO: implement ignoring APP_USEFUL entries here!
                         debug "Pattern of APP_DEFAULT_USELESS: $(distinct d ${pattern})"
-                        ${RM_BIN} -rf "${PREFIX}/${pattern}"
+                        ${RM_BIN} -vrf ${PREFIX}/${pattern} >> ${LOG} 2>> ${LOG}
                     fi
                 done
             fi
+
             # step 1: clean definition side APP_USELESS entries only if APP_USEFUL is empty
             if [ ! -z "${APP_USELESS}" ]; then
                 for pattern in ${APP_USELESS}; do
-                    debug "Pattern of APP_USELESS: $(distinct d ${pattern})"
-                    ${RM_BIN} -rf "${PREFIX}/${pattern}"
+                    if [ ! -z "${PREFIX}" -a \
+                         ! -z "${pattern}" ]; then
+                        debug "Pattern of APP_USELESS: $(distinct d ${PREFIX}/${pattern})"
+                        ${RM_BIN} -vrf ${PREFIX}/${pattern} >> ${LOG} 2>> ${LOG}
+                    fi
                 done
             fi
         fi
@@ -887,7 +891,7 @@ clean_useless () {
                         done
                         if [ -z "${commit_removal}" ]; then
                             debug "Removing useless file: $(distinct d ${file})"
-                            ${RM_BIN} -f "${file}"
+                            ${RM_BIN} -f ${file}
                         else
                             debug "Useful file left intact: $(distinct d ${file})"
                         fi
