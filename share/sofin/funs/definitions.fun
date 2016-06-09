@@ -213,14 +213,14 @@ push_binbuild () {
                         ${ZFS_BIN} list -H 2>/dev/null | ${GREP_BIN} "${element}\$" >/dev/null 2>&1
                         if [ "$?" = "0" ]; then # if dataset exists, unmount it, send to file, and remount back
                             ${ZFS_BIN} umount ${full_dataset_name} || error "ZFS umount failed for: $(distinct e "${full_dataset_name}"). Dataset shouldn't be locked nor used on build hosts."
-                            ${ZFS_BIN} send "${full_dataset_name}" 2>> "${LOG}-aname" \
+                            ${ZFS_BIN} send "${full_dataset_name}" 2>> "${LOG}-${aname}" \
                                 | ${XZ_BIN} > "${final_snap_file}" && \
                                 snap_size="$(${STAT_BIN} -f%z "${final_snap_file}" 2>/dev/null)" && \
-                                ${ZFS_BIN} mount ${full_dataset_name} 2>> "${LOG}-aname" && \
+                                ${ZFS_BIN} mount ${full_dataset_name} 2>> "${LOG}-${aname}" && \
                                 note "Stream file: $(distinct n ${final_snap_file}), of size: $(distinct n ${snap_size}) successfully sent to remote."
                         fi
                         if [ "${snap_size}" = "0" ]; then
-                            ${RM_BIN} -f "${final_snap_file}"
+                            ${RM_BIN} -f "${final_snap_file}" 2>> "${LOG}-${aname}"
                             note "Service dataset has no contents for bundle: $(distinct n ${element}-${version_element}), hence upload will be skipped"
                         fi
                     fi
