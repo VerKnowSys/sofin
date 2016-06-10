@@ -476,7 +476,7 @@ execute_process () {
                             ${RM_BIN} -vf "${dest_file}" >> ${LOG} 2>> ${LOG}
                             # and restart script with same arguments:
                             debug "Evaluating: $(distinct d "${SOFIN_BIN} ${SOFIN_ARGS_FULL}")"
-                            eval "${SOFIN_BIN} ${SOFIN_ARGS_FULL}"
+                            eval "${SOFIN_BIN} ${SOFIN_ARGS_FULL}" # XXX: solve it functionally!
                             exit
                         fi
                     fi
@@ -815,7 +815,7 @@ manage_datasets () {
                     # check dataset existence and create/receive it if necessary
                     ds_mounted="$(${ZFS_BIN} get -H -o value mounted ${full_dataset_name} 2>/dev/null)"
                     debug "Dataset: $(distinct d ${full_dataset_name}) is mounted?: $(distinct d ${ds_mounted})"
-                    if [ "${ds_mounted}" != "yes" ]; then
+                    if [ "${ds_mounted}" != "yes" ]; then # XXX: rewrite this.. THING below -__
                         debug "Moving $(distinct d ${certain_fileset}) to $(distinct d ${certain_fileset}-tmp)"
                         ${RM_BIN} -f "${certain_fileset}-tmp" >> ${LOG} 2>> ${LOG}
                         ${MV_BIN} -f "${certain_fileset}" "${certain_fileset}-tmp"
