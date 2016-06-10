@@ -448,18 +448,10 @@ execute_process () {
         else
             CUR_DIR="$(${PWD_BIN} 2>/dev/null)"
             if [ -z "${SOFIN_CONTINUE_BUILD}" ]; then
-                debug "Runtime SHA1: ${RUNTIME_SHA}"
                 export BUILD_DIR_ROOT="${CACHE_DIR}cache/${APP_NAME}${APP_POSTFIX}-${APP_VERSION}-${RUNTIME_SHA}/"
+                ${FIND_BIN} "${BUILD_DIR_ROOT}" -type d -delete >> ${LOG} 2>> ${LOG}
                 ${MKDIR_BIN} -p "${BUILD_DIR_ROOT}"
                 cd "${BUILD_DIR_ROOT}"
-                for bd in ${BUILD_DIR_ROOT}/*; do
-                    if [ -d "${bd}" ]; then
-                        debug "Unpacked source code found in build dir. Removing: $(distinct d ${bd})"
-                        if [ "${bd}" != "/" ]; then # it's better to be safe than sorry
-                            ${RM_BIN} -rf "${bd}"
-                        fi
-                    fi
-                done
                 if [ -z "${APP_GIT_MODE}" ]; then # Standard http tarball method:
                     debug "APP_HTTP_PATH: ${APP_HTTP_PATH} base: $(${BASENAME_BIN} ${APP_HTTP_PATH})"
                     if [ ! -e ${BUILD_DIR_ROOT}/../$(${BASENAME_BIN} ${APP_HTTP_PATH} 2>/dev/null) ]; then
