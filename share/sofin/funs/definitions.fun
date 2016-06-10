@@ -773,7 +773,7 @@ manage_datasets () {
             fi
 
             # count Sofin jobs. For more than one job available,
-            sofin_ps_list="$(processes_sofin)"
+            sofin_ps_list="$(processes_all_sofin)"
             sofins_all="$(echo "${sofin_ps_list}" | ${WC_BIN} -l 2>/dev/null | ${SED_BIN} 's/ //g' 2>/dev/null)"
             sofins_installing="$(echo "${sofins_all} - 1" | ${BC_BIN} 2>/dev/null)"
             test -z "${sofins_installing}" && sofins_installing="0"
