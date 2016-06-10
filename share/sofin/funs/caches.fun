@@ -2,8 +2,9 @@ create_cache_directories () {
     # check for regular cache dirs for existence:
     if [ ! -d "${CACHE_DIR}" -o \
          ! -d "${BINBUILDS_CACHE_DIR}" -o \
+         ! -d "${LOCKS_DIR}" -o \
          ! -d "${LOGS_DIR}" ]; then
-         ${MKDIR_BIN} -p "${CACHE_DIR}" "${BINBUILDS_CACHE_DIR}" "${LOGS_DIR}"
+         ${MKDIR_BIN} -p "${CACHE_DIR}" "${BINBUILDS_CACHE_DIR}" "${LOGS_DIR}" "${LOCKS_DIR}"
     fi
     if [ ! -d "${DEFINITIONS_DIR}" -o \
          ! -f "${DEFAULTS}" ]; then
