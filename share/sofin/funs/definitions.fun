@@ -251,16 +251,17 @@ push_binbuild () {
 deploy_binbuild () {
     create_cache_directories
     shift
-    dependencies=$*
-    note "Software bundles to be built and deployed to remote: $(distinct n ${dependencies})"
-    for software in ${dependencies}; do
-        USE_BINBUILD=NO ${SOFIN_BIN} install ${software} || \
-            def_error "${software}" "Installation failure" && \
-        ${SOFIN_BIN} push ${software} || \
-            def_error "${software}" "Push failure" && \
-        note "Software bundle deployed successfully: $(distinct n ${software})"
-        note "$(fill)"
+    bundles=$*
+    note "Software bundles to be built and deployed to remote: $(distinct n ${bundles})"
+    for bundle in ${bundles}; do
+        APPLICATIONS="${bundle}"
+        USE_BINBUILD=NO
+        build_all || def_error "${bundle}" "Bundle build failed."
     done
+    note "Pushing built bundles: $(distinct n "${bundles}") to remote host."
+    push_binbuild ${bundles} || def_error "${bundle}" "Push failure"
+    note "Software bundle deployed successfully: $(distinct n ${bundle})"
+    note "$(fill)"
 }
 
 
