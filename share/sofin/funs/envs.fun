@@ -134,18 +134,27 @@ acquire_lock_for () {
     for bundle in ${bundles}; do
         create_lock () {
             debug "Creating bundle lock file for: ${bundle}"
-            echo "$$" > ${LOCKS_DIR}${bundle}${DEFAULT_LOCK_EXT}
+            echo "${SOFIN_PID}" > ${LOCKS_DIR}${bundle}${DEFAULT_LOCK_EXT}
         }
         if [ -f "${LOCKS_DIR}${bundle}${DEFAULT_LOCK_EXT}" ]; then
             lock_pid="$(${CAT_BIN} ${LOCKS_DIR}${bundle}${DEFAULT_LOCK_EXT} 2>/dev/null)"
+            lock_parent_pid="$(${PGREP_BIN} -P${lock_pid})"
+            debug "Lock pid: ${lock_pid}, Sofin pid: ${SOFIN_PID}, lock_parent_pid: ${lock_parent_pid}"
             ${KILL_BIN} -0 "${lock_pid}" >/dev/null 2>/dev/null
-            if [ "$?" = "0" ]; then
-                error "Bundle: $(distinct e ${bundle}) is locked due to background job pid: $(distinct e "${lock_pid}")"
-            else
-                warn "Lock was acquired by some process but it's now dead. Acquring a new lock."
+            if [ "$?" = "0" ]; then # NOTE: process is alive
+                if [ "${lock_pid}" = "${SOFIN_PID}" -o \
+                     "${lock_parent_pid}" = "${SOFIN_PID}" ]; then
+                    debug "Dealing with own process or it's fork, process may continue.."
+                    return
+                else
+                    error "Bundle: $(distinct e ${bundle}) is locked due to background job pid: $(distinct e "${lock_pid}")"
+                fi
+            else # NOTE: process is dead
+                debug "Lock was acquired by some process but it's now dead. Acquring a new lock.."
                 create_lock
             fi
         else
+            debug "No file lock for bundle: $(distinct d ${bundle})"
             create_lock
         fi
     done
