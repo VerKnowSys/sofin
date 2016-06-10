@@ -1044,6 +1044,12 @@ try_fetch_binbuild () {
         debug "Binary build check was skipped"
     else
         aname="$(lowercase ${APP_NAME}${APP_POSTFIX})"
+        if [ -z "${aname}" ]; then
+            error "Cannot fetch binbuild! An empty definition name given!"
+        fi
+        if [ -z "${ARCHIVE_NAME}" ]; then
+            error "Cannot fetch binbuild! An empty archive name given!"
+        fi
         confirm () {
             debug "Fetched archive: $(distinct d ${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME})"
         }
