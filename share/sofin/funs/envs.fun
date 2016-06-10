@@ -138,7 +138,7 @@ acquire_lock_for () {
         }
         if [ -f "${LOCKS_DIR}${bundle}${DEFAULT_LOCK_EXT}" ]; then
             lock_pid="$(${CAT_BIN} ${LOCKS_DIR}${bundle}${DEFAULT_LOCK_EXT} 2>/dev/null)"
-            lock_parent_pid="$(${PGREP_BIN} -P${lock_pid})"
+            lock_parent_pid="$(${PGREP_BIN} -P${lock_pid} 2>/dev/null)"
             debug "Lock pid: ${lock_pid}, Sofin pid: ${SOFIN_PID}, lock_parent_pid: ${lock_parent_pid}"
             ${KILL_BIN} -0 "${lock_pid}" >/dev/null 2>/dev/null
             if [ "$?" = "0" ]; then # NOTE: process is alive
