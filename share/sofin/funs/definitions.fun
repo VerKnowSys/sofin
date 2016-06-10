@@ -58,7 +58,7 @@ build_software_bundle () {
     else
         if [ ! -e "./${name}.sha1" ]; then
             debug "Found sha-less archive. It may be incomplete or damaged. Rebuilding.."
-            ${RM_BIN} -f "${name}"
+            ${RM_BIN} -vf "${name}" >> ${LOG} 2>> ${LOG}
             ${TAR_BIN} -cJ --use-compress-program="${XZ_BIN} --threads=${CPUS}" -f "${name}" "./${element}" 2>> ${LOG} || \
             ${TAR_BIN} -cJf "${name}" "./${element}" 2>> ${LOG} || \
                 error "Failed to create archives for: $(distinct e ${element})"
@@ -78,14 +78,14 @@ update_definitions () {
     note "$(sofin_header)"
     if [ ! -x "${GIT_BIN}" ]; then
         note "Installing initial definition list from tarball to cache dir: $(distinct n ${CACHE_DIR})"
-        ${RM_BIN} -rf "${CACHE_DIR}definitions"
+        ${RM_BIN} -rf "${CACHE_DIR}definitions" >> ${LOG} 2>> ${LOG}
         ${MKDIR_BIN} -p "${LOGS_DIR}" "${CACHE_DIR}definitions"
         cd "${CACHE_DIR}definitions"
         INITIAL_DEFINITIONS="${MAIN_SOURCE_REPOSITORY}initial-definitions${DEFAULT_ARCHIVE_EXT}"
         debug "Fetching latest tarball with initial definitions from: ${INITIAL_DEFINITIONS}"
         retry "${FETCH_BIN} ${INITIAL_DEFINITIONS}" && \
         ${TAR_BIN} -xJf *${DEFAULT_ARCHIVE_EXT} >> ${LOG} 2>> ${LOG} && \
-            ${RM_BIN} -vrf "$(${BASENAME_BIN} ${INITIAL_DEFINITIONS} 2>/dev/null)"
+            ${RM_BIN} -vrf "$(${BASENAME_BIN} ${INITIAL_DEFINITIONS} 2>/dev/null)" >> ${LOG} 2>> ${LOG}
         return
     fi
     if [ -d "${CACHE_DIR}definitions/.git" -a -f "${DEFAULTS}" ]; then
@@ -220,7 +220,7 @@ push_binbuild () {
                                 note "Stream file: $(distinct n ${final_snap_file}), of size: $(distinct n ${snap_size}) successfully sent to remote."
                         fi
                         if [ "${snap_size}" = "0" ]; then
-                            ${RM_BIN} -f "${final_snap_file}" 2>> "${LOG}-${aname}"
+                            ${RM_BIN} -vf "${final_snap_file}" >> "${LOG}-${aname}" 2>> "${LOG}-${aname}"
                             note "Service dataset has no contents for bundle: $(distinct n ${element}-${version_element}), hence upload will be skipped"
                         fi
                     fi
@@ -240,7 +240,7 @@ push_binbuild () {
                     push_service_stream_archive
 
                 done
-                ${RM_BIN} -f "${name}" "${name}.sha1" "${final_snap_file}"
+                ${RM_BIN} -f "${name}" "${name}.sha1" "${final_snap_file}" >> ${LOG} 2>> ${LOG}
             fi
         else
             warn "Not found software: $(distinct w ${element})!"
@@ -302,7 +302,7 @@ remove_application () {
             fi
             note "Removing software bundle: $(distinct n ${given_app_name})"
             aname="$(lowercase ${APP_NAME}${APP_POSTFIX})"
-            ${RM_BIN} -rfv "${SOFTWARE_DIR}${given_app_name}" >> "${LOG}-${aname}"
+            ${RM_BIN} -rfv "${SOFTWARE_DIR}${given_app_name}" >> "${LOG}-${aname}" 2>> "${LOG}-${aname}"
 
             debug "Looking for other installed versions that might be exported automatically.."
             name="$(echo "${given_app_name}" | ${SED_BIN} 's/[0-9]*//g' 2>/dev/null)"
@@ -481,7 +481,7 @@ execute_process () {
                             warn "${WARN_CHAR} $(distinct w ${a_file_checksum}) vs $(distinct w ${APP_SHA})"
                             warn "${WARN_CHAR} Removing corrupted file from cache: $(distinct w ${dest_file}) and retrying.."
                             # remove corrupted file
-                            ${RM_BIN} -f "${dest_file}"
+                            ${RM_BIN} -vf "${dest_file}" >> ${LOG} 2>> ${LOG}
                             # and restart script with same arguments:
                             debug "Evaluating: $(distinct d "${SOFIN_BIN} ${SOFIN_ARGS_FULL}")"
                             eval "${SOFIN_BIN} ${SOFIN_ARGS_FULL}"
@@ -673,7 +673,7 @@ execute_process () {
 
             if [ -z "${DEVEL}" ]; then # if devel mode not set
                 debug "Cleaning build dir: $(distinct d ${BUILD_DIR_ROOT}) of bundle: $(distinct d ${APP_NAME}${APP_POSTFIX}), after successful build."
-                ${RM_BIN} -rf "${BUILD_DIR_ROOT}"
+                ${RM_BIN} -rf "${BUILD_DIR_ROOT}" >> ${LOG} 2>> ${LOG}
             else
                 debug "Leaving build dir intact when working in devel mode. Last build dir: $(distinct d ${BUILD_DIR_ROOT})"
             fi
@@ -705,15 +705,15 @@ create_apple_bundle_if_necessary () {
         done
 
         # if symlink exists, remove it.
-        ${RM_BIN} -f ${APP_BUNDLE_NAME}/lib
-        ${LN_BIN} -s "${APP_BUNDLE_NAME}/libs ${APP_BUNDLE_NAME}/lib"
+        ${RM_BIN} -vf ${APP_BUNDLE_NAME}/lib >> ${LOG} 2>> ${LOG}
+        ${LN_BIN} -vs "${APP_BUNDLE_NAME}/libs ${APP_BUNDLE_NAME}/lib" >> ${LOG} 2>> ${LOG}
 
         # move data, and support files from origin:
-        ${CP_BIN} -R "${PREFIX}/share/${APP_LOWERNAME}" "${APP_BUNDLE_NAME}/share/"
-        ${CP_BIN} -R "${PREFIX}/lib/${APP_LOWERNAME}" "${APP_BUNDLE_NAME}/libs/"
+        ${CP_BIN} -vR "${PREFIX}/share/${APP_LOWERNAME}" "${APP_BUNDLE_NAME}/share/" >> ${LOG} 2>> ${LOG}
+        ${CP_BIN} -vR "${PREFIX}/lib/${APP_LOWERNAME}" "${APP_BUNDLE_NAME}/libs/" >> ${LOG} 2>> ${LOG}
 
         cd "${APP_BUNDLE_NAME}/Contents"
-        test -L MacOS || ${LN_BIN} -s ../exports MacOS >> ${LOG}-${aname} 2>&1
+        ${TEST_BIN} -L MacOS || ${LN_BIN} -s ../exports MacOS >> ${LOG}-${aname} 2>&1
         debug "Creating relative libraries search path"
         cd ${APP_BUNDLE_NAME}
         note "Processing exported binary: $(distinct n ${i})"
@@ -825,7 +825,7 @@ manage_datasets () {
                     debug "Dataset: $(distinct d ${full_dataset_name}) is mounted?: $(distinct d ${ds_mounted})"
                     if [ "${ds_mounted}" != "yes" ]; then
                         debug "Moving $(distinct d ${certain_fileset}) to $(distinct d ${certain_fileset}-tmp)"
-                        ${RM_BIN} -f "${certain_fileset}-tmp"
+                        ${RM_BIN} -f "${certain_fileset}-tmp" >> ${LOG} 2>> ${LOG}
                         ${MV_BIN} -f "${certain_fileset}" "${certain_fileset}-tmp"
                         debug "Creating dataset: $(distinct d ${full_dataset_name})"
                         create_or_receive "${full_dataset_name}"
