@@ -47,6 +47,7 @@ if [ ! -z "${SOFIN_COMMAND_ARG}" ]; then
 
 
         purge)
+            fail_on_background_sofin_job ${SOFIN_ARGS}
             perform_clean purge
             ;;
 
@@ -88,6 +89,7 @@ if [ ! -z "${SOFIN_COMMAND_ARG}" ]; then
             if [ -z "${a_bundle_name}" ]; then
                 error "No bundle name given to continue build. Aborted!"
             fi
+            fail_on_background_sofin_job ${SOFIN_ARGS}
             if [ "${SYSTEM_NAME}" = "Linux" ]; then # GNU guys have to be the unicorns..
                 export MOST_RECENT_DIR="$(${FIND_BIN} ${CACHE_DIR}cache/ -mindepth 2 -maxdepth 2 -type d -iname "*${a_bundle_name}*" -printf '%T@ %p\n' 2>/dev/null | eval ${OLDEST_BUILD_DIR_GUARD})"
             else
@@ -111,6 +113,7 @@ if [ ! -z "${SOFIN_COMMAND_ARG}" ]; then
             if [ "$2" = "" ]; then
                 error "Second argument, with at least one application name (or list) is required!"
             fi
+            fail_on_background_sofin_job ${SOFIN_ARGS}
             # NOTE: trying a list first - it will have priority if file exists:
             if [ -f "${LISTS_DIR}${2}" ]; then
                 export APPLICATIONS="$(${CAT_BIN} ${LISTS_DIR}${2} 2>/dev/null | ${TR_BIN} '\n' ' ' 2>/dev/null)"
@@ -128,6 +131,7 @@ if [ ! -z "${SOFIN_COMMAND_ARG}" ]; then
             if [ "${USERNAME}" = "root" ]; then
                 warn "Installation of project dependencies as root is immoral"
             fi
+            fail_on_background_sofin_job ${SOFIN_ARGS}
             note "Looking for a dependencies list file: $(distinct n ${DEPENDENCIES_FILE}) in current directory"
             if [ ! -e "./${DEPENDENCIES_FILE}" ]; then
                 error "Dependencies file not found!"
@@ -139,6 +143,7 @@ if [ ! -z "${SOFIN_COMMAND_ARG}" ]; then
 
 
         p|push|binpush|send)
+            fail_on_background_sofin_job ${SOFIN_ARGS}
             push_binbuild
             ;;
 
@@ -156,15 +161,18 @@ if [ ! -z "${SOFIN_COMMAND_ARG}" ]; then
 
 
         d|deploy)
+            fail_on_background_sofin_job ${SOFIN_ARGS}
             deploy_binbuild $*
             ;;
 
 
         reset)
+            fail_on_background_sofin_job ${SOFIN_ARGS}
             reset_definitions
             ;;
 
         rebuild)
+            fail_on_background_sofin_job ${SOFIN_ARGS}
             rebuild_application $*
             ;;
 
@@ -175,6 +183,7 @@ if [ ! -z "${SOFIN_COMMAND_ARG}" ]; then
 
 
         delete|remove|uninstall|rm)
+            fail_on_background_sofin_job ${SOFIN_ARGS}
             remove_application $*
             ;;
 
@@ -196,11 +205,13 @@ if [ ! -z "${SOFIN_COMMAND_ARG}" ]; then
 
 
         exportapp|export|exp)
+            fail_on_background_sofin_job ${SOFIN_ARGS}
             make_exports $*
             ;;
 
 
         old|out|outdated|rusk)
+            fail_on_background_sofin_job ${SOFIN_ARGS}
             show_outdated
             ;;
 
