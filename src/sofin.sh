@@ -38,19 +38,16 @@ if [ ! -z "${SOFIN_COMMAND_ARG}" ]; then
 
 
         clean)
-            fail_on_background_sofin_job ${SOFIN_ARGS}
             perform_clean
             ;;
 
 
         distclean)
-            fail_on_background_sofin_job ${SOFIN_ARGS}
             perform_clean dist
             ;;
 
 
         purge)
-            fail_on_background_sofin_job ${SOFIN_ARGS}
             perform_clean purge
             ;;
 
