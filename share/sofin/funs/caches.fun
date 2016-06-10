@@ -16,8 +16,9 @@ create_cache_directories () {
 
 
 log_helper () {
-    files=$(${FIND_BIN} ${CACHE_DIR}logs -type f -iname "sofin*${pattern}*" 2>/dev/null)
+    files=$(${FIND_BIN} ${CACHE_DIR}logs/ -maxdepth 1 -mindepth 1 -type f -iname "sofin*${pattern}*" -print 2>/dev/null)
     num="$(echo "${files}" | eval ${FILES_COUNT_GUARD})"
+    debug "Log helper, files: $(distinct d "${num}")"
     if [ -z "${num}" ]; then
         num="0"
     fi
@@ -49,10 +50,26 @@ show_logs () {
     create_cache_directories
     shift
     pattern="$*"
-    if [ "${pattern}" = "-" -o "${pattern}" = "sofin" ]; then
-        ${TAIL_BIN} -n ${LOG_LINES_AMOUNT} -F ${LOG}
-    elif [ "${pattern}" = "" ]; then
-        ${TAIL_BIN} -n ${LOG_LINES_AMOUNT} -F ${LOG}*
+    minutes="${LOG_LAST_ACCESS_OR_MOD_MINUTES}"
+    files=$(${FIND_BIN} ${CACHE_DIR}logs/ -maxdepth 1 -mindepth 1 -mmin -${minutes} -amin -${minutes} -iname "sofin*${pattern}*" -print 2>/dev/null)
+    ${TOUCH_BIN} ${LOG} >> ${LOG} 2>> ${LOG} # Make sure that main log always exists
+    if [ "-" = "${pattern}" -o \
+         "sofin" = "${pattern}" ]; then
+        ${TAIL_BIN} -n ${LOG_LINES_AMOUNT} ${LOG}
+
+    elif [ "+" = "${pattern}" ]; then
+        note "Setting tail on all logs available.."
+        ${TAIL_BIN} -F ${LOG}*
+
+    elif [ -z "${pattern}" ]; then
+        note "No pattern specified, setting tail on all logs accessed or modified in last ${minutes} minutes.."
+        if [ -z "${files}" ]; then
+            note "No log files updated or accessed in last ${minutes} minutes to show. Specify '+' as param, to attach a tail to all logs."
+        else
+            debug "show_logs(), files: $(distinct d "$(echo "${files}" | eval ${FILES_COUNT_GUARD})")"
+            ${TAIL_BIN} -n ${LOG_LINES_AMOUNT} $(echo "${files}" | ${TR_BIN} '\n' ' ' 2>/dev/null)
+        fi
+
     else
         note "Seeking log files.."
         log_helper
