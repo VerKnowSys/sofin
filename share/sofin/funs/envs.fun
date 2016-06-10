@@ -146,6 +146,9 @@ acquire_lock_for () {
                      "${lock_parent_pid}" = "${SOFIN_PID}" ]; then
                     debug "Dealing with own process or it's fork, process may continue.."
                     return
+                elif [ "${lock_pid}" = "${SOFIN_PID}" -a \
+                       -z "${lock_parent_pid}" ]; then
+                    debug "Dealing with no fork, process may continue.."
                 else
                     error "Bundle: $(distinct e ${bundle}) is locked due to background job pid: $(distinct e "${lock_pid}")"
                 fi
