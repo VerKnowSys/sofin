@@ -25,14 +25,9 @@ validate_env () {
 
 fail_on_background_sofin_job () {
     deps=$*
-    for dep in ${deps}; do
-        warn "Checking for background jobs of: $(distinct d ${dep})"
-        installing="$(processes_installing ${dep})"
-        if [ ! -z "${installing}" ]; then
-            error "Found currently processing jobs of bundle: $(distinct e ${dep}). Task aborted"
-        fi
-    done
-    unset dep installing sofins_all
+    debug "Checking for lock on bundle: $(distinct d ${dep})"
+    acquire_lock_for "${deps}"
+    unset deps
 }
 
 
