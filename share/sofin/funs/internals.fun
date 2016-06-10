@@ -45,9 +45,7 @@ sofin_header () {
 
 
 processes_all () {
-    own_pid="$$"
-    children="$(${PGREP_BIN} -P${own_pid} | ${TR_BIN} '\n' '|')"
-    ${PS_BIN} ${PS_DEFAULT_OPTS} 2>/dev/null | ${EGREP_BIN} -v "(grep|egrep|${children}|${own_pid})" 2>/dev/null
+    ${PS_BIN} ${PS_DEFAULT_OPTS} 2>/dev/null | ${EGREP_BIN} -v "(grep|egrep)" 2>/dev/null
 }
 
 
