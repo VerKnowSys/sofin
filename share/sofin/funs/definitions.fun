@@ -1014,17 +1014,17 @@ rebuild_application () {
     done
 
     note "Will rebuild, wipe and push these bundles: $(distinct n ${to_rebuild})"
-    for software in ${to_rebuild}; do
-        if [ "${software}" = "Git" -o "${software}" = "Zsh" ]; then
+    for bundle in ${to_rebuild}; do
+        if [ "${bundle}" = "Git" -o "${bundle}" = "Zsh" ]; then
             continue
         fi
-        ${SOFIN_BIN} remove ${software}
-        USE_BINBUILD=NO ${SOFIN_BIN} install ${software} || \
-            def_error "${software}" "Installation failed"
-        USE_FORCE=YES ${SOFIN_BIN} wipe ${software} || \
-            def_error "${software}" "Wipe failed"
-        ${SOFIN_BIN} push ${software} || \
-            def_error "${software}" "Push failed"
+        remove_application ${bundle}
+        USE_BINBUILD=NO
+        APPLICATIONS="${bundle}"
+        build_all || def_error "${bundle}" "Bundle build failed."
+        USE_FORCE=YES
+        wipe_remote_archives ${bundle} || def_error "${bundle}" "Wipe failed"
+        push_binbuild ${bundle} || def_error "${bundle}" "Push failure"
     done
 }
 
