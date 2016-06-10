@@ -161,6 +161,18 @@ acquire_lock_for () {
 }
 
 
+destroy_locks () {
+    debug "Cleaning file locks that belong to pid: ${SOFIN_PID}.."
+    for f in $(${FIND_BIN} ${LOCKS_DIR} -mindepth 1 -maxdepth 1 -name "*${DEFAULT_LOCK_EXT}" -print 2>/dev/null); do
+        ${GREP_BIN} "${SOFIN_PID}" "${f}" >> ${LOG} 2>> ${LOG}
+        if [ "$?" = "0" ]; then
+            debug "Removing lock file: $(distinct d ${f})"
+            ${RM_BIN} -fv "${f}" >> ${LOG} 2>> ${LOG}
+        fi
+    done
+}
+
+
 update_shell_vars () {
     ${PRINTF_BIN} "$(${SOFIN_BIN} getshellvars 2>/dev/null)" > ${SOFIN_PROFILE} 2>>${LOG}
 }

@@ -224,4 +224,5 @@ else
     usage_howto
 fi
 
+destroy_locks
 exit
