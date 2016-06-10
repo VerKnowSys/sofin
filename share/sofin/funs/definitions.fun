@@ -781,14 +781,13 @@ manage_datasets () {
             fi
 
             # count Sofin jobs. For more than one job available,
-            sofin_ps_list="$(all_processes | ${EGREP_BIN} "sh ${SOFIN_BIN} (${ALL_INSTALL_PHRASES}) [A-Z].*" 2>/dev/null)"
-            debug "Sofin ps list: $(distinct d $(echo "${sofin_ps_list}" | ${TR_BIN} '\n' ' ' 2>/dev/null))"
+            sofin_ps_list="$(processes_sofin)"
             sofins_all="$(echo "${sofin_ps_list}" | ${WC_BIN} -l 2>/dev/null | ${SED_BIN} 's/ //g' 2>/dev/null)"
-            sofins_running="$(echo "${sofins_all} - 1" | ${BC_BIN} 2>/dev/null)"
-            test -z "${sofins_running}" && sofins_running="0"
+            sofins_installing="$(echo "${sofins_all} - 1" | ${BC_BIN} 2>/dev/null)"
+            test -z "${sofins_installing}" && sofins_installing="0"
             export jobs_in_parallel="NO"
-            if [ ${sofins_running} -gt 1 ]; then
-                note "Found: $(distinct n ${sofins_running}) running Sofin instances. Parallel jobs not allowed"
+            if [ ${sofins_installing} -gt 1 ]; then
+                note "Found: $(distinct n ${sofins_installing}) running Sofin instances. Parallel jobs not allowed"
                 export jobs_in_parallel="YES"
             else
                 note "Parallel jobs allowed. Traversing several datasets at once.."
