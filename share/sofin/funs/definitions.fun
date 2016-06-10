@@ -130,10 +130,10 @@ update_definitions () {
             ${GIT_BIN} checkout "${BRANCH}" >> ${LOG} 2>> ${LOG}
 
         ${GIT_BIN} pull origin "${BRANCH}" >> ${LOG} 2>> ${LOG} && \
-        note "Updated branch: $(distinct n ${BRANCH} )of repository: $(distinct n ${REPOSITORY})" && \
+        note "Updated branch: $(distinct n ${BRANCH}) of repository: $(distinct n ${REPOSITORY})" && \
         return
 
-        note "${red}Error occured: Update from branch: ${BRANCH} of repository: ${REPOSITORY} wasn't possible. Log below:${reset}"
+        note "${red}Error occured: Update from branch: $(distinct n ${BRANCH}) of repository: $(distinct n ${REPOSITORY}) wasn't possible. Log below:${reset}"
         ${TAIL_BIN} -n${LOG_LINES_AMOUNT_ON_ERR} ${LOG} 2>/dev/null
         error "$(fill)"
     fi
