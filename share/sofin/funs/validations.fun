@@ -25,6 +25,7 @@ validate_env () {
 
 fail_on_background_sofin_job () {
     deps=$*
+    create_cache_directories
     debug "Checking for lock on bundle: $(distinct d ${dep})"
     acquire_lock_for "${deps}"
     unset deps
