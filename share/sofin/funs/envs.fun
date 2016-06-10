@@ -177,7 +177,7 @@ destroy_locks () {
 
 
 update_shell_vars () {
-    ${PRINTF_BIN} "$(${SOFIN_BIN} getshellvars 2>/dev/null)" > ${SOFIN_PROFILE} 2>>${LOG}
+    get_shell_vars > ${SOFIN_PROFILE}
 }
 
 
