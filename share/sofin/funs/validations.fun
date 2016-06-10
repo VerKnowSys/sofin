@@ -32,6 +32,19 @@ fail_on_background_sofin_job () {
 }
 
 
+fail_on_any_background_jobs () {
+    # Traverse through locks, make sure that every pid from lock is dead before cleaning can continue
+    for a_lock in $(${FIND_BIN} "${LOCKS_DIR}" -type f -name "*${DEFAULT_LOCK_EXT}" -print 2>/dev/null); do
+        bundle_name="$(${BASENAME_BIN} ${a_lock} 2>/dev/null)"
+        lock_pid="$(${CAT_BIN} "${a_lock}" 2>/dev/null)"
+        ${KILL_BIN} -0 ${lock_pid} 2>/dev/null >/dev/null
+        if [ "$?" = "0" ]; then
+            error "Detected running instance of Sofin, locked on bundle: $(distinct e "${bundle_name}") pid: $(distinct e "${lock_pid}")"
+        fi
+    done
+}
+
+
 check_requirements () {
     if [ "${APPLICATIONS}" = "" ]; then
         exit

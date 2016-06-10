@@ -41,6 +41,7 @@ clean_failbuilds () {
 
 
 perform_clean () {
+    fail_on_any_background_jobs
     case "$1" in
         purge) # purge
             clean_purge
