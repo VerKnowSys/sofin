@@ -145,7 +145,6 @@ acquire_lock_for () {
                 if [ "${lock_pid}" = "${SOFIN_PID}" -o \
                      "${lock_parent_pid}" = "${SOFIN_PID}" ]; then
                     debug "Dealing with own process or it's fork, process may continue.."
-                    return
                 elif [ "${lock_pid}" = "${SOFIN_PID}" -a \
                        -z "${lock_parent_pid}" ]; then
                     debug "Dealing with no fork, process may continue.."
