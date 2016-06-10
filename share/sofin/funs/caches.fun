@@ -34,12 +34,12 @@ log_helper () {
 
             1)
                 note "Found $(distinct n ${num}) log file, that matches pattern: $(distinct n ${pattern}). Attaching tail.."
-                ${TAIL_BIN} -n ${LOG_LINES_AMOUNT} -F ${files}
+                ${TAIL_BIN} -n ${LOG_LINES_AMOUNT} -F $(echo "${files}" | ${TR_BIN} '\n' ' ' 2>/dev/null)
                 ;;
 
             *)
                 note "Found $(distinct n ${num}) log files, that match pattern: $(distinct n ${pattern}). Attaching to all available files.."
-                ${TAIL_BIN} -F ${files}
+                ${TAIL_BIN} -F $(echo "${files}" | ${TR_BIN} '\n' ' ' 2>/dev/null)
                 ;;
         esac
     fi
