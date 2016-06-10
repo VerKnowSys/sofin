@@ -128,6 +128,30 @@ setup_sofin_compiler () {
 }
 
 
+acquire_lock_for () {
+    bundles="$*"
+    debug "Acquring lock for bundles: [${bundles}]"
+    for bundle in ${bundles}; do
+        create_lock () {
+            debug "Creating bundle lock file for: ${bundle}"
+            echo "$$" > ${LOCKS_DIR}${bundle}${DEFAULT_LOCK_EXT}
+        }
+        if [ -f "${LOCKS_DIR}${bundle}${DEFAULT_LOCK_EXT}" ]; then
+            lock_pid="$(${CAT_BIN} ${LOCKS_DIR}${bundle}${DEFAULT_LOCK_EXT} 2>/dev/null)"
+            ${KILL_BIN} -0 "${lock_pid}" >/dev/null 2>/dev/null
+            if [ "$?" = "0" ]; then
+                error "Bundle: $(distinct e ${bundle}) is locked due to background job pid: $(distinct e "${lock_pid}")"
+            else
+                warn "Lock was acquired by some process but it's now dead. Acquring a new lock."
+                create_lock
+            fi
+        else
+            create_lock
+        fi
+    done
+}
+
+
 update_shell_vars () {
     ${PRINTF_BIN} "$(${SOFIN_BIN} getshellvars 2>/dev/null)" > ${SOFIN_PROFILE} 2>>${LOG}
 }
