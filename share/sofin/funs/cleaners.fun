@@ -58,5 +58,4 @@ perform_clean () {
             clean_failbuilds
             ;;
     esac
-    create_cache_directories
 }
