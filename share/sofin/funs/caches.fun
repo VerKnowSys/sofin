@@ -8,7 +8,7 @@ create_cache_directories () {
     fi
     if [ ! -d "${DEFINITIONS_DIR}" -o \
          ! -f "${DEFAULTS}" ]; then
-        note "No valid definitions cache found. Purging leftovers from: $(distinct n ${CACHE_DIR})"
+        note "No valid definitions cache found. Creating one."
         clean_purge
         update_definitions
     fi
