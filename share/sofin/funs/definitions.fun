@@ -1055,30 +1055,18 @@ try_fetch_binbuild () {
             else
                 note "No binary build available for: $(distinct n $(os_tripple)/${APP_NAME}${APP_POSTFIX}-${APP_VERSION})"
             fi
-
-            # checking archive sha1 checksum
-            if [ -e "./${ARCHIVE_NAME}" ]; then
-                note "Found binary build archive: $(distinct n "${ARCHIVE_NAME}")"
-                current_archive_sha1="$(file_checksum "${ARCHIVE_NAME}")"
-                debug "current_archive_sha1: $(distinct d ${current_archive_sha1})"
-            else
-                error "No bundle archive found?"
-            fi
-            current_sha_file="${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}.sha1"
-            if [ -e "${current_sha_file}" ]; then
-                export sha1_value="$(${CAT_BIN} ${current_sha_file} 2>/dev/null)"
-            fi
-
-            debug "Checking SHA1 match: $(distinct d ${current_archive_sha1}) vs $(distinct d ${sha1_value})"
-            if [ "${current_archive_sha1}" != "${sha1_value}" ]; then
-                debug "Bundle archive checksum doesn't match, removing binary builds and proceeding into build phase"
-                ${RM_BIN} -fv ${ARCHIVE_NAME} >> ${LOG} 2>> ${LOG}
-                ${RM_BIN} -fv ${ARCHIVE_NAME}.sha1 >> ${LOG} 2>> ${LOG}
-            fi
         fi
+
         cd "${SOFTWARE_DIR}"
         debug "ARCHIVE_NAME: $(distinct d ${ARCHIVE_NAME}). Expecting binbuild to be available in: $(distinct d ${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME})"
-        if [ -e "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" ]; then # if exists, then checksum is ok
+
+        # validate binary build:
+        if [ -e "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" ]; then
+            validate_archive_sha1 "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}"
+        fi
+
+        # after sha1 validation we may continue with binary build if file still exists
+        if [ -e "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" ]; then
             ${TAR_BIN} -xJf "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" >> "${LOG}-${aname}" 2>> "${LOG}-${aname}"
             if [ "$?" = "0" ]; then # if archive is valid
                 note "Software bundle installed: $(distinct n ${APP_NAME}${APP_POSTFIX}), with version: $(distinct n ${APP_VERSION})"
