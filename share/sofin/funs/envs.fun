@@ -130,16 +130,16 @@ setup_sofin_compiler () {
 
 acquire_lock_for () {
     bundles="$*"
-    debug "Acquring lock for bundles: [${bundles}]"
+    debug "Acquring lock for bundles: [$(distinct d ${bundles})]"
     for bundle in ${bundles}; do
         create_lock () {
-            debug "Creating bundle lock file for: ${bundle}"
+            debug "Creating bundle lock file for: $(distinct d ${bundle})"
             echo "${SOFIN_PID}" > ${LOCKS_DIR}${bundle}${DEFAULT_LOCK_EXT}
         }
         if [ -f "${LOCKS_DIR}${bundle}${DEFAULT_LOCK_EXT}" ]; then
             lock_pid="$(${CAT_BIN} ${LOCKS_DIR}${bundle}${DEFAULT_LOCK_EXT} 2>/dev/null)"
             lock_parent_pid="$(${PGREP_BIN} -P${lock_pid} 2>/dev/null)"
-            debug "Lock pid: ${lock_pid}, Sofin pid: ${SOFIN_PID}, lock_parent_pid: ${lock_parent_pid}"
+            debug "Lock pid: $(distinct d ${lock_pid}), Sofin pid: $(distinct d ${SOFIN_PID}), lock_parent_pid: $(distinct d ${lock_parent_pid})"
             ${KILL_BIN} -0 "${lock_pid}" >/dev/null 2>/dev/null
             if [ "$?" = "0" ]; then # NOTE: process is alive
                 if [ "${lock_pid}" = "${SOFIN_PID}" -o \
@@ -164,7 +164,7 @@ acquire_lock_for () {
 
 
 destroy_locks () {
-    debug "Cleaning file locks that belong to pid: ${SOFIN_PID}.."
+    debug "Cleaning file locks that belong to pid: $(distinct d ${SOFIN_PID}).."
     for f in $(${FIND_BIN} ${LOCKS_DIR} -mindepth 1 -maxdepth 1 -name "*${DEFAULT_LOCK_EXT}" -print 2>/dev/null); do
         ${GREP_BIN} "${SOFIN_PID}" "${f}" >> ${LOG} 2>> ${LOG}
         if [ "$?" = "0" ]; then
