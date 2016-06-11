@@ -70,12 +70,15 @@ install_base () {
 
 
 build_natives () {
+    note "Building native helpers"
     if [ -x "${CXX}" ]; then
         debug "C++ compiler available. Using: $(distinct n ${CXX})"
         ${CXX} ${DEFAULT_COMPILER_FLAGS} -o bin/sofin-microseconds src/sofin_microseconds.cc && \
-        note "$(distinct n "Microseconds since '70 utility") has been successfully built" && \
+        note "$(distinct n "bin/sofin-microseconds") has been successfully built" && \
         ${CXX} ${DEFAULT_COMPILER_FLAGS} -o bin/sofin-version-utility src/sofin-version-utility.cc && \
-        note "$(distinct n "Cross platform version check utility") has been successfully built"
+        note "$(distinct n "bin/sofin-version-utility") has been successfully built" && \
+        return
+        error "Failed to build native helpers!"
     else
         error "C++ compiler is required to continue"
     fi
@@ -92,13 +95,14 @@ Sofin requires read + write access for that path"
     else
         PREFIX="/"
     fi
-    note "Installing to prefix: $(distinct n ${PREFIX})"
-    note "$(distinct n $(${CP_BIN} -v -R "share/sofin" "${PREFIX}usr/share/"))" && \
+    note "Installing: $(distinct n Sof)tware $(distinct n In)staller, version: $(distinct n "${SOFIN_VERSION}") to prefix: $(distinct n ${PREFIX})" && \
+    note "$(distinct n $(${CP_BIN} -fR "share/sofin" "${PREFIX}usr/share/" && echo "install: share/sofin/* -> ${PREFIX}usr/share/sofin"))" && \
     note "$(distinct n $(${INSTALL_BIN} -v "bin/sofin-version-utility" "${PREFIX}usr/bin"))" && \
     note "$(distinct n $(${INSTALL_BIN} -v "bin/sofin-microseconds" "${PREFIX}usr/bin"))" && \
     note "$(distinct n $(${INSTALL_BIN} -v "src/sofin.sh" "${PREFIX}usr/bin/s"))" && \
-    note "$(distinct n Sof)tware $(distinct n In)staller, version: $(distinct n "${SOFIN_VERSION}") was installed successfully." && \
     note "Type: $(distinct n "s usage") for help." && \
     note "Read: $(distinct n "https://bitbucket.org/verknowsys/sofin") for more details." && \
-    ${SED_BIN} -i '' -e "s#OS_TYPE#$(uname)#" ${PREFIX}usr/share/sofin/loader 2>/dev/null
+    ${SED_BIN} -i '' -e "s#OS_TYPE#$(uname)#" ${PREFIX}usr/share/sofin/loader 2>/dev/null && \
+    return
+    error "Sofin installation failed!"
 }
