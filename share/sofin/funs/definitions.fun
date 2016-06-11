@@ -2,16 +2,16 @@ load_defs () {
     if [ -z "$1" ]; then
         load_default
     else
-        debug "Trying to load definitions: $*"
+        debug "Trying to load definitions: $(distinct d $*)"
         for definition in $*; do
             if [ -e "${DEFINITIONS_DIR}${definition}.def" ]; then
-                debug "Loading definition: ${DEFINITIONS_DIR}${definition}.def"
+                debug "Loading definition: $(distinct d ${DEFINITIONS_DIR}${definition}.def)"
                 . ${DEFINITIONS_DIR}${definition}.def
             elif [ -e "${DEFINITIONS_DIR}${definition}" ]; then
-                debug "Loading definition: ${DEFINITIONS_DIR}${definition}"
+                debug "Loading definition: $(distinct d ${DEFINITIONS_DIR}${definition})"
                 . ${DEFINITIONS_DIR}${definition}
             elif [ -e "${definition}" ]; then
-                debug "Loading definition: ${definition}"
+                debug "Loading definition: $(distinct d ${definition})"
                 . ${definition}
             else
                 error "Can't find definition to load: $(distinct e ${definition})"
