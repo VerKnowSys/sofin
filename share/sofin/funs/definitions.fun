@@ -421,11 +421,12 @@ wipe_remote_archives () {
 
 
 execute_process () {
-    if [ -z "$1" ]; then
+    app_param="$1"
+    if [ -z "${app_param}" ]; then
         error "No param given for execute_process()!"
     fi
-    req_definition_file="${DEFINITIONS_DIR}${1}.def"
-    debug "Checking requirement: $1 file: $req_definition_file"
+    req_definition_file="${DEFINITIONS_DIR}${app_param}.def"
+    debug "Checking requirement: $(distinct d ${app_param}) file: $(distinct d ${req_definition_file})"
     if [ ! -e "${req_definition_file}" ]; then
         error "Cannot fetch definition: $(distinct e ${req_definition_file})! Aborting!"
     fi
@@ -474,9 +475,8 @@ execute_process () {
                             # remove corrupted file
                             ${RM_BIN} -vf "${dest_file}" >> ${LOG} 2>> ${LOG}
                             # and restart script with same arguments:
-                            debug "Evaluating: $(distinct d "${SOFIN_BIN} ${SOFIN_ARGS_FULL}")"
-                            eval "${SOFIN_BIN} ${SOFIN_ARGS_FULL}" # XXX: solve it functionally!
-                            exit
+                            debug "Evaluating again: $(distinct d "execute_process(${app_param})")"
+                            execute_process "${app_param}"
                         fi
                     fi
 
