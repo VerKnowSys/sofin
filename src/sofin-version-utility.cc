@@ -55,5 +55,14 @@ int main(int argc, char *argv[]) {
         delete version;
     #endif
 
+    #if defined(__minix)
+        char buff[16];
+        FILE *in;
+        in = popen("/usr/bin/uname -r | /usr/bin/cut -d. -f1-2", "r");
+        fgets(buff, sizeof(buff), in);
+        pclose(in);
+        printf("%s", buff);
+    #endif
+
     return EXIT_SUCCESS;
 }

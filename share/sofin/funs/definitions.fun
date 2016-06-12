@@ -160,7 +160,7 @@ file_checksum () {
         error "Empty file name given for function: $(distinct e "file_checksum()")"
     fi
     case ${SYSTEM_NAME} in
-        Darwin|Linux)
+        Minix|Darwin|Linux)
             ${PRINTF_BIN} "$(${SHA_BIN} "${name}" 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)"
             ;;
 

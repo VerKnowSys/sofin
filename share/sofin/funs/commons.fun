@@ -38,8 +38,11 @@ check_os () {
         Linux)
             ;;
 
+        Minix)
+            ;;
+
         *)
-            error "Currently only FreeBSD, Darwin and Debian hosts are supported."
+            error "Currently only FreeBSD, Minix, Darwin and Debian hosts are supported."
             exit
             ;;
 
