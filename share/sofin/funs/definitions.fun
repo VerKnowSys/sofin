@@ -191,7 +191,8 @@ push_binbuild () {
                     error "No version information available for bundle: $(distinct e "${element}")"
                 fi
                 name="${element}-${version_element}${DEFAULT_ARCHIVE_EXT}"
-                dig_query="$(${DRILL_BIN} A ${MAIN_SOFTWARE_ADDRESS} 2>/dev/null | ${GREP_BIN} "^${MAIN_SOFTWARE_ADDRESS}" 2>/dev/null | ${AWK_BIN} '{print $5;}' 2>/dev/null)"
+                dig_query="$(${HOST_BIN} A ${MAIN_SOFTWARE_ADDRESS} 2>/dev/null | ${GREP_BIN} 'Address:' 2>/dev/null | ${AWK_BIN} '{print $2;}' 2>/dev/null | ${SED_BIN} -e 's/#.*$//' 2>/dev/null)"
+
                 if [ -z "${dig_query}" ]; then
                     error "No mirrors found in address: $(distinct e ${MAIN_SOFTWARE_ADDRESS})"
                 fi
@@ -406,7 +407,7 @@ wipe_remote_archives () {
         for element in ${SOFIN_ARGS}; do
             lowercase_element="$(lowercase ${element})"
             name="${element}-"
-            dig_query="$(${DRILL_BIN} A ${MAIN_SOFTWARE_ADDRESS} 2>/dev/null | ${GREP_BIN} "^${MAIN_SOFTWARE_ADDRESS}" 2>/dev/null | ${AWK_BIN} '{print $5;}' 2>/dev/null)"
+            dig_query="$(${HOST_BIN} A ${MAIN_SOFTWARE_ADDRESS} 2>/dev/null | ${GREP_BIN} 'Address:' 2>/dev/null | ${AWK_BIN} '{print $2;}' 2>/dev/null | ${SED_BIN} -e 's/#.*$//' 2>/dev/null)"
             if [ -z "${dig_query}" ]; then
                 error "No mirrors found in address: $(distinct e ${MAIN_SOFTWARE_ADDRESS})"
             fi

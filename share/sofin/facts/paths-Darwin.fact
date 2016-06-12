@@ -1,6 +1,5 @@
 # OSX specific configuration
 DARWIN_MINIMUM_VERSION="124"
-DRILL_BIN="/usr/bin/dig"
 GIT_BIN="/usr/bin/git"
 CURL_BIN="/usr/bin/curl"
 FETCH_BIN="/usr/bin/curl --connect-timeout 3 -O"

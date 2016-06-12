@@ -5,7 +5,6 @@ CPUS="$(${SYSCTL_BIN} kern.smp.cpus 2>/dev/null | ${AWK_BIN} '{printf $2;}' 2>/d
 FETCH_BIN="/usr/bin/fetch -T 3 -a"
 CURL_BIN="/usr/bin/fetch -T 3 -o -"
 MAKE_OPTS="-j${CPUS}"
-DRILL_BIN="/usr/bin/drill"
 JAIL_BIN="/usr/sbin/jail"
 JEXEC_BIN="/usr/sbin/jexec"
 JLS_BIN="/usr/sbin/jls"

@@ -1,5 +1,4 @@
 # only Debian 6, 7 are supported a.t.m.
-DRILL_BIN="/usr/bin/dig"
 GLIBC_MINIMUM_VERSION="211"
 CHFLAGS_BIN="/usr/bin/chattr"
 CURL_BIN="/usr/bin/wget -qO -"
