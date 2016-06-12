@@ -9,3 +9,7 @@ CURL_BIN="/usr/bin/fetch -T 3 -o -"
 SED_BIN="/usr/pkg/bin/gsed"
 TAR_BIN="/usr/pkg/bin/gtar"
 BC_BIN="/usr/pkg/bin/bc"
+
+# runtime sha
+test -x "${SOFIN_MICROSECONDS_UTILITY_BIN}" && \
+RUNTIME_SHA="$(${PRINTF_BIN} "$(${DATE_BIN} 2>/dev/null)-$(${SOFIN_MICROSECONDS_UTILITY_BIN} 2>/dev/null)" | ${SHA_BIN} 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)"
