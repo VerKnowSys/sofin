@@ -1,1 +1,7 @@
+DEFAULT_ZPOOL="zroot"
+
+CPUS="4" # XXX
+FETCH_BIN="/usr/bin/fetch -T 3 -a"
+CURL_BIN="/usr/bin/fetch -T 3 -o -"
 SED_BIN="/usr/pkg/bin/gsed"
+MAKE_OPTS="-j${CPUS}"
