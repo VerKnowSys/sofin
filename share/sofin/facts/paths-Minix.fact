@@ -1,7 +1,10 @@
 DEFAULT_ZPOOL="zroot"
 
 CPUS="4" # XXX
+MAKE_OPTS="-j${CPUS}"
 FETCH_BIN="/usr/bin/fetch -T 3 -a"
 CURL_BIN="/usr/bin/fetch -T 3 -o -"
+
+# installed from pkgin:
 SED_BIN="/usr/pkg/bin/gsed"
-MAKE_OPTS="-j${CPUS}"
+TAR_BIN="/usr/pkg/bin/gtar"
