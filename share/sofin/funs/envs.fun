@@ -39,6 +39,9 @@ setup_sofin_compiler () {
             BASE_COMPILER="${SOFTWARE_DIR}Clang/exports"
             if [ ! -f "${BASE_COMPILER}/clang" ]; then
                 BASE_COMPILER="/usr/bin"
+                if [ "${SYSTEM_NAME}" = "Minix" ]; then
+                    BASE_COMPILER="/usr/pkg/bin"
+                fi
                 if [ ! -x "${BASE_COMPILER}/clang" ]; then
                     setup_sofin_compiler GNU # fallback to gcc on system without any clang version
                     return
