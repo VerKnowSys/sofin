@@ -100,9 +100,9 @@ Sofin requires read + write access for that path"
     fi
     note "Installing: $(distinct n Sof)tware $(distinct n In)staller, version: $(distinct n "${SOFIN_VERSION}") to prefix: $(distinct n ${PREFIX})" && \
     note "$(distinct n $(${CP_BIN} -fR "share/sofin" "${PREFIX}usr/share/" && echo "install: share/sofin/* -> ${PREFIX}usr/share/sofin"))" && \
-    note "$(distinct n $(${INSTALL_BIN} -v "bin/sofin-version-utility" "${PREFIX}usr/bin"))" && \
-    note "$(distinct n $(${INSTALL_BIN} -v "bin/sofin-microseconds" "${PREFIX}usr/bin"))" && \
-    note "$(distinct n $(${INSTALL_BIN} -v "src/sofin.sh" "${PREFIX}usr/bin/s"))" && \
+    note "$(distinct n $(${INSTALL_BIN} "bin/sofin-version-utility" "${PREFIX}usr/bin"))" && \
+    note "$(distinct n $(${INSTALL_BIN} "bin/sofin-microseconds" "${PREFIX}usr/bin"))" && \
+    note "$(distinct n $(${INSTALL_BIN} "src/sofin.sh" "${PREFIX}usr/bin/s"))" && \
     note "Type: $(distinct n "s usage") for help." && \
     note "Read: $(distinct n "https://bitbucket.org/verknowsys/sofin") for more details." && \
     ${SED_BIN} -i '' -e "s#OS_TYPE#$(uname)#" ${PREFIX}usr/share/sofin/loader 2>/dev/null && \
