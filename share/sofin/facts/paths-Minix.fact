@@ -8,3 +8,4 @@ CURL_BIN="/usr/bin/fetch -T 3 -o -"
 # installed from pkgin:
 SED_BIN="/usr/pkg/bin/gsed"
 TAR_BIN="/usr/pkg/bin/gtar"
+BC_BIN="/usr/pkg/bin/bc"
