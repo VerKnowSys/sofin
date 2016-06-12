@@ -19,6 +19,9 @@ export CXX="/usr/bin/g++"
 if [ -x "/usr/bin/clang++" ]; then
     export CXX="/usr/bin/clang++"
 fi
+if [ -x "/usr/pkg/bin/clang++" ]; then
+    export CXX="/usr/pkg/bin/clang++"
+fi
 if [ ! -x "${CXX}" ]; then
     error "C++ compiler is required to compile Sofin utilities"
 fi
