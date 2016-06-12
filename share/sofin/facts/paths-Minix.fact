@@ -10,6 +10,8 @@ SHA_BIN="/usr/bin/sha1"
 SED_BIN="/usr/pkg/bin/gsed"
 TAR_BIN="/usr/pkg/bin/gtar"
 BC_BIN="/usr/pkg/bin/bc"
+SSH_BIN="/usr/pkg/bin/ssh"
+SCP_BIN="/usr/pkg/bin/scp"
 
 # runtime sha
 test -x "${SOFIN_MICROSECONDS_UTILITY_BIN}" && \
