@@ -194,7 +194,7 @@ reload_zsh_shells () {
         for pid in ${pids}; do
             wishlist="${wishlist}${pid} "
         done
-        ${KILL_BIN} -SIGUSR2 ${wishlist} && \
+        ${KILL_BIN} -SIGUSR2 ${wishlist} 2>> ${LOG} && \
         note "All running $(distinct n $(${BASENAME_BIN} "${SHELL}" 2>/dev/null)) sessions: $(distinct n ${wishlist}) were reloaded successfully"
         unset wishlist pids
     else
