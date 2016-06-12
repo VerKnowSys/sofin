@@ -105,9 +105,7 @@ Sofin requires read + write access for that path"
     note "$(distinct n $(${INSTALL_BIN} "src/sofin.sh" "${PREFIX}usr/bin/s"))" && \
     note "Type: $(distinct n "s usage") for help." && \
     note "Read: $(distinct n "https://bitbucket.org/verknowsys/sofin") for more details." && \
-    ${SED_BIN} -i '' -e "s#OS_TYPE#$(uname)#" ${PREFIX}usr/share/sofin/loader 2>/dev/null && \
+    ${SED_BIN} -i -e "s#OS_TYPE#$(uname)#" ${PREFIX}usr/share/sofin/loader 2>/dev/null && \
     return
-    if [ "Linux" != "${SYSTEM_NAME}" ]; then
-        error "Sofin installation failed!"
-    fi
+    error "Sofin installation failed!"
 }
