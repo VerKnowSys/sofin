@@ -7,6 +7,7 @@ CURL_BIN="/usr/bin/fetch -T 3 -o -"
 SHA_BIN="/usr/bin/sha1"
 
 # installed from pkgin:
+TAR_BIN="/usr/pkg/bin/gtar"
 BC_BIN="/usr/pkg/bin/bc"
 SSH_BIN="/usr/pkg/bin/ssh"
 SCP_BIN="/usr/pkg/bin/scp"
