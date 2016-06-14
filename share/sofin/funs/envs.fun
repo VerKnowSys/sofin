@@ -6,7 +6,12 @@ setup_sofin_compiler () {
     DEFAULT_COMPILER_FLAGS="${COMMON_COMPILER_FLAGS}"
 
     case "${SYSTEM_NAME}" in
-        FreeBSD|Minix)
+        Minix)
+            DEFAULT_COMPILER_FLAGS="-I/usr/pkg/include -fPIE"
+            DEFAULT_LDFLAGS="-L/usr/pkg/lib -fPIE"
+            ;;
+
+        FreeBSD)
             DEFAULT_COMPILER_FLAGS="${DEFAULT_COMPILER_FLAGS} -fPIE"
             DEFAULT_LDFLAGS="${DEFAULT_LDFLAGS} -fPIE"
             ;;
