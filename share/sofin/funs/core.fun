@@ -26,9 +26,9 @@ debug () {
     if [ -z "${DEBUG}" ]; then
         aname="$(echo "${APP_NAME}${APP_POSTFIX}" | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null)"
         if [ ! -z "${aname}" -a -d "${LOGS_DIR}" ]; then
-            cecho "# $1" ${magenta} >> "${LOG}-${aname}" 2>&1
+            cecho "# $1" ${magenta} >> "${LOG}-${aname}" 2>> "${LOG}-${aname}"
         elif [ -z "${aname}" -a -d "${LOGS_DIR}" ]; then
-            cecho "# $1" ${magenta} >> "${LOG}" 2>&1
+            cecho "# $1" ${magenta} >> "${LOG}" 2>> "${LOG}"
         elif [ ! -d "${LOGS_DIR}" ]; then
             ${LOGGER_BIN} "# ${cyan} $1"
         fi
@@ -92,14 +92,14 @@ run () {
         debug "tStamp: $(${DATE_BIN} +%s 2>/dev/null)\
             Launching action: '$(distinct d $@)')"
         if [ -z "${aname}" ]; then
-            eval PATH="${PATH}" "$@" >> "${LOG}" 2>&1
+            eval PATH="${PATH}" "$@" >> "${LOG}" 2>> "${LOG}"
             check_command_result $? "$@"
         else
-            eval PATH="${PATH}" "$@" >> "${LOG}-${aname}" 2>&1
+            eval PATH="${PATH}" "$@" >> "${LOG}-${aname}" 2>> "${LOG}-${aname}"
             check_command_result $? "$@"
         fi
     else
-        error "An empty command to run?"
+        error "Specified an empty command to run. Aborting."
     fi
 }
 

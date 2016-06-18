@@ -697,7 +697,7 @@ create_apple_bundle_if_necessary () {
         ${CP_BIN} -R ${PREFIX}/${APP_NAME}.app/Contents/* "${APP_BUNDLE_NAME}/Contents/"
         ${CP_BIN} -R ${PREFIX}/bin/${APP_LOWERNAME} "${APP_BUNDLE_NAME}/exports/"
         for lib in $(${FIND_BIN} "${PREFIX}" -name '*.dylib' -type f 2>/dev/null); do
-            ${CP_BIN} -vf ${lib} ${APP_BUNDLE_NAME}/libs/ >> ${LOG}-${aname} 2>&1
+            ${CP_BIN} -vf ${lib} ${APP_BUNDLE_NAME}/libs/ >> ${LOG}-${aname} 2>> ${LOG}-${aname}
         done
 
         # if symlink exists, remove it.
@@ -709,11 +709,11 @@ create_apple_bundle_if_necessary () {
         ${CP_BIN} -vR "${PREFIX}/lib/${APP_LOWERNAME}" "${APP_BUNDLE_NAME}/libs/" >> ${LOG} 2>> ${LOG}
 
         cd "${APP_BUNDLE_NAME}/Contents"
-        ${TEST_BIN} -L MacOS || ${LN_BIN} -s ../exports MacOS >> ${LOG}-${aname} 2>&1
+        ${TEST_BIN} -L MacOS || ${LN_BIN} -s ../exports MacOS >> ${LOG}-${aname} 2>> ${LOG}-${aname}
         debug "Creating relative libraries search path"
         cd ${APP_BUNDLE_NAME}
         note "Processing exported binary: $(distinct n ${i})"
-        ${SOFIN_LIBBUNDLE_BIN} -x "${APP_BUNDLE_NAME}/Contents/MacOS/${APP_LOWERNAME}" >> ${LOG}-${aname} 2>&1
+        ${SOFIN_LIBBUNDLE_BIN} -x "${APP_BUNDLE_NAME}/Contents/MacOS/${APP_LOWERNAME}" >> ${LOG}-${aname} 2>> ${LOG}-${aname}
     fi
 }
 
@@ -740,7 +740,7 @@ strip_bundle_files () {
                 if [ -d "${strip}" ]; then
                     files="$(${FIND_BIN} ${strip} -maxdepth 1 -type f 2>/dev/null)"
                     for file in ${files}; do
-                        ${STRIP_BIN} ${file} > /dev/null 2>&1
+                        ${STRIP_BIN} ${file} >> ${LOG} 2>> ${LOG}
                         if [ "$?" = "0" ]; then
                             counter="${counter} + 1"
                         else
