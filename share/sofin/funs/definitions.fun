@@ -59,7 +59,7 @@ build_software_bundle () {
         if [ ! -e "./${name}.sha1" ]; then
             debug "Found sha-less archive. It may be incomplete or damaged. Rebuilding.."
             ${RM_BIN} -vf "${name}" >> ${LOG} 2>> ${LOG}
-            ${TAR_BIN} -cJ --use-compress-program="${XZ_BIN} --threads=${CPUS}" -f "${name}" "./${element}" 2>> ${LOG} || \
+            ${TAR_BIN} -cJ --use-compress-program="${XZ_BIN} --threads=${CPUS}" -f "${name}" "./${element}" 2>> ${LOG} >> ${LOG} || \
             ${TAR_BIN} -cJf "${name}" "./${element}" 2>> ${LOG} || \
                 error "Failed to create archives for: $(distinct e ${element})"
             note "Archived bundle: $(distinct n "${element}") is ready to deploy"
