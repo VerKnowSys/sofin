@@ -1,9 +1,10 @@
 load_defs () {
-    if [ -z "$1" ]; then
-        load_default
+    definitions=$*
+    if [ -z "${definitions}" ]; then
+        error "No definition name specified for load_defs()!"
     else
-        debug "Trying to load definitions: $(distinct d $*)"
-        for definition in $*; do
+        debug "Trying to load definitions: $(distinct e "${definitions}")"
+        for definition in ${definitions}; do
             if [ -e "${DEFINITIONS_DIR}${definition}.def" ]; then
                 debug "Loading definition: $(distinct d ${DEFINITIONS_DIR}${definition}.def)"
                 . ${DEFINITIONS_DIR}${definition}.def
@@ -18,6 +19,7 @@ load_defs () {
             fi
         done
     fi
+    unset definition definitions
 }
 
 
