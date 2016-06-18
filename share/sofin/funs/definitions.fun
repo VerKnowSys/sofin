@@ -730,28 +730,47 @@ create_apple_bundle_if_necessary () {
 
 
 strip_bundle_files () {
+    definition_name="$1"
+    if [ -z "${definition_name}" ]; then
+        error "No definition name specified as first param for strip_bundle_files()!"
+    fi
+    load_defaults # reset possible cached values
+    load_defs "${definition_name}"
+    if [ -z "${PREFIX}" ]; then
+        PREFIX="${SOFTWARE_DIR}${APP_NAME}${APP_POSTFIX}"
+        debug "An empty prefix in strip_bundle_files() for $(distinct d ${definition_name}). Resetting to: $(distinct d ${PREFIX})"
+    fi
+
     dirs_to_strip=""
     case "${APP_STRIP}" in
         all)
+            debug "strip_bundle_files($(distinct d "${definition_name}")): Strip both binaries and libraries."
             dirs_to_strip="${PREFIX}/bin ${PREFIX}/sbin ${PREFIX}/lib ${PREFIX}/libexec"
             ;;
+
         exports)
+            debug "strip_bundle_files($(distinct d "${definition_name}")): Strip exported binaries only"
             dirs_to_strip="${PREFIX}/bin ${PREFIX}/sbin ${PREFIX}/libexec"
             ;;
+
         libs)
+            debug "strip_bundle_files($(distinct d "${definition_name}")): Strip libraries only"
             dirs_to_strip="${PREFIX}/lib"
             ;;
-        no)
+
+        *)
+            debug "strip_bundle_files($(distinct d "${definition_name}")): Strip nothing"
             ;;
     esac
     if [ "${APP_STRIP}" != "no" ]; then
+        bundle_lowercase="$(lowercase "${APP_NAME}${APP_POSTFIX}")"
         if [ -z "${DEBUGBUILD}" ]; then
             counter="0"
-            for strip in ${dirs_to_strip}; do
-                if [ -d "${strip}" ]; then
-                    files="$(${FIND_BIN} ${strip} -maxdepth 1 -type f 2>/dev/null)"
+            for stripdir in ${dirs_to_strip}; do
+                if [ -d "${stripdir}" ]; then
+                    files=$(${FIND_BIN} ${stripdir} -maxdepth 1 -type f 2>/dev/null)
                     for file in ${files}; do
-                        ${STRIP_BIN} ${file} >> ${LOG} 2>> ${LOG}
+                        ${STRIP_BIN} ${file} >> "${LOG}-${bundle_lowercase}" 2>> "${LOG}-${bundle_lowercase}"
                         if [ "$?" = "0" ]; then
                             counter="${counter} + 1"
                         else
@@ -769,6 +788,7 @@ strip_bundle_files () {
             warn "Debug build is enabled. Strip skipped"
         fi
     fi
+    unset definition_name dirs_to_strip result counter files stripdir bundle_lowercase
 }
 
 
@@ -1288,7 +1308,7 @@ build_all () {
             after_export_callback
 
             clean_useless
-            strip_bundle_files
+            strip_bundle_files "${application}"
             manage_datasets
             create_apple_bundle_if_necessary
         fi
