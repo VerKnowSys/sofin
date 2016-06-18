@@ -75,3 +75,20 @@ show_logs () {
         log_helper
     fi
 }
+
+
+pretouch_logs () {
+    debug "Logs pretouch for: $*"
+    ${MKDIR_BIN} -p ${CACHE_DIR}logs >> ${LOG} 2>> ${LOG}
+    ${TOUCH_BIN} ${CACHE_DIR}logs/sofin >> ${LOG} 2>> ${LOG}
+    for app in $*; do
+        if [ -z "${app}" ]; then
+            debug "Empty app?"
+        else
+            lapp="$(lowercase $app)"
+            ${TOUCH_BIN} ${CACHE_DIR}logs/sofin-${lapp} >> ${LOG} 2>> ${LOG}
+            unset lapp
+        fi
+    done
+    unset app
+}

@@ -1159,6 +1159,11 @@ build_all () {
                 debug "Reading definition: $(distinct d ${definition})"
                 load_defaults
                 load_defs "${definition}"
+                if [ -z "${APP_REQUIREMENTS}" ]; then
+                    debug "No app requirements"
+                else
+                    pretouch_logs ${APP_REQUIREMENTS}
+                fi
                 check_disabled "${DISABLE_ON}" # after which just check if it's not disabled
 
                 APP_LOWER="${APP_NAME}${APP_POSTFIX}"
