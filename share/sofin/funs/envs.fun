@@ -76,6 +76,18 @@ setup_sofin_compiler () {
 
     if [ -z "${APP_NO_GOLDEN_LINKER}" ]; then # Golden linker enabled by default
         case "${SYSTEM_NAME}" in
+            Minix)
+                if [ -x "${GOLD_BIN}" -a -f "/usr/lib/LLVMgold.so" ]; then
+                    DEFAULT_COMPILER_FLAGS="${DEFAULT_COMPILER_FLAGS} -Wl,-fuse-ld=gold"
+                    DEFAULT_LDFLAGS="${DEFAULT_LDFLAGS} -Wl,-fuse-ld=gold"
+                    CFLAGS="-I${PREFIX}/include ${APP_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
+                    CXXFLAGS="-I${PREFIX}/include ${APP_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
+                    LDFLAGS="-L${PREFIX}/lib ${APP_LINKER_ARGS} ${DEFAULT_LDFLAGS}"
+                    LD="/usr/bin/ld --plugin /usr/lib/LLVMgold.so"
+                    NM="/usr/bin/nm --plugin /usr/lib/LLVMgold.so"
+                fi
+                ;;
+
             FreeBSD|Minix)
                 if [ -x "${GOLD_BIN}" -a -f "/usr/lib/LLVMgold.so" ]; then
                     DEFAULT_COMPILER_FLAGS="${DEFAULT_COMPILER_FLAGS} -Wl,-fuse-ld=gold"
