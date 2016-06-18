@@ -274,13 +274,12 @@ deploy_binbuild () {
 
 reset_definitions () {
     create_cache_directories
-    cd ${DEFINITIONS_DIR}
-    result="$(${GIT_BIN} reset --hard HEAD 2>> ${LOG})" && \
+    cd "${DEFINITIONS_DIR}"
+    result="$(${GIT_BIN} reset --hard HEAD >> ${LOG} 2>> "${LOG}")" && \
         note "State of definitions repository was reset to: $(distinct n "${result}")"
-    for line in $(${GIT_BIN} status --short 2>/dev/null); do
-        untracked_file="$(echo "${line}" | ${SED_BIN} -e 's/^?? //' 2>/dev/null)"
-        ${FIND_BIN} "./${untracked_file}" -delete >> ${LOG} 2>> ${LOG} && \
-            debug "Removed untracked file: $(distinct d "${untracked_file}")"
+    for line in $(${GIT_BIN} status --short 2>/dev/null | ${CUT_BIN} -f2 -d' ' 2>/dev/null); do
+        ${RM_BIN} -fv "${line}" >> "${LOG}" 2>> "${LOG}" && \
+            debug "Removed untracked file: $(distinct d "${line}")"
     done
     update_definitions
 }
