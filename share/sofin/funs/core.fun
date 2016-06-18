@@ -87,10 +87,8 @@ distinct () {
 
 run () {
     if [ ! -z "$1" ]; then
+        ${MKDIR_BIN} -p "${LOGS_DIR}"
         aname="$(lowercase ${APP_NAME}${APP_POSTFIX})"
-        if [ ! -d "${LOGS_DIR}" ]; then
-            ${MKDIR_BIN} -p "${LOGS_DIR}"
-        fi
         debug "tStamp: $(${DATE_BIN} +%s 2>/dev/null)\
             Launching action: '$(distinct d $@)')"
         if [ -z "${aname}" ]; then
@@ -108,10 +106,8 @@ run () {
 
 try () {
     if [ ! -z "$1" ]; then
+        ${MKDIR_BIN} -p "${LOGS_DIR}"
         aname="$(lowercase ${APP_NAME}${APP_POSTFIX})"
-        if [ ! -d "${LOGS_DIR}" ]; then
-            ${MKDIR_BIN} -p "${LOGS_DIR}"
-        fi
         debug "$(${DATE_BIN} +%s 2>/dev/null) try('$(distinct d $@)')"
         if [ -z "${aname}" ]; then
             eval PATH="${PATH}" "$@" >> "${LOG}" 2>> "${LOG}"
