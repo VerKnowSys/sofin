@@ -40,7 +40,7 @@ store_checksum_bundle () {
     if [ -z "${archive_sha1}" ]; then
         error "Empty checksum for archive: $(distinct e "${name}")"
     fi
-    ${PRINTF_BIN} "${archive_sha1}" > "${name}.sha1" && \
+    ${PRINTF_BIN} "${archive_sha1}" > "${name}${DEFAULT_CHKSUM_EXT}" && \
     debug "Stored checksum: $(distinct d ${archive_sha1}) for bundle file: $(distinct d "${name}")"
     unset archive_sha1
 }
@@ -56,7 +56,7 @@ build_software_bundle () {
             return
         error "Failed to create archives for: $(distinct e ${element})"
     else
-        if [ ! -e "./${name}.sha1" ]; then
+        if [ ! -e "./${name}${DEFAULT_CHKSUM_EXT}" ]; then
             debug "Found sha-less archive. It may be incomplete or damaged. Rebuilding.."
             ${RM_BIN} -vf "${name}" >> ${LOG} 2>> ${LOG}
             ${TAR_BIN} -cJ --use-compress-program="${XZ_BIN} --threads=${CPUS}" -f "${name}" "./${element}" 2>> ${LOG} >> ${LOG} || \
@@ -233,19 +233,19 @@ push_binbuild () {
                     build_software_bundle
                     store_checksum_bundle
 
-                    ${CHMOD_BIN} a+r "${name}" "${name}.sha1" && \
-                        debug "Set read access for archives: $(distinct d ${name}), $(distinct d ${name}.sha1) before we send them to public remote"
+                    ${CHMOD_BIN} a+r "${name}" "${name}${DEFAULT_CHKSUM_EXT}" && \
+                        debug "Set read access for archives: $(distinct d ${name}), $(distinct d ${name}${DEFAULT_CHKSUM_EXT}) before we send them to public remote"
 
                     note "Performing a copy of binary bundle to: $(distinct n ${BINBUILDS_CACHE_DIR}${element}-${version_element})"
                     ${MKDIR_BIN} -p ${BINBUILDS_CACHE_DIR}${element}-${version_element}
                     run "${CP_BIN} -v ${name} ${BINBUILDS_CACHE_DIR}${element}-${version_element}/"
-                    run "${CP_BIN} -v ${name}.sha1 ${BINBUILDS_CACHE_DIR}${element}-${version_element}/"
+                    run "${CP_BIN} -v ${name}${DEFAULT_CHKSUM_EXT} ${BINBUILDS_CACHE_DIR}${element}-${version_element}/"
 
                     push_binary_archive
                     push_service_stream_archive
 
                 done
-                ${RM_BIN} -f "${name}" "${name}.sha1" "${final_snap_file}" >> ${LOG}-${lowercase_element} 2>> ${LOG}-${lowercase_element}
+                ${RM_BIN} -f "${name}" "${name}${DEFAULT_CHKSUM_EXT}" "${final_snap_file}" >> ${LOG}-${lowercase_element} 2>> ${LOG}-${lowercase_element}
             fi
         else
             warn "Not found software: $(distinct w ${element})!"
@@ -1068,8 +1068,8 @@ try_fetch_binbuild () {
         }
         if [ ! -e "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" ]; then
             cd ${BINBUILDS_CACHE_DIR}${ABSNAME}
-            try "${FETCH_BIN} ${MAIN_BINARY_REPOSITORY}$(os_tripple)/${ARCHIVE_NAME}.sha1" || \
-                try "${FETCH_BIN} ${MAIN_BINARY_REPOSITORY}$(os_tripple)/${ARCHIVE_NAME}.sha1"
+            try "${FETCH_BIN} ${MAIN_BINARY_REPOSITORY}$(os_tripple)/${ARCHIVE_NAME}${DEFAULT_CHKSUM_EXT}" || \
+                try "${FETCH_BIN} ${MAIN_BINARY_REPOSITORY}$(os_tripple)/${ARCHIVE_NAME}${DEFAULT_CHKSUM_EXT}"
             if [ "$?" = "0" ]; then
                 $(try "${FETCH_BIN} ${MAIN_BINARY_REPOSITORY}$(os_tripple)/${ARCHIVE_NAME}" && confirm) || \
                 $(try "${FETCH_BIN} ${MAIN_BINARY_REPOSITORY}$(os_tripple)/${ARCHIVE_NAME}" && confirm) || \
@@ -1313,14 +1313,14 @@ dump_debug_info () {
 
 
 push_binary_archive () {
-    shortsha="$(${CAT_BIN} "${name}.sha1" 2>/dev/null | ${CUT_BIN} -c -16 2>/dev/null)…"
+    shortsha="$(${CAT_BIN} "${name}${DEFAULT_CHKSUM_EXT}" 2>/dev/null | ${CUT_BIN} -c -16 2>/dev/null)…"
     note "Pushing archive #$(distinct n ${shortsha}) to remote repository.."
     retry "${SCP_BIN} ${DEFAULT_SSH_OPTS} -P ${MAIN_PORT} ${name} ${address}/${name}.partial 2>> ${LOG}" || \
         def_error "${name}" "Error sending: $(distinct e "${1}") bundle to: $(distinct e "${address}/${1}")"
     if [ "$?" = "0" ]; then
         ${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} ${MAIN_USER}@${mirror} "cd ${MAIN_SOFTWARE_PREFIX}/software/binary/$(os_tripple) && ${MV_BIN} ${name}.partial ${name}" 2>> ${LOG}
-        retry "${SCP_BIN} ${DEFAULT_SSH_OPTS} -P ${MAIN_PORT} ${name}.sha1 ${address}/${name}.sha1 2>> ${LOG}" || \
-            def_error ${name}.sha1 "Error sending: $(distinct e ${name}.sha1) file to: $(distinct e "${address}/${1}")"
+        retry "${SCP_BIN} ${DEFAULT_SSH_OPTS} -P ${MAIN_PORT} ${name}${DEFAULT_CHKSUM_EXT} ${address}/${name}${DEFAULT_CHKSUM_EXT} 2>> ${LOG}" || \
+            def_error ${name}${DEFAULT_CHKSUM_EXT} "Error sending: $(distinct e ${name}${DEFAULT_CHKSUM_EXT}) file to: $(distinct e "${address}/${1}")"
     else
         error "Failed to push binary build of: $(distinct e ${name}) to remote: $(distinct e ${MAIN_BINARY_REPOSITORY}$(os_tripple)/${name})"
     fi

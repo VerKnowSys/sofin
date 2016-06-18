@@ -26,6 +26,7 @@ DEFAULT_MANPATH="/usr/share/man"
 DEFAULT_PATH="/bin:/usr/bin:/sbin:/usr/sbin:/usr/pkg/bin:/usr/pkg/sbin"
 DEFAULT_LOCK_EXT=".lock"
 DEFAULT_ARCHIVE_EXT=".txz"
+DEFAULT_CHKSUM_EXT="${DEFAULT_CHKSUM_EXT}"
 DEPENDENCIES_FILE=".dependencies"
 INSTALLED_MARK=".installed"
 LOG_LINES_AMOUNT=23
