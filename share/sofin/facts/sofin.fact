@@ -1,4 +1,4 @@
-SOFIN_VERSION="1.0.0ßo9"
+SOFIN_VERSION="1.0.0ß10"
 
 DEFAULT_ISSUE_REPORT_SITE="https://bitbucket.org/verknowsys/sofin/issues"
 SERVICES_DIR="/Services/"
