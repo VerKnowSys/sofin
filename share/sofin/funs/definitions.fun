@@ -324,16 +324,13 @@ remove_application () {
                 note "Automatically picking first alternative already installed: $(distinct n ${alternative})"
                 export APPLICATIONS="${alternative}"
                 export_binaries "${alternative}"
-                continue
             elif [ -z "${alternative}" ]; then
                 debug "No alternative: $(distinct d ${alternative}) != $(distinct d ${given_app_name})"
                 export APPLICATIONS=""
-                continue
             fi
         else
             warn "Bundle: $(distinct w ${given_app_name}) not installed."
             export APPLICATIONS=""
-            continue
         fi
     done
 }
