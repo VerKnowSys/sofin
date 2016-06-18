@@ -16,12 +16,16 @@ create_cache_directories () {
 
 
 log_helper () {
-    files=$(${FIND_BIN} ${CACHE_DIR}logs/ -maxdepth 1 -mindepth 1 -type f -iname "sofin*${pattern}*" -print 2>/dev/null)
+    if [ -z "${pattern}" ]; then
+        files=$(${FIND_BIN} ${CACHE_DIR}logs/ -maxdepth 1 -mindepth 1 -type f -iname "sofin*" -print 2>/dev/null)
+    else
+        files=$(${FIND_BIN} ${CACHE_DIR}logs/ -maxdepth 1 -mindepth 1 -type f -iname "sofin*${pattern}*" -print 2>/dev/null)
+    fi
     num="$(echo "${files}" | eval ${FILES_COUNT_GUARD})"
-    debug "Log helper, files: $(distinct d "${num}")"
     if [ -z "${num}" ]; then
         num="0"
     fi
+    debug "Log helper, files found: $(distinct d "${num}")"
     if [ -z "${files}" ]; then
         ${SLEEP_BIN} 2
         log_helper
