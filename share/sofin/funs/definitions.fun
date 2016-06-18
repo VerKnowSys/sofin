@@ -181,6 +181,9 @@ push_binbuild () {
     cd "${SOFTWARE_DIR}"
     for element in ${SOFIN_ARGS}; do
         lowercase_element="$(lowercase ${element})"
+        if [ -z "${lowercase_element}" ]; then
+            error "push_binbuild(): lowercase_element is empty!"
+        fi
         install_indicator_file="${element}/${lowercase_element}${INSTALLED_MARK}"
         version_element="$(${CAT_BIN} "${install_indicator_file}" 2>/dev/null)"
         if [ -d "${element}" -a \
@@ -198,12 +201,10 @@ push_binbuild () {
                 fi
                 debug "Using defined mirror(s): $(distinct d "${dig_query}")"
                 for mirror in ${dig_query}; do
-                    OS_TRIPPLE="$(os_tripple)"
-                    system_path="${MAIN_SOFTWARE_PREFIX}/software/binary/${OS_TRIPPLE}"
+                    system_path="${MAIN_SOFTWARE_PREFIX}/software/binary/$(os_tripple)"
                     address="${MAIN_USER}@${mirror}:${system_path}"
-                    aname="$(lowercase ${element})"
                     ${SSH_BIN} ${DEFAULT_SSH_OPTS} -p "${MAIN_PORT}" "${MAIN_USER}@${mirror}" \
-                        "${MKDIR_BIN} -p ${MAIN_SOFTWARE_PREFIX}/software/binary/${OS_TRIPPLE}" >> "${LOG}-${aname}" 2>> "${LOG}-${aname}"
+                        "${MKDIR_BIN} -p ${MAIN_SOFTWARE_PREFIX}/software/binary/$(os_tripple)" >> "${LOG}-${lowercase_element}" 2>> "${LOG}-${lowercase_element}"
 
                     if [ "${SYSTEM_NAME}" = "FreeBSD" ]; then # NOTE: feature designed for FBSD.
                         svcs_no_slashes="$(echo "${SERVICES_DIR}" | ${SED_BIN} 's/\///g' 2>/dev/null)"
@@ -217,14 +218,14 @@ push_binbuild () {
                         ${ZFS_BIN} list -H 2>/dev/null | ${GREP_BIN} "${element}\$" >/dev/null 2>&1
                         if [ "$?" = "0" ]; then # if dataset exists, unmount it, send to file, and remount back
                             ${ZFS_BIN} umount ${full_dataset_name} || error "ZFS umount failed for: $(distinct e "${full_dataset_name}"). Dataset shouldn't be locked nor used on build hosts."
-                            ${ZFS_BIN} send "${full_dataset_name}" 2>> "${LOG}-${aname}" \
+                            ${ZFS_BIN} send "${full_dataset_name}" 2>> "${LOG}-${lowercase_element}" \
                                 | ${XZ_BIN} > "${final_snap_file}" && \
                                 snap_size="$(${STAT_BIN} -f%z "${final_snap_file}" 2>/dev/null)" && \
-                                ${ZFS_BIN} mount ${full_dataset_name} 2>> "${LOG}-${aname}" && \
+                                ${ZFS_BIN} mount ${full_dataset_name} 2>> "${LOG}-${lowercase_element}" && \
                                 note "Stream file: $(distinct n ${final_snap_file}), of size: $(distinct n ${snap_size}) successfully sent to remote."
                         fi
                         if [ "${snap_size}" = "0" ]; then
-                            ${RM_BIN} -vf "${final_snap_file}" >> "${LOG}-${aname}" 2>> "${LOG}-${aname}"
+                            ${RM_BIN} -vf "${final_snap_file}" >> "${LOG}-${lowercase_element}" 2>> "${LOG}-${lowercase_element}"
                             note "Service dataset has no contents for bundle: $(distinct n ${element}-${version_element}), hence upload will be skipped"
                         fi
                     fi
@@ -244,7 +245,7 @@ push_binbuild () {
                     push_service_stream_archive
 
                 done
-                ${RM_BIN} -f "${name}" "${name}.sha1" "${final_snap_file}" >> ${LOG} 2>> ${LOG}
+                ${RM_BIN} -f "${name}" "${name}.sha1" "${final_snap_file}" >> ${LOG}-${lowercase_element} 2>> ${LOG}-${lowercase_element}
             fi
         else
             warn "Not found software: $(distinct w ${element})!"
@@ -285,7 +286,7 @@ reset_definitions () {
 
 
 remove_application () {
-    if [ "$2" = "" ]; then
+    if [ -z "$2" ]; then
         error "Second argument with application name is required!"
     fi
 
@@ -300,19 +301,27 @@ remove_application () {
 
     for app in $APPLICATIONS; do
         given_app_name="$(capitalize ${app})"
+        if [ -z "${given_app_name}" ]; then
+            error "remove_application(): given_app_name is empty!"
+        fi
         if [ -d "${SOFTWARE_DIR}${given_app_name}" ]; then
             if [ "${given_app_name}" = "/" ]; then
                 error "Czy Ty orzeszki?"
             fi
-            note "Removing software bundle: $(distinct n ${given_app_name})"
+            load_defs "${app}"
             aname="$(lowercase ${APP_NAME}${APP_POSTFIX})"
-            ${RM_BIN} -rfv "${SOFTWARE_DIR}${given_app_name}" >> "${LOG}-${aname}" 2>> "${LOG}-${aname}"
+            note "Removing software bundle(s): $(distinct n ${given_app_name})"
+            if [ -z "${aname}" ]; then
+                ${RM_BIN} -rfv "${SOFTWARE_DIR}${given_app_name}" >> "${LOG}" 2>> "${LOG}"
+            else
+                ${RM_BIN} -rfv "${SOFTWARE_DIR}${given_app_name}" >> "${LOG}-${aname}" 2>> "${LOG}-${aname}"
 
-            debug "Looking for other installed versions that might be exported automatically.."
-            name="$(echo "${given_app_name}" | ${SED_BIN} 's/[0-9]*//g' 2>/dev/null)"
-            alternative="$(${FIND_BIN} ${SOFTWARE_DIR} -maxdepth 1 -type d -name "${name}*" -not -name "${given_app_name}" 2>/dev/null | ${SED_BIN} 's/^.*\///g' 2>/dev/null | ${HEAD_BIN} -n1 2>/dev/null)"
-            alt_lower="$(lowercase ${alternative})"
-            if [ ! -z "${alternative}" -a -f "${SOFTWARE_DIR}${alternative}/${alt_lower}${INSTALLED_MARK}" ]; then
+                debug "Looking for other installed versions of: $(distinct d ${aname}), that might be exported automatically.."
+                name="$(echo "${given_app_name}" | ${SED_BIN} 's/[0-9]*//g' 2>/dev/null)"
+                alternative="$(${FIND_BIN} ${SOFTWARE_DIR} -maxdepth 1 -type d -name "${name}*" -not -name "${given_app_name}" 2>/dev/null | ${SED_BIN} 's/^.*\///g' 2>/dev/null | ${HEAD_BIN} -n1 2>/dev/null)"
+            fi
+            if [ ! -z "${alternative}" -a \
+                   -f "${SOFTWARE_DIR}${alternative}/$(lowercase ${alternative})${INSTALLED_MARK}" ]; then
                 note "Automatically picking first alternative already installed: $(distinct n ${alternative})"
                 export APPLICATIONS="${alternative}"
                 continue
@@ -925,6 +934,16 @@ conflict_resolve () {
 
 
 export_binaries () {
+    if [ -z "${PREFIX}" ]; then
+        error "No PREFIX value in export_binaries()!"
+    fi
+    if [ -z "${APP_NAME}${APP_POSTFIX}" ]; then
+        error "APP_NAME + APP_POSTFIX is empty in export_binaries()!"
+    fi
+    definition_name="$1"
+    if [ -z "${definition_name}" ]; then
+        error "No definition name specified as first param for export_binaries()!"
+    fi
     if [ -d "${PREFIX}/exports-disabled" ]; then # just bring back disabled exports
         debug "Moving $(distinct d ${PREFIX}/exports-disabled) to $(distinct d ${PREFIX}/exports)"
         ${MV_BIN} "${PREFIX}/exports-disabled" "${PREFIX}/exports"
@@ -944,7 +963,7 @@ export_binaries () {
                     if [ -x "${file_to_exp}" ]; then # and it's executable'
                         curr_dir="$(${PWD_BIN} 2>/dev/null)"
                         cd "${PREFIX}${dir}"
-                        ${LN_BIN} -vfs "..${dir}${exp}" "../exports/${exp}" >> "${LOG}-${aname}"
+                        ${LN_BIN} -vfs "..${dir}${exp}" "../exports/${exp}" >> "${LOG}-${aname}" 2>> "${LOG}-${aname}"
                         cd "${curr_dir}"
                         exp_elem="$(${BASENAME_BIN} ${file_to_exp} 2>/dev/null)"
                         EXPORT_LIST="${EXPORT_LIST} ${exp_elem}"
@@ -1263,7 +1282,7 @@ build_all () {
 
                 conflict_resolve
                 load_defs "${application}"
-                export_binaries
+                export_binaries "${application}"
             done
 
             after_export_callback
@@ -1304,11 +1323,11 @@ push_binary_archive () {
     retry "${SCP_BIN} ${DEFAULT_SSH_OPTS} -P ${MAIN_PORT} ${name} ${address}/${name}.partial 2>> ${LOG}" || \
         def_error "${name}" "Error sending: $(distinct e "${1}") bundle to: $(distinct e "${address}/${1}")"
     if [ "$?" = "0" ]; then
-        ${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} ${MAIN_USER}@${mirror} "cd ${MAIN_SOFTWARE_PREFIX}/software/binary/${OS_TRIPPLE} && ${MV_BIN} ${name}.partial ${name}" 2>> ${LOG}
+        ${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} ${MAIN_USER}@${mirror} "cd ${MAIN_SOFTWARE_PREFIX}/software/binary/$(os_tripple) && ${MV_BIN} ${name}.partial ${name}" 2>> ${LOG}
         retry "${SCP_BIN} ${DEFAULT_SSH_OPTS} -P ${MAIN_PORT} ${name}.sha1 ${address}/${name}.sha1 2>> ${LOG}" || \
             def_error ${name}.sha1 "Error sending: $(distinct e ${name}.sha1) file to: $(distinct e "${address}/${1}")"
     else
-        error "Failed to push binary build of: $(distinct e ${name}) to remote: $(distinct e ${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${name})"
+        error "Failed to push binary build of: $(distinct e ${name}) to remote: $(distinct e ${MAIN_BINARY_REPOSITORY}$(os_tripple)/${name})"
     fi
 }
 
