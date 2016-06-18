@@ -102,7 +102,10 @@ validate_alternatives () {
 
 validate_archive_sha1 () {
     archive_name="$1"
-    current_sha_file="${archive_name}.sha1"
+    if [ ! -f "${archive_name}" -o \
+           -z "${archive_name}" ]; then
+         error "validate_archive_sha1(): Specified empty $(distinct e archive_name), or file doesn't exists: $(distinct e ${archive_name})"
+    fi
     # checking archive sha1 checksum
     if [ -e "${archive_name}" ]; then
         note "Found binary build archive: $(distinct n "${archive_name}")"
@@ -111,12 +114,16 @@ validate_archive_sha1 () {
     else
         error "No bundle archive found?"
     fi
-    if [ -e "${current_sha_file}" ]; then
-        export sha1_value="$(${CAT_BIN} ${current_sha_file} 2>/dev/null)"
+    current_sha_file="${archive_name}${DEFAULT_CHKSUM_EXT}"
+    sha1_value="$(${CAT_BIN} ${current_sha_file} 2>/dev/null)"
+    if [ ! -f "${current_sha_file}" -o \
+           -z "${sha1_value}" ]; then
+        ${RM_BIN} -fv "${archive_name}" >> ${LOG} 2>> ${LOG}
+        ${RM_BIN} -fv "${current_sha_file}" >> ${LOG} 2>> ${LOG}
     fi
     debug "Checking SHA1 match: $(distinct d ${current_archive_sha1}) vs $(distinct d ${sha1_value})"
     if [ "${current_archive_sha1}" != "${sha1_value}" ]; then
-        debug "Bundle archive checksum doesn't match, removing binary builds and proceeding into build phase"
+        debug "Bundle archive checksum doesn't match ($(distinct d "${current_archive_sha1}") vs $(distinct d "${sha1_value}")), removing binary builds and proceeding into build phase"
         ${RM_BIN} -fv ${archive_name} >> ${LOG} 2>> ${LOG}
         ${RM_BIN} -fv ${current_sha_file} >> ${LOG} 2>> ${LOG}
     fi
