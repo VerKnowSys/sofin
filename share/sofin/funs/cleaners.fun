@@ -1,6 +1,9 @@
 clean_purge () {
     if [ -d "${CACHE_DIR}" ]; then
         note "Purging all caches from: $(distinct n ${CACHE_DIR})"
+        if [ ! -f "${LOG}" ]; then
+            LOG="/dev/null"
+        fi
         ${RM_BIN} -rf "${CACHE_DIR}" >> ${LOG} 2>> ${LOG}
     fi
 }
@@ -9,6 +12,9 @@ clean_purge () {
 clean_logs () {
     if [ -d "${LOGS_DIR}" ]; then
         note "Removing build logs from: $(distinct n ${LOGS_DIR})"
+        if [ ! -f "${LOG}" ]; then
+            LOG="/dev/null"
+        fi
         ${RM_BIN} -rf "${LOGS_DIR}" >> ${LOG} 2>> ${LOG}
     fi
 }
@@ -17,6 +23,9 @@ clean_logs () {
 clean_binbuilds () {
     if [ -d "${BINBUILDS_CACHE_DIR}" ]; then
         note "Removing binary builds from: $(distinct n ${BINBUILDS_CACHE_DIR})"
+        if [ ! -f "${LOG}" ]; then
+            LOG="/dev/null"
+        fi
         ${RM_BIN} -rf "${BINBUILDS_CACHE_DIR}" >> ${LOG} 2>> ${LOG}
     fi
 }
@@ -34,6 +43,9 @@ clean_failbuilds () {
                 number="${number} + ${num} - 1"
             fi
             for i in ${files}; do
+                if [ ! -f "${LOG}" ]; then
+                    LOG="/dev/null"
+                fi
                 debug "Removing cache directory: ${i}"
                 ${RM_BIN} -rf "${i}" >> ${LOG} 2>> ${LOG}
             done
