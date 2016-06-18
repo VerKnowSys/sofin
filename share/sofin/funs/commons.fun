@@ -74,10 +74,7 @@ retry () {
 
 
 capitalize () {
-    name="$1"
-    if [ -z "${name}" ]; then
-        error "Empty application name given for function: $(distinct e "capitalize()")"
-    fi
+    name="$*"
     _head="$(${PRINTF_BIN} "${name}" 2>/dev/null | ${CUT_BIN} -c1 2>/dev/null | ${TR_BIN} '[a-z]' '[A-Z]' 2>/dev/null)"
     _tail="$(${PRINTF_BIN} "${name}" 2>/dev/null | ${SED_BIN} 's/^[a-zA-Z]//' 2>/dev/null)"
     ${PRINTF_BIN} "${_head}${_tail}"
@@ -86,11 +83,7 @@ capitalize () {
 
 
 lowercase () {
-    name="$1"
-    if [ -z "${name}" ]; then
-        error "Empty application name given for function: $(distinct e "lowercase()")"
-    fi
-    ${PRINTF_BIN} "${name}" 2>/dev/null | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null
+    ${PRINTF_BIN} "$*" | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null
 }
 
 
