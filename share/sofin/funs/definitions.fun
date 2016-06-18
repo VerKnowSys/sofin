@@ -264,7 +264,6 @@ deploy_binbuild () {
         USE_BINBUILD=NO
         build_all || def_error "${bundle}" "Bundle build failed."
     done
-    note "Pushing built bundles: $(distinct n "${bundles}") to remote host."
     push_binbuild ${bundles} || def_error "${bundle}" "Push failure"
     note "Software bundle deployed successfully: $(distinct n ${bundle})"
     note "$(fill)"
@@ -324,6 +323,7 @@ remove_application () {
                    -f "${SOFTWARE_DIR}${alternative}/$(lowercase ${alternative})${INSTALLED_MARK}" ]; then
                 note "Automatically picking first alternative already installed: $(distinct n ${alternative})"
                 export APPLICATIONS="${alternative}"
+                export_binaries "${alternative}"
                 continue
             elif [ -z "${alternative}" ]; then
                 debug "No alternative: $(distinct d ${alternative}) != $(distinct d ${given_app_name})"
@@ -934,15 +934,14 @@ conflict_resolve () {
 
 
 export_binaries () {
-    if [ -z "${PREFIX}" ]; then
-        error "No PREFIX value in export_binaries()!"
-    fi
-    if [ -z "${APP_NAME}${APP_POSTFIX}" ]; then
-        error "APP_NAME + APP_POSTFIX is empty in export_binaries()!"
-    fi
     definition_name="$1"
     if [ -z "${definition_name}" ]; then
         error "No definition name specified as first param for export_binaries()!"
+    fi
+    load_defs "${definition_name}"
+    if [ -z "${PREFIX}" ]; then
+        PREFIX="${SOFTWARE_DIR}${APP_NAME}${APP_POSTFIX}"
+        debug "An empty prefix in export_binaries() for $(distinct d ${definition_name}). Resetting to: $(distinct d ${PREFIX})"
     fi
     if [ -d "${PREFIX}/exports-disabled" ]; then # just bring back disabled exports
         debug "Moving $(distinct d ${PREFIX}/exports-disabled) to $(distinct d ${PREFIX}/exports)"
@@ -1281,7 +1280,6 @@ build_all () {
                 fi
 
                 conflict_resolve
-                load_defs "${application}"
                 export_binaries "${application}"
             done
 
