@@ -31,7 +31,6 @@ setup_sofin_compiler () {
     CXXFLAGS="-I${PREFIX}/include ${APP_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
     LDFLAGS="-L${PREFIX}/lib ${APP_LINKER_ARGS} ${DEFAULT_LDFLAGS}"
 
-    debug "Setting up default system compiler"
     case $1 in
         GNU)
             BASE_COMPILER="/usr/bin"
@@ -68,6 +67,7 @@ setup_sofin_compiler () {
 
     if [ -z "${APP_NO_CCACHE}" ]; then # ccache is supported by default but it's optional
         if [ -x "${CCACHE_BIN_OPTIONAL}" ]; then # check for CCACHE availability
+            debug " $(distinct d "${SUCCESS_CHAR}") $(distinct d "ccache")"
             CC="${CCACHE_BIN_OPTIONAL} ${CC}"
             CXX="${CCACHE_BIN_OPTIONAL} ${CXX}"
             CPP="${CCACHE_BIN_OPTIONAL} ${CPP}"
@@ -117,24 +117,48 @@ setup_sofin_compiler () {
                 fi
                 ;;
         esac
+        debug " $(distinct d "${SUCCESS_CHAR}") $(distinct d "gold-linker")"
     else # Golden linker causes troubles with some build systems like Qt, so we give option to disable it
-        debug "Not using golden linker"
         unset NM LD
+        debug " $(distinct d "${ERROR_CHAR}") $(distinct d "gold-linker")"
     fi
 
     if [ -z "${APP_LINKER_NO_DTAGS}" ]; then
-        debug "Using dtags linker information"
         if [ "${SYSTEM_NAME}" != "Darwin" ]; then # feature isn't required on Darwin
             CFLAGS="${CFLAGS} -Wl,-rpath=${PREFIX}/lib,--enable-new-dtags"
             CXXFLAGS="${CXXFLAGS} -Wl,-rpath=${PREFIX}/lib,--enable-new-dtags"
             LDFLAGS="${LDFLAGS} -Wl,-rpath=${PREFIX}/lib,--enable-new-dtags"
+            debug " $(distinct d "${SUCCESS_CHAR}") $(distinct d "enable-new-dtags")"
+        else
+            debug " $(distinct d "${ERROR_CHAR}") $(distinct d "enable-new-dtags")"
         fi
     fi
 
     if [ -z "${APP_NO_FAST_MATH}" ]; then
-        debug "Enabling 'fast-math' compiler option"
+        debug " $(distinct d "${SUCCESS_CHAR}") $(distinct d "fast-math")"
         CFLAGS="${CFLAGS} -ffast-math"
         CXXFLAGS="${CXXFLAGS} -ffast-math"
+    else
+        debug " $(distinct d "${ERROR_CHAR}") $(distinct d "fast-math")"
+    fi
+
+    debug " $(distinct d "${SUCCESS_CHAR}") $(distinct d "${CC}")"
+    debug " $(distinct d "${SUCCESS_CHAR}") $(distinct d "${CXX}")"
+    debug " $(distinct d "${SUCCESS_CHAR}") $(distinct d "${CPP}")"
+    debug " $(distinct d "${SUCCESS_CHAR}") $(distinct d "${CFLAGS}")"
+    debug " $(distinct d "${SUCCESS_CHAR}") $(distinct d "${CXXFLAGS}")"
+    debug " $(distinct d "${SUCCESS_CHAR}") $(distinct d "${LDFLAGS}")"
+
+    if [ -z "${NM}" ]; then
+        debug " $(distinct d "${ERROR_CHAR}") $(distinct d "${NM}")"
+    else
+        debug " $(distinct d "${SUCCESS_CHAR}") $(distinct d "${NM}")"
+    fi
+
+    if [ -z "${LD}" ]; then
+        debug " $(distinct d "${ERROR_CHAR}") $(distinct d "${LD}")"
+    else
+        debug " $(distinct d "${SUCCESS_CHAR}") $(distinct d "${LD}")"
     fi
 
     export CFLAGS
