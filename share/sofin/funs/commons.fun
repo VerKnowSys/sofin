@@ -43,7 +43,6 @@ check_os () {
 
         *)
             error "Currently only FreeBSD, Minix, Darwin and Debian hosts are supported."
-            exit
             ;;
 
     esac
