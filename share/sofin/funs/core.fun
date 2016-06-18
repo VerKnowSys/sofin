@@ -63,23 +63,23 @@ distinct () {
     fi
     case ${msg_type} in
         n|note)
-            printf "${DISTINCT_COLOUR}${content}${green}"
+            ${PRINTF_BIN} "${DISTINCT_COLOUR}${content}${green}"
             ;;
 
         d|debug)
-            printf "${DISTINCT_COLOUR}${content}${magenta}"
+            ${PRINTF_BIN} "${DISTINCT_COLOUR}${content}${magenta}"
             ;;
 
         w|warn)
-            printf "${DISTINCT_COLOUR}${content}${yellow}"
+            ${PRINTF_BIN} "${DISTINCT_COLOUR}${content}${yellow}"
             ;;
 
         e|error)
-            printf "${DISTINCT_COLOUR}${content}${red}"
+            ${PRINTF_BIN} "${DISTINCT_COLOUR}${content}${red}"
             ;;
 
         *)
-            printf "${msg_type}${content}${reset}"
+            ${PRINTF_BIN} "${msg_type}${content}${reset}"
             ;;
     esac
 }
