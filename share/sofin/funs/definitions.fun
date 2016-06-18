@@ -1206,7 +1206,7 @@ build_all () {
                         if [ "${APP_VERSION}" = "${already_installed_version}" ]; then
                             note "$(distinct n ${APP_NAME}${APP_POSTFIX}) bundle is installed with version: $(distinct n ${already_installed_version})"
                         else
-                            warn "$(distinct w ${APP_NAME}${APP_POSTFIX}) bundle is installed with version: $(distinct w ${already_installed_version}), but newer version is defined: $(distinct w "${APP_VERSION}")"
+                            warn "$(distinct w ${APP_NAME}${APP_POSTFIX}) bundle is installed with version: $(distinct w ${already_installed_version}), different from defined: $(distinct w "${APP_VERSION}")"
                         fi
                         export DONT_BUILD_BUT_DO_EXPORTS=YES
                     fi
