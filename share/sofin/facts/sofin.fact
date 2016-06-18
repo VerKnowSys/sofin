@@ -40,6 +40,16 @@ SOFIN_BIN_SHORT="$(${BASENAME_BIN} ${SOFIN_BIN} 2>/dev/null)"
 DISTINCT_COLOUR="${cyan}"
 DEFAULT_SSH_OPTS="-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
 
+# LLVM backend:
+C_COMPILER_NAME="clang"
+CXX_COMPILER_NAME="${C_COMPILER_NAME}++"
+CPP_PREPROCESSOR_NAME="${C_COMPILER_NAME}-cpp"
+
+# GNU backend:
+C_COMPILER_ALT="gcc"
+CXX_COMPILER_NAME_ALT="g++"
+CPP_PREPROCESSOR_NAME_ALT="cpp"
+
 # Some lazy stuff:
 FILES_COUNT_GUARD="${WC_BIN} -l 2>/dev/null | ${SED_BIN} 's/ //g' 2>/dev/null"
 OLDEST_BUILD_DIR_GUARD="${SORT_BIN} -k1 -n 2>/dev/null | ${TAIL_BIN} -n1 2>/dev/null | ${CUT_BIN} -f2 -d' ' 2>/dev/null | ${SORT_BIN} -k1 -n 2>/dev/null | ${TAIL_BIN} -n1 2>/dev/null | ${CUT_BIN} -f2 -d' ' 2>/dev/null"
