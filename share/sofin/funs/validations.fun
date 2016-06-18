@@ -12,12 +12,11 @@ check_version () { # $1 => installed version, $2 => available version
 
 # validate environment availability or crash
 validate_env () {
-    env | ${GREP_BIN} '_BIN=/' 2>/dev/null | while IFS= read -r envvar
+    ${ENV_BIN} 2>/dev/null | ${GREP_BIN} '_BIN=/' 2>/dev/null | while IFS= read -r envvar
     do
         var_value="$(${PRINTF_BIN} "${envvar}" | ${AWK_BIN} '{sub(/^[A-Z_]*=/, ""); print $1;}' 2>/dev/null)"
         if [ ! -x "${var_value}" ]; then
             error "Required binary is unavailable: $(distinct e ${envvar})"
-            exit 1
         fi
     done || exit 1
 }
@@ -46,16 +45,21 @@ fail_on_any_background_jobs () {
 
 
 check_requirements () {
-    if [ "${APPLICATIONS}" = "" ]; then
+    if [ -z "${APPLICATIONS}" ]; then
+        debug "check_requirements(): APPLICATIONS is empty! Exitting"
         exit
     fi
     if [ "${SYSTEM_NAME}" != "Darwin" ]; then
         if [ -d "/usr/local" ]; then
             files="$(${FIND_BIN} /usr/local -maxdepth 3 -type f 2>/dev/null | ${WC_BIN} -l 2>/dev/null | ${SED_BIN} -e 's/^ *//g;s/ *$//g' 2>/dev/null)"
             if [ "${files}" != "0" ]; then
-                warn "/usr/local has been found, and contains ${files}+ file(s)"
+                if [ "${files}" != "1" ]; then
+                    pstfix="s"
+                fi
+                warn "/usr/local has been found, and contains: $(distinct w ${files}+) file${pstfix}"
             fi
         fi
+        unset files pstfix
     fi
     if [ ! -z "${DEBUGBUILD}" ]; then
         warn "Debug build is enabled."
@@ -65,11 +69,11 @@ check_requirements () {
 
 check_definition_dir () {
     if [ ! -d "${SOFTWARE_DIR}" ]; then
-        debug "No ${SOFTWARE_DIR} found. Creating one."
+        debug "No $(distinct d ${SOFTWARE_DIR}) found. Creating one."
         "${MKDIR_BIN}" -p "${SOFTWARE_DIR}"
     fi
     if [ ! -d "${CACHE_DIR}" ]; then
-        debug "No cache folder found. Creating one at: ${CACHE_DIR}"
+        debug "No cache folder found. Creating one at: $(distinct d ${CACHE_DIR})"
         "${MKDIR_BIN}" -p "${CACHE_DIR}"
     fi
 }
@@ -85,13 +89,14 @@ validate_alternatives () {
             cap_elem="$(capitalize "${elem}")"
             contents="${contents}$(echo "${cap_elem}" | ${SED_BIN} 's/\..*//' 2>/dev/null) "
         done
-        if [ "${contents}" != "" ]; then
-            warn "No such definition found: $(distinct w ${an_app}). Alternatives found: $(distinct w ${contents})"
-        else
+        if [ -z "${contents}" ]; then
             warn "No such definition found: $(distinct w ${an_app}). No alternatives found."
+        else
+            warn "No such definition found: $(distinct w ${an_app}). Alternatives found: $(distinct w ${contents})"
         fi
         exit
     fi
+    unset an_app elem cap_elem contents maybe_version
 }
 
 

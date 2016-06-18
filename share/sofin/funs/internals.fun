@@ -290,8 +290,8 @@ sofin_status () {
 
 
 list_bundles_alphabetic () {
-    debug "Listing installed software alphabetically:"
-    if [ -d ${SOFTWARE_DIR} ]; then
+    if [ -d "${SOFTWARE_DIR}" ]; then
+        debug "Listing installed software bundles in alphabetical order."
         ${FIND_BIN} ${SOFTWARE_DIR} -maxdepth 1 -mindepth 1 -type d  -not -name ".*" -print 2>/dev/null | \
         ${SED_BIN} -e 's#/.*/##' 2>/dev/null | ${SORT_BIN} 2>/dev/null
     fi

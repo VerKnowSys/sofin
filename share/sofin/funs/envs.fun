@@ -232,7 +232,7 @@ reload_zsh_shells () {
         done
         ${KILL_BIN} -SIGUSR2 ${wishlist} 2>> ${LOG} && \
         note "All running $(distinct n $(${BASENAME_BIN} "${SHELL}" 2>/dev/null)) sessions: $(distinct n ${wishlist}) were reloaded successfully"
-        unset wishlist pids
+        unset wishlist pids pattern pid
     else
         write_info_about_shell_configuration
     fi
