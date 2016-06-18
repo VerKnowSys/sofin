@@ -148,14 +148,30 @@ setup_sofin_compiler () {
 }
 
 
+create_lock () {
+    bundle_name="${1}"
+    if [ -z "${bundle_name}" ]; then
+        error "No bundle name specified to lock!"
+    else
+        debug "Acquring bundle lock for: $(distinct d ${bundle_name})"
+    fi
+    if [ -z "${SOFIN_PID}" ]; then
+        SOFIN_PID="$$"
+        debug "\$SOFIN_PID is empty! Assigned as current process pid: $(distinct d ${SOFIN_PID})"
+    else
+        debug "create_lock(): Pid of current Sofin session is: $(distinct d ${SOFIN_PID})"
+    fi
+    bundle="$(capitalize ${bundle_name})"
+    ${MKDIR_BIN} -p ${LOCKS_DIR}
+    ${PRINTF_BIN} "${SOFIN_PID}" > ${LOCKS_DIR}${bundle}${DEFAULT_LOCK_EXT}
+    unset bundle bundle_name
+}
+
+
 acquire_lock_for () {
     bundles="$*"
-    debug "Acquring lock for bundles: [$(distinct d ${bundles})]"
+    debug "Trying lock acquire for bundles: [$(distinct d ${bundles})]"
     for bundle in ${bundles}; do
-        create_lock () {
-            debug "Creating bundle lock file for: $(distinct d ${bundle})"
-            echo "${SOFIN_PID}" > ${LOCKS_DIR}${bundle}${DEFAULT_LOCK_EXT}
-        }
         if [ -f "${LOCKS_DIR}${bundle}${DEFAULT_LOCK_EXT}" ]; then
             lock_pid="$(${CAT_BIN} ${LOCKS_DIR}${bundle}${DEFAULT_LOCK_EXT} 2>/dev/null)"
             lock_parent_pid="$(${PGREP_BIN} -P${lock_pid} 2>/dev/null)"
@@ -172,12 +188,12 @@ acquire_lock_for () {
                     error "Bundle: $(distinct e ${bundle}) is locked due to background job pid: $(distinct e "${lock_pid}")"
                 fi
             else # NOTE: process is dead
-                debug "Lock was acquired by some process but it's now dead. Acquring a new lock.."
-                create_lock
+                debug "Found lock file acquired by dead process. Acquring a new lock.."
+                create_lock "${bundle}"
             fi
         else
             debug "No file lock for bundle: $(distinct d ${bundle})"
-            create_lock
+            create_lock "${bundle}"
         fi
     done
 }
