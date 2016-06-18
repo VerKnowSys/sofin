@@ -20,7 +20,7 @@ usage_howto () {
     note "  $(distinct n "purge                                ") cleans binbuilds cache, unpacked source content, logs, definitions, source cache and possible states"
     note "  $(distinct n "outdated                             ") lists outdated software"
     note "  $(distinct n "build                                ") does binary build from source for software specified as params"
-    note "  $(distinct n "continue Bundlename                  ") continues build from \"make stage\" of bundle name, given as param (previous build dir reused)"
+    # note "  $(distinct n "continue Bundlename                  ") continues build from \"make stage\" of bundle name, given as param (previous build dir reused)"
     note "  $(distinct n "deploy                               ") build + push"
     note "  $(distinct n "push | binpush | send                ") creates binary build from prebuilt software bundles name given as params (example: ${SOFIN_BIN_SHORT} push Rubinius Vifm Curl)"
     note "  $(distinct n "wipe                                 ") wipes binary builds (matching given name) from binary respositories (example: ${SOFIN_BIN_SHORT} wipe Rubinius Vifm)"

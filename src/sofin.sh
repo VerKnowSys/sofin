@@ -82,30 +82,30 @@ if [ ! -z "${SOFIN_COMMAND_ARG}" ]; then
             ;;
 
 
-        cont|continue)
-            create_cache_directories
-            shift
-            a_bundle_name="$1"
-            if [ -z "${a_bundle_name}" ]; then
-                error "No bundle name given to continue build. Aborted!"
-            fi
-            fail_on_background_sofin_job ${SOFIN_ARGS}
-            if [ "${SYSTEM_NAME}" = "Linux" ]; then # GNU guys have to be the unicorns..
-                export MOST_RECENT_DIR="$(${FIND_BIN} ${CACHE_DIR}cache/ -mindepth 2 -maxdepth 2 -type d -iname "*${a_bundle_name}*" -printf '%T@ %p\n' 2>/dev/null | eval ${OLDEST_BUILD_DIR_GUARD})"
-            else
-                export MOST_RECENT_DIR="$(${FIND_BIN} ${CACHE_DIR}cache/ -mindepth 2 -maxdepth 2 -type d -iname "*${a_bundle_name}*" -print 2>/dev/null | ${XARGS_BIN} ${STAT_BIN} -f"%m %N" 2>/dev/null | eval ${OLDEST_BUILD_DIR_GUARD})"
-            fi
-            if [ ! -d "${MOST_RECENT_DIR}" ]; then
-                error "No build dir: '${MOST_RECENT_DIR}' found to continue bundle build of: '${a_bundle_name}'"
-            fi
-            a_build_dir="$(${BASENAME_BIN} ${MOST_RECENT_DIR} 2>/dev/null)"
-            note "Found most recent build dir: $(distinct n ${a_build_dir}) for bundle: $(distinct n ${a_bundle_name})"
-            note "Resuming interrupted build.."
-            export APPLICATIONS="${a_bundle_name}"
-            export PREVIOUS_BUILD_DIR="${MOST_RECENT_DIR}"
-            export SOFIN_CONTINUE_BUILD=YES
-            build_all
-            ;;
+        # cont|continue)
+        #     create_cache_directories
+        #     shift
+        #     a_bundle_name="$1"
+        #     if [ -z "${a_bundle_name}" ]; then
+        #         error "No bundle name given to continue build. Aborted!"
+        #     fi
+        #     fail_on_background_sofin_job ${SOFIN_ARGS}
+        #     if [ "${SYSTEM_NAME}" = "Linux" ]; then # GNU guys have to be the unicorns..
+        #         export MOST_RECENT_DIR="$(${FIND_BIN} ${CACHE_DIR}cache/ -mindepth 2 -maxdepth 2 -type d -iname "*${a_bundle_name}*" -printf '%T@ %p\n' 2>/dev/null | eval ${OLDEST_BUILD_DIR_GUARD})"
+        #     else
+        #         export MOST_RECENT_DIR="$(${FIND_BIN} ${CACHE_DIR}cache/ -mindepth 2 -maxdepth 2 -type d -iname "*${a_bundle_name}*" -print 2>/dev/null | ${XARGS_BIN} ${STAT_BIN} -f"%m %N" 2>/dev/null | eval ${OLDEST_BUILD_DIR_GUARD})"
+        #     fi
+        #     if [ ! -d "${MOST_RECENT_DIR}" ]; then
+        #         error "No build dir: '${MOST_RECENT_DIR}' found to continue bundle build of: '${a_bundle_name}'"
+        #     fi
+        #     a_build_dir="$(${BASENAME_BIN} ${MOST_RECENT_DIR} 2>/dev/null)"
+        #     note "Found most recent build dir: $(distinct n ${a_build_dir}) for bundle: $(distinct n ${a_bundle_name})"
+        #     note "Resuming interrupted build.."
+        #     export APPLICATIONS="${a_bundle_name}"
+        #     export PREVIOUS_BUILD_DIR="${MOST_RECENT_DIR}"
+        #     export SOFIN_CONTINUE_BUILD=YES
+        #     build_all
+        #     ;;
 
 
         i|install|get|pick|choose|use|switch)
