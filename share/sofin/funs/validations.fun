@@ -25,6 +25,7 @@ validate_env () {
 
 fail_on_background_sofin_job () {
     deps=$*
+    debug "fail_on_background_sofin_job(): deps=$(distinct d $(echo ${deps} | eval "${NEWLINES_TO_SPACES_GUARD}"))"
     create_cache_directories
     acquire_lock_for "${deps}"
     unset deps

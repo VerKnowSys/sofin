@@ -291,7 +291,7 @@ remove_application () {
 
     # first look for a list with that name:
     if [ -e "${LISTS_DIR}${2}" ]; then
-        export APPLICATIONS="$(${CAT_BIN} ${LISTS_DIR}${2} 2>/dev/null | ${TR_BIN} '\n' ' ' 2>/dev/null)"
+        export APPLICATIONS="$(${CAT_BIN} ${LISTS_DIR}${2} 2>/dev/null | eval "${NEWLINES_TO_SPACES_GUARD}")"
         debug "Removing list of applications: $(distinct d ${APPLICATIONS})"
     else
         export APPLICATIONS="${SOFIN_ARGS}"
@@ -800,7 +800,7 @@ manage_datasets () {
 
             # Create a dataset for any existing dirs in Services dir that are not ZFS datasets.
             all_dirs="$(${FIND_BIN} ${SERVICES_DIR} -mindepth 1 -maxdepth 1 -type d -not -name '.*' -print 2>/dev/null | ${XARGS_BIN} ${BASENAME_BIN} 2>/dev/null)"
-            debug "Checking for non-dataset directories in $(distinct d ${SERVICES_DIR}): EOF:\n$(echo "${all_dirs}" | ${TR_BIN} '\n' ' ' 2>/dev/null)\nEOF\n"
+            debug "Checking for non-dataset directories in $(distinct d ${SERVICES_DIR}): EOF:\n$(echo "${all_dirs}" | eval "${NEWLINES_TO_SPACES_GUARD}")\nEOF\n"
             full_bundle_name="$(${BASENAME_BIN} "${PREFIX}" 2>/dev/null)"
             for maybe_dataset in ${all_dirs}; do
                 aname="$(lowercase ${full_bundle_name})"

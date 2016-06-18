@@ -38,12 +38,12 @@ log_helper () {
 
             1)
                 note "Found $(distinct n ${num}) log file, that matches pattern: $(distinct n ${pattern}). Attaching tail.."
-                ${TAIL_BIN} -n ${LOG_LINES_AMOUNT} -F $(echo "${files}" | ${TR_BIN} '\n' ' ' 2>/dev/null)
+                ${TAIL_BIN} -n ${LOG_LINES_AMOUNT} -F $(echo "${files}" | eval ${NEWLINES_TO_SPACES_GUARD})
                 ;;
 
             *)
                 note "Found $(distinct n ${num}) log files, that match pattern: $(distinct n ${pattern}). Attaching to all available files.."
-                ${TAIL_BIN} -F $(echo "${files}" | ${TR_BIN} '\n' ' ' 2>/dev/null)
+                ${TAIL_BIN} -F $(echo "${files}" | eval ${NEWLINES_TO_SPACES_GUARD})
                 ;;
         esac
     fi
@@ -71,7 +71,7 @@ show_logs () {
             note "No log files updated or accessed in last ${minutes} minutes to show. Specify '+' as param, to attach a tail to all logs."
         else
             debug "show_logs(), files: $(distinct d "$(echo "${files}" | eval ${FILES_COUNT_GUARD})")"
-            ${TAIL_BIN} -n ${LOG_LINES_AMOUNT} $(echo "${files}" | ${TR_BIN} '\n' ' ' 2>/dev/null)
+            ${TAIL_BIN} -n ${LOG_LINES_AMOUNT} $(echo "${files}" | eval ${NEWLINES_TO_SPACES_GUARD})
         fi
 
     else

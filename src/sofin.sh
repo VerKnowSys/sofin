@@ -116,7 +116,7 @@ if [ ! -z "${SOFIN_COMMAND_ARG}" ]; then
             fail_on_background_sofin_job ${SOFIN_ARGS}
             # NOTE: trying a list first - it will have priority if file exists:
             if [ -f "${LISTS_DIR}${2}" ]; then
-                export APPLICATIONS="$(${CAT_BIN} ${LISTS_DIR}${2} 2>/dev/null | ${TR_BIN} '\n' ' ' 2>/dev/null)"
+                export APPLICATIONS="$(${CAT_BIN} ${LISTS_DIR}${2} 2>/dev/null | eval ${NEWLINES_TO_SPACES_GUARD})"
                 debug "Processing software: $(distinct d ${APPLICATIONS}) for architecture: $(distinct d ${SYSTEM_ARCH})"
             else
                 export APPLICATIONS="${SOFIN_ARGS}"
@@ -136,7 +136,7 @@ if [ ! -z "${SOFIN_COMMAND_ARG}" ]; then
             if [ ! -e "./${DEPENDENCIES_FILE}" ]; then
                 error "Dependencies file not found!"
             fi
-            export APPLICATIONS="$(${CAT_BIN} ./${DEPENDENCIES_FILE} 2>/dev/null | ${TR_BIN} '\n' ' ' 2>/dev/null)"
+            export APPLICATIONS="$(${CAT_BIN} ./${DEPENDENCIES_FILE} 2>/dev/null | eval ${NEWLINES_TO_SPACES_GUARD})"
             note "Installing dependencies: $(distinct n ${APPLICATIONS})"
             build_all
             ;;
