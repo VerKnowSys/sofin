@@ -324,6 +324,10 @@ remove_application () {
                 note "Automatically picking first alternative already installed: $(distinct n ${alternative})"
                 export APPLICATIONS="${alternative}"
                 export_binaries "${alternative}"
+                update_shell_vars
+                reload_zsh_shells
+                exit # Just pick first available alternative bundle
+
             elif [ -z "${alternative}" ]; then
                 debug "No alternative: $(distinct d ${alternative}) != $(distinct d ${given_app_name})"
                 export APPLICATIONS=""
