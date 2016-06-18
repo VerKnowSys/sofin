@@ -35,7 +35,7 @@ clean_failbuilds () {
     if [ -d "${CACHE_DIR}cache" ]; then
         number="0"
         files=$(${FIND_BIN} "${CACHE_DIR}cache" -maxdepth 2 -mindepth 1 -type d 2>/dev/null)
-        if [ ! -z "${files}" ]; then
+        if [ -z "${files}" ]; then
             debug "No cache dirs. Skipped"
         else
             num="$(echo "${files}" | eval ${FILES_COUNT_GUARD})"
