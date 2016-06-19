@@ -49,7 +49,30 @@ note () {
 
 
 error () {
-    cecho "${FAIL_CHAR} $1" ${red}
+    cecho
+    cecho "$(fill)" ${red}
+    cecho "${FAIL_CHAR} Error: $1" ${red}
+    cecho "$(fill)" ${red}
+    warn "\n${NOTE_CHAR2} I'm very serious about software development and it's quality, hence if"
+    warn "  while using Sofin, you encounter, a problem similar to scenarios like:"
+    warn "  ${WARN_CHAR} $(distinct w "*found-design-problem*"),"
+    warn "  ${WARN_CHAR} $(distinct w "*feature-bug*"),"
+    warn "  ${WARN_CHAR} $(distinct w "*stucked-in-some-undefined-behaviour*"),"
+    warn "  ${WARN_CHAR} $(distinct w "*caused-data-loss*"),"
+    warn "  ${WARN_CHAR} $(distinct w "*found-regressions*"),"
+    warn "  ${WARN_CHAR} $(distinct w "*caused-a-crash*"),"
+    warn "                          - please don't hesitate to report an issue(s)!"
+    warn "$(fill)\n"
+    warn "${NOTE_CHAR2} Sofin lacks real-world documentation, mostly because it's not required,"
+    warn "  since this software was designed and written with simplicity in mind ($(distinct w KISS))"
+    warn "  ${WARN_CHAR} $(distinct w "https://github.com/VerKnowSys/sofin")"
+    warn "  ${WARN_CHAR} $(distinct w "https://github.com/VerKnowSys/sofin/wiki/Sofin,-the-software-installer")"
+    warn "                - written for: $(distinct w "https://bsdmag.org"), release: $(distinct w "BSD_06_2013.pdf")"
+    warn "$(fill)\n"
+    warn "${NOTE_CHAR2} Sofin issue trackers:"
+    warn "  ${WARN_CHAR} Bitbucket: $(distinct w "${DEFAULT_ISSUE_REPORT_SITE}")"
+    warn "  ${WARN_CHAR} Github: $(distinct w "${DEFAULT_ISSUE_REPORT_SITE_ALT}")"
+    warn "\n$(fill "${SEPARATOR_CHAR}" 46)$(distinct w "  Daniel (dmilith) Dettlaff  ")$(fill "${SEPARATOR_CHAR}" 5)\n"
     exit 1
 }
 
