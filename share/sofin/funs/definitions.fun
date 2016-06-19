@@ -967,6 +967,8 @@ export_binaries () {
         error "No definition name specified as first param for export_binaries()!"
     fi
     load_defs "${definition_name}"
+    conflict_resolve
+
     if [ -z "${PREFIX}" ]; then
         PREFIX="${SOFTWARE_DIR}${APP_NAME}${APP_POSTFIX}"
         debug "An empty prefix in export_binaries() for $(distinct d ${definition_name}). Resetting to: $(distinct d ${PREFIX})"
@@ -1307,7 +1309,6 @@ build_all () {
                     fi
                 fi
 
-                conflict_resolve
                 export_binaries "${application}"
             done
 
