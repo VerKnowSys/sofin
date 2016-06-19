@@ -330,11 +330,11 @@ remove_application () {
             fi
             if [ ! -z "${alternative}" -a \
                    -f "${SOFTWARE_DIR}${alternative}/$(lowercase ${alternative})${INSTALLED_MARK}" ]; then
-                note "Automatically picking first alternative already installed: $(distinct n ${alternative})"
-                export APPLICATIONS="${alternative}"
+                note "Updating environment with already installed alternative: $(distinct n ${alternative})"
                 export_binaries "${alternative}"
                 update_shell_vars
                 reload_zsh_shells
+                destroy_locks
                 exit # Just pick first available alternative bundle
 
             elif [ -z "${alternative}" ]; then
