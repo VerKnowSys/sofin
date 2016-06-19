@@ -1203,9 +1203,10 @@ build_all () {
         validate_alternatives "${application}"
         load_defs "${application}" # prevent installation of requirements of disabled application:
         check_disabled "${DISABLE_ON}" # after which just check if it's not disabled
-        if [ ! "${ALLOW}" = "1" ]; then
+        if [ ! "${ALLOW}" = "1" -a \
+             ! -z "$(${BASENAME_BIN} ${PREFIX} 2>/dev/null)" ]; then
             warn "Bundle: $(distinct w ${application}) disabled on architecture: $(distinct w $(os_tripple))"
-            ${FIND_BIN} ${PREFIX} -delete >> ${LOG} 2>> ${LOG}
+            ${RM_BIN} -rf "${PREFIX}" >> ${LOG} 2>> ${LOG}
         else
             for definition in ${DEFINITIONS_DIR}${application}.def; do
                 unset DONT_BUILD_BUT_DO_EXPORTS
