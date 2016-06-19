@@ -339,11 +339,9 @@ remove_application () {
 
             elif [ -z "${alternative}" ]; then
                 debug "No alternative: $(distinct d ${alternative}) != $(distinct d ${given_app_name})"
-                export APPLICATIONS=""
             fi
         else
             warn "Bundle: $(distinct w ${given_app_name}) not installed."
-            export APPLICATIONS=""
         fi
     done
 }
