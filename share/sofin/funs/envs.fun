@@ -1,6 +1,13 @@
 setup_sofin_compiler () {
-
-    debug "Configuring available compilers for: $(distinct d ${SYSTEM_NAME})"
+    if [ "${1}" = "silent" ]; then
+        shift
+        debug () {
+            if [ -z "${DEBUG}" ]; then
+                ${LOGGER_BIN} "# ${cyan} $1"
+            fi
+        }
+    fi
+    debug "setup_sofin_compiler(): Compiler features enabled for definition: $(distinct d "${APP_NAME}${APP_POSTFIX}") on platform: $(distinct d ${SYSTEM_NAME})"
     case "${SYSTEM_NAME}" in
         Minix)
             DEFAULT_COMPILER_FLAGS="-I/usr/pkg/include -fPIE"

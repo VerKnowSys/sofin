@@ -164,7 +164,7 @@ get_shell_vars () {
 
     ${PRINTF_BIN} "# PATH:\nexport PATH=\"$(echo "${result}" | eval ${CUT_TRAILING_SPACES_GUARD})\"\n\n"
 
-    setup_sofin_compiler
+    setup_sofin_compiler "silent"
 
     ${PRINTF_BIN} "# CC:\nexport CC='${CC}'\n\n"
     ${PRINTF_BIN} "# CXX:\nexport CXX='${CXX}'\n\n"
