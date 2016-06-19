@@ -5,6 +5,7 @@ setup_sofin_compiler () {
     DEFAULT_LDFLAGS="${COMMON_FLAGS}"
     DEFAULT_COMPILER_FLAGS="${COMMON_COMPILER_FLAGS}"
 
+    debug "Configuring available compilers for: $(distinct d ${SYSTEM_NAME})"
     case "${SYSTEM_NAME}" in
         Minix)
             DEFAULT_COMPILER_FLAGS="-I/usr/pkg/include -fPIE"
@@ -22,8 +23,12 @@ setup_sofin_compiler () {
     esac
 
     if [ "YES" = "${DEBUGBUILD}" ]; then
+        debug " $(distinct d "${SUCCESS_CHAR}") $(distinct d "debug-build")"
+        debug " $(distinct d "${FAIL_CHAR}") $(distinct d "production-build")"
         DEFAULT_COMPILER_FLAGS="${DEFAULT_COMPILER_FLAGS} -O0 -ggdb"
     else
+        debug " $(distinct d "${SUCCESS_CHAR}") $(distinct d "production-build")"
+        debug " $(distinct d "${FAIL_CHAR}") $(distinct d "debug-build")"
         DEFAULT_COMPILER_FLAGS="${DEFAULT_COMPILER_FLAGS} -O2"
     fi
 
@@ -31,38 +36,83 @@ setup_sofin_compiler () {
     CXXFLAGS="-I${PREFIX}/include ${APP_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
     LDFLAGS="-L${PREFIX}/lib ${APP_LINKER_ARGS} ${DEFAULT_LDFLAGS}"
 
-    case $1 in
-        GNU)
-            BASE_COMPILER="/usr/bin"
-            export CC="$(echo "${BASE_COMPILER}/gcc ${APP_COMPILER_ARGS}" | ${SED_BIN} 's/ *$//' 2>/dev/null)"
-            export CXX="$(echo "${BASE_COMPILER}/g++ ${APP_COMPILER_ARGS}" | ${SED_BIN} 's/ *$//' 2>/dev/null)"
-            export CPP="${BASE_COMPILER}/cpp"
-            ;;
+    # pick compiler in order:
+    # 1. /usr/bin/clang
+    # 2. /usr/bin/gcc
+    default_c="${C_COMPILER_NAME}"
+    default_cxx="${CXX_COMPILER_NAME}"
+    default_cpp="${CPP_PREPROCESSOR_NAME}"
+    BASE_COMPILER="${SOFTWARE_DIR}$(capitalize ${C_COMPILER_NAME})" # /Software/Clang
+    if [ -x "${BASE_COMPILER}/bin/${default_c}" -a \
+         -x "${BASE_COMPILER}/bin/${default_cxx}" ]; then
+        debug " $(distinct d "${SUCCESS_CHAR}") $(distinct d "base-compiler: ${default_c}")"
+    else # /usr/bin/clang
+        BASE_COMPILER="/usr"
+        if [ "${SYSTEM_NAME}" = "Minix" ]; then
+            BASE_COMPILER="/usr/pkg"
+        fi
+        if [ -x "${BASE_COMPILER}/bin/${default_c}" -a \
+             -x "${BASE_COMPILER}/bin/${default_cxx}" ]; then
+            debug " $(distinct d "${SUCCESS_CHAR}") $(distinct d "base-compiler: ${default_c}")"
+        else
+            if [ -x "${BASE_COMPILER}/bin/${C_COMPILER_NAME_ALT}" -a \
+                 -x "${BASE_COMPILER}/bin/${CXX_COMPILER_NAME_ALT}" -a \
+                 -x "${BASE_COMPILER}/bin/${CPP_PREPROCESSOR_NAME_ALT}" ]; then
+                default_c="${C_COMPILER_NAME_ALT}"
+                default_cxx="${CXX_COMPILER_NAME_ALT}"
+                default_cpp="${CPP_PREPROCESSOR_NAME_ALT}"
+                debug " $(distinct d "${SUCCESS_CHAR}") $(distinct d "base-compiler: ${default_c}")"
+            else
+                debug " $(distinct d "${FAIL_CHAR}") $(distinct d "base-compiler: ${default_c}")"
+            fi
+        fi
+    fi
+    CC="$(echo "${BASE_COMPILER}/bin/${default_c} ${APP_COMPILER_ARGS}" | ${SED_BIN} 's/ *$//' 2>/dev/null)"
+    if [ ! -x "${CC}" ]; then # fallback for systems with clang without standalone preprocessor binary:
+        error "Base C compiler: $(distinct e "${CC}") should be an executable!"
+    fi
 
-        *)
-            BASE_COMPILER="${SOFTWARE_DIR}Clang/exports"
-            if [ ! -f "${BASE_COMPILER}/clang" ]; then
-                BASE_COMPILER="/usr/bin"
-                if [ "${SYSTEM_NAME}" = "Minix" ]; then
-                    BASE_COMPILER="/usr/pkg/bin"
-                fi
-                if [ ! -x "${BASE_COMPILER}/clang" ]; then
-                    setup_sofin_compiler GNU # fallback to gcc on system without any clang version
-                    return
-                fi
-            fi
-            CC="$(echo "${BASE_COMPILER}/clang ${APP_COMPILER_ARGS}" | ${SED_BIN} 's/ *$//' 2>/dev/null)"
-            CXX="$(echo "${BASE_COMPILER}/clang++ ${APP_COMPILER_ARGS}" | ${SED_BIN} 's/ *$//' 2>/dev/null)"
-            CPP="${BASE_COMPILER}/clang-cpp"
-            if [ ! -x "${CPP}" ]; then # fallback for systems with clang without standalone preprocessor binary:
-                CPP="${BASE_COMPILER}/clang -E"
-            fi
-            ;;
-    esac
+    CXX="$(echo "${BASE_COMPILER}/bin/${default_cxx} ${APP_COMPILER_ARGS}" | ${SED_BIN} 's/ *$//' 2>/dev/null)"
+    if [ ! -x "${CXX}" ]; then # fallback for systems with clang without standalone preprocessor binary:
+        error "Base C++ compiler: $(distinct e "${CXX}") should be an executable!"
+    fi
+
+    CPP="${BASE_COMPILER}/bin/${default_cpp}"
+    if [ ! -x "${CPP}" ]; then # fallback for systems with clang without standalone preprocessor binary:
+        CPP="${BASE_COMPILER}/bin/${default_c} -E"
+    fi
+
+    # -fPIC check:
+    echo "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'f[Pp][Ii][Cc]' >/dev/null 2>/dev/null && \
+        debug " $(distinct d "${SUCCESS_CHAR}") $(distinct d "position-independent-code")" || \
+        debug " $(distinct d "${FAIL_CHAR}") $(distinct d "position-independent-code")"
+
+    # -fPIE check:
+    echo "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'f[Pp][Ii][Ee]' >/dev/null 2>/dev/null && \
+        debug " $(distinct d "${SUCCESS_CHAR}") $(distinct d "position-independent-executable")" || \
+        debug " $(distinct d "${FAIL_CHAR}") $(distinct d "position-independent-executable")"
+
+    # -fstack-protector-all check:
+    echo "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'fstack-protector-all' >/dev/null 2>/dev/null && \
+        debug " $(distinct d "${SUCCESS_CHAR}") $(distinct d "stack-protector-all")" || \
+        debug " $(distinct d "${FAIL_CHAR}") $(distinct d "stack-protector-all")"
+
+    # -fno-strict-overflow check:
+    echo "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'fno-strict-overflow' >/dev/null 2>/dev/null && \
+        debug " $(distinct d "${SUCCESS_CHAR}") $(distinct d "no-strict-overflow")" || \
+        debug " $(distinct d "${FAIL_CHAR}") $(distinct d "no-strict-overflow")"
+
+    if [ "${default_c}" = "${C_COMPILER_NAME}" ]; then
+        debug " $(distinct d "${SUCCESS_CHAR}") $(distinct d "clang-compiler")"
+        debug " $(distinct d "${FAIL_CHAR}") $(distinct d "gnu-c-compiler")"
+    elif [ "${default_c}" = "${C_COMPILER_NAME_ALT}" ]; then
+        debug " $(distinct d "${SUCCESS_CHAR}") $(distinct d "gnu-c-compiler")"
+        debug " $(distinct d "${FAIL_CHAR}") $(distinct d "clang-compiler")"
+    fi
 
     # Support for other definition options
     if [ ! -z "${FORCE_GNU_COMPILER}" ]; then # force GNU compiler usage on definition side:
-        error "Support for GNU compiler was recently dropped. Try using $(distinct e Gcc) instead)?"
+        warn "Support for GNU compiler was recently dropped, and is ignored since Sofin 1.0. Try using $(distinct e Gcc) instead)?"
     fi
 
     if [ -z "${APP_NO_CCACHE}" ]; then # ccache is supported by default but it's optional
@@ -144,24 +194,7 @@ setup_sofin_compiler () {
         debug " $(distinct d "${FAIL_CHAR}") $(distinct d "fast-math")"
     fi
 
-    debug " $(distinct d "${SUCCESS_CHAR}") $(distinct d "${CC}")"
-    debug " $(distinct d "${SUCCESS_CHAR}") $(distinct d "${CXX}")"
-    debug " $(distinct d "${SUCCESS_CHAR}") $(distinct d "${CPP}")"
-    debug " $(distinct d "${SUCCESS_CHAR}") $(distinct d "${CFLAGS}")"
-    debug " $(distinct d "${SUCCESS_CHAR}") $(distinct d "${CXXFLAGS}")"
-    debug " $(distinct d "${SUCCESS_CHAR}") $(distinct d "${LDFLAGS}")"
-
-    if [ -z "${NM}" ]; then
-        debug " $(distinct d "${ERROR_CHAR}") $(distinct d "${NM}")"
-    else
-        debug " $(distinct d "${SUCCESS_CHAR}") $(distinct d "${NM}")"
-    fi
-
-    if [ -z "${LD}" ]; then
-        debug " $(distinct d "${ERROR_CHAR}") $(distinct d "${LD}")"
-    else
-        debug " $(distinct d "${SUCCESS_CHAR}") $(distinct d "${LD}")"
-    fi
+    unset default_c default_cxx default_cpp
 
     export CFLAGS
     export CXXFLAGS
