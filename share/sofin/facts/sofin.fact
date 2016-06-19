@@ -42,6 +42,9 @@ SOFIN_BIN_SHORT="$(${BASENAME_BIN} ${SOFIN_BIN} 2>/dev/null)"
 DISTINCT_COLOUR="${cyan}"
 DEFAULT_SSH_OPTS="-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
 
+# Build timestamp in seconds since 1970
+TIMESTAMP="$(${DATE_BIN} +%s 2>/dev/null)"
+
 # LLVM backend:
 C_COMPILER_NAME="clang"
 CXX_COMPILER_NAME="${C_COMPILER_NAME}++"
