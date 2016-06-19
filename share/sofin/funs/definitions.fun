@@ -743,7 +743,7 @@ strip_bundle_files () {
     load_defaults # reset possible cached values
     load_defs "${definition_name}"
     if [ -z "${PREFIX}" ]; then
-        PREFIX="${SOFTWARE_DIR}${APP_NAME}${APP_POSTFIX}"
+        PREFIX="${SOFTWARE_DIR}$(capitalize "${APP_NAME}${APP_POSTFIX}")"
         debug "An empty prefix in strip_bundle_files() for $(distinct d ${definition_name}). Resetting to: $(distinct d ${PREFIX})"
     fi
 
@@ -970,7 +970,7 @@ export_binaries () {
     conflict_resolve
 
     if [ -z "${PREFIX}" ]; then
-        PREFIX="${SOFTWARE_DIR}${APP_NAME}${APP_POSTFIX}"
+        PREFIX="${SOFTWARE_DIR}$(capitalize "${APP_NAME}${APP_POSTFIX}")"
         debug "An empty prefix in export_binaries() for $(distinct d ${definition_name}). Resetting to: $(distinct d ${PREFIX})"
     fi
     if [ -d "${PREFIX}/exports-disabled" ]; then # just bring back disabled exports
@@ -1229,7 +1229,7 @@ build_all () {
                     fi
                 fi
 
-                export PREFIX="${SOFTWARE_DIR}${APP_NAME}${APP_POSTFIX}"
+                export PREFIX="${SOFTWARE_DIR}$(capitalize "${APP_NAME}${APP_POSTFIX}")"
                 export SERVICE_DIR="${SERVICES_DIR}${APP_NAME}${APP_POSTFIX}"
                 if [ ! -z "${APP_STANDALONE}" ]; then
                     ${MKDIR_BIN} -p "${SERVICE_DIR}"
