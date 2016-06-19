@@ -34,6 +34,14 @@ inherit () {
 }
 
 
+cleanup_after_tasks () {
+    debug "cleanup_after_tasks()"
+    update_shell_vars
+    reload_zsh_shells
+    destroy_locks
+}
+
+
 store_checksum_bundle () {
     if [ -z "${name}" ]; then
         error "Empty archive name in function: $(distinct e "store_checksum_bundle()")!"

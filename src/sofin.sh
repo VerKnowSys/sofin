@@ -99,6 +99,7 @@ if [ ! -z "${SOFIN_COMMAND_ARG}" ]; then
                 debug "Processing software: $(distinct d ${SOFIN_ARGS}) for architecture: $(distinct d ${SYSTEM_ARCH})"
             fi
             build_all
+            cleanup_after_tasks
             ;;
 
 
@@ -115,13 +116,16 @@ if [ ! -z "${SOFIN_COMMAND_ARG}" ]; then
             export APPLICATIONS="$(${CAT_BIN} ./${DEPENDENCIES_FILE} 2>/dev/null | eval ${NEWLINES_TO_SPACES_GUARD})"
             note "Installing dependencies: $(distinct n ${APPLICATIONS})"
             build_all
+            cleanup_after_tasks
             ;;
 
 
         p|push|binpush|send)
             fail_on_background_sofin_job ${SOFIN_ARGS}
             push_binbuild
+            cleanup_after_tasks
             ;;
+
 
         b|build)
             create_cache_directories
@@ -133,23 +137,28 @@ if [ ! -z "${SOFIN_COMMAND_ARG}" ]; then
             export USE_BINBUILD=NO
             export APPLICATIONS="${dependencies}"
             build_all
+            cleanup_after_tasks
             ;;
 
 
         d|deploy)
             fail_on_background_sofin_job ${SOFIN_ARGS}
             deploy_binbuild $*
+            cleanup_after_tasks
             ;;
 
 
         reset)
             fail_on_background_sofin_job ${SOFIN_ARGS}
             reset_definitions
+            cleanup_after_tasks
             ;;
+
 
         rebuild)
             fail_on_background_sofin_job ${SOFIN_ARGS}
             rebuild_application $*
+            cleanup_after_tasks
             ;;
 
 
@@ -161,12 +170,12 @@ if [ ! -z "${SOFIN_COMMAND_ARG}" ]; then
         delete|remove|uninstall|rm)
             fail_on_background_sofin_job ${SOFIN_ARGS}
             remove_application $*
+            cleanup_after_tasks
             ;;
 
 
         reload|rehash)
-            update_shell_vars
-            reload_zsh_shells
+            cleanup_after_tasks
             ;;
 
 
@@ -183,6 +192,7 @@ if [ ! -z "${SOFIN_COMMAND_ARG}" ]; then
         exportapp|export|exp)
             fail_on_background_sofin_job ${SOFIN_ARGS}
             make_exports $*
+            cleanup_after_tasks
             ;;
 
 
@@ -200,5 +210,4 @@ else
     usage_howto
 fi
 
-destroy_locks
 exit
