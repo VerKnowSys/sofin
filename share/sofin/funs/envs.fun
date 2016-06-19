@@ -71,6 +71,8 @@ setup_sofin_compiler () {
             CC="${CCACHE_BIN_OPTIONAL} ${CC}"
             CXX="${CCACHE_BIN_OPTIONAL} ${CXX}"
             CPP="${CCACHE_BIN_OPTIONAL} ${CPP}"
+        else
+            debug " $(distinct d "${FAIL_CHAR}") $(distinct d "ccache")"
         fi
     fi
 
@@ -120,7 +122,7 @@ setup_sofin_compiler () {
         debug " $(distinct d "${SUCCESS_CHAR}") $(distinct d "gold-linker")"
     else # Golden linker causes troubles with some build systems like Qt, so we give option to disable it
         unset NM LD
-        debug " $(distinct d "${ERROR_CHAR}") $(distinct d "gold-linker")"
+        debug " $(distinct d "${FAIL_CHAR}") $(distinct d "gold-linker")"
     fi
 
     if [ -z "${APP_LINKER_NO_DTAGS}" ]; then
@@ -130,7 +132,7 @@ setup_sofin_compiler () {
             LDFLAGS="${LDFLAGS} -Wl,-rpath=${PREFIX}/lib,--enable-new-dtags"
             debug " $(distinct d "${SUCCESS_CHAR}") $(distinct d "enable-new-dtags")"
         else
-            debug " $(distinct d "${ERROR_CHAR}") $(distinct d "enable-new-dtags")"
+            debug " $(distinct d "${FAIL_CHAR}") $(distinct d "enable-new-dtags")"
         fi
     fi
 
@@ -139,7 +141,7 @@ setup_sofin_compiler () {
         CFLAGS="${CFLAGS} -ffast-math"
         CXXFLAGS="${CXXFLAGS} -ffast-math"
     else
-        debug " $(distinct d "${ERROR_CHAR}") $(distinct d "fast-math")"
+        debug " $(distinct d "${FAIL_CHAR}") $(distinct d "fast-math")"
     fi
 
     debug " $(distinct d "${SUCCESS_CHAR}") $(distinct d "${CC}")"

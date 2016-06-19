@@ -13,7 +13,7 @@ TTY="NO"
 SUCCESS_CHAR="V"
 WARN_CHAR="*"
 NOTE_CHAR=">"
-ERROR_CHAR="#"
+FAIL_CHAR="#"
 NOTE_CHAR2="-"
 SEPARATOR_CHAR="_"
 if [ -t 1 ]; then
@@ -22,7 +22,7 @@ if [ -t 1 ]; then
     WARN_CHAR="•"
     NOTE_CHAR="→"
     NOTE_CHAR2="»"
-    ERROR_CHAR="✘"
+    FAIL_CHAR="✘"
     SEPARATOR_CHAR="┈"
 fi
 

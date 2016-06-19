@@ -49,7 +49,7 @@ note () {
 
 
 error () {
-    cecho "${ERROR_CHAR} $1" ${red}
+    cecho "${FAIL_CHAR} $1" ${red}
     exit 1
 }
 

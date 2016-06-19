@@ -210,7 +210,7 @@ list_bundles_full () {
             if [ -e "${installed_file}" ]; then
                 note "${SUCCESS_CHAR} ${app_name}"
             else
-                note "${red}${ERROR_CHAR} ${app_name} ${reset}[${red}!${reset}]"
+                note "${red}${FAIL_CHAR} ${app_name} ${reset}[${red}!${reset}]"
             fi
             for req in $(${FIND_BIN} ${app} -maxdepth 1 -name *${INSTALLED_MARK} 2>/dev/null | ${SORT_BIN} 2>/dev/null); do
                 pp="$(${PRINTF_BIN} "$(${BASENAME_BIN} ${req} 2>/dev/null)" | ${SED_BIN} "s/${INSTALLED_MARK}//" 2>/dev/null)"
