@@ -1326,10 +1326,7 @@ build_all () {
             create_apple_bundle_if_necessary
         fi
     done
-
-    debug "Post build_all tasks.."
     update_shell_vars
-    reload_zsh_shells
 }
 
 
