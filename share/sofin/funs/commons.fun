@@ -7,17 +7,16 @@ check_command_result () {
         debug "Command successful: '$(distinct d "$*")'"
     else
         shift
-        error "Action failed: '$(distinct e "$*")'.
-Might try this: $(distinct e $(${BASENAME_BIN} ${SOFIN_BIN} 2>/dev/null) log defname), to see what went wrong"
+        error "Command failed: $(distinct e "$*")"
     fi
 }
 
 
 def_error () {
     if [ -z "${2}" ]; then
-        error "Failed action for: $(distinct e $1). Report it if necessary on: $(distinct e "${DEFAULT_ISSUE_REPORT_SITE}") or fix definition please!"
+        error "Failed action for: $(distinct e $1)"
     else
-        error "${2}. Report it if necessary on: $(distinct e "${DEFAULT_ISSUE_REPORT_SITE}") or fix definition please!"
+        error "${2}"
     fi
 }
 
@@ -49,26 +48,28 @@ check_os () {
 }
 
 
-
-
 retry () {
-    retries="***"
-    while [ ! -z "${retries}" ]; do
-        if [ ! -z "$1" ]; then
-            debug "$(${DATE_BIN} +%H%M%S-%s 2>/dev/null) Retry('$@')[${retries}];"
-            if [ ! -f "${LOG}" -o ! -d "${LOGS_DIR}" ]; then
+    targets="$@"
+    ammo="***"
+    while [ ! -z "${ammo}" ]; do
+        if [ ! -z "${targets}" ]; then
+            debug "${TIMESTAMP}: Invoking: retry($(distinct d "${targets}")[$(distinct d ${ammo})]"
+            if [ ! -f "${LOG}" -o \
+                 ! -d "${LOGS_DIR}" ]; then
                 ${MKDIR_BIN} -p "${LOGS_DIR}"
             fi
             gitroot="$(${BASENAME_BIN} $(${BASENAME_BIN} ${GIT_BIN} 2>/dev/null) 2>/dev/null)"
-            eval PATH="/bin:/usr/bin:${gitroot}/bin:${gitroot}/libexec/git-core" "$@" >> "${LOG}" 2>> "${LOG}" && \
-            return 0
+            eval PATH="${gitroot}/bin:${gitroot}/libexec/git-core:${DEFAULT_PATH}" \
+                "${targets}" >> "${LOG}" 2>> "${LOG}" && \
+                unset gitroot ammo targets && \
+                return 0
         else
-            error "An empty command to retry?"
+            error "retry(): Given an empty command to evaluate!"
         fi
-        retries="$(echo "${retries}" | ${SED_BIN} 's/\*//' 2>/dev/null)"
-        debug "Retries left: ${retries}"
+        ammo="$(echo "${ammo}" | ${SED_BIN} 's/\*//' 2>/dev/null)"
+        debug "retry(): Remaining attempts: $(distinct d ${ammo})"
     done
-    error "All retries exhausted for launch command: '$@'"
+    error "All ammo exhausted to invoke a command: $(distinct e "$@")"
 }
 
 
@@ -77,7 +78,7 @@ capitalize () {
     _head="$(${PRINTF_BIN} "${name}" 2>/dev/null | ${CUT_BIN} -c1 2>/dev/null | ${TR_BIN} '[a-z]' '[A-Z]' 2>/dev/null)"
     _tail="$(${PRINTF_BIN} "${name}" 2>/dev/null | ${SED_BIN} 's/^[a-zA-Z]//' 2>/dev/null)"
     ${PRINTF_BIN} "${_head}${_tail}"
-    unset _head _tail
+    unset _head _tail name
 }
 
 
@@ -100,5 +101,5 @@ fill () {
         _buf="${_buf}${_char}"
     done
     ${PRINTF_BIN} "${_buf}"
-    unset _times _buf
+    unset _times _buf _char
 }
