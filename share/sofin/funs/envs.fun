@@ -7,17 +7,23 @@ setup_sofin_compiler () {
     debug "setup_sofin_compiler(): Compiler features enabled for definition: $(distinct d "${APP_NAME}${APP_POSTFIX}") on platform: $(distinct d ${SYSTEM_NAME})"
     case "${SYSTEM_NAME}" in
         Minix)
-            DEFAULT_COMPILER_FLAGS="-I/usr/pkg/include -fPIE"
-            DEFAULT_LDFLAGS="-L/usr/pkg/lib -fPIE"
+            DEFAULT_COMPILER_FLAGS="${COMMON_COMPILER_FLAGS} -I/usr/pkg/include -fPIE"
+            DEFAULT_LDFLAGS="${COMMON_LDFLAGS} -L/usr/pkg/lib -fPIE"
             ;;
 
         FreeBSD)
-            DEFAULT_COMPILER_FLAGS="${DEFAULT_COMPILER_FLAGS} -fPIE"
-            DEFAULT_LDFLAGS="${DEFAULT_LDFLAGS} -fPIE"
+            DEFAULT_COMPILER_FLAGS="${COMMON_COMPILER_FLAGS} -fPIE"
+            DEFAULT_LDFLAGS="${COMMON_LDFLAGS} -fPIE"
+            ;;
+
+        Darwin)
+            DEFAULT_COMPILER_FLAGS="${COMMON_COMPILER_FLAGS}"
+            DEFAULT_LDFLAGS="${COMMON_LDFLAGS}"
             ;;
 
         Linux)
-            DEFAULT_COMPILER_FLAGS="${DEFAULT_COMPILER_FLAGS} -mno-avx" # XXX: old Xeons case :)
+            DEFAULT_COMPILER_FLAGS="${COMMON_COMPILER_FLAGS} -mno-avx" # XXX: old Xeons case :)
+            DEFAULT_LDFLAGS="${COMMON_LDFLAGS}"
             ;;
     esac
 
