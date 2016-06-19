@@ -105,7 +105,7 @@ get_shell_vars () {
 
     # LD_LIBRARY_PATH, LDFLAGS, PKG_CONFIG_PATH:
     # ldresult="/lib:/usr/lib"
-    # pkg_config_path="."
+    pkg_config_path="."
     export ldflags="${LDFLAGS} ${DEFAULT_LDFLAGS}"
     process () {
         for app in ${1}*; do # LIB_DIR
@@ -128,7 +128,7 @@ get_shell_vars () {
     fi
 
     # CFLAGS, CXXFLAGS:
-    cflags="${CFLAGS} -fPIC ${DEFAULT_COMPILER_FLAGS}"
+    cflags="${COMMON_COMPILER_FLAGS}"
     process () {
         for app in ${1}*; do
             exp="${app}/include"
@@ -162,39 +162,31 @@ get_shell_vars () {
         process ${SOFTWARE_DIR}
     fi
 
+    ${PRINTF_BIN} "# PATH:\nexport PATH=\"$(echo "${result}" | eval ${CUT_TRAILING_SPACES_GUARD})\"\n\n"
+
     setup_sofin_compiler
 
     ${PRINTF_BIN} "# CC:\nexport CC='${CC}'\n\n"
     ${PRINTF_BIN} "# CXX:\nexport CXX='${CXX}'\n\n"
     ${PRINTF_BIN} "# CPP:\nexport CPP='${CPP}'\n\n"
 
-    if [ -f "${SOFIN_DISABLED_INDICATOR_FILE}" ]; then # sofin disabled. Default system environment
-        ${PRINTF_BIN} "# PATH:\nexport PATH=${result}\n\n"
+    if [ -f "${SOFIN_ENV_DISABLED_INDICATOR_FILE}" ]; then # sofin disabled. Default system environment
         ${PRINTF_BIN} "# CFLAGS:\nexport CFLAGS=''\n\n"
         ${PRINTF_BIN} "# CXXFLAGS:\nexport CXXFLAGS=''\n\n"
-        if [ "${SYSTEM_NAME}" = "Darwin" ]; then
-            ${PRINTF_BIN} "# LDFLAGS:\nexport LDFLAGS=''\n\n"
-            ${PRINTF_BIN} "# PKG_CONFIG_PATH:\nexport PKG_CONFIG_PATH='${pkg_config_path}'\n\n" # commented out: :/opt/X11/lib/pkgconfig
-        else
-            ${PRINTF_BIN} "# LDFLAGS:\nexport LDFLAGS=''\n\n"
-            ${PRINTF_BIN} "# PKG_CONFIG_PATH:\nexport PKG_CONFIG_PATH='${pkg_config_path}'\n\n"
-        fi
-        ${PRINTF_BIN} "# MANPATH:\nexport MANPATH='${manpath}'\n\n"
+        ${PRINTF_BIN} "# LDFLAGS:\nexport LDFLAGS=''\n\n"
 
-    else # sofin enabled, Default behavior:
+    else # sofin environment override enabled, Default behavior:
+        ${PRINTF_BIN} "# CFLAGS:\nexport CFLAGS='$(echo "${cflags}" | eval ${CUT_TRAILING_SPACES_GUARD})'\n\n"
+        ${PRINTF_BIN} "# CXXFLAGS:\nexport CXXFLAGS='$(echo "${cxxflags}" | eval ${CUT_TRAILING_SPACES_GUARD})'\n\n"
 
-        ${PRINTF_BIN} "# PATH:\nexport PATH=${result}\n\n"
-        ${PRINTF_BIN} "# CFLAGS:\nexport CFLAGS='${cflags}'\n\n"
-        ${PRINTF_BIN} "# CXXFLAGS:\nexport CXXFLAGS='${cxxflags}'\n\n"
-        if [ "${SYSTEM_NAME}" = "Darwin" ]; then
-            ${PRINTF_BIN} "# LDFLAGS:\nexport LDFLAGS='${ldflags}'\n\n"
-            ${PRINTF_BIN} "# PKG_CONFIG_PATH:\nexport PKG_CONFIG_PATH='${pkg_config_path}'\n\n" # commented out: :/opt/X11/lib/pkgconfig
-        else
-            ${PRINTF_BIN} "# LDFLAGS:\nexport LDFLAGS='${ldflags} -Wl,--enable-new-dtags'\n\n"
-            ${PRINTF_BIN} "# PKG_CONFIG_PATH:\nexport PKG_CONFIG_PATH='${pkg_config_path}'\n\n"
-        fi
-        ${PRINTF_BIN} "# MANPATH:\nexport MANPATH='${manpath}'\n\n"
+        ${PRINTF_BIN} "# LDFLAGS:\nexport LDFLAGS='$(echo "${ldflags}" | eval ${CUT_TRAILING_SPACES_GUARD})'\n\n"
     fi
+
+    # common
+    ${PRINTF_BIN} "# PKG_CONFIG_PATH:\nexport PKG_CONFIG_PATH='$(echo "${pkg_config_path}" | eval ${CUT_TRAILING_SPACES_GUARD})'\n\n"
+    ${PRINTF_BIN} "# MANPATH:\nexport MANPATH='$(echo "${manpath}" | eval ${CUT_TRAILING_SPACES_GUARD})'\n\n"
+
+    unset result cflags cxxflags ldflags pkg_config_path manpath
 }
 
 
@@ -256,7 +248,7 @@ develop () {
 
 
 enable_sofin_env () {
-    ${RM_BIN} -f ${SOFIN_DISABLED_INDICATOR_FILE}
+    ${RM_BIN} -f ${SOFIN_ENV_DISABLED_INDICATOR_FILE}
     update_shell_vars
     if [ -z "${SHELL_PID}" ]; then
         note "Enabled Sofin environment, yet no SHELL_PID defined. Autoreload skipped."
@@ -268,7 +260,7 @@ enable_sofin_env () {
 
 
 disable_sofin_env () {
-    ${TOUCH_BIN} ${SOFIN_DISABLED_INDICATOR_FILE}
+    ${TOUCH_BIN} ${SOFIN_ENV_DISABLED_INDICATOR_FILE}
     update_shell_vars
     if [ -z "${SHELL_PID}" ]; then
         note "Disabled Sofin environment, yet no SHELL_PID defined. Autoreload skipped."
@@ -280,7 +272,7 @@ disable_sofin_env () {
 
 
 sofin_status () {
-    if [ -f ${SOFIN_DISABLED_INDICATOR_FILE} ]; then
+    if [ -f ${SOFIN_ENV_DISABLED_INDICATOR_FILE} ]; then
         note "Sofin shell environment is: ${red}disabled${reset}"
     else
         note "Sofin shell environment is: $(distinct n enabled${reset})"
