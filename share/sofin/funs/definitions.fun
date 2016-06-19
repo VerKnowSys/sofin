@@ -352,12 +352,12 @@ remove_application () {
 available_definitions () {
     cd "${DEFINITIONS_DIR}"
     note "Available definitions:"
-    ${LS_BIN} -m *def | ${SED_BIN} 's/\.def//g'
+    ${LS_BIN} -m *def 2>/dev/null | ${SED_BIN} 's/\.def//g' 2>/dev/null
     note "Definitions count:"
-    ${LS_BIN} -a *def | ${WC_BIN} -l
+    ${LS_BIN} -a *def 2>/dev/null | ${WC_BIN} -l 2>/dev/null
     cd "${LISTS_DIR}"
     note "Available lists:"
-    ${LS_BIN} -m * | ${SED_BIN} 's/\.def//g'
+    ${LS_BIN} -m * 2>/dev/null | ${SED_BIN} 's/\.def//g' 2>/dev/null
 }
 
 
