@@ -108,7 +108,6 @@ validate_archive_sha1 () {
     fi
     # checking archive sha1 checksum
     if [ -e "${archive_name}" ]; then
-        note "Found binary build archive: $(distinct n "${archive_name}")"
         current_archive_sha1="$(file_checksum "${archive_name}")"
         debug "current_archive_sha1: $(distinct d ${current_archive_sha1})"
     else
@@ -126,5 +125,7 @@ validate_archive_sha1 () {
         debug "Bundle archive checksum doesn't match ($(distinct d "${current_archive_sha1}") vs $(distinct d "${sha1_value}")), removing binary builds and proceeding into build phase"
         ${RM_BIN} -fv ${archive_name} >> ${LOG} 2>> ${LOG}
         ${RM_BIN} -fv ${current_sha_file} >> ${LOG} 2>> ${LOG}
+    else
+        note "Found correct prebuilt binary archive: $(distinct n "${archive_name}")"
     fi
 }
