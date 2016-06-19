@@ -1,10 +1,5 @@
 setup_sofin_compiler () {
 
-    COMMON_FLAGS="-fPIC"
-    COMMON_COMPILER_FLAGS="${COMMON_FLAGS} -w -fno-strict-overflow -fstack-protector-all"
-    DEFAULT_LDFLAGS="${COMMON_FLAGS}"
-    DEFAULT_COMPILER_FLAGS="${COMMON_COMPILER_FLAGS}"
-
     debug "Configuring available compilers for: $(distinct d ${SYSTEM_NAME})"
     case "${SYSTEM_NAME}" in
         Minix)

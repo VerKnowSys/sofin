@@ -50,6 +50,12 @@ C_COMPILER_ALT="gcc"
 CXX_COMPILER_NAME_ALT="g++"
 CPP_PREPROCESSOR_NAME_ALT="cpp"
 
+# Compiler cross platform defaults:
+COMMON_FLAGS="-fPIC"
+COMMON_COMPILER_FLAGS="${COMMON_FLAGS} -w -fno-strict-overflow -fstack-protector-all"
+DEFAULT_LDFLAGS="${COMMON_FLAGS}"
+DEFAULT_COMPILER_FLAGS="${COMMON_COMPILER_FLAGS}"
+
 # Some lazy stuff:
 FILES_COUNT_GUARD="${WC_BIN} -l 2>/dev/null | ${SED_BIN} 's/ //g' 2>/dev/null"
 OLDEST_BUILD_DIR_GUARD="${SORT_BIN} -k1 -n 2>/dev/null | ${TAIL_BIN} -n1 2>/dev/null | ${CUT_BIN} -f2 -d' ' 2>/dev/null | ${SORT_BIN} -k1 -n 2>/dev/null | ${TAIL_BIN} -n1 2>/dev/null | ${CUT_BIN} -f2 -d' ' 2>/dev/null"
