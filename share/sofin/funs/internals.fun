@@ -163,10 +163,9 @@ get_shell_vars () {
     fi
 
     setup_sofin_compiler
-    A_CC="$(echo "${CC}" | ${SED_BIN} 's/ //' 2>/dev/null)"
-    A_CXX="$(echo "${CXX}" | ${SED_BIN} 's/ //' 2>/dev/null)"
-    ${PRINTF_BIN} "# CC:\nexport CC='${A_CC}'\n\n"
-    ${PRINTF_BIN} "# CXX:\nexport CXX='${A_CXX}'\n\n"
+
+    ${PRINTF_BIN} "# CC:\nexport CC='${CC}'\n\n"
+    ${PRINTF_BIN} "# CXX:\nexport CXX='${CXX}'\n\n"
     ${PRINTF_BIN} "# CPP:\nexport CPP='${CPP}'\n\n"
 
     if [ -f "${SOFIN_DISABLED_INDICATOR_FILE}" ]; then # sofin disabled. Default system environment
