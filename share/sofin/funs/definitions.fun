@@ -360,28 +360,31 @@ available_definitions () {
 
 
 make_exports () {
-    if [ "$2" = "" ]; then
+    if [ -z "${2}" ]; then
         error "Missing second argument with export app is required!"
     fi
-    if [ "$3" = "" ]; then
+    if [ -z "${3}" ]; then
         error "Missing third argument with source app is required!"
     fi
-    EXPORT="$2"
-    APP="$(capitalize ${3})"
-    for dir in "/bin/" "/sbin/" "/libexec/"; do
-        debug "Looking into: $(distinct d ${SOFTWARE_DIR}${APP}${dir})"
-        if [ -e "${SOFTWARE_DIR}${APP}${dir}${EXPORT}" ]; then
-            note "Exporting binary: $(distinct n ${SOFTWARE_DIR}${APP}${dir}${EXPORT})"
-            cd "${SOFTWARE_DIR}${APP}${dir}"
-            ${MKDIR_BIN} -p "${SOFTWARE_DIR}${APP}/exports" # make sure exports dir already exists
-            aname="$(lowercase ${APP})"
-            ${LN_BIN} -vfs "..${dir}/${EXPORT}" "../exports/${EXPORT}" >> "${LOG}-${aname}"
-            exit
+    export_bin="${2}"
+    bundle_name="$(capitalize "${3}")"
+    for bindir in "/bin/" "/sbin/" "/libexec/"; do
+        debug "Looking into bundle binary dir: $(distinct d ${SOFTWARE_DIR}${bundle_name}${bindir})"
+        if [ -e "${SOFTWARE_DIR}${bundle_name}${bindir}${export_bin}" ]; then
+            note "Exporting binary: $(distinct n ${SOFTWARE_DIR}${bundle_name}${bindir}${export_bin})"
+            cd "${SOFTWARE_DIR}${bundle_name}${bindir}"
+            ${MKDIR_BIN} -p "${SOFTWARE_DIR}${bundle_name}/exports" # make sure exports dir exists
+            aname="$(lowercase ${bundle_name})"
+            ${LN_BIN} -vfs "..${bindir}/${export_bin}" "../exports/${export_bin}" >> "${LOG}-${aname}"
+
+            cd / # Go outside of bundle directory after exports
+            unset aname bindir bundle_name export_bin
+            return 0
         else
-            debug "Export not found: $(distinct d ${SOFTWARE_DIR}${APP}${dir}${EXPORT})"
+            debug "Export not found: $(distinct d ${SOFTWARE_DIR}${bundle_name}${bindir}${export_bin})"
         fi
     done
-    error "Nothing to export"
+    error "No executable to export from bin paths of: $(distinct e "${bundle_name}/\{bin,sbin,libexec\}/${export_bin}")"
 }
 
 
@@ -982,9 +985,9 @@ export_binaries () {
     else
         aname="$(lowercase ${APP_NAME}${APP_POSTFIX})"
         amount="$(echo "${APP_EXPORTS}" | ${WC_BIN} -w 2>/dev/null | ${TR_BIN} -d '\t|\r|\ ' 2>/dev/null)"
-        note "Exporting $(distinct n ${amount}) binaries of prefix: $(distinct n ${PREFIX})"
+        debug "Exporting $(distinct n ${amount}) binaries of prefix: $(distinct n ${PREFIX})"
         ${MKDIR_BIN} -p "${PREFIX}/exports"
-        EXPORT_LIST=""
+        export_list=""
         for exp in ${APP_EXPORTS}; do
             for dir in "/bin/" "/sbin/" "/libexec/"; do
                 file_to_exp="${PREFIX}${dir}${exp}"
@@ -995,12 +998,14 @@ export_binaries () {
                         ${LN_BIN} -vfs "..${dir}${exp}" "../exports/${exp}" >> "${LOG}-${aname}" 2>> "${LOG}-${aname}"
                         cd "${curr_dir}"
                         exp_elem="$(${BASENAME_BIN} ${file_to_exp} 2>/dev/null)"
-                        EXPORT_LIST="${EXPORT_LIST} ${exp_elem}"
+                        export_list="${export_list} ${exp_elem}"
                     fi
                 fi
             done
         done
+        debug "List of exports: $(distinct d "${export_list}")"
     fi
+    unset exp_elem curr_dir file_to_exp amount aname export_list definition_name
 }
 
 
