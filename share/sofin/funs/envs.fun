@@ -32,9 +32,9 @@ setup_sofin_compiler () {
         DEFAULT_COMPILER_FLAGS="${DEFAULT_COMPILER_FLAGS} -O2"
     fi
 
-    CFLAGS="-I${PREFIX}/include ${APP_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
-    CXXFLAGS="-I${PREFIX}/include ${APP_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
-    LDFLAGS="-L${PREFIX}/lib ${APP_LINKER_ARGS} ${DEFAULT_LDFLAGS}"
+    CFLAGS="$(echo "-I${PREFIX}/include ${APP_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}" | eval ${CUT_TRAILING_SPACES_GUARD})"
+    CXXFLAGS="$(echo "-I${PREFIX}/include ${APP_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}" | eval ${CUT_TRAILING_SPACES_GUARD})"
+    LDFLAGS="$(echo "-L${PREFIX}/lib ${APP_LINKER_ARGS} ${DEFAULT_LDFLAGS}" | eval ${CUT_TRAILING_SPACES_GUARD})"
 
     # pick compiler in order:
     # 1. /usr/bin/clang
@@ -67,17 +67,18 @@ setup_sofin_compiler () {
             fi
         fi
     fi
-    CC="$(echo "${BASE_COMPILER}/bin/${default_c} ${APP_COMPILER_ARGS}" | ${SED_BIN} 's/ *$//' 2>/dev/null)"
+
+    CC="$(echo "${BASE_COMPILER}/bin/${default_c} ${APP_COMPILER_ARGS}" | eval ${CUT_TRAILING_SPACES_GUARD})"
     if [ ! -x "${CC}" ]; then # fallback for systems with clang without standalone preprocessor binary:
         error "Base C compiler: $(distinct e "${CC}") should be an executable!"
     fi
 
-    CXX="$(echo "${BASE_COMPILER}/bin/${default_cxx} ${APP_COMPILER_ARGS}" | ${SED_BIN} 's/ *$//' 2>/dev/null)"
+    CXX="$(echo "${BASE_COMPILER}/bin/${default_cxx} ${APP_COMPILER_ARGS}" | eval ${CUT_TRAILING_SPACES_GUARD})"
     if [ ! -x "${CXX}" ]; then # fallback for systems with clang without standalone preprocessor binary:
         error "Base C++ compiler: $(distinct e "${CXX}") should be an executable!"
     fi
 
-    CPP="${BASE_COMPILER}/bin/${default_cpp}"
+    CPP="$(echo "${BASE_COMPILER}/bin/${default_cpp}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
     if [ ! -x "${CPP}" ]; then # fallback for systems with clang without standalone preprocessor binary:
         CPP="${BASE_COMPILER}/bin/${default_c} -E"
     fi
