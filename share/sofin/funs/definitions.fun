@@ -332,9 +332,7 @@ remove_application () {
                    -f "${SOFTWARE_DIR}${alternative}/$(lowercase ${alternative})${INSTALLED_MARK}" ]; then
                 note "Updating environment with already installed alternative: $(distinct n ${alternative})"
                 export_binaries "${alternative}"
-                update_shell_vars
-                reload_zsh_shells
-                destroy_locks
+                cleanup_after_tasks
                 exit # Just pick first available alternative bundle
 
             elif [ -z "${alternative}" ]; then
