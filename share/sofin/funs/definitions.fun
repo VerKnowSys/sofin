@@ -944,7 +944,7 @@ clean_useless () {
 
 
 conflict_resolve () {
-    debug "Doing app conflict resolve"
+    debug "Resolving conflicts for: $(distinct d "${APP_CONFLICTS_WITH}")"
     if [ ! -z "${APP_CONFLICTS_WITH}" ]; then
         debug "Resolving possible conflicts with: $(distinct d ${APP_CONFLICTS_WITH})"
         for app in ${APP_CONFLICTS_WITH}; do
@@ -956,7 +956,7 @@ conflict_resolve () {
                      -a "${app_name}" != "${APP_NAME}${APP_POSTFIX}" \
                 ]; then
                     ${MV_BIN} "${an_app}/exports" "${an_app}/exports-disabled" && \
-                        note "Resolved conflict with: $(distinct n ${app_name})"
+                        debug "Resolved conflict with: $(distinct n ${app_name})"
                 fi
             done
         done
@@ -1257,7 +1257,7 @@ build_all () {
                     else
                         already_installed_version="$(${CAT_BIN} ${INSTALLED_INDICATOR} 2>/dev/null)"
                         if [ "${APP_VERSION}" = "${already_installed_version}" ]; then
-                            note "$(distinct n ${APP_NAME}${APP_POSTFIX}) bundle is installed with version: $(distinct n ${already_installed_version})"
+                            debug "$(distinct n ${APP_NAME}${APP_POSTFIX}) bundle is installed with version: $(distinct n ${already_installed_version})"
                         else
                             warn "$(distinct w ${APP_NAME}${APP_POSTFIX}) bundle is installed with version: $(distinct w ${already_installed_version}), different from defined: $(distinct w "${APP_VERSION}")"
                         fi
