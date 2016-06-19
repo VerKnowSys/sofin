@@ -22,12 +22,12 @@ setup_sofin_compiler () {
     esac
 
     if [ "YES" = "${DEBUGBUILD}" ]; then
-        debug " $(distinct d "${SUCCESS_CHAR}") $(distinct d "debug-build")"
-        debug " $(distinct d "${FAIL_CHAR}") $(distinct d "production-build")"
+        debug " $(distinct d "${green}${SUCCESS_CHAR}") $(distinct d "${green}debug-build")"
+        debug " $(distinct d "${gray}${FAIL_CHAR}") $(distinct d "${gray}production-build")"
         DEFAULT_COMPILER_FLAGS="${DEFAULT_COMPILER_FLAGS} -O0 -ggdb"
     else
-        debug " $(distinct d "${SUCCESS_CHAR}") $(distinct d "production-build")"
-        debug " $(distinct d "${FAIL_CHAR}") $(distinct d "debug-build")"
+        debug " $(distinct d "${green}${SUCCESS_CHAR}") $(distinct d "${green}production-build")"
+        debug " $(distinct d "${gray}${FAIL_CHAR}") $(distinct d "${gray}debug-build")"
         DEFAULT_COMPILER_FLAGS="${DEFAULT_COMPILER_FLAGS} -O2"
     fi
 
@@ -44,7 +44,7 @@ setup_sofin_compiler () {
     BASE_COMPILER="${SOFTWARE_DIR}$(capitalize ${C_COMPILER_NAME})" # /Software/Clang
     if [ -x "${BASE_COMPILER}/bin/${default_c}" -a \
          -x "${BASE_COMPILER}/bin/${default_cxx}" ]; then
-        debug " $(distinct d "${SUCCESS_CHAR}") $(distinct d "base-compiler: ${default_c}")"
+        debug " $(distinct d "${green}${SUCCESS_CHAR}") $(distinct d "${green}base-compiler: ${default_c}")"
     else # /usr/bin/clang
         BASE_COMPILER="/usr"
         if [ "${SYSTEM_NAME}" = "Minix" ]; then
@@ -52,7 +52,7 @@ setup_sofin_compiler () {
         fi
         if [ -x "${BASE_COMPILER}/bin/${default_c}" -a \
              -x "${BASE_COMPILER}/bin/${default_cxx}" ]; then
-            debug " $(distinct d "${SUCCESS_CHAR}") $(distinct d "base-compiler: ${default_c}")"
+            debug " $(distinct d "${green}${SUCCESS_CHAR}") $(distinct d "${green}base-compiler: ${default_c}")"
         else
             if [ -x "${BASE_COMPILER}/bin/${C_COMPILER_NAME_ALT}" -a \
                  -x "${BASE_COMPILER}/bin/${CXX_COMPILER_NAME_ALT}" -a \
@@ -60,54 +60,54 @@ setup_sofin_compiler () {
                 default_c="${C_COMPILER_NAME_ALT}"
                 default_cxx="${CXX_COMPILER_NAME_ALT}"
                 default_cpp="${CPP_PREPROCESSOR_NAME_ALT}"
-                debug " $(distinct d "${SUCCESS_CHAR}") $(distinct d "base-compiler: ${default_c}")"
+                debug " $(distinct d "${green}${SUCCESS_CHAR}") $(distinct d "${green}base-compiler: ${default_c}")"
             else
-                debug " $(distinct d "${FAIL_CHAR}") $(distinct d "base-compiler: ${default_c}")"
+                debug " $(distinct d "${gray}${FAIL_CHAR}") $(distinct d "${gray}base-compiler: ${default_c}")"
             fi
         fi
     fi
 
     CC="$(echo "${BASE_COMPILER}/bin/${default_c} ${APP_COMPILER_ARGS}" | eval ${CUT_TRAILING_SPACES_GUARD})"
-    if [ ! -x "${CC}" ]; then # fallback for systems with clang without standalone preprocessor binary:
+    if [ ! -x "${BASE_COMPILER}/bin/${default_c}" ]; then # fallback for systems with clang without standalone preprocessor binary:
         error "Base C compiler: $(distinct e "${CC}") should be an executable!"
     fi
 
     CXX="$(echo "${BASE_COMPILER}/bin/${default_cxx} ${APP_COMPILER_ARGS}" | eval ${CUT_TRAILING_SPACES_GUARD})"
-    if [ ! -x "${CXX}" ]; then # fallback for systems with clang without standalone preprocessor binary:
+    if [ ! -x "${BASE_COMPILER}/bin/${default_cxx}" ]; then # fallback for systems with clang without standalone preprocessor binary:
         error "Base C++ compiler: $(distinct e "${CXX}") should be an executable!"
     fi
 
     CPP="$(echo "${BASE_COMPILER}/bin/${default_cpp}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
-    if [ ! -x "${CPP}" ]; then # fallback for systems with clang without standalone preprocessor binary:
+    if [ ! -x "${BASE_COMPILER}/bin/${default_cpp}" ]; then # fallback for systems with clang without standalone preprocessor binary:
         CPP="${BASE_COMPILER}/bin/${default_c} -E"
     fi
 
     # -fPIC check:
     echo "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'f[Pp][Ii][Cc]' >/dev/null 2>/dev/null && \
-        debug " $(distinct d "${SUCCESS_CHAR}") $(distinct d "position-independent-code")" || \
-        debug " $(distinct d "${FAIL_CHAR}") $(distinct d "position-independent-code")"
+        debug " $(distinct d "${green}${SUCCESS_CHAR}") $(distinct d "${green}position-independent-code")" || \
+        debug " $(distinct d "${gray}${FAIL_CHAR}") $(distinct d "${gray}position-independent-code")"
 
     # -fPIE check:
     echo "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'f[Pp][Ii][Ee]' >/dev/null 2>/dev/null && \
-        debug " $(distinct d "${SUCCESS_CHAR}") $(distinct d "position-independent-executable")" || \
-        debug " $(distinct d "${FAIL_CHAR}") $(distinct d "position-independent-executable")"
+        debug " $(distinct d "${green}${SUCCESS_CHAR}") $(distinct d "${green}position-independent-executable")" || \
+        debug " $(distinct d "${gray}${FAIL_CHAR}") $(distinct d "${gray}position-independent-executable")"
 
     # -fstack-protector-all check:
     echo "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'fstack-protector-all' >/dev/null 2>/dev/null && \
-        debug " $(distinct d "${SUCCESS_CHAR}") $(distinct d "stack-protector-all")" || \
-        debug " $(distinct d "${FAIL_CHAR}") $(distinct d "stack-protector-all")"
+        debug " $(distinct d "${green}${SUCCESS_CHAR}") $(distinct d "${green}stack-protector-all")" || \
+        debug " $(distinct d "${gray}${FAIL_CHAR}") $(distinct d "${gray}stack-protector-all")"
 
     # -fno-strict-overflow check:
     echo "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'fno-strict-overflow' >/dev/null 2>/dev/null && \
-        debug " $(distinct d "${SUCCESS_CHAR}") $(distinct d "no-strict-overflow")" || \
-        debug " $(distinct d "${FAIL_CHAR}") $(distinct d "no-strict-overflow")"
+        debug " $(distinct d "${green}${SUCCESS_CHAR}") $(distinct d "${green}no-strict-overflow")" || \
+        debug " $(distinct d "${gray}${FAIL_CHAR}") $(distinct d "${gray}no-strict-overflow")"
 
     if [ "${default_c}" = "${C_COMPILER_NAME}" ]; then
-        debug " $(distinct d "${SUCCESS_CHAR}") $(distinct d "clang-compiler")"
-        debug " $(distinct d "${FAIL_CHAR}") $(distinct d "gnu-c-compiler")"
+        debug " $(distinct d "${green}${SUCCESS_CHAR}") $(distinct d "${green}clang-compiler")"
+        debug " $(distinct d "${gray}${FAIL_CHAR}") $(distinct d "${gray}gnu-c-compiler")"
     elif [ "${default_c}" = "${C_COMPILER_NAME_ALT}" ]; then
-        debug " $(distinct d "${SUCCESS_CHAR}") $(distinct d "gnu-c-compiler")"
-        debug " $(distinct d "${FAIL_CHAR}") $(distinct d "clang-compiler")"
+        debug " $(distinct d "${green}${SUCCESS_CHAR}") $(distinct d "${green}gnu-c-compiler")"
+        debug " $(distinct d "${gray}${FAIL_CHAR}") $(distinct d "${gray}clang-compiler")"
     fi
 
     # Support for other definition options
@@ -117,12 +117,12 @@ setup_sofin_compiler () {
 
     if [ -z "${APP_NO_CCACHE}" ]; then # ccache is supported by default but it's optional
         if [ -x "${CCACHE_BIN_OPTIONAL}" ]; then # check for CCACHE availability
-            debug " $(distinct d "${SUCCESS_CHAR}") $(distinct d "ccache")"
+            debug " $(distinct d "${green}${SUCCESS_CHAR}") $(distinct d "${green}ccache")"
             CC="${CCACHE_BIN_OPTIONAL} ${CC}"
             CXX="${CCACHE_BIN_OPTIONAL} ${CXX}"
             CPP="${CCACHE_BIN_OPTIONAL} ${CPP}"
         else
-            debug " $(distinct d "${FAIL_CHAR}") $(distinct d "ccache")"
+            debug " $(distinct d "${gray}${FAIL_CHAR}") $(distinct d "${gray}ccache")"
         fi
     fi
 
@@ -169,10 +169,10 @@ setup_sofin_compiler () {
                 fi
                 ;;
         esac
-        debug " $(distinct d "${SUCCESS_CHAR}") $(distinct d "gold-linker")"
+        debug " $(distinct d "${green}${SUCCESS_CHAR}") $(distinct d "${green}gold-linker")"
     else # Golden linker causes troubles with some build systems like Qt, so we give option to disable it
         unset NM LD
-        debug " $(distinct d "${FAIL_CHAR}") $(distinct d "gold-linker")"
+        debug " $(distinct d "${gray}${FAIL_CHAR}") $(distinct d "${gray}gold-linker")"
     fi
 
     if [ -z "${APP_LINKER_NO_DTAGS}" ]; then
@@ -180,18 +180,18 @@ setup_sofin_compiler () {
             CFLAGS="${CFLAGS} -Wl,-rpath=${PREFIX}/lib,--enable-new-dtags"
             CXXFLAGS="${CXXFLAGS} -Wl,-rpath=${PREFIX}/lib,--enable-new-dtags"
             LDFLAGS="${LDFLAGS} -Wl,-rpath=${PREFIX}/lib,--enable-new-dtags"
-            debug " $(distinct d "${SUCCESS_CHAR}") $(distinct d "enable-new-dtags")"
+            debug " $(distinct d "${green}${SUCCESS_CHAR}") $(distinct d "${green}enable-new-dtags")"
         else
-            debug " $(distinct d "${FAIL_CHAR}") $(distinct d "enable-new-dtags")"
+            debug " $(distinct d "${gray}${FAIL_CHAR}") $(distinct d "${gray}enable-new-dtags")"
         fi
     fi
 
     if [ -z "${APP_NO_FAST_MATH}" ]; then
-        debug " $(distinct d "${SUCCESS_CHAR}") $(distinct d "fast-math")"
+        debug " $(distinct d "${green}${SUCCESS_CHAR}") $(distinct d "${green}fast-math")"
         CFLAGS="${CFLAGS} -ffast-math"
         CXXFLAGS="${CXXFLAGS} -ffast-math"
     else
-        debug " $(distinct d "${FAIL_CHAR}") $(distinct d "fast-math")"
+        debug " $(distinct d "${gray}${FAIL_CHAR}") $(distinct d "${gray}fast-math")"
     fi
 
     unset default_c default_cxx default_cpp
