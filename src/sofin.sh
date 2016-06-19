@@ -44,11 +44,13 @@ if [ ! -z "${SOFIN_COMMAND_ARG}" ]; then
 
         distclean)
             perform_clean dist
+            update_definitions
             ;;
 
 
         purge)
             perform_clean purge
+            update_definitions
             ;;
 
 
