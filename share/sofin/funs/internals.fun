@@ -5,7 +5,7 @@ usage_howto () {
     note "  $(distinct n "uninstall | remove | delete          ") removes an application or list (example: ${SOFIN_BIN_SHORT} uninstall Rubinius)"
     note "  $(distinct n "list | installed                     ") gives short list of installed software"
     note "  $(distinct n "fulllist | fullinstalled             ") gives detailed list with installed software including requirements"
-    note "  $(distinct n "available                            ") lists available software"
+    note "  $(distinct n "available | avail                    ") lists available software"
     note "  $(distinct n "export | exp | exportapp             ") adds given command to application exports (example: ${SOFIN_BIN_SHORT} export rails Rubinius)"
     note "  $(distinct n "getshellvars | shellvars | vars      ") returns shell variables for installed software"
     note "  $(distinct n "log                                  ") shows tail of all logs (for debug messages and verbose info)"
