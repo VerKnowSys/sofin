@@ -4,7 +4,8 @@ load_defs () {
         error "No definition name specified for load_defs()!"
     else
         debug "Trying to load definitions: $(distinct e "${definitions}")"
-        for definition in ${definitions}; do
+        for given_def in ${definitions}; do
+            definition="$(lowercase "${given_def}")"
             if [ -e "${DEFINITIONS_DIR}${definition}.def" ]; then
                 debug "Loading definition: $(distinct d ${DEFINITIONS_DIR}${definition}.def)"
                 . ${DEFINITIONS_DIR}${definition}.def
