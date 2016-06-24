@@ -658,7 +658,9 @@ execute_process () {
                         fi
                         if [ "${SYSTEM_NAME}" = "Linux" ]; then
                             # NOTE: No /Services feature implemented for Linux.
-                            run "${APP_CONFIGURE_SCRIPT} ${APP_CONFIGURE_ARGS} --prefix=${PREFIX}"
+                            try "${APP_CONFIGURE_SCRIPT} ${APP_CONFIGURE_ARGS} --prefix=${PREFIX} ${pic_optional} --sysconfdir=/etc" || \
+                            try "${APP_CONFIGURE_SCRIPT} ${APP_CONFIGURE_ARGS} --prefix=${PREFIX} ${pic_optional}" || \
+                            run "${APP_CONFIGURE_SCRIPT} ${APP_CONFIGURE_ARGS} --prefix=${PREFIX}" # fallback
                         else
                             # do a simple check for "configure" in APP_CONFIGURE_SCRIPT definition
                             # this way we can tell if we want to put configure options as params
@@ -670,6 +672,8 @@ execute_process () {
                                 #   --localstatedir=${SERVICE_DIR}/var
                                 #   --runstatedir=${SERVICE_DIR}/run
                                 #   --with-pic
+                                # OPTIMIZE: TODO: XXX: use ./configure --help | grep option to
+                                #      build configure options quickly
                                 try "${APP_CONFIGURE_SCRIPT} ${APP_CONFIGURE_ARGS} --prefix=${PREFIX} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var --runstatedir=${SERVICE_DIR}/run ${pic_optional}" || \
                                 try "${APP_CONFIGURE_SCRIPT} ${APP_CONFIGURE_ARGS} --prefix=${PREFIX} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var ${pic_optional}" || \
                                 try "${APP_CONFIGURE_SCRIPT} ${APP_CONFIGURE_ARGS} --prefix=${PREFIX} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var" || \
