@@ -17,7 +17,7 @@ setup_sofin_compiler () {
             ;;
 
         Darwin)
-            DEFAULT_COMPILER_FLAGS="${COMMON_COMPILER_FLAGS}"
+            DEFAULT_COMPILER_FLAGS="${COMMON_COMPILER_FLAGS} -mmacosx-version-min=10.9 -arch=x86_64"
             DEFAULT_LDFLAGS="${COMMON_LDFLAGS}"
             ;;
 
