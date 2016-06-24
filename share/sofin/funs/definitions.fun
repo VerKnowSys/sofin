@@ -5,7 +5,8 @@ load_defs () {
     else
         debug "Trying to load definitions: $(distinct e "${definitions}")"
         for given_def in ${definitions}; do
-            definition="$(lowercase "${given_def}")"
+            name_base="$(${BASENAME_BIN} "${given_def}" 2>/dev/null)"
+            definition="$(lowercase "${name_base}")"
             if [ -e "${DEFINITIONS_DIR}${definition}.def" ]; then
                 debug "Loading definition: $(distinct d ${DEFINITIONS_DIR}${definition}.def)"
                 . ${DEFINITIONS_DIR}${definition}.def
