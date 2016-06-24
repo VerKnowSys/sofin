@@ -21,17 +21,17 @@ load_defs () {
 
     # Perform several sanity checks here..
     debug "Validating existence of required fields in definition: $(distinct d ${Definition})"
-    for required_field in   "APP_NAME=${APP_NAME}" \
-                            "APP_NAME_APP_POSTFIX=${APP_NAME}${APP_POSTFIX}" \
-                            "APP_VERSION=${APP_VERSION}" \
-                            "APP_SHA_OR_APP_GIT_MODE=${APP_SHA}${APP_GIT_MODE}" \
-                            "APP_HTTP_PATH=${APP_HTTP_PATH}" ; do
+    for required_field in   "DEF_NAME=${DEF_NAME}" \
+                            "DEF_NAME_APP_POSTFIX=${DEF_NAME}${DEF_POSTFIX}" \
+                            "DEF_VERSION=${DEF_VERSION}" \
+                            "DEF_SHA_OR_APP_GIT_MODE=${DEF_SHA}${DEF_GIT_MODE}" \
+                            "DEF_HTTP_PATH=${DEF_HTTP_PATH}" ; do
         debug "Required field check: $(distinct d ${required_field})"
-        for check in    "APP_NAME" \
-                        "APP_NAME_APP_POSTFIX" \
-                        "APP_VERSION" \
-                        "APP_SHA_OR_APP_GIT_MODE" \
-                        "APP_HTTP_PATH"; do
+        for check in    "DEF_NAME" \
+                        "DEF_NAME_APP_POSTFIX" \
+                        "DEF_VERSION" \
+                        "DEF_SHA_OR_APP_GIT_MODE" \
+                        "DEF_HTTP_PATH"; do
             if [ "${check}=" = "${required_field}" -o \
                  "${check}=." = "${required_field}" -o \
                  "${check}=${DEFAULT_DEF_EXT}" = "${required_field}" ]; then
@@ -337,7 +337,7 @@ remove_application () {
                 error "Czy Ty orzeszki?"
             fi
             load_defs "${app}"
-            aname="$(lowercase ${APP_NAME}${APP_POSTFIX})"
+            aname="$(lowercase ${DEF_NAME}${DEF_POSTFIX})"
             note "Removing software bundle(s): $(distinct n ${given_app_name})"
             if [ -z "${aname}" ]; then
                 ${RM_BIN} -rfv "${SOFTWARE_DIR}${given_app_name}" >> "${LOG}" 2>> "${LOG}"
@@ -422,7 +422,7 @@ show_outdated () {
                 continue
             fi
             load_defs "${application}"
-            check_version "${ver}" "${APP_VERSION}"
+            check_version "${ver}" "${DEF_VERSION}"
         done
     fi
 
@@ -482,39 +482,39 @@ execute_process () {
 
     export PATH="${PREFIX}/bin:${PREFIX}/sbin:${DEFAULT_PATH}"
     if [ "${ALLOW}" = "1" ]; then
-        if [ -z "${APP_HTTP_PATH}" ]; then
+        if [ -z "${DEF_HTTP_PATH}" ]; then
             definition_file_no_ext="\
                 $(echo "$(${BASENAME_BIN} ${req_definition_file} 2>/dev/null)" | \
                 ${SED_BIN} -e 's/\..*$//g' 2>/dev/null)"
-            note "   ${NOTE_CHAR2} $(distinct n "APP_HTTP_PATH=\"\"") is undefined for: $(distinct n "${definition_file_no_ext}")."
-            note "NOTE: It's only valid for meta bundles. You may consider setting: $(distinct n "APP_CONFIGURE_SCRIPT=\"meta\"") in bundle definition file. Type: $(distinct n "s dev ${definition_file_no_ext}"))"
+            note "   ${NOTE_CHAR2} $(distinct n "DEF_HTTP_PATH=\"\"") is undefined for: $(distinct n "${definition_file_no_ext}")."
+            note "NOTE: It's only valid for meta bundles. You may consider setting: $(distinct n "DEF_CONFIGURE=\"meta\"") in bundle definition file. Type: $(distinct n "s dev ${definition_file_no_ext}"))"
         else
             current_directory="$(${PWD_BIN} 2>/dev/null)"
             if [ -z "${SOFIN_CONTINUE_BUILD}" ]; then
-                export BUILD_DIR_ROOT="${CACHE_DIR}cache/${APP_NAME}${APP_POSTFIX}-${APP_VERSION}-${RUNTIME_SHA}/"
+                export BUILD_DIR_ROOT="${CACHE_DIR}cache/${DEF_NAME}${DEF_POSTFIX}-${DEF_VERSION}-${RUNTIME_SHA}/"
                 ${FIND_BIN} "${BUILD_DIR_ROOT}" -type d -delete >> ${LOG} 2>> ${LOG}
                 ${MKDIR_BIN} -p "${BUILD_DIR_ROOT}"
                 cd "${BUILD_DIR_ROOT}"
-                if [ -z "${APP_GIT_MODE}" ]; then # Standard http tarball method:
-                    base="$(${BASENAME_BIN} ${APP_HTTP_PATH} 2>/dev/null)"
-                    debug "APP_HTTP_PATH: $(distinct d ${APP_HTTP_PATH}) base: $(distinct d ${base})"
+                if [ -z "${DEF_GIT_MODE}" ]; then # Standard http tarball method:
+                    base="$(${BASENAME_BIN} ${DEF_HTTP_PATH} 2>/dev/null)"
+                    debug "DEF_HTTP_PATH: $(distinct d ${DEF_HTTP_PATH}) base: $(distinct d ${base})"
                     if [ ! -e ${BUILD_DIR_ROOT}/../${base} ]; then
                         note "   ${NOTE_CHAR} Fetching required tarball source: $(distinct n ${base})"
-                        retry "${FETCH_BIN} ${APP_HTTP_PATH}"
+                        retry "${FETCH_BIN} ${DEF_HTTP_PATH}"
                         ${MV_BIN} ${base} ${BUILD_DIR_ROOT}/..
                     fi
 
                     dest_file="${BUILD_DIR_ROOT}/../${base}"
                     debug "Build dir: $(distinct d ${BUILD_DIR_ROOT}), file: $(distinct d ${dest_file})"
-                    if [ -z "${APP_SHA}" ]; then
+                    if [ -z "${DEF_SHA}" ]; then
                         error "Missing SHA sum for source: $(distinct e ${dest_file})!"
                     else
                         a_file_checksum="$(file_checksum ${dest_file})"
-                        if [ "${a_file_checksum}" = "${APP_SHA}" ]; then
+                        if [ "${a_file_checksum}" = "${DEF_SHA}" ]; then
                             debug "Bundle checksum is fine"
                         else
                             warn "${WARN_CHAR} Bundle checksum mismatch detected!"
-                            warn "${WARN_CHAR} $(distinct w ${a_file_checksum}) vs $(distinct w ${APP_SHA})"
+                            warn "${WARN_CHAR} $(distinct w ${a_file_checksum}) vs $(distinct w ${DEF_SHA})"
                             warn "${WARN_CHAR} Removing corrupted file from cache: $(distinct w ${dest_file}) and retrying.."
                             # remove corrupted file
                             ${RM_BIN} -vf "${dest_file}" >> ${LOG} 2>> ${LOG}
@@ -524,7 +524,7 @@ execute_process () {
                         fi
                     fi
 
-                    note "   ${NOTE_CHAR} Unpacking source code of: $(distinct n ${APP_NAME})"
+                    note "   ${NOTE_CHAR} Unpacking source code of: $(distinct n ${DEF_NAME})"
                     debug "Build dir root: $(distinct d ${BUILD_DIR_ROOT})"
                     try "${TAR_BIN} -xf ${dest_file}" || \
                     try "${TAR_BIN} -xfj ${dest_file}" || \
@@ -533,13 +533,13 @@ execute_process () {
                     # git method:
                     # .cache/git-cache => git bare repos
                     ${MKDIR_BIN} -p ${GIT_CACHE_DIR}
-                    app_cache_dir="${GIT_CACHE_DIR}${APP_NAME}${APP_VERSION}.git"
-                    note "   ${NOTE_CHAR} Fetching git repository: $(distinct n ${APP_HTTP_PATH}${reset})"
-                    try "${GIT_BIN} clone --depth 1 --bare ${APP_HTTP_PATH} ${app_cache_dir}" || \
-                    try "${GIT_BIN} clone --depth 1 --bare ${APP_HTTP_PATH} ${app_cache_dir}" || \
-                    try "${GIT_BIN} clone --depth 1 --bare ${APP_HTTP_PATH} ${app_cache_dir}"
+                    app_cache_dir="${GIT_CACHE_DIR}${DEF_NAME}${DEF_VERSION}.git"
+                    note "   ${NOTE_CHAR} Fetching git repository: $(distinct n ${DEF_HTTP_PATH}${reset})"
+                    try "${GIT_BIN} clone --depth 1 --bare ${DEF_HTTP_PATH} ${app_cache_dir}" || \
+                    try "${GIT_BIN} clone --depth 1 --bare ${DEF_HTTP_PATH} ${app_cache_dir}" || \
+                    try "${GIT_BIN} clone --depth 1 --bare ${DEF_HTTP_PATH} ${app_cache_dir}"
                     if [ "$?" = "0" ]; then
-                        debug "Fetched bare repository: $(distinct d ${APP_NAME}${APP_VERSION})"
+                        debug "Fetched bare repository: $(distinct d ${DEF_NAME}${DEF_VERSION})"
                     else
                         if [ ! -d "${app_cache_dir}/branches" -a ! -f "${app_cache_dir}/config" ]; then
                             note "\n${red}Definitions were not updated. Below displaying $(distinct n ${LOG_LINES_AMOUNT_ON_ERR}) lines of internal log:${reset}"
@@ -549,44 +549,44 @@ execute_process () {
                             current="$(${PWD_BIN} 2>/dev/null)"
                             debug "Trying to update existing bare repository cache in: $(distinct d ${app_cache_dir})"
                             cd "${app_cache_dir}"
-                            try "${GIT_BIN} fetch origin ${APP_GIT_CHECKOUT}" || \
+                            try "${GIT_BIN} fetch origin ${DEF_GIT_CHECKOUT}" || \
                             try "${GIT_BIN} fetch origin" || \
                             warn "   ${WARN_CHAR} Failed to fetch an update from bare repository: $(distinct w ${app_cache_dir})"
-                            # for empty APP_VERSION it will fill it with first 16 chars of repository HEAD SHA1:
-                            if [ -z "${APP_VERSION}" ]; then
-                                APP_VERSION="$(${GIT_BIN} rev-parse HEAD 2>/dev/null | ${CUT_BIN} -c -16 2>/dev/null)"
+                            # for empty DEF_VERSION it will fill it with first 16 chars of repository HEAD SHA1:
+                            if [ -z "${DEF_VERSION}" ]; then
+                                DEF_VERSION="$(${GIT_BIN} rev-parse HEAD 2>/dev/null | ${CUT_BIN} -c -16 2>/dev/null)"
                             fi
                             cd "${current}"
                         fi
                     fi
                     # bare repository is already cloned, so we just clone from it now..
-                    run "${GIT_BIN} clone ${app_cache_dir} ${APP_NAME}${APP_VERSION}" && \
+                    run "${GIT_BIN} clone ${app_cache_dir} ${DEF_NAME}${DEF_VERSION}" && \
                     debug "Cloned git respository from git bare cache repository"
                 fi
 
-                export BUILD_DIR="$(${FIND_BIN} ${BUILD_DIR_ROOT}/* -maxdepth 0 -type d -name "*${APP_VERSION}*" 2>/dev/null)"
+                export BUILD_DIR="$(${FIND_BIN} ${BUILD_DIR_ROOT}/* -maxdepth 0 -type d -name "*${DEF_VERSION}*" 2>/dev/null)"
                 if [ -z "${BUILD_DIR}" ]; then
                     export BUILD_DIR=$(${FIND_BIN} ${BUILD_DIR_ROOT}/* -maxdepth 0 -type d 2>/dev/null) # try any dir instead
                 fi
-                if [ ! -z "${APP_SOURCE_DIR_POSTFIX}" ]; then
-                    export BUILD_DIR="${BUILD_DIR}/${APP_SOURCE_DIR_POSTFIX}"
+                if [ ! -z "${DEF_SOURCE_DIR_POSTFIX}" ]; then
+                    export BUILD_DIR="${BUILD_DIR}/${DEF_SOURCE_DIR_POSTFIX}"
                 fi
                 cd "${BUILD_DIR}"
                 debug "Switched to build dir: $(distinct d ${BUILD_DIR})"
 
-                if [ "${APP_GIT_CHECKOUT}" != "" ]; then
-                    note "   ${NOTE_CHAR} Checking out: $(distinct n ${APP_GIT_CHECKOUT})"
-                    run "${GIT_BIN} checkout -b ${APP_GIT_CHECKOUT}"
+                if [ "${DEF_GIT_CHECKOUT}" != "" ]; then
+                    note "   ${NOTE_CHAR} Checking out: $(distinct n ${DEF_GIT_CHECKOUT})"
+                    run "${GIT_BIN} checkout -b ${DEF_GIT_CHECKOUT}"
                 fi
 
                 after_update_callback
 
-                aname="$(lowercase ${APP_NAME}${APP_POSTFIX})"
+                aname="$(lowercase ${DEF_NAME}${DEF_POSTFIX})"
                 LIST_DIR="${DEFINITIONS_DIR}patches/$1" # $1 is definition file name
                 if [ -d "${LIST_DIR}" ]; then
                     patches_files="$(${FIND_BIN} ${LIST_DIR}/* -maxdepth 0 -type f 2>/dev/null)"
                     ${TEST_BIN} ! -z "${patches_files}" && \
-                    note "   ${NOTE_CHAR} Applying common patches for: $(distinct n ${APP_NAME}${APP_POSTFIX})"
+                    note "   ${NOTE_CHAR} Applying common patches for: $(distinct n ${DEF_NAME}${DEF_POSTFIX})"
                     for patch in ${patches_files}; do
                         for level in 0 1 2 3 4 5; do
                             debug "Trying to patch source with patch: $(distinct d ${patch}), level: $(distinct d ${level})"
@@ -600,7 +600,7 @@ execute_process () {
                     pspatch_dir="${LIST_DIR}/${SYSTEM_NAME}"
                     debug "Checking psp dir: $(distinct d ${pspatch_dir})"
                     if [ -d "${pspatch_dir}" ]; then
-                        note "   ${NOTE_CHAR} Applying platform specific patches for: $(distinct n ${APP_NAME}${APP_POSTFIX}/${SYSTEM_NAME})"
+                        note "   ${NOTE_CHAR} Applying platform specific patches for: $(distinct n ${DEF_NAME}${DEF_POSTFIX}/${SYSTEM_NAME})"
                         patches_files="$(${FIND_BIN} ${pspatch_dir}/* -maxdepth 0 -type f 2>/dev/null)"
                         ${TEST_BIN} ! -z "${patches_files}" && \
                         for platform_specific_patch in ${patches_files}; do
@@ -619,8 +619,8 @@ execute_process () {
                 after_patch_callback
                 dump_debug_info
 
-                note "   ${NOTE_CHAR} Configuring: $(distinct n $1), version: $(distinct n ${APP_VERSION})"
-                case "${APP_CONFIGURE_SCRIPT}" in
+                note "   ${NOTE_CHAR} Configuring: $(distinct n $1), version: $(distinct n ${DEF_VERSION})"
+                case "${DEF_CONFIGURE}" in
 
                     ignore)
                         note "   ${NOTE_CHAR} Configuration skipped for definition: $(distinct n $1)"
@@ -628,28 +628,28 @@ execute_process () {
 
                     no-conf)
                         note "   ${NOTE_CHAR} No configuration for definition: $(distinct n $1)"
-                        export APP_MAKE_METHOD="${APP_MAKE_METHOD} PREFIX=${PREFIX}"
-                        export APP_INSTALL_METHOD="${APP_INSTALL_METHOD} PREFIX=${PREFIX}"
+                        export DEF_MAKE_METHOD="${DEF_MAKE_METHOD} PREFIX=${PREFIX}"
+                        export DEF_INSTALL_METHOD="${DEF_INSTALL_METHOD} PREFIX=${PREFIX}"
                         ;;
 
                     binary)
                         note "   ${NOTE_CHAR} Prebuilt definition of: $(distinct n $1)"
-                        export APP_MAKE_METHOD="true"
-                        export APP_INSTALL_METHOD="true"
+                        export DEF_MAKE_METHOD="true"
+                        export DEF_INSTALL_METHOD="true"
                         ;;
 
                     posix)
-                        run "./configure -prefix ${PREFIX} -cc $(${BASENAME_BIN} ${CC} 2>/dev/null) ${APP_CONFIGURE_ARGS}"
+                        run "./configure -prefix ${PREFIX} -cc $(${BASENAME_BIN} ${CC} 2>/dev/null) ${DEF_CONFIGURE_ARGS}"
                         ;;
 
                     cmake)
-                        test -z "${APP_CMAKE_BUILD_DIR}" && APP_CMAKE_BUILD_DIR="." # default - cwd
-                        run "${APP_CONFIGURE_SCRIPT} ${APP_CMAKE_BUILD_DIR} -LH -DCMAKE_INSTALL_RPATH=\"${PREFIX}/lib;${PREFIX}/libexec\" -DCMAKE_INSTALL_PREFIX=${PREFIX} -DCMAKE_BUILD_TYPE=Release -DSYSCONFDIR=${SERVICE_DIR}/etc -DDOCDIR=${SERVICE_DIR}/share/doc -DJOB_POOL_COMPILE=${CPUS} -DJOB_POOL_LINK=${CPUS} -DCMAKE_C_FLAGS=\"${CFLAGS}\" -DCMAKE_CXX_FLAGS=\"${CXXFLAGS}\" ${APP_CONFIGURE_ARGS}"
+                        test -z "${DEF_CMAKE_BUILD_DIR}" && DEF_CMAKE_BUILD_DIR="." # default - cwd
+                        run "${DEF_CONFIGURE} ${DEF_CMAKE_BUILD_DIR} -LH -DCMAKE_INSTALL_RPATH=\"${PREFIX}/lib;${PREFIX}/libexec\" -DCMAKE_INSTALL_PREFIX=${PREFIX} -DCMAKE_BUILD_TYPE=Release -DSYSCONFDIR=${SERVICE_DIR}/etc -DDOCDIR=${SERVICE_DIR}/share/doc -DJOB_POOL_COMPILE=${CPUS} -DJOB_POOL_LINK=${CPUS} -DCMAKE_C_FLAGS=\"${CFLAGS}\" -DCMAKE_CXX_FLAGS=\"${CXXFLAGS}\" ${DEF_CONFIGURE_ARGS}"
                         ;;
 
                     void|meta|empty|none)
-                        APP_MAKE_METHOD="true"
-                        APP_INSTALL_METHOD="true"
+                        DEF_MAKE_METHOD="true"
+                        DEF_INSTALL_METHOD="true"
                         ;;
 
                     *)
@@ -658,13 +658,13 @@ execute_process () {
                         fi
                         if [ "${SYSTEM_NAME}" = "Linux" ]; then
                             # NOTE: No /Services feature implemented for Linux.
-                            try "${APP_CONFIGURE_SCRIPT} ${APP_CONFIGURE_ARGS} --prefix=${PREFIX} ${pic_optional} --sysconfdir=/etc" || \
-                            try "${APP_CONFIGURE_SCRIPT} ${APP_CONFIGURE_ARGS} --prefix=${PREFIX} ${pic_optional}" || \
-                            run "${APP_CONFIGURE_SCRIPT} ${APP_CONFIGURE_ARGS} --prefix=${PREFIX}" # fallback
+                            try "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${PREFIX} ${pic_optional} --sysconfdir=/etc" || \
+                            try "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${PREFIX} ${pic_optional}" || \
+                            run "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${PREFIX}" # fallback
                         else
-                            # do a simple check for "configure" in APP_CONFIGURE_SCRIPT definition
+                            # do a simple check for "configure" in DEF_CONFIGURE definition
                             # this way we can tell if we want to put configure options as params
-                            echo "${APP_CONFIGURE_SCRIPT}" | ${GREP_BIN} "configure" >/dev/null 2>&1
+                            echo "${DEF_CONFIGURE}" | ${GREP_BIN} "configure" >/dev/null 2>&1
                             if [ "$?" = "0" ]; then
                                 # TODO: add --docdir=${PREFIX}/docs
                                 # NOTE: By default try to configure software with these options:
@@ -674,17 +674,17 @@ execute_process () {
                                 #   --with-pic
                                 # OPTIMIZE: TODO: XXX: use ./configure --help | grep option to
                                 #      build configure options quickly
-                                try "${APP_CONFIGURE_SCRIPT} ${APP_CONFIGURE_ARGS} --prefix=${PREFIX} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var --runstatedir=${SERVICE_DIR}/run ${pic_optional}" || \
-                                try "${APP_CONFIGURE_SCRIPT} ${APP_CONFIGURE_ARGS} --prefix=${PREFIX} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var ${pic_optional}" || \
-                                try "${APP_CONFIGURE_SCRIPT} ${APP_CONFIGURE_ARGS} --prefix=${PREFIX} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var" || \
-                                try "${APP_CONFIGURE_SCRIPT} ${APP_CONFIGURE_ARGS} --prefix=${PREFIX} --sysconfdir=${SERVICE_DIR}/etc ${pic_optional}" || \
-                                try "${APP_CONFIGURE_SCRIPT} ${APP_CONFIGURE_ARGS} --prefix=${PREFIX} --sysconfdir=${SERVICE_DIR}/etc" || \
-                                try "${APP_CONFIGURE_SCRIPT} ${APP_CONFIGURE_ARGS} --prefix=${PREFIX} ${pic_optional}" || \
-                                run "${APP_CONFIGURE_SCRIPT} ${APP_CONFIGURE_ARGS} --prefix=${PREFIX}" # last two - only as a fallback
+                                try "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${PREFIX} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var --runstatedir=${SERVICE_DIR}/run ${pic_optional}" || \
+                                try "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${PREFIX} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var ${pic_optional}" || \
+                                try "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${PREFIX} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var" || \
+                                try "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${PREFIX} --sysconfdir=${SERVICE_DIR}/etc ${pic_optional}" || \
+                                try "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${PREFIX} --sysconfdir=${SERVICE_DIR}/etc" || \
+                                try "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${PREFIX} ${pic_optional}" || \
+                                run "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${PREFIX}" # last two - only as a fallback
 
                             else # fallback again:
-                                try "${APP_CONFIGURE_SCRIPT} ${APP_CONFIGURE_ARGS} --prefix=${PREFIX} ${pic_optional}" || \
-                                run "${APP_CONFIGURE_SCRIPT} ${APP_CONFIGURE_ARGS} --prefix=${PREFIX}"
+                                try "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${PREFIX} ${pic_optional}" || \
+                                run "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${PREFIX}"
                             fi
                         fi
                         ;;
@@ -701,8 +701,8 @@ execute_process () {
 
             # and common part between normal and continue modes:
             note "   ${NOTE_CHAR} Building requirement: $(distinct n $1)"
-            try "${APP_MAKE_METHOD}" || \
-            run "${APP_MAKE_METHOD}"
+            try "${DEF_MAKE_METHOD}" || \
+            run "${DEF_MAKE_METHOD}"
             after_make_callback
 
             debug "Cleaning man dir from previous dependencies, we want to install man pages that belong to LAST requirement which is app bundle itself"
@@ -711,16 +711,16 @@ execute_process () {
             done
 
             note "   ${NOTE_CHAR} Installing requirement: $(distinct n $1)"
-            run "${APP_INSTALL_METHOD}"
+            run "${DEF_INSTALL_METHOD}"
             after_install_callback
 
             debug "Marking $(distinct d $1) as installed in: $(distinct d ${PREFIX})"
             ${TOUCH_BIN} "${PREFIX}/$1${INSTALLED_MARK}"
-            debug "Writing version: $(distinct d ${APP_VERSION}) of software: $(distinct d ${APP_NAME}) installed in: $(distinct d ${PREFIX})"
-            ${PRINTF_BIN} "${APP_VERSION}" > "${PREFIX}/$1${INSTALLED_MARK}"
+            debug "Writing version: $(distinct d ${DEF_VERSION}) of software: $(distinct d ${DEF_NAME}) installed in: $(distinct d ${PREFIX})"
+            ${PRINTF_BIN} "${DEF_VERSION}" > "${PREFIX}/$1${INSTALLED_MARK}"
 
             if [ -z "${DEVEL}" ]; then # if devel mode not set
-                debug "Cleaning build dir: $(distinct d ${BUILD_DIR_ROOT}) of bundle: $(distinct d ${APP_NAME}${APP_POSTFIX}), after successful build."
+                debug "Cleaning build dir: $(distinct d ${BUILD_DIR_ROOT}) of bundle: $(distinct d ${DEF_NAME}${DEF_POSTFIX}), after successful build."
                 ${RM_BIN} -rf "${BUILD_DIR_ROOT}" >> ${LOG} 2>> ${LOG}
             else
                 debug "Leaving build dir intact when working in devel mode. Last build dir: $(distinct d ${BUILD_DIR_ROOT})"
@@ -729,7 +729,7 @@ execute_process () {
             unset current_directory
         fi
     else
-        warn "   ${WARN_CHAR} Requirement: $(distinct w ${APP_NAME}) disabled on: $(distinct w ${SYSTEM_NAME})"
+        warn "   ${WARN_CHAR} Requirement: $(distinct w ${DEF_NAME}) disabled on: $(distinct w ${SYSTEM_NAME})"
         if [ ! -d "${PREFIX}" ]; then # case when disabled requirement is first on list of dependencies
             ${MKDIR_BIN} -p "${PREFIX}"
         fi
@@ -740,33 +740,33 @@ execute_process () {
 
 
 create_apple_bundle_if_necessary () {
-    if [ ! -z "${APP_APPLE_BUNDLE}" ]; then
-        APP_LOWERNAME="${APP_NAME}"
-        APP_NAME="$(${PRINTF_BIN} "${APP_NAME}" | ${CUT_BIN} -c1 2>/dev/null | ${TR_BIN} '[a-z]' '[A-Z]' 2>/dev/null)$(${PRINTF_BIN} "${APP_NAME}" | ${SED_BIN} 's/^[a-zA-Z]//' 2>/dev/null)"
-        APP_BUNDLE_NAME="${PREFIX}.app"
-        aname="$(lowercase ${APP_NAME}${APP_POSTFIX})"
-        note "Creating Apple bundle: $(distinct n ${APP_NAME} )in: $(distinct n ${APP_BUNDLE_NAME})"
-        ${MKDIR_BIN} -p "${APP_BUNDLE_NAME}/libs" "${APP_BUNDLE_NAME}/Contents" "${APP_BUNDLE_NAME}/Contents/Resources/${APP_LOWERNAME}" "${APP_BUNDLE_NAME}/exports" "${APP_BUNDLE_NAME}/share"
-        ${CP_BIN} -R ${PREFIX}/${APP_NAME}.app/Contents/* "${APP_BUNDLE_NAME}/Contents/"
-        ${CP_BIN} -R ${PREFIX}/bin/${APP_LOWERNAME} "${APP_BUNDLE_NAME}/exports/"
+    if [ ! -z "${DEF_APPLE_BUNDLE}" ]; then
+        DEF_LOWERNAME="${DEF_NAME}"
+        DEF_NAME="$(${PRINTF_BIN} "${DEF_NAME}" | ${CUT_BIN} -c1 2>/dev/null | ${TR_BIN} '[a-z]' '[A-Z]' 2>/dev/null)$(${PRINTF_BIN} "${DEF_NAME}" | ${SED_BIN} 's/^[a-zA-Z]//' 2>/dev/null)"
+        DEF_BUNDLE_NAME="${PREFIX}.app"
+        aname="$(lowercase ${DEF_NAME}${DEF_POSTFIX})"
+        note "Creating Apple bundle: $(distinct n ${DEF_NAME} )in: $(distinct n ${DEF_BUNDLE_NAME})"
+        ${MKDIR_BIN} -p "${DEF_BUNDLE_NAME}/libs" "${DEF_BUNDLE_NAME}/Contents" "${DEF_BUNDLE_NAME}/Contents/Resources/${DEF_LOWERNAME}" "${DEF_BUNDLE_NAME}/exports" "${DEF_BUNDLE_NAME}/share"
+        ${CP_BIN} -R ${PREFIX}/${DEF_NAME}.app/Contents/* "${DEF_BUNDLE_NAME}/Contents/"
+        ${CP_BIN} -R ${PREFIX}/bin/${DEF_LOWERNAME} "${DEF_BUNDLE_NAME}/exports/"
         for lib in $(${FIND_BIN} "${PREFIX}" -name '*.dylib' -type f 2>/dev/null); do
-            ${CP_BIN} -vf ${lib} ${APP_BUNDLE_NAME}/libs/ >> ${LOG}-${aname} 2>> ${LOG}-${aname}
+            ${CP_BIN} -vf ${lib} ${DEF_BUNDLE_NAME}/libs/ >> ${LOG}-${aname} 2>> ${LOG}-${aname}
         done
 
         # if symlink exists, remove it.
-        ${RM_BIN} -vf ${APP_BUNDLE_NAME}/lib >> ${LOG} 2>> ${LOG}
-        ${LN_BIN} -vs "${APP_BUNDLE_NAME}/libs ${APP_BUNDLE_NAME}/lib" >> ${LOG} 2>> ${LOG}
+        ${RM_BIN} -vf ${DEF_BUNDLE_NAME}/lib >> ${LOG} 2>> ${LOG}
+        ${LN_BIN} -vs "${DEF_BUNDLE_NAME}/libs ${DEF_BUNDLE_NAME}/lib" >> ${LOG} 2>> ${LOG}
 
         # move data, and support files from origin:
-        ${CP_BIN} -vR "${PREFIX}/share/${APP_LOWERNAME}" "${APP_BUNDLE_NAME}/share/" >> ${LOG} 2>> ${LOG}
-        ${CP_BIN} -vR "${PREFIX}/lib/${APP_LOWERNAME}" "${APP_BUNDLE_NAME}/libs/" >> ${LOG} 2>> ${LOG}
+        ${CP_BIN} -vR "${PREFIX}/share/${DEF_LOWERNAME}" "${DEF_BUNDLE_NAME}/share/" >> ${LOG} 2>> ${LOG}
+        ${CP_BIN} -vR "${PREFIX}/lib/${DEF_LOWERNAME}" "${DEF_BUNDLE_NAME}/libs/" >> ${LOG} 2>> ${LOG}
 
-        cd "${APP_BUNDLE_NAME}/Contents"
+        cd "${DEF_BUNDLE_NAME}/Contents"
         ${TEST_BIN} -L MacOS || ${LN_BIN} -s ../exports MacOS >> ${LOG}-${aname} 2>> ${LOG}-${aname}
         debug "Creating relative libraries search path"
-        cd ${APP_BUNDLE_NAME}
+        cd ${DEF_BUNDLE_NAME}
         note "Processing exported binary: $(distinct n ${i})"
-        ${SOFIN_LIBBUNDLE_BIN} -x "${APP_BUNDLE_NAME}/Contents/MacOS/${APP_LOWERNAME}" >> ${LOG}-${aname} 2>> ${LOG}-${aname}
+        ${SOFIN_LIBBUNDLE_BIN} -x "${DEF_BUNDLE_NAME}/Contents/MacOS/${DEF_LOWERNAME}" >> ${LOG}-${aname} 2>> ${LOG}-${aname}
     fi
 }
 
@@ -779,12 +779,12 @@ strip_bundle_files () {
     load_defaults # reset possible cached values
     load_defs "${definition_name}"
     if [ -z "${PREFIX}" ]; then
-        PREFIX="${SOFTWARE_DIR}$(capitalize "${APP_NAME}${APP_POSTFIX}")"
+        PREFIX="${SOFTWARE_DIR}$(capitalize "${DEF_NAME}${DEF_POSTFIX}")"
         debug "An empty prefix in strip_bundle_files() for $(distinct d ${definition_name}). Resetting to: $(distinct d ${PREFIX})"
     fi
 
     dirs_to_strip=""
-    case "${APP_STRIP}" in
+    case "${DEF_STRIP}" in
         all)
             debug "strip_bundle_files($(distinct d "${definition_name}")): Strip both binaries and libraries."
             dirs_to_strip="${PREFIX}/bin ${PREFIX}/sbin ${PREFIX}/lib ${PREFIX}/libexec"
@@ -804,8 +804,8 @@ strip_bundle_files () {
             debug "strip_bundle_files($(distinct d "${definition_name}")): Strip nothing"
             ;;
     esac
-    if [ "${APP_STRIP}" != "no" ]; then
-        bundle_lowercase="$(lowercase "${APP_NAME}${APP_POSTFIX}")"
+    if [ "${DEF_STRIP}" != "no" ]; then
+        bundle_lowercase="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
         if [ -z "${DEBUGBUILD}" ]; then
             counter="0"
             for stripdir in ${dirs_to_strip}; do
@@ -889,7 +889,7 @@ manage_datasets () {
                     certain_dataset="${SERVICES_DIR}${inner_dir}${maybe_dataset}"
                     certain_fileset="${SERVICES_DIR}${maybe_dataset}"
                     full_dataset_name="${DEFAULT_ZPOOL}${certain_dataset}"
-                    snap_file="${maybe_dataset}-${APP_VERSION}.${SERVICE_SNAPSHOT_POSTFIX}"
+                    snap_file="${maybe_dataset}-${DEF_VERSION}.${SERVICE_SNAPSHOT_POSTFIX}"
                     final_snap_file="${snap_file}${DEFAULT_ARCHIVE_EXT}"
 
                     # check dataset existence and create/receive it if necessary
@@ -918,26 +918,26 @@ manage_datasets () {
 
 
 clean_useless () {
-    if [ "${APP_CLEAN_USELESS}" = "YES" ]; then
+    if [ "${DEF_CLEAN_USELESS}" = "YES" ]; then
         # we shall clean the bundle, from useless files..
         if [ ! -z "${PREFIX}" ]; then
-            # step 0: clean defaults side APP_DEFAULT_USELESS entries only if APP_USEFUL is empty
-            if [ ! -z "${APP_DEFAULT_USELESS}" ]; then
-                for pattern in ${APP_DEFAULT_USELESS}; do
+            # step 0: clean defaults side DEF_DEFAULT_USELESS entries only if DEF_USEFUL is empty
+            if [ ! -z "${DEF_DEFAULT_USELESS}" ]; then
+                for pattern in ${DEF_DEFAULT_USELESS}; do
                     if [ ! -z "${PREFIX}" -a \
-                           -z "${APP_USEFUL}" ]; then # TODO: implement ignoring APP_USEFUL entries here!
-                        debug "Pattern of APP_DEFAULT_USELESS: $(distinct d ${pattern})"
+                           -z "${DEF_USEFUL}" ]; then # TODO: implement ignoring DEF_USEFUL entries here!
+                        debug "Pattern of DEF_DEFAULT_USELESS: $(distinct d ${pattern})"
                         ${RM_BIN} -vrf ${PREFIX}/${pattern} >> ${LOG} 2>> ${LOG}
                     fi
                 done
             fi
 
-            # step 1: clean definition side APP_USELESS entries only if APP_USEFUL is empty
-            if [ ! -z "${APP_USELESS}" ]; then
-                for pattern in ${APP_USELESS}; do
+            # step 1: clean definition side DEF_USELESS entries only if DEF_USEFUL is empty
+            if [ ! -z "${DEF_USELESS}" ]; then
+                for pattern in ${DEF_USELESS}; do
                     if [ ! -z "${PREFIX}" -a \
                          ! -z "${pattern}" ]; then
-                        debug "Pattern of APP_USELESS: $(distinct d ${PREFIX}/${pattern})"
+                        debug "Pattern of DEF_USELESS: $(distinct d ${PREFIX}/${pattern})"
                         ${RM_BIN} -vrf ${PREFIX}/${pattern} >> ${LOG} 2>> ${LOG}
                     fi
                 done
@@ -952,9 +952,9 @@ clean_useless () {
                     if [ -e "${PREFIX}/exports/${base}" ]; then
                         debug "Found export: $(distinct d ${base})"
                     else
-                        # traverse through APP_USEFUL for file patterns required by software but not exported
+                        # traverse through DEF_USEFUL for file patterns required by software but not exported
                         commit_removal=""
-                        for is_useful in ${APP_USEFUL}; do
+                        for is_useful in ${DEF_USEFUL}; do
                             echo "${file}" | ${GREP_BIN} "${is_useful}" >/dev/null 2>&1
                             if [ "$?" = "0" ]; then
                                 commit_removal="no"
@@ -977,16 +977,16 @@ clean_useless () {
 
 
 conflict_resolve () {
-    debug "Resolving conflicts for: $(distinct d "${APP_CONFLICTS_WITH}")"
-    if [ ! -z "${APP_CONFLICTS_WITH}" ]; then
-        debug "Resolving possible conflicts with: $(distinct d ${APP_CONFLICTS_WITH})"
-        for app in ${APP_CONFLICTS_WITH}; do
+    debug "Resolving conflicts for: $(distinct d "${DEF_CONFLICTS_WITH}")"
+    if [ ! -z "${DEF_CONFLICTS_WITH}" ]; then
+        debug "Resolving possible conflicts with: $(distinct d ${DEF_CONFLICTS_WITH})"
+        for app in ${DEF_CONFLICTS_WITH}; do
             maybe_software="$(${FIND_BIN} ${SOFTWARE_DIR} -maxdepth 1 -type d -iname "${app}*" 2>/dev/null)"
             for an_app in ${maybe_software}; do
                 app_name="$(${BASENAME_BIN} ${an_app} 2>/dev/null)"
                 if [ -e "${an_app}/exports" \
-                     -a "${app_name}" != "${APP_NAME}" \
-                     -a "${app_name}" != "${APP_NAME}${APP_POSTFIX}" \
+                     -a "${app_name}" != "${DEF_NAME}" \
+                     -a "${app_name}" != "${DEF_NAME}${DEF_POSTFIX}" \
                 ]; then
                     ${MV_BIN} "${an_app}/exports" "${an_app}/exports-disabled" && \
                         debug "Resolved conflict with: $(distinct n ${app_name})"
@@ -1006,22 +1006,22 @@ export_binaries () {
     conflict_resolve
 
     if [ -z "${PREFIX}" ]; then
-        PREFIX="${SOFTWARE_DIR}$(capitalize "${APP_NAME}${APP_POSTFIX}")"
+        PREFIX="${SOFTWARE_DIR}$(capitalize "${DEF_NAME}${DEF_POSTFIX}")"
         debug "An empty prefix in export_binaries() for $(distinct d ${definition_name}). Resetting to: $(distinct d ${PREFIX})"
     fi
     if [ -d "${PREFIX}/exports-disabled" ]; then # just bring back disabled exports
         debug "Moving $(distinct d ${PREFIX}/exports-disabled) to $(distinct d ${PREFIX}/exports)"
         ${MV_BIN} "${PREFIX}/exports-disabled" "${PREFIX}/exports"
     fi
-    if [ -z "${APP_EXPORTS}" ]; then
+    if [ -z "${DEF_EXPORTS}" ]; then
         note "Defined no binaries to export of prefix: $(distinct n ${PREFIX})"
     else
-        aname="$(lowercase ${APP_NAME}${APP_POSTFIX})"
-        amount="$(echo "${APP_EXPORTS}" | ${WC_BIN} -w 2>/dev/null | ${TR_BIN} -d '\t|\r|\ ' 2>/dev/null)"
+        aname="$(lowercase ${DEF_NAME}${DEF_POSTFIX})"
+        amount="$(echo "${DEF_EXPORTS}" | ${WC_BIN} -w 2>/dev/null | ${TR_BIN} -d '\t|\r|\ ' 2>/dev/null)"
         debug "Exporting $(distinct n ${amount}) binaries of prefix: $(distinct n ${PREFIX})"
         ${MKDIR_BIN} -p "${PREFIX}/exports"
         export_list=""
-        for exp in ${APP_EXPORTS}; do
+        for exp in ${DEF_EXPORTS}; do
             for dir in "/bin/" "/sbin/" "/libexec/"; do
                 file_to_exp="${PREFIX}${dir}${exp}"
                 if [ -f "${file_to_exp}" ]; then # a file
@@ -1098,7 +1098,7 @@ rebuild_application () {
     for deps in ${all_defs}; do
         load_defaults
         load_defs ${deps}
-        echo "${APP_REQUIREMENTS}" | ${GREP_BIN} "${dependency}" >/dev/null 2>&1
+        echo "${DEF_REQUIREMENTS}" | ${GREP_BIN} "${dependency}" >/dev/null 2>&1
         if [ "$?" = "0" ]; then
             dep="$(${BASENAME_BIN} "${deps}" 2>/dev/null)"
             rawname="$(${PRINTF_BIN} "${dep}" | ${SED_BIN} "s/${DEFAULT_DEF_EXT}//g" 2>/dev/null)"
@@ -1127,7 +1127,7 @@ try_fetch_binbuild () {
     if [ ! -z "${USE_BINBUILD}" ]; then
         debug "Binary build check was skipped"
     else
-        aname="$(lowercase ${APP_NAME}${APP_POSTFIX})"
+        aname="$(lowercase ${DEF_NAME}${DEF_POSTFIX})"
         if [ -z "${aname}" ]; then
             error "Cannot fetch binbuild! An empty definition name given!"
         fi
@@ -1147,7 +1147,7 @@ try_fetch_binbuild () {
                 $(try "${FETCH_BIN} ${MAIN_BINARY_REPOSITORY}$(os_tripple)/${ARCHIVE_NAME}" && confirm) || \
                 error "Failure fetching available binary build for: $(distinct e "${ARCHIVE_NAME}"). Please check your DNS / Network setup!"
             else
-                note "No binary build available for: $(distinct n $(os_tripple)/${APP_NAME}${APP_POSTFIX}-${APP_VERSION})"
+                note "No binary build available for: $(distinct n $(os_tripple)/${DEF_NAME}${DEF_POSTFIX}-${DEF_VERSION})"
             fi
         fi
 
@@ -1163,10 +1163,10 @@ try_fetch_binbuild () {
         if [ -e "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" ]; then
             ${TAR_BIN} -xJf "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" >> "${LOG}-${aname}" 2>> "${LOG}-${aname}"
             if [ "$?" = "0" ]; then # if archive is valid
-                note "Software bundle installed: $(distinct n ${APP_NAME}${APP_POSTFIX}), with version: $(distinct n ${APP_VERSION})"
+                note "Software bundle installed: $(distinct n ${DEF_NAME}${DEF_POSTFIX}), with version: $(distinct n ${DEF_VERSION})"
                 export DONT_BUILD_BUT_DO_EXPORTS=YES
             else
-                debug "  ${NOTE_CHAR} No binary bundle available for: $(distinct n ${APP_NAME}${APP_POSTFIX})"
+                debug "  ${NOTE_CHAR} No binary bundle available for: $(distinct n ${DEF_NAME}${DEF_POSTFIX})"
                 ${RM_BIN} -fr "${BINBUILDS_CACHE_DIR}${ABSNAME}"
             fi
         else
@@ -1177,49 +1177,49 @@ try_fetch_binbuild () {
 
 
 after_update_callback () {
-    if [ ! -z "${APP_AFTER_UNPACK_CALLBACK}" ]; then
-        debug "Running after unpack callback: $(distinct d "${APP_AFTER_UNPACK_CALLBACK}")"
-        run "${APP_AFTER_UNPACK_CALLBACK}"
+    if [ ! -z "${DEF_AFTER_UNPACK_CALLBACK}" ]; then
+        debug "Running after unpack callback: $(distinct d "${DEF_AFTER_UNPACK_CALLBACK}")"
+        run "${DEF_AFTER_UNPACK_CALLBACK}"
     fi
 }
 
 
 after_export_callback () {
-    if [ ! -z "${APP_AFTER_EXPORT_CALLBACK}" ]; then
-        debug "Executing APP_AFTER_EXPORT_CALLBACK: $(distinct d "${APP_AFTER_EXPORT_CALLBACK}")"
-        run "${APP_AFTER_EXPORT_CALLBACK}"
+    if [ ! -z "${DEF_AFTER_EXPORT_CALLBACK}" ]; then
+        debug "Executing DEF_AFTER_EXPORT_CALLBACK: $(distinct d "${DEF_AFTER_EXPORT_CALLBACK}")"
+        run "${DEF_AFTER_EXPORT_CALLBACK}"
     fi
 }
 
 
 after_patch_callback () {
-    if [ ! -z "${APP_AFTER_PATCH_CALLBACK}" ]; then
-        debug "Running after patch callback: $(distinct d "${APP_AFTER_PATCH_CALLBACK}")"
-        run "${APP_AFTER_PATCH_CALLBACK}"
+    if [ ! -z "${DEF_AFTER_PATCH_CALLBACK}" ]; then
+        debug "Running after patch callback: $(distinct d "${DEF_AFTER_PATCH_CALLBACK}")"
+        run "${DEF_AFTER_PATCH_CALLBACK}"
     fi
 }
 
 
 after_configure_callback () {
-    if [ ! -z "${APP_AFTER_CONFIGURE_CALLBACK}" ]; then
-        debug "Running after configure callback: $(distinct d "${APP_AFTER_CONFIGURE_CALLBACK}")"
-        run "${APP_AFTER_CONFIGURE_CALLBACK}"
+    if [ ! -z "${DEF_AFTER_CONFIGURE_CALLBACK}" ]; then
+        debug "Running after configure callback: $(distinct d "${DEF_AFTER_CONFIGURE_CALLBACK}")"
+        run "${DEF_AFTER_CONFIGURE_CALLBACK}"
     fi
 }
 
 
 after_make_callback () {
-    if [ ! -z "${APP_AFTER_MAKE_CALLBACK}" ]; then
-        debug "Running after make callback: $(distinct d "${APP_AFTER_MAKE_CALLBACK}")"
-        run "${APP_AFTER_MAKE_CALLBACK}"
+    if [ ! -z "${DEF_AFTER_MAKE_CALLBACK}" ]; then
+        debug "Running after make callback: $(distinct d "${DEF_AFTER_MAKE_CALLBACK}")"
+        run "${DEF_AFTER_MAKE_CALLBACK}"
     fi
 }
 
 
 after_install_callback () {
-    if [ ! "${APP_AFTER_INSTALL_CALLBACK}" = "" ]; then
-        debug "After install callback: $(distinct d "${APP_AFTER_INSTALL_CALLBACK}")"
-        run "${APP_AFTER_INSTALL_CALLBACK}"
+    if [ ! "${DEF_AFTER_INSTALL_CALLBACK}" = "" ]; then
+        debug "After install callback: $(distinct d "${DEF_AFTER_INSTALL_CALLBACK}")"
+        run "${DEF_AFTER_INSTALL_CALLBACK}"
     fi
 }
 
@@ -1246,41 +1246,41 @@ build_all () {
                 debug "Reading definition: $(distinct d ${definition})"
                 load_defaults
                 load_defs "${definition}"
-                if [ -z "${APP_REQUIREMENTS}" ]; then
+                if [ -z "${DEF_REQUIREMENTS}" ]; then
                     debug "No app requirements"
                 else
-                    pretouch_logs ${APP_REQUIREMENTS}
+                    pretouch_logs ${DEF_REQUIREMENTS}
                 fi
                 check_disabled "${DISABLE_ON}" # after which just check if it's not disabled
 
-                APP_LOWER="${APP_NAME}${APP_POSTFIX}"
-                APP_NAME="$(capitalize ${APP_NAME})"
+                DEF_LOWER="${DEF_NAME}${DEF_POSTFIX}"
+                DEF_NAME="$(capitalize ${DEF_NAME})"
                 # some additional convention check:
-                if [ "${APP_NAME}" != "${specified}" -a \
-                     "${APP_NAME}${APP_POSTFIX}" != "${specified}" ]; then
+                if [ "${DEF_NAME}" != "${specified}" -a \
+                     "${DEF_NAME}${DEF_POSTFIX}" != "${specified}" ]; then
                     warn "You specified lowercase name of bundle: $(distinct w ${specified}), which is in contradiction to Sofin's convention (bundle - capitalized: f.e. 'Rust', dependencies and definitions - lowercase: f.e. 'yaml')."
                 fi
                 # if definition requires root privileges, throw an "exception":
                 if [ ! -z "${REQUIRE_ROOT_ACCESS}" ]; then
                     if [ "${USERNAME}" != "root" ]; then
-                        warn "Definition requires superuser priviledges: $(distinct w ${APP_NAME}). Installation aborted."
+                        warn "Definition requires superuser priviledges: $(distinct w ${DEF_NAME}). Installation aborted."
                         return
                     fi
                 fi
 
-                export PREFIX="${SOFTWARE_DIR}$(capitalize "${APP_NAME}${APP_POSTFIX}")"
-                export SERVICE_DIR="${SERVICES_DIR}${APP_NAME}${APP_POSTFIX}"
-                if [ ! -z "${APP_STANDALONE}" ]; then
+                export PREFIX="${SOFTWARE_DIR}$(capitalize "${DEF_NAME}${DEF_POSTFIX}")"
+                export SERVICE_DIR="${SERVICES_DIR}${DEF_NAME}${DEF_POSTFIX}"
+                if [ ! -z "${DEF_STANDALONE}" ]; then
                     ${MKDIR_BIN} -p "${SERVICE_DIR}"
                     ${CHMOD_BIN} 0710 "${SERVICE_DIR}"
                 fi
 
                 # binary build of whole software bundle
-                ABSNAME="${APP_NAME}${APP_POSTFIX}-${APP_VERSION}"
+                ABSNAME="${DEF_NAME}${DEF_POSTFIX}-${DEF_VERSION}"
                 ${MKDIR_BIN} -p "${BINBUILDS_CACHE_DIR}${ABSNAME}"
 
-                ARCHIVE_NAME="${APP_NAME}${APP_POSTFIX}-${APP_VERSION}${DEFAULT_ARCHIVE_EXT}"
-                INSTALLED_INDICATOR="${PREFIX}/${APP_LOWER}${INSTALLED_MARK}"
+                ARCHIVE_NAME="${DEF_NAME}${DEF_POSTFIX}-${DEF_VERSION}${DEFAULT_ARCHIVE_EXT}"
+                INSTALLED_INDICATOR="${PREFIX}/${DEF_LOWER}${INSTALLED_MARK}"
 
                 if [ "${SOFIN_CONTINUE_BUILD}" = "YES" ]; then # normal build by default
                     note "Continuing build in: $(distinct n ${PREVIOUS_BUILD_DIR})"
@@ -1290,27 +1290,27 @@ build_all () {
                         try_fetch_binbuild
                     else
                         already_installed_version="$(${CAT_BIN} ${INSTALLED_INDICATOR} 2>/dev/null)"
-                        if [ "${APP_VERSION}" = "${already_installed_version}" ]; then
-                            debug "$(distinct n ${APP_NAME}${APP_POSTFIX}) bundle is installed with version: $(distinct n ${already_installed_version})"
+                        if [ "${DEF_VERSION}" = "${already_installed_version}" ]; then
+                            debug "$(distinct n ${DEF_NAME}${DEF_POSTFIX}) bundle is installed with version: $(distinct n ${already_installed_version})"
                         else
-                            warn "$(distinct w ${APP_NAME}${APP_POSTFIX}) bundle is installed with version: $(distinct w ${already_installed_version}), different from defined: $(distinct w "${APP_VERSION}")"
+                            warn "$(distinct w ${DEF_NAME}${DEF_POSTFIX}) bundle is installed with version: $(distinct w ${already_installed_version}), different from defined: $(distinct w "${DEF_VERSION}")"
                         fi
                         export DONT_BUILD_BUT_DO_EXPORTS=YES
                     fi
                 fi
 
                 if [ -z "${DONT_BUILD_BUT_DO_EXPORTS}" ]; then
-                    if [ -z "${APP_REQUIREMENTS}" ]; then
-                        note "Installing: $(distinct n ${APP_FULL_NAME}), version: $(distinct n ${APP_VERSION})"
+                    if [ -z "${DEF_REQUIREMENTS}" ]; then
+                        note "Installing: $(distinct n ${DEF_FULL_NAME}), version: $(distinct n ${DEF_VERSION})"
                     else
-                        note "Installing: $(distinct n ${APP_FULL_NAME}), version: $(distinct n ${APP_VERSION}), with requirements: $(distinct n ${APP_REQUIREMENTS})"
+                        note "Installing: $(distinct n ${DEF_FULL_NAME}), version: $(distinct n ${DEF_VERSION}), with requirements: $(distinct n ${DEF_REQUIREMENTS})"
                     fi
-                    export req_amount="$(${PRINTF_BIN} "${APP_REQUIREMENTS}" | ${WC_BIN} -w 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)"
+                    export req_amount="$(${PRINTF_BIN} "${DEF_REQUIREMENTS}" | ${WC_BIN} -w 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)"
                     export req_amount="$(${PRINTF_BIN} "${req_amount} + 1\n" | ${BC_BIN} 2>/dev/null)"
                     export req_all="${req_amount}"
-                    for req in ${APP_REQUIREMENTS}; do
-                        if [ ! -z "${APP_USER_INFO}" ]; then
-                            warn "${APP_USER_INFO}"
+                    for req in ${DEF_REQUIREMENTS}; do
+                        if [ ! -z "${DEF_USER_INFO}" ]; then
+                            warn "${DEF_USER_INFO}"
                         fi
                         if [ -z "${req}" ]; then
                             note "No additional requirements defined"
@@ -1338,13 +1338,13 @@ build_all () {
                         else
                             note "  ${application} ($(distinct n 1) of $(distinct n ${req_all}))"
                             show_done
-                            debug "${SUCCESS_CHAR} $(distinct d ${application}) current: $(distinct d ${ver}), definition: [$(distinct d ${APP_VERSION})] Ok."
+                            debug "${SUCCESS_CHAR} $(distinct d ${application}) current: $(distinct d ${ver}), definition: [$(distinct d ${DEF_VERSION})] Ok."
                         fi
                     else
                         note "  ${application} ($(distinct n 1) of $(distinct n ${req_all}))"
                         execute_process "${application}"
                         mark
-                        note "${SUCCESS_CHAR} ${application} [$(distinct n ${APP_VERSION})]\n"
+                        note "${SUCCESS_CHAR} ${application} [$(distinct n ${DEF_VERSION})]\n"
                     fi
                 fi
 

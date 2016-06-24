@@ -24,7 +24,7 @@ cecho () {
 
 debug () {
     if [ -z "${DEBUG}" ]; then
-        aname="$(echo "${APP_NAME}${APP_POSTFIX}" | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null)"
+        aname="$(echo "${DEF_NAME}${DEF_POSTFIX}" | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null)"
         if [ ! -z "${aname}" -a -d "${LOGS_DIR}" ]; then
             cecho "# $1" ${magenta} >> "${LOG}-${aname}" 2>> "${LOG}-${aname}"
         elif [ -z "${aname}" -a -d "${LOGS_DIR}" ]; then
@@ -111,7 +111,7 @@ distinct () {
 run () {
     if [ ! -z "$1" ]; then
         ${MKDIR_BIN} -p "${LOGS_DIR}"
-        aname="$(lowercase ${APP_NAME}${APP_POSTFIX})"
+        aname="$(lowercase ${DEF_NAME}${DEF_POSTFIX})"
         debug "$(${DATE_BIN} +%s 2>/dev/null) Launching action: $(distinct d $@))"
         if [ -z "${aname}" ]; then
             eval PATH="${PATH}" "$@" >> "${LOG}" 2>> "${LOG}"
@@ -129,7 +129,7 @@ run () {
 try () {
     if [ ! -z "$1" ]; then
         ${MKDIR_BIN} -p "${LOGS_DIR}"
-        aname="$(lowercase ${APP_NAME}${APP_POSTFIX})"
+        aname="$(lowercase ${DEF_NAME}${DEF_POSTFIX})"
         debug "$(${DATE_BIN} +%s 2>/dev/null) try('$(distinct d $@)')"
         if [ -z "${aname}" ]; then
             eval PATH="${PATH}" "$@" >> "${LOG}" 2>> "${LOG}"
@@ -137,7 +137,7 @@ try () {
             eval PATH="${PATH}" "$@" >> "${LOG}-${aname}" 2>> "${LOG}-${aname}"
         fi
     else
-        error "An empty command to run for: $(distinct e ${APP_NAME})?"
+        error "An empty command to run for: $(distinct e ${DEF_NAME})?"
     fi
 }
 

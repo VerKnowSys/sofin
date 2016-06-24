@@ -4,7 +4,7 @@ setup_sofin_compiler () {
             ${LOGGER_BIN} "# ${cyan} $@"
         }
     fi
-    debug "setup_sofin_compiler(): Compiler features enabled for definition: $(distinct d "${APP_NAME}${APP_POSTFIX}") on platform: $(distinct d ${SYSTEM_NAME})"
+    debug "setup_sofin_compiler(): Compiler features enabled for definition: $(distinct d "${DEF_NAME}${DEF_POSTFIX}") on platform: $(distinct d ${SYSTEM_NAME})"
     case "${SYSTEM_NAME}" in
         Minix)
             DEFAULT_COMPILER_FLAGS="${COMMON_COMPILER_FLAGS} -I/usr/pkg/include -fPIE"
@@ -37,9 +37,9 @@ setup_sofin_compiler () {
         DEFAULT_COMPILER_FLAGS="${DEFAULT_COMPILER_FLAGS} -O2"
     fi
 
-    CFLAGS="$(echo "-I${PREFIX}/include ${APP_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}" | eval ${CUT_TRAILING_SPACES_GUARD})"
-    CXXFLAGS="$(echo "-I${PREFIX}/include ${APP_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}" | eval ${CUT_TRAILING_SPACES_GUARD})"
-    LDFLAGS="$(echo "-L${PREFIX}/lib ${APP_LINKER_ARGS} ${DEFAULT_LDFLAGS}" | eval ${CUT_TRAILING_SPACES_GUARD})"
+    CFLAGS="$(echo "-I${PREFIX}/include ${DEF_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}" | eval ${CUT_TRAILING_SPACES_GUARD})"
+    CXXFLAGS="$(echo "-I${PREFIX}/include ${DEF_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}" | eval ${CUT_TRAILING_SPACES_GUARD})"
+    LDFLAGS="$(echo "-L${PREFIX}/lib ${DEF_LINKER_ARGS} ${DEFAULT_LDFLAGS}" | eval ${CUT_TRAILING_SPACES_GUARD})"
 
     # pick compiler in order:
     # 1. /usr/bin/clang
@@ -73,12 +73,12 @@ setup_sofin_compiler () {
         fi
     fi
 
-    CC="$(echo "${BASE_COMPILER}/bin/${default_c} ${APP_COMPILER_ARGS}" | eval ${CUT_TRAILING_SPACES_GUARD})"
+    CC="$(echo "${BASE_COMPILER}/bin/${default_c} ${DEF_COMPILER_ARGS}" | eval ${CUT_TRAILING_SPACES_GUARD})"
     if [ ! -x "${BASE_COMPILER}/bin/${default_c}" ]; then # fallback for systems with clang without standalone preprocessor binary:
         error "Base C compiler: $(distinct e "${CC}") should be an executable!"
     fi
 
-    CXX="$(echo "${BASE_COMPILER}/bin/${default_cxx} ${APP_COMPILER_ARGS}" | eval ${CUT_TRAILING_SPACES_GUARD})"
+    CXX="$(echo "${BASE_COMPILER}/bin/${default_cxx} ${DEF_COMPILER_ARGS}" | eval ${CUT_TRAILING_SPACES_GUARD})"
     if [ ! -x "${BASE_COMPILER}/bin/${default_cxx}" ]; then # fallback for systems with clang without standalone preprocessor binary:
         error "Base C++ compiler: $(distinct e "${CXX}") should be an executable!"
     fi
@@ -121,7 +121,7 @@ setup_sofin_compiler () {
         warn "Support for GNU compiler was recently dropped, and is ignored since Sofin 1.0. Try using $(distinct e Gcc) instead)?"
     fi
 
-    if [ -z "${APP_NO_CCACHE}" ]; then # ccache is supported by default but it's optional
+    if [ -z "${DEF_NO_CCACHE}" ]; then # ccache is supported by default but it's optional
         if [ -x "${CCACHE_BIN_OPTIONAL}" ]; then # check for CCACHE availability
             debug " $(distinct d "${green}${SUCCESS_CHAR}") $(distinct d "${green}ccache")"
             CC="${CCACHE_BIN_OPTIONAL} ${CC}"
@@ -132,15 +132,15 @@ setup_sofin_compiler () {
         fi
     fi
 
-    if [ -z "${APP_NO_GOLDEN_LINKER}" ]; then # Golden linker enabled by default
+    if [ -z "${DEF_NO_GOLDEN_LINKER}" ]; then # Golden linker enabled by default
         case "${SYSTEM_NAME}" in
             Minix)
                 if [ -x "${GOLD_BIN}" -a -f "/usr/lib/LLVMgold.so" ]; then
                     DEFAULT_COMPILER_FLAGS="${DEFAULT_COMPILER_FLAGS} -Wl,-fuse-ld=gold"
                     DEFAULT_LDFLAGS="${DEFAULT_LDFLAGS} -Wl,-fuse-ld=gold"
-                    CFLAGS="-I${PREFIX}/include ${APP_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
-                    CXXFLAGS="-I${PREFIX}/include ${APP_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
-                    LDFLAGS="-L${PREFIX}/lib ${APP_LINKER_ARGS} ${DEFAULT_LDFLAGS}"
+                    CFLAGS="-I${PREFIX}/include ${DEF_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
+                    CXXFLAGS="-I${PREFIX}/include ${DEF_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
+                    LDFLAGS="-L${PREFIX}/lib ${DEF_LINKER_ARGS} ${DEFAULT_LDFLAGS}"
                     LD="/usr/bin/ld --plugin /usr/lib/LLVMgold.so"
                     NM="/usr/bin/nm --plugin /usr/lib/LLVMgold.so"
                 fi
@@ -150,9 +150,9 @@ setup_sofin_compiler () {
                 if [ -x "${GOLD_BIN}" -a -f "/usr/lib/LLVMgold.so" ]; then
                     DEFAULT_COMPILER_FLAGS="${DEFAULT_COMPILER_FLAGS} -Wl,-fuse-ld=gold"
                     DEFAULT_LDFLAGS="${DEFAULT_LDFLAGS} -Wl,-fuse-ld=gold"
-                    CFLAGS="-I${PREFIX}/include ${APP_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
-                    CXXFLAGS="-I${PREFIX}/include ${APP_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
-                    LDFLAGS="-L${PREFIX}/lib ${APP_LINKER_ARGS} ${DEFAULT_LDFLAGS}"
+                    CFLAGS="-I${PREFIX}/include ${DEF_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
+                    CXXFLAGS="-I${PREFIX}/include ${DEF_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
+                    LDFLAGS="-L${PREFIX}/lib ${DEF_LINKER_ARGS} ${DEFAULT_LDFLAGS}"
                     LD="/usr/bin/ld --plugin /usr/lib/LLVMgold.so"
                     NM="/usr/bin/nm --plugin /usr/lib/LLVMgold.so"
                 fi
@@ -168,9 +168,9 @@ setup_sofin_compiler () {
                     else
                         DEFAULT_LDFLAGS="${DEFAULT_LDFLAGS}"
                     fi
-                    CFLAGS="-I${PREFIX}/include ${APP_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
-                    CXXFLAGS="-I${PREFIX}/include ${APP_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
-                    LDFLAGS="-L${PREFIX}/lib ${APP_LINKER_ARGS} ${DEFAULT_LDFLAGS}"
+                    CFLAGS="-I${PREFIX}/include ${DEF_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
+                    CXXFLAGS="-I${PREFIX}/include ${DEF_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
+                    LDFLAGS="-L${PREFIX}/lib ${DEF_LINKER_ARGS} ${DEFAULT_LDFLAGS}"
                     unset NM LD
                 fi
                 ;;
@@ -181,7 +181,7 @@ setup_sofin_compiler () {
         debug " $(distinct d "${gray}${FAIL_CHAR}") $(distinct d "${gray}gold-linker")"
     fi
 
-    if [ -z "${APP_LINKER_NO_DTAGS}" ]; then
+    if [ -z "${DEF_LINKER_NO_DTAGS}" ]; then
         if [ "${SYSTEM_NAME}" != "Darwin" ]; then # feature isn't required on Darwin
             CFLAGS="${CFLAGS} -Wl,-rpath=${PREFIX}/lib,--enable-new-dtags"
             CXXFLAGS="${CXXFLAGS} -Wl,-rpath=${PREFIX}/lib,--enable-new-dtags"
@@ -192,7 +192,7 @@ setup_sofin_compiler () {
         fi
     fi
 
-    if [ -z "${APP_NO_FAST_MATH}" ]; then
+    if [ -z "${DEF_NO_FAST_MATH}" ]; then
         debug " $(distinct d "${green}${SUCCESS_CHAR}") $(distinct d "${green}fast-math")"
         CFLAGS="${CFLAGS} -ffast-math"
         CXXFLAGS="${CXXFLAGS} -ffast-math"

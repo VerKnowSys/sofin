@@ -294,8 +294,8 @@ list_bundles_alphabetic () {
 mark () {
     debug "Marking definition: $(distinct d ${application}) as installed"
     ${TOUCH_BIN} "${PREFIX}/${application}${INSTALLED_MARK}"
-    debug "Writing version: $(distinct d ${APP_VERSION}) of software: $(distinct d ${application}) installed in: $(distinct d ${PREFIX})"
-    ${PRINTF_BIN} "${APP_VERSION}" > "${PREFIX}/${application}${INSTALLED_MARK}"
+    debug "Writing version: $(distinct d ${DEF_VERSION}) of software: $(distinct d ${application}) installed in: $(distinct d ${PREFIX})"
+    ${PRINTF_BIN} "${DEF_VERSION}" > "${PREFIX}/${application}${INSTALLED_MARK}"
 }
 
 
