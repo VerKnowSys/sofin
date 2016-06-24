@@ -112,8 +112,7 @@ run () {
     if [ ! -z "$1" ]; then
         ${MKDIR_BIN} -p "${LOGS_DIR}"
         aname="$(lowercase ${APP_NAME}${APP_POSTFIX})"
-        debug "tStamp: $(${DATE_BIN} +%s 2>/dev/null)\
-            Launching action: '$(distinct d $@)')"
+        debug "$(${DATE_BIN} +%s 2>/dev/null) Launching action: $(distinct d $@))"
         if [ -z "${aname}" ]; then
             eval PATH="${PATH}" "$@" >> "${LOG}" 2>> "${LOG}"
             check_command_result $? "$@"
