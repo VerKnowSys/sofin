@@ -24,13 +24,13 @@ load_defs () {
     for required_field in   "APP_NAME=${APP_NAME}" \
                             "APP_NAME_APP_POSTFIX=${APP_NAME}${APP_POSTFIX}" \
                             "APP_VERSION=${APP_VERSION}" \
-                            "APP_SHA=${APP_SHA}" \
+                            "APP_SHA_OR_APP_GIT_MODE=${APP_SHA}${APP_GIT_MODE}" \
                             "APP_HTTP_PATH=${APP_HTTP_PATH}" ; do
         debug "Required field check: $(distinct d ${required_field})"
         for check in    "APP_NAME" \
                         "APP_NAME_APP_POSTFIX" \
                         "APP_VERSION" \
-                        "APP_SHA" \
+                        "APP_SHA_OR_APP_GIT_MODE" \
                         "APP_HTTP_PATH"; do
             if [ "${check}=" = "${required_field}" -o \
                  "${check}=." = "${required_field}" -o \
