@@ -34,14 +34,14 @@ customizable software for HardenedBSD/FreeBSD servers. Darwin (Mac OS X) support
 * By default Sofin verbosity is limited to minimum. More detailed information is written to LOG file (located in ~/.cache/install.log. Quick access to them by `s log`)
 * Exports. Each app has own ROOT_DIR/exports/ with symlinks to exported binaries. Exported binaries are just simple symlinks used to generate PATH environment variable.
 * Supports custom callbacks executed in order as follows:
-  - APP_AFTER_UNPACK_CALLBACK (executed after software unpack process)
-  - APP_AFTER_PATCH_CALLBACK (executed after software patch process)
-  - APP_AFTER_CONFIGURE_CALLBACK (executed after software configuration process)
-  - APP_AFTER_MAKE_CALLBACK (executed after software compilation process)
-  - APP_AFTER_INSTALL_CALLBACK (executed after software installation process)
-  - APP_AFTER_EXPORT_CALLBACK (executed after final stage of exporting software binaries)
+  - DEF_AFTER_UNPACK_CALLBACK (executed after software unpack process)
+  - DEF_AFTER_PATCH_CALLBACK (executed after software patch process)
+  - DEF_AFTER_CONFIGURE_CALLBACK (executed after software configuration process)
+  - DEF_AFTER_MAKE_CALLBACK (executed after software compilation process)
+  - DEF_AFTER_INSTALL_CALLBACK (executed after software installation process)
+  - DEF_AFTER_EXPORT_CALLBACK (executed after final stage of exporting software binaries)
   Each callback can be sh function itself and to be called by name. Look into [sbt.def](https://github.com/VerKnowSys/sofin-definitions/blob/stable/definitions/sbt.def) for an example createLaunchScript().
-* Supports collisions between definitions through APP_CONFLICTS_WITH option since version 0.38.0. An example in [ruby.def](https://github.com/VerKnowSys/sofin-definitions/blob/stable/definitions/ruby.def)
+* Supports collisions between definitions through DEF_CONFLICTS_WITH option since version 0.38.0. An example in [ruby.def](https://github.com/VerKnowSys/sofin-definitions/blob/stable/definitions/ruby.def)
 * Supports binary builds of software bundles since 0.47.2
 * Since version 0.51.0, Sofin automatically avoids using software binary builds, that won't work on given host. In that case, software will be built from source. Minimum system requirements for binary builds to work, depend on platfrom:
    - HardenedBSD: OS version >= 9.1
@@ -132,7 +132,7 @@ s get databases
 
 
 ## Differences from [POSIX](https://en.wikipedia.org/wiki/POSIX) and [FHS](https://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard) standards:
-* Sofin provides a slightly different approach to shell PATH variable. By default user PATH variable is overriden to include APP-PREFIX/exports instead of default APP-PREFIX/(s)bin. After each successful software installation sofin will populate APP-PREFIX/exports with relative symlinks to existing binaries of bundle. Application exports are defined in "APP_EXPORTS" variable (available for any definition).
+* Sofin provides a slightly different approach to shell PATH variable. By default user PATH variable is overriden to include APP-PREFIX/exports instead of default APP-PREFIX/(s)bin. After each successful software installation sofin will populate APP-PREFIX/exports with relative symlinks to existing binaries of bundle. Application exports are defined in "DEF_EXPORTS" variable (available for any definition).
 * Sofin suggests empty /usr/local folder. It's caused by POSIX "shared nature" of /usr/local. Sofin was built against this rule to prevent cross requirements between prefixes, and to make sure that each software is easily movable between machines with same architecture.
 * Each application has own "root" directory (Similarly to Mac OS X software in *.app folders).
 * Each software bundle includes all dependencies of given software, hence application bundle requires more disk

@@ -31,15 +31,15 @@ load_defs () {
     # Perform several sanity checks here..
     debug "Validating existence of required fields in definition: $(distinct d ${Definition})"
     for required_field in   "DEF_NAME=${DEF_NAME}" \
-                            "DEF_NAME_APP_POSTFIX=${DEF_NAME}${DEF_POSTFIX}" \
+                            "DEF_NAME_DEF_POSTFIX=${DEF_NAME}${DEF_POSTFIX}" \
                             "DEF_VERSION=${DEF_VERSION}" \
-                            "DEF_SHA_OR_APP_GIT_MODE=${DEF_SHA}${DEF_GIT_MODE}" \
+                            "DEF_SHA_OR_DEF_GIT_MODE=${DEF_SHA}${DEF_GIT_MODE}" \
                             "DEF_HTTP_PATH=${DEF_HTTP_PATH}" ; do
         debug "Required field check: $(distinct d ${required_field})"
         for check in    "DEF_NAME" \
-                        "DEF_NAME_APP_POSTFIX" \
+                        "DEF_NAME_DEF_POSTFIX" \
                         "DEF_VERSION" \
-                        "DEF_SHA_OR_APP_GIT_MODE" \
+                        "DEF_SHA_OR_DEF_GIT_MODE" \
                         "DEF_HTTP_PATH"; do
             if [ "${check}=" = "${required_field}" -o \
                  "${check}=." = "${required_field}" -o \
