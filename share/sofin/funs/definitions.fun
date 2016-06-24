@@ -489,7 +489,7 @@ execute_process () {
             note "   ${NOTE_CHAR2} $(distinct n "APP_HTTP_PATH=\"\"") is undefined for: $(distinct n "${definition_file_no_ext}")."
             note "NOTE: It's only valid for meta bundles. You may consider setting: $(distinct n "APP_CONFIGURE_SCRIPT=\"meta\"") in bundle definition file. Type: $(distinct n "s dev ${definition_file_no_ext}"))"
         else
-            CUR_DIR="$(${PWD_BIN} 2>/dev/null)"
+            current_directory="$(${PWD_BIN} 2>/dev/null)"
             if [ -z "${SOFIN_CONTINUE_BUILD}" ]; then
                 export BUILD_DIR_ROOT="${CACHE_DIR}cache/${APP_NAME}${APP_POSTFIX}-${APP_VERSION}-${RUNTIME_SHA}/"
                 ${FIND_BIN} "${BUILD_DIR_ROOT}" -type d -delete >> ${LOG} 2>> ${LOG}
@@ -725,7 +725,8 @@ execute_process () {
             else
                 debug "Leaving build dir intact when working in devel mode. Last build dir: $(distinct d ${BUILD_DIR_ROOT})"
             fi
-            cd "${CUR_DIR}" 2>/dev/null
+            cd "${current_directory}" 2>/dev/null
+            unset current_directory
         fi
     else
         warn "   ${WARN_CHAR} Requirement: $(distinct w ${APP_NAME}) disabled on: $(distinct w ${SYSTEM_NAME})"
