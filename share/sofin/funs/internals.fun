@@ -216,8 +216,8 @@ show_diff () {
     create_cache_directories
     defname="${2}"
     # if specified a file name, make sure it's named properly:
-    ${EGREP_BIN} '\.def$' "${defname}" >/dev/null 2>&1 || \
-        defname="${defname}.def"
+    ${EGREP_BIN} "${DEFAULT_DEF_EXT}$" "${defname}" >/dev/null 2>&1 || \
+        defname="${defname}${DEFAULT_DEF_EXT}"
     beauty_defn="$(distinct n ${defname})"
 
     cd ${DEFINITIONS_DIR}

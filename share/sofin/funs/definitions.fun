@@ -7,9 +7,9 @@ load_defs () {
         for given_def in ${definitions}; do
             name_base="$(${BASENAME_BIN} "${given_def}" 2>/dev/null)"
             definition="$(lowercase "${name_base}")"
-            if [ -e "${DEFINITIONS_DIR}${definition}.def" ]; then
-                debug "Loading definition: $(distinct d ${DEFINITIONS_DIR}${definition}.def)"
-                . ${DEFINITIONS_DIR}${definition}.def
+            if [ -e "${DEFINITIONS_DIR}${definition}${DEFAULT_DEF_EXT}" ]; then
+                debug "Loading definition: $(distinct d ${DEFINITIONS_DIR}${definition}${DEFAULT_DEF_EXT})"
+                . ${DEFINITIONS_DIR}${definition}${DEFAULT_DEF_EXT}
             elif [ -e "${DEFINITIONS_DIR}${definition}" ]; then
                 debug "Loading definition: $(distinct d ${DEFINITIONS_DIR}${definition})"
                 . ${DEFINITIONS_DIR}${definition}
@@ -32,7 +32,7 @@ load_defaults () {
 
 
 inherit () {
-    . ${DEFINITIONS_DIR}${1}.def
+    . ${DEFINITIONS_DIR}${1}${DEFAULT_DEF_EXT}
 }
 
 
@@ -350,12 +350,12 @@ remove_application () {
 available_definitions () {
     cd "${DEFINITIONS_DIR}"
     note "Available definitions:"
-    ${LS_BIN} -m *def 2>/dev/null | ${SED_BIN} 's/\.def//g' 2>/dev/null
+    ${LS_BIN} -m *def 2>/dev/null | ${SED_BIN} "s/${DEFAULT_DEF_EXT}//g" 2>/dev/null
     note "Definitions count:"
     ${LS_BIN} -a *def 2>/dev/null | ${WC_BIN} -l 2>/dev/null
     cd "${LISTS_DIR}"
     note "Available lists:"
-    ${LS_BIN} -m * 2>/dev/null | ${SED_BIN} 's/\.def//g' 2>/dev/null
+    ${LS_BIN} -m * 2>/dev/null | ${SED_BIN} "s/${DEFAULT_DEF_EXT}//g" 2>/dev/null
 }
 
 
@@ -399,7 +399,7 @@ show_outdated () {
                 continue
             fi
             ver="$(${CAT_BIN} "${prefix}/${application}${INSTALLED_MARK}" 2>/dev/null)"
-            if [ ! -f "${DEFINITIONS_DIR}${application}.def" ]; then
+            if [ ! -f "${DEFINITIONS_DIR}${application}${DEFAULT_DEF_EXT}" ]; then
                 warn "No such bundle found: $(distinct w ${application})"
                 continue
             fi
@@ -450,7 +450,7 @@ execute_process () {
     if [ -z "${app_param}" ]; then
         error "No param given for execute_process()!"
     fi
-    req_definition_file="${DEFINITIONS_DIR}${app_param}.def"
+    req_definition_file="${DEFINITIONS_DIR}${app_param}${DEFAULT_DEF_EXT}"
     debug "Checking requirement: $(distinct d ${app_param}) file: $(distinct d ${req_definition_file})"
     if [ ! -e "${req_definition_file}" ]; then
         error "Cannot fetch definition: $(distinct e ${req_definition_file})! Aborting!"
@@ -1060,7 +1060,7 @@ rebuild_application () {
     dependency="$2"
 
     # go to definitions dir, and gather software list that include given dependency:
-    all_defs="$(${FIND_BIN} ${DEFINITIONS_DIR} -maxdepth 1 -type f -name '*.def' 2>/dev/null)"
+    all_defs="$(${FIND_BIN} ${DEFINITIONS_DIR} -maxdepth 1 -type f -name "*${DEFAULT_DEF_EXT}" 2>/dev/null)"
     to_rebuild=""
     for deps in ${all_defs}; do
         load_defaults
@@ -1068,7 +1068,7 @@ rebuild_application () {
         echo "${APP_REQUIREMENTS}" | ${GREP_BIN} "${dependency}" >/dev/null 2>&1
         if [ "$?" = "0" ]; then
             dep="$(${BASENAME_BIN} "${deps}" 2>/dev/null)"
-            rawname="$(${PRINTF_BIN} "${dep}" | ${SED_BIN} 's/\.def//g' 2>/dev/null)"
+            rawname="$(${PRINTF_BIN} "${dep}" | ${SED_BIN} "s/${DEFAULT_DEF_EXT}//g" 2>/dev/null)"
             app_name="$(capitalize ${rawname})"
             to_rebuild="${app_name} ${to_rebuild}"
         fi
@@ -1208,7 +1208,7 @@ build_all () {
             warn "Bundle: $(distinct w ${application}) disabled on architecture: $(distinct w $(os_tripple))"
             ${RM_BIN} -rf "${PREFIX}" >> ${LOG} 2>> ${LOG}
         else
-            for definition in ${DEFINITIONS_DIR}${application}.def; do
+            for definition in ${DEFINITIONS_DIR}${application}${DEFAULT_DEF_EXT}; do
                 unset DONT_BUILD_BUT_DO_EXPORTS
                 debug "Reading definition: $(distinct d ${definition})"
                 load_defaults

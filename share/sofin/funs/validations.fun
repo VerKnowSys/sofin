@@ -81,9 +81,9 @@ check_definition_dir () {
 
 validate_alternatives () {
     an_app="$1"
-    if [ ! -f "${DEFINITIONS_DIR}${an_app}.def" ]; then
+    if [ ! -f "${DEFINITIONS_DIR}${an_app}${DEFAULT_DEF_EXT}" ]; then
         contents=""
-        maybe_version="$(${FIND_BIN} ${DEFINITIONS_DIR} -maxdepth 1 -name ${an_app}\*.def 2>/dev/null)"
+        maybe_version="$(${FIND_BIN} ${DEFINITIONS_DIR} -maxdepth 1 -name ${an_app}\*${DEFAULT_DEF_EXT} 2>/dev/null)"
         for maybe in ${maybe_version}; do
             elem="$(${BASENAME_BIN} ${maybe} 2>/dev/null)"
             cap_elem="$(capitalize "${elem}")"
