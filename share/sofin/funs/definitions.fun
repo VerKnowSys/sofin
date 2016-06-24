@@ -653,16 +653,16 @@ execute_process () {
                         ;;
 
                     *)
+                        if [ "${SYSTEM_NAME}" != "Darwin" ]; then
+                            pic_optional="--with-pic"
+                        fi
                         if [ "${SYSTEM_NAME}" = "Linux" ]; then
                             # NOTE: No /Services feature implemented for Linux.
                             run "${APP_CONFIGURE_SCRIPT} ${APP_CONFIGURE_ARGS} --prefix=${PREFIX}"
                         else
                             # do a simple check for "configure" in APP_CONFIGURE_SCRIPT definition
                             # this way we can tell if we want to put configure options as params
-                            if [ "${SYSTEM_NAME}" != "Darwin" ]; then
-                                pic_optional="--with-pic"
-                            fi
-                            echo "${APP_CONFIGURE_SCRIPT}" | ${EGREP_BIN} "configure\|Configure\|config" >/dev/null 2>&1
+                            echo "${APP_CONFIGURE_SCRIPT}" | ${GREP_BIN} "configure" >/dev/null 2>&1
                             if [ "$?" = "0" ]; then
                                 # TODO: add --docdir=${PREFIX}/docs
                                 # NOTE: By default try to configure software with these options:
