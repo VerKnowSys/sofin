@@ -18,6 +18,27 @@ load_defs () {
             fi
         done
     fi
+
+    # Perform several sanity checks here..
+    debug "Validating existence of required fields in definition: $(distinct d ${Definition})"
+    for required_field in   "APP_NAME=${APP_NAME}" \
+                            "APP_NAME_APP_POSTFIX=${APP_NAME}${APP_POSTFIX}" \
+                            "APP_VERSION=${APP_VERSION}" \
+                            "APP_SHA=${APP_SHA}" \
+                            "APP_HTTP_PATH=${APP_HTTP_PATH}" ; do
+        debug "Required field check: $(distinct d ${required_field})"
+        for check in    "APP_NAME" \
+                        "APP_NAME_APP_POSTFIX" \
+                        "APP_VERSION" \
+                        "APP_SHA" \
+                        "APP_HTTP_PATH"; do
+            if [ "${check}=" = "${required_field}" -o \
+                 "${check}=." = "${required_field}" -o \
+                 "${check}=${DEFAULT_DEF_EXT}" = "${required_field}" ]; then
+                error "Empty or wrong value for required field: $(distinct e ${check}) from definition: $(distinct w "${definition}")."
+            fi
+        done
+    done
     unset definition definitions
 }
 
