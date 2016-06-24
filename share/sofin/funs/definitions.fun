@@ -499,7 +499,7 @@ execute_process () {
                     base="$(${BASENAME_BIN} ${APP_HTTP_PATH} 2>/dev/null)"
                     debug "APP_HTTP_PATH: $(distinct d ${APP_HTTP_PATH}) base: $(distinct d ${base})"
                     if [ ! -e ${BUILD_DIR_ROOT}/../${base} ]; then
-                        note "   ${NOTE_CHAR} Fetching required source: $(distinct n ${base})"
+                        note "   ${NOTE_CHAR} Fetching required tarball source: $(distinct n ${base})"
                         retry "${FETCH_BIN} ${APP_HTTP_PATH}"
                         ${MV_BIN} ${base} ${BUILD_DIR_ROOT}/..
                     fi
