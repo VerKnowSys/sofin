@@ -659,6 +659,9 @@ execute_process () {
                         else
                             # do a simple check for "configure" in APP_CONFIGURE_SCRIPT definition
                             # this way we can tell if we want to put configure options as params
+                            if [ "${SYSTEM_NAME}" != "Darwin" ]; then
+                                pic_optional="--with-pic"
+                            fi
                             echo "${APP_CONFIGURE_SCRIPT}" | ${EGREP_BIN} "configure\|Configure\|config" >/dev/null 2>&1
                             if [ "$?" = "0" ]; then
                                 # TODO: add --docdir=${PREFIX}/docs
@@ -667,16 +670,16 @@ execute_process () {
                                 #   --localstatedir=${SERVICE_DIR}/var
                                 #   --runstatedir=${SERVICE_DIR}/run
                                 #   --with-pic
-                                try "${APP_CONFIGURE_SCRIPT} ${APP_CONFIGURE_ARGS} --prefix=${PREFIX} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var --runstatedir=${SERVICE_DIR}/run --with-pic" || \
-                                try "${APP_CONFIGURE_SCRIPT} ${APP_CONFIGURE_ARGS} --prefix=${PREFIX} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var --with-pic" || \
+                                try "${APP_CONFIGURE_SCRIPT} ${APP_CONFIGURE_ARGS} --prefix=${PREFIX} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var --runstatedir=${SERVICE_DIR}/run ${pic_optional}" || \
+                                try "${APP_CONFIGURE_SCRIPT} ${APP_CONFIGURE_ARGS} --prefix=${PREFIX} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var ${pic_optional}" || \
                                 try "${APP_CONFIGURE_SCRIPT} ${APP_CONFIGURE_ARGS} --prefix=${PREFIX} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var" || \
-                                try "${APP_CONFIGURE_SCRIPT} ${APP_CONFIGURE_ARGS} --prefix=${PREFIX} --sysconfdir=${SERVICE_DIR}/etc --with-pic" || \
+                                try "${APP_CONFIGURE_SCRIPT} ${APP_CONFIGURE_ARGS} --prefix=${PREFIX} --sysconfdir=${SERVICE_DIR}/etc ${pic_optional}" || \
                                 try "${APP_CONFIGURE_SCRIPT} ${APP_CONFIGURE_ARGS} --prefix=${PREFIX} --sysconfdir=${SERVICE_DIR}/etc" || \
-                                try "${APP_CONFIGURE_SCRIPT} ${APP_CONFIGURE_ARGS} --prefix=${PREFIX} --with-pic" || \
+                                try "${APP_CONFIGURE_SCRIPT} ${APP_CONFIGURE_ARGS} --prefix=${PREFIX} ${pic_optional}" || \
                                 run "${APP_CONFIGURE_SCRIPT} ${APP_CONFIGURE_ARGS} --prefix=${PREFIX}" # last two - only as a fallback
 
                             else # fallback again:
-                                try "${APP_CONFIGURE_SCRIPT} ${APP_CONFIGURE_ARGS} --prefix=${PREFIX} --with-pic" || \
+                                try "${APP_CONFIGURE_SCRIPT} ${APP_CONFIGURE_ARGS} --prefix=${PREFIX} ${pic_optional}" || \
                                 run "${APP_CONFIGURE_SCRIPT} ${APP_CONFIGURE_ARGS} --prefix=${PREFIX}"
                             fi
                         fi
