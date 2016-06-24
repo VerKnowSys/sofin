@@ -983,7 +983,7 @@ export_binaries () {
         ${MV_BIN} "${PREFIX}/exports-disabled" "${PREFIX}/exports"
     fi
     if [ -z "${APP_EXPORTS}" ]; then
-        note "  ${NOTE_CHAR} Defined no binaries to export of prefix: $(distinct n ${PREFIX})"
+        note "Defined no binaries to export of prefix: $(distinct n ${PREFIX})"
     else
         aname="$(lowercase ${APP_NAME}${APP_POSTFIX})"
         amount="$(echo "${APP_EXPORTS}" | ${WC_BIN} -w 2>/dev/null | ${TR_BIN} -d '\t|\r|\ ' 2>/dev/null)"
