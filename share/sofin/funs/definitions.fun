@@ -662,14 +662,20 @@ execute_process () {
                         ;;
 
                     *)
+                        unset pic_optional
                         if [ "${SYSTEM_NAME}" != "Darwin" ]; then
                             pic_optional="--with-pic"
                         fi
                         if [ "${SYSTEM_NAME}" = "Linux" ]; then
                             # NOTE: No /Services feature implemented for Linux.
-                            try "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${PREFIX} ${pic_optional} --sysconfdir=/etc" || \
-                            try "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${PREFIX} ${pic_optional}" || \
-                            run "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${PREFIX}" # fallback
+                            echo "${DEF_CONFIGURE}" | ${GREP_BIN} "configure" >/dev/null 2>&1
+                            if [ "$?" = "0" ]; then
+                                try "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${PREFIX} ${pic_optional} --sysconfdir=/etc" || \
+                                try "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${PREFIX} ${pic_optional}" || \
+                                run "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${PREFIX}" # fallback
+                            else
+                                run "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${PREFIX}"
+                            fi
                         else
                             # do a simple check for "configure" in DEF_CONFIGURE definition
                             # this way we can tell if we want to put configure options as params
@@ -692,7 +698,6 @@ execute_process () {
                                 run "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${PREFIX}" # last two - only as a fallback
 
                             else # fallback again:
-                                try "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${PREFIX} ${pic_optional}" || \
                                 run "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${PREFIX}"
                             fi
                         fi
