@@ -701,6 +701,7 @@ execute_process () {
 
             # and common part between normal and continue modes:
             note "   ${NOTE_CHAR} Building requirement: $(distinct n $1)"
+            try "${APP_MAKE_METHOD}" || \
             run "${APP_MAKE_METHOD}"
             after_make_callback
 
