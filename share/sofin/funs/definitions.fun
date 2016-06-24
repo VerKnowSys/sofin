@@ -13,11 +13,8 @@ load_defs () {
             elif [ -e "${DEFINITIONS_DIR}${definition}" ]; then
                 debug "Loading definition: $(distinct d ${DEFINITIONS_DIR}${definition})"
                 . ${DEFINITIONS_DIR}${definition}
-            elif [ -e "${definition}" ]; then
-                debug "Loading definition: $(distinct d ${definition})"
-                . ${definition}
             else
-                error "Can't find definition to load: $(distinct e ${definition})"
+                error "Can't find definition to load: $(distinct e ${definition}) from dir: $(distinct e "${DEFINITIONS_DIR}")"
             fi
         done
     fi
