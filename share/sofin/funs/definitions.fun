@@ -1,5 +1,14 @@
 load_defs () {
     definitions=$*
+
+    # check definition/defaults compliance version
+    debug "Defaults - version compliance test - defcomp: $(distinct d "${DEF_COMPLIANCE} vs sofinver: ${SOFIN_VERSION}")"
+    echo "${SOFIN_VERSION}" | ${EGREP_BIN} "${DEF_COMPLIANCE}" >/dev/null 2>&1
+    if [ "$?" = "0" ]; then
+        debug "Compliance check passed."
+    else
+        error "Unable to pass version match!\n  Versions mismatch!. Both: DEF_COMPILIANCE='$(distinct e "${DEF_COMPLIANCE}")' and SOFIN_VERSION='$(distinct e "${SOFIN_VERSION}")' should contain same value.\n  Hint: Update your definitions repository to latest version!"
+    fi
     if [ -z "${definitions}" ]; then
         error "No definition name specified for load_defs()!"
     else
