@@ -239,11 +239,13 @@ show_diff () {
 
 develop () {
     create_cache_directories
-    if [ -z "${2}" ]; then
+    devname="$(lowercase "${2}")"
+    if [ -z "${devname}" ]; then
         error "No definition file name specified."
     fi
     note "Paste your definition below. Hit ctrl-d after a newline to commit"
-    ${CAT_BIN} > ${DEFINITIONS_DIR}/${2}.def 2>/dev/null
+    ${CAT_BIN} > "${DEFINITIONS_DIR}/${devname}${DEFAULT_DEF_EXT}" 2>/dev/null
+    unset devname
 }
 
 
