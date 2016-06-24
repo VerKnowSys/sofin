@@ -475,14 +475,15 @@ execute_process () {
                 ${MKDIR_BIN} -p "${BUILD_DIR_ROOT}"
                 cd "${BUILD_DIR_ROOT}"
                 if [ -z "${APP_GIT_MODE}" ]; then # Standard http tarball method:
-                    debug "APP_HTTP_PATH: ${APP_HTTP_PATH} base: $(${BASENAME_BIN} ${APP_HTTP_PATH})"
-                    if [ ! -e ${BUILD_DIR_ROOT}/../$(${BASENAME_BIN} ${APP_HTTP_PATH} 2>/dev/null) ]; then
-                        note "   ${NOTE_CHAR} Fetching requirement source from: $(distinct n ${APP_HTTP_PATH})"
+                    base="$(${BASENAME_BIN} ${APP_HTTP_PATH} 2>/dev/null)"
+                    debug "APP_HTTP_PATH: $(distinct d ${APP_HTTP_PATH}) base: $(distinct d ${base})"
+                    if [ ! -e ${BUILD_DIR_ROOT}/../${base} ]; then
+                        note "   ${NOTE_CHAR} Fetching required source: $(distinct n ${base})"
                         retry "${FETCH_BIN} ${APP_HTTP_PATH}"
-                        ${MV_BIN} $(${BASENAME_BIN} ${APP_HTTP_PATH} 2>/dev/null) ${BUILD_DIR_ROOT}/..
+                        ${MV_BIN} ${base} ${BUILD_DIR_ROOT}/..
                     fi
 
-                    dest_file="${BUILD_DIR_ROOT}/../$(${BASENAME_BIN} ${APP_HTTP_PATH} 2>/dev/null)"
+                    dest_file="${BUILD_DIR_ROOT}/../${base}"
                     debug "Build dir: $(distinct d ${BUILD_DIR_ROOT}), file: $(distinct d ${dest_file})"
                     if [ -z "${APP_SHA}" ]; then
                         error "Missing SHA sum for source: $(distinct e ${dest_file})!"
