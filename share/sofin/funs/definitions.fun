@@ -485,7 +485,7 @@ execute_process () {
 
     load_defaults
     load_defs "${req_definition_file}"
-    check_disabled "${DISABLE_ON}" # check requirement for disabled state:
+    check_disabled "${DEF_DISABLE_ON}" # check requirement for disabled state:
 
     setup_sofin_compiler
 
@@ -1249,7 +1249,7 @@ build_all () {
         load_defaults
         validate_alternatives "${application}"
         load_defs "${application}" # prevent installation of requirements of disabled application:
-        check_disabled "${DISABLE_ON}" # after which just check if it's not disabled
+        check_disabled "${DEF_DISABLE_ON}" # after which just check if it's not disabled
         if [ ! "${ALLOW}" = "1" -a \
              ! -z "$(${BASENAME_BIN} ${PREFIX} 2>/dev/null)" ]; then
             warn "Bundle: $(distinct w ${application}) disabled on architecture: $(distinct w $(os_tripple))"
@@ -1265,7 +1265,7 @@ build_all () {
                 else
                     pretouch_logs ${DEF_REQUIREMENTS}
                 fi
-                check_disabled "${DISABLE_ON}" # after which just check if it's not disabled
+                check_disabled "${DEF_DISABLE_ON}" # after which just check if it's not disabled
 
                 DEF_LOWER="${DEF_NAME}${DEF_POSTFIX}"
                 DEF_NAME="$(capitalize ${DEF_NAME})"
