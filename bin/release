@@ -44,24 +44,27 @@ else
     DEST_PATH="/home/dmilith/Web/Public/Sofin-releases"
     HTTP_PATH="http://dmilith.verknowsys.com/Public/Sofin-releases"
     DEFAULT_REPOSITORY="https://verknowsys@bitbucket.org/verknowsys/sofin-definitions.git" # main sofin definitions repository
+    DEFAULT_REPOSITORY_MIRROR="git@github.com:VerKnowSys/sofin-definitions.git" # alternative sofin definitions repository
     INITIALS="initial-definitions"
     DEST_NAME="sofin-${version}${DEFAULT_ARCHIVE_EXT}"
 
     note "Pushing Sofin package to remote server: "
     ${CHMOD_BIN} a+r releases/${DEST_NAME}
-    ${SCP_BIN} releases/${DEST_NAME} "${DEST_HOST}:${DEST_PATH}" 2>/dev/null
+    ${SCP_BIN} releases/${DEST_NAME} "${DEST_HOST}:${DEST_PATH}" >/dev/null
     ${SSH_BIN} ${DEST_USER}@${DEST_HOST} "source ~/.functions.sh && gather-source ${HTTP_PATH}/${DEST_NAME}"
 
     note "Preparing initial snapshot from repository: ${DEFAULT_REPOSITORY}"
-    ${GIT_BIN} clone ${DEFAULT_REPOSITORY} sofin-definitions 2>/dev/null
+    ${GIT_BIN} clone ${DEFAULT_REPOSITORY} sofin-definitions >/dev/null
     cd ./sofin-definitions
-    ${TAR_BIN} cJf ../releases/${INITIALS}${DEFAULT_ARCHIVE_EXT} definitions lists README.md 2>/dev/null
+    ${GIT_BIN} push --all "${DEFAULT_REPOSITORY_MIRROR}" >/dev/null
+    ${GIT_BIN} push --tags "${DEFAULT_REPOSITORY_MIRROR}" >/dev/null
+    ${TAR_BIN} cJf ../releases/${INITIALS}${DEFAULT_ARCHIVE_EXT} definitions lists README.md >/dev/null
     cd ..
 
     note "Pushing snapshot to remote server(s)"
     ${CHMOD_BIN} a+r releases/${INITIALS}${DEFAULT_ARCHIVE_EXT}
-    ${SCP_BIN} releases/${INITIALS}${DEFAULT_ARCHIVE_EXT} "${DEST_HOST}:${DEST_PATH}" 2>/dev/null
-    ${SSH_BIN} ${DEST_USER}@${DEST_HOST} "${RM_BIN} /Mirror/software/source/${INITIALS}${DEFAULT_ARCHIVE_EXT} ; source ~/.functions.sh && gather-source ${HTTP_PATH}/${INITIALS}${DEFAULT_ARCHIVE_EXT}" 2>/dev/null
+    ${SCP_BIN} releases/${INITIALS}${DEFAULT_ARCHIVE_EXT} "${DEST_HOST}:${DEST_PATH}" >/dev/null
+    ${SSH_BIN} ${DEST_USER}@${DEST_HOST} "${RM_BIN} /Mirror/software/source/${INITIALS}${DEFAULT_ARCHIVE_EXT} ; source ~/.functions.sh && gather-source ${HTTP_PATH}/${INITIALS}${DEFAULT_ARCHIVE_EXT}" >/dev/null
     ${RM_BIN} -rf ./sofin-definitions ${INITIALS}${DEFAULT_ARCHIVE_EXT}
     note "Sofin v${version} deployed to: ${HTTP_PATH}"
 fi
