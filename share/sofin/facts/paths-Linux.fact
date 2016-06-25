@@ -33,7 +33,7 @@ fi
 # set core parameters:
 CPUS="$(${CAT_BIN} /proc/cpuinfo 2>/dev/null | ${EGREP_BIN} -c 'processor.*:' 2>/dev/null)"
 MAKE_OPTS="-j${CPUS}"
-FETCH_OPTS="--continue --no-verbose --progress=bar --ca-certificate=${DEFAULT_CACERT_FILE}"
+FETCH_OPTS="--continue --no-verbose --progress=bar --ca-certificate=${DEFAULT_CACERT}"
 
 # runtime sha
 ${TEST_BIN} -x "${SOFIN_MICROSECONDS_UTILITY_BIN}" && \

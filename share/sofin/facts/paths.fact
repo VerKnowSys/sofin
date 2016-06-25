@@ -1,4 +1,7 @@
-# utils software from POSIX base system variables:
+# default CA Root certs to be used by Sofin:
+DEFAULT_CACERT="/etc/ssl/cert.pem"
+
+# POSIX base system binaries used internally by Sofin:
 PRINTF_BIN="/usr/bin/printf"
 KILL_BIN="/bin/kill"
 KILLALL_BIN="/usr/bin/killall"
