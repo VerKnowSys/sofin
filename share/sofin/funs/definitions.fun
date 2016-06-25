@@ -425,6 +425,7 @@ make_exports () {
 
 show_outdated () {
     create_cache_directories
+    load_defaults
     if [ -d ${SOFTWARE_DIR} ]; then
         for prefix in $(${FIND_BIN} ${SOFTWARE_DIR} -mindepth 1 -maxdepth 1 -type d 2>/dev/null); do
             application="$(${BASENAME_BIN} "${prefix}" 2>/dev/null | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null)" # lowercase for case sensitive fs
