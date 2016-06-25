@@ -1258,11 +1258,15 @@ build_all () {
         validate_alternatives "${application}"
         load_defs "${application}" # prevent installation of requirements of disabled application:
         check_disabled "${DEF_DISABLE_ON}" # after which just check if it's not disabled
+        pref_base="$(${BASENAME_BIN} ${PREFIX} 2>/dev/null)"
         if [ ! "${ALLOW}" = "1" -a \
-             ! -z "$(${BASENAME_BIN} ${PREFIX} 2>/dev/null)" ]; then
+             ! -z "${pref_base}" -a \
+             "/" != "${pref_base}" ]; then
             warn "Bundle: $(distinct w ${application}) disabled on architecture: $(distinct w $(os_tripple))"
             ${RM_BIN} -rf "${PREFIX}" >> ${LOG} 2>> ${LOG}
+            unset pref_base
         else
+            unset pref_base
             for definition in ${DEFINITIONS_DIR}${application}${DEFAULT_DEF_EXT}; do
                 unset DONT_BUILD_BUT_DO_EXPORTS
                 debug "Reading definition: $(distinct d ${definition})"
