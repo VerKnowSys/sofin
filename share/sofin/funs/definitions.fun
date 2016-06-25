@@ -51,7 +51,7 @@ load_defaults () {
     if [ -z "${COMPLIANCE_CHECK}" ]; then
         # check definition/defaults compliance version
         debug "Defaults - version compliance test - defcomp: $(distinct d "${DEF_COMPLIANCE}") vs sofver: $(distinct d "${SOFIN_VERSION}")"
-        ${PRINTF_BIN} "${SOFIN_VERSION}" | eval "${EGREP_BIN} -E '${DEF_COMPLIANCE}'" >/dev/null 2>&1
+        ${PRINTF_BIN} "${SOFIN_VERSION}" | eval "${EGREP_BIN} '${DEF_COMPLIANCE}'" >/dev/null 2>&1
         if [ "$?" = "0" ]; then
             debug "Compliance check passed."
             COMPLIANCE_CHECK="passed"
