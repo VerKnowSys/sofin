@@ -1,10 +1,6 @@
-# Defaults:
-DEFAULT_ZPOOL="zroot"
-FREEBSD_MINIMUM_VERSION="91"
-CPUS="$(${SYSCTL_BIN} kern.smp.cpus 2>/dev/null | ${AWK_BIN} '{printf $2;}' 2>/dev/null)"
-FETCH_BIN="/usr/bin/fetch -T 3 -a"
-CURL_BIN="/usr/bin/fetch -T 3 -a -o -"
-MAKE_OPTS="-j${CPUS}"
+# FreeBSD specific configuration
+
+BHYVE_BIN="/usr/sbin/bhyve"
 JAIL_BIN="/usr/sbin/jail"
 JEXEC_BIN="/usr/sbin/jexec"
 JLS_BIN="/usr/sbin/jls"
@@ -25,6 +21,12 @@ MERGEMASTER_BIN="/usr/sbin/mergemaster"
 KLDLOAD_BIN="/sbin/kldload"
 MDMFS_BIN="/sbin/mdmfs"
 LIMITS_BIN="/usr/bin/limits"
+
+# set core parameters:
+CPUS="$(${SYSCTL_BIN} -e kern.smp.cpus 2>/dev/null | ${CUT_BIN} -d'=' -f2 2>/dev/null)"
+FETCH_OPTS="--timeout=5 --retry --ca-cert=${DEFAULT_CACERT_FILE}"
+MAKE_OPTS="-j${CPUS}"
+DEFAULT_ZPOOL="$(${ZPOOL_BIN} list -H 2>/dev/null | ${CUT_BIN} -w -f1 2>/dev/null)"
 
 # XXX: disable ssl verification of https://github.com which fails on FreeBSD by default.
 if [ -x "${GIT_BIN}" ]; then

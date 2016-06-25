@@ -1,9 +1,6 @@
-DEFAULT_ZPOOL="zroot"
+# Minix specific configuration
 
-CPUS="4" # XXX
-MAKE_OPTS="-j${CPUS}"
-FETCH_BIN="/usr/bin/fetch -T 3 -a"
-CURL_BIN="/usr/bin/fetch -T 3 -o -"
+# available in base:
 SHA_BIN="/usr/bin/sha1"
 
 # installed from pkgin:
@@ -11,6 +8,11 @@ TAR_BIN="/usr/pkg/bin/gtar"
 BC_BIN="/usr/pkg/bin/bc"
 SSH_BIN="/usr/pkg/bin/ssh"
 SCP_BIN="/usr/pkg/bin/scp"
+
+# set core parameters:
+CPUS="4" # XXX: hardcoded
+MAKE_OPTS="-j${CPUS}"
+FETCH_OPTS="--timeout=5 --retry --ca-cert=${DEFAULT_CACERT_FILE}"
 
 # runtime sha
 test -x "${SOFIN_MICROSECONDS_UTILITY_BIN}" && \
