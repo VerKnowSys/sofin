@@ -14,24 +14,24 @@
 
 ## About:
 This software is my way of how to get reliable, updatable, bundled, closed-dependency, secure and fully
-customizable software for HardenedBSD/FreeBSD servers. Darwin (Mac OS X) support started with version >=0.14.10. Linux support started with version >=0.24.4 and ended with 0.51.9. If you wish me to support "your" Linux distribution, please consider a donation or hire me :)
+customizable software for HardenedBSD/FreeBSD servers. Darwin (Mac OS X) support started with version >=0.14.10. Linux support started with version >=0.24.4.
 
 
 ## Features:
-* Designed to work on all *BSD (HardenedBSD/FreeBSD >=11.x), *Darwin (OSX >=10.11.x)
+* Designed to work on all *BSD (HardenedBSD/FreeBSD >=11.x), *Darwin (OSX >=10.11.x), support for Minix/NetBSD/OpenBSD platforms is comming as well.
 * User friendly, clean and clear colorful information. No magic. KISS, DRY, BDD driven development.
-* Simple, ~1.5k LOC solution, written in legacy /bin/sh shell scripting language.
+* Simple, modular solution, written in legacy /bin/sh shell scripting language.
 * Every "software" has own definition ("def" file) with defined flat dependency list and basic information.
   Every definition is sh script itself (More in [skeleton.def](https://github.com/VerKnowSys/sofin-definitions/blob/stable/definitions/skeleton.def.sample) and [defaults.def](https://github.com/VerKnowSys/sofin-definitions/blob/stable/definitions/defaults.def))
-* Supports selective application installation or from list. (By "get" param. More in [examples](https://github.com/VerKnowSys/sofin#examples)).
+* Supports selective application installation or from list. (More in [examples](https://github.com/VerKnowSys/sofin#examples)).
 * Has simple flat dependency management. Sofin architecture is flexible enough to bundle almost any mix of requirements in application bundle, if only it's supported by given software. No need to get tons of useless/ not needed dependencies just because software supports it.
 * Has simple way of creating "lists" of definitions to build. (more in [examples](https://github.com/VerKnowSys/sofin#examples)).
 * Source patches are supported out of the box. The only thing required is to put patches into "definitions/patches/smallcase_definition_name_without_def_extension/" directory (there's also system specific patches support. For OSX you have to put your patches in patches/yourdefinition/Darwin/ directory. It can also be: "Linux" and "FreeBSD"). Sofin will use these patches automagically (It tries with patch levels from -p0 to -p5 for each patch file). Software patch applies on bundle at build time, before configuration phase.
 * Software bundling. Every application is bundled separately with all dependencies in own "root directory". The only external dependencies used by Sofin are those from base system. No other external dependencies allowed at all.
-* Supports basic "marking" of status of installed applications/ dependencies to resume broken/ failed/ interrupted installation.
+* Supports basic "marking" of status of installed applications/ dependencies to resume broken/ failed/ interrupted build process.
 * You may feel safe upgrading only *one* software bundle without headache of "how it affects rest of my software". No application bundle will affect any other. Ever.
-* Sofin is designed to not touch any part of system.
-* By default Sofin verbosity is limited to minimum. More detailed information is written to LOG file (located in ~/.cache/install.log. Quick access to them by `s log`)
+* Sofin is designed to not touch nor interfere with any part of already installed base system (shell configuration might be considered an exception)
+* By default Sofin verbosity is limited to minimum. More detailed information is written to log files (located in ~/.cache/logs/. Quick access to them by `s log pattern`)
 * Exports. Each app has own ROOT_DIR/exports/ with symlinks to exported binaries. Exported binaries are just simple symlinks used to generate PATH environment variable.
 * Supports custom callbacks executed in order as follows:
   - DEF_AFTER_UNPACK_CALLBACK (executed after software unpack process)
@@ -54,13 +54,13 @@ customizable software for HardenedBSD/FreeBSD servers. Darwin (Mac OS X) support
 ## Shell (hidden) options:
 * Will skip definitions update before installing "Vim" bundle:
 ```bash
-USE_UPDATE=false s get Vim
+USE_UPDATE=NO s get Vim
 ```
 
 
 * Will skip checking for binary build for "Vifm" bundle.
 ```bash
-USE_BINBUILD=false s get Vifm
+USE_BINBUILD=NO s get Vifm
 # or just:
 # s build Vifm
 ```
@@ -68,7 +68,7 @@ USE_BINBUILD=false s get Vifm
 
 * This trick is required to rebuild bundles like "Git". Note that Sofin requires Git to work properly. By default on clean systems, it's trying to fetch initial definitions tarball, that must be purged manually after first run by using "s distclean". On ServeD systems Git bundle is always installed by default.
 ```bash
-USE_UPDATE=false s build Git
+USE_UPDATE=NO s build Git
 ```
 
 
@@ -102,7 +102,7 @@ s get databases
 
 * Show list of available software:
 ```bash
-s available
+s avail
 ```
 
 * Show list of installed software:
@@ -119,9 +119,9 @@ s installed
 s export ruby Passenger
 ```
 
-* Uninstall installed software "SomeApp"?
+* Uninstall installed software "SomeBundle"?
 ```bash
-s remove SomeApp
+s remove SomeBundle
 ```
 
 * Create own list called "databases", with definitions: "Postgresql" and "Rubinius", and get it with Sofin:
@@ -141,14 +141,14 @@ space than it does with "old fasioned, system wide, shared software".
 
 ## Pitfalls/ Limitations:
 * Support for root software will be continuously dropped from support, because it's a bad habit.
-* Sofin assumes that /Software is owned by single non-root user.
-* Sofin assumes that /User is user data directory. On OSX, if you don't have /User directory, you might want to do `sudo ln -s ~ /User`. It will be also required under vanilla versions of HardenedBSD. Under ServeD-OS each worker user is located under /User by default.
+* Sofin assumes that /Software is owned by single non-root user. (In ServeD OS, each user has his own /Software mounted from 'zroot/Software/USERNAME' private dataset).
+* Sofin assumes that /User is user data directory. On OSX, if you don't have /User directory, you might want to do `sudo ln -s ~ /User`. It will be also required under vanilla versions of HardenedBSD. Under ServeD-OS each worker user is located under /User by default (mounted from 'zroot/User/USERNAME' dataset).
 
 
 ## Installation info (platform specific):
 
 ### HardenedBSD specific (no git available in vanilla):
-  - Install base 64bit system - I used 64bit HardenedBSD 10.X bootonly iso here.
+  - Install base 64bit system - I used 64bit HardenedBSD 11.X bootonly iso here.
   - Fetch latest package from [this site](http://dmilith.verknowsys.com/Public/Sofin-releases/), unpack and run `bin/install` as root.
   - Type `s get Zsh`, then when it finishes, do: `grep 'Software/Zsh' /etc/shells || sudo echo '/Software/Zsh/exports/zsh' >> /etc/shells; sudo chsh -s /Software/Zsh/exports/zsh ${USER}` to change your shell, to one that is supported by default by Sofin.
   - Start using Sofin as regular user.
@@ -162,7 +162,7 @@ space than it does with "old fasioned, system wide, shared software".
 
 
 ## Conflicts/ Problems/ Known issues:
-* Sofin build mechanism is known to be in conflict with other software managment solutions like: BSD Ports, HomeBrew, MacPorts, Fink. Keep that in mind before reporting problems.
+* Sofin build mechanism is known to be in conflict with other software managment solutions like: BSD Ports, HomeBrew, MacPorts, Fink. Keep that in mind before reporting problems, cause they're the root of true evil on your OS :)
 * It's recommended to change shell by doing: `chsh -s /Software/Zsh/exports/zsh` for each user which will use Sofin. It's caused shells built the way, they don't read default shell initialization scripts like /etc/zshenv for Zsh.
 
 
