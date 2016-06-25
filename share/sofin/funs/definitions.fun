@@ -25,12 +25,14 @@ load_defs () {
                             "DEF_NAME_DEF_POSTFIX=${DEF_NAME}${DEF_POSTFIX}" \
                             "DEF_VERSION=${DEF_VERSION}" \
                             "DEF_SHA_OR_DEF_GIT_MODE=${DEF_SHA}${DEF_GIT_MODE}" \
+                            "DEF_COMPLIANCE=${DEF_COMPLIANCE}" \
                             "DEF_HTTP_PATH=${DEF_HTTP_PATH}" ; do
         debug "Required field check: $(distinct d ${required_field})"
         for check in    "DEF_NAME" \
                         "DEF_NAME_DEF_POSTFIX" \
                         "DEF_VERSION" \
                         "DEF_SHA_OR_DEF_GIT_MODE" \
+                        "DEF_COMPLIANCE" \
                         "DEF_HTTP_PATH"; do
             if [ "${check}=" = "${required_field}" -o \
                  "${check}=." = "${required_field}" -o \
