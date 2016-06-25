@@ -3,6 +3,9 @@
 
 . /usr/share/sofin/loader
 
+# this is internal version check for defaults.def
+unset COMPLIANCE_CHECK
+
 SOFIN_ARGS_FULL="$*"
 SOFIN_ARGS="$(echo ${SOFIN_ARGS_FULL} | ${CUT_BIN} -d' ' -f2- 2>/dev/null)"
 SOFIN_COMMAND_ARG="${1}"
