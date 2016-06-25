@@ -301,6 +301,7 @@ push_binbuild () {
 
 deploy_binbuild () {
     create_cache_directories
+    load_defaults
     shift
     bundles=$*
     note "Software bundles to be built and deployed to remote: $(distinct n ${bundles})"
@@ -342,6 +343,7 @@ remove_application () {
         debug "Removing applications: $(distinct d ${APPLICATIONS})"
     fi
 
+    load_defaults
     for app in $APPLICATIONS; do
         given_app_name="$(capitalize ${app})"
         if [ -z "${given_app_name}" ]; then
