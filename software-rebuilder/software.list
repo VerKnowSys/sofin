@@ -16,12 +16,14 @@ Db
 Db47
 Dhcp
 Dovecot
+Ekg2
 Elixir
 Exim
 Fontconfig
 Freetype
 Gd
 Ghostscript
+Glib
 Gmake
 Gnupg
 Gnutls
@@ -100,7 +102,6 @@ Smartmontools
 Squid
 Sox
 Sphinx
-Ssmtp
 Subversion
 Syslog-ng
 Tarsnap
@@ -116,6 +117,7 @@ Vim
 Xz
 Yasm
 Zabbix
+Zabbix-agent
 Zeromq4
 Znc
 ------
