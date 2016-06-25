@@ -706,7 +706,10 @@ execute_process () {
                                 run "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${PREFIX}" # last two - only as a fallback
 
                             else # fallback again:
-                                run "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${PREFIX}"
+                                # NOTE: First - try to specify GNU prefix,
+                                # then trust prefix given in software definition.
+                                try "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${PREFIX}" || \
+                                run "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS}"
                             fi
                         fi
                         ;;
