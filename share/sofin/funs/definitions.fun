@@ -528,9 +528,9 @@ execute_process () {
                     else
                         a_file_checksum="$(file_checksum ${dest_file})"
                         if [ "${a_file_checksum}" = "${DEF_SHA}" ]; then
-                            debug "Bundle checksum is fine"
+                            debug "Source tarball checksum is fine"
                         else
-                            warn "${WARN_CHAR} Bundle checksum mismatch detected!"
+                            warn "${WARN_CHAR} Source tarball checksum mismatch detected!"
                             warn "${WARN_CHAR} $(distinct w ${a_file_checksum}) vs $(distinct w ${DEF_SHA})"
                             warn "${WARN_CHAR} Removing corrupted file from cache: $(distinct w ${dest_file}) and retrying.."
                             # remove corrupted file
@@ -541,7 +541,7 @@ execute_process () {
                         fi
                     fi
 
-                    note "   ${NOTE_CHAR} Unpacking source code of: $(distinct n ${DEF_NAME})"
+                    note "   ${NOTE_CHAR} Unpacking source tarball of: $(distinct n ${DEF_NAME})"
                     debug "Build dir root: $(distinct d ${BUILD_DIR_ROOT})"
                     try "${TAR_BIN} -xf ${dest_file}" || \
                     try "${TAR_BIN} -xfj ${dest_file}" || \
