@@ -128,14 +128,28 @@ run () {
 
 try () {
     if [ ! -z "$1" ]; then
+        params="$@"
         ${MKDIR_BIN} -p "${LOGS_DIR}"
         aname="$(lowercase ${DEF_NAME}${DEF_POSTFIX})"
-        debug "$(${DATE_BIN} +%s 2>/dev/null) try('$(distinct d $@)')"
-        if [ -z "${aname}" ]; then
-            eval PATH="${PATH}" "$@" >> "${LOG}" 2>> "${LOG}"
-        else
-            eval PATH="${PATH}" "$@" >> "${LOG}-${aname}" 2>> "${LOG}-${aname}"
+        debug "$(${DATE_BIN} +%s 2>/dev/null) try($(distinct d ${params}))"
+        echo "${params}" | ${EGREP_BIN} '^.*(fetch|curl|wget).*$' >/dev/null 2>/dev/null
+        if [ "$?" = "0" ]; then
+            show_stdout_progress=YES
         fi
+        if [ -z "${aname}" ]; then
+            if [ -z "${show_stdout_progress}" ]; then
+                eval PATH="${PATH}" "${params}" >> "${LOG}" 2>> "${LOG}"
+            else
+                eval PATH="${PATH}" "${params}" >> "${LOG}" # show progress on stderr
+            fi
+        else
+            if [ -z "${show_stdout_progress}" ]; then
+                eval PATH="${PATH}" "${params}" >> "${LOG}-${aname}" 2>> "${LOG}-${aname}"
+            else
+                eval PATH="${PATH}" "${params}" >> "${LOG}-${aname}"
+            fi
+        fi
+        unset params aname show_stdout_progress
     else
         error "An empty command to run for: $(distinct e ${DEF_NAME})?"
     fi
