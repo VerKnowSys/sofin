@@ -1,14 +1,5 @@
 load_defs () {
     definitions=$*
-
-    # check definition/defaults compliance version
-    debug "Defaults - version compliance test - defcomp: $(distinct d "${DEF_COMPLIANCE} vs sofinver: ${SOFIN_VERSION}")"
-    echo "${SOFIN_VERSION}" | ${EGREP_BIN} "${DEF_COMPLIANCE}" >/dev/null 2>&1
-    if [ "$?" = "0" ]; then
-        debug "Compliance check passed."
-    else
-        error "Unable to pass version match!\n  Versions mismatch!. Both: DEF_COMPILIANCE='$(distinct e "${DEF_COMPLIANCE}")' and SOFIN_VERSION='$(distinct e "${SOFIN_VERSION}")' should contain same value.\n  Hint: Update your definitions repository to latest version!"
-    fi
     if [ -z "${definitions}" ]; then
         error "No definition name specified for load_defs()!"
     else
@@ -55,6 +46,19 @@ load_defs () {
 load_defaults () {
     debug "Loading definition defaults"
     . "${DEFAULTS}"
+    if [ -z "${COMPLIANCE_CHECK}" ]; then
+        # check definition/defaults compliance version
+        debug "Defaults - version compliance test - defcomp: $(distinct d "${DEF_COMPLIANCE}") vs sofver: $(distinct d "${SOFIN_VERSION}")"
+        ${PRINTF_BIN} "${SOFIN_VERSION}" | eval "${EGREP_BIN} -E '${DEF_COMPLIANCE}'" >/dev/null 2>&1
+        if [ "$?" = "0" ]; then
+            debug "Compliance check passed."
+            COMPLIANCE_CHECK="passed"
+        else
+            error "Versions mismatch!. DEF_COMPILIANCE='$(distinct e "${DEF_COMPLIANCE}")' and SOFIN_VERSION='$(distinct e "${SOFIN_VERSION}")' should match.\n  Hint: Update your definitions repository to latest version!"
+        fi
+    else
+        debug "Check passed previously once. Skipping compliance check"
+    fi
 }
 
 
