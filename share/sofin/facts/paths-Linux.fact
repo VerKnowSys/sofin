@@ -12,7 +12,6 @@ EGREP_BIN="/bin/egrep"
 BC_BIN="/usr/bin/bc"
 CHOWN_BIN="/bin/chown"
 TEST_BIN="/usr/bin/test"
-NPROC_BIN="/usr/bin/nproc"
 AWK_BIN="/usr/bin/awk"
 ZFS_BIN="/bin/true"
 PGREP_BIN="/usr/bin/pgrep"
@@ -32,7 +31,7 @@ if [ -f /etc/centos-release -o -f /etc/redhat-release ]; then
 fi
 
 # set core parameters:
-CPUS="$(${NPROC_BIN} 2>/dev/null)"
+CPUS="$(${CAT_BIN} /proc/cpuinfo 2>/dev/null | ${EGREP_BIN} -c 'processor.*:' 2>/dev/null)"
 MAKE_OPTS="-j${CPUS}"
 FETCH_OPTS="--continue --no-verbose --progress=bar --ca-certificate=${DEFAULT_CACERT_FILE}"
 
