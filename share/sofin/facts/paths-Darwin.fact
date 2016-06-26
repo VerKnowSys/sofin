@@ -13,7 +13,7 @@ PGREP_BIN="/usr/bin/pgrep"
 
 # set core parameters:
 FETCH_OPTS="--progress-bar --connect-timeout 3 --remote-name --cacert ${DEFAULT_CACERT}"
-ALL_CPUS=$(${SYSCTL_BIN} -e machdep.cpu.thread_count 2>/dev/null | ${CUT_BIN} -d'=' -f2 2>/dev/null)
+ALL_CPUS="$(${SYSCTL_BIN} -e machdep.cpu.thread_count 2>/dev/null | ${CUT_BIN} -d'=' -f2 2>/dev/null)"
 CPUS="$(echo "${ALL_CPUS}-2" | ${BC_BIN} 2>/dev/null)" # decrease threads by 2 on workstation OS
 MAKE_OPTS="-j${CPUS}"
 

@@ -126,11 +126,11 @@ update_definitions () {
         ${RM_BIN} -rf "${CACHE_DIR}definitions" >> ${LOG} 2>> ${LOG}
         ${MKDIR_BIN} -p "${LOGS_DIR}" "${CACHE_DIR}definitions"
         cd "${CACHE_DIR}definitions"
-        INITIAL_DEFINITIONS="${MAIN_SOURCE_REPOSITORY}initial-definitions${DEFAULT_ARCHIVE_EXT}"
-        debug "Fetching latest tarball with initial definitions from: ${INITIAL_DEFINITIONS}"
+        initial_definitions="${MAIN_SOURCE_REPOSITORY}initial-definitions${DEFAULT_ARCHIVE_EXT}"
+        debug "Fetching latest tarball with initial definitions from: ${initial_definitions}"
         retry "${FETCH_BIN} ${FETCH_OPTS} ${initial_definitions}" && \
         ${TAR_BIN} -xJf *${DEFAULT_ARCHIVE_EXT} >> ${LOG} 2>> ${LOG} && \
-            ${RM_BIN} -vrf "$(${BASENAME_BIN} ${INITIAL_DEFINITIONS} 2>/dev/null)" >> ${LOG} 2>> ${LOG}
+            ${RM_BIN} -vrf "$(${BASENAME_BIN} ${initial_definitions} 2>/dev/null)" >> ${LOG} 2>> ${LOG}
         return
     fi
     if [ -d "${CACHE_DIR}definitions/.git" -a -f "${DEFAULTS}" ]; then
@@ -882,7 +882,7 @@ manage_datasets () {
             sofin_ps_list="$(processes_all_sofin)"
             sofins_all="$(echo "${sofin_ps_list}" | ${WC_BIN} -l 2>/dev/null | ${SED_BIN} 's/ //g' 2>/dev/null)"
             sofins_installing="$(echo "${sofins_all} - 1" | ${BC_BIN} 2>/dev/null)"
-            test -z "${sofins_installing}" && sofins_installing="0"
+            ${TEST_BIN} -z "${sofins_installing}" && sofins_installing="0"
             export jobs_in_parallel="NO"
             if [ ${sofins_installing} -gt 1 ]; then
                 note "Found: $(distinct n ${sofins_installing}) running Sofin instances. Parallel jobs not allowed"
