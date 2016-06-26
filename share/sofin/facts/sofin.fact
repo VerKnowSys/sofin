@@ -42,6 +42,7 @@ MOST_DEFAULT_OPTIONS="-c -s +s +u"
 SOFIN_BIN_SHORT="$(${BASENAME_BIN} ${SOFIN_BIN} 2>/dev/null)"
 DISTINCT_COLOUR="${cyan}"
 DEFAULT_SSH_OPTS="" #-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
+DEFAULT_SCP_OPTS="-C -B"
 DEFAULT_DEFAULT_GIT_OPTS="--quiet --progress"
 
 # Build timestamp in seconds since 1970
