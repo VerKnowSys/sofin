@@ -128,7 +128,7 @@ update_definitions () {
         cd "${CACHE_DIR}definitions"
         INITIAL_DEFINITIONS="${MAIN_SOURCE_REPOSITORY}initial-definitions${DEFAULT_ARCHIVE_EXT}"
         debug "Fetching latest tarball with initial definitions from: ${INITIAL_DEFINITIONS}"
-        retry "${FETCH_BIN} ${INITIAL_DEFINITIONS}" && \
+        retry "${FETCH_BIN} ${FETCH_OPTS} ${initial_definitions}" && \
         ${TAR_BIN} -xJf *${DEFAULT_ARCHIVE_EXT} >> ${LOG} 2>> ${LOG} && \
             ${RM_BIN} -vrf "$(${BASENAME_BIN} ${INITIAL_DEFINITIONS} 2>/dev/null)" >> ${LOG} 2>> ${LOG}
         return
@@ -518,7 +518,7 @@ execute_process () {
                     debug "DEF_HTTP_PATH: $(distinct d ${DEF_HTTP_PATH}) base: $(distinct d ${base})"
                     if [ ! -e ${BUILD_DIR_ROOT}/../${base} ]; then
                         note "   ${NOTE_CHAR} Fetching required tarball source: $(distinct n ${base})"
-                        retry "${FETCH_BIN} ${DEF_HTTP_PATH}"
+                        retry "${FETCH_BIN} ${FETCH_OPTS} ${DEF_HTTP_PATH}"
                         ${MV_BIN} ${base} ${BUILD_DIR_ROOT}/..
                     fi
 
@@ -1165,12 +1165,12 @@ try_fetch_binbuild () {
         }
         if [ ! -e "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" ]; then
             cd ${BINBUILDS_CACHE_DIR}${ABSNAME}
-            try "${FETCH_BIN} ${MAIN_BINARY_REPOSITORY}$(os_tripple)/${ARCHIVE_NAME}${DEFAULT_CHKSUM_EXT}" || \
-                try "${FETCH_BIN} ${MAIN_BINARY_REPOSITORY}$(os_tripple)/${ARCHIVE_NAME}${DEFAULT_CHKSUM_EXT}"
+            try "${FETCH_BIN} ${FETCH_OPTS} ${MAIN_BINARY_REPOSITORY}$(os_tripple)/${ARCHIVE_NAME}${DEFAULT_CHKSUM_EXT}" || \
+                try "${FETCH_BIN} ${FETCH_OPTS} ${MAIN_BINARY_REPOSITORY}$(os_tripple)/${ARCHIVE_NAME}${DEFAULT_CHKSUM_EXT}"
             if [ "$?" = "0" ]; then
-                $(try "${FETCH_BIN} ${MAIN_BINARY_REPOSITORY}$(os_tripple)/${ARCHIVE_NAME}" && confirm) || \
-                $(try "${FETCH_BIN} ${MAIN_BINARY_REPOSITORY}$(os_tripple)/${ARCHIVE_NAME}" && confirm) || \
-                $(try "${FETCH_BIN} ${MAIN_BINARY_REPOSITORY}$(os_tripple)/${ARCHIVE_NAME}" && confirm) || \
+                $(try "${FETCH_BIN} ${FETCH_OPTS} ${MAIN_BINARY_REPOSITORY}$(os_tripple)/${ARCHIVE_NAME}" && confirm) || \
+                $(try "${FETCH_BIN} ${FETCH_OPTS} ${MAIN_BINARY_REPOSITORY}$(os_tripple)/${ARCHIVE_NAME}" && confirm) || \
+                $(try "${FETCH_BIN} ${FETCH_OPTS} ${MAIN_BINARY_REPOSITORY}$(os_tripple)/${ARCHIVE_NAME}" && confirm) || \
                 error "Failure fetching available binary build for: $(distinct e "${ARCHIVE_NAME}"). Please check your DNS / Network setup!"
             else
                 note "No binary build available for: $(distinct n $(os_tripple)/${DEF_NAME}${DEF_POSTFIX}-${DEF_VERSION})"

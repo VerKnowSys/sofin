@@ -309,9 +309,9 @@ create_or_receive () {
     dataset_name="$1"
     remote_path="${MAIN_BINARY_REPOSITORY}${MAIN_COMMON_NAME}/${final_snap_file}"
     debug "Seeking remote snapshot existence: $(distinct d ${remote_path})"
-    try "${FETCH_BIN} ${remote_path}" || \
-    try "${FETCH_BIN} ${remote_path}" || \
-    try "${FETCH_BIN} ${remote_path}"
+    try "${FETCH_BIN} ${FETCH_OPTS} ${remote_path}" || \
+    try "${FETCH_BIN} ${FETCH_OPTS} ${remote_path}" || \
+    try "${FETCH_BIN} ${FETCH_OPTS} ${remote_path}"
     if [ "$?" = "0" ]; then
         debug "Stream archive available. Creating service dataset: $(distinct d ${dataset_name}) from file stream: $(distinct d ${final_snap_file})"
         note "Dataset: $(distinct n ${dataset_name}) - $(${XZCAT_BIN} "${final_snap_file}" | ${ZFS_BIN} receive -v "${dataset_name}" 2>/dev/null | ${TAIL_BIN} -n1)"
