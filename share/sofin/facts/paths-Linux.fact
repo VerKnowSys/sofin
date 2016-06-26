@@ -37,4 +37,4 @@ FETCH_OPTS="--continue --no-verbose --progress=bar --ca-certificate=${DEFAULT_CA
 
 # runtime sha
 ${TEST_BIN} -x "${SOFIN_MICROSECONDS_UTILITY_BIN}" && \
-RUNTIME_SHA="$(${PRINTF_BIN} "$(${DATE_BIN} 2>/dev/null)-$(${SOFIN_MICROSECONDS_UTILITY_BIN} 2>/dev/null)" | ${SHA_BIN} 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)"
+RUNTIME_SHA="$(${PRINTF_BIN} "$(${DATE_BIN} 2>/dev/null)-$(${SOFIN_MICROSECONDS_UTILITY_BIN} 2>/dev/null)" | eval "${CALCULATE_SHA_GUARD}")"
