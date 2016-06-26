@@ -21,11 +21,6 @@ def_error () {
 }
 
 
-os_tripple () {
-    ${PRINTF_BIN} "${SYSTEM_NAME}-${FULL_SYSTEM_VERSION}-${SYSTEM_ARCH}"
-}
-
-
 check_os () {
     case "${SYSTEM_NAME}" in
         FreeBSD)
