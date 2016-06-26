@@ -145,7 +145,6 @@ try () {
                 eval PATH="${PATH}" "${params}" >> "${LOG}-${aname}"
             fi
         fi
-        unset params aname show_stdout_progress
     else
         error "An empty command to run for: $(distinct e ${DEF_NAME})?"
     fi
