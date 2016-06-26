@@ -200,23 +200,20 @@ check_disabled () {
 
 
 file_checksum () {
-    name="$1"
-    if [ -z "${name}" ]; then
+    _name="$1"
+    if [ -z "${_name}" ]; then
         error "Empty file name given for function: $(distinct e "file_checksum()")"
     fi
     case ${SYSTEM_NAME} in
-        Minix)
-            ${PRINTF_BIN} "$(${SHA_BIN} "${name}" 2>/dev/null | ${AWK_BIN} '{print $4;}' 2>/dev/null)"
-            ;;
-
-        Darwin|Linux)
-            ${PRINTF_BIN} "$(${SHA_BIN} "${name}" 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)"
+        Minix|Darwin|Linux)
+            ${PRINTF_BIN} "$(${SHA_BIN} "${_name}" 2>/dev/null | ${CUT_BIN} -d' ' -f1 2>/dev/null)"
             ;;
 
         FreeBSD)
-            ${PRINTF_BIN} "$(${SHA_BIN} -q "${name}" 2>/dev/null)"
+            ${PRINTF_BIN} "$(${SHA_BIN} -q "${_name}" 2>/dev/null)"
             ;;
     esac
+    unset _name
 }
 
 
@@ -1395,21 +1392,23 @@ build_all () {
 
 dump_debug_info () {
     debug "-------------- PRE CONFIGURE SETTINGS DUMP --------------"
-    debug "Current DIR: $(${PWD_BIN} 2>/dev/null)"
-    debug "CPUS (used): ${CPUS}"
-    debug "ALL_CPUS: ${ALL_CPUS}"
-    debug "MAKE_OPTS: ${MAKE_OPTS}"
-    debug "FETCH_OPTS: ${FETCH_OPTS}"
-    debug "PREFIX: ${PREFIX}"
-    debug "SERVICE_DIR: ${SERVICE_DIR}"
-    debug "PATH: ${PATH}"
-    debug "CC: ${CC}"
-    debug "CXX: ${CXX}"
-    debug "CPP: ${CPP}"
-    debug "CXXFLAGS: ${CXXFLAGS}"
-    debug "CFLAGS: ${CFLAGS}"
-    debug "LDFLAGS: ${LDFLAGS}"
-    debug "LD_LIBRARY_PATH: ${LD_LIBRARY_PATH}"
+    debug "CPUS (used): $(distinct d ${CPUS})"
+    debug "ALL_CPUS: $(distinct d ${ALL_CPUS})"
+    debug "MAKE_OPTS: $(distinct d ${MAKE_OPTS})"
+    debug "FETCH_OPTS: $(distinct d ${FETCH_OPTS})"
+    debug "PREFIX: $(distinct d ${PREFIX})"
+    debug "SERVICE_DIR: $(distinct d ${SERVICE_DIR})"
+    debug "CURRENT_DIR: $(${PWD_BIN} 2>/dev/null)"
+    debug "BUILD_DIR_ROOT: $(distinct d ${BUILD_DIR_ROOT})"
+    debug "BUILD_DIR: $(distinct d ${BUILD_DIR})"
+    debug "PATH: $(distinct d ${PATH})"
+    debug "CC: $(distinct d ${CC})"
+    debug "CXX: $(distinct d ${CXX})"
+    debug "CPP: $(distinct d ${CPP})"
+    debug "CXXFLAGS: $(distinct d ${CXXFLAGS})"
+    debug "CFLAGS: $(distinct d ${CFLAGS})"
+    debug "LDFLAGS: $(distinct d ${LDFLAGS})"
+    debug "LD_LIBRARY_PATH: $(distinct d ${LD_LIBRARY_PATH})"
     debug "-------------- PRE CONFIGURE SETTINGS DUMP ENDS ---------"
 }
 
