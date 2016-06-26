@@ -33,7 +33,3 @@ DEFAULT_ZPOOL="$(${ZPOOL_BIN} list -H 2>/dev/null | ${CUT_BIN} -w -f1 2>/dev/nul
 if [ -x "${GIT_BIN}" ]; then
     ${GIT_BIN} config --global http.sslVerify false
 fi
-
-# runtime sha
-${TEST_BIN} -x "${SOFIN_MICROSECONDS_UTILITY_BIN}" && \
-RUNTIME_SHA="$(${PRINTF_BIN} "$(${DATE_BIN} 2>/dev/null)-$(${SOFIN_MICROSECONDS_UTILITY_BIN} 2>/dev/null)" | ${SHA_BIN} 2>/dev/null)"

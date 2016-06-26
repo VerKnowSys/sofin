@@ -35,7 +35,3 @@ CPUS="$(${CAT_BIN} /proc/cpuinfo 2>/dev/null | ${EGREP_BIN} -c 'processor.*:' 2>
 ALL_CPUS="${CPUS}"
 MAKE_OPTS="-j${CPUS}"
 FETCH_OPTS="--continue --no-verbose --progress=bar --ca-certificate=${DEFAULT_CACERT}"
-
-# runtime sha
-${TEST_BIN} -x "${SOFIN_MICROSECONDS_UTILITY_BIN}" && \
-RUNTIME_SHA="$(${PRINTF_BIN} "$(${DATE_BIN} 2>/dev/null)-$(${SOFIN_MICROSECONDS_UTILITY_BIN} 2>/dev/null)" | eval "${CALCULATE_SHA_GUARD}")"

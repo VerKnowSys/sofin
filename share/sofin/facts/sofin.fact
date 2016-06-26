@@ -78,3 +78,6 @@ HOST_ADDRESS_GUARD="${CUT_BIN} -d' ' -f2 2>/dev/null | ${CUT_BIN} -d'#' -f1 2>/d
 if [ ! -z "${SOFIN_TRACE}" ]; then
     set -x
 fi
+
+# Runtime-unique ID
+RUNTIME_ID="$(${DD_BIN} \i\f=/dev/urandom bs=64 count=1 2>/dev/null | eval "${CALCULATE_SHA_GUARD}")"

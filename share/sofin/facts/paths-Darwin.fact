@@ -27,8 +27,3 @@ if [ -z "${ZPOOL_BIN}" ]; then
 else
     DEFAULT_ZPOOL="$(${ZPOOL_BIN} list -H 2>/dev/null | ${CUT_BIN} -f1 2>/dev/null)"
 fi
-
-
-# runtime sha
-test -x "${SOFIN_MICROSECONDS_UTILITY_BIN}" && \
-RUNTIME_SHA="$(${PRINTF_BIN} "$(${DATE_BIN} 2>/dev/null)-$(${SOFIN_MICROSECONDS_UTILITY_BIN} 2>/dev/null)" | eval "${CALCULATE_SHA_GUARD}")"
