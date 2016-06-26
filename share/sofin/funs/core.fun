@@ -125,13 +125,11 @@ run () {
 try () {
     if [ ! -z "$1" ]; then
         params="$@"
-        ${MKDIR_BIN} -p "${LOGS_DIR}"
+        unset show_stdout_progress
+        echo "${params}" | eval "${MATCH_FETCH_CMDS_GUARD}" && show_stdout_progress=YES
         aname="$(lowercase ${DEF_NAME}${DEF_POSTFIX})"
-        debug "$(${DATE_BIN} +%s 2>/dev/null) try($(distinct d ${params}))"
-        echo "${params}" | ${EGREP_BIN} '^.*(fetch|curl|wget).*$' >/dev/null 2>/dev/null
-        if [ "$?" = "0" ]; then
-            show_stdout_progress=YES
-        fi
+        ${MKDIR_BIN} -p "${LOGS_DIR}"
+        debug "$(${DATE_BIN} +%s 2>/dev/null) try($(distinct d ${params}), show_stdout_progress=$(distinct d ${show_stdout_progress})"
         if [ -z "${aname}" ]; then
             if [ -z "${show_stdout_progress}" ]; then
                 eval PATH="${PATH}" "${params}" >> "${LOG}" 2>> "${LOG}"

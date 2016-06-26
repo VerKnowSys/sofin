@@ -49,8 +49,14 @@ check_os () {
 
 
 retry () {
-    targets="$@"
     ammo="***"
+    targets="$@"
+
+    # check for commands that puts something important/intersting on stdout
+    unset show_stdout_progress
+    echo "${targets}" | eval "${MATCH_FETCH_CMDS_GUARD}" && show_stdout_progress=YES
+
+    debug "Show stdout progress show_stdout_progress=$(distinct d "${show_stdout_progress}")"
     while [ ! -z "${ammo}" ]; do
         if [ ! -z "${targets}" ]; then
             debug "${TIMESTAMP}: Invoking: retry($(distinct d "${targets}")[$(distinct d ${ammo})]"
@@ -59,17 +65,25 @@ retry () {
                 ${MKDIR_BIN} -p "${LOGS_DIR}"
             fi
             gitroot="$(${BASENAME_BIN} $(${BASENAME_BIN} ${GIT_BIN} 2>/dev/null) 2>/dev/null)"
-            eval PATH="${gitroot}/bin:${gitroot}/libexec/git-core:${DEFAULT_PATH}" \
-                "${targets}" >> "${LOG}" 2>> "${LOG}" && \
-                unset gitroot ammo targets && \
-                return 0
+            if [ -z "${show_stdout_progress}" ]; then
+                eval PATH="${gitroot}/bin:${gitroot}/libexec/git-core:${DEFAULT_PATH}" \
+                    "${targets}" >> "${LOG}" 2>> "${LOG}" && \
+                    unset gitroot ammo targets && \
+                    return 0
+            else
+                ${PRINTF_BIN} "${green}"
+                eval PATH="${gitroot}/bin:${gitroot}/libexec/git-core:${DEFAULT_PATH}" \
+                    "${targets}" >> "${LOG}" && \
+                    unset gitroot ammo targets && \
+                    return 0
+            fi
         else
             error "retry(): Given an empty command to evaluate!"
         fi
         ammo="$(echo "${ammo}" | ${SED_BIN} 's/\*//' 2>/dev/null)"
         debug "retry(): Remaining attempts: $(distinct d ${ammo})"
     done
-    error "All ammo exhausted to invoke a command: $(distinct e "$@")"
+    error "All ammo exhausted to invoke a command: $(distinct e "${targets}")"
 }
 
 
