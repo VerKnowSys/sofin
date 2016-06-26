@@ -316,8 +316,15 @@ deploy_binbuild () {
 reset_definitions () {
     create_cache_directories
     cd "${DEFINITIONS_DIR}"
-    result="$(${GIT_BIN} reset --hard HEAD >> ${LOG} 2>> "${LOG}")" && \
-    note "State of definitions repository was reset to: $(distinct n "${result}")"
+    ${GIT_BIN} reset --hard HEAD >/dev/null 2>&1
+    if [ -z "${BRANCH}" ]; then
+        BRANCH="stable"
+    fi
+    _branch="$(${CAT_BIN} ${CACHE_DIR}definitions/.git/refs/heads/${BRANCH} 2>/dev/null)"
+    if [ -z "${_branch}" ]; then
+        _branch="HEAD"
+    fi
+    note "State of definitions repository was reset to: $(distinct n "${_branch}")"
     for line in $(${GIT_BIN} status --short 2>/dev/null | ${CUT_BIN} -f2 -d' ' 2>/dev/null); do
         ${RM_BIN} -fv "${line}" >> "${LOG}" 2>> "${LOG}" && \
             debug "Removed untracked file: $(distinct d "${line}")"
