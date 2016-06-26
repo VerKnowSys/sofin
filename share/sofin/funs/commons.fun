@@ -117,3 +117,50 @@ fill () {
     ${PRINTF_BIN} "${_buf}"
     unset _times _buf _char
 }
+
+
+find_most_recent () {
+    _path="${1}"
+    shift
+    _matcher="${1}"
+    shift
+    _type="$1"
+    if [ -z "${_type}" ]; then
+        _type='f' # look for files only by default
+    fi
+    if [ -z "${_path}" ]; then
+        error "Empty path given to find_most_recent()!"
+    else
+        if [ -z "${_matcher}" ]; then
+            debug "Empty matcher given in find_most_recent(), using wildcard."
+            _matcher="*"
+        fi
+        _stat_param='-f' # BSD syntax
+        case ${SYSTEM_NAME} in
+            Linux)
+                _stat_param='-c' # GNU syntax
+                ;;
+        esac
+        if [ -d "${_path}" ]; then
+            _find_results="$(${FIND_BIN} "${_path}" \
+                -maxdepth 1 \
+                -mindepth 1 \
+                -type ${_type} \
+                -name "${_matcher}" \
+                -exec ${STAT_BIN} ${_stat_param} '%m %N' {} \; 2>/dev/null | \
+                ${SORT_BIN} -n 2>/dev/null | \
+                ${TAIL_BIN} -n${MAX_OPEN_TAIL_LOGS} 2>/dev/null | \
+                ${REV_BIN} 2>/dev/null | \
+                ${CUT_BIN} -d'/' -f1 2>/dev/null | \
+                ${REV_BIN} 2>/dev/null)"
+            if [ -z "${_find_results}" ]; then
+                ${PRINTF_BIN} "" 2>/dev/null
+            else
+                ${PRINTF_BIN} "${_find_results}" 2>/dev/null
+            fi
+        else
+            error "Directory $(distinct e "${_path}") doesn't exists!"
+        fi
+    fi
+    unset _path _matcher _type _find_results _stat_param
+}
