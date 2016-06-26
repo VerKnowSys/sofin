@@ -106,29 +106,28 @@ distinct () {
 
 run () {
     if [ ! -z "$1" ]; then
-        params="$@"
+        _params="$@"
         unset show_stdout_progress
-        echo "${params}" | eval "${MATCH_FETCH_CMDS_GUARD}" && show_stdout_progress=YES
-        ${MKDIR_BIN} -p "${LOGS_DIR}"
-        aname="$(lowercase ${DEF_NAME}${DEF_POSTFIX})"
-        debug "$(${DATE_BIN} +%s 2>/dev/null) run($(distinct d ${params}))"
-        if [ -z "${aname}" ]; then
+        echo "${_params}" | eval "${MATCH_FETCH_CMDS_GUARD}" && show_stdout_progress=YES
+        _aname="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
+        debug "$(${DATE_BIN} +%s 2>/dev/null) run($(distinct d ${_params}))"
+        if [ -z "${_aname}" ]; then
             if [ -z "${show_stdout_progress}" ]; then
-                eval PATH="${PATH}" "${params}" >> "${LOG}" 2>> "${LOG}"
-                check_command_result $? "${params}"
+                eval PATH="${PATH}" "${_params}" >> "${LOG}" 2>> "${LOG}"
+                check_command_result $? "${_params}"
             else
                 ${PRINTF_BIN} "${blue}"
-                eval PATH="${PATH}" "${params}" >> "${LOG}"
-                check_command_result $? "${params}"
+                eval PATH="${PATH}" "${_params}" >> "${LOG}"
+                check_command_result $? "${_params}"
             fi
         else
             if [ -z "${show_stdout_progress}" ]; then
-                eval PATH="${PATH}" "${params}" >> "${LOG}-${aname}" 2>> "${LOG}-${aname}"
-                check_command_result $? "${params}"
+                eval PATH="${PATH}" "${_params}" >> "${LOG}-${_aname}" 2>> "${LOG}-${_aname}"
+                check_command_result $? "${_params}"
             else
                 ${PRINTF_BIN} "${blue}"
-                eval PATH="${PATH}" "${params}" >> "${LOG}-${aname}"
-                check_command_result $? "${params}"
+                eval PATH="${PATH}" "${_params}" >> "${LOG}-${_aname}"
+                check_command_result $? "${_params}"
             fi
         fi
     else
@@ -139,29 +138,29 @@ run () {
 
 try () {
     if [ ! -z "$1" ]; then
-        params="$@"
-        unset show_stdout_progress
-        echo "${params}" | eval "${MATCH_FETCH_CMDS_GUARD}" && show_stdout_progress=YES
-        aname="$(lowercase ${DEF_NAME}${DEF_POSTFIX})"
-        ${MKDIR_BIN} -p "${LOGS_DIR}"
-        debug "$(${DATE_BIN} +%s 2>/dev/null) try($(distinct d ${params}), show_stdout_progress=$(distinct d ${show_stdout_progress})"
-        if [ -z "${aname}" ]; then
-            if [ -z "${show_stdout_progress}" ]; then
-                eval PATH="${PATH}" "${params}" >> "${LOG}" 2>> "${LOG}"
+        _params="$@"
+        unset _show_stdout_progress
+        echo "${_params}" | eval "${MATCH_FETCH_CMDS_GUARD}" && \
+            _show_stdout_progress=YES
+        _aname="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
+        debug "$(${DATE_BIN} +%s 2>/dev/null): try($(distinct d ${_params}), show_stdout_progress=$(distinct d "${_show_stdout_progress}")"
+        if [ -z "${_aname}" ]; then
+            if [ -z "${_show_stdout_progress}" ]; then
+                eval PATH="${PATH}" "${_params}" >> "${LOG}" 2>> "${LOG}"
             else
                 ${PRINTF_BIN} "${blue}"
-                eval PATH="${PATH}" "${params}" >> "${LOG}" # show progress on stderr
+                eval PATH="${PATH}" "${_params}" >> "${LOG}" # show progress on stderr
             fi
         else
-            if [ -z "${show_stdout_progress}" ]; then
-                eval PATH="${PATH}" "${params}" >> "${LOG}-${aname}" 2>> "${LOG}-${aname}"
+            if [ -z "${_show_stdout_progress}" ]; then
+                eval PATH="${PATH}" "${_params}" >> "${LOG}-${_aname}" 2>> "${LOG}-${_aname}"
             else
                 ${PRINTF_BIN} "${blue}"
-                eval PATH="${PATH}" "${params}" >> "${LOG}-${aname}"
+                eval PATH="${PATH}" "${_params}" >> "${LOG}-${_aname}"
             fi
         fi
     else
-        error "An empty command to run for: $(distinct e ${DEF_NAME})?"
+        error "An empty command to run for: $(distinct e ${DEF_NAME}${DEF_POSTFIX})?"
     fi
 }
 
