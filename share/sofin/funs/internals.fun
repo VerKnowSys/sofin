@@ -239,13 +239,16 @@ show_diff () {
 
 develop () {
     create_cache_directories
-    devname="$(lowercase "${2}")"
-    if [ -z "${devname}" ]; then
-        error "No definition file name specified."
+    shift
+    _defname_input="${1}"
+    _defname_no_ext="$(echo "${_defname_input}" | ${SED_BIN} -e "s#\.${DEFAULT_DEF_EXT}##" 2>/dev/null)"
+    _devname="$(lowercase "$(${BASENAME_BIN} ${_defname_no_ext} 2>/dev/null)")"
+    if [ -z "${_devname}" ]; then
+        error "No definition file name specified as first param!"
     fi
-    note "Paste your definition below. Hit ctrl-d after a newline to commit"
-    ${CAT_BIN} > "${DEFINITIONS_DIR}/${devname}${DEFAULT_DEF_EXT}" 2>/dev/null
-    unset devname
+    note "Paste your definition below. Hit ctrl-d (after a newline) to commit. ctrl-c breaks."
+    ${CAT_BIN} > "${DEFINITIONS_DIR}/${_devname}${DEFAULT_DEF_EXT}" 2>/dev/null
+    unset _devname _defname_no_ext _defname_input
 }
 
 
