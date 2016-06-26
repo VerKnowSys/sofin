@@ -71,6 +71,7 @@ NEWLINES_TO_SPACES_GUARD="${TR_BIN} '\n' ' ' 2>/dev/null"
 CUT_TRAILING_SPACES_GUARD="${SED_BIN} 's/ *$//' 2>/dev/null"
 MATCH_FETCH_CMDS_GUARD="${EGREP_BIN} '^.*(fetch|curl|wget|ssh|scp|git|svn|cvs|bzr|hg).*$' >/dev/null 2>&1"
 CALCULATE_SHA_GUARD="${SHA_BIN} 2>/dev/null | ${CUT_BIN} -d' ' -f1 2>/dev/null"
+HOST_ADDRESS_GUARD="${CUT_BIN} -d' ' -f2 2>/dev/null | ${CUT_BIN} -d'#' -f1 2>/dev/null"
 
 if [ ! -z "${SOFIN_TRACE}" ]; then
     set -x
