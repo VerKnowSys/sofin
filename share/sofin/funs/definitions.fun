@@ -133,30 +133,39 @@ update_definitions () {
             ${RM_BIN} -vrf "$(${BASENAME_BIN} ${initial_definitions} 2>/dev/null)" >> ${LOG} 2>> ${LOG}
         return
     fi
-    if [ -d "${CACHE_DIR}definitions/.git" -a -f "${DEFAULTS}" ]; then
+    if [ -d "${CACHE_DIR}definitions/.git" -a \
+         -f "${DEFAULTS}" ]; then
         cd "${CACHE_DIR}definitions"
         current_branch="$(${GIT_BIN} rev-parse --abbrev-ref HEAD 2>/dev/null)"
+        latestsha="$(${CAT_BIN} "${CACHE_DIR}definitions/.git/refs/heads/${current_branch}" 2>/dev/null)"
+        if [ -z "${latestsha}" ]; then
+            latestsha="HEAD"
+        fi
+        debug "State of definitions repository was reset to: $(distinct d "${latestsha}")"
         if [ "${current_branch}" != "${BRANCH}" ]; then # use current_branch value if branch isn't matching default branch
-            ${GIT_BIN} checkout -b "${current_branch}" >> ${LOG} 2>> ${LOG} || \
-                ${GIT_BIN} checkout "${current_branch}" >> ${LOG} 2>> ${LOG}
-            ${GIT_BIN} pull origin ${current_branch} >> ${LOG} 2>> ${LOG} && \
             debug "Checking out branch: $(distinct d ${current_branch})"
+            try "${GIT_BIN} checkout ${DEFAULT_GIT_OPTS} -b ${current_branch}" || \
+                try "${GIT_BIN} checkout ${DEFAULT_GIT_OPTS} ${current_branch}" || \
                     warn "Can't checkout branch: $(distinct w ${current_branch})"
-            note "Updated branch: $(distinct n ${current_branch}) of repository: $(distinct n ${REPOSITORY})" && \
-            return
+
+            try "${GIT_BIN} pull ${DEFAULT_GIT_OPTS} origin ${current_branch}" && \
+            note "Branch: $(distinct n ${current_branch}) is at: $(distinct n ${latestsha})" && \
+                return
 
             note "${red}Error occured: Update from branch: $(distinct e ${BRANCH}) of repository: $(distinct e ${REPOSITORY}) wasn't possible. Log below:${reset}"
             ${TAIL_BIN} -n${LOG_LINES_AMOUNT_ON_ERR} ${LOG} 2>/dev/null
             error "$(fill)"
 
         else # else use default branch
-            ${GIT_BIN} checkout -b "${BRANCH}" >> ${LOG} 2>> ${LOG} || \
-                ${GIT_BIN} checkout "${BRANCH}" >> ${LOG} 2>> ${LOG}
-
-            ${GIT_BIN} pull origin ${BRANCH} >> ${LOG} 2>> ${LOG} && \
-            return
             debug "Using default branch: $(distinct d ${BRANCH})"
-                note "Updated branch: $(distinct n ${BRANCH}) of repository: $(distinct n ${REPOSITORY})" && \
+            if [ "${current_branch}" != "${BRANCH}" ]; then
+                try "${GIT_BIN} checkout ${DEFAULT_GIT_OPTS} -b ${BRANCH}" || \
+                    try "${GIT_BIN} checkout ${DEFAULT_GIT_OPTS} ${BRANCH}" || \
+                        warn "Can't checkout branch: $(distinct w ${BRANCH})"
+            fi
+            try "${GIT_BIN} pull ${DEFAULT_GIT_OPTS} origin ${BRANCH}" && \
+                note "Updated branch: $(distinct n ${BRANCH}) to: $(distinct n ${latestsha})" && \
+                return
 
             note "${red}Error occured: Update from branch: $(distinct e ${BRANCH}) of repository: $(distinct e ${REPOSITORY}) wasn't possible. Log's below:${reset}"
             ${TAIL_BIN} -n${LOG_LINES_AMOUNT_ON_ERR} ${LOG} 2>/dev/null
@@ -169,15 +178,19 @@ update_definitions () {
         ${MKDIR_BIN} -p "${LOGS_DIR}"
         debug "Cloning repository: $(distinct d ${REPOSITORY}) from branch: $(distinct d ${BRANCH}); LOGS_DIR: $(distinct d ${LOGS_DIR}), CACHE_DIR: $(distinct d ${CACHE_DIR})"
         ${RM_BIN} -rf definitions >> ${LOG} 2>> ${LOG} # if something is already here, wipe it out from cache
-        ${GIT_BIN} clone ${REPOSITORY} definitions >> ${LOG} 2>> ${LOG} || \
+        try "${GIT_BIN} clone ${DEFAULT_GIT_OPTS} ${REPOSITORY} definitions" || \
             error "Error occured: Update from branch: $(distinct e ${BRANCH}) of repository: $(distinct e ${REPOSITORY}) isn't possible. Please make sure that given repository and branch are valid."
         cd "${CACHE_DIR}definitions"
-        ${GIT_BIN} checkout -b "${BRANCH}" >> ${LOG} 2>> ${LOG} || \
-            ${GIT_BIN} checkout "${BRANCH}" >> ${LOG} 2>> ${LOG}
+        current_branch="$(${GIT_BIN} rev-parse --abbrev-ref HEAD 2>/dev/null)"
+        if [ "${BRANCH}" != "${current_branch}" ]; then
+            try "${GIT_BIN} checkout ${DEFAULT_GIT_OPTS} -b ${BRANCH}" || \
+                try "${GIT_BIN} checkout ${DEFAULT_GIT_OPTS} ${BRANCH}" || \
+                    warn "Can't checkout branch: $(distinct w ${BRANCH})"
+        fi
 
-        ${GIT_BIN} pull origin "${BRANCH}" >> ${LOG} 2>> ${LOG} && \
-        return
+        try "${GIT_BIN} pull ${DEFAULT_GIT_OPTS} origin ${BRANCH}" && \
             note "Updated branch: $(distinct n ${BRANCH}) of repository: $(distinct n ${REPOSITORY})" && \
+            return
 
         note "${red}Error occured: Update from branch: $(distinct n ${BRANCH}) of repository: $(distinct n ${REPOSITORY}) wasn't possible. Log below:${reset}"
         ${TAIL_BIN} -n${LOG_LINES_AMOUNT_ON_ERR} ${LOG} 2>/dev/null
@@ -555,34 +568,35 @@ execute_process () {
                     # git method:
                     # .cache/git-cache => git bare repos
                     ${MKDIR_BIN} -p ${GIT_CACHE_DIR}
-                    app_cache_dir="${GIT_CACHE_DIR}${DEF_NAME}${DEF_VERSION}.git"
+                    git_cached="${GIT_CACHE_DIR}${DEF_NAME}${DEF_VERSION}.git"
                     note "   ${NOTE_CHAR} Fetching git repository: $(distinct n ${DEF_HTTP_PATH}${reset})"
-                    try "${GIT_BIN} clone --depth 1 --bare ${DEF_HTTP_PATH} ${app_cache_dir}" || \
-                    try "${GIT_BIN} clone --depth 1 --bare ${DEF_HTTP_PATH} ${app_cache_dir}" || \
-                    try "${GIT_BIN} clone --depth 1 --bare ${DEF_HTTP_PATH} ${app_cache_dir}"
+                    try "${GIT_BIN} clone ${DEFAULT_GIT_OPTS} --depth 1 --bare ${DEF_HTTP_PATH} ${git_cached}" || \
+                    try "${GIT_BIN} clone ${DEFAULT_GIT_OPTS} --depth 1 --bare ${DEF_HTTP_PATH} ${git_cached}" || \
+                    try "${GIT_BIN} clone ${DEFAULT_GIT_OPTS} --depth 1 --bare ${DEF_HTTP_PATH} ${git_cached}"
                     if [ "$?" = "0" ]; then
                         debug "Fetched bare repository: $(distinct d ${DEF_NAME}${DEF_VERSION})"
                     else
-                        if [ ! -d "${app_cache_dir}/branches" -a ! -f "${app_cache_dir}/config" ]; then
-                            note "\n${red}Definitions were not updated. Below displaying $(distinct n ${LOG_LINES_AMOUNT_ON_ERR}) lines of internal log:${reset}"
+                        if [ ! -d "${git_cached}/branches" -a ! -f "${git_cached}/config" ]; then
+                            note "\n${red}Definitions were not updated. Showing $(distinct n ${LOG_LINES_AMOUNT_ON_ERR}) lines of internal log:${reset}"
                             ${TAIL_BIN} -n${LOG_LINES_AMOUNT_ON_ERR} ${LOG} 2>/dev/null
                             note "$(fill)"
                         else
                             current="$(${PWD_BIN} 2>/dev/null)"
-                            cd "${app_cache_dir}"
-                            try "${GIT_BIN} fetch origin ${DEF_GIT_CHECKOUT}" || \
-                            try "${GIT_BIN} fetch origin" || \
                             debug "Trying to update existing bare repository cache in: $(distinct d ${git_cached})"
-                            warn "   ${WARN_CHAR} Failed to fetch an update from bare repository: $(distinct w ${git_cached})"
+                            cd "${git_cached}"
+                            try "${GIT_BIN} fetch ${DEFAULT_GIT_OPTS} origin ${DEF_GIT_CHECKOUT}" || \
+                                try "${GIT_BIN} fetch ${DEFAULT_GIT_OPTS} origin" || \
+                                warn "   ${WARN_CHAR} Failed to fetch an update from bare repository: $(distinct w ${git_cached})"
                             # for empty DEF_VERSION it will fill it with first 16 chars of repository HEAD SHA1:
                             if [ -z "${DEF_VERSION}" ]; then
                                 DEF_VERSION="$(${GIT_BIN} rev-parse HEAD 2>/dev/null | ${CUT_BIN} -c -16 2>/dev/null)"
+                                debug "Set DEF_VERSION=$(distinct d ${DEF_VERSION}) - based on git commit sha"
                             fi
                             cd "${current}"
                         fi
                     fi
                     # bare repository is already cloned, so we just clone from it now..
-                    run "${GIT_BIN} clone ${app_cache_dir} ${DEF_NAME}${DEF_VERSION}" && \
+                    run "${GIT_BIN} clone ${DEFAULT_GIT_OPTS} ${git_cached} ${DEF_NAME}${DEF_VERSION}" && \
                     debug "Cloned git respository from git bare cache repository"
                 fi
 
@@ -596,9 +610,13 @@ execute_process () {
                 cd "${BUILD_DIR}"
                 debug "Switched to build dir: $(distinct d ${BUILD_DIR})"
 
-                if [ "${DEF_GIT_CHECKOUT}" != "" ]; then
-                    run "${GIT_BIN} checkout -b ${DEF_GIT_CHECKOUT}"
+                if [ ! -z "${DEF_GIT_CHECKOUT}" ]; then
                     note "   ${NOTE_CHAR} Definition branch: $(distinct n ${DEF_GIT_CHECKOUT})"
+                    current_branch="$(${GIT_BIN} rev-parse --abbrev-ref HEAD 2>/dev/null)"
+                    if [ "${current_branch}" != "${DEF_GIT_CHECKOUT}" ]; then
+                        try "${GIT_BIN} checkout ${DEFAULT_GIT_OPTS} -b ${DEF_GIT_CHECKOUT}"
+                    fi
+                    try "${GIT_BIN} checkout ${DEFAULT_GIT_OPTS} ${DEF_GIT_CHECKOUT}"
                 fi
 
                 after_update_callback
