@@ -95,10 +95,10 @@ if [ ! -z "${SOFIN_COMMAND_ARG}" ]; then
             fail_on_background_sofin_job ${SOFIN_ARGS}
             # NOTE: trying a list first - it will have priority if file exists:
             if [ -f "${LISTS_DIR}${2}" ]; then
-                APPLICATIONS="$(${CAT_BIN} ${LISTS_DIR}${2} 2>/dev/null | eval ${NEWLINES_TO_SPACES_GUARD})"
-                debug "Processing software: $(distinct d ${APPLICATIONS}) for architecture: $(distinct d ${SYSTEM_ARCH})"
+                BUNDLES="$(${CAT_BIN} ${LISTS_DIR}${2} 2>/dev/null | eval ${NEWLINES_TO_SPACES_GUARD})"
+                debug "Processing software: $(distinct d ${BUNDLES}) for architecture: $(distinct d ${SYSTEM_ARCH})"
             else
-                APPLICATIONS="${SOFIN_ARGS}"
+                BUNDLES="${SOFIN_ARGS}"
                 debug "Processing software: $(distinct d ${SOFIN_ARGS}) for architecture: $(distinct d ${SYSTEM_ARCH})"
             fi
             build_all
@@ -116,8 +116,8 @@ if [ ! -z "${SOFIN_COMMAND_ARG}" ]; then
             if [ ! -e "./${DEPENDENCIES_FILE}" ]; then
                 error "Dependencies file not found!"
             fi
-            APPLICATIONS="$(${CAT_BIN} ./${DEPENDENCIES_FILE} 2>/dev/null | eval ${NEWLINES_TO_SPACES_GUARD})"
-            note "Installing dependencies: $(distinct n ${APPLICATIONS})"
+            BUNDLES="$(${CAT_BIN} ./${DEPENDENCIES_FILE} 2>/dev/null | eval ${NEWLINES_TO_SPACES_GUARD})"
+            note "Installing dependencies: $(distinct n ${BUNDLES})"
             build_all
             cleanup_after_tasks
             ;;
@@ -138,7 +138,7 @@ if [ ! -z "${SOFIN_COMMAND_ARG}" ]; then
 
             export USE_UPDATE=NO
             export USE_BINBUILD=NO
-            APPLICATIONS="${dependencies}"
+            BUNDLES="${dependencies}"
             build_all
             cleanup_after_tasks
             ;;
