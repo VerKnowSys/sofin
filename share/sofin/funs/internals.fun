@@ -304,26 +304,33 @@ mark () {
 
 show_done () {
     ver="$(${CAT_BIN} "${PREFIX}/${application}${INSTALLED_MARK}" 2>/dev/null)"
+    if [ -z "${ver}" ]; then
+        ver="-"
+    fi
     note "${SUCCESS_CHAR} ${application} [$(distinct n ${ver})]\n"
 }
 
 
 create_or_receive () {
-    dataset_name="$1"
-    remote_path="${MAIN_BINARY_REPOSITORY}${MAIN_COMMON_NAME}/${final_snap_file}"
-    debug "Seeking remote snapshot existence: $(distinct d ${remote_path})"
-    try "${FETCH_BIN} ${FETCH_OPTS} ${remote_path}" || \
-    try "${FETCH_BIN} ${FETCH_OPTS} ${remote_path}" || \
-    try "${FETCH_BIN} ${FETCH_OPTS} ${remote_path}"
+    _dataset_name="$1"
+    _final_snap_file="${2}"
+    if [ -z "${_dataset_name}" -o \
+         -z "${_final_snap_file}" ]; then
+        error "create_or_receive(): Expected two aruments: $(distinct e dataset_name) and $(distinct e final_snapshot_file)."
+    fi
+    _commons_path="${MAIN_COMMON_REPOSITORY}/${_final_snap_file}"
+    try "${FETCH_BIN} ${FETCH_OPTS} ${_commons_path}" || \
+        try "${FETCH_BIN} ${FETCH_OPTS} ${_commons_path}" || \
+        try "${FETCH_BIN} ${FETCH_OPTS} ${_commons_path}"
     if [ "$?" = "0" ]; then
-        debug "Stream archive available. Creating service dataset: $(distinct d ${dataset_name}) from file stream: $(distinct d ${final_snap_file})"
-        note "Dataset: $(distinct n ${dataset_name}) - $(${XZCAT_BIN} "${final_snap_file}" | ${ZFS_BIN} receive -v "${dataset_name}" 2>/dev/null | ${TAIL_BIN} -n1)"
-        ${ZFS_BIN} rename ${dataset_name}@--head-- @origin >> ${LOG} 2>> ${LOG} && \
-        debug "Cleaning snapshot file: $(distinct d ${final_snap_file}), after successful receive"
-        ${RM_BIN} -f "${final_snap_file}"
+        note "Common stream available for: $(distinct n ). Creating service dataset: $(distinct n ${_dataset_name}), from file stream: $(distinct n ${_final_snap_file})."
+        try "${XZCAT_BIN} ${_final_snap_file} 2>/dev/null | \
+             ${ZFS_BIN} receive -e origin -v ${_dataset_name}" && \
+            ${RM_BIN} -fv "${_final_snap_file}" >> ${LOG} 2>> ${LOG}
     else
         debug "Initial service dataset unavailable"
-        ${ZFS_BIN} create "${dataset_name}" >> ${LOG} 2>> ${LOG} && \
-        note "Created an empty service dataset for: $(distinct n ${dataset_name})"
+        try "${ZFS_BIN} create ${_dataset_name}" && \
+            note "Created an empty service dataset for: $(distinct n ${_dataset_name})"
     fi
+    unset _dataset_name _final_snap_file _commons_path
 }
