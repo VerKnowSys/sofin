@@ -1,47 +1,57 @@
 load_defs () {
-    definitions=$*
-    if [ -z "${definitions}" ]; then
+    _definitions=$*
+    if [ -z "${_definitions}" ]; then
         error "No definition name specified for load_defs()!"
     else
-        debug "Trying to load definitions: $(distinct e "${definitions}")"
-        for given_def in ${definitions}; do
-            name_base="$(${BASENAME_BIN} "${given_def}" 2>/dev/null)"
-            definition="$(lowercase "${name_base}")"
-            if [ -e "${DEFINITIONS_DIR}${definition}${DEFAULT_DEF_EXT}" ]; then
-                debug "Loading definition: $(distinct d ${DEFINITIONS_DIR}${definition}${DEFAULT_DEF_EXT})"
-                . ${DEFINITIONS_DIR}${definition}${DEFAULT_DEF_EXT}
-            elif [ -e "${DEFINITIONS_DIR}${definition}" ]; then
-                debug "Loading definition: $(distinct d ${DEFINITIONS_DIR}${definition})"
-                . ${DEFINITIONS_DIR}${definition}
+        debug "Trying to load definitions: $(distinct e "${_definitions}")"
+        for _given_def in ${_definitions}; do
+            _name_base="$(${BASENAME_BIN} "${_given_def}" 2>/dev/null)"
+            _definition="$(lowercase "${_name_base}")"
+            if [ -e "${DEFINITIONS_DIR}${_definition}${DEFAULT_DEF_EXT}" ]; then
+                debug "Loading definition: $(distinct d ${DEFINITIONS_DIR}${_definition}${DEFAULT_DEF_EXT})"
+                . ${DEFINITIONS_DIR}${_definition}${DEFAULT_DEF_EXT}
+            elif [ -e "${DEFINITIONS_DIR}${_definition}" ]; then
+                debug "Loading definition: $(distinct d ${DEFINITIONS_DIR}${_definition})"
+                . ${DEFINITIONS_DIR}${_definition}
             else
-                error "Can't find definition to load: $(distinct e ${definition}) from dir: $(distinct e "${DEFINITIONS_DIR}")"
+                error "Can't find definition to load: $(distinct e ${_definition}) from dir: $(distinct e "${DEFINITIONS_DIR}")"
             fi
         done
     fi
 
     # Perform several sanity checks here..
     debug "Validating existence of required fields in definition: $(distinct d ${Definition})"
-    for required_field in   "DEF_NAME=${DEF_NAME}" \
+    for _required_field in  "DEF_NAME=${DEF_NAME}" \
                             "DEF_NAME_DEF_POSTFIX=${DEF_NAME}${DEF_POSTFIX}" \
                             "DEF_VERSION=${DEF_VERSION}" \
                             "DEF_SHA_OR_DEF_GIT_MODE=${DEF_SHA}${DEF_GIT_MODE}" \
                             "DEF_COMPLIANCE=${DEF_COMPLIANCE}" \
-                            "DEF_HTTP_PATH=${DEF_HTTP_PATH}" ; do
-        debug "Required field check: $(distinct d ${required_field})"
-        for check in    "DEF_NAME" \
-                        "DEF_NAME_DEF_POSTFIX" \
-                        "DEF_VERSION" \
-                        "DEF_SHA_OR_DEF_GIT_MODE" \
-                        "DEF_COMPLIANCE" \
-                        "DEF_HTTP_PATH"; do
-            if [ "${check}=" = "${required_field}" -o \
-                 "${check}=." = "${required_field}" -o \
-                 "${check}=${DEFAULT_DEF_EXT}" = "${required_field}" ]; then
-                error "Empty or wrong value for required field: $(distinct e ${check}) from definition: $(distinct w "${definition}")."
-            fi
-        done
+                            "DEF_HTTP_PATH=${DEF_HTTP_PATH}" \
+                            "SYSTEM_VERSION=${SYSTEM_VERSION}" \
+                            "OS_TRIPPLE=${OS_TRIPPLE}" \
+                            "RUNTIME_ID=${RUNTIME_ID}" \
+                            "SYS_SPECIFIC_BINARY_REMOTE=${SYS_SPECIFIC_BINARY_REMOTE}";
+            do
+                debug "Required field check: $(distinct d ${_required_field})"
+                for _check in   "DEF_NAME" \
+                                "DEF_NAME_DEF_POSTFIX" \
+                                "DEF_VERSION" \
+                                "DEF_SHA_OR_DEF_GIT_MODE" \
+                                "DEF_COMPLIANCE" \
+                                "DEF_HTTP_PATH" \
+                                "SYSTEM_VERSION" \
+                                "OS_TRIPPLE" \
+                                "RUNTIME_ID" \
+                                "SYS_SPECIFIC_BINARY_REMOTE";
+                    do
+                        if [ "${_check}=" = "${_required_field}" -o \
+                             "${_check}=." = "${_required_field}" -o \
+                             "${_check}=${DEFAULT_DEF_EXT}" = "${_required_field}" ]; then
+                            error "Empty or wrong value for required field: $(distinct e ${_check}) from definition: $(distinct e "${_definition}")."
+                        fi
+                done
     done
-    unset definition definitions
+    unset _definition _definitions _check _required_field _name_base _given_def
 }
 
 
@@ -78,40 +88,44 @@ cleanup_after_tasks () {
 
 
 store_checksum_bundle () {
-    if [ -z "${name}" ]; then
+    _name="${1}"
+    if [ -z "${_name}" ]; then
         error "Empty archive name in function: $(distinct e "store_checksum_bundle()")!"
     fi
-    archive_sha1="$(file_checksum "${name}")"
-    if [ -z "${archive_sha1}" ]; then
-        error "Empty checksum for archive: $(distinct e "${name}")"
+    _archive_sha1="$(file_checksum "${_name}")"
+    if [ -z "${_archive_sha1}" ]; then
+        error "Empty checksum for archive: $(distinct e "${_name}")"
     fi
-    ${PRINTF_BIN} "${archive_sha1}" > "${name}${DEFAULT_CHKSUM_EXT}" && \
-    debug "Stored checksum: $(distinct d ${archive_sha1}) for bundle file: $(distinct d "${name}")"
-    unset archive_sha1
+    ${PRINTF_BIN} "${_archive_sha1}" > "${_name}${DEFAULT_CHKSUM_EXT}" 2>> ${LOG} && \
+    debug "Stored checksum: $(distinct d ${_archive_sha1}) for bundle file: $(distinct d "${_name}")"
+    unset _archive_sha1 _name
 }
 
 
 build_software_bundle () {
-    if [ ! -e "./${name}" ]; then
-        ${TAR_BIN} -cJ --use-compress-program="${XZ_BIN} --threads=${CPUS}" -f "${name}" "./${element}" 2>> ${LOG} && \
-            note "Bundle archive of: $(distinct n ${element}) (using: $(distinct n ${CPUS}) threads) has been built." && \
+    _name="${1}"
+    _element="${2}"
+    if [ ! -e "./${_name}" ]; then
+        ${TAR_BIN} -cJ --use-compress-program="${XZ_BIN} --threads=${CPUS}" -f "${_name}" "./${_element}" 2>> ${LOG} && \
+            note "Bundle archive of: $(distinct n ${_element}) (using: $(distinct n ${CPUS}) threads) has been built." && \
             return
-        ${TAR_BIN} -cJf "${name}" "./${element}" 2>> ${LOG} && \
-            note "Bundle archive of: $(distinct n ${element}) has been built." && \
+        ${TAR_BIN} -cJf "${_name}" "./${_element}" 2>> ${LOG} && \
+            note "Bundle archive of: $(distinct n ${_element}) has been built." && \
             return
-        error "Failed to create archives for: $(distinct e ${element})"
+        error "Failed to create archives for: $(distinct e ${_element})"
     else
-        if [ ! -e "./${name}${DEFAULT_CHKSUM_EXT}" ]; then
+        if [ ! -e "./${_name}${DEFAULT_CHKSUM_EXT}" ]; then
             debug "Found sha-less archive. It may be incomplete or damaged. Rebuilding.."
-            ${RM_BIN} -vf "${name}" >> ${LOG} 2>> ${LOG}
-            ${TAR_BIN} -cJ --use-compress-program="${XZ_BIN} --threads=${CPUS}" -f "${name}" "./${element}" 2>> ${LOG} >> ${LOG} || \
-            ${TAR_BIN} -cJf "${name}" "./${element}" 2>> ${LOG} || \
-                error "Failed to create archives for: $(distinct e ${element})"
-            note "Archived bundle: $(distinct n "${element}") is ready to deploy"
+            ${RM_BIN} -vf "${_name}" >> ${LOG} 2>> ${LOG}
+            ${TAR_BIN} -cJ --use-compress-program="${XZ_BIN} --threads=${CPUS}" -f "${_name}" "./${_element}" 2>> ${LOG} >> ${LOG} || \
+            ${TAR_BIN} -cJf "${_name}" "./${_element}" 2>> ${LOG} || \
+                error "Failed to create archives for: $(distinct e ${_element})"
+            note "Archived bundle: $(distinct n "${_element}") is ready to deploy"
         else
-            note "Archived bundle: $(distinct n "${element}") already exists, and will be reused to deploy"
+            note "Archived bundle: $(distinct n "${_element}") already exists, and will be reused to deploy"
         fi
     fi
+    unset _name _element
 }
 
 
@@ -1175,8 +1189,8 @@ try_fetch_binbuild () {
     if [ ! -z "${USE_BINBUILD}" ]; then
         debug "Binary build check was skipped"
     else
-        aname="$(lowercase ${DEF_NAME}${DEF_POSTFIX})"
-        if [ -z "${aname}" ]; then
+        _aname="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
+        if [ -z "${_aname}" ]; then
             error "Cannot fetch binbuild! An empty definition name given!"
         fi
         if [ -z "${ARCHIVE_NAME}" ]; then
@@ -1187,15 +1201,15 @@ try_fetch_binbuild () {
         }
         if [ ! -e "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" ]; then
             cd ${BINBUILDS_CACHE_DIR}${ABSNAME}
-            try "${FETCH_BIN} ${FETCH_OPTS} ${MAIN_BINARY_REPOSITORY}$(os_tripple)/${ARCHIVE_NAME}${DEFAULT_CHKSUM_EXT}" || \
-                try "${FETCH_BIN} ${FETCH_OPTS} ${MAIN_BINARY_REPOSITORY}$(os_tripple)/${ARCHIVE_NAME}${DEFAULT_CHKSUM_EXT}"
+            try "${FETCH_BIN} ${FETCH_OPTS} ${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${ARCHIVE_NAME}${DEFAULT_CHKSUM_EXT}" || \
+                try "${FETCH_BIN} ${FETCH_OPTS} ${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${ARCHIVE_NAME}${DEFAULT_CHKSUM_EXT}"
             if [ "$?" = "0" ]; then
-                $(try "${FETCH_BIN} ${FETCH_OPTS} ${MAIN_BINARY_REPOSITORY}$(os_tripple)/${ARCHIVE_NAME}" && confirm) || \
-                $(try "${FETCH_BIN} ${FETCH_OPTS} ${MAIN_BINARY_REPOSITORY}$(os_tripple)/${ARCHIVE_NAME}" && confirm) || \
-                $(try "${FETCH_BIN} ${FETCH_OPTS} ${MAIN_BINARY_REPOSITORY}$(os_tripple)/${ARCHIVE_NAME}" && confirm) || \
+                $(try "${FETCH_BIN} ${FETCH_OPTS} ${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${ARCHIVE_NAME}" && confirm) || \
+                $(try "${FETCH_BIN} ${FETCH_OPTS} ${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${ARCHIVE_NAME}" && confirm) || \
+                $(try "${FETCH_BIN} ${FETCH_OPTS} ${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${ARCHIVE_NAME}" && confirm) || \
                 error "Failure fetching available binary build for: $(distinct e "${ARCHIVE_NAME}"). Please check your DNS / Network setup!"
             else
-                note "No binary build available for: $(distinct n $(os_tripple)/${DEF_NAME}${DEF_POSTFIX}-${DEF_VERSION})"
+                note "No binary build available for: $(distinct n ${OS_TRIPPLE}/${DEF_NAME}${DEF_POSTFIX}-${DEF_VERSION})"
             fi
         fi
 
@@ -1209,7 +1223,7 @@ try_fetch_binbuild () {
 
         # after sha1 validation we may continue with binary build if file still exists
         if [ -e "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" ]; then
-            ${TAR_BIN} -xJf "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" >> "${LOG}-${aname}" 2>> "${LOG}-${aname}"
+            ${TAR_BIN} -xJf "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" >> "${LOG}-${_aname}" 2>> "${LOG}-${_aname}"
             if [ "$?" = "0" ]; then # if archive is valid
                 note "Software bundle installed: $(distinct n ${DEF_NAME}${DEF_POSTFIX}), with version: $(distinct n ${DEF_VERSION})"
                 export DONT_BUILD_BUT_DO_EXPORTS=YES
@@ -1439,43 +1453,53 @@ dump_debug_info () {
 
 
 push_binary_archive () {
-    shortsha="$(${CAT_BIN} "${name}${DEFAULT_CHKSUM_EXT}" 2>/dev/null | ${CUT_BIN} -c -16 2>/dev/null)…"
-    note "Pushing archive #$(distinct n ${shortsha}) to remote repository.."
-    retry "${SCP_BIN} ${DEFAULT_SSH_OPTS} ${DEFAULT_SCP_OPTS} -P ${MAIN_PORT} ${name} ${address}/${name}.partial 2>> ${LOG}" || \
-        def_error "${name}" "Error sending: $(distinct e "${1}") bundle to: $(distinct e "${address}/${1}")"
+    _bundle_file="${1}"
+    _name="${2}"
+    _mirror="${3}"
+    _address="${4}"
+    _shortsha="$(${CAT_BIN} "${_name}${DEFAULT_CHKSUM_EXT}" 2>/dev/null | ${CUT_BIN} -c -16 2>/dev/null)…"
+    note "Pushing archive #$(distinct n ${_shortsha}) to remote repository with address: ${_address}"
+    debug "name: ${_name}, bundle_file: ${_bundle_file}"
+    retry "${SCP_BIN} ${DEFAULT_SSH_OPTS} ${DEFAULT_SCP_OPTS} -P ${MAIN_PORT} ${_name} ${_address}/${_name}.partial" || \
+        def_error "${_name}" "Unable to push: $(distinct e "${_bundle_file}") bundle to: $(distinct e "${_address}/${_bundle_file}")"
     if [ "$?" = "0" ]; then
         ${PRINTF_BIN} "${blue}"
-        ${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} ${MAIN_USER}@${mirror} "cd ${MAIN_SOFTWARE_PREFIX}/software/binary/$(os_tripple) && ${MV_BIN} ${name}.partial ${name}" >> ${LOG}
-        retry "${SCP_BIN} ${DEFAULT_SSH_OPTS} ${DEFAULT_SCP_OPTS} -P ${MAIN_PORT} ${name}${DEFAULT_CHKSUM_EXT} ${address}/${name}${DEFAULT_CHKSUM_EXT}" || \
-            def_error ${name}${DEFAULT_CHKSUM_EXT} "Error sending: $(distinct e ${name}${DEFAULT_CHKSUM_EXT}) file to: $(distinct e "${address}/${1}")"
+        ${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} ${MAIN_USER}@${_mirror} \
+            "cd ${SYS_SPECIFIC_BINARY_REMOTE} && ${MV_BIN} ${_name}.partial ${_name}"
+        retry "${SCP_BIN} ${DEFAULT_SSH_OPTS} ${DEFAULT_SCP_OPTS} -P ${MAIN_PORT} ${_name}${DEFAULT_CHKSUM_EXT} ${_address}/${_name}${DEFAULT_CHKSUM_EXT}" || \
+            def_error ${_name}${DEFAULT_CHKSUM_EXT} "Error sending: $(distinct e ${_name}${DEFAULT_CHKSUM_EXT}) file to: $(distinct e "${_address}/${_bundle_file}")"
     else
-        error "Failed to push binary build of: $(distinct e ${name}) to remote: $(distinct e ${MAIN_BINARY_REPOSITORY}$(os_tripple)/${name})"
+        error "Failed to push binary build of: $(distinct e ${_name}) to remote: $(distinct e ${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_name})"
     fi
+    unset _bundle_file _name _mirror _address _shortsha
 }
 
 
 push_service_stream_archive () {
+    _fin_snapfile="${1}"
+    _element="${2}"
+    _mirror="${3}"
     if [ "${SYSTEM_NAME}" = "FreeBSD" ]; then # NOTE: feature designed for FBSD.
-        if [ -f "${final_snap_file}" ]; then
-            system_path="${MAIN_SOFTWARE_PREFIX}/software/binary/${MAIN_COMMON_NAME}"
-            address="${MAIN_USER}@${mirror}:${system_path}"
+        if [ -f "${_fin_snapfile}" ]; then
+            ${PRINTF_BIN} "${blue}"
+            ${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} "${MAIN_USER}@${_mirror}" \
+                "cd ${MAIN_BINARY_PREFIX}; ${MKDIR_BIN} -p ${MAIN_COMMON_NAME} ; ${CHMOD_BIN} 755 ${MAIN_COMMON_NAME}"
 
-            ${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} "${MAIN_USER}@${mirror}" \
-                "cd ${MAIN_SOFTWARE_PREFIX}/software/binary; ${MKDIR_BIN} -p ${MAIN_COMMON_NAME} ; ${CHMOD_BIN} 755 ${MAIN_COMMON_NAME}" 2>> ${LOG}
+            debug "Setting common access to archive files before we send it: $(distinct d ${_fin_snapfile})"
+            ${CHMOD_BIN} -v a+r "${_fin_snapfile}" >> ${LOG} 2>> ${LOG}
+            debug "Sending initial service stream to $(distinct d ${MAIN_COMMON_NAME}) repository: $(distinct d ${MAIN_COMMON_REPOSITORY}/${_fin_snapfile})"
 
-            debug "Setting common access to archive files before we send it: $(distinct d ${final_snap_file})"
-            ${CHMOD_BIN} a+r "${final_snap_file}"
-            debug "Sending initial service stream to $(distinct d ${MAIN_COMMON_NAME}) repository: $(distinct d ${MAIN_BINARY_REPOSITORY}${MAIN_COMMON_NAME}/${final_snap_file})"
-
-            retry "${SCP_BIN} ${DEFAULT_SSH_OPTS} ${DEFAULT_SCP_OPTS} -P ${MAIN_PORT} ${final_snap_file} ${address}/${final_snap_file}.partial 2>> ${LOG}"
+            retry "${SCP_BIN} ${DEFAULT_SSH_OPTS} ${DEFAULT_SCP_OPTS} -P ${MAIN_PORT} ${_fin_snapfile} ${MAIN_USER}@${_mirror}:${MAIN_BINARY_PREFIX}/${COMMON_BINARY_REMOTE}/${_fin_snapfile}.partial"
             if [ "$?" = "0" ]; then
-                ${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} "${MAIN_USER}@${mirror}" \
-                    "cd ${MAIN_SOFTWARE_PREFIX}/software/binary/${MAIN_COMMON_NAME} && ${MV_BIN} ${final_snap_file}.partial ${final_snap_file}" 2>> ${LOG}
+                ${PRINTF_BIN} "${blue}"
+                ${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} "${MAIN_USER}@${_mirror}" \
+                    "cd ${COMMON_BINARY_REMOTE} && ${MV_BIN} ${_fin_snapfile}.partial ${_fin_snapfile}"
             else
-                error "Failed to send service snapshot archive file: $(distinct e "${final_snap_file}") to remote host: $(distinct e "${MAIN_USER}@${mirror}")!"
+                error "Failed to send service snapshot archive file: $(distinct e "${_fin_snapfile}") to remote host: $(distinct e "${MAIN_USER}@${_mirror}")!"
             fi
         else
-            note "No service stream available for: $(distinct n ${element})"
+            note "No service stream available for: $(distinct n ${_element})"
         fi
     fi
+    unset _bundle_file _name _mirror _address _shortsha _element _fin_snapfile
 }
