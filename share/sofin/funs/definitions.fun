@@ -333,10 +333,10 @@ remove_application () {
 
     # first look for a list with that name:
     if [ -e "${LISTS_DIR}${2}" ]; then
-        export APPLICATIONS="$(${CAT_BIN} ${LISTS_DIR}${2} 2>/dev/null | eval "${NEWLINES_TO_SPACES_GUARD}")"
+        APPLICATIONS="$(${CAT_BIN} ${LISTS_DIR}${2} 2>/dev/null | eval "${NEWLINES_TO_SPACES_GUARD}")"
         debug "Removing list of applications: $(distinct d ${APPLICATIONS})"
     else
-        export APPLICATIONS="${SOFIN_ARGS}"
+        APPLICATIONS="${SOFIN_ARGS}"
         debug "Removing applications: $(distinct d ${APPLICATIONS})"
     fi
 
