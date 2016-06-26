@@ -127,7 +127,7 @@ update_definitions () {
         ${MKDIR_BIN} -p "${LOGS_DIR}" "${CACHE_DIR}definitions"
         cd "${CACHE_DIR}definitions"
         initial_definitions="${MAIN_SOURCE_REPOSITORY}initial-definitions${DEFAULT_ARCHIVE_EXT}"
-        debug "Fetching latest tarball with initial definitions from: ${initial_definitions}"
+        debug "Fetching latest tarball with initial definitions from: $(distinct d ${initial_definitions})"
         retry "${FETCH_BIN} ${FETCH_OPTS} ${initial_definitions}" && \
         ${TAR_BIN} -xJf *${DEFAULT_ARCHIVE_EXT} >> ${LOG} 2>> ${LOG} && \
             ${RM_BIN} -vrf "$(${BASENAME_BIN} ${initial_definitions} 2>/dev/null)" >> ${LOG} 2>> ${LOG}
@@ -137,25 +137,26 @@ update_definitions () {
         cd "${CACHE_DIR}definitions"
         current_branch="$(${GIT_BIN} rev-parse --abbrev-ref HEAD 2>/dev/null)"
         if [ "${current_branch}" != "${BRANCH}" ]; then # use current_branch value if branch isn't matching default branch
-            debug "Checking out branch: ${current_branch}"
             ${GIT_BIN} checkout -b "${current_branch}" >> ${LOG} 2>> ${LOG} || \
                 ${GIT_BIN} checkout "${current_branch}" >> ${LOG} 2>> ${LOG}
             ${GIT_BIN} pull origin ${current_branch} >> ${LOG} 2>> ${LOG} && \
+            debug "Checking out branch: $(distinct d ${current_branch})"
+                    warn "Can't checkout branch: $(distinct w ${current_branch})"
             note "Updated branch: $(distinct n ${current_branch}) of repository: $(distinct n ${REPOSITORY})" && \
             return
 
-            note "${red}Error occured: Update from branch: ${BRANCH} of repository: ${REPOSITORY} wasn't possible. Log below:${reset}"
+            note "${red}Error occured: Update from branch: $(distinct e ${BRANCH}) of repository: $(distinct e ${REPOSITORY}) wasn't possible. Log below:${reset}"
             ${TAIL_BIN} -n${LOG_LINES_AMOUNT_ON_ERR} ${LOG} 2>/dev/null
             error "$(fill)"
 
         else # else use default branch
-            debug "Using default branch: ${BRANCH}"
             ${GIT_BIN} checkout -b "${BRANCH}" >> ${LOG} 2>> ${LOG} || \
                 ${GIT_BIN} checkout "${BRANCH}" >> ${LOG} 2>> ${LOG}
 
             ${GIT_BIN} pull origin ${BRANCH} >> ${LOG} 2>> ${LOG} && \
-            note "Updated branch: $(distinct n ${BRANCH}) of repository: $(distinct n ${REPOSITORY})" && \
             return
+            debug "Using default branch: $(distinct d ${BRANCH})"
+                note "Updated branch: $(distinct n ${BRANCH}) of repository: $(distinct n ${REPOSITORY})" && \
 
             note "${red}Error occured: Update from branch: $(distinct e ${BRANCH}) of repository: $(distinct e ${REPOSITORY}) wasn't possible. Log's below:${reset}"
             ${TAIL_BIN} -n${LOG_LINES_AMOUNT_ON_ERR} ${LOG} 2>/dev/null
@@ -175,8 +176,8 @@ update_definitions () {
             ${GIT_BIN} checkout "${BRANCH}" >> ${LOG} 2>> ${LOG}
 
         ${GIT_BIN} pull origin "${BRANCH}" >> ${LOG} 2>> ${LOG} && \
-        note "Updated branch: $(distinct n ${BRANCH}) of repository: $(distinct n ${REPOSITORY})" && \
         return
+            note "Updated branch: $(distinct n ${BRANCH}) of repository: $(distinct n ${REPOSITORY})" && \
 
         note "${red}Error occured: Update from branch: $(distinct n ${BRANCH}) of repository: $(distinct n ${REPOSITORY}) wasn't possible. Log below:${reset}"
         ${TAIL_BIN} -n${LOG_LINES_AMOUNT_ON_ERR} ${LOG} 2>/dev/null
@@ -190,7 +191,6 @@ check_disabled () {
     export ALLOW="1"
     if [ ! -z "$1" ]; then
         for disabled in ${1}; do
-            debug "Running system: ${SYSTEM_NAME}; disable_on element: ${disabled}"
             if [ "${SYSTEM_NAME}" = "${disabled}" ]; then
                 export ALLOW="0"
             fi
@@ -317,7 +317,7 @@ reset_definitions () {
     create_cache_directories
     cd "${DEFINITIONS_DIR}"
     result="$(${GIT_BIN} reset --hard HEAD >> ${LOG} 2>> "${LOG}")" && \
-        note "State of definitions repository was reset to: $(distinct n "${result}")"
+    note "State of definitions repository was reset to: $(distinct n "${result}")"
     for line in $(${GIT_BIN} status --short 2>/dev/null | ${CUT_BIN} -f2 -d' ' 2>/dev/null); do
         ${RM_BIN} -fv "${line}" >> "${LOG}" 2>> "${LOG}" && \
             debug "Removed untracked file: $(distinct d "${line}")"
@@ -562,11 +562,11 @@ execute_process () {
                             note "$(fill)"
                         else
                             current="$(${PWD_BIN} 2>/dev/null)"
-                            debug "Trying to update existing bare repository cache in: $(distinct d ${app_cache_dir})"
                             cd "${app_cache_dir}"
                             try "${GIT_BIN} fetch origin ${DEF_GIT_CHECKOUT}" || \
                             try "${GIT_BIN} fetch origin" || \
-                            warn "   ${WARN_CHAR} Failed to fetch an update from bare repository: $(distinct w ${app_cache_dir})"
+                            debug "Trying to update existing bare repository cache in: $(distinct d ${git_cached})"
+                            warn "   ${WARN_CHAR} Failed to fetch an update from bare repository: $(distinct w ${git_cached})"
                             # for empty DEF_VERSION it will fill it with first 16 chars of repository HEAD SHA1:
                             if [ -z "${DEF_VERSION}" ]; then
                                 DEF_VERSION="$(${GIT_BIN} rev-parse HEAD 2>/dev/null | ${CUT_BIN} -c -16 2>/dev/null)"
@@ -590,8 +590,8 @@ execute_process () {
                 debug "Switched to build dir: $(distinct d ${BUILD_DIR})"
 
                 if [ "${DEF_GIT_CHECKOUT}" != "" ]; then
-                    note "   ${NOTE_CHAR} Checking out: $(distinct n ${DEF_GIT_CHECKOUT})"
                     run "${GIT_BIN} checkout -b ${DEF_GIT_CHECKOUT}"
+                    note "   ${NOTE_CHAR} Definition branch: $(distinct n ${DEF_GIT_CHECKOUT})"
                 fi
 
                 after_update_callback
