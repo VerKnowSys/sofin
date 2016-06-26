@@ -1,14 +1,21 @@
 create_cache_directories () {
+    # special threatment for LOGS_DIR
+    if [ ! -d "${LOGS_DIR}" ]; then
+        debug "LOGS_DIR: $(distinct d "${LOGS_DIR}")"
+        ${MKDIR_BIN} -p "${LOGS_DIR}" >/dev/null 2>&1
+    fi
+
     # check for regular cache dirs for existence:
     if [ ! -d "${CACHE_DIR}" -o \
          ! -d "${BINBUILDS_CACHE_DIR}" -o \
-         ! -d "${LOCKS_DIR}" -o \
-         ! -d "${LOGS_DIR}" ]; then
-         ${MKDIR_BIN} -p "${CACHE_DIR}" "${BINBUILDS_CACHE_DIR}" "${LOGS_DIR}" "${LOCKS_DIR}"
+         ! -d "${LOCKS_DIR}" ]; then
+         for dir in "${CACHE_DIR}" "${BINBUILDS_CACHE_DIR}" "${LOCKS_DIR}"; do
+            ${MKDIR_BIN} -p "${dir}" >/dev/null 2>&1
+         done
     fi
     if [ ! -d "${DEFINITIONS_DIR}" -o \
          ! -f "${DEFAULTS}" ]; then
-        note "No valid definitions cache found. Creating one."
+        debug "No valid definitions cache found in: $(distinct d "${DEFINITIONS_DIR}"). Creating one."
         clean_purge
         update_definitions
     fi
