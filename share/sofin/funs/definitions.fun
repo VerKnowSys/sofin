@@ -1396,6 +1396,10 @@ build_all () {
 dump_debug_info () {
     debug "-------------- PRE CONFIGURE SETTINGS DUMP --------------"
     debug "Current DIR: $(${PWD_BIN} 2>/dev/null)"
+    debug "CPUS (used): ${CPUS}"
+    debug "ALL_CPUS: ${ALL_CPUS}"
+    debug "MAKE_OPTS: ${MAKE_OPTS}"
+    debug "FETCH_OPTS: ${FETCH_OPTS}"
     debug "PREFIX: ${PREFIX}"
     debug "SERVICE_DIR: ${SERVICE_DIR}"
     debug "PATH: ${PATH}"
