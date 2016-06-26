@@ -43,6 +43,31 @@ check_os () {
 }
 
 
+file_size () {
+    _file="${1}"
+    if [ -z "${_file}" ]; then
+        unset _file
+        return 0
+    fi
+    if [ ! -f "${_file}" ]; then
+        unset _file
+        return 0
+    fi
+    case "${SYSTEM_NAME}" in
+        Linux)
+            _size=$(${STAT_BIN} -c%s "${_file}" 2>/dev/null)
+            ;;
+
+        *)
+            _size=$(${STAT_BIN} -f%z "${_file}" 2>/dev/null)
+            ;;
+    esac
+
+    ${PRINTF_BIN} "${_size}" 2>/dev/null
+    unset _file _size
+}
+
+
 retry () {
     _targets="${1}"
     _ammo="OOO"
