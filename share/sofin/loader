@@ -13,11 +13,28 @@ load_funs () {
 
 
 load_sofin () {
+    if [ -z "${HOME}" ]; then
+        echo "${yellow}WARNING: HOME unset? Expect problems!${reset}"
+    fi
+
     # loading facts
-    load_facts paths.fact paths-OS_TYPE.fact system.fact shell.fact sofin.fact
+    load_facts  \
+                shell.fact \
+                paths.fact \
+                paths-OS_TYPE.fact \
+                sofin.fact \
+                system.fact
 
     # loading funs
-    load_funs core.fun validations.fun commons.fun envs.fun internals.fun cleaners.fun caches.fun definitions.fun
+    load_funs \
+                core.fun \
+                validations.fun \
+                commons.fun \
+                envs.fun \
+                internals.fun \
+                cleaners.fun \
+                caches.fun \
+                definitions.fun
 
     # initial validations
     setup_default_branch
