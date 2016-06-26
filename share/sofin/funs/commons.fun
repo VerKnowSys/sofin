@@ -71,7 +71,7 @@ retry () {
                     unset gitroot ammo targets && \
                     return 0
             else
-                ${PRINTF_BIN} "${green}"
+                ${PRINTF_BIN} "${blue}"
                 eval PATH="${gitroot}/bin:${gitroot}/libexec/git-core:${DEFAULT_PATH}" \
                     "${targets}" >> "${LOG}" && \
                     unset gitroot ammo targets && \
