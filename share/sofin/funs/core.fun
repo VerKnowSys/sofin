@@ -106,15 +106,28 @@ distinct () {
 
 run () {
     if [ ! -z "$1" ]; then
+        params="$@"
+        unset show_stdout_progress
+        echo "${params}" | eval "${MATCH_FETCH_CMDS_GUARD}" && show_stdout_progress=YES
         ${MKDIR_BIN} -p "${LOGS_DIR}"
         aname="$(lowercase ${DEF_NAME}${DEF_POSTFIX})"
-        debug "$(${DATE_BIN} +%s 2>/dev/null) Launching action: $(distinct d $@))"
+        debug "$(${DATE_BIN} +%s 2>/dev/null) run($(distinct d ${params}))"
         if [ -z "${aname}" ]; then
-            eval PATH="${PATH}" "$@" >> "${LOG}" 2>> "${LOG}"
-            check_command_result $? "$@"
+            if [ -z "${show_stdout_progress}" ]; then
+                eval PATH="${PATH}" "${params}" >> "${LOG}" 2>> "${LOG}"
+                check_command_result $? "${params}"
+            else
+                eval PATH="${PATH}" "${params}" >> "${LOG}"
+                check_command_result $? "${params}"
+            fi
         else
-            eval PATH="${PATH}" "$@" >> "${LOG}-${aname}" 2>> "${LOG}-${aname}"
-            check_command_result $? "$@"
+            if [ -z "${show_stdout_progress}" ]; then
+                eval PATH="${PATH}" "${params}" >> "${LOG}-${aname}" 2>> "${LOG}-${aname}"
+                check_command_result $? "${params}"
+            else
+                eval PATH="${PATH}" "${params}" >> "${LOG}-${aname}"
+                check_command_result $? "${params}"
+            fi
         fi
     else
         error "Specified an empty command to run. Aborting."
