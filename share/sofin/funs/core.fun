@@ -117,6 +117,7 @@ run () {
                 eval PATH="${PATH}" "${params}" >> "${LOG}" 2>> "${LOG}"
                 check_command_result $? "${params}"
             else
+                ${PRINTF_BIN} "${blue}"
                 eval PATH="${PATH}" "${params}" >> "${LOG}"
                 check_command_result $? "${params}"
             fi
@@ -125,6 +126,7 @@ run () {
                 eval PATH="${PATH}" "${params}" >> "${LOG}-${aname}" 2>> "${LOG}-${aname}"
                 check_command_result $? "${params}"
             else
+                ${PRINTF_BIN} "${blue}"
                 eval PATH="${PATH}" "${params}" >> "${LOG}-${aname}"
                 check_command_result $? "${params}"
             fi
@@ -147,12 +149,14 @@ try () {
             if [ -z "${show_stdout_progress}" ]; then
                 eval PATH="${PATH}" "${params}" >> "${LOG}" 2>> "${LOG}"
             else
+                ${PRINTF_BIN} "${blue}"
                 eval PATH="${PATH}" "${params}" >> "${LOG}" # show progress on stderr
             fi
         else
             if [ -z "${show_stdout_progress}" ]; then
                 eval PATH="${PATH}" "${params}" >> "${LOG}-${aname}" 2>> "${LOG}-${aname}"
             else
+                ${PRINTF_BIN} "${blue}"
                 eval PATH="${PATH}" "${params}" >> "${LOG}-${aname}"
             fi
         fi
