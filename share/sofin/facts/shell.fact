@@ -10,6 +10,7 @@ white='\033[38;40m'
 reset='\033[0m'
 
 TTY="NO"
+MAX_COLS="80"
 SUCCESS_CHAR="V"
 WARN_CHAR="*"
 NOTE_CHAR=">"
