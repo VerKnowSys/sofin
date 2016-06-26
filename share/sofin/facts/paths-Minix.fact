@@ -11,6 +11,7 @@ SCP_BIN="/usr/pkg/bin/scp"
 
 # set core parameters:
 CPUS="4" # XXX: hardcoded
+ALL_CPUS="${CPUS}"
 MAKE_OPTS="-j${CPUS}"
 FETCH_OPTS="--timeout=5 --retry --ca-cert=${DEFAULT_CACERT}"
 

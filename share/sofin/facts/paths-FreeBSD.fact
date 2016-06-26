@@ -24,6 +24,7 @@ LIMITS_BIN="/usr/bin/limits"
 
 # set core parameters:
 CPUS="$(${SYSCTL_BIN} -e kern.smp.cpus 2>/dev/null | ${CUT_BIN} -d'=' -f2 2>/dev/null)"
+ALL_CPUS="${CPUS}"
 FETCH_OPTS="--timeout=5 --retry --ca-cert=${DEFAULT_CACERT}"
 MAKE_OPTS="-j${CPUS}"
 DEFAULT_ZPOOL="$(${ZPOOL_BIN} list -H 2>/dev/null | ${CUT_BIN} -w -f1 2>/dev/null)"
