@@ -108,11 +108,11 @@ retry () {
 
 
 capitalize () {
-    _name="$*"
-    _head="$(${PRINTF_BIN} "${_name}" 2>/dev/null | ${CUT_BIN} -c1 2>/dev/null | ${TR_BIN} '[a-z]' '[A-Z]' 2>/dev/null)"
-    _tail="$(${PRINTF_BIN} "${_name}" 2>/dev/null | ${SED_BIN} 's/^[a-zA-Z]//' 2>/dev/null)"
-    ${PRINTF_BIN} "${_head}${_tail}"
-    unset _head _tail _name
+    _capi_name="$*"
+    _capi_head="$(${PRINTF_BIN} "${_capi_name}" 2>/dev/null | ${CUT_BIN} -c1 2>/dev/null | ${TR_BIN} '[a-z]' '[A-Z]' 2>/dev/null)"
+    _capi_tail="$(${PRINTF_BIN} "${_capi_name}" 2>/dev/null | ${SED_BIN} 's/^[a-zA-Z]//' 2>/dev/null)"
+    ${PRINTF_BIN} "${_capi_head}${_capi_tail}"
+    unset _capi_head _capi_tail _capi_name
 }
 
 
@@ -140,79 +140,79 @@ fill () {
 
 
 find_all () {
-    _path="${1}"
-    _matcher="${2}"
-    _type="${3}"
-    if [ -z "${_type}" ]; then
-        _type='f' # look for files only by default
+    _fapath="${1}"
+    _famatcher="${2}"
+    _fatype="${3}"
+    if [ -z "${_fatype}" ]; then
+        _fatype='f' # look for files only by default
     fi
-    if [ -z "${_path}" ]; then
+    if [ -z "${_fapath}" ]; then
         error "Empty path given to find_all()!"
     else
-        if [ -z "${_matcher}" ]; then
+        if [ -z "${_famatcher}" ]; then
             debug "Empty matcher given in find_all(), using wildcard."
-            _matcher='*'
+            _famatcher='*'
         fi
-        if [ -d "${_path}" ]; then
-            _find_results="$(${FIND_BIN} "${_path}" \
+        if [ -d "${_fapath}" ]; then
+            _fafind_results="$(${FIND_BIN} "${_fapath}" \
                 -maxdepth 1 \
                 -mindepth 1 \
-                -type "${_type}" \
-                -name "${_matcher}" \
+                -type "${_fatype}" \
+                -name "${_famatcher}" \
                 2>/dev/null)"
-            if [ -z "${_find_results}" ]; then
+            if [ -z "${_fafind_results}" ]; then
                 ${PRINTF_BIN} "" 2>/dev/null
             else
-                ${PRINTF_BIN} "${_find_results}" 2>/dev/null
+                ${PRINTF_BIN} "${_fafind_results}" 2>/dev/null
             fi
         else
-            error "Directory $(distinct e "${_path}") doesn't exists!"
+            error "Directory $(distinct e "${_fapath}") doesn't exists!"
         fi
     fi
-    unset _path _matcher _type _find_results
+    unset _fapath _famatcher _fatype _fafind_results
 }
 
 
 find_most_recent () {
-    _path="${1}"
-    _matcher="${2}"
-    _type="${3}"
-    if [ -z "${_type}" ]; then
-        _type="f" # look for files only by default
+    _frpath="${1}"
+    _frmatcher="${2}"
+    _frtype="${3}"
+    if [ -z "${_frtype}" ]; then
+        _frtype="f" # look for files only by default
     fi
-    if [ -z "${_path}" ]; then
+    if [ -z "${_frpath}" ]; then
         error "Empty path given to find_most_recent()!"
     elif [ "${SYSTEM_NAME}" = "Linux" ]; then
         error "This function does bad things with GNU find. Fix it if you want.."
     else
-        if [ -z "${_matcher}" ]; then
+        if [ -z "${_frmatcher}" ]; then
             debug "Empty matcher given in find_most_recent(), using wildcard."
-            _matcher="*"
+            _frmatcher="*"
         else
-            debug "Specified matcher: $(distinct d ${_matcher})"
+            debug "Specified matcher: $(distinct d ${_frmatcher})"
         fi
-        if [ -d "${_path}" ]; then
-            debug "Find _path: $(distinct d "${_path}")"
-            _find_results="$(${FIND_BIN} "${_path}" \
+        if [ -d "${_frpath}" ]; then
+            debug "Find _frpath: $(distinct d "${_frpath}")"
+            _frfind_results="$(${FIND_BIN} "${_frpath}" \
                 -maxdepth 2 \
                 -mindepth 1 \
-                -type "${_type}" \
-                -name "${_matcher}" \
+                -type "${_frtype}" \
+                -name "${_frmatcher}" \
                 -exec ${STAT_BIN} -f '%m %N' {} \; \
                 2>> ${LOG} | \
                 ${SORT_BIN} -nr 2>/dev/null | \
                 ${HEAD_BIN} -n${MAX_OPEN_TAIL_LOGS} 2>/dev/null | \
                 ${CUT_BIN} -d' ' -f2 2>/dev/null)"
-            _res_singleline="$(echo "${_find_results}" | eval "${NEWLINES_TO_SPACES_GUARD}")"
-            debug "Find results: $(distinct d "${_res_singleline}")"
-            if [ -z "${_find_results}" ]; then
+            _frres_singleline="$(echo "${_frfind_results}" | eval "${NEWLINES_TO_SPACES_GUARD}")"
+            debug "Find results: $(distinct d "${_frres_singleline}")"
+            if [ -z "${_frfind_results}" ]; then
                 ${PRINTF_BIN} "" 2>/dev/null
             else
-                ${PRINTF_BIN} "${_find_results}" 2>/dev/null
+                ${PRINTF_BIN} "${_frfind_results}" 2>/dev/null
             fi
         else
-            error "Directory $(distinct e "${_path}") doesn't exists!"
+            error "Directory $(distinct e "${_frpath}") doesn't exists!"
         fi
     fi
-    unset _path _matcher _type _find_results _stat_param _res_singleline
+    unset _frpath _frmatcher _frtype _frfind_results _frres_singleline
 }
