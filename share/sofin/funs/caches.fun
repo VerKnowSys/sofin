@@ -76,6 +76,7 @@ show_logs () {
         if [ -d "${LOGS_DIR}" ]; then
             debug "LOGS_DIR: $(distinct d ${LOGS_DIR})"
             _files_list="$(find_most_recent "${LOGS_DIR}" "sofin*")"
+            debug "_files_list: ${_files_list}"
             _files_abspaths="$(${PRINTF_BIN} "${_files_list}" | eval "${NEWLINES_TO_SPACES_GUARD}")"
             _files_count="$(${PRINTF_BIN} "${_files_list}" | eval "${FILES_COUNT_GUARD}")"
             _files_blist="" # build file list without full path to each one
