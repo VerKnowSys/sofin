@@ -186,9 +186,8 @@ update_definitions () {
         fi
     else
         # create cache; clone definitions repository:
-        # ${MKDIR_BIN} -p "${CACHE_DIR}" 2>/dev/null
-        # ${MKDIR_BIN} -p "${LOGS_DIR}" 2>/dev/null
-        create_cache_directories
+        ${MKDIR_BIN} -p "${CACHE_DIR}" 2>/dev/null
+        ${MKDIR_BIN} -p "${LOGS_DIR}" 2>/dev/null
 
         cd "${CACHE_DIR}"
         debug "Cloning repository: $(distinct d ${REPOSITORY}) from branch: $(distinct d ${BRANCH}); LOGS_DIR: $(distinct d ${LOGS_DIR}), CACHE_DIR: $(distinct d ${CACHE_DIR})"
