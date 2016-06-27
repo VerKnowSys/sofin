@@ -390,8 +390,8 @@ remove_bundles () {
             if [ "${_given_name}" = "/" ]; then
                 error "Czy Ty orzeszki?"
             fi
-            load_defs "${_def}"
-            _aname="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
+            _aname="$(lowercase "${_given_name}")"
+            debug "Given name: _given_name: ${_given_name}, _aname: ${_aname}"
             note "Removing software bundle(s): $(distinct n ${_given_name})"
             if [ -z "${_aname}" ]; then
                 ${RM_BIN} -rfv "${SOFTWARE_DIR}${_given_name}" >> "${LOG}" 2>> "${LOG}"
