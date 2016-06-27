@@ -248,16 +248,23 @@ file_checksum () {
 
 
 push_binbuild () {
+    _push_bundles="$*"
+    if [ -z "${_push_bundles}" ]; then
+        error "push_binbuild(): Arguments cannot be empty!"
+    fi
     create_cache_directories
-    note "Pushing binary bundle: $(distinct n ${SOFIN_ARGS}) to remote: $(distinct n ${MAIN_BINARY_REPOSITORY})"
+    note "Pushing binary bundle: $(distinct n ${_push_bundles}) to remote: $(distinct n ${MAIN_BINARY_REPOSITORY})"
     cd "${SOFTWARE_DIR}"
-    for _pbelement in ${SOFIN_ARGS}; do
+    for _pbelement in ${_push_bundles}; do
         _lowercase_element="$(lowercase "${_pbelement}")"
         if [ -z "${_lowercase_element}" ]; then
             error "push_binbuild(): _lowercase_element is empty!"
         fi
-        _install_indicator_file="${_pbelement}/${_lowercase_element}${INSTALLED_MARK}"
+        _install_indicator_file="${SOFTWARE_DIR}${_pbelement}/${_lowercase_element}${INSTALLED_MARK}"
         _version_element="$(${CAT_BIN} "${_install_indicator_file}" 2>/dev/null)"
+        if [ ! -f "${_install_indicator_file}" ]; then
+            error "push_binbuild(): _install_indicator_file: $(distinct e "${_install_indicator_file}") doesn't exists! You can't push a binary build of uncomplete build!"
+        fi
         if [ -d "${_pbelement}" -a \
              -f "${_install_indicator_file}" -a \
              ! -z "${_version_element}" ]; then
@@ -323,7 +330,7 @@ push_binbuild () {
                 ${RM_BIN} -f "${_element_name}" "${_element_name}${DEFAULT_CHKSUM_EXT}" "${_final_snap_file}" >> ${LOG}-${_lowercase_element} 2>> ${LOG}-${_lowercase_element}
             fi
         else
-            warn "Not found software: $(distinct w ${_pbelement})!"
+            warn "No version file of software: $(distinct w ${_pbelement}) found! It seems to not be fully installed or broken."
         fi
     done
 }
@@ -1483,8 +1490,8 @@ push_binary_archive () {
     _bpamirror="${3}"
     _bpaddress="${4}"
     _bpshortsha="$(${CAT_BIN} "${_uniqname}${DEFAULT_CHKSUM_EXT}" 2>/dev/null | ${CUT_BIN} -c -16 2>/dev/null)…"
-    note "Pushing archive #$(distinct n ${_bpshortsha}) to remote repository with address: ${_bpaddress}"
-    debug "name: ${_uniqname}, bundle_file: ${_bpbundle_file}"
+    note "Pushing archive sha1: $(distinct n ${_bpshortsha}) to remote.."
+    debug "name: $(distinct d ${_uniqname}), bundle_file: $(distinct d ${_bpbundle_file}), repository address: $(distinct d ${_bpaddress})"
     retry "${SCP_BIN} ${DEFAULT_SSH_OPTS} ${DEFAULT_SCP_OPTS} -P ${MAIN_PORT} ${_uniqname} ${_bpaddress}/${_uniqname}.partial" || \
         def_error "${_uniqname}" "Unable to push: $(distinct e "${_bpbundle_file}") bundle to: $(distinct e "${_bpaddress}/${_bpbundle_file}")"
     if [ "$?" = "0" ]; then
@@ -1514,7 +1521,7 @@ push_service_stream_archive () {
             ${CHMOD_BIN} -v a+r "${_fin_snapfile}" >> ${LOG} 2>> ${LOG}
             debug "Sending initial service stream to $(distinct d ${MAIN_COMMON_NAME}) repository: $(distinct d ${MAIN_COMMON_REPOSITORY}/${_fin_snapfile})"
 
-            retry "${SCP_BIN} ${DEFAULT_SSH_OPTS} ${DEFAULT_SCP_OPTS} -P ${MAIN_PORT} ${_fin_snapfile} ${MAIN_USER}@${_psmirror}:${MAIN_BINARY_PREFIX}/${COMMON_BINARY_REMOTE}/${_fin_snapfile}.partial"
+            retry "${SCP_BIN} ${DEFAULT_SSH_OPTS} ${DEFAULT_SCP_OPTS} -P ${MAIN_PORT} ${_fin_snapfile} ${MAIN_USER}@${_psmirror}:${COMMON_BINARY_REMOTE}/${_fin_snapfile}.partial"
             if [ "$?" = "0" ]; then
                 ${PRINTF_BIN} "${blue}"
                 ${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} "${MAIN_USER}@${_psmirror}" \
