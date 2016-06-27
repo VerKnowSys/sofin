@@ -1225,18 +1225,15 @@ try_fetch_binbuild () {
             error "Cannot fetch binbuild! An empty archive name given!"
         fi
         _full_name="$(capitalize "${_full_name}")"
-        confirm () {
-            debug "Fetched archive: $(distinct d ${BINBUILDS_CACHE_DIR}${_full_name}/${_bb_archive})"
-        }
         if [ ! -e "${BINBUILDS_CACHE_DIR}${_full_name}/${_bb_archive}" ]; then
             cd ${BINBUILDS_CACHE_DIR}${_full_name}
-            try "${FETCH_BIN} ${FETCH_OPTS} ${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}${DEFAULT_CHKSUM_EXT}" || \
-                try "${FETCH_BIN} ${FETCH_OPTS} ${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}${DEFAULT_CHKSUM_EXT}"
+            try "${FETCH_BIN} ${FETCH_OPTS} '${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}${DEFAULT_CHKSUM_EXT}'" || \
+                try "${FETCH_BIN} ${FETCH_OPTS} '${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}${DEFAULT_CHKSUM_EXT}'"
             if [ "$?" = "0" ]; then
-                $(try "${FETCH_BIN} ${FETCH_OPTS} ${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}" && confirm) || \
-                $(try "${FETCH_BIN} ${FETCH_OPTS} ${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}" && confirm) || \
-                $(try "${FETCH_BIN} ${FETCH_OPTS} ${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}" && confirm) || \
-                error "Failure fetching available binary build for: $(distinct e "${_bb_archive}"). Please check your DNS / Network setup!"
+                try "${FETCH_BIN} ${FETCH_OPTS} '${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}'" || \
+                    try "${FETCH_BIN} ${FETCH_OPTS} '${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}'" || \
+                    try "${FETCH_BIN} ${FETCH_OPTS} '${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}'" || \
+                    error "Failure fetching available binary build for: $(distinct e "${_bb_archive}"). Please check your DNS / Network setup!"
             else
                 note "No binary build available for: $(distinct n ${OS_TRIPPLE}/${DEF_NAME}${DEF_POSTFIX}-${DEF_VERSION})"
             fi
