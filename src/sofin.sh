@@ -125,7 +125,7 @@ if [ ! -z "${SOFIN_COMMAND_ARG}" ]; then
 
         p|push|binpush|send)
             fail_on_background_sofin_job ${SOFIN_ARGS}
-            push_binbuild
+            push_binbuild ${SOFIN_ARGS}
             cleanup_after_tasks
             ;;
 
