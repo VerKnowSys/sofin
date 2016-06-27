@@ -307,7 +307,7 @@ push_binbuild () {
                     build_software_bundle "${_name}" "${_element}"
                     store_checksum_bundle "${_name}"
 
-                    ${CHMOD_BIN} a+r "${_name}" "${_name}${DEFAULT_CHKSUM_EXT}" && \
+                    try "${CHMOD_BIN} -v o+r ${_name} ${_name}${DEFAULT_CHKSUM_EXT}" && \
                         debug "Set read access for archives: $(distinct d ${_name}), $(distinct d ${_name}${DEFAULT_CHKSUM_EXT}) before we send them to public remote"
 
                     _bin_bundle="${BINBUILDS_CACHE_DIR}${_element}-${_version_element}"
