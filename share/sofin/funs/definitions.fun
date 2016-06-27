@@ -1221,6 +1221,7 @@ try_fetch_binbuild () {
         if [ -z "${_bbaname}" ]; then
             error "Cannot fetch binbuild! An empty definition name given!"
         fi
+        _bb_archive="$(capitalize "${_bb_archive}")"
         if [ -z "${_bb_archive}" ]; then
             error "Cannot fetch binbuild! An empty archive name given!"
         fi
