@@ -397,10 +397,13 @@ remove_bundles () {
                 ${RM_BIN} -rfv "${SOFTWARE_DIR}${_given_name}" >> "${LOG}" 2>> "${LOG}"
             else
                 ${RM_BIN} -rfv "${SOFTWARE_DIR}${_given_name}" >> "${LOG}-${_aname}" 2>> "${LOG}-${_aname}"
-
-                debug "Looking for other installed versions of: $(distinct d ${_aname}), that might be exported automatically.."
-                _inname="$(echo "${_given_name}" | ${SED_BIN} 's/[0-9]*//g' 2>/dev/null)"
-                _alternative="$(${FIND_BIN} ${SOFTWARE_DIR} -maxdepth 1 -type d -name "${_inname}*" -not -name "${_given_name}" 2>/dev/null | ${SED_BIN} 's/^.*\///g' 2>/dev/null | ${HEAD_BIN} -n1 2>/dev/null)"
+                # if removing a single bundle, then look for alternatives. Otherwise, just remove bundle..
+                debug "BUNDLES: ${BUNDLES}, _given_name: ${_given_name}"
+                if [ ! "${BUNDLES}" = "${_given_name}" ]; then
+                    debug "Looking for other installed versions of: $(distinct d ${_aname}), that might be exported automatically.."
+                    _inname="$(echo "${_given_name}" | ${SED_BIN} 's/[0-9]*//g' 2>/dev/null)"
+                    _alternative="$(${FIND_BIN} ${SOFTWARE_DIR} -maxdepth 1 -type d -name "${_inname}*" -not -name "${_given_name}" 2>/dev/null | ${SED_BIN} 's/^.*\///g' 2>/dev/null | ${HEAD_BIN} -n1 2>/dev/null)"
+                fi
             fi
             if [ ! -z "${_alternative}" -a \
                    -f "${SOFTWARE_DIR}${_alternative}/$(lowercase ${_alternative})${INSTALLED_MARK}" ]; then
