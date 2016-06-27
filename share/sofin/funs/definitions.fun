@@ -296,8 +296,7 @@ push_binbuild () {
                             ${ZFS_BIN} send "${_full_dataset_name}" \
                                 | ${XZ_BIN} > "${_final_snap_file}" 2>> "${LOG}-${_lowercase_element}" && \
                                     _snap_size="$(file_size "${_final_snap_file}")" && \
-                                    try "${ZFS_BIN} mount ${_full_dataset_name}" && \
-                                        note "Stream file: $(distinct n ${_final_snap_file}), of size: $(distinct n ${_snap_size}) successfully sent to remote."
+                                    try "${ZFS_BIN} mount ${_full_dataset_name}"
                         fi
                         if [ "${_snap_size}" = "0" ]; then
                             ${RM_BIN} -vf "${_final_snap_file}" >> "${LOG}-${_lowercase_element}" 2>> "${LOG}-${_lowercase_element}"
