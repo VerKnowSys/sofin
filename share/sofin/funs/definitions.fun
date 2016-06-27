@@ -531,7 +531,7 @@ execute_process () {
     if [ -z "${_app_param}" ]; then
         error "No param given for execute_process()!"
     fi
-    _req_definition="${DEFINITIONS_DIR}${_app_param}${DEFAULT_DEF_EXT}"
+    _req_definition="${DEFINITIONS_DIR}$(lowercase "${_app_param}")${DEFAULT_DEF_EXT}"
     debug "Checking requirement: $(distinct d ${_app_param}) file: $(distinct d ${_req_definition})"
     if [ ! -e "${_req_definition}" ]; then
         error "Cannot fetch definition: $(distinct e ${_req_definition})! Aborting!"
