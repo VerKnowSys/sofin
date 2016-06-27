@@ -1254,7 +1254,7 @@ try_fetch_binbuild () {
             ${TAR_BIN} -xJf "${BINBUILDS_CACHE_DIR}${_full_name}/${_bb_archive}" >> "${LOG}-${_bbaname}" 2>> "${LOG}-${_bbaname}"
             if [ "$?" = "0" ]; then # if archive is valid
                 note "Software bundle installed: $(distinct n ${DEF_NAME}${DEF_POSTFIX}), with version: $(distinct n ${DEF_VERSION})"
-                export DONT_BUILD_BUT_DO_EXPORTS=YES
+                DONT_BUILD_BUT_DO_EXPORTS=YES
             else
                 debug "  ${NOTE_CHAR} No binary bundle available for: $(distinct n ${DEF_NAME}${DEF_POSTFIX})"
                 ${RM_BIN} -fr "${BINBUILDS_CACHE_DIR}${_full_name}"
@@ -1391,7 +1391,7 @@ build_all () {
                         else
                             warn "$(distinct w ${_common_lowercase}) bundle is installed with version: $(distinct w ${_already_installed_version}), different from defined: $(distinct w "${DEF_VERSION}")"
                         fi
-                        export DONT_BUILD_BUT_DO_EXPORTS=YES
+                        DONT_BUILD_BUT_DO_EXPORTS=YES
                         unset _already_installed_version
                     fi
                 fi
