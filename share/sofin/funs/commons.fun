@@ -178,32 +178,39 @@ find_most_recent () {
     _matcher="${2}"
     _type="${3}"
     if [ -z "${_type}" ]; then
-        _type='f' # look for files only by default
+        _type="f" # look for files only by default
     fi
     if [ -z "${_path}" ]; then
         error "Empty path given to find_most_recent()!"
     else
         if [ -z "${_matcher}" ]; then
             debug "Empty matcher given in find_most_recent(), using wildcard."
-            _matcher='*'
+            _matcher="*"
+        else
+            debug "Specified matcher: $(distinct d ${_matcher})"
         fi
-        _stat_param='-f' # BSD syntax
+        _stat_param="-f" # BSD syntax
         case ${SYSTEM_NAME} in
             Linux)
-                _stat_param='-c' # GNU syntax
+                _stat_param="-c" # GNU syntax
                 ;;
         esac
         if [ -d "${_path}" ]; then
-            _find_results="$(${FIND_BIN} "${_path}" \
-                -maxdepth 1 \
+            debug "Find cmd: $(distinct d "${_path}")"
+            _cmd="${FIND_BIN} "${_path}" \
+                -maxdepth 2 \
                 -mindepth 1 \
                 -type ${_type} \
-                -name "${_matcher}" \
-                -exec ${STAT_BIN} ${_stat_param} '%m %N' {} \; 2>/dev/null | \
+                -name '${_matcher}' \
+                -exec ${STAT_BIN} ${_stat_param} '%%%%m %%%%N' {} \; \
+                2>> ${LOG} | \
+                ${TR_BIN} -d '\`' 2>/dev/null | \
+                ${TR_BIN} -d \"'\" 2>/dev/null | \
                 ${SORT_BIN} -nr 2>/dev/null | \
                 ${HEAD_BIN} -n${MAX_OPEN_TAIL_LOGS} 2>/dev/null | \
-                ${CUT_BIN} -d' ' -f2 2>/dev/null \
-                )"
+                ${CUT_BIN} -d' ' -f2 2>/dev/null"
+            debug "Find cmd: $(distinct d "${_cmd}")"
+            _find_results="$(eval "${_cmd}")"
             if [ -z "${_find_results}" ]; then
                 ${PRINTF_BIN} "" 2>/dev/null
             else
