@@ -30,7 +30,7 @@ debug () {
         elif [ -z "${aname}" -a -d "${LOGS_DIR}" ]; then
             cecho "# $1" ${magenta} >> "${LOG}" 2>> "${LOG}"
         elif [ ! -d "${LOGS_DIR}" ]; then
-            ${LOGGER_BIN} "# ${cyan} $1"
+            ${LOGGER_BIN} "sofin: $1"
         fi
     else
         cecho "# $1" ${magenta} # NOTE: this "#" is required for debug mode to work properly with generation of ~/.profile

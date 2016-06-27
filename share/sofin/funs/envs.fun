@@ -1,7 +1,7 @@
 setup_sofin_compiler () {
     if [ "${1}" = "silent" ]; then
         debug () {
-            ${LOGGER_BIN} "# ${cyan} $@"
+            ${LOGGER_BIN} "sofin: $@"
         }
     fi
     debug "setup_sofin_compiler(): Compiler features enabled for definition: $(distinct d "${DEF_NAME}${DEF_POSTFIX}") on platform: $(distinct d ${SYSTEM_NAME})"
