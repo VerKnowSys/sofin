@@ -365,25 +365,26 @@ reset_definitions () {
 }
 
 
-remove_application () {
-    if [ -z "$2" ]; then
-        error "Second argument with application name is required!"
+remove_bundles () {
+    _bundle_nam="${2}"
+    if [ -z "${_bundle_nam}" ]; then
+        error "Second argument with bundle name is required!"
     fi
 
     # first look for a list with that name:
-    if [ -e "${LISTS_DIR}${2}" ]; then
-        BUNDLES="$(${CAT_BIN} ${LISTS_DIR}${2} 2>/dev/null | eval "${NEWLINES_TO_SPACES_GUARD}")"
-        debug "Removing list of applications: $(distinct d ${BUNDLES})"
+    if [ -e "${LISTS_DIR}${_bundle_nam}" ]; then
+        BUNDLES="$(${CAT_BIN} ${LISTS_DIR}${_bundle_nam} 2>/dev/null | eval "${NEWLINES_TO_SPACES_GUARD}")"
+        debug "Removing list of bundles: $(distinct d ${BUNDLES})"
     else
         BUNDLES="${SOFIN_ARGS}"
-        debug "Removing applications: $(distinct d ${BUNDLES})"
+        debug "Removing bundles: $(distinct d ${BUNDLES})"
     fi
 
     load_defaults
     for _def in ${BUNDLES}; do
         _given_name="$(capitalize "${_def}")"
         if [ -z "${_given_name}" ]; then
-            error "remove_application(): _given_name is empty!"
+            error "remove_bundles(): _given_name is empty!"
         fi
         if [ -d "${SOFTWARE_DIR}${_given_name}" ]; then
             if [ "${_given_name}" = "/" ]; then
@@ -1181,7 +1182,7 @@ rebuild_application () {
         if [ "${bundle}" = "Git" -o "${bundle}" = "Zsh" ]; then
             continue
         fi
-        remove_application ${bundle}
+        remove_bundles ${bundle}
         USE_BINBUILD=NO
         BUNDLES="${bundle}"
         build_all || def_error "${bundle}" "Bundle build failed."

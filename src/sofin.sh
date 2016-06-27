@@ -172,7 +172,7 @@ if [ ! -z "${SOFIN_COMMAND_ARG}" ]; then
 
         delete|remove|uninstall|rm)
             fail_on_background_sofin_job ${SOFIN_ARGS}
-            remove_application $*
+            remove_bundles $*
             cleanup_after_tasks
             ;;
 
