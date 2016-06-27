@@ -87,44 +87,44 @@ cleanup_after_tasks () {
 
 
 store_checksum_bundle () {
-    _name="${1}"
-    if [ -z "${_name}" ]; then
+    _cksname="${1}"
+    if [ -z "${_cksname}" ]; then
         error "Empty archive name in function: $(distinct e "store_checksum_bundle()")!"
     fi
-    _archive_sha1="$(file_checksum "${_name}")"
-    if [ -z "${_archive_sha1}" ]; then
-        error "Empty checksum for archive: $(distinct e "${_name}")"
+    _cksarchive_sha1="$(file_checksum "${_cksname}")"
+    if [ -z "${_cksarchive_sha1}" ]; then
+        error "Empty checksum for archive: $(distinct e "${_cksname}")"
     fi
-    ${PRINTF_BIN} "${_archive_sha1}" > "${_name}${DEFAULT_CHKSUM_EXT}" 2>> ${LOG} && \
-    debug "Stored checksum: $(distinct d ${_archive_sha1}) for bundle file: $(distinct d "${_name}")"
-    unset _archive_sha1 _name
+    ${PRINTF_BIN} "${_cksarchive_sha1}" > "${_cksname}${DEFAULT_CHKSUM_EXT}" 2>> ${LOG} && \
+    debug "Stored checksum: $(distinct d ${_cksarchive_sha1}) for bundle file: $(distinct d "${_cksname}")"
+    unset _cksarchive_sha1 _cksname
 }
 
 
 build_software_bundle () {
-    _name="${1}"
-    _element="${2}"
-    if [ ! -e "./${_name}" ]; then
-        ${TAR_BIN} -cJ --use-compress-program="${XZ_BIN} --threads=${CPUS}" -f "${_name}" "./${_element}" 2>> ${LOG} && \
-            note "Bundle archive of: $(distinct n ${_element}) (using: $(distinct n ${CPUS}) threads) has been built." && \
+    _bsbname="${1}"
+    _bsbelement="${2}"
+    if [ ! -e "./${_bsbname}" ]; then
+        ${TAR_BIN} -cJ --use-compress-program="${XZ_BIN} --threads=${CPUS}" -f "${_bsbname}" "./${_bsbelement}" 2>> ${LOG} && \
+            note "Bundle archive of: $(distinct n ${_bsbelement}) (using: $(distinct n ${CPUS}) threads) has been built." && \
             return
-        ${TAR_BIN} -cJf "${_name}" "./${_element}" 2>> ${LOG} && \
-            note "Bundle archive of: $(distinct n ${_element}) has been built." && \
+        ${TAR_BIN} -cJf "${_bsbname}" "./${_bsbelement}" 2>> ${LOG} && \
+            note "Bundle archive of: $(distinct n ${_bsbelement}) has been built." && \
             return
-        error "Failed to create archives for: $(distinct e ${_element})"
+        error "Failed to create archives for: $(distinct e ${_bsbelement})"
     else
-        if [ ! -e "./${_name}${DEFAULT_CHKSUM_EXT}" ]; then
+        if [ ! -e "./${_bsbname}${DEFAULT_CHKSUM_EXT}" ]; then
             debug "Found sha-less archive. It may be incomplete or damaged. Rebuilding.."
-            ${RM_BIN} -vf "${_name}" >> ${LOG} 2>> ${LOG}
-            ${TAR_BIN} -cJ --use-compress-program="${XZ_BIN} --threads=${CPUS}" -f "${_name}" "./${_element}" 2>> ${LOG} >> ${LOG} || \
-            ${TAR_BIN} -cJf "${_name}" "./${_element}" 2>> ${LOG} || \
-                error "Failed to create archives for: $(distinct e ${_element})"
-            note "Archived bundle: $(distinct n "${_element}") is ready to deploy"
+            ${RM_BIN} -vf "${_bsbname}" >> ${LOG} 2>> ${LOG}
+            ${TAR_BIN} -cJ --use-compress-program="${XZ_BIN} --threads=${CPUS}" -f "${_bsbname}" "./${_bsbelement}" 2>> ${LOG} >> ${LOG} || \
+            ${TAR_BIN} -cJf "${_bsbname}" "./${_bsbelement}" 2>> ${LOG} || \
+                error "Failed to create archives for: $(distinct e ${_bsbelement})"
+            note "Archived bundle: $(distinct n "${_bsbelement}") is ready to deploy"
         else
-            note "Archived bundle: $(distinct n "${_element}") already exists, and will be reused to deploy"
+            note "Archived bundle: $(distinct n "${_bsbelement}") already exists, and will be reused to deploy"
         fi
     fi
-    unset _name _element
+    unset _bsbname _bsbelement
 }
 
 
@@ -230,20 +230,20 @@ check_disabled () {
 
 
 file_checksum () {
-    _name="$1"
-    if [ -z "${_name}" ]; then
+    _fcsmname="$1"
+    if [ -z "${_fcsmname}" ]; then
         error "Empty file name given for function: $(distinct e "file_checksum()")"
     fi
     case ${SYSTEM_NAME} in
         Minix|Darwin|Linux)
-            ${PRINTF_BIN} "$(${SHA_BIN} "${_name}" 2>/dev/null | ${CUT_BIN} -d' ' -f1 2>/dev/null)"
+            ${PRINTF_BIN} "$(${SHA_BIN} "${_fcsmname}" 2>/dev/null | ${CUT_BIN} -d' ' -f1 2>/dev/null)"
             ;;
 
         FreeBSD)
-            ${PRINTF_BIN} "$(${SHA_BIN} -q "${_name}" 2>/dev/null)"
+            ${PRINTF_BIN} "$(${SHA_BIN} -q "${_fcsmname}" 2>/dev/null)"
             ;;
     esac
-    unset _name
+    unset _fcsmname
 }
 
 
@@ -265,8 +265,8 @@ push_binbuild () {
                 if [ -z "${_version_element}" ]; then
                     error "No version information available for bundle: $(distinct e "${_element}")"
                 fi
-                _name="${_element}-${_version_element}${DEFAULT_ARCHIVE_EXT}"
-                debug "element: $(distinct d ${_element}) -> name: $(distinct d ${_name})"
+                _element_name="${_element}-${_version_element}${DEFAULT_ARCHIVE_EXT}"
+                debug "element: $(distinct d ${_element}) -> name: $(distinct d ${_element_name})"
                 _dig_query="$(${HOST_BIN} A ${MAIN_SOFTWARE_ADDRESS} 2>/dev/null | ${GREP_BIN} 'Address:' 2>/dev/null | eval "${HOST_ADDRESS_GUARD}")"
 
                 if [ -z "${_dig_query}" ]; then
@@ -290,12 +290,14 @@ push_binbuild () {
                         note "Preparing service dataset: $(distinct n ${_full_dataset_name}), for bundle: $(distinct n ${_element})"
                         ${ZFS_BIN} list -H 2>/dev/null | ${GREP_BIN} "${_element}\$" >/dev/null 2>&1
                         if [ "$?" = "0" ]; then # if dataset exists, unmount it, send to file, and remount back
-                            ${ZFS_BIN} umount ${_full_dataset_name} || error "ZFS umount failed for: $(distinct e "${_full_dataset_name}"). Dataset shouldn't be locked nor used on build hosts."
+                            ${PRINTF_BIN} "${blue}"
+                            try "${ZFS_BIN} umount ${_full_dataset_name}" || \
+                                error "ZFS umount failed for: $(distinct e "${_full_dataset_name}"). Dataset shouldn't be locked nor used on build hosts."
                             ${ZFS_BIN} send "${_full_dataset_name}" \
                                 | ${XZ_BIN} > "${_final_snap_file}" 2>> "${LOG}-${_lowercase_element}" && \
                                     _snap_size="$(file_size "${_final_snap_file}")" && \
-                                    ${ZFS_BIN} mount ${_full_dataset_name} 2>> "${LOG}-${_lowercase_element}" && \
-                                    note "Stream file: $(distinct n ${_final_snap_file}), of size: $(distinct n ${_snap_size}) successfully sent to remote."
+                                    try "${ZFS_BIN} mount ${_full_dataset_name}" && \
+                                        note "Stream file: $(distinct n ${_final_snap_file}), of size: $(distinct n ${_snap_size}) successfully sent to remote."
                         fi
                         if [ "${_snap_size}" = "0" ]; then
                             ${RM_BIN} -vf "${_final_snap_file}" >> "${LOG}-${_lowercase_element}" 2>> "${LOG}-${_lowercase_element}"
@@ -303,23 +305,23 @@ push_binbuild () {
                         fi
                     fi
 
-                    build_software_bundle "${_name}" "${_element}"
-                    store_checksum_bundle "${_name}"
+                    build_software_bundle "${_element_name}" "${_element}"
+                    store_checksum_bundle "${_element_name}"
 
-                    try "${CHMOD_BIN} -v o+r ${_name} ${_name}${DEFAULT_CHKSUM_EXT}" && \
-                        debug "Set read access for archives: $(distinct d ${_name}), $(distinct d ${_name}${DEFAULT_CHKSUM_EXT}) before we send them to public remote"
+                    try "${CHMOD_BIN} -v o+r ${_element_name} ${_element_name}${DEFAULT_CHKSUM_EXT}" && \
+                        debug "Set read access for archives: $(distinct d ${_element_name}), $(distinct d ${_element_name}${DEFAULT_CHKSUM_EXT}) before we send them to public remote"
 
                     _bin_bundle="${BINBUILDS_CACHE_DIR}${_element}-${_version_element}"
                     debug "Performing a copy of binary bundle to: $(distinct d ${_bin_bundle})"
                     ${MKDIR_BIN} -p ${_bin_bundle} >/dev/null 2>&1
-                    run "${CP_BIN} -v ${_name} ${_bin_bundle}/"
-                    run "${CP_BIN} -v ${_name}${DEFAULT_CHKSUM_EXT} ${_bin_bundle}/"
+                    run "${CP_BIN} -v ${_element_name} ${_bin_bundle}/"
+                    run "${CP_BIN} -v ${_element_name}${DEFAULT_CHKSUM_EXT} ${_bin_bundle}/"
 
-                    push_binary_archive "${_bin_bundle}" "${_name}" "${_mirror}" "${_address}"
+                    push_binary_archive "${_bin_bundle}" "${_element_name}" "${_mirror}" "${_address}"
                     push_service_stream_archive "${_final_snap_file}" "${_element}" "${_mirror}"
 
                 done
-                ${RM_BIN} -f "${_name}" "${_name}${DEFAULT_CHKSUM_EXT}" "${_final_snap_file}" >> ${LOG}-${_lowercase_element} 2>> ${LOG}-${_lowercase_element}
+                ${RM_BIN} -f "${_element_name}" "${_element_name}${DEFAULT_CHKSUM_EXT}" "${_final_snap_file}" >> ${LOG}-${_lowercase_element} 2>> ${LOG}-${_lowercase_element}
             fi
         else
             warn "Not found software: $(distinct w ${_element})!"
@@ -491,6 +493,7 @@ show_outdated () {
     else
         note "All installed bundles looks recent"
     fi
+    unset _bund_vers
 }
 
 
@@ -504,17 +507,17 @@ wipe_remote_archives () {
         cd "${SOFTWARE_DIR}"
         for _element in ${SOFIN_ARGS}; do
             _lowercase_element="$(lowercase ${_element})"
-            _name="${_element}-"
+            _remote_ar_name="${_element}-"
             _dig_query="$(${HOST_BIN} A ${MAIN_SOFTWARE_ADDRESS} 2>/dev/null | ${GREP_BIN} 'Address:' 2>/dev/null | eval "${HOST_ADDRESS_GUARD}")"
             if [ -z "${_dig_query}" ]; then
                 error "No mirrors found in address: $(distinct e ${MAIN_SOFTWARE_ADDRESS})"
             fi
             debug "Using defined mirror(s): $(distinct d "${_dig_query}")"
             for _mirror in ${_dig_query}; do
-                note "Wiping out remote: $(distinct n ${_mirror}) binary archives: $(distinct n "${_name}")"
+                note "Wiping out remote: $(distinct n ${_mirror}) binary archives: $(distinct n "${_remote_ar_name}")"
                 ${PRINTF_BIN} "${blue}"
                 ${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} "${MAIN_USER}@${_mirror}" \
-                    "${FIND_BIN} ${SYS_SPECIFIC_BINARY_REMOTE} -iname '${_name}' -print -delete" 2>> "${LOG}"
+                    "${FIND_BIN} ${SYS_SPECIFIC_BINARY_REMOTE} -iname '${_remote_ar_name}' -print -delete" 2>> "${LOG}"
             done
         done
     else
@@ -879,14 +882,14 @@ strip_bundle_files () {
             ;;
     esac
     if [ "${DEF_STRIP}" != "no" ]; then
-        _bundle_lowercase="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
+        _bundlower="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
         if [ -z "${DEBUGBUILD}" ]; then
             _counter="0"
             for _stripdir in ${_dirs_to_strip}; do
                 if [ -d "${_stripdir}" ]; then
-                    _files=$(${FIND_BIN} ${_stripdir} -maxdepth 1 -type f 2>/dev/null)
-                    for _file in ${_files}; do
-                        ${STRIP_BIN} ${file} >> "${LOG}-${_bundle_lowercase}.strip" 2>> "${LOG}-${_bundle_lowercase}.strip"
+                    _tbstripfiles=$(${FIND_BIN} ${_stripdir} -maxdepth 1 -type f 2>/dev/null)
+                    for _file in ${_tbstripfiles}; do
+                        ${STRIP_BIN} "${_file}" >> "${LOG}-${_bundlower}.strip" 2>> "${LOG}-${_bundlower}.strip"
                         if [ "$?" = "0" ]; then
                             _counter="${_counter} + 1"
                         else
@@ -895,16 +898,16 @@ strip_bundle_files () {
                     done
                 fi
             done
-            _result="$(echo "${_counter}" | ${BC_BIN} 2>/dev/null)"
-            if [ "${_result}" -lt "0" ]; then
-                _result="0"
+            _sbresult="$(echo "${_counter}" | ${BC_BIN} 2>/dev/null)"
+            if [ "${_sbresult}" -lt "0" ]; then
+                _sbresult="0"
             fi
-            note "$(distinct n ${_result}) files were stripped"
+            note "$(distinct n ${_sbresult}) files were stripped"
         else
             warn "Debug build is enabled. Strip skipped"
         fi
     fi
-    unset _definition_name _dirs_to_strip _result _counter _files _stripdir _bundle_lowercase
+    unset _definition_name _dirs_to_strip _sbresult _counter _files _stripdir _bundlower
 }
 
 
@@ -940,10 +943,10 @@ manage_datasets () {
             fi
 
             # Create a dataset for any existing dirs in Services dir that are not ZFS datasets.
-            _all_dirs="$(${FIND_BIN} ${SERVICES_DIR} -mindepth 1 -maxdepth 1 -type d -not -name '.*' -print 2>/dev/null | ${XARGS_BIN} ${BASENAME_BIN} 2>/dev/null)"
-            debug "Checking for non-dataset directories in $(distinct d ${SERVICES_DIR}): EOF:\n$(echo "${_all_dirs}" | eval "${NEWLINES_TO_SPACES_GUARD}")\nEOF\n"
+            _all_soft="$(${FIND_BIN} ${SERVICES_DIR} -mindepth 1 -maxdepth 1 -type d -not -name '.*' -print 2>/dev/null | ${XARGS_BIN} ${BASENAME_BIN} 2>/dev/null)"
+            debug "Checking for non-dataset directories in $(distinct d ${SERVICES_DIR}): EOF:\n$(echo "${_all_soft}" | eval "${NEWLINES_TO_SPACES_GUARD}")\nEOF\n"
             _full_bundname="$(${BASENAME_BIN} "${PREFIX}" 2>/dev/null)"
-            for _maybe_dataset in ${_all_dirs}; do
+            for _maybe_dataset in ${_all_soft}; do
                 _aname="$(lowercase ${_full_bundname})"
                 _app_name_lowercase="$(lowercase ${_maybe_dataset})"
                 if [ "${_app_name_lowercase}" = "${_aname}" -o ${_jobs_in_parallel} = "NO" ]; then
@@ -997,48 +1000,48 @@ clean_useless () {
         if [ ! -z "${PREFIX}" ]; then
             # step 0: clean defaults side DEF_DEFAULT_USELESS entries only if DEF_USEFUL is empty
             if [ ! -z "${DEF_DEFAULT_USELESS}" ]; then
-                for pattern in ${DEF_DEFAULT_USELESS}; do
+                for _cu_pattern in ${DEF_DEFAULT_USELESS}; do
                     if [ ! -z "${PREFIX}" -a \
                            -z "${DEF_USEFUL}" ]; then # TODO: implement ignoring DEF_USEFUL entries here!
-                        debug "Pattern of DEF_DEFAULT_USELESS: $(distinct d ${pattern})"
-                        ${RM_BIN} -vrf ${PREFIX}/${pattern} >> ${LOG} 2>> ${LOG}
+                        debug "Pattern of DEF_DEFAULT_USELESS: $(distinct d ${_cu_pattern})"
+                        ${RM_BIN} -vrf ${PREFIX}/${_cu_pattern} >> ${LOG} 2>> ${LOG}
                     fi
                 done
             fi
 
             # step 1: clean definition side DEF_USELESS entries only if DEF_USEFUL is empty
             if [ ! -z "${DEF_USELESS}" ]; then
-                for pattern in ${DEF_USELESS}; do
+                for _cu_pattern in ${DEF_USELESS}; do
                     if [ ! -z "${PREFIX}" -a \
-                         ! -z "${pattern}" ]; then
-                        debug "Pattern of DEF_USELESS: $(distinct d ${PREFIX}/${pattern})"
-                        ${RM_BIN} -vrf ${PREFIX}/${pattern} >> ${LOG} 2>> ${LOG}
+                         ! -z "${_cu_pattern}" ]; then
+                        debug "Pattern of DEF_USELESS: $(distinct d ${PREFIX}/${_cu_pattern})"
+                        ${RM_BIN} -vrf ${PREFIX}/${_cu_pattern} >> ${LOG} 2>> ${LOG}
                     fi
                 done
             fi
         fi
 
-        for dir in bin sbin libexec; do
-            if [ -d "${PREFIX}/${dir}" ]; then
-                ALL_BINS=$(${FIND_BIN} ${PREFIX}/${dir} -maxdepth 1 -type f -or -type l 2>/dev/null)
-                for file in ${ALL_BINS}; do
-                    _base="$(${BASENAME_BIN} ${file} 2>/dev/null)"
-                    if [ -e "${PREFIX}/exports/${_base}" ]; then
-                        debug "Found export: $(distinct d ${_base})"
+        for _cu_dir in bin sbin libexec; do
+            if [ -d "${PREFIX}/${_cu_dir}" ]; then
+                _cuall_binaries=$(${FIND_BIN} ${PREFIX}/${_cu_dir} -maxdepth 1 -type f -or -type l 2>/dev/null)
+                for _cufile in ${_cuall_binaries}; do
+                    _cubase="$(${BASENAME_BIN} ${_cufile} 2>/dev/null)"
+                    if [ -e "${PREFIX}/exports/${_cubase}" ]; then
+                        debug "Found export: $(distinct d ${_cubase})"
                     else
-                        # traverse through DEF_USEFUL for file patterns required by software but not exported
-                        commit_removal=""
+                        # traverse through DEF_USEFUL for _cufile patterns required by software but not exported
+                        _cu_commit_removal=""
                         for is_useful in ${DEF_USEFUL}; do
-                            echo "${file}" | ${GREP_BIN} "${is_useful}" >/dev/null 2>&1
+                            echo "${_cufile}" | ${GREP_BIN} "${is_useful}" >/dev/null 2>&1
                             if [ "$?" = "0" ]; then
-                                commit_removal="no"
+                                _cu_commit_removal="no"
                             fi
                         done
-                        if [ -z "${commit_removal}" ]; then
-                            debug "Removing useless file: $(distinct d ${file})"
-                            ${RM_BIN} -f ${file}
+                        if [ -z "${_cu_commit_removal}" ]; then
+                            debug "Removing useless _cufile: $(distinct d ${_cufile})"
+                            ${RM_BIN} -f ${_cufile}
                         else
-                            debug "Useful file left intact: $(distinct d ${file})"
+                            debug "Useful _cufile left intact: $(distinct d ${_cufile})"
                         fi
                     fi
                 done
@@ -1047,6 +1050,7 @@ clean_useless () {
     else
         debug "Useless files cleanup skipped"
     fi
+    unset _cu_pattern _cufile _cuall_binaries _cu_commit_removal _cubase
 }
 
 
@@ -1054,34 +1058,35 @@ conflict_resolve () {
     debug "Resolving conflicts for: $(distinct d "${DEF_CONFLICTS_WITH}")"
     if [ ! -z "${DEF_CONFLICTS_WITH}" ]; then
         debug "Resolving possible conflicts with: $(distinct d ${DEF_CONFLICTS_WITH})"
-        for app in ${DEF_CONFLICTS_WITH}; do
-            maybe_software="$(${FIND_BIN} ${SOFTWARE_DIR} -maxdepth 1 -type d -iname "${app}*" 2>/dev/null)"
-            for an_app in ${maybe_software}; do
-                app_name="$(${BASENAME_BIN} ${an_app} 2>/dev/null)"
-                if [ -e "${an_app}/exports" \
-                     -a "${app_name}" != "${DEF_NAME}" \
-                     -a "${app_name}" != "${DEF_NAME}${DEF_POSTFIX}" \
+        for _cr_app in ${DEF_CONFLICTS_WITH}; do
+            _crfind_s="$(${FIND_BIN} ${SOFTWARE_DIR} -maxdepth 1 -type d -iname "${_cr_app}*" 2>/dev/null)"
+            for _cr_name in ${_crfind_s}; do
+                _crn="$(${BASENAME_BIN} "${_cr_name}" 2>/dev/null)"
+                if [ -e "${_cr_name}/exports" \
+                     -a "${_crn}" != "${DEF_NAME}" \
+                     -a "${_crn}" != "${DEF_NAME}${DEF_POSTFIX}" \
                 ]; then
-                    ${MV_BIN} "${an_app}/exports" "${an_app}/exports-disabled" && \
-                        debug "Resolved conflict with: $(distinct n ${app_name})"
+                    ${MV_BIN} "${_cr_name}/exports" "${_cr_name}/exports-disabled" && \
+                        debug "Resolved conflict with: $(distinct n ${_crn})"
                 fi
             done
         done
     fi
+    unset _crfind_s _cr_app _cr_name _crn
 }
 
 
 export_binaries () {
-    definition_name="$1"
-    if [ -z "${definition_name}" ]; then
+    _ebdef_name="$1"
+    if [ -z "${_ebdef_name}" ]; then
         error "No definition name specified as first param for export_binaries()!"
     fi
-    load_defs "${definition_name}"
+    load_defs "${_ebdef_name}"
     conflict_resolve
 
     if [ -z "${PREFIX}" ]; then
         PREFIX="${SOFTWARE_DIR}$(capitalize "${DEF_NAME}${DEF_POSTFIX}")"
-        debug "An empty prefix in export_binaries() for $(distinct d ${definition_name}). Resetting to: $(distinct d ${PREFIX})"
+        debug "An empty prefix in export_binaries() for $(distinct d ${_ebdef_name}). Resetting to: $(distinct d ${PREFIX})"
     fi
     if [ -d "${PREFIX}/exports-disabled" ]; then # just bring back disabled exports
         debug "Moving $(distinct d ${PREFIX}/exports-disabled) to $(distinct d ${PREFIX}/exports)"
@@ -1090,29 +1095,29 @@ export_binaries () {
     if [ -z "${DEF_EXPORTS}" ]; then
         note "Defined no binaries to export of prefix: $(distinct n ${PREFIX})"
     else
-        _aname="$(lowercase ${DEF_NAME}${DEF_POSTFIX})"
-        amount="$(echo "${DEF_EXPORTS}" | ${WC_BIN} -w 2>/dev/null | ${TR_BIN} -d '\t|\r|\ ' 2>/dev/null)"
-        debug "Exporting $(distinct n ${amount}) binaries of prefix: $(distinct n ${PREFIX})"
-        ${MKDIR_BIN} -p "${PREFIX}/exports"
-        export_list=""
+        _a_name="$(lowercase ${DEF_NAME}${DEF_POSTFIX})"
+        _an_amount="$(echo "${DEF_EXPORTS}" | ${WC_BIN} -w 2>/dev/null | ${TR_BIN} -d '\t|\r|\ ' 2>/dev/null)"
+        debug "Exporting $(distinct n ${_an_amount}) binaries of prefix: $(distinct n ${PREFIX})"
+        ${MKDIR_BIN} -p "${PREFIX}/exports" >/dev/null 2>&1
+        _expolist=""
         for exp in ${DEF_EXPORTS}; do
             for dir in "/bin/" "/sbin/" "/libexec/"; do
-                file_to_exp="${PREFIX}${dir}${exp}"
-                if [ -f "${file_to_exp}" ]; then # a file
-                    if [ -x "${file_to_exp}" ]; then # and it's executable'
-                        curr_dir="$(${PWD_BIN} 2>/dev/null)"
+                _afile_to_exp="${PREFIX}${dir}${exp}"
+                if [ -f "${_afile_to_exp}" ]; then # a file
+                    if [ -x "${_afile_to_exp}" ]; then # and it's executable'
+                        _acurrdir="$(${PWD_BIN} 2>/dev/null)"
                         cd "${PREFIX}${dir}"
-                        ${LN_BIN} -vfs "..${dir}${exp}" "../exports/${exp}" >> "${LOG}-${_aname}" 2>> "${LOG}-${_aname}"
-                        cd "${curr_dir}"
-                        exp_elem="$(${BASENAME_BIN} ${file_to_exp} 2>/dev/null)"
-                        export_list="${export_list} ${exp_elem}"
+                        ${LN_BIN} -vfs "..${dir}${exp}" "../exports/${exp}" >> "${LOG}-${_a_name}" 2>> "${LOG}-${_a_name}"
+                        cd "${_acurrdir}"
+                        _expo_elem="$(${BASENAME_BIN} ${_afile_to_exp} 2>/dev/null)"
+                        _expolist="${_expolist} ${_expo_elem}"
                     fi
                 fi
             done
         done
-        debug "List of exports: $(distinct d "${export_list}")"
+        debug "List of exports: $(distinct d "${_expolist}")"
     fi
-    unset exp_elem curr_dir file_to_exp amount _aname export_list definition_name
+    unset _expo_elem _acurrdir _afile_to_exp _an_amount _a_name _expolist _ebdef_name
 }
 
 
@@ -1121,41 +1126,41 @@ hack_definition () {
     if [ -z "${2}" ]; then
         error "No pattern specified"
     fi
-    pattern="${2}"
-    beauty_pat="$(distinct n *${pattern}*)"
-    _all_dirs=$(${FIND_BIN} ${CACHE_DIR}cache -type d -mindepth 2 -maxdepth 2 -iname "*${pattern}*" 2>/dev/null)
-    amount="$(echo "${_all_dirs}" | ${WC_BIN} -l 2>/dev/null | ${TR_BIN} -d '\t|\r|\ ' 2>/dev/null)"
-    ${TEST_BIN} -z "${amount}" && amount="0"
-    if [ -z "${_all_dirs}" ]; then
-        error "No matching build dirs found for pattern: ${beauty_pat}"
+    _hack_pattern="${2}"
+    _abeauty_pat="$(distinct n "*${_hack_pattern}*")"
+    _all_hackdirs=$(${FIND_BIN} ${CACHE_DIR}cache -type d -mindepth 2 -maxdepth 2 -iname "*${_hack_pattern}*" 2>/dev/null)
+    _all_am="$(echo "${_all_hackdirs}" | ${WC_BIN} -l 2>/dev/null | ${TR_BIN} -d '\t|\r|\ ' 2>/dev/null)"
+    ${TEST_BIN} -z "${_all_am}" && _all_am="0"
+    if [ -z "${_all_hackdirs}" ]; then
+        error "No matching build dirs found for pattern: $(distinct e ${_abeauty_pat})"
     else
-        note "Sofin will now walk through: $(distinct n ${amount}) build dirs in: $(distinct n ${CACHE_DIR}cache), that matches pattern: $(distinct n ${beauty_pat})"
+        note "Sofin will now walk through: $(distinct n ${_all_am}) build dirs in: $(distinct n ${CACHE_DIR}cache), that matches pattern: $(distinct n ${_abeauty_pat})"
     fi
-    for dir in ${_all_dirs}; do
+    for _a_dir in ${_all_hackdirs}; do
         note
         warn "$(fill)"
         warn "Quit viever/ Exit that shell, to continue with next build dir"
         warn "Sofin will now traverse through build logs, looking for errors.."
 
         currdir="$(${PWD_BIN} 2>/dev/null)"
-        cd "${dir}"
+        cd "${_a_dir}"
 
         found_any=""
         log_viewer="${LESS_BIN} ${LESS_DEFAULT_OPTIONS} +/error:"
         for logfile in config.log build.log CMakeFiles/CMakeError.log CMakeFiles/CMakeOutput.log; do
             if [ -f "${logfile}" ]; then
                 found_any="yes"
-                eval "cd ${dir} && ${ZSH_BIN} --login -c '${log_viewer} ${logfile} || exit'"
+                eval "cd ${_a_dir} && ${ZSH_BIN} --login -c '${log_viewer} ${logfile} || exit'"
             fi
         done
         if [ -z "${found_any}" ]; then
             note "Entering build dir.."
-            eval "cd ${dir} && ${ZSH_BIN} --login"
+            eval "cd ${_a_dir} && ${ZSH_BIN} --login"
         fi
         cd "${currdir}"
         warn "---------------------------------------------------------"
     done
-    note "Hack process finished for pattern: ${beauty_pat}"
+    note "Hack process finished for pattern: ${_abeauty_pat}"
 }
 
 
@@ -1164,81 +1169,81 @@ rebuild_application () {
     if [ "$2" = "" ]; then
         error "Missing second argument with library/software name."
     fi
-    dependency="$2"
+    _a_dependency="$2"
 
-    # go to definitions dir, and gather software list that include given dependency:
-    all_defs="$(${FIND_BIN} ${DEFINITIONS_DIR} -maxdepth 1 -type f -name "*${DEFAULT_DEF_EXT}" 2>/dev/null)"
-    to_rebuild=""
-    for deps in ${all_defs}; do
+    # go to definitions dir, and gather software list that include given _a_dependency:
+    _alldefs_avail="$(${FIND_BIN} ${DEFINITIONS_DIR} -maxdepth 1 -type f -name "*${DEFAULT_DEF_EXT}" 2>/dev/null)"
+    _those_to_rebuild=""
+    for _dep in ${_alldefs_avail}; do
         load_defaults
-        load_defs ${deps}
-        echo "${DEF_REQUIREMENTS}" | ${GREP_BIN} "${dependency}" >/dev/null 2>&1
+        load_defs "${_dep}"
+        echo "${DEF_REQUIREMENTS}" | ${GREP_BIN} "${_a_dependency}" >/dev/null 2>&1
         if [ "$?" = "0" ]; then
-            dep="$(${BASENAME_BIN} "${deps}" 2>/dev/null)"
-            rawname="$(${PRINTF_BIN} "${dep}" | ${SED_BIN} "s/${DEFAULT_DEF_EXT}//g" 2>/dev/null)"
-            app_name="$(capitalize ${rawname})"
-            to_rebuild="${app_name} ${to_rebuild}"
+            _idep="$(${BASENAME_BIN} "${_dep}" 2>/dev/null)"
+            _irawname="$(${PRINTF_BIN} "${_idep}" | ${SED_BIN} "s/${DEFAULT_DEF_EXT}//g" 2>/dev/null)"
+            _an_def_nam="$(capitalize ${_irawname})"
+            _those_to_rebuild="${_an_def_nam} ${_those_to_rebuild}"
         fi
     done
 
-    note "Will rebuild, wipe and push these bundles: $(distinct n ${to_rebuild})"
-    for bundle in ${to_rebuild}; do
-        if [ "${bundle}" = "Git" -o "${bundle}" = "Zsh" ]; then
+    note "Will rebuild, wipe and push these bundles: $(distinct n ${_those_to_rebuild})"
+    for _reb_ap_bundle in ${_those_to_rebuild}; do
+        if [ "${_reb_ap_bundle}" = "Git" -o "${_reb_ap_bundle}" = "Zsh" ]; then
             continue
         fi
-        remove_bundles ${bundle}
+        remove_bundles ${_reb_ap_bundle}
         USE_BINBUILD=NO
-        BUNDLES="${bundle}"
-        build_all || def_error "${bundle}" "Bundle build failed."
+        BUNDLES="${_reb_ap_bundle}"
+        build_all || def_error "${_reb_ap_bundle}" "Bundle build failed."
         USE_FORCE=YES
-        wipe_remote_archives ${bundle} || def_error "${bundle}" "Wipe failed"
-        push_binbuild ${bundle} || def_error "${bundle}" "Push failure"
+        wipe_remote_archives ${_reb_ap_bundle} || def_error "${_reb_ap_bundle}" "Wipe failed"
+        push_binbuild ${_reb_ap_bundle} || def_error "${_reb_ap_bundle}" "Push failure"
     done
 }
 
 
 try_fetch_binbuild () {
     _full_name="${1}"
-    _aname="${2}"
-    _an_archive="${3}"
+    _bbaname="${2}"
+    _bb_archive="${3}"
     if [ ! -z "${USE_BINBUILD}" ]; then
         debug "Binary build check was skipped"
     else
-        _aname="$(lowercase "${_aname}")"
-        if [ -z "${_aname}" ]; then
+        _bbaname="$(lowercase "${_bbaname}")"
+        if [ -z "${_bbaname}" ]; then
             error "Cannot fetch binbuild! An empty definition name given!"
         fi
-        if [ -z "${_an_archive}" ]; then
+        if [ -z "${_bb_archive}" ]; then
             error "Cannot fetch binbuild! An empty archive name given!"
         fi
         confirm () {
-            debug "Fetched archive: $(distinct d ${BINBUILDS_CACHE_DIR}${_full_name}/${_an_archive})"
+            debug "Fetched archive: $(distinct d ${BINBUILDS_CACHE_DIR}${_full_name}/${_bb_archive})"
         }
-        if [ ! -e "${BINBUILDS_CACHE_DIR}${_full_name}/${_an_archive}" ]; then
+        if [ ! -e "${BINBUILDS_CACHE_DIR}${_full_name}/${_bb_archive}" ]; then
             cd ${BINBUILDS_CACHE_DIR}${_full_name}
-            try "${FETCH_BIN} ${FETCH_OPTS} ${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_an_archive}${DEFAULT_CHKSUM_EXT}" || \
-                try "${FETCH_BIN} ${FETCH_OPTS} ${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_an_archive}${DEFAULT_CHKSUM_EXT}"
+            try "${FETCH_BIN} ${FETCH_OPTS} ${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}${DEFAULT_CHKSUM_EXT}" || \
+                try "${FETCH_BIN} ${FETCH_OPTS} ${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}${DEFAULT_CHKSUM_EXT}"
             if [ "$?" = "0" ]; then
-                $(try "${FETCH_BIN} ${FETCH_OPTS} ${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_an_archive}" && confirm) || \
-                $(try "${FETCH_BIN} ${FETCH_OPTS} ${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_an_archive}" && confirm) || \
-                $(try "${FETCH_BIN} ${FETCH_OPTS} ${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_an_archive}" && confirm) || \
-                error "Failure fetching available binary build for: $(distinct e "${_an_archive}"). Please check your DNS / Network setup!"
+                $(try "${FETCH_BIN} ${FETCH_OPTS} ${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}" && confirm) || \
+                $(try "${FETCH_BIN} ${FETCH_OPTS} ${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}" && confirm) || \
+                $(try "${FETCH_BIN} ${FETCH_OPTS} ${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}" && confirm) || \
+                error "Failure fetching available binary build for: $(distinct e "${_bb_archive}"). Please check your DNS / Network setup!"
             else
                 note "No binary build available for: $(distinct n ${OS_TRIPPLE}/${DEF_NAME}${DEF_POSTFIX}-${DEF_VERSION})"
             fi
         fi
 
         cd "${SOFTWARE_DIR}"
-        debug "_an_archive: $(distinct d ${_an_archive}). Expecting binbuild to be available in: $(distinct d ${BINBUILDS_CACHE_DIR}${_full_name}/${_an_archive})"
+        debug "_bb_archive: $(distinct d ${_bb_archive}). Expecting binbuild to be available in: $(distinct d ${BINBUILDS_CACHE_DIR}${_full_name}/${_bb_archive})"
 
         # validate binary build:
-        if [ -e "${BINBUILDS_CACHE_DIR}${_full_name}/${_an_archive}" ]; then
-            validate_archive_sha1 "${BINBUILDS_CACHE_DIR}${_full_name}/${_an_archive}"
+        if [ -e "${BINBUILDS_CACHE_DIR}${_full_name}/${_bb_archive}" ]; then
+            validate_archive_sha1 "${BINBUILDS_CACHE_DIR}${_full_name}/${_bb_archive}"
         fi
 
         # after sha1 validation we may continue with binary build if file still exists
-        if [ -e "${BINBUILDS_CACHE_DIR}${_full_name}/${_an_archive}" ]; then
-            ${TAR_BIN} -xJf "${BINBUILDS_CACHE_DIR}${_full_name}/${_an_archive}" >> "${LOG}-${_aname}" 2>> "${LOG}-${_aname}"
+        if [ -e "${BINBUILDS_CACHE_DIR}${_full_name}/${_bb_archive}" ]; then
+            ${TAR_BIN} -xJf "${BINBUILDS_CACHE_DIR}${_full_name}/${_bb_archive}" >> "${LOG}-${_bbaname}" 2>> "${LOG}-${_bbaname}"
             if [ "$?" = "0" ]; then # if archive is valid
                 note "Software bundle installed: $(distinct n ${DEF_NAME}${DEF_POSTFIX}), with version: $(distinct n ${DEF_VERSION})"
                 export DONT_BUILD_BUT_DO_EXPORTS=YES
@@ -1473,24 +1478,24 @@ dump_debug_info () {
 
 push_binary_archive () {
     _bundle_file="${1}"
-    _name="${2}"
+    _uniqname="${2}"
     _mirror="${3}"
     _address="${4}"
-    _shortsha="$(${CAT_BIN} "${_name}${DEFAULT_CHKSUM_EXT}" 2>/dev/null | ${CUT_BIN} -c -16 2>/dev/null)…"
+    _shortsha="$(${CAT_BIN} "${_uniqname}${DEFAULT_CHKSUM_EXT}" 2>/dev/null | ${CUT_BIN} -c -16 2>/dev/null)…"
     note "Pushing archive #$(distinct n ${_shortsha}) to remote repository with address: ${_address}"
-    debug "name: ${_name}, bundle_file: ${_bundle_file}"
-    retry "${SCP_BIN} ${DEFAULT_SSH_OPTS} ${DEFAULT_SCP_OPTS} -P ${MAIN_PORT} ${_name} ${_address}/${_name}.partial" || \
-        def_error "${_name}" "Unable to push: $(distinct e "${_bundle_file}") bundle to: $(distinct e "${_address}/${_bundle_file}")"
+    debug "name: ${_uniqname}, bundle_file: ${_bundle_file}"
+    retry "${SCP_BIN} ${DEFAULT_SSH_OPTS} ${DEFAULT_SCP_OPTS} -P ${MAIN_PORT} ${_uniqname} ${_address}/${_uniqname}.partial" || \
+        def_error "${_uniqname}" "Unable to push: $(distinct e "${_bundle_file}") bundle to: $(distinct e "${_address}/${_bundle_file}")"
     if [ "$?" = "0" ]; then
         ${PRINTF_BIN} "${blue}"
         ${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} ${MAIN_USER}@${_mirror} \
-            "cd ${SYS_SPECIFIC_BINARY_REMOTE} && ${MV_BIN} ${_name}.partial ${_name}"
-        retry "${SCP_BIN} ${DEFAULT_SSH_OPTS} ${DEFAULT_SCP_OPTS} -P ${MAIN_PORT} ${_name}${DEFAULT_CHKSUM_EXT} ${_address}/${_name}${DEFAULT_CHKSUM_EXT}" || \
-            def_error ${_name}${DEFAULT_CHKSUM_EXT} "Error sending: $(distinct e ${_name}${DEFAULT_CHKSUM_EXT}) file to: $(distinct e "${_address}/${_bundle_file}")"
+            "cd ${SYS_SPECIFIC_BINARY_REMOTE} && ${MV_BIN} ${_uniqname}.partial ${_uniqname}"
+        retry "${SCP_BIN} ${DEFAULT_SSH_OPTS} ${DEFAULT_SCP_OPTS} -P ${MAIN_PORT} ${_uniqname}${DEFAULT_CHKSUM_EXT} ${_address}/${_uniqname}${DEFAULT_CHKSUM_EXT}" || \
+            def_error ${_uniqname}${DEFAULT_CHKSUM_EXT} "Error sending: $(distinct e ${_uniqname}${DEFAULT_CHKSUM_EXT}) file to: $(distinct e "${_address}/${_bundle_file}")"
     else
-        error "Failed to push binary build of: $(distinct e ${_name}) to remote: $(distinct e ${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_name})"
+        error "Failed to push binary build of: $(distinct e ${_uniqname}) to remote: $(distinct e ${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_uniqname})"
     fi
-    unset _bundle_file _name _mirror _address _shortsha
+    unset _bundle_file _uniqname _mirror _address _shortsha
 }
 
 

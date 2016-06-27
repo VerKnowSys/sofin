@@ -23,56 +23,56 @@ create_cache_directories () {
 
 
 log_helper () {
-    _pattern="$1"
+    _log_h_pattern="$1"
     create_cache_directories
-    if [ -z "${_pattern}" ]; then
-        _files="$(find_all "${LOGS_DIR}" "sofin*")"
+    if [ -z "${_log_h_pattern}" ]; then
+        _log_files="$(find_all "${LOGS_DIR}" "sofin*")"
     else
-        _files="$(find_all "${LOGS_DIR}" "sofin*${_pattern}*")"
+        _log_files="$(find_all "${LOGS_DIR}" "sofin*${_log_h_pattern}*")"
     fi
-    _num="$(echo "${_files}" | eval ${FILES_COUNT_GUARD})"
-    if [ -z "${_num}" ]; then
-        _num="0"
+    _lognum_f="$(echo "${_log_files}" | eval ${FILES_COUNT_GUARD})"
+    if [ -z "${_lognum_f}" ]; then
+        _lognum_f="0"
     fi
-    debug "Log helper, files found: $(distinct d "${_num}")"
-    if [ -z "${_files}" ]; then
+    debug "Log helper, files found: $(distinct d "${_lognum_f}")"
+    if [ -z "${_log_files}" ]; then
         ${SLEEP_BIN} 2
-        log_helper ${_pattern}
+        log_helper ${_log_h_pattern}
     else
-        case ${_num} in
+        case ${_lognum_f} in
             0)
                 ${SLEEP_BIN} 2
-                log_helper ${_pattern}
+                log_helper ${_log_h_pattern}
                 ;;
 
             1)
-                note "Found $(distinct n ${_num}) log file, that matches _pattern: $(distinct n ${_pattern}). Attaching tail.."
-                ${TAIL_BIN} -n ${LOG_LINES_AMOUNT} -F $(echo "${_files}" | eval ${NEWLINES_TO_SPACES_GUARD})
+                note "Found $(distinct n ${_lognum_f}) log file, that matches _log_h_pattern: $(distinct n ${_log_h_pattern}). Attaching tail.."
+                ${TAIL_BIN} -n ${LOG_LINES_AMOUNT} -F $(echo "${_log_files}" | eval ${NEWLINES_TO_SPACES_GUARD})
                 ;;
 
             *)
-                note "Found $(distinct n ${_num}) log files, that match pattern: $(distinct n ${pattern}). Attaching to all available files.."
-                ${TAIL_BIN} -F $(echo "${_files}" | eval "${NEWLINES_TO_SPACES_GUARD}")
+                note "Found $(distinct n ${_lognum_f}) log files, that match pattern: $(distinct n ${_log_h_pattern}). Attaching to all available files.."
+                ${TAIL_BIN} -F $(echo "${_log_files}" | eval "${NEWLINES_TO_SPACES_GUARD}")
                 ;;
         esac
     fi
-
+    unset _log_h_pattern _log_files _lognum_f
 }
 
 
 show_logs () {
     create_cache_directories
     shift
-    _pattern="$*"
-    debug "show_logs() pattern: $(distinct d "${_pattern}")"
-    _minutes="${LOG_LAST_ACCESS_OR_MOD_MINUTES}"
-    _files=$(${FIND_BIN} "${LOGS_DIR}" -maxdepth 1 -mindepth 1 -mmin -${_minutes} -amin -${_minutes} -iname "sofin*${_pattern}*" -print 2>/dev/null)
+    _logf_pattern="$*"
+    _logf_minutes="${LOG_LAST_ACCESS_OR_MOD_MINUTES}"
+    debug "show_logs(): _logf_minutes: $(distinct d ${_logf_minutes}), pattern: $(distinct d "${_logf_pattern}")"
+    _files_x_min=$(${FIND_BIN} "${LOGS_DIR}" -maxdepth 1 -mindepth 1 -mmin -${_logf_minutes} -amin -${_logf_minutes} -iname "sofin*${_logf_pattern}*" -print 2>/dev/null)
     ${TOUCH_BIN} ${LOG} >/dev/null 2>&1
-    if [ "-" = "${_pattern}" -o \
-         "sofin" = "${_pattern}" ]; then
+    if [ "-" = "${_logf_pattern}" -o \
+         "sofin" = "${_logf_pattern}" ]; then
         ${TAIL_BIN} -n ${LOG_LINES_AMOUNT} "${LOG}" 2>&1
 
-    elif [ "+" = "${_pattern}" ]; then
+    elif [ "+" = "${_logf_pattern}" ]; then
         if [ -d "${LOGS_DIR}" ]; then
             debug "LOGS_DIR: $(distinct d ${LOGS_DIR})"
             if [ "${SYSTEM_NAME}" = "Linux" ]; then
@@ -107,19 +107,19 @@ show_logs () {
             note "No logs to attach to. LOGS_DIR=($(distinct n "${LOGS_DIR}")) contain no log files?"
         fi
 
-    elif [ -z "${_pattern}" ]; then
-        note "No pattern specified, setting tail on all logs accessed or modified in last ${_minutes} minutes.."
-        if [ -z "${_files}" ]; then
-            note "No log files updated or accessed in last ${_minutes} minutes to show. Specify '+' as param, to attach a tail to all logs."
+    elif [ -z "${_logf_pattern}" ]; then
+        note "No pattern specified, setting tail on all logs accessed or modified in last ${_logf_minutes} minutes.."
+        if [ -z "${_files_x_min}" ]; then
+            note "No log files updated or accessed in last ${_logf_minutes} minutes to show. Specify '+' as param, to attach a tail to all logs."
         else
-            debug "show_logs(), files: $(distinct d "$(echo "${_files}" | eval ${FILES_COUNT_GUARD})")"
-            ${TAIL_BIN} -n ${LOG_LINES_AMOUNT} $(echo "${_files}" | eval ${NEWLINES_TO_SPACES_GUARD})
+            debug "show_logs(), files: $(distinct d "$(echo "${_files_x_min}" | eval ${FILES_COUNT_GUARD})")"
+            ${TAIL_BIN} -n ${LOG_LINES_AMOUNT} $(echo "${_files_x_min}" | eval ${NEWLINES_TO_SPACES_GUARD})
         fi
     else
         note "Seeking for log files.."
-        log_helper ${_params}
+        log_helper "${_logf_pattern}"
     fi
-    unset _files _minutes _pattern _files_list _files_count _files_blist _mod_f_names
+    unset _files_x_min _logf_minutes _logf_pattern _files_list _files_count _files_blist _mod_f_names
 }
 
 
