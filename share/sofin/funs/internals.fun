@@ -295,10 +295,20 @@ list_bundles_alphabetic () {
 
 
 mark () {
-    debug "Marking definition: $(distinct d ${application}) as installed"
-    ${TOUCH_BIN} "${PREFIX}/${application}${INSTALLED_MARK}"
-    debug "Writing version: $(distinct d ${DEF_VERSION}) of software: $(distinct d ${application}) installed in: $(distinct d ${PREFIX})"
-    ${PRINTF_BIN} "${DEF_VERSION}" > "${PREFIX}/${application}${INSTALLED_MARK}"
+    _softname="${1}"
+    _ver_to_write="${2}"
+    if [ -z "${_softname}" ]; then
+        error "mark(): Failed with an empty _softname!"
+    fi
+    if [ -z "${_ver_to_write}" ]; then
+        error "mark(): Failed with an empty _ver_to_write!"
+    fi
+    _softfile="$(lowercase "${_softname}")"
+    debug "Marking definition: $(distinct d ${_softfile}) as installed"
+    ${TOUCH_BIN} "${PREFIX}/${_softfile}${INSTALLED_MARK}"
+    debug "Writing version: $(distinct d ${_ver_to_write}) of software: $(distinct d ${_softfile}) installed in: $(distinct d ${PREFIX})"
+    ${PRINTF_BIN} "${_ver_to_write}" > "${PREFIX}/${_softfile}${INSTALLED_MARK}"
+    unset _softname _ver_to_write _softfile
 }
 
 
