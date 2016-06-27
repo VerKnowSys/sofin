@@ -20,7 +20,6 @@ load_defs () {
     fi
 
     # Perform several sanity checks here..
-    debug "Validating existence of required fields in definition: $(distinct d ${Definition})"
     for _required_field in  "DEF_NAME=${DEF_NAME}" \
                             "DEF_NAME_DEF_POSTFIX=${DEF_NAME}${DEF_POSTFIX}" \
                             "DEF_VERSION=${DEF_VERSION}" \
@@ -140,45 +139,45 @@ update_definitions () {
         ${RM_BIN} -rf "${CACHE_DIR}definitions" >> ${LOG} 2>> ${LOG}
         ${MKDIR_BIN} -p "${LOGS_DIR}" "${CACHE_DIR}definitions"
         cd "${CACHE_DIR}definitions"
-        initial_definitions="${MAIN_SOURCE_REPOSITORY}initial-definitions${DEFAULT_ARCHIVE_EXT}"
-        debug "Fetching latest tarball with initial definitions from: $(distinct d ${initial_definitions})"
-        retry "${FETCH_BIN} ${FETCH_OPTS} ${initial_definitions}" && \
+        _initial_defs="${MAIN_SOURCE_REPOSITORY}initial-definitions${DEFAULT_ARCHIVE_EXT}"
+        debug "Fetching latest tarball with initial definitions from: $(distinct d ${_initial_defs})"
+        retry "${FETCH_BIN} ${FETCH_OPTS} ${_initial_defs}" && \
             ${TAR_BIN} -xJf *${DEFAULT_ARCHIVE_EXT} >> ${LOG} 2>> ${LOG} && \
-            ${RM_BIN} -vrf "$(${BASENAME_BIN} ${initial_definitions} 2>/dev/null)" >> ${LOG} 2>> ${LOG}
+            ${RM_BIN} -vrf "$(${BASENAME_BIN} ${_initial_defs} 2>/dev/null)" >> ${LOG} 2>> ${LOG}
             return
     fi
     if [ -d "${CACHE_DIR}definitions/.git" -a \
          -f "${DEFAULTS}" ]; then
         cd "${CACHE_DIR}definitions"
-        current_branch="$(${GIT_BIN} rev-parse --abbrev-ref HEAD 2>/dev/null)"
-        latestsha="$(${CAT_BIN} "${CACHE_DIR}definitions/.git/refs/heads/${current_branch}" 2>/dev/null)"
-        if [ -z "${latestsha}" ]; then
-            latestsha="HEAD"
+        _current_branch="$(${GIT_BIN} rev-parse --abbrev-ref HEAD 2>/dev/null)"
+        _latestsha="$(${CAT_BIN} "${CACHE_DIR}definitions/.git/refs/heads/${_current_branch}" 2>/dev/null)"
+        if [ -z "${_latestsha}" ]; then
+            _latestsha="HEAD"
         fi
-        debug "State of definitions repository was reset to: $(distinct d "${latestsha}")"
-        if [ "${current_branch}" != "${BRANCH}" ]; then # use current_branch value if branch isn't matching default branch
-            debug "Checking out branch: $(distinct d ${current_branch})"
-            try "${GIT_BIN} checkout ${DEFAULT_GIT_OPTS} -b ${current_branch}" || \
-                try "${GIT_BIN} checkout ${DEFAULT_GIT_OPTS} ${current_branch}" || \
-                    warn "Can't checkout branch: $(distinct w ${current_branch})"
+        debug "State of definitions repository was reset to: $(distinct d "${_latestsha}")"
+        if [ "${_current_branch}" != "${BRANCH}" ]; then # use _current_branch value if branch isn't matching default branch
+            debug "Checking out branch: $(distinct d ${_current_branch})"
+            try "${GIT_BIN} checkout ${DEFAULT_GIT_OPTS} -b ${_current_branch}" || \
+                try "${GIT_BIN} checkout ${DEFAULT_GIT_OPTS} ${_current_branch}" || \
+                    warn "Can't checkout branch: $(distinct w ${_current_branch})"
 
-            try "${GIT_BIN} pull ${DEFAULT_GIT_OPTS} origin ${current_branch}" && \
-            note "Branch: $(distinct n ${current_branch}) is at: $(distinct n ${latestsha})" && \
+            try "${GIT_BIN} pull ${DEFAULT_GIT_OPTS} origin ${_current_branch}" && \
+                note "Branch: $(distinct n ${_current_branch}) is at: $(distinct n ${_latestsha})" && \
                 return
 
             note "${red}Error occured: Update from branch: $(distinct e ${BRANCH}) of repository: $(distinct e ${REPOSITORY}) wasn't possible. Log below:${reset}"
-            ${TAIL_BIN} -n${LOG_LINES_AMOUNT_ON_ERR} ${LOG} 2>/dev/null
+            ${TAIL_BIN} -n${LOG_LINES_AMOUNT_ON_ERR} "${LOG}" 2>/dev/null
             error "$(fill)"
 
         else # else use default branch
             debug "Using default branch: $(distinct d ${BRANCH})"
-            if [ "${current_branch}" != "${BRANCH}" ]; then
+            if [ "${_current_branch}" != "${BRANCH}" ]; then
                 try "${GIT_BIN} checkout ${DEFAULT_GIT_OPTS} -b ${BRANCH}" || \
                     try "${GIT_BIN} checkout ${DEFAULT_GIT_OPTS} ${BRANCH}" || \
                         warn "Can't checkout branch: $(distinct w ${BRANCH})"
             fi
             try "${GIT_BIN} pull ${DEFAULT_GIT_OPTS} origin ${BRANCH}" && \
-                note "Updated branch: $(distinct n ${BRANCH}) to: $(distinct n ${latestsha})" && \
+                note "Branch: $(distinct n ${BRANCH}) is at: $(distinct n ${_latestsha})" && \
                 return
 
             note "${red}Error occured: Update from branch: $(distinct e ${BRANCH}) of repository: $(distinct e ${REPOSITORY}) wasn't possible. Log's below:${reset}"
@@ -187,23 +186,28 @@ update_definitions () {
         fi
     else
         # create cache; clone definitions repository:
-        ${MKDIR_BIN} -p "${CACHE_DIR}"
+        # ${MKDIR_BIN} -p "${CACHE_DIR}" 2>/dev/null
+        # ${MKDIR_BIN} -p "${LOGS_DIR}" 2>/dev/null
+        create_cache_directories
+
         cd "${CACHE_DIR}"
-        ${MKDIR_BIN} -p "${LOGS_DIR}"
         debug "Cloning repository: $(distinct d ${REPOSITORY}) from branch: $(distinct d ${BRANCH}); LOGS_DIR: $(distinct d ${LOGS_DIR}), CACHE_DIR: $(distinct d ${CACHE_DIR})"
-        ${RM_BIN} -rf definitions >> ${LOG} 2>> ${LOG} # if something is already here, wipe it out from cache
+        ${RM_BIN} -vrf definitions >> ${LOG} 2>> ${LOG} # if something is already here, wipe it out from cache
         try "${GIT_BIN} clone ${DEFAULT_GIT_OPTS} ${REPOSITORY} definitions" || \
-            error "Error occured: Update from branch: $(distinct e ${BRANCH}) of repository: $(distinct e ${REPOSITORY}) isn't possible. Please make sure that given repository and branch are valid."
+            error "Error cloning branch: $(distinct e ${BRANCH}) of repository: $(distinct e ${REPOSITORY}). Please make sure that given repository and branch are valid!"
         cd "${CACHE_DIR}definitions"
-        current_branch="$(${GIT_BIN} rev-parse --abbrev-ref HEAD 2>/dev/null)"
-        if [ "${BRANCH}" != "${current_branch}" ]; then
+        _current_branch="$(${GIT_BIN} rev-parse --abbrev-ref HEAD 2>/dev/null)"
+        if [ "${BRANCH}" != "${_current_branch}" ]; then
             try "${GIT_BIN} checkout ${DEFAULT_GIT_OPTS} -b ${BRANCH}" || \
                 try "${GIT_BIN} checkout ${DEFAULT_GIT_OPTS} ${BRANCH}" || \
                     warn "Can't checkout branch: $(distinct w ${BRANCH})"
         fi
-
-        try "${GIT_BIN} pull ${DEFAULT_GIT_OPTS} origin ${BRANCH}" && \
-            note "Updated branch: $(distinct n ${BRANCH}) of repository: $(distinct n ${REPOSITORY})" && \
+        _latestsha="$(${CAT_BIN} "${CACHE_DIR}definitions/.git/refs/heads/${_current_branch}" 2>/dev/null)"
+        if [ -z "${_latestsha}" ]; then
+            _latestsha="HEAD"
+        fi
+        try "${GIT_BIN} pull --progress origin ${BRANCH}" && \
+            note "Branch: $(distinct n ${BRANCH}) is currenly at: $(distinct n "${_latestsha}") in repository: $(distinct n ${REPOSITORY})" && \
             return
 
         note "${red}Error occured: Update from branch: $(distinct n ${BRANCH}) of repository: $(distinct n ${REPOSITORY}) wasn't possible. Log below:${reset}"
@@ -249,75 +253,77 @@ push_binbuild () {
     note "Pushing binary bundle: $(distinct n ${SOFIN_ARGS}) to remote: $(distinct n ${MAIN_BINARY_REPOSITORY})"
     cd "${SOFTWARE_DIR}"
     for element in ${SOFIN_ARGS}; do
-        lowercase_element="$(lowercase ${element})"
-        if [ -z "${lowercase_element}" ]; then
-            error "push_binbuild(): lowercase_element is empty!"
+        _lowercase_element="$(lowercase ${_element})"
+        if [ -z "${_lowercase_element}" ]; then
+            error "push_binbuild(): _lowercase_element is empty!"
         fi
-        install_indicator_file="${element}/${lowercase_element}${INSTALLED_MARK}"
-        version_element="$(${CAT_BIN} "${install_indicator_file}" 2>/dev/null)"
-        if [ -d "${element}" -a \
-             -f "${install_indicator_file}" -a \
-             ! -z "${version_element}" ]; then
-            if [ ! -L "${element}" ]; then
-                if [ -z "${version_element}" ]; then
-                    error "No version information available for bundle: $(distinct e "${element}")"
+        _install_indicator_file="${_element}/${_lowercase_element}${INSTALLED_MARK}"
+        _version_element="$(${CAT_BIN} "${_install_indicator_file}" 2>/dev/null)"
+        if [ -d "${_element}" -a \
+             -f "${_install_indicator_file}" -a \
+             ! -z "${_version_element}" ]; then
+            if [ ! -L "${_element}" ]; then
+                if [ -z "${_version_element}" ]; then
+                    error "No version information available for bundle: $(distinct e "${_element}")"
                 fi
-                name="${element}-${version_element}${DEFAULT_ARCHIVE_EXT}"
-                dig_query="$(${HOST_BIN} A ${MAIN_SOFTWARE_ADDRESS} 2>/dev/null | ${GREP_BIN} 'Address:' 2>/dev/null | eval "${HOST_ADDRESS_GUARD}")"
+                _name="${_element}-${_version_element}${DEFAULT_ARCHIVE_EXT}"
+                debug "element: $(distinct d ${_element}) -> name: $(distinct d ${_name})"
+                _dig_query="$(${HOST_BIN} A ${MAIN_SOFTWARE_ADDRESS} 2>/dev/null | ${GREP_BIN} 'Address:' 2>/dev/null | eval "${HOST_ADDRESS_GUARD}")"
 
-                if [ -z "${dig_query}" ]; then
+                if [ -z "${_dig_query}" ]; then
                     error "No mirrors found in address: $(distinct e ${MAIN_SOFTWARE_ADDRESS})"
                 fi
-                debug "Using defined mirror(s): $(distinct d "${dig_query}")"
-                for mirror in ${dig_query}; do
-                    system_path="${MAIN_SOFTWARE_PREFIX}/software/binary/$(os_tripple)"
-                    address="${MAIN_USER}@${mirror}:${system_path}"
-                    ${SSH_BIN} ${DEFAULT_SSH_OPTS} -p "${MAIN_PORT}" "${MAIN_USER}@${mirror}" \
-                        "${MKDIR_BIN} -p ${MAIN_SOFTWARE_PREFIX}/software/binary/$(os_tripple)" >> "${LOG}-${lowercase_element}" 2>> "${LOG}-${lowercase_element}"
+                debug "Using defined mirror(s): $(distinct d "${_dig_query}")"
+                for _mirror in ${_dig_query}; do
+                    _address="${MAIN_USER}@${_mirror}:${SYS_SPECIFIC_BINARY_REMOTE}"
+                    ${PRINTF_BIN} "${blue}"
+                    ${SSH_BIN} ${DEFAULT_SSH_OPTS} -p "${MAIN_PORT}" "${MAIN_USER}@${_mirror}" \
+                        "${MKDIR_BIN} -p ${SYS_SPECIFIC_BINARY_REMOTE}" >> "${LOG}-${_lowercase_element}" 2>> "${LOG}-${_lowercase_element}"
 
                     if [ "${SYSTEM_NAME}" = "FreeBSD" ]; then # NOTE: feature designed for FBSD.
-                        svcs_no_slashes="$(echo "${SERVICES_DIR}" | ${SED_BIN} 's/\///g' 2>/dev/null)"
-                        inner_dir="$(${ZFS_BIN} list -H 2>/dev/null | ${GREP_BIN} "${element}$" 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null | ${SED_BIN} "s/.*${svcs_no_slashes}\///; s/\/.*//" 2>/dev/null)/"
-                        certain_dataset="${SERVICES_DIR}${inner_dir}${element}"
-                        full_dataset_name="${DEFAULT_ZPOOL}${certain_dataset}"
-                        snap_file="${element}-${version_element}.${SERVICE_SNAPSHOT_POSTFIX}"
-                        final_snap_file="${snap_file}${DEFAULT_ARCHIVE_EXT}"
-                        snap_size="0"
-                        note "Preparing service dataset: $(distinct n ${full_dataset_name}), for bundle: $(distinct n ${element})"
-                        ${ZFS_BIN} list -H 2>/dev/null | ${GREP_BIN} "${element}\$" >/dev/null 2>&1
+                        _svcs_no_slashes="$(echo "${SERVICES_DIR}" | ${SED_BIN} 's/\///g' 2>/dev/null)"
+                        _inner_dir="$(${ZFS_BIN} list -H 2>/dev/null | ${GREP_BIN} "${_element}$" 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null | ${SED_BIN} "s/.*${_svcs_no_slashes}\///; s/\/.*//" 2>/dev/null)/"
+                        _certain_dataset="${SERVICES_DIR}${_inner_dir}${_element}"
+                        _full_dataset_name="${DEFAULT_ZPOOL}${_certain_dataset}"
+                        _snap_file="${_element}-${_version_element}.${SERVICE_SNAPSHOT_POSTFIX}"
+                        _final_snap_file="${_snap_file}${DEFAULT_ARCHIVE_EXT}"
+                        _snap_size="0"
+                        note "Preparing service dataset: $(distinct n ${_full_dataset_name}), for bundle: $(distinct n ${_element})"
+                        ${ZFS_BIN} list -H 2>/dev/null | ${GREP_BIN} "${_element}\$" >/dev/null 2>&1
                         if [ "$?" = "0" ]; then # if dataset exists, unmount it, send to file, and remount back
-                            ${ZFS_BIN} umount ${full_dataset_name} || error "ZFS umount failed for: $(distinct e "${full_dataset_name}"). Dataset shouldn't be locked nor used on build hosts."
-                            ${ZFS_BIN} send "${full_dataset_name}" 2>> "${LOG}-${lowercase_element}" \
-                                | ${XZ_BIN} > "${final_snap_file}" && \
-                                snap_size="$(${STAT_BIN} -f%z "${final_snap_file}" 2>/dev/null)" && \
-                                ${ZFS_BIN} mount ${full_dataset_name} 2>> "${LOG}-${lowercase_element}" && \
-                                note "Stream file: $(distinct n ${final_snap_file}), of size: $(distinct n ${snap_size}) successfully sent to remote."
+                            ${ZFS_BIN} umount ${_full_dataset_name} || error "ZFS umount failed for: $(distinct e "${_full_dataset_name}"). Dataset shouldn't be locked nor used on build hosts."
+                            ${ZFS_BIN} send "${_full_dataset_name}" \
+                                | ${XZ_BIN} > "${_final_snap_file}" 2>> "${LOG}-${_lowercase_element}" && \
+                                    _snap_size="$(file_size "${_final_snap_file}")" && \
+                                    ${ZFS_BIN} mount ${_full_dataset_name} 2>> "${LOG}-${_lowercase_element}" && \
+                                    note "Stream file: $(distinct n ${_final_snap_file}), of size: $(distinct n ${_snap_size}) successfully sent to remote."
                         fi
-                        if [ "${snap_size}" = "0" ]; then
-                            ${RM_BIN} -vf "${final_snap_file}" >> "${LOG}-${lowercase_element}" 2>> "${LOG}-${lowercase_element}"
-                            note "Service dataset has no contents for bundle: $(distinct n ${element}-${version_element}), hence upload will be skipped"
+                        if [ "${_snap_size}" = "0" ]; then
+                            ${RM_BIN} -vf "${_final_snap_file}" >> "${LOG}-${_lowercase_element}" 2>> "${LOG}-${_lowercase_element}"
+                            note "Service dataset has no contents for bundle: $(distinct n ${_element}-${_version_element}), hence upload will be skipped"
                         fi
                     fi
 
-                    build_software_bundle
-                    store_checksum_bundle
+                    build_software_bundle "${_name}" "${_element}"
+                    store_checksum_bundle "${_name}"
 
-                    ${CHMOD_BIN} a+r "${name}" "${name}${DEFAULT_CHKSUM_EXT}" && \
-                        debug "Set read access for archives: $(distinct d ${name}), $(distinct d ${name}${DEFAULT_CHKSUM_EXT}) before we send them to public remote"
+                    ${CHMOD_BIN} a+r "${_name}" "${_name}${DEFAULT_CHKSUM_EXT}" && \
+                        debug "Set read access for archives: $(distinct d ${_name}), $(distinct d ${_name}${DEFAULT_CHKSUM_EXT}) before we send them to public remote"
 
-                    note "Performing a copy of binary bundle to: $(distinct n ${BINBUILDS_CACHE_DIR}${element}-${version_element})"
-                    ${MKDIR_BIN} -p ${BINBUILDS_CACHE_DIR}${element}-${version_element}
-                    run "${CP_BIN} -v ${name} ${BINBUILDS_CACHE_DIR}${element}-${version_element}/"
-                    run "${CP_BIN} -v ${name}${DEFAULT_CHKSUM_EXT} ${BINBUILDS_CACHE_DIR}${element}-${version_element}/"
+                    _bin_bundle="${BINBUILDS_CACHE_DIR}${_element}-${_version_element}"
+                    debug "Performing a copy of binary bundle to: $(distinct d ${_bin_bundle})"
+                    ${MKDIR_BIN} -p ${_bin_bundle} >/dev/null 2>&1
+                    run "${CP_BIN} -v ${_name} ${_bin_bundle}/"
+                    run "${CP_BIN} -v ${_name}${DEFAULT_CHKSUM_EXT} ${_bin_bundle}/"
 
-                    push_binary_archive
-                    push_service_stream_archive
+                    push_binary_archive "${_bin_bundle}" "${_name}" "${_mirror}" "${_address}"
+                    push_service_stream_archive "${_final_snap_file}" "${_element}" "${_mirror}"
 
                 done
-                ${RM_BIN} -f "${name}" "${name}${DEFAULT_CHKSUM_EXT}" "${final_snap_file}" >> ${LOG}-${lowercase_element} 2>> ${LOG}-${lowercase_element}
+                ${RM_BIN} -f "${_name}" "${_name}${DEFAULT_CHKSUM_EXT}" "${_final_snap_file}" >> ${LOG}-${_lowercase_element} 2>> ${LOG}-${_lowercase_element}
             fi
         else
-            warn "Not found software: $(distinct w ${element})!"
+            warn "Not found software: $(distinct w ${_element})!"
         fi
     done
 }
@@ -327,15 +333,15 @@ deploy_binbuild () {
     create_cache_directories
     load_defaults
     shift
-    bundles=$*
-    note "Software bundles to be built and deployed to remote: $(distinct n ${bundles})"
-    for bundle in ${bundles}; do
-        APPLICATIONS="${bundle}"
+    _bundles=$*
+    note "Software bundles to be built and deployed to remote: $(distinct n ${_bundles})"
+    for _bundle in ${_bundles}; do
+        BUNDLES="${_bundle}"
         USE_BINBUILD=NO
-        build_all || def_error "${bundle}" "Bundle build failed."
+        build_all || def_error "${_bundle}" "Bundle build failed."
     done
-    push_binbuild ${bundles} || def_error "${bundle}" "Push failure"
-    note "Software bundle deployed successfully: $(distinct n ${bundle})"
+    push_binbuild ${_bundles} || def_error "${_bundle}" "Push failure"
+    note "Software bundle deployed successfully: $(distinct n ${_bundle})"
     note "$(fill)"
 }
 
@@ -367,49 +373,51 @@ remove_application () {
 
     # first look for a list with that name:
     if [ -e "${LISTS_DIR}${2}" ]; then
-        APPLICATIONS="$(${CAT_BIN} ${LISTS_DIR}${2} 2>/dev/null | eval "${NEWLINES_TO_SPACES_GUARD}")"
-        debug "Removing list of applications: $(distinct d ${APPLICATIONS})"
+        BUNDLES="$(${CAT_BIN} ${LISTS_DIR}${2} 2>/dev/null | eval "${NEWLINES_TO_SPACES_GUARD}")"
+        debug "Removing list of applications: $(distinct d ${BUNDLES})"
     else
-        APPLICATIONS="${SOFIN_ARGS}"
-        debug "Removing applications: $(distinct d ${APPLICATIONS})"
+        BUNDLES="${SOFIN_ARGS}"
+        debug "Removing applications: $(distinct d ${BUNDLES})"
     fi
 
     load_defaults
-    for app in $APPLICATIONS; do
-        given_app_name="$(capitalize ${app})"
-        if [ -z "${given_app_name}" ]; then
-            error "remove_application(): given_app_name is empty!"
+    for _def in ${BUNDLES}; do
+        _given_name="$(capitalize "${_def}")"
+        if [ -z "${_given_name}" ]; then
+            error "remove_application(): _given_name is empty!"
         fi
-        if [ -d "${SOFTWARE_DIR}${given_app_name}" ]; then
-            if [ "${given_app_name}" = "/" ]; then
+        if [ -d "${SOFTWARE_DIR}${_given_name}" ]; then
+            if [ "${_given_name}" = "/" ]; then
                 error "Czy Ty orzeszki?"
             fi
-            load_defs "${app}"
-            aname="$(lowercase ${DEF_NAME}${DEF_POSTFIX})"
-            note "Removing software bundle(s): $(distinct n ${given_app_name})"
-            if [ -z "${aname}" ]; then
-                ${RM_BIN} -rfv "${SOFTWARE_DIR}${given_app_name}" >> "${LOG}" 2>> "${LOG}"
+            load_defs "${_def}"
+            _aname="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
+            note "Removing software bundle(s): $(distinct n ${_given_name})"
+            if [ -z "${_aname}" ]; then
+                ${RM_BIN} -rfv "${SOFTWARE_DIR}${_given_name}" >> "${LOG}" 2>> "${LOG}"
             else
-                ${RM_BIN} -rfv "${SOFTWARE_DIR}${given_app_name}" >> "${LOG}-${aname}" 2>> "${LOG}-${aname}"
+                ${RM_BIN} -rfv "${SOFTWARE_DIR}${_given_name}" >> "${LOG}-${_aname}" 2>> "${LOG}-${_aname}"
 
-                debug "Looking for other installed versions of: $(distinct d ${aname}), that might be exported automatically.."
-                name="$(echo "${given_app_name}" | ${SED_BIN} 's/[0-9]*//g' 2>/dev/null)"
-                alternative="$(${FIND_BIN} ${SOFTWARE_DIR} -maxdepth 1 -type d -name "${name}*" -not -name "${given_app_name}" 2>/dev/null | ${SED_BIN} 's/^.*\///g' 2>/dev/null | ${HEAD_BIN} -n1 2>/dev/null)"
+                debug "Looking for other installed versions of: $(distinct d ${_aname}), that might be exported automatically.."
+                _inname="$(echo "${_given_name}" | ${SED_BIN} 's/[0-9]*//g' 2>/dev/null)"
+                _alternative="$(${FIND_BIN} ${SOFTWARE_DIR} -maxdepth 1 -type d -name "${_inname}*" -not -name "${_given_name}" 2>/dev/null | ${SED_BIN} 's/^.*\///g' 2>/dev/null | ${HEAD_BIN} -n1 2>/dev/null)"
             fi
-            if [ ! -z "${alternative}" -a \
-                   -f "${SOFTWARE_DIR}${alternative}/$(lowercase ${alternative})${INSTALLED_MARK}" ]; then
-                note "Updating environment with already installed alternative: $(distinct n ${alternative})"
-                export_binaries "${alternative}"
+            if [ ! -z "${_alternative}" -a \
+                   -f "${SOFTWARE_DIR}${_alternative}/$(lowercase ${_alternative})${INSTALLED_MARK}" ]; then
+                note "Updating environment with already installed alternative: $(distinct n ${_alternative})"
+                export_binaries "${_alternative}"
                 cleanup_after_tasks
+                unset _given_name _inname _alternative _aname _def
                 exit # Just pick first available alternative bundle
 
-            elif [ -z "${alternative}" ]; then
-                debug "No alternative: $(distinct d ${alternative}) != $(distinct d ${given_app_name})"
+            elif [ -z "${_alternative}" ]; then
+                debug "No alternative: $(distinct d ${_alternative}) != $(distinct d ${_given_name})"
             fi
         else
-            warn "Bundle: $(distinct w ${given_app_name}) not installed."
+            warn "Bundle: $(distinct w ${_given_name}) not installed."
         fi
     done
+    unset _given_name _inname _alternative _aname _def
 }
 
 
@@ -432,46 +440,46 @@ make_exports () {
     if [ -z "${3}" ]; then
         error "Missing third argument with source app is required!"
     fi
-    export_bin="${2}"
-    bundle_name="$(capitalize "${3}")"
-    for bindir in "/bin/" "/sbin/" "/libexec/"; do
-        debug "Looking into bundle binary dir: $(distinct d ${SOFTWARE_DIR}${bundle_name}${bindir})"
-        if [ -e "${SOFTWARE_DIR}${bundle_name}${bindir}${export_bin}" ]; then
-            note "Exporting binary: $(distinct n ${SOFTWARE_DIR}${bundle_name}${bindir}${export_bin})"
-            cd "${SOFTWARE_DIR}${bundle_name}${bindir}"
-            ${MKDIR_BIN} -p "${SOFTWARE_DIR}${bundle_name}/exports" # make sure exports dir exists
-            aname="$(lowercase ${bundle_name})"
-            ${LN_BIN} -vfs "..${bindir}/${export_bin}" "../exports/${export_bin}" >> "${LOG}-${aname}"
+    _export_bin="${2}"
+    _bundle_name="$(capitalize "${3}")"
+    for _bindir in "/bin/" "/sbin/" "/libexec/"; do
+        debug "Looking into bundle binary dir: $(distinct d ${SOFTWARE_DIR}${_bundle_name}${_bindir})"
+        if [ -e "${SOFTWARE_DIR}${_bundle_name}${_bindir}${_export_bin}" ]; then
+            note "Exporting binary: $(distinct n ${SOFTWARE_DIR}${_bundle_name}${_bindir}${_export_bin})"
+            cd "${SOFTWARE_DIR}${_bundle_name}${_bindir}"
+            ${MKDIR_BIN} -p "${SOFTWARE_DIR}${_bundle_name}/exports" # make sure exports dir exists
+            _aname="$(lowercase ${_bundle_name})"
+            ${LN_BIN} -vfs "..${_bindir}/${_export_bin}" "../exports/${_export_bin}" >> "${LOG}-${_aname}"
 
             cd / # Go outside of bundle directory after exports
-            unset aname bindir bundle_name export_bin
+            unset _aname _bindir _bundle_name _export_bin
             return 0
         else
-            debug "Export not found: $(distinct d ${SOFTWARE_DIR}${bundle_name}${bindir}${export_bin})"
+            debug "Export not found: $(distinct d ${SOFTWARE_DIR}${_bundle_name}${_bindir}${_export_bin})"
         fi
     done
-    error "No executable to export from bin paths of: $(distinct e "${bundle_name}/\{bin,sbin,libexec\}/${export_bin}")"
+    error "No executable to export from bin paths of: $(distinct e "${_bundle_name}/\{bin,sbin,libexec\}/${_export_bin}")"
 }
 
 
 show_outdated () {
     create_cache_directories
     load_defaults
-    if [ -d ${SOFTWARE_DIR} ]; then
-        for prefix in $(${FIND_BIN} ${SOFTWARE_DIR} -mindepth 1 -maxdepth 1 -type d 2>/dev/null); do
-            application="$(${BASENAME_BIN} "${prefix}" 2>/dev/null | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null)" # lowercase for case sensitive fs
+    if [ -d "${SOFTWARE_DIR}" ]; then
+        for _prefix in $(${FIND_BIN} ${SOFTWARE_DIR} -mindepth 1 -maxdepth 1 -type d 2>/dev/null); do
+            _bundle="$(${BASENAME_BIN} "${_prefix}" 2>/dev/null | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null)" # lowercase for case sensitive fs
 
-            if [ ! -f "${prefix}/${application}${INSTALLED_MARK}" ]; then
-                warn "Bundle: $(distinct w ${application}) is not yet installed or damaged."
+            if [ ! -f "${_prefix}/${_bundle}${INSTALLED_MARK}" ]; then
+                warn "Bundle: $(distinct w ${_bundle}) is not yet installed or damaged."
                 continue
             fi
-            ver="$(${CAT_BIN} "${prefix}/${application}${INSTALLED_MARK}" 2>/dev/null)"
-            if [ ! -f "${DEFINITIONS_DIR}${application}${DEFAULT_DEF_EXT}" ]; then
-                warn "No such bundle found: $(distinct w ${application})"
+            _bund_vers="$(${CAT_BIN} "${_prefix}/${_bundle}${INSTALLED_MARK}" 2>/dev/null)"
+            if [ ! -f "${DEFINITIONS_DIR}${_bundle}${DEFAULT_DEF_EXT}" ]; then
+                warn "No such bundle found: $(distinct w ${_bundle})"
                 continue
             fi
-            load_defs "${application}"
-            check_version "${ver}" "${DEF_VERSION}"
+            load_defs "${_bundle}"
+            check_version "${_bund_vers}" "${DEF_VERSION}"
         done
     fi
 
@@ -491,19 +499,19 @@ wipe_remote_archives () {
     fi
     if [ "${ANS}" = "YES" ]; then
         cd "${SOFTWARE_DIR}"
-        for element in ${SOFIN_ARGS}; do
-            lowercase_element="$(lowercase ${element})"
-            name="${element}-"
-            dig_query="$(${HOST_BIN} A ${MAIN_SOFTWARE_ADDRESS} 2>/dev/null | ${GREP_BIN} 'Address:' 2>/dev/null | eval "${HOST_ADDRESS_GUARD}")"
-            if [ -z "${dig_query}" ]; then
+        for _element in ${SOFIN_ARGS}; do
+            _lowercase_element="$(lowercase ${_element})"
+            _name="${_element}-"
+            _dig_query="$(${HOST_BIN} A ${MAIN_SOFTWARE_ADDRESS} 2>/dev/null | ${GREP_BIN} 'Address:' 2>/dev/null | eval "${HOST_ADDRESS_GUARD}")"
+            if [ -z "${_dig_query}" ]; then
                 error "No mirrors found in address: $(distinct e ${MAIN_SOFTWARE_ADDRESS})"
             fi
-            debug "Using defined mirror(s): $(distinct d "${dig_query}")"
-            for mirror in ${dig_query}; do
-                system_path="${MAIN_SOFTWARE_PREFIX}/software/binary/$(os_tripple)"
-                note "Wiping out remote: $(distinct n ${mirror}) binary archives: $(distinct n "${name}")"
-                ${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} "${MAIN_USER}@${mirror}" \
-                    "${FIND_BIN} ${system_path} -iname '${name}' -delete" >> "${LOG}" 2>> "${LOG}"
+            debug "Using defined mirror(s): $(distinct d "${_dig_query}")"
+            for _mirror in ${_dig_query}; do
+                note "Wiping out remote: $(distinct n ${_mirror}) binary archives: $(distinct n "${_name}")"
+                ${PRINTF_BIN} "${blue}"
+                ${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} "${MAIN_USER}@${_mirror}" \
+                    "${FIND_BIN} ${SYS_SPECIFIC_BINARY_REMOTE} -iname '${_name}' -print -delete" 2>> "${LOG}"
             done
         done
     else
@@ -513,18 +521,18 @@ wipe_remote_archives () {
 
 
 execute_process () {
-    app_param="$1"
-    if [ -z "${app_param}" ]; then
+    _app_param="$1"
+    if [ -z "${_app_param}" ]; then
         error "No param given for execute_process()!"
     fi
-    req_definition_file="${DEFINITIONS_DIR}${app_param}${DEFAULT_DEF_EXT}"
-    debug "Checking requirement: $(distinct d ${app_param}) file: $(distinct d ${req_definition_file})"
-    if [ ! -e "${req_definition_file}" ]; then
-        error "Cannot fetch definition: $(distinct e ${req_definition_file})! Aborting!"
+    _req_definition="${DEFINITIONS_DIR}${_app_param}${DEFAULT_DEF_EXT}"
+    debug "Checking requirement: $(distinct d ${_app_param}) file: $(distinct d ${_req_definition})"
+    if [ ! -e "${_req_definition}" ]; then
+        error "Cannot fetch definition: $(distinct e ${_req_definition})! Aborting!"
     fi
 
     load_defaults
-    load_defs "${req_definition_file}"
+    load_defs "${_req_definition}"
     check_disabled "${DEF_DISABLE_ON}" # check requirement for disabled state:
 
     setup_sofin_compiler
@@ -532,75 +540,75 @@ execute_process () {
     export PATH="${PREFIX}/bin:${PREFIX}/sbin:${DEFAULT_PATH}"
     if [ "${ALLOW}" = "1" ]; then
         if [ -z "${DEF_HTTP_PATH}" ]; then
-            definition_file_no_ext="\
-                $(echo "$(${BASENAME_BIN} ${req_definition_file} 2>/dev/null)" | \
+            _definition_no_ext="\
+                $(echo "$(${BASENAME_BIN} ${_req_definition} 2>/dev/null)" | \
                 ${SED_BIN} -e 's/\..*$//g' 2>/dev/null)"
-            note "   ${NOTE_CHAR2} $(distinct n "DEF_HTTP_PATH=\"\"") is undefined for: $(distinct n "${definition_file_no_ext}")."
-            note "NOTE: It's only valid for meta bundles. You may consider setting: $(distinct n "DEF_CONFIGURE=\"meta\"") in bundle definition file. Type: $(distinct n "s dev ${definition_file_no_ext}"))"
+            note "   ${NOTE_CHAR2} $(distinct n "DEF_HTTP_PATH=\"\"") is undefined for: $(distinct n "${_definition_no_ext}")."
+            note "NOTE: It's only valid for meta bundles. You may consider setting: $(distinct n "DEF_CONFIGURE=\"meta\"") in bundle definition file. Type: $(distinct n "s dev ${_definition_no_ext}"))"
         else
-            current_directory="$(${PWD_BIN} 2>/dev/null)"
+            _cwd="$(${PWD_BIN} 2>/dev/null)"
             if [ -z "${SOFIN_CONTINUE_BUILD}" ]; then
-                export BUILD_DIR_ROOT="${CACHE_DIR}cache/${DEF_NAME}${DEF_POSTFIX}-${DEF_VERSION}-${RUNTIME_SHA}/"
-                ${FIND_BIN} "${BUILD_DIR_ROOT}" -type d -delete >> ${LOG} 2>> ${LOG}
-                ${MKDIR_BIN} -p "${BUILD_DIR_ROOT}"
+                export BUILD_DIR_ROOT="${CACHE_DIR}cache/${DEF_NAME}${DEF_POSTFIX}-${DEF_VERSION}-${RUNTIME_ID}/"
+                ${RM_BIN} -rf "${BUILD_DIR_ROOT}" >> ${LOG} 2>> ${LOG}
+                ${MKDIR_BIN} -p "${BUILD_DIR_ROOT}" >/dev/null 2>&1
                 cd "${BUILD_DIR_ROOT}"
                 if [ -z "${DEF_GIT_MODE}" ]; then # Standard http tarball method:
-                    base="$(${BASENAME_BIN} ${DEF_HTTP_PATH} 2>/dev/null)"
-                    debug "DEF_HTTP_PATH: $(distinct d ${DEF_HTTP_PATH}) base: $(distinct d ${base})"
-                    if [ ! -e ${BUILD_DIR_ROOT}/../${base} ]; then
-                        note "   ${NOTE_CHAR} Fetching required tarball source: $(distinct n ${base})"
+                    _base="$(${BASENAME_BIN} ${DEF_HTTP_PATH} 2>/dev/null)"
+                    debug "DEF_HTTP_PATH: $(distinct d ${DEF_HTTP_PATH}) base: $(distinct d ${_base})"
+                    if [ ! -e ${BUILD_DIR_ROOT}/../${_base} ]; then
+                        note "   ${NOTE_CHAR} Fetching required tarball source: $(distinct n ${_base})"
                         retry "${FETCH_BIN} ${FETCH_OPTS} ${DEF_HTTP_PATH}"
-                        ${MV_BIN} ${base} ${BUILD_DIR_ROOT}/..
+                        ${MV_BIN} ${_base} ${BUILD_DIR_ROOT}/.. >> ${LOG} 2>> ${LOG}
                     fi
 
-                    dest_file="${BUILD_DIR_ROOT}/../${base}"
-                    debug "Build dir: $(distinct d ${BUILD_DIR_ROOT}), file: $(distinct d ${dest_file})"
+                    _dest_file="${BUILD_DIR_ROOT}/../${_base}"
+                    debug "Build dir: $(distinct d ${BUILD_DIR_ROOT}), file: $(distinct d ${_dest_file})"
                     if [ -z "${DEF_SHA}" ]; then
-                        error "Missing SHA sum for source: $(distinct e ${dest_file})!"
+                        error "Missing SHA sum for source: $(distinct e ${_dest_file})!"
                     else
-                        a_file_checksum="$(file_checksum ${dest_file})"
-                        if [ "${a_file_checksum}" = "${DEF_SHA}" ]; then
+                        _a_file_checksum="$(file_checksum ${_dest_file})"
+                        if [ "${_a_file_checksum}" = "${DEF_SHA}" ]; then
                             debug "Source tarball checksum is fine"
                         else
                             warn "${WARN_CHAR} Source tarball checksum mismatch detected!"
-                            warn "${WARN_CHAR} $(distinct w ${a_file_checksum}) vs $(distinct w ${DEF_SHA})"
-                            warn "${WARN_CHAR} Removing corrupted file from cache: $(distinct w ${dest_file}) and retrying.."
+                            warn "${WARN_CHAR} $(distinct w ${_a_file_checksum}) vs $(distinct w ${DEF_SHA})"
+                            warn "${WARN_CHAR} Removing corrupted file from cache: $(distinct w ${_dest_file}) and retrying.."
                             # remove corrupted file
-                            ${RM_BIN} -vf "${dest_file}" >> ${LOG} 2>> ${LOG}
+                            ${RM_BIN} -vf "${_dest_file}" >> ${LOG} 2>> ${LOG}
                             # and restart script with same arguments:
-                            debug "Evaluating again: $(distinct d "execute_process(${app_param})")"
-                            execute_process "${app_param}"
+                            debug "Evaluating again: $(distinct d "execute_process(${_app_param})")"
+                            execute_process "${_app_param}"
                         fi
                     fi
 
-                    note "   ${NOTE_CHAR} Unpacking source tarball of: $(distinct n ${DEF_NAME})"
+                    note "   ${NOTE_CHAR} Unpacking source tarball of: $(distinct n ${DEF_NAME}${DEF_POSTFIX})"
                     debug "Build dir root: $(distinct d ${BUILD_DIR_ROOT})"
-                    try "${TAR_BIN} -xf ${dest_file}" || \
-                    try "${TAR_BIN} -xfj ${dest_file}" || \
-                    run "${TAR_BIN} -xfJ ${dest_file}"
+                    try "${TAR_BIN} -xf ${_dest_file}" || \
+                    try "${TAR_BIN} -xfj ${_dest_file}" || \
+                    run "${TAR_BIN} -xfJ ${_dest_file}"
                 else
                     # git method:
                     # .cache/git-cache => git bare repos
                     ${MKDIR_BIN} -p ${GIT_CACHE_DIR}
-                    git_cached="${GIT_CACHE_DIR}${DEF_NAME}${DEF_VERSION}.git"
+                    _git_cached="${GIT_CACHE_DIR}${DEF_NAME}${DEF_VERSION}.git"
                     note "   ${NOTE_CHAR} Fetching git repository: $(distinct n ${DEF_HTTP_PATH}${reset})"
-                    try "${GIT_BIN} clone ${DEFAULT_GIT_OPTS} --depth 1 --bare ${DEF_HTTP_PATH} ${git_cached}" || \
-                    try "${GIT_BIN} clone ${DEFAULT_GIT_OPTS} --depth 1 --bare ${DEF_HTTP_PATH} ${git_cached}" || \
-                    try "${GIT_BIN} clone ${DEFAULT_GIT_OPTS} --depth 1 --bare ${DEF_HTTP_PATH} ${git_cached}"
+                    try "${GIT_BIN} clone ${DEFAULT_GIT_OPTS} --depth 1 --bare ${DEF_HTTP_PATH} ${_git_cached}" || \
+                    try "${GIT_BIN} clone ${DEFAULT_GIT_OPTS} --depth 1 --bare ${DEF_HTTP_PATH} ${_git_cached}" || \
+                    try "${GIT_BIN} clone ${DEFAULT_GIT_OPTS} --depth 1 --bare ${DEF_HTTP_PATH} ${_git_cached}"
                     if [ "$?" = "0" ]; then
                         debug "Fetched bare repository: $(distinct d ${DEF_NAME}${DEF_VERSION})"
                     else
-                        if [ ! -d "${git_cached}/branches" -a ! -f "${git_cached}/config" ]; then
+                        if [ ! -d "${_git_cached}/branches" -a ! -f "${_git_cached}/config" ]; then
                             note "\n${red}Definitions were not updated. Showing $(distinct n ${LOG_LINES_AMOUNT_ON_ERR}) lines of internal log:${reset}"
                             ${TAIL_BIN} -n${LOG_LINES_AMOUNT_ON_ERR} ${LOG} 2>/dev/null
                             note "$(fill)"
                         else
                             current="$(${PWD_BIN} 2>/dev/null)"
-                            debug "Trying to update existing bare repository cache in: $(distinct d ${git_cached})"
-                            cd "${git_cached}"
+                            debug "Trying to update existing bare repository cache in: $(distinct d ${_git_cached})"
+                            cd "${_git_cached}"
                             try "${GIT_BIN} fetch ${DEFAULT_GIT_OPTS} origin ${DEF_GIT_CHECKOUT}" || \
                                 try "${GIT_BIN} fetch ${DEFAULT_GIT_OPTS} origin" || \
-                                warn "   ${WARN_CHAR} Failed to fetch an update from bare repository: $(distinct w ${git_cached})"
+                                warn "   ${WARN_CHAR} Failed to fetch an update from bare repository: $(distinct w ${_git_cached})"
                             # for empty DEF_VERSION it will fill it with first 16 chars of repository HEAD SHA1:
                             if [ -z "${DEF_VERSION}" ]; then
                                 DEF_VERSION="$(${GIT_BIN} rev-parse HEAD 2>/dev/null | ${CUT_BIN} -c -16 2>/dev/null)"
@@ -610,7 +618,7 @@ execute_process () {
                         fi
                     fi
                     # bare repository is already cloned, so we just clone from it now..
-                    run "${GIT_BIN} clone ${DEFAULT_GIT_OPTS} ${git_cached} ${DEF_NAME}${DEF_VERSION}" && \
+                    run "${GIT_BIN} clone ${DEFAULT_GIT_OPTS} ${_git_cached} ${DEF_NAME}${DEF_VERSION}" && \
                     debug "Cloned git respository from git bare cache repository"
                 fi
 
@@ -626,8 +634,8 @@ execute_process () {
 
                 if [ ! -z "${DEF_GIT_CHECKOUT}" ]; then
                     note "   ${NOTE_CHAR} Definition branch: $(distinct n ${DEF_GIT_CHECKOUT})"
-                    current_branch="$(${GIT_BIN} rev-parse --abbrev-ref HEAD 2>/dev/null)"
-                    if [ "${current_branch}" != "${DEF_GIT_CHECKOUT}" ]; then
+                    _current_branch="$(${GIT_BIN} rev-parse --abbrev-ref HEAD 2>/dev/null)"
+                    if [ "${_current_branch}" != "${DEF_GIT_CHECKOUT}" ]; then
                         try "${GIT_BIN} checkout ${DEFAULT_GIT_OPTS} -b ${DEF_GIT_CHECKOUT}"
                     fi
                     try "${GIT_BIN} checkout ${DEFAULT_GIT_OPTS} ${DEF_GIT_CHECKOUT}"
@@ -635,34 +643,34 @@ execute_process () {
 
                 after_update_callback
 
-                aname="$(lowercase ${DEF_NAME}${DEF_POSTFIX})"
+                _aname="$(lowercase ${DEF_NAME}${DEF_POSTFIX})"
                 LIST_DIR="${DEFINITIONS_DIR}patches/$1" # $1 is definition file name
                 if [ -d "${LIST_DIR}" ]; then
-                    patches_files="$(${FIND_BIN} ${LIST_DIR}/* -maxdepth 0 -type f 2>/dev/null)"
-                    ${TEST_BIN} ! -z "${patches_files}" && \
+                    _ps_patches="$(${FIND_BIN} ${LIST_DIR}/* -maxdepth 0 -type f 2>/dev/null)"
+                    ${TEST_BIN} ! -z "${_ps_patches}" && \
                     note "   ${NOTE_CHAR} Applying common patches for: $(distinct n ${DEF_NAME}${DEF_POSTFIX})"
-                    for patch in ${patches_files}; do
-                        for level in 0 1 2 3 4 5; do
-                            debug "Trying to patch source with patch: $(distinct d ${patch}), level: $(distinct d ${level})"
-                            ${PATCH_BIN} -p${level} -N -f -i "${patch}" >> "${LOG}-${aname}" 2>> "${LOG}-${aname}" # don't use run.. it may fail - we don't care
+                    for _patch in ${_ps_patches}; do
+                        for _level in 0 1 2 3 4 5; do
+                            debug "Trying to patch source with patch: $(distinct d ${_patch}), level: $(distinct d ${_level})"
+                            ${PATCH_BIN} -p${_level} -N -f -i "${_patch}" >> "${LOG}-${_aname}" 2>> "${LOG}-${_aname}" # don't use run.. it may fail - we don't care
                             if [ "$?" = "0" ]; then # skip applying single patch if it already passed
-                                debug "Patch: $(distinct d ${patch}) applied successfully!"
+                                debug "Patch: $(distinct d ${_patch}) applied successfully!"
                                 break;
                             fi
                         done
                     done
-                    pspatch_dir="${LIST_DIR}/${SYSTEM_NAME}"
-                    debug "Checking psp dir: $(distinct d ${pspatch_dir})"
-                    if [ -d "${pspatch_dir}" ]; then
+                    _pspatch_dir="${LIST_DIR}/${SYSTEM_NAME}"
+                    debug "Checking psp dir: $(distinct d ${_pspatch_dir})"
+                    if [ -d "${_pspatch_dir}" ]; then
                         note "   ${NOTE_CHAR} Applying platform specific patches for: $(distinct n ${DEF_NAME}${DEF_POSTFIX}/${SYSTEM_NAME})"
-                        patches_files="$(${FIND_BIN} ${pspatch_dir}/* -maxdepth 0 -type f 2>/dev/null)"
-                        ${TEST_BIN} ! -z "${patches_files}" && \
-                        for platform_specific_patch in ${patches_files}; do
-                            for level in 0 1 2 3 4 5; do
-                                debug "Patching source code with pspatch: $(distinct d ${platform_specific_patch}) (p$(distinct d ${level}))"
-                                ${PATCH_BIN} -p${level} -N -f -i "${platform_specific_patch}" >> "${LOG}-${aname}" 2>> "${LOG}-${aname}"
+                        _ps_patches="$(${FIND_BIN} ${_pspatch_dir}/* -maxdepth 0 -type f 2>/dev/null)"
+                        ${TEST_BIN} ! -z "${_ps_patches}" && \
+                        for _pspp in ${_ps_patches}; do
+                            for _level in 0 1 2 3 4 5; do
+                                debug "Patching source code with pspatch: $(distinct d ${_pspp}) (p$(distinct d ${_level}))"
+                                ${PATCH_BIN} -p${_level} -N -f -i "${_pspp}" >> "${LOG}-${_aname}" 2>> "${LOG}-${_aname}"
                                 if [ "$?" = "0" ]; then # skip applying single patch if it already passed
-                                    debug "Patch: $(distinct d ${platform_specific_patch}) applied successfully!"
+                                    debug "Patch: $(distinct d ${_pspp}) applied successfully!"
                                     break;
                                 fi
                             done
@@ -707,16 +715,16 @@ execute_process () {
                         ;;
 
                     *)
-                        unset pic_optional
+                        unset _pic_optional
                         if [ "${SYSTEM_NAME}" != "Darwin" ]; then
-                            pic_optional="--with-pic"
+                            _pic_optional="--with-pic"
                         fi
                         if [ "${SYSTEM_NAME}" = "Linux" ]; then
                             # NOTE: No /Services feature implemented for Linux.
                             echo "${DEF_CONFIGURE}" | ${GREP_BIN} "configure" >/dev/null 2>&1
                             if [ "$?" = "0" ]; then
-                                try "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${PREFIX} ${pic_optional} --sysconfdir=/etc" || \
-                                try "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${PREFIX} ${pic_optional}" || \
+                                try "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${PREFIX} ${_pic_optional} --sysconfdir=/etc" || \
+                                try "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${PREFIX} ${_pic_optional}" || \
                                 run "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${PREFIX}" # fallback
                             else
                                 run "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${PREFIX}"
@@ -734,12 +742,12 @@ execute_process () {
                                 #   --with-pic
                                 # OPTIMIZE: TODO: XXX: use ./configure --help | grep option to
                                 #      build configure options quickly
-                                try "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${PREFIX} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var --runstatedir=${SERVICE_DIR}/run ${pic_optional}" || \
-                                try "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${PREFIX} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var ${pic_optional}" || \
+                                try "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${PREFIX} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var --runstatedir=${SERVICE_DIR}/run ${_pic_optional}" || \
+                                try "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${PREFIX} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var ${_pic_optional}" || \
                                 try "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${PREFIX} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var" || \
-                                try "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${PREFIX} --sysconfdir=${SERVICE_DIR}/etc ${pic_optional}" || \
+                                try "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${PREFIX} --sysconfdir=${SERVICE_DIR}/etc ${_pic_optional}" || \
                                 try "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${PREFIX} --sysconfdir=${SERVICE_DIR}/etc" || \
-                                try "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${PREFIX} ${pic_optional}" || \
+                                try "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${PREFIX} ${_pic_optional}" || \
                                 run "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${PREFIX}" # last two - only as a fallback
 
                             else # fallback again:
@@ -787,32 +795,32 @@ execute_process () {
             else
                 debug "Leaving build dir intact when working in devel mode. Last build dir: $(distinct d ${BUILD_DIR_ROOT})"
             fi
-            cd "${current_directory}" 2>/dev/null
-            unset current_directory
+            cd "${_cwd}" 2>/dev/null
+            unset _cwd
         fi
     else
         warn "   ${WARN_CHAR} Requirement: $(distinct w ${DEF_NAME}) disabled on: $(distinct w ${SYSTEM_NAME})"
         if [ ! -d "${PREFIX}" ]; then # case when disabled requirement is first on list of dependencies
             ${MKDIR_BIN} -p "${PREFIX}"
         fi
-        ${TOUCH_BIN} "${PREFIX}/${req}${INSTALLED_MARK}"
-        ${PRINTF_BIN} "os-default" > "${PREFIX}/${req}${INSTALLED_MARK}"
+        ${TOUCH_BIN} "${PREFIX}/${_req}${INSTALLED_MARK}"
+        ${PRINTF_BIN} "os-default" > "${PREFIX}/${_req}${INSTALLED_MARK}"
     fi
+    unset _req _current_branch
 }
 
 
-create_apple_bundle_if_necessary () {
+create_apple_bundle_if_necessary () { # XXXXXX
     if [ ! -z "${DEF_APPLE_BUNDLE}" ]; then
-        DEF_LOWERNAME="${DEF_NAME}"
+        _aname="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
         DEF_NAME="$(${PRINTF_BIN} "${DEF_NAME}" | ${CUT_BIN} -c1 2>/dev/null | ${TR_BIN} '[a-z]' '[A-Z]' 2>/dev/null)$(${PRINTF_BIN} "${DEF_NAME}" | ${SED_BIN} 's/^[a-zA-Z]//' 2>/dev/null)"
         DEF_BUNDLE_NAME="${PREFIX}.app"
-        aname="$(lowercase ${DEF_NAME}${DEF_POSTFIX})"
         note "Creating Apple bundle: $(distinct n ${DEF_NAME} )in: $(distinct n ${DEF_BUNDLE_NAME})"
-        ${MKDIR_BIN} -p "${DEF_BUNDLE_NAME}/libs" "${DEF_BUNDLE_NAME}/Contents" "${DEF_BUNDLE_NAME}/Contents/Resources/${DEF_LOWERNAME}" "${DEF_BUNDLE_NAME}/exports" "${DEF_BUNDLE_NAME}/share"
+        ${MKDIR_BIN} -p "${DEF_BUNDLE_NAME}/libs" "${DEF_BUNDLE_NAME}/Contents" "${DEF_BUNDLE_NAME}/Contents/Resources/${_aname}" "${DEF_BUNDLE_NAME}/exports" "${DEF_BUNDLE_NAME}/share"
         ${CP_BIN} -R ${PREFIX}/${DEF_NAME}.app/Contents/* "${DEF_BUNDLE_NAME}/Contents/"
-        ${CP_BIN} -R ${PREFIX}/bin/${DEF_LOWERNAME} "${DEF_BUNDLE_NAME}/exports/"
+        ${CP_BIN} -R ${PREFIX}/bin/${_aname} "${DEF_BUNDLE_NAME}/exports/"
         for lib in $(${FIND_BIN} "${PREFIX}" -name '*.dylib' -type f 2>/dev/null); do
-            ${CP_BIN} -vf ${lib} ${DEF_BUNDLE_NAME}/libs/ >> ${LOG}-${aname} 2>> ${LOG}-${aname}
+            ${CP_BIN} -vf ${lib} ${DEF_BUNDLE_NAME}/libs/ >> ${LOG}-${_aname} 2>> ${LOG}-${_aname}
         done
 
         # if symlink exists, remove it.
@@ -820,79 +828,79 @@ create_apple_bundle_if_necessary () {
         ${LN_BIN} -vs "${DEF_BUNDLE_NAME}/libs ${DEF_BUNDLE_NAME}/lib" >> ${LOG} 2>> ${LOG}
 
         # move data, and support files from origin:
-        ${CP_BIN} -vR "${PREFIX}/share/${DEF_LOWERNAME}" "${DEF_BUNDLE_NAME}/share/" >> ${LOG} 2>> ${LOG}
-        ${CP_BIN} -vR "${PREFIX}/lib/${DEF_LOWERNAME}" "${DEF_BUNDLE_NAME}/libs/" >> ${LOG} 2>> ${LOG}
+        ${CP_BIN} -vR "${PREFIX}/share/${_aname}" "${DEF_BUNDLE_NAME}/share/" >> ${LOG} 2>> ${LOG}
+        ${CP_BIN} -vR "${PREFIX}/lib/${_aname}" "${DEF_BUNDLE_NAME}/libs/" >> ${LOG} 2>> ${LOG}
 
         cd "${DEF_BUNDLE_NAME}/Contents"
-        ${TEST_BIN} -L MacOS || ${LN_BIN} -s ../exports MacOS >> ${LOG}-${aname} 2>> ${LOG}-${aname}
+        ${TEST_BIN} -L MacOS || ${LN_BIN} -s ../exports MacOS >> ${LOG}-${_aname} 2>> ${LOG}-${_aname}
         debug "Creating relative libraries search path"
         cd ${DEF_BUNDLE_NAME}
         note "Processing exported binary: $(distinct n ${i})"
-        ${SOFIN_LIBBUNDLE_BIN} -x "${DEF_BUNDLE_NAME}/Contents/MacOS/${DEF_LOWERNAME}" >> ${LOG}-${aname} 2>> ${LOG}-${aname}
+        ${SOFIN_LIBBUNDLE_BIN} -x "${DEF_BUNDLE_NAME}/Contents/MacOS/${_aname}" >> ${LOG}-${_aname} 2>> ${LOG}-${_aname}
     fi
 }
 
 
 strip_bundle_files () {
-    definition_name="$1"
-    if [ -z "${definition_name}" ]; then
+    _definition_name="$1"
+    if [ -z "${_definition_name}" ]; then
         error "No definition name specified as first param for strip_bundle_files()!"
     fi
     load_defaults # reset possible cached values
-    load_defs "${definition_name}"
+    load_defs "${_definition_name}"
     if [ -z "${PREFIX}" ]; then
         PREFIX="${SOFTWARE_DIR}$(capitalize "${DEF_NAME}${DEF_POSTFIX}")"
-        debug "An empty prefix in strip_bundle_files() for $(distinct d ${definition_name}). Resetting to: $(distinct d ${PREFIX})"
+        debug "An empty prefix in strip_bundle_files() for $(distinct d ${_definition_name}). Resetting to: $(distinct d ${PREFIX})"
     fi
 
-    dirs_to_strip=""
+    _dirs_to_strip=""
     case "${DEF_STRIP}" in
         all)
-            debug "strip_bundle_files($(distinct d "${definition_name}")): Strip both binaries and libraries."
-            dirs_to_strip="${PREFIX}/bin ${PREFIX}/sbin ${PREFIX}/lib ${PREFIX}/libexec"
+            debug "strip_bundle_files($(distinct d "${_definition_name}")): Strip both binaries and libraries."
+            _dirs_to_strip="${PREFIX}/bin ${PREFIX}/sbin ${PREFIX}/lib ${PREFIX}/libexec"
             ;;
 
         exports)
-            debug "strip_bundle_files($(distinct d "${definition_name}")): Strip exported binaries only"
-            dirs_to_strip="${PREFIX}/bin ${PREFIX}/sbin ${PREFIX}/libexec"
+            debug "strip_bundle_files($(distinct d "${_definition_name}")): Strip exported binaries only"
+            _dirs_to_strip="${PREFIX}/bin ${PREFIX}/sbin ${PREFIX}/libexec"
             ;;
 
         libs)
-            debug "strip_bundle_files($(distinct d "${definition_name}")): Strip libraries only"
-            dirs_to_strip="${PREFIX}/lib"
+            debug "strip_bundle_files($(distinct d "${_definition_name}")): Strip libraries only"
+            _dirs_to_strip="${PREFIX}/lib"
             ;;
 
         *)
-            debug "strip_bundle_files($(distinct d "${definition_name}")): Strip nothing"
+            debug "strip_bundle_files($(distinct d "${_definition_name}")): Strip nothing"
             ;;
     esac
     if [ "${DEF_STRIP}" != "no" ]; then
-        bundle_lowercase="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
+        _bundle_lowercase="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
         if [ -z "${DEBUGBUILD}" ]; then
-            counter="0"
-            for stripdir in ${dirs_to_strip}; do
-                if [ -d "${stripdir}" ]; then
-                    files=$(${FIND_BIN} ${stripdir} -maxdepth 1 -type f 2>/dev/null)
-                    for file in ${files}; do
-                        ${STRIP_BIN} ${file} >> "${LOG}-${bundle_lowercase}" 2>> "${LOG}-${bundle_lowercase}"
+            _counter="0"
+            for _stripdir in ${_dirs_to_strip}; do
+                if [ -d "${_stripdir}" ]; then
+                    _files=$(${FIND_BIN} ${_stripdir} -maxdepth 1 -type f 2>/dev/null)
+                    for _file in ${_files}; do
+                        ${STRIP_BIN} ${file} >> "${LOG}-${_bundle_lowercase}.strip" 2>> "${LOG}-${_bundle_lowercase}.strip"
                         if [ "$?" = "0" ]; then
-                            counter="${counter} + 1"
+                            _counter="${_counter} + 1"
                         else
-                            counter="${counter} - 1"
+                            _counter="${_counter} - 1"
                         fi
                     done
                 fi
             done
-            result="$(echo "${counter}" | ${BC_BIN} 2>/dev/null)"
-            if [ "${result}" -lt "0" ]; then
-                result="0"
+            _result="$(echo "${_counter}" | ${BC_BIN} 2>/dev/null)"
+            if [ "${_result}" -lt "0" ]; then
+                _result="0"
             fi
-            note "$(distinct n ${result}) files were stripped"
+            note "$(distinct n ${_result}) files were stripped"
         else
             warn "Debug build is enabled. Strip skipped"
         fi
     fi
-    unset definition_name dirs_to_strip result counter files stripdir bundle_lowercase
+    unset _definition_name _dirs_to_strip _result _counter _files _stripdir _bundle_lowercase
 }
 
 
@@ -915,63 +923,63 @@ manage_datasets () {
             fi
 
             # count Sofin jobs. For more than one job available,
-            sofin_ps_list="$(processes_all_sofin)"
-            sofins_all="$(echo "${sofin_ps_list}" | ${WC_BIN} -l 2>/dev/null | ${SED_BIN} 's/ //g' 2>/dev/null)"
-            sofins_installing="$(echo "${sofins_all} - 1" | ${BC_BIN} 2>/dev/null)"
-            ${TEST_BIN} -z "${sofins_installing}" && sofins_installing="0"
-            export jobs_in_parallel="NO"
-            if [ ${sofins_installing} -gt 1 ]; then
-                note "Found: $(distinct n ${sofins_installing}) running Sofin instances. Parallel jobs not allowed"
-                export jobs_in_parallel="YES"
+            _sofin_ps_list="$(processes_all_sofin)"
+            _sofins_all="$(echo "${_sofin_ps_list}" | ${WC_BIN} -l 2>/dev/null | ${SED_BIN} 's/ //g' 2>/dev/null)"
+            _sofins_installing="$(echo "${_sofins_all} - 1" | ${BC_BIN} 2>/dev/null)"
+            ${TEST_BIN} -z "${_sofins_installing}" && _sofins_installing="0"
+            export _jobs_in_parallel="NO"
+            if [ ${_sofins_installing} -gt 1 ]; then
+                note "Found: $(distinct n ${_sofins_installing}) running Sofin instances. Parallel jobs not allowed"
+                export _jobs_in_parallel="YES"
             else
                 note "Parallel jobs allowed. Traversing several datasets at once.."
             fi
 
             # Create a dataset for any existing dirs in Services dir that are not ZFS datasets.
-            all_dirs="$(${FIND_BIN} ${SERVICES_DIR} -mindepth 1 -maxdepth 1 -type d -not -name '.*' -print 2>/dev/null | ${XARGS_BIN} ${BASENAME_BIN} 2>/dev/null)"
-            debug "Checking for non-dataset directories in $(distinct d ${SERVICES_DIR}): EOF:\n$(echo "${all_dirs}" | eval "${NEWLINES_TO_SPACES_GUARD}")\nEOF\n"
-            full_bundle_name="$(${BASENAME_BIN} "${PREFIX}" 2>/dev/null)"
-            for maybe_dataset in ${all_dirs}; do
-                aname="$(lowercase ${full_bundle_name})"
-                app_name_lowercase="$(lowercase ${maybe_dataset})"
-                if [ "${app_name_lowercase}" = "${aname}" -o ${jobs_in_parallel} = "NO" ]; then
+            _all_dirs="$(${FIND_BIN} ${SERVICES_DIR} -mindepth 1 -maxdepth 1 -type d -not -name '.*' -print 2>/dev/null | ${XARGS_BIN} ${BASENAME_BIN} 2>/dev/null)"
+            debug "Checking for non-dataset directories in $(distinct d ${SERVICES_DIR}): EOF:\n$(echo "${_all_dirs}" | eval "${NEWLINES_TO_SPACES_GUARD}")\nEOF\n"
+            _full_bundname="$(${BASENAME_BIN} "${PREFIX}" 2>/dev/null)"
+            for _maybe_dataset in ${_all_dirs}; do
+                _aname="$(lowercase ${_full_bundname})"
+                _app_name_lowercase="$(lowercase ${_maybe_dataset})"
+                if [ "${_app_name_lowercase}" = "${_aname}" -o ${_jobs_in_parallel} = "NO" ]; then
                     # find name of mount from default ZFS Services:
-                    inner_dir=""
+                    _inner_dir=""
                     if [ "${USERNAME}" = "root" ]; then
-                        inner_dir="root/"
+                        _inner_dir="root/"
                     else
                         # NOTE: In ServeD-OS there's only 1 inner dir name that's also the cell name
                         no_ending_slash="$(echo "${SERVICES_DIR}" | ${SED_BIN} 's/\/$//' 2>/dev/null)"
-                        inner_dir="$(${ZFS_BIN} list -H 2>/dev/null | ${EGREP_BIN} "${no_ending_slash}$" 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null | ${SED_BIN} 's/.*\///' 2>/dev/null)/"
-                        if [ -z "${inner_dir}" ]; then
+                        _inner_dir="$(${ZFS_BIN} list -H 2>/dev/null | ${EGREP_BIN} "${no_ending_slash}$" 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null | ${SED_BIN} 's/.*\///' 2>/dev/null)/"
+                        if [ -z "${_inner_dir}" ]; then
                             warn "Falling back with inner dir name to current user name: ${USERNAME}/"
-                            inner_dir="${USERNAME}/"
+                            _inner_dir="${USERNAME}/"
                         fi
                     fi
-                    certain_dataset="${SERVICES_DIR}${inner_dir}${maybe_dataset}"
-                    certain_fileset="${SERVICES_DIR}${maybe_dataset}"
-                    full_dataset_name="${DEFAULT_ZPOOL}${certain_dataset}"
-                    snap_file="${maybe_dataset}-${DEF_VERSION}.${SERVICE_SNAPSHOT_POSTFIX}"
-                    final_snap_file="${snap_file}${DEFAULT_ARCHIVE_EXT}"
+                    _certain_dataset="${SERVICES_DIR}${_inner_dir}${_maybe_dataset}"
+                    certain_fileset="${SERVICES_DIR}${_maybe_dataset}"
+                    _full_dataset_name="${DEFAULT_ZPOOL}${_certain_dataset}"
+                    _snap_file="${_maybe_dataset}-${DEF_VERSION}.${SERVICE_SNAPSHOT_POSTFIX}"
+                    _final_snap_file="${_snap_file}${DEFAULT_ARCHIVE_EXT}"
 
                     # check dataset existence and create/receive it if necessary
-                    ds_mounted="$(${ZFS_BIN} get -H -o value mounted ${full_dataset_name} 2>/dev/null)"
-                    debug "Dataset: $(distinct d ${full_dataset_name}) is mounted?: $(distinct d ${ds_mounted})"
+                    ds_mounted="$(${ZFS_BIN} get -H -o value mounted ${_full_dataset_name} 2>/dev/null)"
+                    debug "Dataset: $(distinct d ${_full_dataset_name}) is mounted?: $(distinct d ${ds_mounted})"
                     if [ "${ds_mounted}" != "yes" ]; then # XXX: rewrite this.. THING below -__
                         debug "Moving $(distinct d ${certain_fileset}) to $(distinct d ${certain_fileset}-tmp)"
                         ${RM_BIN} -f "${certain_fileset}-tmp" >> ${LOG} 2>> ${LOG}
                         ${MV_BIN} -f "${certain_fileset}" "${certain_fileset}-tmp"
-                        debug "Creating dataset: $(distinct d ${full_dataset_name})"
-                        create_or_receive "${full_dataset_name}"
+                        debug "Creating dataset: $(distinct d ${_full_dataset_name})"
+                        create_or_receive "${_full_dataset_name}" "${_final_snap_file}"
                         debug "Copying $(distinct d "${certain_fileset}-tmp/") back to $(distinct d ${certain_fileset})"
                         ${CP_BIN} -RP "${certain_fileset}-tmp/" "${certain_fileset}"
                         debug "Cleaning $(distinct d "${certain_fileset}-tmp/")"
                         ${RM_BIN} -rf "${certain_fileset}-tmp"
-                        debug "Dataset created: $(distinct d ${full_dataset_name})"
+                        debug "Dataset created: $(distinct d ${_full_dataset_name})"
                     fi
 
                 else # no name match
-                    debug "No match for: $(distinct d ${app_name_lowercase})"
+                    debug "No match for: $(distinct d ${_app_name_lowercase})"
                 fi
             done
             ;;
@@ -1010,9 +1018,9 @@ clean_useless () {
             if [ -d "${PREFIX}/${dir}" ]; then
                 ALL_BINS=$(${FIND_BIN} ${PREFIX}/${dir} -maxdepth 1 -type f -or -type l 2>/dev/null)
                 for file in ${ALL_BINS}; do
-                    base="$(${BASENAME_BIN} ${file} 2>/dev/null)"
-                    if [ -e "${PREFIX}/exports/${base}" ]; then
-                        debug "Found export: $(distinct d ${base})"
+                    _base="$(${BASENAME_BIN} ${file} 2>/dev/null)"
+                    if [ -e "${PREFIX}/exports/${_base}" ]; then
+                        debug "Found export: $(distinct d ${_base})"
                     else
                         # traverse through DEF_USEFUL for file patterns required by software but not exported
                         commit_removal=""
@@ -1078,7 +1086,7 @@ export_binaries () {
     if [ -z "${DEF_EXPORTS}" ]; then
         note "Defined no binaries to export of prefix: $(distinct n ${PREFIX})"
     else
-        aname="$(lowercase ${DEF_NAME}${DEF_POSTFIX})"
+        _aname="$(lowercase ${DEF_NAME}${DEF_POSTFIX})"
         amount="$(echo "${DEF_EXPORTS}" | ${WC_BIN} -w 2>/dev/null | ${TR_BIN} -d '\t|\r|\ ' 2>/dev/null)"
         debug "Exporting $(distinct n ${amount}) binaries of prefix: $(distinct n ${PREFIX})"
         ${MKDIR_BIN} -p "${PREFIX}/exports"
@@ -1090,7 +1098,7 @@ export_binaries () {
                     if [ -x "${file_to_exp}" ]; then # and it's executable'
                         curr_dir="$(${PWD_BIN} 2>/dev/null)"
                         cd "${PREFIX}${dir}"
-                        ${LN_BIN} -vfs "..${dir}${exp}" "../exports/${exp}" >> "${LOG}-${aname}" 2>> "${LOG}-${aname}"
+                        ${LN_BIN} -vfs "..${dir}${exp}" "../exports/${exp}" >> "${LOG}-${_aname}" 2>> "${LOG}-${_aname}"
                         cd "${curr_dir}"
                         exp_elem="$(${BASENAME_BIN} ${file_to_exp} 2>/dev/null)"
                         export_list="${export_list} ${exp_elem}"
@@ -1100,7 +1108,7 @@ export_binaries () {
         done
         debug "List of exports: $(distinct d "${export_list}")"
     fi
-    unset exp_elem curr_dir file_to_exp amount aname export_list definition_name
+    unset exp_elem curr_dir file_to_exp amount _aname export_list definition_name
 }
 
 
@@ -1111,15 +1119,15 @@ hack_definition () {
     fi
     pattern="${2}"
     beauty_pat="$(distinct n *${pattern}*)"
-    all_dirs=$(${FIND_BIN} ${CACHE_DIR}cache -type d -mindepth 2 -maxdepth 2 -iname "*${pattern}*" 2>/dev/null)
-    amount="$(echo "${all_dirs}" | ${WC_BIN} -l 2>/dev/null | ${TR_BIN} -d '\t|\r|\ ' 2>/dev/null)"
+    _all_dirs=$(${FIND_BIN} ${CACHE_DIR}cache -type d -mindepth 2 -maxdepth 2 -iname "*${pattern}*" 2>/dev/null)
+    amount="$(echo "${_all_dirs}" | ${WC_BIN} -l 2>/dev/null | ${TR_BIN} -d '\t|\r|\ ' 2>/dev/null)"
     ${TEST_BIN} -z "${amount}" && amount="0"
-    if [ -z "${all_dirs}" ]; then
+    if [ -z "${_all_dirs}" ]; then
         error "No matching build dirs found for pattern: ${beauty_pat}"
     else
         note "Sofin will now walk through: $(distinct n ${amount}) build dirs in: $(distinct n ${CACHE_DIR}cache), that matches pattern: $(distinct n ${beauty_pat})"
     fi
-    for dir in ${all_dirs}; do
+    for dir in ${_all_dirs}; do
         note
         warn "$(fill)"
         warn "Quit viever/ Exit that shell, to continue with next build dir"
@@ -1176,7 +1184,7 @@ rebuild_application () {
         fi
         remove_application ${bundle}
         USE_BINBUILD=NO
-        APPLICATIONS="${bundle}"
+        BUNDLES="${bundle}"
         build_all || def_error "${bundle}" "Bundle build failed."
         USE_FORCE=YES
         wipe_remote_archives ${bundle} || def_error "${bundle}" "Wipe failed"
@@ -1186,53 +1194,56 @@ rebuild_application () {
 
 
 try_fetch_binbuild () {
+    _full_name="${1}"
+    _aname="${2}"
+    _an_archive="${3}"
     if [ ! -z "${USE_BINBUILD}" ]; then
         debug "Binary build check was skipped"
     else
-        _aname="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
+        _aname="$(lowercase "${_aname}")"
         if [ -z "${_aname}" ]; then
             error "Cannot fetch binbuild! An empty definition name given!"
         fi
-        if [ -z "${ARCHIVE_NAME}" ]; then
+        if [ -z "${_an_archive}" ]; then
             error "Cannot fetch binbuild! An empty archive name given!"
         fi
         confirm () {
-            debug "Fetched archive: $(distinct d ${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME})"
+            debug "Fetched archive: $(distinct d ${BINBUILDS_CACHE_DIR}${_full_name}/${_an_archive})"
         }
-        if [ ! -e "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" ]; then
-            cd ${BINBUILDS_CACHE_DIR}${ABSNAME}
-            try "${FETCH_BIN} ${FETCH_OPTS} ${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${ARCHIVE_NAME}${DEFAULT_CHKSUM_EXT}" || \
-                try "${FETCH_BIN} ${FETCH_OPTS} ${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${ARCHIVE_NAME}${DEFAULT_CHKSUM_EXT}"
+        if [ ! -e "${BINBUILDS_CACHE_DIR}${_full_name}/${_an_archive}" ]; then
+            cd ${BINBUILDS_CACHE_DIR}${_full_name}
+            try "${FETCH_BIN} ${FETCH_OPTS} ${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_an_archive}${DEFAULT_CHKSUM_EXT}" || \
+                try "${FETCH_BIN} ${FETCH_OPTS} ${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_an_archive}${DEFAULT_CHKSUM_EXT}"
             if [ "$?" = "0" ]; then
-                $(try "${FETCH_BIN} ${FETCH_OPTS} ${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${ARCHIVE_NAME}" && confirm) || \
-                $(try "${FETCH_BIN} ${FETCH_OPTS} ${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${ARCHIVE_NAME}" && confirm) || \
-                $(try "${FETCH_BIN} ${FETCH_OPTS} ${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${ARCHIVE_NAME}" && confirm) || \
-                error "Failure fetching available binary build for: $(distinct e "${ARCHIVE_NAME}"). Please check your DNS / Network setup!"
+                $(try "${FETCH_BIN} ${FETCH_OPTS} ${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_an_archive}" && confirm) || \
+                $(try "${FETCH_BIN} ${FETCH_OPTS} ${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_an_archive}" && confirm) || \
+                $(try "${FETCH_BIN} ${FETCH_OPTS} ${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_an_archive}" && confirm) || \
+                error "Failure fetching available binary build for: $(distinct e "${_an_archive}"). Please check your DNS / Network setup!"
             else
                 note "No binary build available for: $(distinct n ${OS_TRIPPLE}/${DEF_NAME}${DEF_POSTFIX}-${DEF_VERSION})"
             fi
         fi
 
         cd "${SOFTWARE_DIR}"
-        debug "ARCHIVE_NAME: $(distinct d ${ARCHIVE_NAME}). Expecting binbuild to be available in: $(distinct d ${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME})"
+        debug "_an_archive: $(distinct d ${_an_archive}). Expecting binbuild to be available in: $(distinct d ${BINBUILDS_CACHE_DIR}${_full_name}/${_an_archive})"
 
         # validate binary build:
-        if [ -e "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" ]; then
-            validate_archive_sha1 "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}"
+        if [ -e "${BINBUILDS_CACHE_DIR}${_full_name}/${_an_archive}" ]; then
+            validate_archive_sha1 "${BINBUILDS_CACHE_DIR}${_full_name}/${_an_archive}"
         fi
 
         # after sha1 validation we may continue with binary build if file still exists
-        if [ -e "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" ]; then
-            ${TAR_BIN} -xJf "${BINBUILDS_CACHE_DIR}${ABSNAME}/${ARCHIVE_NAME}" >> "${LOG}-${_aname}" 2>> "${LOG}-${_aname}"
+        if [ -e "${BINBUILDS_CACHE_DIR}${_full_name}/${_an_archive}" ]; then
+            ${TAR_BIN} -xJf "${BINBUILDS_CACHE_DIR}${_full_name}/${_an_archive}" >> "${LOG}-${_aname}" 2>> "${LOG}-${_aname}"
             if [ "$?" = "0" ]; then # if archive is valid
                 note "Software bundle installed: $(distinct n ${DEF_NAME}${DEF_POSTFIX}), with version: $(distinct n ${DEF_VERSION})"
                 export DONT_BUILD_BUT_DO_EXPORTS=YES
             else
                 debug "  ${NOTE_CHAR} No binary bundle available for: $(distinct n ${DEF_NAME}${DEF_POSTFIX})"
-                ${RM_BIN} -fr "${BINBUILDS_CACHE_DIR}${ABSNAME}"
+                ${RM_BIN} -fr "${BINBUILDS_CACHE_DIR}${_full_name}"
             fi
         else
-            debug "Binary build checksum doesn't match for: $(distinct n ${ABSNAME})"
+            debug "Binary build checksum doesn't match for: $(distinct n ${_full_name})"
         fi
     fi
 }
@@ -1291,27 +1302,27 @@ build_all () {
     check_requirements
 
     PATH=${DEFAULT_PATH}
-    for application in ${APPLICATIONS}; do
-        specified="${application}" # store original value of user input
-        application="$(lowercase ${application})"
+    for _bund_name in ${BUNDLES}; do
+        _specified="${_bund_name}" # store original value of user input
+        _bund_name="$(lowercase ${_bund_name})"
         load_defaults
-        validate_alternatives "${application}"
-        load_defs "${application}" # prevent installation of requirements of disabled application:
+        validate_alternatives "${_bund_name}"
+        load_defs "${_bund_name}" # prevent installation of requirements of disabled _defname:
         check_disabled "${DEF_DISABLE_ON}" # after which just check if it's not disabled
-        pref_base="$(${BASENAME_BIN} ${PREFIX} 2>/dev/null)"
+        _pref_base="$(${BASENAME_BIN} ${PREFIX} 2>/dev/null)"
         if [ ! "${ALLOW}" = "1" -a \
-             ! -z "${pref_base}" -a \
-             "/" != "${pref_base}" ]; then
-            warn "Bundle: $(distinct w ${application}) disabled on architecture: $(distinct w $(os_tripple))"
+             ! -z "${_pref_base}" -a \
+             "/" != "${_pref_base}" ]; then
+            warn "Bundle: $(distinct w ${_bund_name}) disabled on architecture: $(distinct w ${OS_TRIPPLE})"
             ${RM_BIN} -rf "${PREFIX}" >> ${LOG} 2>> ${LOG}
-            unset pref_base
+            unset _pref_base
         else
-            unset pref_base
-            for definition in ${DEFINITIONS_DIR}${application}${DEFAULT_DEF_EXT}; do
+            unset _pref_base
+            for _req_name in ${DEFINITIONS_DIR}${_bund_name}${DEFAULT_DEF_EXT}; do
                 unset DONT_BUILD_BUT_DO_EXPORTS
-                debug "Reading definition: $(distinct d ${definition})"
+                debug "Reading definition: $(distinct d ${_req_name})"
                 load_defaults
-                load_defs "${definition}"
+                load_defs "${_req_name}"
                 if [ -z "${DEF_REQUIREMENTS}" ]; then
                     debug "No app requirements"
                 else
@@ -1319,49 +1330,52 @@ build_all () {
                 fi
                 check_disabled "${DEF_DISABLE_ON}" # after which just check if it's not disabled
 
-                DEF_LOWER="${DEF_NAME}${DEF_POSTFIX}"
-                DEF_NAME="$(capitalize ${DEF_NAME})"
+                # Note: this acutally may break definitions like ImageMagick..
+                #_common_lowercase="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
+                _common_lowercase="${DEF_NAME}${DEF_POSTFIX}"
+                DEF_NAME="$(capitalize ${_common_lowercase})"
+
                 # some additional convention check:
-                if [ "${DEF_NAME}" != "${specified}" -a \
-                     "${DEF_NAME}${DEF_POSTFIX}" != "${specified}" ]; then
-                    warn "You specified lowercase name of bundle: $(distinct w ${specified}), which is in contradiction to Sofin's convention (bundle - capitalized: f.e. 'Rust', dependencies and definitions - lowercase: f.e. 'yaml')."
+                if [ "${DEF_NAME}" != "${_specified}" -a \
+                     "${_common_lowercase}" != "${_specified}" ]; then
+                    warn "You specified lowercase name of bundle: $(distinct w ${_specified}), which is in contradiction to Sofin's convention (bundle - capitalized: f.e. 'Rust', dependencies and definitions - lowercase: f.e. 'yaml')."
                 fi
                 # if definition requires root privileges, throw an "exception":
                 if [ ! -z "${REQUIRE_ROOT_ACCESS}" ]; then
                     if [ "${USERNAME}" != "root" ]; then
-                        warn "Definition requires superuser priviledges: $(distinct w ${DEF_NAME}). Installation aborted."
-                        return
+                        error "Definition requires superuser priviledges: $(distinct e ${_common_lowercase}). Installation aborted."
                     fi
                 fi
 
-                export PREFIX="${SOFTWARE_DIR}$(capitalize "${DEF_NAME}${DEF_POSTFIX}")"
-                export SERVICE_DIR="${SERVICES_DIR}${DEF_NAME}${DEF_POSTFIX}"
+                export PREFIX="${SOFTWARE_DIR}$(capitalize "${_common_lowercase}")"
+                export SERVICE_DIR="${SERVICES_DIR}${_common_lowercase}"
                 if [ ! -z "${DEF_STANDALONE}" ]; then
                     ${MKDIR_BIN} -p "${SERVICE_DIR}"
                     ${CHMOD_BIN} 0710 "${SERVICE_DIR}"
                 fi
 
                 # binary build of whole software bundle
-                ABSNAME="${DEF_NAME}${DEF_POSTFIX}-${DEF_VERSION}"
-                ${MKDIR_BIN} -p "${BINBUILDS_CACHE_DIR}${ABSNAME}"
+                _full_bund_name="${_common_lowercase}-${DEF_VERSION}"
+                ${MKDIR_BIN} -p "${BINBUILDS_CACHE_DIR}${_full_bund_name}" >/dev/null 2>&1
 
-                ARCHIVE_NAME="${DEF_NAME}${DEF_POSTFIX}-${DEF_VERSION}${DEFAULT_ARCHIVE_EXT}"
-                INSTALLED_INDICATOR="${PREFIX}/${DEF_LOWER}${INSTALLED_MARK}"
+                _an_archive="${_common_lowercase}-${DEF_VERSION}${DEFAULT_ARCHIVE_EXT}"
+                INSTALLED_INDICATOR="${PREFIX}/${_common_lowercase}${INSTALLED_MARK}"
 
                 if [ "${SOFIN_CONTINUE_BUILD}" = "YES" ]; then # normal build by default
                     note "Continuing build in: $(distinct n ${PREVIOUS_BUILD_DIR})"
                     cd "${PREVIOUS_BUILD_DIR}"
                 else
                     if [ ! -e "${INSTALLED_INDICATOR}" ]; then
-                        try_fetch_binbuild
+                        try_fetch_binbuild "${_full_bund_name}" "${_common_lowercase}" "${_an_archive}"
                     else
-                        already_installed_version="$(${CAT_BIN} ${INSTALLED_INDICATOR} 2>/dev/null)"
-                        if [ "${DEF_VERSION}" = "${already_installed_version}" ]; then
-                            debug "$(distinct n ${DEF_NAME}${DEF_POSTFIX}) bundle is installed with version: $(distinct n ${already_installed_version})"
+                        _already_installed_version="$(${CAT_BIN} ${INSTALLED_INDICATOR} 2>/dev/null)"
+                        if [ "${DEF_VERSION}" = "${_already_installed_version}" ]; then
+                            debug "$(distinct n ${_common_lowercase}) bundle is installed with version: $(distinct n ${_already_installed_version})"
                         else
-                            warn "$(distinct w ${DEF_NAME}${DEF_POSTFIX}) bundle is installed with version: $(distinct w ${already_installed_version}), different from defined: $(distinct w "${DEF_VERSION}")"
+                            warn "$(distinct w ${_common_lowercase}) bundle is installed with version: $(distinct w ${_already_installed_version}), different from defined: $(distinct w "${DEF_VERSION}")"
                         fi
                         export DONT_BUILD_BUT_DO_EXPORTS=YES
+                        unset _already_installed_version
                     fi
                 fi
 
@@ -1371,56 +1385,56 @@ build_all () {
                     else
                         note "Installing: $(distinct n ${DEF_FULL_NAME}), version: $(distinct n ${DEF_VERSION}), with requirements: $(distinct n ${DEF_REQUIREMENTS})"
                     fi
-                    export req_amount="$(${PRINTF_BIN} "${DEF_REQUIREMENTS}" | ${WC_BIN} -w 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)"
-                    export req_amount="$(${PRINTF_BIN} "${req_amount} + 1\n" | ${BC_BIN} 2>/dev/null)"
-                    export req_all="${req_amount}"
-                    for req in ${DEF_REQUIREMENTS}; do
+                    _req_amount="$(${PRINTF_BIN} "${DEF_REQUIREMENTS}" | ${WC_BIN} -w 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)"
+                    _req_amount="$(${PRINTF_BIN} "${_req_amount} + 1\n" | ${BC_BIN} 2>/dev/null)"
+                    _req_all="${_req_amount}"
+                    for _req in ${DEF_REQUIREMENTS}; do
                         if [ ! -z "${DEF_USER_INFO}" ]; then
                             warn "${DEF_USER_INFO}"
                         fi
-                        if [ -z "${req}" ]; then
+                        if [ -z "${_req}" ]; then
                             note "No additional requirements defined"
                             break
                         else
-                            note "  ${req} ($(distinct n ${req_amount}) of $(distinct n ${req_all}) remaining)"
-                            if [ ! -e "${PREFIX}/${req}${INSTALLED_MARK}" ]; then
+                            note "  ${_req} ($(distinct n ${_req_amount}) of $(distinct n ${_req_all}) remaining)"
+                            if [ ! -e "${PREFIX}/${_req}${INSTALLED_MARK}" ]; then
                                 export CHANGED=YES
-                                execute_process "${req}"
+                                execute_process "${_req}"
                             fi
                         fi
-                        export req_amount="$(${PRINTF_BIN} "${req_amount} - 1\n" | ${BC_BIN} 2>/dev/null)"
+                        export _req_amount="$(${PRINTF_BIN} "${_req_amount} - 1\n" | ${BC_BIN} 2>/dev/null)"
                     done
                 fi
 
                 if [ -z "${DONT_BUILD_BUT_DO_EXPORTS}" ]; then
-                    if [ -e "${PREFIX}/${application}${INSTALLED_MARK}" ]; then
+                    if [ -e "${PREFIX}/${_defname}${INSTALLED_MARK}" ]; then
                         if [ "${CHANGED}" = "YES" ]; then
-                            note "  ${application} ($(distinct n 1) of $(distinct n ${req_all}))"
-                            note "   ${NOTE_CHAR} App dependencies changed. Rebuilding: $(distinct n ${application})"
-                            execute_process "${application}"
+                            note "  ${_defname} ($(distinct n 1) of $(distinct n ${_req_all}))"
+                            note "   ${NOTE_CHAR} App dependencies changed. Rebuilding: $(distinct n ${_defname})"
+                            execute_process "${_defname}"
                             unset CHANGED
                             mark
                             show_done
                         else
-                            note "  ${application} ($(distinct n 1) of $(distinct n ${req_all}))"
+                            note "  ${_defname} ($(distinct n 1) of $(distinct n ${_req_all}))"
                             show_done
-                            debug "${SUCCESS_CHAR} $(distinct d ${application}) current: $(distinct d ${ver}), definition: [$(distinct d ${DEF_VERSION})] Ok."
+                            debug "${SUCCESS_CHAR} $(distinct d ${_defname}) current: $(distinct d ${_version_element}), definition: [$(distinct d ${DEF_VERSION})] Ok."
                         fi
                     else
-                        note "  ${application} ($(distinct n 1) of $(distinct n ${req_all}))"
-                        execute_process "${application}"
+                        note "  ${_defname} ($(distinct n 1) of $(distinct n ${_req_all}))"
+                        execute_process "${_defname}"
                         mark
-                        note "${SUCCESS_CHAR} ${application} [$(distinct n ${DEF_VERSION})]\n"
+                        note "${SUCCESS_CHAR} ${_defname} [$(distinct n ${DEF_VERSION})]\n"
                     fi
                 fi
 
-                export_binaries "${application}"
+                export_binaries "${_defname}"
             done
 
             after_export_callback
 
             clean_useless
-            strip_bundle_files "${application}"
+            strip_bundle_files "${_defname}"
             manage_datasets
             create_apple_bundle_if_necessary
         fi
@@ -1437,7 +1451,7 @@ dump_debug_info () {
     debug "FETCH_OPTS: $(distinct d ${FETCH_OPTS})"
     debug "PREFIX: $(distinct d ${PREFIX})"
     debug "SERVICE_DIR: $(distinct d ${SERVICE_DIR})"
-    debug "CURRENT_DIR: $(${PWD_BIN} 2>/dev/null)"
+    debug "CURRENT_DIR: $(distinct d $(${PWD_BIN} 2>/dev/null))"
     debug "BUILD_DIR_ROOT: $(distinct d ${BUILD_DIR_ROOT})"
     debug "BUILD_DIR: $(distinct d ${BUILD_DIR})"
     debug "PATH: $(distinct d ${PATH})"
