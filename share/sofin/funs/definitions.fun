@@ -1387,7 +1387,7 @@ build_all () {
                     else
                         _already_installed_version="$(${CAT_BIN} ${INSTALLED_INDICATOR} 2>/dev/null)"
                         if [ "${DEF_VERSION}" = "${_already_installed_version}" ]; then
-                            debug "$(distinct n ${_common_lowercase}) bundle is installed with version: $(distinct n ${_already_installed_version})"
+                            debug "$(distinct d ${_common_lowercase}) bundle is installed with version: $(distinct d ${_already_installed_version})"
                         else
                             warn "$(distinct w ${_common_lowercase}) bundle is installed with version: $(distinct w ${_already_installed_version}), different from defined: $(distinct w "${DEF_VERSION}")"
                         fi
