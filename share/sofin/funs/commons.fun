@@ -191,28 +191,20 @@ find_most_recent () {
         else
             debug "Specified matcher: $(distinct d ${_matcher})"
         fi
-        _stat_param="-f" # BSD syntax
-        case ${SYSTEM_NAME} in
-            Linux)
-                _stat_param="-c" # GNU syntax
-                ;;
-        esac
         if [ -d "${_path}" ]; then
-            debug "Find cmd: $(distinct d "${_path}")"
-            _cmd="${FIND_BIN} "${_path}" \
+            debug "Find _path: $(distinct d "${_path}")"
+            _find_results="$(${FIND_BIN} "${_path}" \
                 -maxdepth 2 \
                 -mindepth 1 \
-                -type ${_type} \
-                -name '${_matcher}' \
-                -exec ${STAT_BIN} ${_stat_param} '%%%%m %%%%N' {} \; \
+                -type "${_type}" \
+                -name "${_matcher}" \
+                -exec ${STAT_BIN} -f '%m %N' {} \; \
                 2>> ${LOG} | \
-                ${TR_BIN} -d '\`' 2>/dev/null | \
-                ${TR_BIN} -d \"'\" 2>/dev/null | \
                 ${SORT_BIN} -nr 2>/dev/null | \
                 ${HEAD_BIN} -n${MAX_OPEN_TAIL_LOGS} 2>/dev/null | \
-                ${CUT_BIN} -d' ' -f2 2>/dev/null"
-            debug "Find cmd: $(distinct d "${_cmd}")"
-            _find_results="$(eval "${_cmd}")"
+                ${CUT_BIN} -d' ' -f2 2>/dev/null)"
+            _res_singleline="$(echo "${_find_results}" | eval "${NEWLINES_TO_SPACES_GUARD}")"
+            debug "Find results: $(distinct d "${_res_singleline}")"
             if [ -z "${_find_results}" ]; then
                 ${PRINTF_BIN} "" 2>/dev/null
             else
@@ -222,5 +214,5 @@ find_most_recent () {
             error "Directory $(distinct e "${_path}") doesn't exists!"
         fi
     fi
-    unset _path _matcher _type _find_results _stat_param
+    unset _path _matcher _type _find_results _stat_param _res_singleline
 }
