@@ -74,6 +74,7 @@ show_logs () {
 
     elif [ "+" = "${_pattern}" ]; then
         if [ -d "${LOGS_DIR}" ]; then
+            debug "LOGS_DIR: $(distinct d ${LOGS_DIR})"
             _files_list="$(find_most_recent "${LOGS_DIR}" "sofin*")"
             _files_abspaths="$(${PRINTF_BIN} "${_files_list}" | eval "${NEWLINES_TO_SPACES_GUARD}")"
             _files_count="$(${PRINTF_BIN} "${_files_list}" | eval "${FILES_COUNT_GUARD}")"
@@ -90,12 +91,12 @@ show_logs () {
                     fi
                 fi
             done
-            _mod_f_names=$(${PRINTF_BIN} "${_files_blist}" | eval "${NEWLINES_TO_SPACES_GUARD}")
             if [ "0" = "${_files_count}" ]; then
-                note "Attaching tail only to internal log: [$(distinct n "${_mod_f_names}")]"
+                note "Attaching tail only to internal log: [$(distinct n "${_files_blist}")]"
             else
-                note "Attaching tail to $(distinct n "${_files_count}") most recently modified log files (exact order): [$(distinct n "${_mod_f_names}")]"
+                note "Attaching tail to $(distinct n "${_files_count}") most recently modified log files (exact order): [$(distinct n "${_files_blist}")]"
             fi
+            debug "_files_abspaths: $(distinct d ${_files_abspaths})"
             ${TAIL_BIN} -n0 -F ${_files_abspaths} 2>/dev/null
         else
             note "No logs to attach to. LOGS_DIR=($(distinct n "${LOGS_DIR}")) contain no log files?"
