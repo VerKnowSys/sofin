@@ -284,7 +284,7 @@ push_binbuild () {
                     _address="${MAIN_USER}@${_mirror}:${SYS_SPECIFIC_BINARY_REMOTE}"
                     ${PRINTF_BIN} "${blue}"
                     ${SSH_BIN} ${DEFAULT_SSH_OPTS} -p "${MAIN_PORT}" "${MAIN_USER}@${_mirror}" \
-                        "${MKDIR_BIN} -p ${SYS_SPECIFIC_BINARY_REMOTE}" >> "${LOG}-${_lowercase_element}" 2>> "${LOG}-${_lowercase_element}"
+                        "${MKDIR_BIN} -p ${SYS_SPECIFIC_BINARY_REMOTE}"
 
                     if [ "${SYSTEM_NAME}" = "FreeBSD" ]; then # NOTE: feature designed for FBSD.
                         _svcs_no_slashes="$(echo "${SERVICES_DIR}" | ${SED_BIN} 's/\///g' 2>/dev/null)"
