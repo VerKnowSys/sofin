@@ -151,13 +151,13 @@ find_all () {
     else
         if [ -z "${_matcher}" ]; then
             debug "Empty matcher given in find_all(), using wildcard."
-            _matcher="*"
+            _matcher='*'
         fi
         if [ -d "${_path}" ]; then
             _find_results="$(${FIND_BIN} "${_path}" \
                 -maxdepth 1 \
                 -mindepth 1 \
-                -type ${_type} \
+                -type "${_type}" \
                 -name "${_matcher}" \
                 2>/dev/null)"
             if [ -z "${_find_results}" ]; then
@@ -182,6 +182,8 @@ find_most_recent () {
     fi
     if [ -z "${_path}" ]; then
         error "Empty path given to find_most_recent()!"
+    elif [ "${SYSTEM_NAME}" = "Linux" ]; then
+        error "This function does bad things with GNU find. Fix it if you want.."
     else
         if [ -z "${_matcher}" ]; then
             debug "Empty matcher given in find_most_recent(), using wildcard."

@@ -75,7 +75,11 @@ show_logs () {
     elif [ "+" = "${_pattern}" ]; then
         if [ -d "${LOGS_DIR}" ]; then
             debug "LOGS_DIR: $(distinct d ${LOGS_DIR})"
-            _files_list="$(find_most_recent "${LOGS_DIR}" "sofin*")"
+            if [ "${SYSTEM_NAME}" = "Linux" ]; then
+                _files_list="$(find_all "${LOGS_DIR}" "sofin*")"
+            else
+                _files_list="$(find_most_recent "${LOGS_DIR}" "sofin*")"
+            fi
             debug "_files_list: ${_files_list}"
             _files_abspaths="$(${PRINTF_BIN} "${_files_list}" | eval "${NEWLINES_TO_SPACES_GUARD}")"
             _files_count="$(${PRINTF_BIN} "${_files_list}" | eval "${FILES_COUNT_GUARD}")"
