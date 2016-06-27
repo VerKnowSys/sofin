@@ -1221,7 +1221,6 @@ try_fetch_binbuild () {
         if [ -z "${_bbaname}" ]; then
             error "Cannot fetch binbuild! An empty definition name given!"
         fi
-        _bb_archive="$(capitalize "${_bb_archive}")"
         if [ -z "${_bb_archive}" ]; then
             error "Cannot fetch binbuild! An empty archive name given!"
         fi
@@ -1376,7 +1375,7 @@ build_all () {
                 _full_bund_name="${_common_lowercase}-${DEF_VERSION}"
                 ${MKDIR_BIN} -p "${BINBUILDS_CACHE_DIR}${_full_bund_name}" >/dev/null 2>&1
 
-                _an_archive="${_common_lowercase}-${DEF_VERSION}${DEFAULT_ARCHIVE_EXT}"
+                _an_archive="$(capitalize "${_common_lowercase}")-${DEF_VERSION}${DEFAULT_ARCHIVE_EXT}"
                 INSTALLED_INDICATOR="${PREFIX}/${_common_lowercase}${INSTALLED_MARK}"
 
                 if [ "${SOFIN_CONTINUE_BUILD}" = "YES" ]; then # normal build by default
