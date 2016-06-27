@@ -286,13 +286,13 @@ update_shell_vars () {
 
 reload_zsh_shells () {
     if [ ! -z "${SHELL_PID}" ]; then
-        _pattern="zsh"
+        _shell_pattern="zsh"
         if [ "Darwin" = "${SYSTEM_NAME}" ]; then
-            _pattern="\d ${ZSH_BIN}" # NOTE: this fixes issue with SIGUSR2 signal sent to iTerm
+            _shell_pattern="\d ${ZSH_BIN}" # NOTE: this fixes issue with SIGUSR2 signal sent to iTerm
         fi
-        _shellshort="$(${BASENAME_BIN} "${SHELL}" 2>/dev/null))"
+        _shellshort="$(${BASENAME_BIN} "${SHELL}" 2>/dev/null)"
         _wishlist=""
-        _pids=$(processes_all | ${EGREP_BIN} "${_pattern}" 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)
+        _pids=$(processes_all | ${EGREP_BIN} "${_shell_pattern}" 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)
         for _pid in ${_pids}; do
             if [ -z "${_wishlist}" ]; then
                 _wishlist="${_pid}"
@@ -305,9 +305,9 @@ reload_zsh_shells () {
             fi
         done
         ${KILL_BIN} -SIGUSR2 ${_wishlist} >> ${LOG} 2>> ${LOG} && \
-            note "Shell reload signal sent to all $(distinct n ${_shellshort}) pids: $(distinct n ${_wishlist})"
+            note "Shell reload signal sent to all $(distinct n "${_shellshort}") shell pids: $(distinct n ${_wishlist})"
     else
         write_info_about_shell_configuration
     fi
-    unset _wishlist _pids _pattern _pid _shellshort
+    unset _wishlist _pids _shell_pattern _pid _shellshort
 }
