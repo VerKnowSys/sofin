@@ -1224,6 +1224,7 @@ try_fetch_binbuild () {
         if [ -z "${_bb_archive}" ]; then
             error "Cannot fetch binbuild! An empty archive name given!"
         fi
+        _full_name="$(capitalize "${_full_name}")"
         confirm () {
             debug "Fetched archive: $(distinct d ${BINBUILDS_CACHE_DIR}${_full_name}/${_bb_archive})"
         }
