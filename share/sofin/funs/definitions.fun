@@ -251,29 +251,29 @@ push_binbuild () {
     create_cache_directories
     note "Pushing binary bundle: $(distinct n ${SOFIN_ARGS}) to remote: $(distinct n ${MAIN_BINARY_REPOSITORY})"
     cd "${SOFTWARE_DIR}"
-    for _element in ${SOFIN_ARGS}; do
-        _lowercase_element="$(lowercase "${_element}")"
+    for _pbelement in ${SOFIN_ARGS}; do
+        _lowercase_element="$(lowercase "${_pbelement}")"
         if [ -z "${_lowercase_element}" ]; then
             error "push_binbuild(): _lowercase_element is empty!"
         fi
-        _install_indicator_file="${_element}/${_lowercase_element}${INSTALLED_MARK}"
+        _install_indicator_file="${_pbelement}/${_lowercase_element}${INSTALLED_MARK}"
         _version_element="$(${CAT_BIN} "${_install_indicator_file}" 2>/dev/null)"
-        if [ -d "${_element}" -a \
+        if [ -d "${_pbelement}" -a \
              -f "${_install_indicator_file}" -a \
              ! -z "${_version_element}" ]; then
-            if [ ! -L "${_element}" ]; then
+            if [ ! -L "${_pbelement}" ]; then
                 if [ -z "${_version_element}" ]; then
-                    error "No version information available for bundle: $(distinct e "${_element}")"
+                    error "No version information available for bundle: $(distinct e "${_pbelement}")"
                 fi
-                _element_name="${_element}-${_version_element}${DEFAULT_ARCHIVE_EXT}"
-                debug "element: $(distinct d ${_element}) -> name: $(distinct d ${_element_name})"
-                _dig_query="$(${HOST_BIN} A ${MAIN_SOFTWARE_ADDRESS} 2>/dev/null | ${GREP_BIN} 'Address:' 2>/dev/null | eval "${HOST_ADDRESS_GUARD}")"
+                _element_name="${_pbelement}-${_version_element}${DEFAULT_ARCHIVE_EXT}"
+                debug "element: $(distinct d ${_pbelement}) -> name: $(distinct d ${_element_name})"
+                _def_dig_query="$(${HOST_BIN} A ${MAIN_SOFTWARE_ADDRESS} 2>/dev/null | ${GREP_BIN} 'Address:' 2>/dev/null | eval "${HOST_ADDRESS_GUARD}")"
 
-                if [ -z "${_dig_query}" ]; then
+                if [ -z "${_def_dig_query}" ]; then
                     error "No mirrors found in address: $(distinct e ${MAIN_SOFTWARE_ADDRESS})"
                 fi
-                debug "Using defined mirror(s): $(distinct d "${_dig_query}")"
-                for _mirror in ${_dig_query}; do
+                debug "Using defined mirror(s): $(distinct d "${_def_dig_query}")"
+                for _mirror in ${_def_dig_query}; do
                     _address="${MAIN_USER}@${_mirror}:${SYS_SPECIFIC_BINARY_REMOTE}"
                     ${PRINTF_BIN} "${blue}"
                     ${SSH_BIN} ${DEFAULT_SSH_OPTS} -p "${MAIN_PORT}" "${MAIN_USER}@${_mirror}" \
@@ -281,14 +281,14 @@ push_binbuild () {
 
                     if [ "${SYSTEM_NAME}" = "FreeBSD" ]; then # NOTE: feature designed for FBSD.
                         _svcs_no_slashes="$(echo "${SERVICES_DIR}" | ${SED_BIN} 's/\///g' 2>/dev/null)"
-                        _inner_dir="$(${ZFS_BIN} list -H 2>/dev/null | ${GREP_BIN} "${_element}$" 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null | ${SED_BIN} "s/.*${_svcs_no_slashes}\///; s/\/.*//" 2>/dev/null)/"
-                        _certain_dataset="${SERVICES_DIR}${_inner_dir}${_element}"
+                        _inner_dir="$(${ZFS_BIN} list -H 2>/dev/null | ${GREP_BIN} "${_pbelement}$" 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null | ${SED_BIN} "s/.*${_svcs_no_slashes}\///; s/\/.*//" 2>/dev/null)/"
+                        _certain_dataset="${SERVICES_DIR}${_inner_dir}${_pbelement}"
                         _full_dataset_name="${DEFAULT_ZPOOL}${_certain_dataset}"
-                        _snap_file="${_element}-${_version_element}.${SERVICE_SNAPSHOT_POSTFIX}"
+                        _snap_file="${_pbelement}-${_version_element}.${SERVICE_SNAPSHOT_POSTFIX}"
                         _final_snap_file="${_snap_file}${DEFAULT_ARCHIVE_EXT}"
                         _snap_size="0"
-                        note "Preparing service dataset: $(distinct n ${_full_dataset_name}), for bundle: $(distinct n ${_element})"
-                        ${ZFS_BIN} list -H 2>/dev/null | ${GREP_BIN} "${_element}\$" >/dev/null 2>&1
+                        note "Preparing service dataset: $(distinct n ${_full_dataset_name}), for bundle: $(distinct n ${_pbelement})"
+                        ${ZFS_BIN} list -H 2>/dev/null | ${GREP_BIN} "${_pbelement}\$" >/dev/null 2>&1
                         if [ "$?" = "0" ]; then # if dataset exists, unmount it, send to file, and remount back
                             ${PRINTF_BIN} "${blue}"
                             try "${ZFS_BIN} umount ${_full_dataset_name}" || \
@@ -301,30 +301,30 @@ push_binbuild () {
                         fi
                         if [ "${_snap_size}" = "0" ]; then
                             ${RM_BIN} -vf "${_final_snap_file}" >> "${LOG}-${_lowercase_element}" 2>> "${LOG}-${_lowercase_element}"
-                            note "Service dataset has no contents for bundle: $(distinct n ${_element}-${_version_element}), hence upload will be skipped"
+                            note "Service dataset has no contents for bundle: $(distinct n ${_pbelement}-${_version_element}), hence upload will be skipped"
                         fi
                     fi
 
-                    build_software_bundle "${_element_name}" "${_element}"
+                    build_software_bundle "${_element_name}" "${_pbelement}"
                     store_checksum_bundle "${_element_name}"
 
                     try "${CHMOD_BIN} -v o+r ${_element_name} ${_element_name}${DEFAULT_CHKSUM_EXT}" && \
                         debug "Set read access for archives: $(distinct d ${_element_name}), $(distinct d ${_element_name}${DEFAULT_CHKSUM_EXT}) before we send them to public remote"
 
-                    _bin_bundle="${BINBUILDS_CACHE_DIR}${_element}-${_version_element}"
+                    _bin_bundle="${BINBUILDS_CACHE_DIR}${_pbelement}-${_version_element}"
                     debug "Performing a copy of binary bundle to: $(distinct d ${_bin_bundle})"
                     ${MKDIR_BIN} -p ${_bin_bundle} >/dev/null 2>&1
                     run "${CP_BIN} -v ${_element_name} ${_bin_bundle}/"
                     run "${CP_BIN} -v ${_element_name}${DEFAULT_CHKSUM_EXT} ${_bin_bundle}/"
 
                     push_binary_archive "${_bin_bundle}" "${_element_name}" "${_mirror}" "${_address}"
-                    push_service_stream_archive "${_final_snap_file}" "${_element}" "${_mirror}"
+                    push_service_stream_archive "${_final_snap_file}" "${_pbelement}" "${_mirror}"
 
                 done
                 ${RM_BIN} -f "${_element_name}" "${_element_name}${DEFAULT_CHKSUM_EXT}" "${_final_snap_file}" >> ${LOG}-${_lowercase_element} 2>> ${LOG}-${_lowercase_element}
             fi
         else
-            warn "Not found software: $(distinct w ${_element})!"
+            warn "Not found software: $(distinct w ${_pbelement})!"
         fi
     done
 }
@@ -334,16 +334,17 @@ deploy_binbuild () {
     create_cache_directories
     load_defaults
     shift
-    _bundles=$*
-    note "Software bundles to be built and deployed to remote: $(distinct n ${_bundles})"
-    for _bundle in ${_bundles}; do
-        BUNDLES="${_bundle}"
+    _dbbundles=$*
+    note "Software bundles to be built and deployed to remote: $(distinct n ${_dbbundles})"
+    for _dbbundle in ${_dbbundles}; do
+        BUNDLES="${_dbbundle}"
         USE_BINBUILD=NO
-        build_all || def_error "${_bundle}" "Bundle build failed."
+        build_all || def_error "${_dbbundle}" "Bundle build failed."
     done
-    push_binbuild ${_bundles} || def_error "${_bundle}" "Push failure"
-    note "Software bundle deployed successfully: $(distinct n ${_bundle})"
+    push_binbuild ${_dbbundles} || def_error "${_dbbundle}" "Push failure"
+    note "Software bundle deployed successfully: $(distinct n ${_dbbundle})"
     note "$(fill)"
+    unset _dbbundles _dbbundle
 }
 
 
@@ -505,24 +506,25 @@ wipe_remote_archives () {
     fi
     if [ "${ANS}" = "YES" ]; then
         cd "${SOFTWARE_DIR}"
-        for _element in ${SOFIN_ARGS}; do
-            _lowercase_element="$(lowercase ${_element})"
-            _remote_ar_name="${_element}-"
-            _dig_query="$(${HOST_BIN} A ${MAIN_SOFTWARE_ADDRESS} 2>/dev/null | ${GREP_BIN} 'Address:' 2>/dev/null | eval "${HOST_ADDRESS_GUARD}")"
-            if [ -z "${_dig_query}" ]; then
+        for _wr_element in ${SOFIN_ARGS}; do
+            _lowercase_element="$(lowercase ${_wr_element})"
+            _remote_ar_name="${_wr_element}-"
+            _wr_dig="$(${HOST_BIN} A ${MAIN_SOFTWARE_ADDRESS} 2>/dev/null | ${GREP_BIN} 'Address:' 2>/dev/null | eval "${HOST_ADDRESS_GUARD}")"
+            if [ -z "${_wr_dig}" ]; then
                 error "No mirrors found in address: $(distinct e ${MAIN_SOFTWARE_ADDRESS})"
             fi
-            debug "Using defined mirror(s): $(distinct d "${_dig_query}")"
-            for _mirror in ${_dig_query}; do
-                note "Wiping out remote: $(distinct n ${_mirror}) binary archives: $(distinct n "${_remote_ar_name}")"
+            debug "Using defined mirror(s): $(distinct d "${_wr_dig}")"
+            for _wr_mirr in ${_wr_dig}; do
+                note "Wiping out remote: $(distinct n ${_wr_mirr}) binary archives: $(distinct n "${_remote_ar_name}")"
                 ${PRINTF_BIN} "${blue}"
-                ${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} "${MAIN_USER}@${_mirror}" \
+                ${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} "${MAIN_USER}@${_wr_mirr}" \
                     "${FIND_BIN} ${SYS_SPECIFIC_BINARY_REMOTE} -iname '${_remote_ar_name}' -print -delete" 2>> "${LOG}"
             done
         done
     else
         error "Aborted remote wipe of: $(distinct e "${SOFIN_ARGS}")"
     fi
+    unset _wr_mirr _remote_ar_name _wr_dig _lowercase_element _wr_element
 }
 
 
@@ -1477,53 +1479,53 @@ dump_debug_info () {
 
 
 push_binary_archive () {
-    _bundle_file="${1}"
+    _bpbundle_file="${1}"
     _uniqname="${2}"
-    _mirror="${3}"
-    _address="${4}"
-    _shortsha="$(${CAT_BIN} "${_uniqname}${DEFAULT_CHKSUM_EXT}" 2>/dev/null | ${CUT_BIN} -c -16 2>/dev/null)…"
-    note "Pushing archive #$(distinct n ${_shortsha}) to remote repository with address: ${_address}"
-    debug "name: ${_uniqname}, bundle_file: ${_bundle_file}"
-    retry "${SCP_BIN} ${DEFAULT_SSH_OPTS} ${DEFAULT_SCP_OPTS} -P ${MAIN_PORT} ${_uniqname} ${_address}/${_uniqname}.partial" || \
-        def_error "${_uniqname}" "Unable to push: $(distinct e "${_bundle_file}") bundle to: $(distinct e "${_address}/${_bundle_file}")"
+    _bpamirror="${3}"
+    _bpaddress="${4}"
+    _bpshortsha="$(${CAT_BIN} "${_uniqname}${DEFAULT_CHKSUM_EXT}" 2>/dev/null | ${CUT_BIN} -c -16 2>/dev/null)…"
+    note "Pushing archive #$(distinct n ${_bpshortsha}) to remote repository with address: ${_bpaddress}"
+    debug "name: ${_uniqname}, bundle_file: ${_bpbundle_file}"
+    retry "${SCP_BIN} ${DEFAULT_SSH_OPTS} ${DEFAULT_SCP_OPTS} -P ${MAIN_PORT} ${_uniqname} ${_bpaddress}/${_uniqname}.partial" || \
+        def_error "${_uniqname}" "Unable to push: $(distinct e "${_bpbundle_file}") bundle to: $(distinct e "${_bpaddress}/${_bpbundle_file}")"
     if [ "$?" = "0" ]; then
         ${PRINTF_BIN} "${blue}"
-        ${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} ${MAIN_USER}@${_mirror} \
+        ${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} ${MAIN_USER}@${_bpamirror} \
             "cd ${SYS_SPECIFIC_BINARY_REMOTE} && ${MV_BIN} ${_uniqname}.partial ${_uniqname}"
-        retry "${SCP_BIN} ${DEFAULT_SSH_OPTS} ${DEFAULT_SCP_OPTS} -P ${MAIN_PORT} ${_uniqname}${DEFAULT_CHKSUM_EXT} ${_address}/${_uniqname}${DEFAULT_CHKSUM_EXT}" || \
-            def_error ${_uniqname}${DEFAULT_CHKSUM_EXT} "Error sending: $(distinct e ${_uniqname}${DEFAULT_CHKSUM_EXT}) file to: $(distinct e "${_address}/${_bundle_file}")"
+        retry "${SCP_BIN} ${DEFAULT_SSH_OPTS} ${DEFAULT_SCP_OPTS} -P ${MAIN_PORT} ${_uniqname}${DEFAULT_CHKSUM_EXT} ${_bpaddress}/${_uniqname}${DEFAULT_CHKSUM_EXT}" || \
+            def_error ${_uniqname}${DEFAULT_CHKSUM_EXT} "Error sending: $(distinct e ${_uniqname}${DEFAULT_CHKSUM_EXT}) file to: $(distinct e "${_bpaddress}/${_bpbundle_file}")"
     else
         error "Failed to push binary build of: $(distinct e ${_uniqname}) to remote: $(distinct e ${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_uniqname})"
     fi
-    unset _bundle_file _uniqname _mirror _address _shortsha
+    unset _bpbundle_file _uniqname _bpamirror _bpaddress _bpshortsha
 }
 
 
 push_service_stream_archive () {
     _fin_snapfile="${1}"
-    _element="${2}"
-    _mirror="${3}"
+    _pselement="${2}"
+    _psmirror="${3}"
     if [ "${SYSTEM_NAME}" = "FreeBSD" ]; then # NOTE: feature designed for FBSD.
         if [ -f "${_fin_snapfile}" ]; then
             ${PRINTF_BIN} "${blue}"
-            ${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} "${MAIN_USER}@${_mirror}" \
+            ${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} "${MAIN_USER}@${_psmirror}" \
                 "cd ${MAIN_BINARY_PREFIX}; ${MKDIR_BIN} -p ${MAIN_COMMON_NAME} ; ${CHMOD_BIN} 755 ${MAIN_COMMON_NAME}"
 
             debug "Setting common access to archive files before we send it: $(distinct d ${_fin_snapfile})"
             ${CHMOD_BIN} -v a+r "${_fin_snapfile}" >> ${LOG} 2>> ${LOG}
             debug "Sending initial service stream to $(distinct d ${MAIN_COMMON_NAME}) repository: $(distinct d ${MAIN_COMMON_REPOSITORY}/${_fin_snapfile})"
 
-            retry "${SCP_BIN} ${DEFAULT_SSH_OPTS} ${DEFAULT_SCP_OPTS} -P ${MAIN_PORT} ${_fin_snapfile} ${MAIN_USER}@${_mirror}:${MAIN_BINARY_PREFIX}/${COMMON_BINARY_REMOTE}/${_fin_snapfile}.partial"
+            retry "${SCP_BIN} ${DEFAULT_SSH_OPTS} ${DEFAULT_SCP_OPTS} -P ${MAIN_PORT} ${_fin_snapfile} ${MAIN_USER}@${_psmirror}:${MAIN_BINARY_PREFIX}/${COMMON_BINARY_REMOTE}/${_fin_snapfile}.partial"
             if [ "$?" = "0" ]; then
                 ${PRINTF_BIN} "${blue}"
-                ${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} "${MAIN_USER}@${_mirror}" \
+                ${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} "${MAIN_USER}@${_psmirror}" \
                     "cd ${COMMON_BINARY_REMOTE} && ${MV_BIN} ${_fin_snapfile}.partial ${_fin_snapfile}"
             else
-                error "Failed to send service snapshot archive file: $(distinct e "${_fin_snapfile}") to remote host: $(distinct e "${MAIN_USER}@${_mirror}")!"
+                error "Failed to send service snapshot archive file: $(distinct e "${_fin_snapfile}") to remote host: $(distinct e "${MAIN_USER}@${_psmirror}")!"
             fi
         else
-            note "No service stream available for: $(distinct n ${_element})"
+            note "No service stream available for: $(distinct n ${_pselement})"
         fi
     fi
-    unset _bundle_file _name _mirror _address _shortsha _element _fin_snapfile
+    unset _psmirror _pselement _fin_snapfile
 }
