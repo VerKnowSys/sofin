@@ -252,8 +252,8 @@ push_binbuild () {
     create_cache_directories
     note "Pushing binary bundle: $(distinct n ${SOFIN_ARGS}) to remote: $(distinct n ${MAIN_BINARY_REPOSITORY})"
     cd "${SOFTWARE_DIR}"
-    for element in ${SOFIN_ARGS}; do
-        _lowercase_element="$(lowercase ${_element})"
+    for _element in ${SOFIN_ARGS}; do
+        _lowercase_element="$(lowercase "${_element}")"
         if [ -z "${_lowercase_element}" ]; then
             error "push_binbuild(): _lowercase_element is empty!"
         fi
@@ -536,6 +536,7 @@ execute_process () {
     check_disabled "${DEF_DISABLE_ON}" # check requirement for disabled state:
 
     setup_sofin_compiler
+    dump_debug_info
 
     export PATH="${PREFIX}/bin:${PREFIX}/sbin:${DEFAULT_PATH}"
     if [ "${ALLOW}" = "1" ]; then
@@ -644,7 +645,7 @@ execute_process () {
                 after_update_callback
 
                 _aname="$(lowercase ${DEF_NAME}${DEF_POSTFIX})"
-                LIST_DIR="${DEFINITIONS_DIR}patches/$1" # $1 is definition file name
+                LIST_DIR="${DEFINITIONS_DIR}patches/${_app_param}"
                 if [ -d "${LIST_DIR}" ]; then
                     _ps_patches="$(${FIND_BIN} ${LIST_DIR}/* -maxdepth 0 -type f 2>/dev/null)"
                     ${TEST_BIN} ! -z "${_ps_patches}" && \
@@ -679,23 +680,22 @@ execute_process () {
                 fi
 
                 after_patch_callback
-                dump_debug_info
 
-                note "   ${NOTE_CHAR} Configuring: $(distinct n $1), version: $(distinct n ${DEF_VERSION})"
+                note "   ${NOTE_CHAR} Configuring: $(distinct n ${_app_param}), version: $(distinct n ${DEF_VERSION})"
                 case "${DEF_CONFIGURE}" in
 
                     ignore)
-                        note "   ${NOTE_CHAR} Configuration skipped for definition: $(distinct n $1)"
+                        note "   ${NOTE_CHAR} Configuration skipped for definition: $(distinct n ${_app_param})"
                         ;;
 
                     no-conf)
-                        note "   ${NOTE_CHAR} No configuration for definition: $(distinct n $1)"
+                        note "   ${NOTE_CHAR} No configuration for definition: $(distinct n ${_app_param})"
                         export DEF_MAKE_METHOD="${DEF_MAKE_METHOD} PREFIX=${PREFIX}"
                         export DEF_INSTALL_METHOD="${DEF_INSTALL_METHOD} PREFIX=${PREFIX}"
                         ;;
 
                     binary)
-                        note "   ${NOTE_CHAR} Prebuilt definition of: $(distinct n $1)"
+                        note "   ${NOTE_CHAR} Prebuilt definition of: $(distinct n ${_app_param})"
                         export DEF_MAKE_METHOD="true"
                         export DEF_INSTALL_METHOD="true"
                         ;;
@@ -770,7 +770,7 @@ execute_process () {
             fi
 
             # and common part between normal and continue modes:
-            note "   ${NOTE_CHAR} Building requirement: $(distinct n $1)"
+            note "   ${NOTE_CHAR} Building requirement: $(distinct n ${_app_param})"
             try "${DEF_MAKE_METHOD}" || \
             run "${DEF_MAKE_METHOD}"
             after_make_callback
@@ -780,14 +780,14 @@ execute_process () {
                 ${FIND_BIN} "${PREFIX}/${place}" -delete 2>/dev/null
             done
 
-            note "   ${NOTE_CHAR} Installing requirement: $(distinct n $1)"
+            note "   ${NOTE_CHAR} Installing requirement: $(distinct n ${_app_param})"
             run "${DEF_INSTALL_METHOD}"
             after_install_callback
 
-            debug "Marking $(distinct d $1) as installed in: $(distinct d ${PREFIX})"
-            ${TOUCH_BIN} "${PREFIX}/$1${INSTALLED_MARK}"
+            debug "Marking $(distinct d ${_app_param}) as installed in: $(distinct d ${PREFIX})"
+            ${TOUCH_BIN} "${PREFIX}/${_app_param}${INSTALLED_MARK}"
             debug "Writing version: $(distinct d ${DEF_VERSION}) of software: $(distinct d ${DEF_NAME}) installed in: $(distinct d ${PREFIX})"
-            ${PRINTF_BIN} "${DEF_VERSION}" > "${PREFIX}/$1${INSTALLED_MARK}"
+            ${PRINTF_BIN} "${DEF_VERSION}" > "${PREFIX}/${_app_param}${INSTALLED_MARK}"
 
             if [ -z "${DEVEL}" ]; then # if devel mode not set
                 debug "Cleaning build dir: $(distinct d ${BUILD_DIR_ROOT}) of bundle: $(distinct d ${DEF_NAME}${DEF_POSTFIX}), after successful build."
@@ -842,7 +842,7 @@ create_apple_bundle_if_necessary () { # XXXXXX
 
 
 strip_bundle_files () {
-    _definition_name="$1"
+    _definition_name="${1}"
     if [ -z "${_definition_name}" ]; then
         error "No definition name specified as first param for strip_bundle_files()!"
     fi
@@ -1407,34 +1407,35 @@ build_all () {
                 fi
 
                 if [ -z "${DONT_BUILD_BUT_DO_EXPORTS}" ]; then
-                    if [ -e "${PREFIX}/${_defname}${INSTALLED_MARK}" ]; then
+                    if [ -e "${PREFIX}/${_common_lowercase}${INSTALLED_MARK}" ]; then
                         if [ "${CHANGED}" = "YES" ]; then
-                            note "  ${_defname} ($(distinct n 1) of $(distinct n ${_req_all}))"
-                            note "   ${NOTE_CHAR} App dependencies changed. Rebuilding: $(distinct n ${_defname})"
-                            execute_process "${_defname}"
+                            note "  ${_common_lowercase} ($(distinct n 1) of $(distinct n ${_req_all}))"
+                            note "   ${NOTE_CHAR} App dependencies changed. Rebuilding: $(distinct n ${_common_lowercase})"
+                            execute_process "${_common_lowercase}"
                             unset CHANGED
                             mark
                             show_done
                         else
-                            note "  ${_defname} ($(distinct n 1) of $(distinct n ${_req_all}))"
+                            note "  ${_common_lowercase} ($(distinct n 1) of $(distinct n ${_req_all}))"
                             show_done
-                            debug "${SUCCESS_CHAR} $(distinct d ${_defname}) current: $(distinct d ${_version_element}), definition: [$(distinct d ${DEF_VERSION})] Ok."
+                            debug "${SUCCESS_CHAR} $(distinct d ${_common_lowercase}) current: $(distinct d ${_version_element}), definition: [$(distinct d ${DEF_VERSION})] Ok."
                         fi
                     else
-                        note "  ${_defname} ($(distinct n 1) of $(distinct n ${_req_all}))"
-                        execute_process "${_defname}"
+                        note "  ${_common_lowercase} ($(distinct n 1) of $(distinct n ${_req_all}))"
+                        debug "Right before execute_process call: ${_common_lowercase}"
+                        execute_process "${_common_lowercase}"
                         mark
-                        note "${SUCCESS_CHAR} ${_defname} [$(distinct n ${DEF_VERSION})]\n"
+                        note "${SUCCESS_CHAR} ${_common_lowercase} [$(distinct n ${DEF_VERSION})]\n"
                     fi
                 fi
 
-                export_binaries "${_defname}"
+                export_binaries "${_common_lowercase}"
             done
 
             after_export_callback
 
             clean_useless
-            strip_bundle_files "${_defname}"
+            strip_bundle_files "${_common_lowercase}"
             manage_datasets
             create_apple_bundle_if_necessary
         fi
