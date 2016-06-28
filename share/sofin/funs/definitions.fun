@@ -182,12 +182,14 @@ update_definitions () {
 
 
 check_disabled () {
+    _ch_dis_name="${1}"
+    unset DEFINITION_DISABLED
     # check requirement for disabled state:
-    export ALLOW="1"
-    if [ ! -z "$1" ]; then
-        for disabled in ${1}; do
-            if [ "${SYSTEM_NAME}" = "${disabled}" ]; then
-                export ALLOW="0"
+    if [ ! -z "${_ch_dis_name}" ]; then
+        for _def_disabled in ${_ch_dis_name}; do
+            if [ "${SYSTEM_NAME}" = "${_def_disabled}" ]; then
+                debug "Disabled: $(distinct d "${_def_disabled}") on $(distinct d "${SYSTEM_NAME}")"
+                DEFINITION_DISABLED=YES
             fi
         done
     fi
@@ -411,7 +413,7 @@ execute_process () {
     dump_debug_info
 
     export PATH="${PREFIX}/bin:${PREFIX}/sbin:${DEFAULT_PATH}"
-    if [ "${ALLOW}" = "1" ]; then
+    if [ "${DEFINITION_DISABLED}" != "YES" ]; then
         if [ -z "${DEF_HTTP_PATH}" ]; then
             _definition_no_ext="\
                 $(echo "$(${BASENAME_BIN} ${_req_definition} 2>/dev/null)" | \
