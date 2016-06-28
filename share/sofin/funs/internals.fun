@@ -192,22 +192,23 @@ get_shell_vars () {
 
 list_bundles_full () {
     note "Installed software bundles (with dependencies):"
-    if [ -d ${SOFTWARE_DIR} ]; then
-        for app in ${SOFTWARE_DIR}*; do
-            note
-            app_name="$(${BASENAME_BIN} ${app} 2>/dev/null)"
-            lowercase="$(lowercase ${app_name})"
-            installed_file="${SOFTWARE_DIR}/${app_name}/${lowercase}${INSTALLED_MARK}"
-            if [ -e "${installed_file}" ]; then
-                note "${SUCCESS_CHAR} ${app_name}"
+    if [ -d "${SOFTWARE_DIR}" ]; then
+        for _lbfapp in ${SOFTWARE_DIR}*; do
+            echo
+            _lbfapp_name="$(${BASENAME_BIN} "${_lbfapp}" 2>/dev/null)"
+            _lbflowercase="$(lowercase "${_lbfapp_name}")"
+            _lbinstald_file="${SOFTWARE_DIR}/${_lbfapp_name}/${_lbflowercase}${INSTALLED_MARK}"
+            if [ -e "${_lbinstald_file}" ]; then
+                note "${SUCCESS_CHAR} ${_lbfapp_name}"
             else
-                note "${red}${FAIL_CHAR} ${app_name} ${reset}[${red}!${reset}]"
+                note "${red}${FAIL_CHAR} ${_lbfapp_name} ${reset}[${red}!${reset}]"
             fi
-            for req in $(${FIND_BIN} ${app} -maxdepth 1 -name *${INSTALLED_MARK} 2>/dev/null | ${SORT_BIN} 2>/dev/null); do
-                pp="$(${PRINTF_BIN} "$(${BASENAME_BIN} ${req} 2>/dev/null)" | ${SED_BIN} "s/${INSTALLED_MARK}//" 2>/dev/null)"
-                note "   ${NOTE_CHAR} ${pp} $(distinct "${gray}" "[")$(distinct n $(${CAT_BIN} ${req} 2>/dev/null))$(distinct "${gray}" "]")"
+            for _lbfreq in $(${FIND_BIN} ${_lbfapp} -maxdepth 1 -name *${INSTALLED_MARK} 2>/dev/null | ${SORT_BIN} 2>/dev/null); do
+                _lbpp="$(${PRINTF_BIN} "$(${BASENAME_BIN} "${_lbfreq}" 2>/dev/null)" | ${SED_BIN} "s/${INSTALLED_MARK}//" 2>/dev/null)"
+                note "   ${NOTE_CHAR} ${_lbpp} $(distinct "${gray}" "[")$(distinct n $(${CAT_BIN} "${_lbfreq}" 2>/dev/null))$(distinct "${gray}" "]")"
             done
         done
+        unset _lbfreq _lbfapp _lbflowercase _lbfapp_name _lbinstald_file _lbpp
     fi
 }
 
