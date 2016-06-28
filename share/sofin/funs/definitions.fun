@@ -1172,7 +1172,7 @@ hack_definition () {
 }
 
 
-rebuild_application () {
+rebuild_bundle () {
     create_cache_directories
     if [ "$2" = "" ]; then
         error "Missing second argument with library/software name."
