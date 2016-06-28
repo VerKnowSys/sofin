@@ -201,6 +201,7 @@ find_most_recent () {
                 -mindepth 1 \
                 -type "${_frtype}" \
                 -name "${_frmatcher}" \
+                -not -name "*.strip" \
                 -exec ${STAT_BIN} -f '%m %N' {} \; \
                 2>> ${LOG} | \
                 ${SORT_BIN} -nr 2>/dev/null | \
