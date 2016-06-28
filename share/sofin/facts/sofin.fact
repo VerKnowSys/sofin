@@ -1,4 +1,4 @@
-SOFIN_VERSION="1.0.5"
+SOFIN_VERSION="1.0.6"
 
 DEFAULT_ISSUE_REPORT_SITE="https://bitbucket.org/verknowsys/sofin/issues"
 DEFAULT_ISSUE_REPORT_SITE_ALT="https://github.com/VerKnowSys/sofin/issues"
