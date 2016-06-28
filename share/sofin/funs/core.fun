@@ -24,14 +24,15 @@ cecho () {
 
 debug () {
     if [ -z "${DEBUG}" ]; then
-        aname="$(echo "${DEF_NAME}${DEF_POSTFIX}" | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null)"
-        if [ ! -z "${aname}" -a -d "${LOGS_DIR}" ]; then
-            cecho "# $1" ${magenta} >> "${LOG}-${aname}" 2>> "${LOG}-${aname}"
-        elif [ -z "${aname}" -a -d "${LOGS_DIR}" ]; then
+        _dbgnme="$(echo "${DEF_NAME}${DEF_POSTFIX}" | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null)"
+        if [ ! -z "${_dbgnme}" -a -d "${LOGS_DIR}" ]; then
+            cecho "# $1" ${magenta} >> "${LOG}-${_dbgnme}" 2>> "${LOG}-${_dbgnme}"
+        elif [ -z "${_dbgnme}" -a -d "${LOGS_DIR}" ]; then
             cecho "# $1" ${magenta} >> "${LOG}" 2>> "${LOG}"
         elif [ ! -d "${LOGS_DIR}" ]; then
             ${LOGGER_BIN} "sofin: $1"
         fi
+        unset _dbgnme
     else
         cecho "# $1" ${magenta} # NOTE: this "#" is required for debug mode to work properly with generation of ~/.profile
     fi
