@@ -809,6 +809,7 @@ clean_useless () {
         for _cu_dir in bin sbin libexec; do
             if [ -d "${PREFIX}/${_cu_dir}" ]; then
                 _cuall_binaries=$(${FIND_BIN} ${PREFIX}/${_cu_dir} -maxdepth 1 -type f -or -type l 2>/dev/null)
+                _tobermlist=""
                 for _cufile in ${_cuall_binaries}; do
                     _cubase="$(${BASENAME_BIN} ${_cufile} 2>/dev/null)"
                     if [ -e "${PREFIX}/exports/${_cubase}" ]; then
@@ -823,19 +824,24 @@ clean_useless () {
                             fi
                         done
                         if [ -z "${_cu_commit_removal}" ]; then
-                            debug "Removing useless _cufile: $(distinct d ${_cufile})"
-                            ${RM_BIN} -f ${_cufile}
+                            if [ -z "${_tobermlist}" ]; then
+                                _tobermlist="${_cufile}"
+                            else
+                                _tobermlist="${_cufile} ${_tobermlist}"
+                            fi
                         else
                             debug "Useful _cufile left intact: $(distinct d ${_cufile})"
                         fi
                     fi
                 done
+                debug "Removing useless files: $(distinct d "${_tobermlist}")"
+                ${RM_BIN} -f ${_tobermlist}
             fi
         done
     else
         debug "Useless files cleanup skipped"
     fi
-    unset _cu_pattern _cufile _cuall_binaries _cu_commit_removal _cubase
+    unset _cu_pattern _cufile _cuall_binaries _cu_commit_removal _cubase _tobermlist
 }
 
 
