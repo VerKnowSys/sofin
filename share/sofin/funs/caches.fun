@@ -62,7 +62,6 @@ log_helper () {
 
 show_logs () {
     create_cache_directories
-    shift
     _logf_pattern="$*"
     _logf_minutes="${LOG_LAST_ACCESS_OR_MOD_MINUTES}"
     debug "show_logs(): _logf_minutes: $(distinct d ${_logf_minutes}), pattern: $(distinct d "${_logf_pattern}")"

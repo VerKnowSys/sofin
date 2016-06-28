@@ -214,32 +214,32 @@ list_bundles_full () {
 
 show_diff () {
     create_cache_directories
-    defname="${2}"
+    _sddefname="${1}"
     # if specified a file name, make sure it's named properly:
-    ${EGREP_BIN} "${DEFAULT_DEF_EXT}$" "${defname}" >/dev/null 2>&1 || \
-        defname="${defname}${DEFAULT_DEF_EXT}"
-    beauty_defn="$(distinct n ${defname})"
+    ${EGREP_BIN} "${DEFAULT_DEF_EXT}$" "${_sddefname}" >/dev/null 2>&1 || \
+        _sddefname="${_sddefname}${DEFAULT_DEF_EXT}"
+    _beauty_defn="$(distinct n "${_sddefname}")"
 
     cd ${DEFINITIONS_DIR}
-    if [ -f "./${defname}" ]; then
+    if [ -f "./${_sddefname}" ]; then
         debug "Checking status for untracked files.."
-        ${GIT_BIN} status --short "${defname}" 2>/dev/null | ${EGREP_BIN} '\?\?' >/dev/null 2>&1
+        ${GIT_BIN} status --short "${_sddefname}" 2>/dev/null | ${EGREP_BIN} '\?\?' >/dev/null 2>&1
         if [ "$?" = "0" ]; then # found "??" which means file is untracked..
-            note "No diff available for definition: ${beauty_defn} (currently untracked)"
+            note "No diff available for definition: ${_beauty_defn} (currently untracked)"
         else
-            note "Showing detailed modifications of defintion: ${beauty_defn}"
+            note "Showing detailed modifications of defintion: ${_beauty_defn}"
         fi
-        ${GIT_BIN} status -vv --long "${defname}" 2>/dev/null
+        ${GIT_BIN} status -vv --long "${_sddefname}" 2>/dev/null
     else
         note "Showing all modifications from current defintions cache"
         ${GIT_BIN} status --short 2>/dev/null
     fi
+    unset _sddefname _beauty_defn
 }
 
 
 develop () {
     create_cache_directories
-    shift
     _defname_input="${1}"
     _defname_no_ext="$(echo "${_defname_input}" | ${SED_BIN} -e "s#\.${DEFAULT_DEF_EXT}##" 2>/dev/null)"
     _devname="$(lowercase "$(${BASENAME_BIN} ${_defname_no_ext} 2>/dev/null)")"
