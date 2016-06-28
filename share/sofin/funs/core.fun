@@ -107,61 +107,62 @@ distinct () {
 
 run () {
     if [ ! -z "$1" ]; then
-        _params="$@"
-        unset show_stdout_progress
-        echo "${_params}" | eval "${MATCH_FETCH_CMDS_GUARD}" && show_stdout_progress=YES
-        _aname="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
-        debug "$(${DATE_BIN} +%s 2>/dev/null) run($(distinct d ${_params}))"
-        if [ -z "${_aname}" ]; then
-            if [ -z "${show_stdout_progress}" ]; then
-                eval PATH="${PATH}" "${_params}" >> "${LOG}" 2>> "${LOG}"
-                check_command_result $? "${_params}"
+        _run_params="$@"
+        unset _run_show_stdout_progress
+        echo "${_run_params}" | eval "${MATCH_FETCH_CMDS_GUARD}" && _run_show_stdout_progress=YES
+        _rnm="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
+        debug "$(${DATE_BIN} +%s 2>/dev/null) run($(distinct d ${_run_params}))"
+        if [ -z "${_rnm}" ]; then
+            if [ -z "${_run_show_stdout_progress}" ]; then
+                eval PATH="${PATH}" "${_run_params}" >> "${LOG}" 2>> "${LOG}"
+                check_command_result $? "${_run_params}"
             else
                 ${PRINTF_BIN} "${blue}"
-                eval PATH="${PATH}" "${_params}" >> "${LOG}"
-                check_command_result $? "${_params}"
+                eval PATH="${PATH}" "${_run_params}" >> "${LOG}"
+                check_command_result $? "${_run_params}"
             fi
         else
-            if [ -z "${show_stdout_progress}" ]; then
-                eval PATH="${PATH}" "${_params}" >> "${LOG}-${_aname}" 2>> "${LOG}-${_aname}"
-                check_command_result $? "${_params}"
+            if [ -z "${_run_show_stdout_progress}" ]; then
+                eval PATH="${PATH}" "${_run_params}" >> "${LOG}-${_rnm}" 2>> "${LOG}-${_rnm}"
+                check_command_result $? "${_run_params}"
             else
                 ${PRINTF_BIN} "${blue}"
-                eval PATH="${PATH}" "${_params}" >> "${LOG}-${_aname}"
-                check_command_result $? "${_params}"
+                eval PATH="${PATH}" "${_run_params}" >> "${LOG}-${_rnm}"
+                check_command_result $? "${_run_params}"
             fi
         fi
     else
-        error "Specified an empty command to run. Aborting."
+        error "Specified an empty command to run()!"
     fi
+    unset _rnm _run_show_stdout_progress _run_params
 }
 
 
 try () {
     if [ ! -z "$1" ]; then
-        _params="$@"
-        unset _show_stdout_progress
-        echo "${_params}" | eval "${MATCH_FETCH_CMDS_GUARD}" && \
-            _show_stdout_progress=YES
-        _aname="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
-        debug "$(${DATE_BIN} +%s 2>/dev/null): try($(distinct d ${_params}), show_stdout_progress=$(distinct d "${_show_stdout_progress}")"
-        if [ -z "${_aname}" ]; then
-            if [ -z "${_show_stdout_progress}" ]; then
-                eval PATH="${PATH}" "${_params}" >> "${LOG}" 2>> "${LOG}"
+        _try_params="$@"
+        unset _try_show_stdout_progress
+        echo "${_try_params}" | eval "${MATCH_FETCH_CMDS_GUARD}" && \
+            _try_show_stdout_progress=YES
+        _try_aname="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
+        debug "$(${DATE_BIN} +%s 2>/dev/null): try($(distinct d ${_try_params}), show_stdout_progress=$(distinct d "${_try_show_stdout_progress}")"
+        if [ -z "${_try_aname}" ]; then
+            if [ -z "${_try_show_stdout_progress}" ]; then
+                eval PATH="${PATH}" "${_try_params}" >> "${LOG}" 2>> "${LOG}"
             else
                 ${PRINTF_BIN} "${blue}"
-                eval PATH="${PATH}" "${_params}" >> "${LOG}" # show progress on stderr
+                eval PATH="${PATH}" "${_try_params}" >> "${LOG}" # show progress on stderr
             fi
         else
-            if [ -z "${_show_stdout_progress}" ]; then
-                eval PATH="${PATH}" "${_params}" >> "${LOG}-${_aname}" 2>> "${LOG}-${_aname}"
+            if [ -z "${_try_show_stdout_progress}" ]; then
+                eval PATH="${PATH}" "${_try_params}" >> "${LOG}-${_try_aname}" 2>> "${LOG}-${_try_aname}"
             else
                 ${PRINTF_BIN} "${blue}"
-                eval PATH="${PATH}" "${_params}" >> "${LOG}-${_aname}"
+                eval PATH="${PATH}" "${_try_params}" >> "${LOG}-${_try_aname}"
             fi
         fi
     else
-        error "An empty command to run for: $(distinct e ${DEF_NAME}${DEF_POSTFIX})?"
+        error "Specified an empty command to try()!"
     fi
 }
 

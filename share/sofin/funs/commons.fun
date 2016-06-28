@@ -75,10 +75,10 @@ retry () {
     _ammo="OOO"
 
     # check for commands that puts something important/intersting on stdout
-    unset show_stdout_progress
-    echo "${_targets}" | eval "${MATCH_FETCH_CMDS_GUARD}" && show_stdout_progress=YES
+    unset _rtry_show_stdout_progress
+    echo "${_targets}" | eval "${MATCH_FETCH_CMDS_GUARD}" && _rtry_show_stdout_progress=YES
 
-    debug "Show stdout progress show_stdout_progress=$(distinct d "${show_stdout_progress}")"
+    debug "Show stdout progress _rtry_show_stdout_progress=$(distinct d "${_rtry_show_stdout_progress}")"
     while [ ! -z "${_ammo}" ]; do
         if [ ! -z "${_targets}" ]; then
             debug "${TIMESTAMP}: Invoking: retry($(distinct d "${_targets}")) [$(distinct d ${_ammo})]"
@@ -87,7 +87,7 @@ retry () {
                 ${MKDIR_BIN} -p "${LOGS_DIR}" >/dev/null 2>&1
             fi
             _gitroot="$(${BASENAME_BIN} $(${BASENAME_BIN} ${GIT_BIN} 2>/dev/null) 2>/dev/null)"
-            if [ -z "${show_stdout_progress}" ]; then
+            if [ -z "${_rtry_show_stdout_progress}" ]; then
                 eval PATH="${_gitroot}/bin:${_gitroot}/libexec/git-core:${DEFAULT_PATH}" \
                     "${_targets}" >> "${LOG}" 2>> "${LOG}" && \
                     unset _gitroot _ammo _targets && \
@@ -105,6 +105,7 @@ retry () {
         _ammo="$(echo "${_ammo}" | ${SED_BIN} 's/O//' 2>/dev/null)"
         debug "retry(): Remaining attempts: $(distinct d ${_ammo})"
     done
+    unset _ammo _targets
     error "All _ammo exhausted to invoke a command: $(distinct e "${_targets}")"
 }
 
