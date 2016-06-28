@@ -75,3 +75,11 @@ perform_clean () {
             ;;
     esac
 }
+
+
+cleanup_after_tasks () {
+    debug "cleanup_after_tasks()"
+    update_shell_vars
+    reload_zsh_shells
+    destroy_locks
+}
