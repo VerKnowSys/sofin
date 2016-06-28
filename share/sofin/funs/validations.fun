@@ -47,10 +47,6 @@ fail_on_any_background_jobs () {
 
 
 check_requirements () {
-    if [ -z "${BUNDLES}" ]; then
-        debug "check_requirements(): BUNDLES is empty! Exitting"
-        exit
-    fi
     if [ "${SYSTEM_NAME}" != "Darwin" ]; then
         if [ -d "/usr/local" ]; then
             _a_files="$(${FIND_BIN} /usr/local -maxdepth 3 -type f 2>/dev/null | ${WC_BIN} -l 2>/dev/null | ${SED_BIN} -e 's/^ *//g;s/ *$//g' 2>/dev/null)"

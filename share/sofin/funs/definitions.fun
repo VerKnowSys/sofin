@@ -235,22 +235,21 @@ reset_definitions () {
 
 
 remove_bundles () {
-    _bundle_nam="${2}"
+    _bundle_nam="$@"
     if [ -z "${_bundle_nam}" ]; then
-        error "Second argument with bundle name is required!"
+        error "Second argument with at least one bundle name is required!"
     fi
-
     # first look for a list with that name:
-    if [ -e "${LISTS_DIR}${_bundle_nam}" ]; then
-        BUNDLES="$(${CAT_BIN} ${LISTS_DIR}${_bundle_nam} 2>/dev/null | eval "${NEWLINES_TO_SPACES_GUARD}")"
-        debug "Removing list of bundles: $(distinct d ${BUNDLES})"
+    if [ -e "${LISTS_DIR}$(lowercase "${_bundle_nam}")" ]; then
+        _picked_bundles="$(${CAT_BIN} ${LISTS_DIR}${_bundle_nam} 2>/dev/null | eval "${NEWLINES_TO_SPACES_GUARD}")"
+        debug "Removing list of bundles: $(distinct d ${_picked_bundles})"
     else
-        BUNDLES="${SOFIN_ARGS}"
-        debug "Removing bundles: $(distinct d ${BUNDLES})"
+        _picked_bundles="${_bundle_nam}"
+        debug "Removing bundles: $(distinct d ${_picked_bundles})"
     fi
 
     load_defaults
-    for _def in ${BUNDLES}; do
+    for _def in ${_picked_bundles}; do
         _given_name="$(capitalize "${_def}")"
         if [ -z "${_given_name}" ]; then
             error "remove_bundles(): _given_name is empty!"
@@ -267,8 +266,8 @@ remove_bundles () {
             else
                 ${RM_BIN} -rfv "${SOFTWARE_DIR}${_given_name}" >> "${LOG}-${_aname}" 2>> "${LOG}-${_aname}"
                 # if removing a single bundle, then look for alternatives. Otherwise, just remove bundle..
-                debug "BUNDLES: ${BUNDLES}, _given_name: ${_given_name}"
-                if [ ! "${BUNDLES}" = "${_given_name}" ]; then
+                debug "_picked_bundles: ${_picked_bundles}, _given_name: ${_given_name}"
+                if [ ! "${_picked_bundles}" = "${_given_name}" ]; then
                     debug "Looking for other installed versions of: $(distinct d ${_aname}), that might be exported automatically.."
                     _inname="$(echo "${_given_name}" | ${SED_BIN} 's/[0-9]*//g' 2>/dev/null)"
                     _alternative="$(${FIND_BIN} ${SOFTWARE_DIR} -maxdepth 1 -type d -name "${_inname}*" -not -name "${_given_name}" 2>/dev/null | ${SED_BIN} 's/^.*\///g' 2>/dev/null | ${HEAD_BIN} -n1 2>/dev/null)"
@@ -289,7 +288,7 @@ remove_bundles () {
             warn "Bundle: $(distinct w ${_given_name}) not installed."
         fi
     done
-    unset _given_name _inname _alternative _aname _def
+    unset _given_name _inname _alternative _aname _def _picked_bundles
 }
 
 
@@ -306,14 +305,14 @@ available_definitions () {
 
 
 make_exports () {
-    if [ -z "${2}" ]; then
+    if [ -z "${1}" ]; then
         error "Missing second argument with export app is required!"
     fi
-    if [ -z "${3}" ]; then
+    if [ -z "${2}" ]; then
         error "Missing third argument with source app is required!"
     fi
-    _export_bin="${2}"
-    _bundle_name="$(capitalize "${3}")"
+    _export_bin="${1}"
+    _bundle_name="$(capitalize "${2}")"
     for _bindir in "/bin/" "/sbin/" "/libexec/"; do
         debug "Looking into bundle binary dir: $(distinct d ${SOFTWARE_DIR}${_bundle_name}${_bindir})"
         if [ -e "${SOFTWARE_DIR}${_bundle_name}${_bindir}${_export_bin}" ]; then
@@ -365,14 +364,15 @@ show_outdated () {
 
 
 wipe_remote_archives () {
-    ANS="YES"
+    _bund_names="$@"
+    _ans="YES"
     if [ -z "${USE_FORCE}" ]; then
-        warn "Are you sure you want to wipe binary bundles: $(distinct w ${SOFIN_ARGS}) from binary repository: $(distinct w ${MAIN_BINARY_REPOSITORY})? (Type $(distinct w YES) to confirm)"
-        read ANS
+        warn "Are you sure you want to wipe binary bundles: $(distinct w ${_bund_names}) from binary repository: $(distinct w ${MAIN_BINARY_REPOSITORY})? (Type $(distinct w YES) to confirm)"
+        read _ans
     fi
-    if [ "${ANS}" = "YES" ]; then
+    if [ "${_ans}" = "YES" ]; then
         cd "${SOFTWARE_DIR}"
-        for _wr_element in ${SOFIN_ARGS}; do
+        for _wr_element in ${_bund_names}; do
             _lowercase_element="$(lowercase ${_wr_element})"
             _remote_ar_name="${_wr_element}-"
             _wr_dig="$(${HOST_BIN} A ${MAIN_SOFTWARE_ADDRESS} 2>/dev/null | ${GREP_BIN} 'Address:' 2>/dev/null | eval "${HOST_ADDRESS_GUARD}")"
@@ -388,7 +388,7 @@ wipe_remote_archives () {
             done
         done
     else
-        error "Aborted remote wipe of: $(distinct e "${SOFIN_ARGS}")"
+        error "Aborted remote wipe of: $(distinct e "${_bund_names}")"
     fi
     unset _wr_mirr _remote_ar_name _wr_dig _lowercase_element _wr_element
 }
@@ -908,16 +908,16 @@ export_binaries () {
 
 hack_definition () {
     create_cache_directories
-    if [ -z "${2}" ]; then
-        error "No pattern specified"
+    if [ -z "${1}" ]; then
+        error "No name of pattern to hack given!"
     fi
-    _hack_pattern="${2}"
+    _hack_pattern="${1}"
     _abeauty_pat="$(distinct n "*${_hack_pattern}*")"
     _all_hackdirs=$(${FIND_BIN} ${CACHE_DIR}cache -type d -mindepth 2 -maxdepth 2 -iname "*${_hack_pattern}*" 2>/dev/null)
     _all_am="$(echo "${_all_hackdirs}" | ${WC_BIN} -l 2>/dev/null | ${TR_BIN} -d '\t|\r|\ ' 2>/dev/null)"
     ${TEST_BIN} -z "${_all_am}" && _all_am="0"
     if [ -z "${_all_hackdirs}" ]; then
-        error "No matching build dirs found for pattern: $(distinct e ${_abeauty_pat})"
+        warn "No matching build dirs found for pattern: $(distinct e ${_abeauty_pat})"
     else
         note "Sofin will now walk through: $(distinct n ${_all_am}) build dirs in: $(distinct n ${CACHE_DIR}cache), that matches pattern: $(distinct n ${_abeauty_pat})"
     fi
@@ -926,27 +926,25 @@ hack_definition () {
         warn "$(fill)"
         warn "Quit viever/ Exit that shell, to continue with next build dir"
         warn "Sofin will now traverse through build logs, looking for errors.."
-
-        currdir="$(${PWD_BIN} 2>/dev/null)"
+        _currdir="$(${PWD_BIN} 2>/dev/null)"
         cd "${_a_dir}"
-
-        found_any=""
-        log_viewer="${LESS_BIN} ${LESS_DEFAULT_OPTIONS} +/error:"
-        for logfile in config.log build.log CMakeFiles/CMakeError.log CMakeFiles/CMakeOutput.log; do
-            if [ -f "${logfile}" ]; then
-                found_any="yes"
-                eval "cd ${_a_dir} && ${ZSH_BIN} --login -c '${log_viewer} ${logfile} || exit'"
+        _found_any=""
+        _log_viewer="${LESS_BIN} ${LESS_DEFAULT_OPTIONS} +/error:"
+        for _logfile in config.log build.log CMakeFiles/CMakeError.log CMakeFiles/CMakeOutput.log; do
+            if [ -f "${_logfile}" ]; then
+                _found_any="yes"
+                eval "cd ${_a_dir} && ${ZSH_BIN} --login -c '${_log_viewer} ${_logfile}'"
             fi
         done
-        if [ -z "${found_any}" ]; then
+        if [ -z "${_found_any}" ]; then
             note "Entering build dir.."
             eval "cd ${_a_dir} && ${ZSH_BIN} --login"
         fi
-        cd "${currdir}"
+        cd "${_currdir}"
         warn "---------------------------------------------------------"
     done
-    note "Hack process finished for pattern: ${_abeauty_pat}"
-}
+    debug "Hack process finished for pattern: $(distinct d "${_abeauty_pat}")"
+    unset _abeauty_pat _currdir _a_dir _logfile _all_hackdirs _all_am _hack_pattern
 }
 
 
