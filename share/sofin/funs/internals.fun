@@ -295,7 +295,7 @@ list_bundles_alphabetic () {
 }
 
 
-mark () {
+mark_installed () {
     _softname="${1}"
     _ver_to_write="${2}"
     if [ -z "${_softname}" ]; then
@@ -314,11 +314,13 @@ mark () {
 
 
 show_done () {
-    ver="$(${CAT_BIN} "${PREFIX}/${application}${INSTALLED_MARK}" 2>/dev/null)"
-    if [ -z "${ver}" ]; then
-        ver="-"
+    _sd_low_name="$(lowercase "${1}")"
+    _sdver="$(${CAT_BIN} "${PREFIX}/${_sd_low_name}${INSTALLED_MARK}" 2>/dev/null)"
+    if [ -z "${_sdver}" ]; then
+        _sdver="0"
     fi
-    note "${SUCCESS_CHAR} ${application} [$(distinct n ${ver})]\n"
+    note "${SUCCESS_CHAR} ${_sd_low_name} [$(distinct n ${_sdver})]"
+    unset _sdver _sd_low_name
 }
 
 

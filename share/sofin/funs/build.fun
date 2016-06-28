@@ -345,18 +345,18 @@ build_all () {
                             note "   ${NOTE_CHAR} App dependencies changed. Rebuilding: $(distinct n ${_common_lowercase})"
                             execute_process "${_common_lowercase}"
                             unset CHANGED
-                            mark "${DEF_NAME}${DEF_POSTFIX}" "${DEF_VERSION}"
-                            show_done
+                            mark_installed "${DEF_NAME}${DEF_POSTFIX}" "${DEF_VERSION}"
+                            show_done "${DEF_NAME}${DEF_POSTFIX}"
                         else
                             note "  ${_common_lowercase} ($(distinct n 1) of $(distinct n ${_req_all}))"
-                            show_done
+                            show_done "${DEF_NAME}${DEF_POSTFIX}"
                             debug "${SUCCESS_CHAR} $(distinct d ${_common_lowercase}) current: $(distinct d ${_version_element}), definition: [$(distinct d ${DEF_VERSION})] Ok."
                         fi
                     else
                         note "  ${_common_lowercase} ($(distinct n 1) of $(distinct n ${_req_all}))"
                         debug "Right before execute_process call: ${_common_lowercase}"
                         execute_process "${_common_lowercase}"
-                        mark "${DEF_NAME}${DEF_POSTFIX}" "${DEF_VERSION}"
+                        mark_installed "${DEF_NAME}${DEF_POSTFIX}" "${DEF_VERSION}"
                         note "${SUCCESS_CHAR} ${_common_lowercase} [$(distinct n ${DEF_VERSION})]\n"
                     fi
                 fi
