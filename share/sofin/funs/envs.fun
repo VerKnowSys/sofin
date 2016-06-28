@@ -305,7 +305,7 @@ reload_zsh_shells () {
             fi
         done
         ${KILL_BIN} -SIGUSR2 ${_wishlist} >> ${LOG} 2>> ${LOG} && \
-            note "Shell reload signal sent to all $(distinct n "${_shellshort}") shell pids: $(distinct n ${_wishlist})"
+            note "Reload signal sent to $(distinct n "${_shellshort}") pids: $(distinct n ${_wishlist})"
     else
         write_info_about_shell_configuration
     fi
