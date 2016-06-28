@@ -34,7 +34,9 @@ load_sofin () {
                 internals.fun \
                 cleaners.fun \
                 caches.fun \
-                definitions.fun
+                definitions.fun \
+                datasets.fun \
+                build.fun
 
     # initial validations
     setup_default_branch
