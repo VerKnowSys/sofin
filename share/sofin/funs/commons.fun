@@ -46,10 +46,12 @@ check_os () {
 file_size () {
     _file="${1}"
     if [ -z "${_file}" ]; then
+        ${PRINTF_BIN} "0" 2>/dev/null
         unset _file
         return 0
     fi
     if [ ! -f "${_file}" ]; then
+        ${PRINTF_BIN} "0" 2>/dev/null
         unset _file
         return 0
     fi
