@@ -16,17 +16,17 @@ if [ ! -z "${SOFIN_COMMAND_ARG}" ]; then
     case ${SOFIN_COMMAND_ARG} in
 
         dev)
-            develop $*
+            develop ${SOFIN_ARGS}
             ;;
 
 
         hack|h)
-            hack_definition $*
+            hack_definition ${SOFIN_ARGS}
             ;;
 
 
         diffs|diff)
-            show_diff $*
+            show_diff ${SOFIN_ARGS}
             ;;
 
 
@@ -36,7 +36,7 @@ if [ ! -z "${SOFIN_COMMAND_ARG}" ]; then
 
 
         log)
-            show_logs $*
+            show_logs ${SOFIN_ARGS}
             ;;
 
 
@@ -89,19 +89,20 @@ if [ ! -z "${SOFIN_COMMAND_ARG}" ]; then
 
         i|install|get|pick|choose|use|switch)
             create_cache_directories
-            if [ "$2" = "" ]; then
-                error "Second argument, with at least one application name (or list) is required!"
+            _list_maybe="$(lowercase "${2}")"
+            if [ -z "${_list_maybe}" ]; then
+                error "Second argument, with at least one application (or list) name is required!"
             fi
             fail_on_background_sofin_job ${SOFIN_ARGS}
             # NOTE: trying a list first - it will have priority if file exists:
-            if [ -f "${LISTS_DIR}${2}" ]; then
-                BUNDLES="$(${CAT_BIN} ${LISTS_DIR}${2} 2>/dev/null | eval ${NEWLINES_TO_SPACES_GUARD})"
-                debug "Processing software: $(distinct d ${BUNDLES}) for architecture: $(distinct d ${SYSTEM_ARCH})"
+            if [ -f "${LISTS_DIR}${_list_maybe}" ]; then
+                _pickd_bundls="$(${CAT_BIN} "${LISTS_DIR}${_list_maybe}" 2>/dev/null | eval ${NEWLINES_TO_SPACES_GUARD})"
             else
-                BUNDLES="${SOFIN_ARGS}"
-                debug "Processing software: $(distinct d ${SOFIN_ARGS}) for architecture: $(distinct d ${SYSTEM_ARCH})"
+                _pickd_bundls="${SOFIN_ARGS}"
             fi
-            build_all
+            debug "Processing software: $(distinct d "${_pickd_bundls}") for: $(distinct d ${OS_TRIPPLE})"
+            build_all "${_pickd_bundls}"
+            unset _pickd_bundls
             cleanup_after_tasks
             ;;
 
@@ -116,9 +117,10 @@ if [ ! -z "${SOFIN_COMMAND_ARG}" ]; then
             if [ ! -e "./${DEPENDENCIES_FILE}" ]; then
                 error "Dependencies file not found!"
             fi
-            BUNDLES="$(${CAT_BIN} ./${DEPENDENCIES_FILE} 2>/dev/null | eval ${NEWLINES_TO_SPACES_GUARD})"
-            note "Installing dependencies: $(distinct n ${BUNDLES})"
-            build_all
+            _pickd_bundls="$(${CAT_BIN} ./${DEPENDENCIES_FILE} 2>/dev/null | eval ${NEWLINES_TO_SPACES_GUARD})"
+            note "Installing dependencies: $(distinct n ${_pickd_bundls})"
+            build_all "${_pickd_bundls}"
+            unset _pickd_bundls
             cleanup_after_tasks
             ;;
 
@@ -132,21 +134,20 @@ if [ ! -z "${SOFIN_COMMAND_ARG}" ]; then
 
         b|build)
             create_cache_directories
-            dependencies="${SOFIN_ARGS}"
-            note "Software bundles to be built: $(distinct n ${dependencies})"
-            fail_on_background_sofin_job ${dependencies}
-
-            export USE_UPDATE=NO
-            export USE_BINBUILD=NO
-            BUNDLES="${dependencies}"
-            build_all
+            _to_be_built="${SOFIN_ARGS}"
+            note "Software bundles to be built: $(distinct n ${_to_be_built})"
+            fail_on_background_sofin_job ${_to_be_built}
+            USE_UPDATE=NO
+            USE_BINBUILD=NO
+            build_all "${_to_be_built}"
+            unset _to_be_built
             cleanup_after_tasks
             ;;
 
 
         d|deploy)
             fail_on_background_sofin_job ${SOFIN_ARGS}
-            deploy_binbuild $*
+            deploy_binbuild ${SOFIN_ARGS}
             cleanup_after_tasks
             ;;
 
@@ -160,19 +161,19 @@ if [ ! -z "${SOFIN_COMMAND_ARG}" ]; then
 
         rebuild)
             fail_on_background_sofin_job ${SOFIN_ARGS}
-            rebuild_bundle $*
+            rebuild_bundle ${SOFIN_ARGS}
             cleanup_after_tasks
             ;;
 
 
         wipe)
-            wipe_remote_archives $*
+            wipe_remote_archives ${SOFIN_ARGS}
             ;;
 
 
         delete|remove|uninstall|rm)
             fail_on_background_sofin_job ${SOFIN_ARGS}
-            remove_bundles $*
+            remove_bundles ${SOFIN_ARGS}
             cleanup_after_tasks
             ;;
 
@@ -194,7 +195,7 @@ if [ ! -z "${SOFIN_COMMAND_ARG}" ]; then
 
         exportapp|export|exp)
             fail_on_background_sofin_job ${SOFIN_ARGS}
-            make_exports $*
+            make_exports ${SOFIN_ARGS}
             cleanup_after_tasks
             ;;
 
