@@ -1103,9 +1103,9 @@ export_binaries () {
     if [ -z "${DEF_EXPORTS}" ]; then
         note "Defined no binaries to export of prefix: $(distinct n ${PREFIX})"
     else
-        _a_name="$(lowercase ${DEF_NAME}${DEF_POSTFIX})"
+        _a_name="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
         _an_amount="$(echo "${DEF_EXPORTS}" | ${WC_BIN} -w 2>/dev/null | ${TR_BIN} -d '\t|\r|\ ' 2>/dev/null)"
-        debug "Exporting $(distinct n ${_an_amount}) binaries of prefix: $(distinct n ${PREFIX})"
+        debug "Exporting $(distinct d ${_an_amount}) binaries of prefix: $(distinct d ${PREFIX})"
         ${MKDIR_BIN} -p "${PREFIX}/exports" >/dev/null 2>&1
         _expolist=""
         for exp in ${DEF_EXPORTS}; do
