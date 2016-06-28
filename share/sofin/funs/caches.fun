@@ -127,14 +127,20 @@ pretouch_logs () {
     create_cache_directories
     debug "Logs pretouch called with params: $(distinct d ${_params})"
     ${TOUCH_BIN} ${LOGS_DIR}sofin >/dev/null 2>&1
+    _pret_list=""
     for _app in ${_params}; do
         if [ -z "${_app}" ]; then
             debug "Empty app given out of params: $(distinct d "${_params}")?"
         else
             _lapp="$(lowercase ${_app})"
-            debug "pretouch_logs(): $(distinct d "${_lapp}")"
-            ${TOUCH_BIN} "${LOGS_DIR}sofin-${_lapp}" >/dev/null 2>&1
+            if [ -z "${_pret_list}" ]; then
+                _pret_list="${LOGS_DIR}sofin-${_lapp}"
+            else
+                _pret_list="${LOGS_DIR}sofin-${_lapp} ${_pret_list}"
+            fi
         fi
     done
-    unset _app _params _lapp
+    debug "pretouch_logs(): $(distinct d "${_pret_list}")"
+    ${TOUCH_BIN} ${_pret_list} >/dev/null 2>&1
+    unset _app _params _lapp _pret_list
 }
