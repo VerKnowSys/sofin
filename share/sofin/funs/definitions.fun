@@ -767,10 +767,11 @@ strip_bundle_files () {
                 fi
             done
             _sbresult="$(echo "${_counter}" | ${BC_BIN} 2>/dev/null)"
-            if [ "${_sbresult}" -lt "0" ]; then
+            if [ "${_sbresult}" -lt "0" -o \
+                 -z "${_sbresult}" ]; then
                 _sbresult="0"
             fi
-            note "$(distinct n ${_sbresult}) files were stripped"
+            note "$(distinct n "${_sbresult}") files were stripped"
         else
             warn "Debug build is enabled. Strip skipped"
         fi
