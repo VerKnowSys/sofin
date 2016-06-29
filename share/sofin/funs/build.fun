@@ -189,6 +189,7 @@ try_fetch_binbuild () {
         fi
         _full_name="$(capitalize "${_full_name}")"
         if [ ! -e "${BINBUILDS_CACHE_DIR}${_full_name}/${_bb_archive}" ]; then
+            ${MKDIR_BIN} -p "${BINBUILDS_CACHE_DIR}${_full_name}" 2>/dev/null
             cd ${BINBUILDS_CACHE_DIR}${_full_name}
             try "${FETCH_BIN} ${FETCH_OPTS} '${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}${DEFAULT_CHKSUM_EXT}'" || \
                 try "${FETCH_BIN} ${FETCH_OPTS} '${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}${DEFAULT_CHKSUM_EXT}'"
