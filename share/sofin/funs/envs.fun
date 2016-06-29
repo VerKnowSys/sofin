@@ -22,7 +22,7 @@ setup_sofin_compiler () {
             ;;
 
         Linux)
-            DEFAULT_COMPILER_FLAGS="${COMMON_COMPILER_FLAGS} -mno-avx" # XXX: old Xeons case :)
+            DEFAULT_COMPILER_FLAGS="${COMMON_COMPILER_FLAGS} -mno-avx" # NOTE: Disable on Centos 5, XXX: old Xeons case :)
             DEFAULT_LDFLAGS="${COMMON_LDFLAGS}"
             ;;
     esac

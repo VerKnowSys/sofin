@@ -66,7 +66,7 @@ CPP_PREPROCESSOR_NAME_ALT="cpp"
 
 # Compiler cross platform defaults:
 COMMON_FLAGS="-fPIC"
-COMMON_COMPILER_FLAGS="${COMMON_FLAGS} -w -fno-strict-overflow -fstack-protector-all"
+COMMON_COMPILER_FLAGS="${COMMON_FLAGS} -w -fno-strict-overflow -fstack-protector-all" # NOTE: comment out "-fno-strict-overflow -fstack-protector-all" on Centos 5
 COMMON_LDFLAGS="${COMMON_FLAGS}"
 DEFAULT_LDFLAGS="${COMMON_FLAGS}"
 DEFAULT_COMPILER_FLAGS="${COMMON_COMPILER_FLAGS}"
