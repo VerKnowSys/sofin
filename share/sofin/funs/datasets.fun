@@ -22,10 +22,10 @@ manage_datasets () {
             _sofins_all="$(echo "${_sofin_ps_list}" | ${WC_BIN} -l 2>/dev/null | ${SED_BIN} 's/ //g' 2>/dev/null)"
             _sofins_installing="$(echo "${_sofins_all} - 1" | ${BC_BIN} 2>/dev/null)"
             ${TEST_BIN} -z "${_sofins_installing}" && _sofins_installing="0"
-            export _jobs_in_parallel="NO"
+            _jobs_in_parallel="NO"
             if [ ${_sofins_installing} -gt 1 ]; then
                 note "Found: $(distinct n ${_sofins_installing}) running Sofin instances. Parallel jobs not allowed"
-                export _jobs_in_parallel="YES"
+                _jobs_in_parallel="YES"
             else
                 note "Parallel jobs allowed. Traversing several datasets at once.."
             fi
