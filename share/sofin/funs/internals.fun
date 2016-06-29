@@ -325,7 +325,7 @@ show_done () {
 
 
 create_or_receive () {
-    _dataset_name="$1"
+    _dataset_name="$(capitalize "$1")"
     _final_snap_file="${2}"
     if [ -z "${_dataset_name}" -o \
          -z "${_final_snap_file}" ]; then
