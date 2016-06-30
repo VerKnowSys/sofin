@@ -28,7 +28,6 @@ load_defs () {
                             "DEF_HTTP_PATH=${DEF_HTTP_PATH}" \
                             "SYSTEM_VERSION=${SYSTEM_VERSION}" \
                             "OS_TRIPPLE=${OS_TRIPPLE}" \
-                            "RUNTIME_ID=${RUNTIME_ID}" \
                             "SYS_SPECIFIC_BINARY_REMOTE=${SYS_SPECIFIC_BINARY_REMOTE}";
             do
                 debug "Required field check: $(distinct d ${_required_field})"
@@ -40,7 +39,6 @@ load_defs () {
                                 "DEF_HTTP_PATH" \
                                 "SYSTEM_VERSION" \
                                 "OS_TRIPPLE" \
-                                "RUNTIME_ID" \
                                 "SYS_SPECIFIC_BINARY_REMOTE";
                     do
                         if [ "${_check}=" = "${_required_field}" -o \
