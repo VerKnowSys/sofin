@@ -8,8 +8,9 @@ create_cache_directories () {
     # check for regular cache dirs for existence:
     if [ ! -d "${CACHE_DIR}" -o \
          ! -d "${BINBUILDS_CACHE_DIR}" -o \
+         ! -d "${FILE_CACHE_DIR}" -o \
          ! -d "${LOCKS_DIR}" ]; then
-         for dir in "${CACHE_DIR}" "${BINBUILDS_CACHE_DIR}" "${LOCKS_DIR}"; do
+         for dir in "${FILE_CACHE_DIR}" "${CACHE_DIR}" "${BINBUILDS_CACHE_DIR}" "${LOCKS_DIR}"; do
             ${MKDIR_BIN} -p "${dir}" >/dev/null 2>&1
          done
     fi
