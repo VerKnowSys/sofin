@@ -74,6 +74,7 @@ load_defaults () {
 
 
 inherit () {
+    debug "Inheritance from parent: $(distinct d "${1}")"
     . ${DEFINITIONS_DIR}${1}${DEFAULT_DEF_EXT}
 }
 
