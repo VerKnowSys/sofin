@@ -429,36 +429,36 @@ create_apple_bundle_if_necessary () { # XXXXXX
 
 
 strip_bundle_files () {
-    _definition_name="${1}"
-    if [ -z "${_definition_name}" ]; then
+    _sbfdefinition_name="${1}"
+    if [ -z "${_sbfdefinition_name}" ]; then
         error "No definition name specified as first param for strip_bundle_files()!"
     fi
     load_defaults # reset possible cached values
-    load_defs "${_definition_name}"
+    load_defs "${_sbfdefinition_name}"
     if [ -z "${PREFIX}" ]; then
         PREFIX="${SOFTWARE_DIR}$(capitalize "${DEF_NAME}${DEF_POSTFIX}")"
-        debug "An empty prefix in strip_bundle_files() for $(distinct d ${_definition_name}). Resetting to: $(distinct d ${PREFIX})"
+        debug "An empty prefix in strip_bundle_files() for $(distinct d ${_sbfdefinition_name}). Resetting to: $(distinct d ${PREFIX})"
     fi
 
     _dirs_to_strip=""
     case "${DEF_STRIP}" in
         all)
-            debug "strip_bundle_files($(distinct d "${_definition_name}")): Strip both binaries and libraries."
+            debug "strip_bundle_files($(distinct d "${_sbfdefinition_name}")): Strip both binaries and libraries."
             _dirs_to_strip="${PREFIX}/bin ${PREFIX}/sbin ${PREFIX}/lib ${PREFIX}/libexec"
             ;;
 
         exports)
-            debug "strip_bundle_files($(distinct d "${_definition_name}")): Strip exported binaries only"
+            debug "strip_bundle_files($(distinct d "${_sbfdefinition_name}")): Strip exported binaries only"
             _dirs_to_strip="${PREFIX}/bin ${PREFIX}/sbin ${PREFIX}/libexec"
             ;;
 
         libs)
-            debug "strip_bundle_files($(distinct d "${_definition_name}")): Strip libraries only"
+            debug "strip_bundle_files($(distinct d "${_sbfdefinition_name}")): Strip libraries only"
             _dirs_to_strip="${PREFIX}/lib"
             ;;
 
         *)
-            debug "strip_bundle_files($(distinct d "${_definition_name}")): Strip nothing"
+            debug "strip_bundle_files($(distinct d "${_sbfdefinition_name}")): Strip nothing"
             ;;
     esac
     if [ "${DEF_STRIP}" != "no" ]; then
@@ -488,7 +488,7 @@ strip_bundle_files () {
             warn "Debug build is enabled. Strip skipped"
         fi
     fi
-    unset _definition_name _dirs_to_strip _sbresult _counter _files _stripdir _bundlower
+    unset _sbfdefinition_name _dirs_to_strip _sbresult _counter _files _stripdir _bundlower
 }
 
 
@@ -712,29 +712,6 @@ after_install_callback () {
         debug "After install callback: $(distinct d "${DEF_AFTER_INSTALL_CALLBACK}")"
         run "${DEF_AFTER_INSTALL_CALLBACK}"
     fi
-}
-
-
-dump_debug_info () {
-    debug "-------------- PRE CONFIGURE SETTINGS DUMP --------------"
-    debug "CPUS (used): $(distinct d ${CPUS})"
-    debug "ALL_CPUS: $(distinct d ${ALL_CPUS})"
-    debug "MAKE_OPTS: $(distinct d ${MAKE_OPTS})"
-    debug "FETCH_OPTS: $(distinct d ${FETCH_OPTS})"
-    debug "PREFIX: $(distinct d ${PREFIX})"
-    debug "SERVICE_DIR: $(distinct d ${SERVICE_DIR})"
-    debug "CURRENT_DIR: $(distinct d $(${PWD_BIN} 2>/dev/null))"
-    debug "BUILD_DIR_ROOT: $(distinct d ${BUILD_DIR_ROOT})"
-    debug "BUILD_DIR: $(distinct d ${BUILD_DIR})"
-    debug "PATH: $(distinct d ${PATH})"
-    debug "CC: $(distinct d ${CC})"
-    debug "CXX: $(distinct d ${CXX})"
-    debug "CPP: $(distinct d ${CPP})"
-    debug "CXXFLAGS: $(distinct d ${CXXFLAGS})"
-    debug "CFLAGS: $(distinct d ${CFLAGS})"
-    debug "LDFLAGS: $(distinct d ${LDFLAGS})"
-    debug "LD_LIBRARY_PATH: $(distinct d ${LD_LIBRARY_PATH})"
-    debug "-------------- PRE CONFIGURE SETTINGS DUMP ENDS ---------"
 }
 
 
