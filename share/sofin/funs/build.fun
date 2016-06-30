@@ -452,3 +452,289 @@ push_service_stream_archive () {
     fi
     unset _psmirror _pselement _fin_snapfile
 }
+
+
+execute_process () {
+    _app_param="$1"
+    if [ -z "${_app_param}" ]; then
+        error "No param given for execute_process()!"
+    fi
+    _req_definition="${DEFINITIONS_DIR}$(lowercase "${_app_param}")${DEFAULT_DEF_EXT}"
+    debug "Checking requirement: $(distinct d ${_app_param}) file: $(distinct d ${_req_definition})"
+    if [ ! -e "${_req_definition}" ]; then
+        error "Cannot fetch definition: $(distinct e ${_req_definition})! Aborting!"
+    fi
+
+    load_defaults
+    load_defs "${_req_definition}"
+    check_disabled "${DEF_DISABLE_ON}" # check requirement for disabled state:
+
+    setup_sofin_compiler
+    dump_debug_info
+
+    PATH="${PREFIX}/bin:${PREFIX}/sbin:${DEFAULT_PATH}"
+    if [ "${DEFINITION_DISABLED}" != "YES" ]; then
+        if [ -z "${DEF_HTTP_PATH}" ]; then
+            _definition_no_ext="\
+                $(echo "$(${BASENAME_BIN} ${_req_definition} 2>/dev/null)" | \
+                ${SED_BIN} -e 's/\..*$//g' 2>/dev/null)"
+            note "   ${NOTE_CHAR2} $(distinct n "DEF_HTTP_PATH=\"\"") is undefined for: $(distinct n "${_definition_no_ext}")."
+            note "NOTE: It's only valid for meta bundles. You may consider setting: $(distinct n "DEF_CONFIGURE=\"meta\"") in bundle definition file. Type: $(distinct n "s dev ${_definition_no_ext}"))"
+        else
+            _cwd="$(${PWD_BIN} 2>/dev/null)"
+            if [ ! -z "${BUILD_DIR_ROOT}" -a \
+                 ! -z "${BUILD_DIR}" -a \
+                 ! -z "${BUILD_NAMESUM}" ]; then
+                ${MKDIR_BIN} -p "${BUILD_DIR_ROOT}" 2>> ${LOG}
+                cd "${BUILD_DIR_ROOT}"
+                if [ -z "${DEF_GIT_MODE}" ]; then # Standard http tarball method:
+                    _base="$(${BASENAME_BIN} ${DEF_HTTP_PATH} 2>/dev/null)"
+                    debug "DEF_HTTP_PATH: $(distinct d ${DEF_HTTP_PATH}) base: $(distinct d ${_base})"
+                    if [ ! -e "${FILE_CACHE_DIR}/${_base}" ]; then
+                        note "   ${NOTE_CHAR} Fetching required tarball source: $(distinct n ${_base})"
+                        cd "${FILE_CACHE_DIR}"
+                        retry "${FETCH_BIN} ${FETCH_OPTS} ${DEF_HTTP_PATH}"
+                    fi
+                    cd "${BUILD_DIR_ROOT}"
+                    _dest_file="${FILE_CACHE_DIR}/${_base}"
+                    debug "Build root: $(distinct d ${BUILD_DIR_ROOT}), file: $(distinct d ${_dest_file})"
+                    if [ -z "${DEF_SHA}" ]; then
+                        error "Missing SHA sum for source: $(distinct e ${_dest_file})!"
+                    else
+                        _a_file_checksum="$(file_checksum ${_dest_file})"
+                        if [ "${_a_file_checksum}" = "${DEF_SHA}" ]; then
+                            debug "Source tarball checksum is fine"
+                        else
+                            warn "${WARN_CHAR} Source tarball checksum mismatch detected!"
+                            warn "${WARN_CHAR} $(distinct w ${_a_file_checksum}) vs $(distinct w ${DEF_SHA})"
+                            warn "${WARN_CHAR} Removing corrupted file from cache: $(distinct w ${_dest_file}) and retrying.."
+                            # remove corrupted file
+                            ${RM_BIN} -vf "${_dest_file}" >> ${LOG} 2>> ${LOG}
+                            # and restart script with same arguments:
+                            debug "Evaluating again: $(distinct d "execute_process(${_app_param})")"
+                            execute_process "${_app_param}"
+                        fi
+                    fi
+
+                    note "   ${NOTE_CHAR} Unpacking source tarball of: $(distinct n "${DEF_NAME}${DEF_POSTFIX}")"
+                    debug "Build dir root: $(distinct d "${BUILD_DIR_ROOT}")"
+                    try "${TAR_BIN} --directory ${BUILD_DIR_ROOT} -xf ${_dest_file}" || \
+                    try "${TAR_BIN} --directory ${BUILD_DIR_ROOT} -xfj ${_dest_file}" || \
+                    run "${TAR_BIN} --directory ${BUILD_DIR_ROOT} -xfJ ${_dest_file}"
+                else
+                    # git method:
+                    # .cache/git-cache => git bare repos
+                    ${MKDIR_BIN} -p ${GIT_CACHE_DIR}
+                    _git_cached="${GIT_CACHE_DIR}${DEF_NAME}${DEF_VERSION}.git"
+                    note "   ${NOTE_CHAR} Fetching git repository: $(distinct n ${DEF_HTTP_PATH}${reset})"
+                    try "${GIT_BIN} clone ${DEFAULT_GIT_OPTS} --depth 1 --bare ${DEF_HTTP_PATH} ${_git_cached}" || \
+                    try "${GIT_BIN} clone ${DEFAULT_GIT_OPTS} --depth 1 --bare ${DEF_HTTP_PATH} ${_git_cached}"
+                    if [ "$?" = "0" ]; then
+                        debug "Fetched bare repository: $(distinct d ${DEF_NAME}${DEF_VERSION})"
+                    else
+                        if [ ! -d "${_git_cached}/branches" -a ! -f "${_git_cached}/config" ]; then
+                            note "\n${red}Definitions were not updated. Showing $(distinct n ${LOG_LINES_AMOUNT_ON_ERR}) lines of internal log:${reset}"
+                            ${TAIL_BIN} -n${LOG_LINES_AMOUNT_ON_ERR} ${LOG} 2>/dev/null
+                            note "$(fill)"
+                        else
+                            current="$(${PWD_BIN} 2>/dev/null)"
+                            debug "Trying to update existing bare repository cache in: $(distinct d ${_git_cached})"
+                            cd "${_git_cached}"
+                            try "${GIT_BIN} fetch ${DEFAULT_GIT_OPTS} origin ${DEF_GIT_CHECKOUT}" || \
+                                try "${GIT_BIN} fetch ${DEFAULT_GIT_OPTS} origin" || \
+                                warn "   ${WARN_CHAR} Failed to fetch an update from bare repository: $(distinct w ${_git_cached})"
+                            # for empty DEF_VERSION it will fill it with first 16 chars of repository HEAD SHA1:
+                            if [ -z "${DEF_VERSION}" ]; then
+                                DEF_VERSION="$(${GIT_BIN} rev-parse HEAD 2>/dev/null | ${CUT_BIN} -c -16 2>/dev/null)"
+                                debug "Set DEF_VERSION=$(distinct d ${DEF_VERSION}) - based on git commit sha"
+                            fi
+                            cd "${current}"
+                        fi
+                    fi
+                    # bare repository is already cloned, so we just clone from it now..
+                    run "${GIT_BIN} clone ${DEFAULT_GIT_OPTS} ${_git_cached} ${DEF_NAME}${DEF_VERSION}" && \
+                    debug "Cloned git respository from git bare cache repository"
+                fi
+
+                _fd="$(${FIND_BIN} "${BUILD_DIR_ROOT}" -maxdepth 1 -mindepth 1 -type d -iname "*${_app_param}*${DEF_VERSION}*" 2>/dev/null)"
+                cd "${_fd}"
+                # Handle DEF_SOURCE_DIR_POSTFIX here
+                if [ ! -z "${DEF_SOURCE_DIR_POSTFIX}" ]; then
+                    ${MKDIR_BIN} -p "${DEF_SOURCE_DIR_POSTFIX}"
+                    cd "${DEF_SOURCE_DIR_POSTFIX}"
+                fi
+                debug "Switched to build dir root: $(distinct d "$(${PWD_BIN} 2>/dev/null)")"
+
+                if [ ! -z "${DEF_GIT_CHECKOUT}" ]; then
+                    note "   ${NOTE_CHAR} Definition branch: $(distinct n ${DEF_GIT_CHECKOUT})"
+                    _current_branch="$(${GIT_BIN} rev-parse --abbrev-ref HEAD 2>/dev/null)"
+                    if [ "${_current_branch}" != "${DEF_GIT_CHECKOUT}" ]; then
+                        try "${GIT_BIN} checkout ${DEFAULT_GIT_OPTS} -b ${DEF_GIT_CHECKOUT}"
+                    fi
+                    try "${GIT_BIN} checkout ${DEFAULT_GIT_OPTS} ${DEF_GIT_CHECKOUT}"
+                fi
+
+                after_update_callback
+
+                _pcpaname="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
+                _pcpatch_dir="${DEFINITIONS_DIR}patches/${_app_param}"
+                if [ -d "${_pcpatch_dir}" ]; then
+                    _ps_patches="$(${FIND_BIN} ${_pcpatch_dir}/* -maxdepth 0 -type f 2>/dev/null)"
+                    ${TEST_BIN} ! -z "${_ps_patches}" && \
+                    note "   ${NOTE_CHAR} Applying common patches for: $(distinct n "${DEF_NAME}${DEF_POSTFIX}")"
+                    for _patch in ${_ps_patches}; do
+                        for _level in 0 1 2 3 4 5; do
+                            debug "Trying to patch source with patch: $(distinct d ${_patch}), level: $(distinct d ${_level})"
+                            ${PATCH_BIN} -p${_level} -N -f -i "${_patch}" >> "${LOG}-${_pcpaname}" 2>> "${LOG}-${_pcpaname}" # don't use run.. it may fail - we don't care
+                            if [ "$?" = "0" ]; then # skip applying single patch if it already passed
+                                debug "Patch: $(distinct d ${_patch}) applied successfully!"
+                                break;
+                            fi
+                        done
+                    done
+                    _pspatch_dir="${_pcpatch_dir}/${SYSTEM_NAME}"
+                    debug "Checking psp dir: $(distinct d ${_pspatch_dir})"
+                    if [ -d "${_pspatch_dir}" ]; then
+                        note "   ${NOTE_CHAR} Applying platform specific patches for: $(distinct n ${DEF_NAME}${DEF_POSTFIX}/${SYSTEM_NAME})"
+                        _ps_patches="$(${FIND_BIN} ${_pspatch_dir}/* -maxdepth 0 -type f 2>/dev/null)"
+                        ${TEST_BIN} ! -z "${_ps_patches}" && \
+                        for _pspp in ${_ps_patches}; do
+                            for _level in 0 1 2 3 4 5; do
+                                debug "Patching source code with pspatch: $(distinct d ${_pspp}) (p$(distinct d ${_level}))"
+                                ${PATCH_BIN} -p${_level} -N -f -i "${_pspp}" >> "${LOG}-${_pcpaname}" 2>> "${LOG}-${_pcpaname}"
+                                if [ "$?" = "0" ]; then # skip applying single patch if it already passed
+                                    debug "Patch: $(distinct d ${_pspp}) applied successfully!"
+                                    break;
+                                fi
+                            done
+                        done
+                    fi
+                fi
+
+                after_patch_callback
+
+                note "   ${NOTE_CHAR} Configuring: $(distinct n ${_app_param}), version: $(distinct n ${DEF_VERSION})"
+                case "${DEF_CONFIGURE}" in
+
+                    ignore)
+                        note "   ${NOTE_CHAR} Configuration skipped for definition: $(distinct n ${_app_param})"
+                        ;;
+
+                    no-conf)
+                        note "   ${NOTE_CHAR} No configuration for definition: $(distinct n ${_app_param})"
+                        DEF_MAKE_METHOD="${DEF_MAKE_METHOD} PREFIX=${PREFIX}"
+                        DEF_INSTALL_METHOD="${DEF_INSTALL_METHOD} PREFIX=${PREFIX}"
+                        ;;
+
+                    binary)
+                        note "   ${NOTE_CHAR} Prebuilt definition of: $(distinct n ${_app_param})"
+                        DEF_MAKE_METHOD="true"
+                        DEF_INSTALL_METHOD="true"
+                        ;;
+
+                    posix)
+                        run "./configure -prefix ${PREFIX} -cc $(${BASENAME_BIN} ${CC} 2>/dev/null) ${DEF_CONFIGURE_ARGS}"
+                        ;;
+
+                    cmake)
+                        ${TEST_BIN} -z "${DEF_CMAKE_BUILD_DIR}" && DEF_CMAKE_BUILD_DIR="." # default - cwd
+                        run "${DEF_CONFIGURE} ${DEF_CMAKE_BUILD_DIR} -LH -DCMAKE_INSTALL_RPATH=\"${PREFIX}/lib;${PREFIX}/libexec\" -DCMAKE_INSTALL_PREFIX=${PREFIX} -DCMAKE_BUILD_TYPE=Release -DSYSCONFDIR=${SERVICE_DIR}/etc -DDOCDIR=${SERVICE_DIR}/share/doc -DJOB_POOL_COMPILE=${CPUS} -DJOB_POOL_LINK=${CPUS} -DCMAKE_C_FLAGS=\"${CFLAGS}\" -DCMAKE_CXX_FLAGS=\"${CXXFLAGS}\" ${DEF_CONFIGURE_ARGS}"
+                        ;;
+
+                    void|meta|empty|none)
+                        DEF_MAKE_METHOD="true"
+                        DEF_INSTALL_METHOD="true"
+                        ;;
+
+                    *)
+                        unset _pic_optional
+                        if [ "${SYSTEM_NAME}" != "Darwin" ]; then
+                            _pic_optional="--with-pic"
+                        fi
+                        if [ "${SYSTEM_NAME}" = "Linux" ]; then
+                            # NOTE: No /Services feature implemented for Linux.
+                            echo "${DEF_CONFIGURE}" | ${GREP_BIN} "configure" >/dev/null 2>&1
+                            if [ "$?" = "0" ]; then
+                                try "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${PREFIX} ${_pic_optional} --sysconfdir=/etc" || \
+                                try "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${PREFIX} ${_pic_optional}" || \
+                                run "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${PREFIX}" # fallback
+                            else
+                                try "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${PREFIX}" || \
+                                run "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS}" # Trust definition
+                            fi
+                        else
+                            # do a simple check for "configure" in DEF_CONFIGURE definition
+                            # this way we can tell if we want to put configure options as params
+                            echo "${DEF_CONFIGURE}" | ${GREP_BIN} "configure" >/dev/null 2>&1
+                            if [ "$?" = "0" ]; then
+                                # TODO: add --docdir=${PREFIX}/docs
+                                # NOTE: By default try to configure software with these options:
+                                #   --sysconfdir=${SERVICE_DIR}/etc
+                                #   --localstatedir=${SERVICE_DIR}/var
+                                #   --runstatedir=${SERVICE_DIR}/run
+                                #   --with-pic
+                                # OPTIMIZE: TODO: XXX: use ./configure --help | grep option to
+                                #      build configure options quickly
+                                try "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${PREFIX} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var --runstatedir=${SERVICE_DIR}/run ${_pic_optional}" || \
+                                try "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${PREFIX} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var ${_pic_optional}" || \
+                                try "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${PREFIX} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var" || \
+                                try "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${PREFIX} --sysconfdir=${SERVICE_DIR}/etc ${_pic_optional}" || \
+                                try "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${PREFIX} --sysconfdir=${SERVICE_DIR}/etc" || \
+                                try "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${PREFIX} ${_pic_optional}" || \
+                                run "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${PREFIX}" # last two - only as a fallback
+
+                            else # fallback again:
+                                # NOTE: First - try to specify GNU prefix,
+                                # then trust prefix given in software definition.
+                                try "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${PREFIX}" || \
+                                run "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS}"
+                            fi
+                        fi
+                        ;;
+
+                esac
+
+                after_configure_callback
+            else
+                error "These values cannot be empty: BUILD_DIR, BUILD_DIR_ROOT, BUILD_NAMESUM"
+            fi
+
+            # and common part between normal and continue modes:
+            note "   ${NOTE_CHAR} Building requirement: $(distinct n ${_app_param})"
+            try "${DEF_MAKE_METHOD}" || \
+            run "${DEF_MAKE_METHOD}"
+            after_make_callback
+
+            debug "Cleaning man dir from previous dependencies, we want to install man pages that belong to LAST requirement which is app bundle itself"
+            for place in man share/man share/info share/doc share/docs; do
+                ${FIND_BIN} "${PREFIX}/${place}" -delete 2>/dev/null
+            done
+
+            note "   ${NOTE_CHAR} Installing requirement: $(distinct n ${_app_param})"
+            run "${DEF_INSTALL_METHOD}"
+            after_install_callback
+
+            debug "Marking $(distinct d ${_app_param}) as installed in: $(distinct d ${PREFIX})"
+            ${TOUCH_BIN} "${PREFIX}/${_app_param}${INSTALLED_MARK}"
+            debug "Writing version: $(distinct d ${DEF_VERSION}) of software: $(distinct d ${DEF_NAME}) installed in: $(distinct d ${PREFIX})"
+            ${PRINTF_BIN} "${DEF_VERSION}" > "${PREFIX}/${_app_param}${INSTALLED_MARK}"
+
+            if [ -z "${DEVEL}" ]; then # if devel mode not set
+                debug "Cleaning build dir: $(distinct d ${BUILD_DIR_ROOT}) of bundle: $(distinct d ${DEF_NAME}${DEF_POSTFIX}), after successful build."
+                ${RM_BIN} -rf "${BUILD_DIR_ROOT}/${_app_param}-${DEF_VERSION}" >> ${LOG} 2>> ${LOG}
+            else
+                debug "Leaving build dir intact when working in devel mode. Last build dir: $(distinct d ${BUILD_DIR_ROOT})"
+            fi
+            cd "${_cwd}" 2>/dev/null
+            unset _cwd
+        fi
+    else
+        warn "   ${WARN_CHAR} Requirement: $(distinct w ${DEF_NAME}) disabled on: $(distinct w ${SYSTEM_NAME})"
+        if [ ! -d "${PREFIX}" ]; then # case when disabled requirement is first on list of dependencies
+            ${MKDIR_BIN} -p "${PREFIX}"
+        fi
+        ${TOUCH_BIN} "${PREFIX}/${_req}${INSTALLED_MARK}"
+        ${PRINTF_BIN} "os-default" > "${PREFIX}/${_req}${INSTALLED_MARK}"
+    fi
+    unset _req _current_branch
+}
