@@ -3,7 +3,7 @@ check_version () { # $1 => installed version, $2 => available version
         if [ ! "${2}" = "" ]; then
             if [ ! "${1}" = "${2}" ]; then
                 warn "Bundle: $(distinct w ${application}), version: $(distinct w ${2}) is definied, but installed version is: $(distinct w ${1})"
-                export outdated=YES
+                FOUND_OUTDATED=YES
             fi
         fi
     fi

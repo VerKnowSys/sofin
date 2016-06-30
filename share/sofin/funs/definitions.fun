@@ -357,7 +357,7 @@ show_outdated () {
         done
     fi
 
-    if [ "${outdated}" = "YES" ]; then
+    if [ "${FOUND_OUTDATED}" = "YES" ]; then
         exit 1
     else
         note "All installed bundles looks recent"
