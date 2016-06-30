@@ -220,3 +220,21 @@ find_most_recent () {
     fi
     unset _frpath _frmatcher _frtype _frfind_results _frres_singleline
 }
+
+
+text_checksum () {
+    _fcsmname="$1"
+    if [ -z "${_fcsmname}" ]; then
+        error "Empty content string given for function: $(distinct e "text_checksum()")"
+    fi
+    case ${SYSTEM_NAME} in
+        Minix|Darwin|Linux)
+            ${PRINTF_BIN} "${_fcsmname}" | ${SHA_BIN} 2>/dev/null | ${CUT_BIN} -d' ' -f1 2>/dev/null
+            ;;
+
+        FreeBSD)
+            ${PRINTF_BIN} "${_fcsmname}" | ${SHA_BIN} 2>/dev/null
+            ;;
+    esac
+    unset _fcsmname
+}
