@@ -555,12 +555,14 @@ execute_process () {
 
                 _fd="$(${FIND_BIN} "${BUILD_DIR_ROOT}" -maxdepth 1 -mindepth 1 -type d -iname "*${_app_param}*${DEF_VERSION}*" 2>/dev/null)"
                 cd "${_fd}"
+
                 # Handle DEF_SOURCE_DIR_POSTFIX here
-                if [ ! -z "${DEF_SOURCE_DIR_POSTFIX}" ]; then
-                    ${MKDIR_BIN} -p "${DEF_SOURCE_DIR_POSTFIX}"
-                    cd "${DEF_SOURCE_DIR_POSTFIX}"
+                if [ ! -z "${_fd}/${DEF_SOURCE_DIR_POSTFIX}" ]; then
+                    ${MKDIR_BIN} -p "${_fd}/${DEF_SOURCE_DIR_POSTFIX}"
+                    cd "${_fd}/${DEF_SOURCE_DIR_POSTFIX}"
                 fi
-                debug "Switched to build dir root: $(distinct d "$(${PWD_BIN} 2>/dev/null)")"
+                _pwd="$(${PWD_BIN} 2>/dev/null)"
+                debug "Switched to build dir root: $(distinct d "${_pwd}")"
 
                 if [ ! -z "${DEF_GIT_CHECKOUT}" ]; then
                     note "   ${NOTE_CHAR} Definition branch: $(distinct n ${DEF_GIT_CHECKOUT})"
