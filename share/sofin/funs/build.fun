@@ -553,7 +553,18 @@ execute_process () {
                     debug "Cloned git respository from git bare cache repository"
                 fi
 
-                _fd="$(${FIND_BIN} "${BUILD_DIR_ROOT}" -maxdepth 1 -mindepth 1 -type d -iname "*${_app_param}*${DEF_VERSION}*" 2>/dev/null)"
+                debug "_app_param: ${_app_param}, DEF_NAME: ${DEF_NAME}, BUILD_DIR_ROOT: ${BUILD_DIR_ROOT}"
+                # NOTE: patterns sorted by safety
+                for _pati in "*${_app_param}*${DEF_VERSION}*" "*${_app_param}*" "*${DEF_NAME}*${DEF_VERSION}*"  "*${DEF_NAME}*${DEF_VERSION}*" "*${DEF_NAME}*" "*$(lowercase "${DEF_NAME}")*"; do
+                    _fd="$(${FIND_BIN} "${BUILD_DIR_ROOT}" -maxdepth 1 -mindepth 1 -type d -iname "${_pati}" 2>/dev/null)"
+                    if [ ! -z "${_fd}" ]; then
+                        debug "Found build dir: $(distinct d "${_fd}"), for definition: $(distinct d "${DEF_NAME}")"
+                        break
+                    fi
+                done
+                if [ -z "${_fd}" ]; then
+                    error "No source dir found for definition: $(distinct e "${_app_param}")?"
+                fi
                 cd "${_fd}"
 
                 # Handle DEF_SOURCE_DIR_POSTFIX here
