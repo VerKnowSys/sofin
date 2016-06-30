@@ -268,11 +268,6 @@ build_all () {
                 _common_lowercase="${DEF_NAME}${DEF_POSTFIX}"
                 DEF_NAME="$(capitalize ${_common_lowercase})"
 
-                # some additional convention check:
-                if [ "${DEF_NAME}" != "${_specified}" -a \
-                     "${_common_lowercase}" != "${_specified}" ]; then
-                    warn "You specified lowercase name of bundle: $(distinct w ${_specified}), which is in contradiction to Sofin's convention (bundle - capitalized: f.e. 'Rust', dependencies and definitions - lowercase: f.e. 'yaml')."
-                fi
                 # if definition requires root privileges, throw an "exception":
                 if [ ! -z "${REQUIRE_ROOT_ACCESS}" ]; then
                     if [ "${USERNAME}" != "root" ]; then
