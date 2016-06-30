@@ -128,3 +128,18 @@ validate_archive_sha1 () {
     fi
     unset _sha1_value _current_sha_file _current_archive_sha1 _archive_name
 }
+
+
+validate_definition_postfix () {
+    __cut_ext_guard='${SED_BIN} -e "s#${DEFAULT_DEF_EXT}##" 2>/dev/null'
+    _cigiven_name="$(${BASENAME_BIN} "$(echo "$(lowercase "${1}")" | eval "${__cut_ext_guard}")")"
+    _cidefinition_name="$(${BASENAME_BIN} "$(echo "$(lowercase "${1}")" | eval "${__cut_ext_guard}")")"
+    # case when DEF_POSTFIX was ommited => use definition file name difference as POSTFIX:
+    _cispc_nme_diff="$(difftext "${_cigiven_name}" "${_cidefinition_name}")"
+    if [ -z "${DEF_POSTFIX}" -a \
+       ! -z "${_cispc_nme_diff}" ]; then
+       debug "Inferred value from definition file name: DEF_POSTFIX=$(distinct d "${_cispc_nme_diff}")"
+       DEF_POSTFIX="${_cispc_nme_diff}"
+    fi
+    unset _cidefinition_name _cigiven_name _cispec_name_diff __cut_ext_guard
+}
