@@ -16,6 +16,10 @@ load_defs () {
             else
                 error "Can't find definition to load: $(distinct e ${_definition}) from dir: $(distinct e "${DEFINITIONS_DIR}")"
             fi
+
+            # if definition lacks definition of DEF_POSTFIX, after loading
+            # the definition file, try to infer DEF_POSTFIX:
+            validate_definition_postfix "${_given_def}" "${DEF_NAME}"
         done
     fi
 
