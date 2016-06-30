@@ -281,7 +281,7 @@ build_all () {
                 fi
 
                 export PREFIX="${SOFTWARE_DIR}$(capitalize "${_common_lowercase}")"
-                export SERVICE_DIR="${SERVICES_DIR}${_common_lowercase}"
+                export SERVICE_DIR="${SERVICES_DIR}$(capitalize "${_common_lowercase}")"
                 if [ ! -z "${DEF_STANDALONE}" ]; then
                     ${MKDIR_BIN} -p "${SERVICE_DIR}"
                     ${CHMOD_BIN} 0710 "${SERVICE_DIR}"
