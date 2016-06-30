@@ -275,12 +275,19 @@ build_all () {
                     fi
                 fi
 
-                export PREFIX="${SOFTWARE_DIR}$(capitalize "${_common_lowercase}")"
-                export SERVICE_DIR="${SERVICES_DIR}$(capitalize "${_common_lowercase}")"
+                PREFIX="${SOFTWARE_DIR}$(capitalize "${_common_lowercase}")"
+                BUILD_DIR="${SOFTWARE_DIR}.src"
+                ${MKDIR_BIN} -p "${BUILD_DIR}" >/dev/null 2>> ${LOG}
+
+                SERVICE_DIR="${SERVICES_DIR}$(capitalize "${_common_lowercase}")"
                 if [ ! -z "${DEF_STANDALONE}" ]; then
-                    ${MKDIR_BIN} -p "${SERVICE_DIR}"
+                    ${MKDIR_BIN} -p "${SERVICE_DIR}" >/dev/null 2>> ${LOG}
                     ${CHMOD_BIN} 0710 "${SERVICE_DIR}"
                 fi
+
+                BUILD_NAMESUM="$(text_checksum "${DEF_NAME}${DEF_POSTFIX}-${DEF_VERSION}")"
+                BUILD_DIR_ROOT="${BUILD_DIR}/${BUILD_NAMESUM}"
+                ${MKDIR_BIN} -p "${BUILD_DIR_ROOT}" >/dev/null 2>> ${LOG}
 
                 # binary build of whole software bundle
                 _full_bund_name="${_common_lowercase}-${DEF_VERSION}"
@@ -288,23 +295,17 @@ build_all () {
 
                 _an_archive="$(capitalize "${_common_lowercase}")-${DEF_VERSION}${DEFAULT_ARCHIVE_EXT}"
                 INSTALLED_INDICATOR="${PREFIX}/${_common_lowercase}${INSTALLED_MARK}"
-
-                if [ "${SOFIN_CONTINUE_BUILD}" = "YES" ]; then # normal build by default
-                    note "Continuing build in: $(distinct n ${PREVIOUS_BUILD_DIR})"
-                    cd "${PREVIOUS_BUILD_DIR}"
+                if [ ! -e "${INSTALLED_INDICATOR}" ]; then
+                    try_fetch_binbuild "${_full_bund_name}" "${_common_lowercase}" "${_an_archive}"
                 else
-                    if [ ! -e "${INSTALLED_INDICATOR}" ]; then
-                        try_fetch_binbuild "${_full_bund_name}" "${_common_lowercase}" "${_an_archive}"
+                    _already_installed_version="$(${CAT_BIN} ${INSTALLED_INDICATOR} 2>/dev/null)"
+                    if [ "${DEF_VERSION}" = "${_already_installed_version}" ]; then
+                        debug "$(distinct d ${_common_lowercase}) bundle is installed with version: $(distinct d ${_already_installed_version})"
                     else
-                        _already_installed_version="$(${CAT_BIN} ${INSTALLED_INDICATOR} 2>/dev/null)"
-                        if [ "${DEF_VERSION}" = "${_already_installed_version}" ]; then
-                            debug "$(distinct d ${_common_lowercase}) bundle is installed with version: $(distinct d ${_already_installed_version})"
-                        else
-                            warn "$(distinct w ${_common_lowercase}) bundle is installed with version: $(distinct w ${_already_installed_version}), different from defined: $(distinct w "${DEF_VERSION}")"
-                        fi
-                        DONT_BUILD_BUT_DO_EXPORTS=YES
-                        unset _already_installed_version
+                        warn "$(distinct w ${_common_lowercase}) bundle is installed with version: $(distinct w ${_already_installed_version}), different from defined: $(distinct w "${DEF_VERSION}")"
                     fi
+                    DONT_BUILD_BUT_DO_EXPORTS=YES
+                    unset _already_installed_version
                 fi
 
                 if [ -z "${DONT_BUILD_BUT_DO_EXPORTS}" ]; then
@@ -326,11 +327,11 @@ build_all () {
                         else
                             note "  ${_req} ($(distinct n ${_req_amount}) of $(distinct n ${_req_all}) remaining)"
                             if [ ! -e "${PREFIX}/${_req}${INSTALLED_MARK}" ]; then
-                                export CHANGED=YES
+                                CHANGED=YES
                                 execute_process "${_req}"
                             fi
                         fi
-                        export _req_amount="$(${PRINTF_BIN} "${_req_amount} - 1\n" | ${BC_BIN} 2>/dev/null)"
+                        _req_amount="$(${PRINTF_BIN} "${_req_amount} - 1\n" | ${BC_BIN} 2>/dev/null)"
                     done
                 fi
 
@@ -382,8 +383,9 @@ dump_debug_info () {
     debug "PREFIX: $(distinct d ${PREFIX})"
     debug "SERVICE_DIR: $(distinct d ${SERVICE_DIR})"
     debug "CURRENT_DIR: $(distinct d $(${PWD_BIN} 2>/dev/null))"
-    debug "BUILD_DIR_ROOT: $(distinct d ${BUILD_DIR_ROOT})"
+    debug "BUILD_NAMESUM: $(distinct d ${BUILD_NAMESUM})"
     debug "BUILD_DIR: $(distinct d ${BUILD_DIR})"
+    debug "BUILD_DIR_ROOT: $(distinct d ${BUILD_DIR_ROOT})"
     debug "PATH: $(distinct d ${PATH})"
     debug "CC: $(distinct d ${CC})"
     debug "CXX: $(distinct d ${CXX})"

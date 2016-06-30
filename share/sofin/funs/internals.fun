@@ -106,7 +106,7 @@ get_shell_vars () {
     # LD_LIBRARY_PATH, LDFLAGS, PKG_CONFIG_PATH:
     # ldresult="/lib:/usr/lib"
     pkg_config_path="."
-    export ldflags="${LDFLAGS} ${DEFAULT_LDFLAGS}"
+    ldflags="${LDFLAGS} ${DEFAULT_LDFLAGS}"
     process () {
         for app in ${1}*; do # LIB_DIR
             if [ -e "${app}/lib" ]; then
