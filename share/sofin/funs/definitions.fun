@@ -134,13 +134,13 @@ update_definitions () {
                 try "${GIT_BIN} checkout ${DEFAULT_GIT_OPTS} ${_current_branch}" || \
                     warn "Can't checkout branch: $(distinct w ${_current_branch})"
 
-            try "${GIT_BIN} pull ${DEFAULT_GIT_OPTS} origin ${_current_branch}" && \
+            ${GIT_BIN} pull ${DEFAULT_GIT_OPTS} origin ${_current_branch} && \
                 note "Branch: $(distinct n ${_current_branch}) is at: $(distinct n ${_latestsha})" && \
                 return
 
             note "${red}Error occured: Update from branch: $(distinct e ${BRANCH}) of repository: $(distinct e ${REPOSITORY}) wasn't possible. Log below:${reset}"
             ${TAIL_BIN} -n${LOG_LINES_AMOUNT_ON_ERR} "${LOG}" 2>/dev/null
-            error "$(fill)"
+            return
 
         else # else use default branch
             debug "Using default branch: $(distinct d ${BRANCH})"
@@ -155,7 +155,7 @@ update_definitions () {
 
             note "${red}Error occured: Update from branch: $(distinct e ${BRANCH}) of repository: $(distinct e ${REPOSITORY}) wasn't possible. Log's below:${reset}"
             ${TAIL_BIN} -n${LOG_LINES_AMOUNT_ON_ERR} ${LOG} 2>/dev/null
-            error "$(fill)"
+            return
         fi
     else
         # create cache; clone definitions repository:
@@ -184,26 +184,8 @@ update_definitions () {
 
         note "${red}Error occured: Update from branch: $(distinct n ${BRANCH}) of repository: $(distinct n ${REPOSITORY}) wasn't possible. Log below:${reset}"
         ${TAIL_BIN} -n${LOG_LINES_AMOUNT_ON_ERR} ${LOG} 2>/dev/null
-        error "$(fill)"
+        return
     fi
-}
-
-
-file_checksum () {
-    _fcsmname="$1"
-    if [ -z "${_fcsmname}" ]; then
-        error "Empty file name given for function: $(distinct e "file_checksum()")"
-    fi
-    case ${SYSTEM_NAME} in
-        Minix|Darwin|Linux)
-            ${PRINTF_BIN} "$(${SHA_BIN} "${_fcsmname}" 2>/dev/null | ${CUT_BIN} -d' ' -f1 2>/dev/null)"
-            ;;
-
-        FreeBSD)
-            ${PRINTF_BIN} "$(${SHA_BIN} -q "${_fcsmname}" 2>/dev/null)"
-            ;;
-    esac
-    unset _fcsmname
 }
 
 
@@ -253,19 +235,17 @@ remove_bundles () {
             fi
             _aname="$(lowercase "${_given_name}")"
             debug "Given name: _given_name: ${_given_name}, _aname: ${_aname}"
-            note "Removing software bundle(s): $(distinct n ${_given_name})"
-            if [ -z "${_aname}" ]; then
-                ${RM_BIN} -rfv "${SOFTWARE_DIR}${_given_name}" >> "${LOG}" 2>> "${LOG}"
-            else
-                ${RM_BIN} -rfv "${SOFTWARE_DIR}${_given_name}" >> "${LOG}-${_aname}" 2>> "${LOG}-${_aname}"
-                # if removing a single bundle, then look for alternatives. Otherwise, just remove bundle..
-                debug "_picked_bundles: ${_picked_bundles}, _given_name: ${_given_name}"
-                if [ ! "${_picked_bundles}" = "${_given_name}" ]; then
-                    debug "Looking for other installed versions of: $(distinct d ${_aname}), that might be exported automatically.."
-                    _inname="$(echo "${_given_name}" | ${SED_BIN} 's/[0-9]*//g' 2>/dev/null)"
-                    _alternative="$(${FIND_BIN} ${SOFTWARE_DIR} -maxdepth 1 -type d -name "${_inname}*" -not -name "${_given_name}" 2>/dev/null | ${SED_BIN} 's/^.*\///g' 2>/dev/null | ${HEAD_BIN} -n1 2>/dev/null)"
-                fi
+            note "Removing software bundle(s): $(distinct n "${_given_name}")"
+            ${RM_BIN} -rf "${SOFTWARE_DIR}${_given_name}" >/dev/null 2>> "${LOG}-${_aname}"
+
+            # if removing a single bundle, then look for alternatives. Otherwise, just remove bundle..
+            debug "_picked_bundles: ${_picked_bundles}, _given_name: ${_given_name}"
+            if [ "${_picked_bundles}" = "${_given_name}" ]; then
+                debug "Looking for other installed versions of: $(distinct d ${_aname}), that might be exported automatically.."
+                _inname="$(echo "$(lowercase "${_given_name}")" | ${SED_BIN} 's/[0-9]*//g' 2>/dev/null)"
+                _alternative="$(${FIND_BIN} ${SOFTWARE_DIR} -mindepth 1 -maxdepth 1 -type d -iname "${_inname}*" -not -name "${_given_name}" 2>/dev/null | ${SED_BIN} 's/^.*\///g' 2>/dev/null | ${HEAD_BIN} -n1 2>/dev/null)"
             fi
+
             if [ ! -z "${_alternative}" -a \
                    -f "${SOFTWARE_DIR}${_alternative}/$(lowercase ${_alternative})${INSTALLED_MARK}" ]; then
                 note "Updating environment with already installed alternative: $(distinct n ${_alternative})"
