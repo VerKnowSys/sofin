@@ -14,7 +14,8 @@ load_defs () {
                 debug "Loading definition: $(distinct d ${DEFINITIONS_DIR}${_definition})"
                 . ${DEFINITIONS_DIR}${_definition}
             else
-                error "Can't find definition to load: $(distinct e ${_definition}) from dir: $(distinct e "${DEFINITIONS_DIR}")"
+                # validate available alternatives
+                validate_alternatives "${_given_def}"
             fi
 
             # if definition lacks definition of DEF_POSTFIX, after loading
