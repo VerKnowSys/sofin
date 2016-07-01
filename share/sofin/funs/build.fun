@@ -232,21 +232,18 @@ build_all () {
     _build_list=$*
 
     # Update definitions and perform more checks
-    check_requirements
+    validate_requirements
 
     PATH="${DEFAULT_PATH}"
     for _bund_name in ${_build_list}; do
         _specified="${_bund_name}" # store original value of user input
         _bund_name="$(lowercase "${_bund_name}")"
         load_defaults
-        validate_alternatives "${_bund_name}"
-        load_defs "${_bund_name}" # prevent installation of requirements of disabled _defname:
-        check_disabled "${DEF_DISABLE_ON}" # after which just check if it's not disabled
+        load_defs "${_bund_name}"
         _pref_base="$(${BASENAME_BIN} "${PREFIX}" 2>/dev/null)"
-        if [ "${DEFINITION_DISABLED}" = "YES" -a \
-             ! -z "${_pref_base}" -a \
-             "/" != "${_pref_base}" ]; then
-            warn "Bundle: $(distinct w ${_bund_name}) disabled on: $(distinct w "${OS_TRIPPLE}")"
+        if [ "${DEF_DISABLED}" = "YES" ]; then
+            _anm="$(capitalize "${_bund_name}")"
+            warn "Bundle: $(distinct w "${_anm}") is disabled on: $(distinct w "${OS_TRIPPLE}")"
             ${RM_BIN} -rf "${PREFIX}" >> ${LOG} 2>> ${LOG}
             unset _pref_base
         else
@@ -261,7 +258,6 @@ build_all () {
                 else
                     pretouch_logs ${DEF_REQUIREMENTS}
                 fi
-                check_disabled "${DEF_DISABLE_ON}" # after which just check if it's not disabled
 
                 # Note: this acutally may break definitions like ImageMagick..
                 #_common_lowercase="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
@@ -468,13 +464,12 @@ execute_process () {
 
     load_defaults
     load_defs "${_req_definition}"
-    check_disabled "${DEF_DISABLE_ON}" # check requirement for disabled state:
 
     setup_sofin_compiler
     dump_debug_info
 
     PATH="${PREFIX}/bin:${PREFIX}/sbin:${DEFAULT_PATH}"
-    if [ "${DEFINITION_DISABLED}" != "YES" ]; then
+    if [ -z "${DEF_DISABLED}" ]; then
         if [ -z "${DEF_HTTP_PATH}" ]; then
             _definition_no_ext="\
                 $(echo "$(${BASENAME_BIN} ${_req_definition} 2>/dev/null)" | \
@@ -506,15 +501,16 @@ execute_process () {
                         if [ "${_a_file_checksum}" = "${DEF_SHA}" ]; then
                             debug "Source tarball checksum is fine"
                         else
-                            warn "${WARN_CHAR} Source tarball checksum mismatch detected!"
-                            warn "${WARN_CHAR} $(distinct w ${_a_file_checksum}) vs $(distinct w ${DEF_SHA})"
-                            warn "${WARN_CHAR} Removing corrupted file from cache: $(distinct w ${_dest_file}) and retrying.."
+                            warn "${WARN_CHAR} Source checksum mismatch: $(distinct w "${_a_file_checksum}") vs $(distinct w "${DEF_SHA}")"
+                            _bname="$(${BASENAME_BIN} "${_dest_file}" 2>/dev/null)"
+                            warn "${WARN_CHAR} Removing file from cache: $(distinct w "${_bname}") and retrying.."
                             # remove corrupted file
                             ${RM_BIN} -vf "${_dest_file}" >> ${LOG} 2>> ${LOG}
                             # and restart script with same arguments:
                             debug "Evaluating again: $(distinct d "execute_process(${_app_param})")"
                             execute_process "${_app_param}"
                         fi
+                        unset _bname _a_file_checksum
                     fi
 
                     note "   ${NOTE_CHAR} Unpacking source tarball of: $(distinct n "${DEF_NAME}${DEF_POSTFIX}")"
@@ -531,7 +527,7 @@ execute_process () {
                     try "${GIT_BIN} clone ${DEFAULT_GIT_OPTS} --depth 1 --bare ${DEF_HTTP_PATH} ${_git_cached}" || \
                     try "${GIT_BIN} clone ${DEFAULT_GIT_OPTS} --depth 1 --bare ${DEF_HTTP_PATH} ${_git_cached}"
                     if [ "$?" = "0" ]; then
-                        debug "Fetched bare repository: $(distinct d ${DEF_NAME}${DEF_VERSION})"
+                        debug "Fetched bare repository: $(distinct d "${DEF_NAME}${DEF_VERSION}")"
                     else
                         if [ ! -d "${_git_cached}/branches" -a ! -f "${_git_cached}/config" ]; then
                             note "\n${red}Definitions were not updated. Showing $(distinct n ${LOG_LINES_AMOUNT_ON_ERR}) lines of internal log:${reset}"
@@ -742,7 +738,7 @@ execute_process () {
             unset _cwd
         fi
     else
-        warn "   ${WARN_CHAR} Requirement: $(distinct w ${DEF_NAME}) disabled on: $(distinct w ${SYSTEM_NAME})"
+        warn "   ${WARN_CHAR} Requirement: $(distinct w "${DEF_NAME}${DEF_POSTFIX}") disabled on: $(distinct w ${SYSTEM_NAME})"
         if [ ! -d "${PREFIX}" ]; then # case when disabled requirement is first on list of dependencies
             ${MKDIR_BIN} -p "${PREFIX}"
         fi
