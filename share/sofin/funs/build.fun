@@ -215,7 +215,7 @@ try_fetch_binbuild () {
         if [ -e "${BINBUILDS_CACHE_DIR}${_full_name}/${_bb_archive}" ]; then
             ${TAR_BIN} -xJf "${BINBUILDS_CACHE_DIR}${_full_name}/${_bb_archive}" >> "${LOG}-${_bbaname}" 2>> "${LOG}-${_bbaname}"
             if [ "$?" = "0" ]; then # if archive is valid
-                note "Software bundle installed: $(distinct n ${DEF_NAME}${DEF_POSTFIX}), with version: $(distinct n ${DEF_VERSION})"
+                note "Software bundle installed: $(distinct n "${DEF_NAME}"), with version: $(distinct n "${DEF_VERSION}")"
                 DONT_BUILD_BUT_DO_EXPORTS=YES
             else
                 debug "  ${NOTE_CHAR} No binary bundle available for: $(distinct n ${DEF_NAME}${DEF_POSTFIX})"
