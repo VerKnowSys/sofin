@@ -277,16 +277,20 @@ build_all () {
 
                 PREFIX="${SOFTWARE_DIR}$(capitalize "${_common_lowercase}")"
                 BUILD_DIR="${SOFTWARE_DIR}.src"
-                ${MKDIR_BIN} -p "${BUILD_DIR}" >/dev/null 2>> ${LOG}
-
+                BUILD_NAMESUM="$(text_checksum "${DEF_NAME}${DEF_POSTFIX}-${DEF_VERSION}")"
+                BUILD_DIR_ROOT="${BUILD_DIR}/${BUILD_NAMESUM}"
                 SERVICE_DIR="${SERVICES_DIR}$(capitalize "${_common_lowercase}")"
+
+                # These values has to be exported because external build mechanisms
+                # has to be able to reach these values to find dependencies and utilities
+                export PATH="${PREFIX}/bin:${PREFIX}/sbin:${DEFAULT_PATH}"
+                export PKG_CONFIG_PATH="${PREFIX}/lib/pkgconfig"
+
                 if [ ! -z "${DEF_STANDALONE}" ]; then
                     ${MKDIR_BIN} -p "${SERVICE_DIR}" >/dev/null 2>> ${LOG}
                     ${CHMOD_BIN} 0710 "${SERVICE_DIR}"
                 fi
-
-                BUILD_NAMESUM="$(text_checksum "${DEF_NAME}${DEF_POSTFIX}-${DEF_VERSION}")"
-                BUILD_DIR_ROOT="${BUILD_DIR}/${BUILD_NAMESUM}"
+                ${MKDIR_BIN} -p "${BUILD_DIR}" >/dev/null 2>> ${LOG}
                 ${MKDIR_BIN} -p "${BUILD_DIR_ROOT}" >/dev/null 2>> ${LOG}
 
                 # binary build of whole software bundle
