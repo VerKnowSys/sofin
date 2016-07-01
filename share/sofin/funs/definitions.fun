@@ -14,8 +14,8 @@ load_defs () {
                 debug "Loading definition: $(distinct d ${DEFINITIONS_DIR}${_definition})"
                 . ${DEFINITIONS_DIR}${_definition}
             else
-                # validate available alternatives
-                validate_alternatives "${_given_def}"
+                # validate available alternatives and quit no matter the result
+                show_alt_definitions_and_exit "${_given_def}"
             fi
 
             # if definition lacks definition of DEF_POSTFIX, after loading
