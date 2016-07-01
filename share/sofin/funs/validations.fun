@@ -46,7 +46,7 @@ fail_on_any_background_jobs () {
 }
 
 
-check_requirements () {
+validate_requirements () {
     if [ "${SYSTEM_NAME}" != "Darwin" ]; then
         if [ -d "/usr/local" ]; then
             _a_files="$(${FIND_BIN} /usr/local -maxdepth 3 -type f 2>/dev/null | ${WC_BIN} -l 2>/dev/null | ${SED_BIN} -e 's/^ *//g;s/ *$//g' 2>/dev/null)"
@@ -88,9 +88,9 @@ validate_alternatives () {
             _contents="${_contents}$(echo "${_cap_elem}" | ${SED_BIN} 's/\..*//' 2>/dev/null) "
         done
         if [ -z "${_contents}" ]; then
-            warn "No such definition found: $(distinct w ${_an_app}). No alternatives found."
+            warn "No such definition found: $(distinct w "${_an_app}"). No alternatives found."
         else
-            warn "No such definition found: $(distinct w ${_an_app}). Alternatives found: $(distinct w ${_contents})"
+            warn "No such definition found: $(distinct w "${_an_app}"). Alternatives found: $(distinct w "${_contents}")"
         fi
         unset _an_app _elem _cap_elem _contents _maybe_version _maybe_version _maybe
         exit
@@ -143,4 +143,19 @@ validate_definition_postfix () {
        DEF_POSTFIX="${_cispc_nme_diff}"
     fi
     unset _cidefinition_name _cigiven_name _cispec_name_diff __cut_ext_guard
+}
+
+
+validate_definition_disabled () {
+    _ch_dis_name="${1}"
+    unset DEF_DISABLED
+    # check requirement for disabled state:
+    if [ ! -z "${_ch_dis_name}" ]; then
+        for _def_disabled in ${_ch_dis_name}; do
+            if [ "${SYSTEM_NAME}" = "${_def_disabled}" ]; then
+                debug "Disabled: $(distinct d "${_def_disabled}") on $(distinct d "${SYSTEM_NAME}")"
+                DEF_DISABLED=YES
+            fi
+        done
+    fi
 }

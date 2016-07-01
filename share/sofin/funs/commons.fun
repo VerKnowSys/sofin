@@ -245,3 +245,21 @@ text_checksum () {
     esac
     unset _fcsmname
 }
+
+
+file_checksum () {
+    _fcsmname="$1"
+    if [ -z "${_fcsmname}" ]; then
+        error "Empty file name given for function: $(distinct e "file_checksum()")"
+    fi
+    case ${SYSTEM_NAME} in
+        Minix|Darwin|Linux)
+            ${PRINTF_BIN} "$(${SHA_BIN} "${_fcsmname}" 2>/dev/null | ${CUT_BIN} -d' ' -f1 2>/dev/null)"
+            ;;
+
+        FreeBSD)
+            ${PRINTF_BIN} "$(${SHA_BIN} -q "${_fcsmname}" 2>/dev/null)"
+            ;;
+    esac
+    unset _fcsmname
+}

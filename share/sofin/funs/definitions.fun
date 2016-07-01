@@ -20,6 +20,10 @@ load_defs () {
             # if definition lacks definition of DEF_POSTFIX, after loading
             # the definition file, try to infer DEF_POSTFIX:
             validate_definition_postfix "${_given_def}" "${DEF_NAME}"
+
+            # check disabled definition state
+            validate_definition_disabled "${DEF_DISABLE_ON}"
+
         done
     fi
 
@@ -180,21 +184,6 @@ update_definitions () {
         note "${red}Error occured: Update from branch: $(distinct n ${BRANCH}) of repository: $(distinct n ${REPOSITORY}) wasn't possible. Log below:${reset}"
         ${TAIL_BIN} -n${LOG_LINES_AMOUNT_ON_ERR} ${LOG} 2>/dev/null
         error "$(fill)"
-    fi
-}
-
-
-check_disabled () {
-    _ch_dis_name="${1}"
-    unset DEFINITION_DISABLED
-    # check requirement for disabled state:
-    if [ ! -z "${_ch_dis_name}" ]; then
-        for _def_disabled in ${_ch_dis_name}; do
-            if [ "${SYSTEM_NAME}" = "${_def_disabled}" ]; then
-                debug "Disabled: $(distinct d "${_def_disabled}") on $(distinct d "${SYSTEM_NAME}")"
-                DEFINITION_DISABLED=YES
-            fi
-        done
     fi
 }
 
