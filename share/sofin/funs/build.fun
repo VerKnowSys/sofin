@@ -730,7 +730,8 @@ execute_process () {
 
             if [ -z "${DEVEL}" ]; then # if devel mode not set
                 debug "Cleaning build dir: $(distinct d ${BUILD_DIR_ROOT}) of bundle: $(distinct d ${DEF_NAME}${DEF_POSTFIX}), after successful build."
-                ${RM_BIN} -rf "${BUILD_DIR_ROOT}/${_app_param}-${DEF_VERSION}" >> ${LOG} 2>> ${LOG}
+                ${RM_BIN} -rf "${BUILD_DIR_ROOT}" >/dev/null 2>> ${LOG}
+                ${MKDIR_BIN} -p "${BUILD_DIR_ROOT}" >/dev/null 2>> ${LOG}
             else
                 debug "Leaving build dir intact when working in devel mode. Last build dir: $(distinct d ${BUILD_DIR_ROOT})"
             fi
