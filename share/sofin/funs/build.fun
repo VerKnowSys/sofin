@@ -147,7 +147,7 @@ rebuild_bundle () {
     _those_to_rebuild=""
     for _dep in ${_alldefs_avail}; do
         load_defaults
-        load_defs "${_dep}"
+        . "${_dep}"
         echo "${DEF_REQUIREMENTS}" | ${GREP_BIN} "${_a_dependency}" >/dev/null 2>&1
         if [ "$?" = "0" ]; then
             _idep="$(${BASENAME_BIN} "${_dep}" 2>/dev/null)"
