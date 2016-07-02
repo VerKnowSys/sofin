@@ -13,6 +13,7 @@ load_defs () {
             elif [ -e "${DEFINITIONS_DIR}${_definition}" ]; then
                 debug "Loading definition: $(distinct d ${DEFINITIONS_DIR}${_definition})"
                 . ${DEFINITIONS_DIR}${_definition}
+                _given_def="$(${PRINTF_BIN} "${_def}" | eval "${CUTOFF_DEF_EXT_GUARD}")" # cut off extension!
             else
                 # validate available alternatives and quit no matter the result
                 show_alt_definitions_and_exit "${_given_def}"
