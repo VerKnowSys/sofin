@@ -74,8 +74,6 @@ load_defaults () {
         else
             error "Versions mismatch!. DEF_COMPILIANCE='$(distinct e "${DEF_COMPLIANCE}")' and SOFIN_VERSION='$(distinct e "${SOFIN_VERSION}")' should match.\n  Hint: Update your definitions repository to latest version!"
         fi
-    else
-        debug "Check passed previously once. Skipping compliance check"
     fi
 }
 
@@ -235,7 +233,7 @@ remove_bundles () {
             fi
             _aname="$(lowercase "${_given_name}")"
             debug "Given name: _given_name: ${_given_name}, _aname: ${_aname}"
-            note "Removing software bundle(s): $(distinct n "${_given_name}")"
+            note "Removing bundle: $(distinct n "${_given_name}")"
             ${RM_BIN} -rf "${SOFTWARE_DIR}${_given_name}" >/dev/null 2>> "${LOG}-${_aname}"
 
             # if removing a single bundle, then look for alternatives. Otherwise, just remove bundle..
@@ -453,9 +451,9 @@ strip_bundle_files () {
                  -z "${_sbresult}" ]; then
                 _sbresult="0"
             fi
-            note "$(distinct n "${_sbresult}") files were stripped"
+            debug "$(distinct d "${_sbresult}") files were stripped"
         else
-            warn "Debug build is enabled. Strip skipped"
+            warn "Symbol strip disabled for debug build."
         fi
     fi
     unset _sbfdefinition_name _dirs_to_strip _sbresult _counter _files _stripdir _bundlower
