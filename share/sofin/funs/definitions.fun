@@ -80,8 +80,9 @@ load_defaults () {
 
 
 inherit () {
-    debug "Inheritance from parent: $(distinct d "${1}")"
-    . ${DEFINITIONS_DIR}${1}${DEFAULT_DEF_EXT}
+    _inhnm="$(${PRINTF_BIN} "${1}" | eval "${CUTOFF_DEF_EXT_GUARD}")"
+    debug "Loading parent definition: $(distinct d "${_inhnm}")"
+    . ${DEFINITIONS_DIR}${_inhnm}${DEFAULT_DEF_EXT}
 }
 
 
