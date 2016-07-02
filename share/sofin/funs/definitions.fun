@@ -417,12 +417,12 @@ strip_bundle_files () {
             _dirs_to_strip="${PREFIX}/bin ${PREFIX}/sbin ${PREFIX}/lib ${PREFIX}/libexec"
             ;;
 
-        exports)
+        exports|export|bins|binaries|bin)
             debug "strip_bundle_files($(distinct d "${_sbfdefinition_name}")): Strip exported binaries only"
             _dirs_to_strip="${PREFIX}/bin ${PREFIX}/sbin ${PREFIX}/libexec"
             ;;
 
-        libs)
+        libs|lib|libexec)
             debug "strip_bundle_files($(distinct d "${_sbfdefinition_name}")): Strip libraries only"
             _dirs_to_strip="${PREFIX}/lib"
             ;;
