@@ -138,7 +138,7 @@ deploy_binbuild () {
 
 rebuild_bundle () {
     create_cache_directories
-    _a_dependency="$(lowercase "${2}")"
+    _a_dependency="$(lowercase "${1}")"
     if [ -z "${_a_dependency}" ]; then
         error "Missing second argument with library/software name."
     fi
