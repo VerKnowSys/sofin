@@ -14,28 +14,57 @@ env_reset () {
 
 
 cecho () {
+    _cein="${1}" # content
+    _cecol="${2}" # color
     if [ "${TTY}" = "YES" ]; then # if it's terminal then use colors
-        ${PRINTF_BIN} "${2}${1}${reset}\n"
+        ${PRINTF_BIN} "${_cecol}${_cein}${reset}\n"
     else
-        ${PRINTF_BIN} "${1}\n"
+        ${PRINTF_BIN} "${_cein}\n"
     fi
+    unset _cein _cecol
 }
 
 
 debug () {
+    _in="$@"
+    _dbfnin=""
+    for _cee in ${FUNCNAME[*]}; do
+        case "${_cee}" in
+            debug|cecho|note|warn|error)
+                ;;
+            *)
+                if [ -z "${_dbfnin}" ]; then
+                    _dbfnin="${_cee}()"
+                else
+                    _dbfnin="${_cee}->${_dbfnin}"
+                fi
+                ;;
+        esac
+    done
+    _dbfn="# ${func}${_dbfnin}${magenta2}: " # NOTE: "#" is required for debug mode to work properly
     if [ -z "${DEBUG}" ]; then
-        _dbgnme="$(echo "${DEF_NAME}${DEF_POSTFIX}" | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null)"
-        if [ ! -z "${_dbgnme}" -a -d "${LOGS_DIR}" ]; then
-            cecho "# $1" ${magenta} >> "${LOG}-${_dbgnme}" 2>> "${LOG}-${_dbgnme}"
-        elif [ -z "${_dbgnme}" -a -d "${LOGS_DIR}" ]; then
-            cecho "# $1" ${magenta} >> "${LOG}" 2>> "${LOG}"
+        _dbgnme="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
+        if [ ! -z "${_dbgnme}" -a \
+               -d "${LOGS_DIR}" ]; then
+            # Definition log
+            cecho "${_dbfn}${_in}" ${magenta2} \
+                >> "${LOG}-${_dbgnme}" 2>> "${LOG}-${_dbgnme}"
+
+        elif [ -z "${_dbgnme}" -a \
+               -d "${LOGS_DIR}" ]; then
+            # Main log
+            cecho "${_dbfn}${_in}" ${magenta2} \
+                >> "${LOG}" 2>> "${LOG}"
+
         elif [ ! -d "${LOGS_DIR}" ]; then
-            ${LOGGER_BIN} "sofin: $1"
+            # System logger fallback
+            ${LOGGER_BIN} "sofin: ${_in}"
+
         fi
-        unset _dbgnme
-    else
-        cecho "# $1" ${magenta} # NOTE: this "#" is required for debug mode to work properly with generation of ~/.profile
+    else # DEBUG is set.
+        cecho "${_dbfn}${_in}" ${magenta}
     fi
+    unset _dbgnme _in _dbfn _cee _dbfnin
 }
 
 
@@ -87,7 +116,7 @@ distinct () {
             ;;
 
         d|debug)
-            ${PRINTF_BIN} "${DISTINCT_COLOUR}${content}${magenta}"
+            ${PRINTF_BIN} "${DISTINCT_COLOUR}${content}${magenta2}"
             ;;
 
         w|warn)
