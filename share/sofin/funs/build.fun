@@ -262,7 +262,7 @@ build_all () {
                 # Note: this acutally may break definitions like ImageMagick..
                 #_common_lowercase="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
                 _common_lowercase="${DEF_NAME}${DEF_POSTFIX}"
-                DEF_NAME="$(capitalize ${_common_lowercase})"
+                DEF_NAME="$(capitalize "${_common_lowercase}")"
 
                 # if definition requires root privileges, throw an "exception":
                 if [ ! -z "${REQUIRE_ROOT_ACCESS}" ]; then

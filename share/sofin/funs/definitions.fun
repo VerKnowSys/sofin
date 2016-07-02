@@ -1,19 +1,19 @@
 load_defs () {
     _definitions=$*
     if [ -z "${_definitions}" ]; then
-        error "No definition name specified for load_defs()!"
+        error "No definition name specified!"
     else
-        debug "Trying to load definitions: $(distinct e "${_definitions}")"
+        debug "Seeking: $(distinct d "${_definitions}")"
         for _given_def in ${_definitions}; do
             _name_base="$(${BASENAME_BIN} "${_given_def}" 2>/dev/null)"
             _definition="$(lowercase "${_name_base}")"
             if [ -e "${DEFINITIONS_DIR}${_definition}${DEFAULT_DEF_EXT}" ]; then
-                debug "Loading definition: $(distinct d ${DEFINITIONS_DIR}${_definition}${DEFAULT_DEF_EXT})"
                 . ${DEFINITIONS_DIR}${_definition}${DEFAULT_DEF_EXT}
             elif [ -e "${DEFINITIONS_DIR}${_definition}" ]; then
-                debug "Loading definition: $(distinct d ${DEFINITIONS_DIR}${_definition})"
                 . ${DEFINITIONS_DIR}${_definition}
                 _given_def="$(${PRINTF_BIN} "${_def}" | eval "${CUTOFF_DEF_EXT_GUARD}")" # cut off extension!
+                debug "< $(distinct d "${DEFINITIONS_DIR}${_def}${DEFAULT_DEF_EXT}")"
+                debug "< $(distinct d "${DEFINITIONS_DIR}${_def}")"
             else
                 # validate available alternatives and quit no matter the result
                 show_alt_definitions_and_exit "${_given_def}"
@@ -40,7 +40,6 @@ load_defs () {
                             "OS_TRIPPLE=${OS_TRIPPLE}" \
                             "SYS_SPECIFIC_BINARY_REMOTE=${SYS_SPECIFIC_BINARY_REMOTE}";
             do
-                debug "Required field check: $(distinct d ${_required_field})"
                 for _check in   "DEF_NAME" \
                                 "DEF_NAME_DEF_POSTFIX" \
                                 "DEF_VERSION" \
@@ -54,11 +53,13 @@ load_defs () {
                         if [ "${_check}=" = "${_required_field}" -o \
                              "${_check}=." = "${_required_field}" -o \
                              "${_check}=${DEFAULT_DEF_EXT}" = "${_required_field}" ]; then
-                            error "Empty or wrong value for required field: $(distinct e ${_check}) from definition: $(distinct e "${_definition}")."
+                            error "Empty or wrong value for required field: $(distinct e "${_check}") from definition: $(distinct e "${_def}")."
+                        else
+                            debug "validating requirement: $(distinct d ${_check})"
                         fi
                 done
     done
-    unset _definition _definitions _check _required_field _name_base _given_def
+    unset _def _definitions _check _required_field _name_base _given_def
 }
 
 
@@ -89,7 +90,7 @@ inherit () {
 store_checksum_bundle () {
     _cksname="${1}"
     if [ -z "${_cksname}" ]; then
-        error "Empty archive name in function: $(distinct e "store_checksum_bundle()")!"
+        error "Empty archive name!"
     fi
     _cksarchive_sha1="$(file_checksum "${_cksname}")"
     if [ -z "${_cksarchive_sha1}" ]; then
@@ -401,34 +402,34 @@ create_apple_bundle_if_necessary () { # XXXXXX
 strip_bundle_files () {
     _sbfdefinition_name="${1}"
     if [ -z "${_sbfdefinition_name}" ]; then
-        error "No definition name specified as first param for strip_bundle_files()!"
+        error "No definition name specified as first param!"
     fi
     load_defaults # reset possible cached values
     load_defs "${_sbfdefinition_name}"
     if [ -z "${PREFIX}" ]; then
         PREFIX="${SOFTWARE_DIR}$(capitalize "${DEF_NAME}${DEF_POSTFIX}")"
-        debug "An empty prefix in strip_bundle_files() for $(distinct d ${_sbfdefinition_name}). Resetting to: $(distinct d ${PREFIX})"
+        debug "An empty prefix for: $(distinct d ${_sbfdefinition_name}). Resetting to: $(distinct d "${PREFIX}")"
     fi
 
     _dirs_to_strip=""
     case "${DEF_STRIP}" in
         all)
-            debug "strip_bundle_files($(distinct d "${_sbfdefinition_name}")): Strip both binaries and libraries."
+            debug "$(distinct d "${_sbfdefinition_name}"): Strip both binaries and libraries."
             _dirs_to_strip="${PREFIX}/bin ${PREFIX}/sbin ${PREFIX}/lib ${PREFIX}/libexec"
             ;;
 
         exports|export|bins|binaries|bin)
-            debug "strip_bundle_files($(distinct d "${_sbfdefinition_name}")): Strip exported binaries only"
+            debug "$(distinct d "${_sbfdefinition_name}"): Strip exported binaries only"
             _dirs_to_strip="${PREFIX}/bin ${PREFIX}/sbin ${PREFIX}/libexec"
             ;;
 
         libs|lib|libexec)
-            debug "strip_bundle_files($(distinct d "${_sbfdefinition_name}")): Strip libraries only"
+            debug "$(distinct d "${_sbfdefinition_name}"): Strip libraries only"
             _dirs_to_strip="${PREFIX}/lib"
             ;;
 
         *)
-            debug "strip_bundle_files($(distinct d "${_sbfdefinition_name}")): Strip nothing"
+            debug "$(distinct d "${_sbfdefinition_name}"): Strip nothing"
             ;;
     esac
     if [ "${DEF_STRIP}" != "no" ]; then
@@ -639,7 +640,7 @@ hack_definition () {
 
 after_update_callback () {
     if [ ! -z "${DEF_AFTER_UNPACK_CALLBACK}" ]; then
-        debug "Running after unpack callback: $(distinct d "${DEF_AFTER_UNPACK_CALLBACK}")"
+        debug "Evaluating callback: $(distinct d "${DEF_AFTER_UNPACK_CALLBACK}")"
         run "${DEF_AFTER_UNPACK_CALLBACK}"
     fi
 }
@@ -647,7 +648,7 @@ after_update_callback () {
 
 after_export_callback () {
     if [ ! -z "${DEF_AFTER_EXPORT_CALLBACK}" ]; then
-        debug "Executing DEF_AFTER_EXPORT_CALLBACK: $(distinct d "${DEF_AFTER_EXPORT_CALLBACK}")"
+        debug "Evaluating callback DEF_AFTER_EXPORT_CALLBACK: $(distinct d "${DEF_AFTER_EXPORT_CALLBACK}")"
         run "${DEF_AFTER_EXPORT_CALLBACK}"
     fi
 }
@@ -655,7 +656,7 @@ after_export_callback () {
 
 after_patch_callback () {
     if [ ! -z "${DEF_AFTER_PATCH_CALLBACK}" ]; then
-        debug "Running after patch callback: $(distinct d "${DEF_AFTER_PATCH_CALLBACK}")"
+        debug "Evaluating callback: $(distinct d "${DEF_AFTER_PATCH_CALLBACK}")"
         run "${DEF_AFTER_PATCH_CALLBACK}"
     fi
 }
@@ -663,7 +664,7 @@ after_patch_callback () {
 
 after_configure_callback () {
     if [ ! -z "${DEF_AFTER_CONFIGURE_CALLBACK}" ]; then
-        debug "Running after configure callback: $(distinct d "${DEF_AFTER_CONFIGURE_CALLBACK}")"
+        debug "Evaluating callback: $(distinct d "${DEF_AFTER_CONFIGURE_CALLBACK}")"
         run "${DEF_AFTER_CONFIGURE_CALLBACK}"
     fi
 }
@@ -671,7 +672,7 @@ after_configure_callback () {
 
 after_make_callback () {
     if [ ! -z "${DEF_AFTER_MAKE_CALLBACK}" ]; then
-        debug "Running after make callback: $(distinct d "${DEF_AFTER_MAKE_CALLBACK}")"
+        debug "Evaluating callback: $(distinct d "${DEF_AFTER_MAKE_CALLBACK}")"
         run "${DEF_AFTER_MAKE_CALLBACK}"
     fi
 }
@@ -679,7 +680,7 @@ after_make_callback () {
 
 after_install_callback () {
     if [ ! "${DEF_AFTER_INSTALL_CALLBACK}" = "" ]; then
-        debug "After install callback: $(distinct d "${DEF_AFTER_INSTALL_CALLBACK}")"
+        debug "Evaluating callback: $(distinct d "${DEF_AFTER_INSTALL_CALLBACK}")"
         run "${DEF_AFTER_INSTALL_CALLBACK}"
     fi
 }
