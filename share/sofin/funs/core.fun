@@ -170,13 +170,13 @@ try () {
 setup_default_branch () {
     # setting up definitions repository
     if [ -z "${BRANCH}" ]; then
-        BRANCH="stable"
+        BRANCH="${DEFAULT_DEFINITIONS_BRANCH}"
     fi
 }
 
 
 setup_default_repository () {
     if [ -z "${REPOSITORY}" ]; then
-        REPOSITORY="https://verknowsys@bitbucket.org/verknowsys/sofin-definitions.git" # main sofin definitions repository
+        REPOSITORY="${DEFAULT_DEFINITIONS_REPOSITORY}"
     fi
 }
