@@ -225,7 +225,7 @@ find_most_recent () {
 difftext () {
     _text_input="${1}"
     _text_match="${2}"
-    ${PRINTF_BIN} "$(echo "${_text_input}" | ${SED_BIN} -e "s#${_text_match}##" 2>/dev/null)"
+    ${PRINTF_BIN} "$(${PRINTF_BIN} "${_text_input}" | ${SED_BIN} -e "s#${_text_match}##" 2>/dev/null)"
 }
 
 
