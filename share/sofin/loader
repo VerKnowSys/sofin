@@ -15,8 +15,8 @@ load_funs () {
 load_sofin () {
     # loading facts
     load_facts  \
-                shell.fact \
                 paths.fact \
+                shell.fact \
                 paths-OS_TYPE.fact \
                 sofin.fact \
                 system.fact
