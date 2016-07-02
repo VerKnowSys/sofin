@@ -1,13 +1,23 @@
 # ANSI color definitions
-red='\033[31;40m'
-green='\033[32;40m'
-yellow='\033[33;40m'
-blue='\033[34;40m'
-magenta='\033[35;40m'
-cyan='\033[36;40m'
-gray='\033[37;40m'
-white='\033[38;40m'
-reset='\033[0m'
+
+# tput:
+# setaf => foreground
+# setab => background
+
+reset="$(${TPUT_BIN} setaf 0)"
+red="$(${TPUT_BIN} setaf 1)"
+green="$(${TPUT_BIN} setaf 2)"
+yellow="$(${TPUT_BIN} setaf 3)"
+blue="$(${TPUT_BIN} setaf 4)"
+magenta="$(${TPUT_BIN} setaf 5)"
+cyan="$(${TPUT_BIN} setaf 6)"
+white="$(${TPUT_BIN} setaf 15)"
+gray="$(${TPUT_BIN} setaf 7)"
+
+cyan2="$(${TPUT_BIN} setaf 12)"
+magenta2="$(${TPUT_BIN} setaf 97)"
+func="$(${TPUT_BIN} setaf 241)"
+
 
 TTY="NO"
 MAX_COLS="80"
