@@ -277,6 +277,12 @@ build_all () {
                 BUILD_DIR_ROOT="${BUILD_DIR}/${BUILD_NAMESUM}"
                 SERVICE_DIR="${SERVICES_DIR}$(capitalize "${_common_lowercase}")"
 
+                if [ -z "${DEVEL}" ]; then
+                    debug "Cleaning before PROD build in BUILD_DIR_ROOT: $(distinct d "${BUILD_DIR_ROOT}")"
+                    ${RM_BIN} -rf "${BUILD_DIR_ROOT}" >/dev/null 2>> ${LOG}
+                    ${MKDIR_BIN} -p "${BUILD_DIR_ROOT}" >/dev/null 2>> ${LOG}
+                fi
+
                 # These values has to be exported because external build mechanisms
                 # has to be able to reach these values to find dependencies and utilities
                 export PATH="${PREFIX}/bin:${PREFIX}/sbin:${DEFAULT_PATH}"
