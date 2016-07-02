@@ -110,17 +110,29 @@ validate_archive_sha1 () {
 
 
 validate_definition_postfix () {
-    __cut_ext_guard='${SED_BIN} -e "s#${DEFAULT_DEF_EXT}##" 2>/dev/null'
-    _cigiven_name="$(${BASENAME_BIN} "$(echo "$(lowercase "${1}")" | eval "${__cut_ext_guard}")")"
-    _cidefinition_name="$(${BASENAME_BIN} "$(echo "$(lowercase "${1}")" | eval "${__cut_ext_guard}")")"
+    _cigiven_name="$(${BASENAME_BIN} "$(echo "$(lowercase "${1}")" | eval "${CUTOFF_DEF_EXT_GUARD}")")"
+    _cidefinition_name="$(${BASENAME_BIN} "$(echo "$(lowercase "${2}")" | eval "${CUTOFF_DEF_EXT_GUARD}")")"
+    debug "_cigiven_name: $(distinct d "${_cigiven_name}"), _cidefinition_name: $(distinct d "${_cidefinition_name}")"
     # case when DEF_POSTFIX was ommited => use definition file name difference as POSTFIX:
-    _cispc_nme_diff="$(difftext "${_cigiven_name}" "${_cidefinition_name}")"
+    _l1="$(${PRINTF_BIN} "${_cidefinition_name}" | ${WC_BIN} -c 2>/dev/null)"
+    _l2="$(${PRINTF_BIN} "${_cigiven_name}" | ${WC_BIN} -c 2>/dev/null)"
+    if [ "${_l1}" -gt "${_l2}" ]; then
+        _cispc_nme_diff="$(difftext "${_cidefinition_name}" "${_cigiven_name}")"
+    elif [ "${_l2}" -gt "${_l1}" ]; then
+        _cispc_nme_diff="$(difftext "${_cigiven_name}" "${_cidefinition_name}")"
+    else # equal
+        _cispc_nme_diff="$(difftext "${_cigiven_name}" "${DEF_NAME}")"
+    fi
     if [ -z "${DEF_POSTFIX}" -a \
        ! -z "${_cispc_nme_diff}" ]; then
-       debug "Inferred value from definition file name: DEF_POSTFIX=$(distinct d "${_cispc_nme_diff}")"
+       debug "Inferred DEF_POSTFIX=$(distinct d "${_cispc_nme_diff}") from definition: $(distinct d "${DEF_NAME}")"
        DEF_POSTFIX="${_cispc_nme_diff}"
+    elif [ ! -z "${_cispc_nme_diff}" ]; then
+        debug "Difference: $(distinct d "${_cispc_nme_diff}")"
+    else
+        debug "No difference."
     fi
-    unset _cidefinition_name _cigiven_name _cispec_name_diff __cut_ext_guard
+    unset _cidefinition_name _cigiven_name _cispec_name_diff __cut_ext_guard _cispc_nme_diff _l1 _l2
 }
 
 
