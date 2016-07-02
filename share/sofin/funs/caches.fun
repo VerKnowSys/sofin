@@ -18,7 +18,7 @@ create_cache_directories () {
          ! -f "${DEFAULTS}" ]; then
         debug "No valid definitions cache found in: $(distinct d "${DEFINITIONS_DIR}"). Creating one."
         clean_purge
-        update_definitions
+        update_defs
     fi
 }
 

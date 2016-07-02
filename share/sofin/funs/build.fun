@@ -94,7 +94,7 @@ push_binbuild () {
                     fi
 
                     build_software_bundle "${_element_name}" "${_pbelement}"
-                    store_checksum_bundle "${_element_name}"
+                    store_checksum "${_element_name}"
 
                     try "${CHMOD_BIN} -v o+r ${_element_name} ${_element_name}${DEFAULT_CHKSUM_EXT}" && \
                         debug "Set read access for archives: $(distinct d ${_element_name}), $(distinct d ${_element_name}${DEFAULT_CHKSUM_EXT}) before we send them to public remote"
@@ -370,7 +370,7 @@ build_all () {
             after_export_callback
 
             clean_useless
-            strip_bundle_files "${_common_lowercase}"
+            strip_bundle "${_common_lowercase}"
             manage_datasets
             create_apple_bundle_if_necessary
         fi

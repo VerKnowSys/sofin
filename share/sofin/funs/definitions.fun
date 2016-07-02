@@ -87,7 +87,7 @@ inherit () {
 }
 
 
-store_checksum_bundle () {
+store_checksum () {
     _cksname="${1}"
     if [ -z "${_cksname}" ]; then
         error "Empty archive name!"
@@ -102,7 +102,7 @@ store_checksum_bundle () {
 }
 
 
-update_definitions () {
+update_defs () {
     if [ ! -z "${USE_UPDATE}" ]; then
         debug "Definitions update skipped on demand"
         return
@@ -206,7 +206,7 @@ reset_definitions () {
         ${RM_BIN} -fv "${line}" >> "${LOG}" 2>> "${LOG}" && \
             debug "Removed untracked file: $(distinct d "${line}")"
     done
-    update_definitions
+    update_defs
 }
 
 
@@ -399,7 +399,7 @@ create_apple_bundle_if_necessary () { # XXXXXX
 }
 
 
-strip_bundle_files () {
+strip_bundle () {
     _sbfdefinition_name="${1}"
     if [ -z "${_sbfdefinition_name}" ]; then
         error "No definition name specified as first param!"
