@@ -263,3 +263,12 @@ file_checksum () {
     esac
     unset _fcsmname
 }
+
+
+print_rainbow () {
+    ${PRINTF_BIN} "${reset}reset${red}red${green}green${yellow}yellow${blue}blue${magenta}magenta${cyan}cyan${gray}gray${white}white"
+
+    for i in $(seq 0 $(${TPUT_BIN} colors)); do
+        ${PRINTF_BIN} "$(${TPUT_BIN} setaf ${i}):${i}:TEXT-COLORFUL${reset}\t"
+    done
+}
