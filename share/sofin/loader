@@ -13,10 +13,6 @@ load_funs () {
 
 
 load_sofin () {
-    if [ -z "${HOME}" ]; then
-        echo "${yellow}WARNING: HOME unset? Expect problems!${reset}"
-    fi
-
     # loading facts
     load_facts  \
                 shell.fact \
