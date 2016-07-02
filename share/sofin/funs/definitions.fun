@@ -6,14 +6,16 @@ load_defs () {
         debug "Seeking: $(distinct d "${_definitions}")"
         for _given_def in ${_definitions}; do
             _name_base="$(${BASENAME_BIN} "${_given_def}" 2>/dev/null)"
-            _definition="$(lowercase "${_name_base}")"
-            if [ -e "${DEFINITIONS_DIR}${_definition}${DEFAULT_DEF_EXT}" ]; then
-                . ${DEFINITIONS_DIR}${_definition}${DEFAULT_DEF_EXT}
-            elif [ -e "${DEFINITIONS_DIR}${_definition}" ]; then
-                . ${DEFINITIONS_DIR}${_definition}
-                _given_def="$(${PRINTF_BIN} "${_def}" | eval "${CUTOFF_DEF_EXT_GUARD}")" # cut off extension!
+            _def="$(lowercase "${_name_base}")"
+            if [ -e "${DEFINITIONS_DIR}${_def}${DEFAULT_DEF_EXT}" ]; then
                 debug "< $(distinct d "${DEFINITIONS_DIR}${_def}${DEFAULT_DEF_EXT}")"
+                . ${DEFINITIONS_DIR}${_def}${DEFAULT_DEF_EXT}
+
+            elif [ -e "${DEFINITIONS_DIR}${_def}" ]; then
                 debug "< $(distinct d "${DEFINITIONS_DIR}${_def}")"
+                . ${DEFINITIONS_DIR}${_def}
+                _given_def="$(${PRINTF_BIN} "${_def}" | eval "${CUTOFF_DEF_EXT_GUARD}")"
+
             else
                 # validate available alternatives and quit no matter the result
                 show_alt_definitions_and_exit "${_given_def}"
