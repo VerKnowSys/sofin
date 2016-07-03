@@ -99,7 +99,7 @@ get_shell_vars () {
         done
     }
     process ${SOFTWARE_DIR}
-    if [ "${USERNAME}" != "root" ]; then
+    if [ "${USER}" != "root" ]; then
         process ${SOFTWARE_DIR}
     fi
 
@@ -123,7 +123,7 @@ get_shell_vars () {
         done
     }
     process ${SOFTWARE_DIR}
-    if [ "${USERNAME}" != "root" ]; then
+    if [ "${USER}" != "root" ]; then
         process ${SOFTWARE_DIR}
     fi
 
@@ -138,7 +138,7 @@ get_shell_vars () {
         done
     }
     process ${SOFTWARE_DIR}
-    if [ "${USERNAME}" != "root" ]; then
+    if [ "${USER}" != "root" ]; then
         process ${SOFTWARE_DIR}
     fi
     cxxflags="${cflags}"
@@ -158,7 +158,7 @@ get_shell_vars () {
         done
     }
     process ${SOFTWARE_DIR}
-    if [ "${USERNAME}" != "root" ]; then
+    if [ "${USER}" != "root" ]; then
         process ${SOFTWARE_DIR}
     fi
 

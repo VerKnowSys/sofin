@@ -1,9 +1,7 @@
 # System specific configuration
 
-USERNAME="$(${ID_BIN} -un 2>/dev/null)"
-if [ -z "${USERNAME}" ]; then
-    echo "${red}FATAL: \$USERNAME environment variable, requires a value!"
-    exit 1
+if [ -z "${USER}" ]; then
+    USER="$(${ID_BIN} -un 2>/dev/null)"
 fi
 
 SYSTEM_NAME="$(${UNAME_BIN} -s 2>/dev/null)"

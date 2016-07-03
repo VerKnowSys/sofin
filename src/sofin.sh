@@ -109,7 +109,7 @@ if [ ! -z "${SOFIN_COMMAND_ARG}" ]; then
 
         deps|dependencies|local)
             create_cache_directories
-            if [ "${USERNAME}" = "root" ]; then
+            if [ "${USER}" = "root" ]; then
                 warn "Installation of project dependencies as root is immoral"
             fi
             fail_on_bg_job ${SOFIN_ARGS}

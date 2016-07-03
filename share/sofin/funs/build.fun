@@ -266,7 +266,7 @@ build_all () {
 
                 # if definition requires root privileges, throw an "exception":
                 if [ ! -z "${REQUIRE_ROOT_ACCESS}" ]; then
-                    if [ "${USERNAME}" != "root" ]; then
+                    if [ "${USER}" != "root" ]; then
                         error "Definition requires superuser priviledges: $(distinct e ${_common_lowercase}). Installation aborted."
                     fi
                 fi

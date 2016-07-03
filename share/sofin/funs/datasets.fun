@@ -40,15 +40,15 @@ manage_datasets () {
                 if [ "${_app_name_lowercase}" = "${_aname}" -o ${_jobs_in_parallel} = "NO" ]; then
                     # find name of mount from default ZFS Services:
                     _inner_dir=""
-                    if [ "${USERNAME}" = "root" ]; then
+                    if [ "${USER}" = "root" ]; then
                         _inner_dir="root/"
                     else
                         # NOTE: In ServeD-OS there's only 1 inner dir name that's also the cell name
                         no_ending_slash="$(echo "${SERVICES_DIR}" | ${SED_BIN} 's/\/$//' 2>/dev/null)"
                         _inner_dir="$(${ZFS_BIN} list -H 2>/dev/null | ${EGREP_BIN} "${no_ending_slash}$" 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null | ${SED_BIN} 's/.*\///' 2>/dev/null)/"
                         if [ -z "${_inner_dir}" ]; then
-                            warn "Falling back with inner dir name to current user name: ${USERNAME}/"
-                            _inner_dir="${USERNAME}/"
+                            warn "Falling back with inner dir name to current user name: ${USER}/"
+                            _inner_dir="${USER}/"
                         fi
                     fi
                     _certain_dataset="${SERVICES_DIR}${_inner_dir}${_maybe_dataset}"
