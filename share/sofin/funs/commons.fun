@@ -1,4 +1,4 @@
-check_command_result () {
+check_result () {
     if [ -z "$1" ]; then
         error "Empty command given for: $(distinct e "check_command_result()")!"
     fi

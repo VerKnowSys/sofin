@@ -46,12 +46,12 @@ update_env_files () {
             else
                 note "Updating environment file: ${i}"
                 echo "${shell_configuration}" >> "${i}"
-                check_command_result $?
+                check_result $?
             fi
         else
             note "Creating environment file: ${i}"
             echo "${shell_configuration}" >> "${i}"
-            check_command_result $?
+            check_result $?
         fi
     done
 }

@@ -1,4 +1,4 @@
-setup_sofin_compiler () {
+compiler_setup () {
     if [ "${1}" = "silent" ]; then
         debug () {
             ${LOGGER_BIN} "sofin: $@"

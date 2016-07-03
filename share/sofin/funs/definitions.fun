@@ -199,8 +199,8 @@ update_defs () {
 }
 
 
-reset_definitions () {
-    create_cache_directories
+reset_defs () {
+    create_dirs
     cd "${DEFINITIONS_DIR}"
     ${GIT_BIN} reset --hard HEAD >/dev/null 2>&1
     if [ -z "${BRANCH}" ]; then
@@ -260,7 +260,7 @@ remove_bundles () {
                    -f "${SOFTWARE_DIR}${_alternative}/$(lowercase ${_alternative})${INSTALLED_MARK}" ]; then
                 note "Updating environment with already installed alternative: $(distinct n ${_alternative})"
                 export_binaries "${_alternative}"
-                cleanup_after_tasks
+                finalize
                 unset _given_name _inname _alternative _aname _def
                 exit # Just pick first available alternative bundle
 
@@ -317,7 +317,7 @@ make_exports () {
 
 
 show_outdated () {
-    create_cache_directories
+    create_dirs
     load_defaults
     if [ -d "${SOFTWARE_DIR}" ]; then
         for _prefix in $(${FIND_BIN} ${SOFTWARE_DIR} -mindepth 1 -maxdepth 1 -type d 2>/dev/null); do
@@ -605,8 +605,8 @@ export_binaries () {
 }
 
 
-hack_definition () {
-    create_cache_directories
+hack_def () {
+    create_dirs
     if [ -z "${1}" ]; then
         error "No name of pattern to hack given!"
     fi
@@ -718,7 +718,7 @@ push_binary_archive () {
 }
 
 
-push_service_stream_archive () {
+push_zfs_stream () {
     _fin_snapfile="${1}"
     _pselement="${2}"
     _psmirror="${3}"

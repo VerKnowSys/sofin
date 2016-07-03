@@ -164,7 +164,7 @@ get_shell_vars () {
 
     ${PRINTF_BIN} "# PATH:\nexport PATH=\"$(echo "${result}" | eval ${CUT_TRAILING_SPACES_GUARD})\"\n\n"
 
-    setup_sofin_compiler "silent"
+    compiler_setup "silent"
 
     ${PRINTF_BIN} "# CC:\nexport CC='${CC}'\n\n"
     ${PRINTF_BIN} "# CXX:\nexport CXX='${CXX}'\n\n"
@@ -214,7 +214,7 @@ list_bundles_full () {
 
 
 show_diff () {
-    create_cache_directories
+    create_dirs
     _sddefname="${1}"
     # if specified a file name, make sure it's named properly:
     ${EGREP_BIN} "${DEFAULT_DEF_EXT}$" "${_sddefname}" >/dev/null 2>&1 || \
@@ -240,7 +240,7 @@ show_diff () {
 
 
 develop () {
-    create_cache_directories
+    create_dirs
     _defname_input="${1}"
     _defname_no_ext="$(echo "${_defname_input}" | ${SED_BIN} -e "s#\.${DEFAULT_DEF_EXT}##" 2>/dev/null)"
     _devname="$(lowercase "$(${BASENAME_BIN} ${_defname_no_ext} 2>/dev/null)")"

@@ -1,5 +1,5 @@
 
-build_software_bundle () {
+build_bundle () {
     _bsbname="${1}"
     _bsbelement="${2}"
     if [ ! -e "./${_bsbname}" ]; then
@@ -34,7 +34,7 @@ push_binbuild () {
     if [ -z "${_push_bundles}" ]; then
         error "push_binbuild(): Arguments cannot be empty!"
     fi
-    create_cache_directories
+    create_dirs
     note "Pushing binary bundle: $(distinct n ${_push_bundles}) to remote: $(distinct n ${MAIN_BINARY_REPOSITORY})"
     cd "${SOFTWARE_DIR}"
     for _pbelement in ${_push_bundles}; do
@@ -93,7 +93,7 @@ push_binbuild () {
                         fi
                     fi
 
-                    build_software_bundle "${_element_name}" "${_pbelement}"
+                    build_bundle "${_element_name}" "${_pbelement}"
                     store_checksum "${_element_name}"
 
                     try "${CHMOD_BIN} -v o+r ${_element_name} ${_element_name}${DEFAULT_CHKSUM_EXT}" && \
@@ -106,7 +106,7 @@ push_binbuild () {
                     run "${CP_BIN} -v ${_element_name}${DEFAULT_CHKSUM_EXT} ${_bin_bundle}/"
 
                     push_binary_archive "${_bin_bundle}" "${_element_name}" "${_mirror}" "${_address}"
-                    push_service_stream_archive "${_final_snap_file}" "${_pbelement}" "${_mirror}"
+                    push_zfs_stream "${_final_snap_file}" "${_pbelement}" "${_mirror}"
 
                 done
                 ${RM_BIN} -f "${_element_name}" "${_element_name}${DEFAULT_CHKSUM_EXT}" "${_final_snap_file}" >> ${LOG}-${_lowercase_element} 2>> ${LOG}-${_lowercase_element}
@@ -120,12 +120,12 @@ push_binbuild () {
 
 deploy_binbuild () {
     _dbbundles=$*
-    create_cache_directories
+    create_dirs
     load_defaults
     note "Software bundles to be built and deployed to remote: $(distinct n ${_dbbundles})"
     for _dbbundle in ${_dbbundles}; do
         USE_BINBUILD=NO
-        build_all "${_dbbundle}" || \
+        build "${_dbbundle}" || \
             def_error "${_dbbundle}" "Bundle build failed."
     done
     push_binbuild ${_dbbundles} || \
@@ -137,7 +137,7 @@ deploy_binbuild () {
 
 
 rebuild_bundle () {
-    create_cache_directories
+    create_dirs
     _a_dependency="$(lowercase "${1}")"
     if [ -z "${_a_dependency}" ]; then
         error "Missing second argument with library/software name."
@@ -164,7 +164,7 @@ rebuild_bundle () {
         fi
         remove_bundles "${_reb_ap_bundle}"
         USE_BINBUILD=NO
-        build_all "${_reb_ap_bundle}" || def_error "${_reb_ap_bundle}" "Bundle build failed."
+        build "${_reb_ap_bundle}" || def_error "${_reb_ap_bundle}" "Bundle build failed."
         USE_FORCE=YES
         wipe_remote_archives ${_reb_ap_bundle} || def_error "${_reb_ap_bundle}" "Wipe failed"
         push_binbuild ${_reb_ap_bundle} || def_error "${_reb_ap_bundle}" "Push failure"
@@ -173,7 +173,7 @@ rebuild_bundle () {
 }
 
 
-try_fetch_binbuild () {
+fetch_binbuild () {
     _full_name="${1}"
     _bbaname="${2}"
     _bb_archive="${3}"
@@ -228,11 +228,11 @@ try_fetch_binbuild () {
 }
 
 
-build_all () {
+build () {
     _build_list=$*
 
     # Update definitions and perform more checks
-    validate_requirements
+    validate_reqs
 
     PATH="${DEFAULT_PATH}"
     for _bund_name in ${_build_list}; do
@@ -302,7 +302,7 @@ build_all () {
                 _an_archive="$(capitalize "${_common_lowercase}")-${DEF_VERSION}${DEFAULT_ARCHIVE_EXT}"
                 INSTALLED_INDICATOR="${PREFIX}/${_common_lowercase}${INSTALLED_MARK}"
                 if [ ! -e "${INSTALLED_INDICATOR}" ]; then
-                    try_fetch_binbuild "${_full_bund_name}" "${_common_lowercase}" "${_an_archive}"
+                    fetch_binbuild "${_full_bund_name}" "${_common_lowercase}" "${_an_archive}"
                 else
                     _already_installed_version="$(${CAT_BIN} ${INSTALLED_INDICATOR} 2>/dev/null)"
                     if [ "${DEF_VERSION}" = "${_already_installed_version}" ]; then
@@ -334,7 +334,7 @@ build_all () {
                             note "  ${_req} ($(distinct n ${_req_amount}) of $(distinct n ${_req_all}) remaining)"
                             if [ ! -e "${PREFIX}/${_req}${INSTALLED_MARK}" ]; then
                                 CHANGED=YES
-                                execute_process "${_req}"
+                                process "${_req}"
                             fi
                         fi
                         _req_amount="$(${PRINTF_BIN} "${_req_amount} - 1\n" | ${BC_BIN} 2>/dev/null)"
@@ -346,7 +346,7 @@ build_all () {
                         if [ "${CHANGED}" = "YES" ]; then
                             note "  ${_common_lowercase} ($(distinct n 1) of $(distinct n ${_req_all}))"
                             note "   ${NOTE_CHAR} App dependencies changed. Rebuilding: $(distinct n ${_common_lowercase})"
-                            execute_process "${_common_lowercase}"
+                            process "${_common_lowercase}"
                             unset CHANGED
                             mark_installed "${DEF_NAME}${DEF_POSTFIX}" "${DEF_VERSION}"
                             show_done "${DEF_NAME}${DEF_POSTFIX}"
@@ -357,8 +357,8 @@ build_all () {
                         fi
                     else
                         note "  ${_common_lowercase} ($(distinct n 1) of $(distinct n ${_req_all}))"
-                        debug "Right before execute_process call: ${_common_lowercase}"
-                        execute_process "${_common_lowercase}"
+                        debug "Right before process call: ${_common_lowercase}"
+                        process "${_common_lowercase}"
                         mark_installed "${DEF_NAME}${DEF_POSTFIX}" "${DEF_VERSION}"
                         note "${SUCCESS_CHAR} ${_common_lowercase} [$(distinct n ${DEF_VERSION})]\n"
                     fi
@@ -427,7 +427,7 @@ push_binary_archive () {
 }
 
 
-push_service_stream_archive () {
+push_zfs_stream () {
     _fin_snapfile="${1}"
     _pselement="${2}"
     _psmirror="${3}"
@@ -457,10 +457,10 @@ push_service_stream_archive () {
 }
 
 
-execute_process () {
+process () {
     _app_param="$1"
     if [ -z "${_app_param}" ]; then
-        error "No param given for execute_process()!"
+        error "No param given for process()!"
     fi
     _req_definition="${DEFINITIONS_DIR}$(lowercase "${_app_param}")${DEFAULT_DEF_EXT}"
     debug "Checking requirement: $(distinct d ${_app_param}) file: $(distinct d ${_req_definition})"
@@ -471,7 +471,7 @@ execute_process () {
     load_defaults
     load_defs "${_req_definition}"
 
-    setup_sofin_compiler
+    compiler_setup
     dump_debug_info
 
     PATH="${PREFIX}/bin:${PREFIX}/sbin:${DEFAULT_PATH}"
@@ -513,8 +513,8 @@ execute_process () {
                             # remove corrupted file
                             ${RM_BIN} -vf "${_dest_file}" >> ${LOG} 2>> ${LOG}
                             # and restart script with same arguments:
-                            debug "Evaluating again: $(distinct d "execute_process(${_app_param})")"
-                            execute_process "${_app_param}"
+                            debug "Evaluating again: $(distinct d "process(${_app_param})")"
+                            process "${_app_param}"
                         fi
                         unset _bname _a_file_checksum
                     fi

@@ -57,7 +57,7 @@ clean_failbuilds () {
 
 
 perform_clean () {
-    fail_on_any_background_jobs
+    fail_any_bg_jobs
     case "$1" in
         purge) # purge
             clean_purge
@@ -77,8 +77,8 @@ perform_clean () {
 }
 
 
-cleanup_after_tasks () {
-    debug "cleanup_after_tasks()"
+finalize () {
+    debug "finalize()"
     update_shell_vars
     reload_zsh_shells
     destroy_locks

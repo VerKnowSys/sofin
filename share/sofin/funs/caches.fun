@@ -1,4 +1,4 @@
-create_cache_directories () {
+create_dirs () {
     # special threatment for LOGS_DIR
     if [ ! -d "${LOGS_DIR}" ]; then
         debug "LOGS_DIR: $(distinct d "${LOGS_DIR}")"
@@ -25,7 +25,7 @@ create_cache_directories () {
 
 log_helper () {
     _log_h_pattern="$1"
-    create_cache_directories
+    create_dirs
     if [ -z "${_log_h_pattern}" ]; then
         _log_files="$(find_all "${LOGS_DIR}" "sofin*")"
     else
@@ -62,7 +62,7 @@ log_helper () {
 
 
 show_logs () {
-    create_cache_directories
+    create_dirs
     _logf_pattern="$*"
     _logf_minutes="${LOG_LAST_ACCESS_OR_MOD_MINUTES}"
     debug "show_logs(): _logf_minutes: $(distinct d ${_logf_minutes}), pattern: $(distinct d "${_logf_pattern}")"
@@ -125,7 +125,7 @@ show_logs () {
 
 pretouch_logs () {
     _params="$*"
-    create_cache_directories
+    create_dirs
     debug "Logs pretouch called with params: $(distinct d ${_params})"
     ${TOUCH_BIN} ${LOGS_DIR}sofin >/dev/null 2>&1
     _pret_list=""

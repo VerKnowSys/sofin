@@ -148,20 +148,20 @@ run () {
         if [ -z "${_rnm}" ]; then
             if [ -z "${_run_show_stdout_progress}" ]; then
                 eval PATH="${PATH}" "${_run_params}" >> "${LOG}" 2>> "${LOG}"
-                check_command_result $? "${_run_params}"
+                check_result $? "${_run_params}"
             else
                 ${PRINTF_BIN} "${blue}"
                 eval PATH="${PATH}" "${_run_params}" >> "${LOG}"
-                check_command_result $? "${_run_params}"
+                check_result $? "${_run_params}"
             fi
         else
             if [ -z "${_run_show_stdout_progress}" ]; then
                 eval PATH="${PATH}" "${_run_params}" >> "${LOG}-${_rnm}" 2>> "${LOG}-${_rnm}"
-                check_command_result $? "${_run_params}"
+                check_result $? "${_run_params}"
             else
                 ${PRINTF_BIN} "${blue}"
                 eval PATH="${PATH}" "${_run_params}" >> "${LOG}-${_rnm}"
-                check_command_result $? "${_run_params}"
+                check_result $? "${_run_params}"
             fi
         fi
     else
@@ -200,7 +200,7 @@ try () {
 }
 
 
-setup_default_branch () {
+setup_def_branch () {
     # setting up definitions repository
     if [ -z "${BRANCH}" ]; then
         BRANCH="${DEFAULT_DEFINITIONS_BRANCH}"
@@ -208,7 +208,7 @@ setup_default_branch () {
 }
 
 
-setup_default_repository () {
+setup_def_repo () {
     if [ -z "${REPOSITORY}" ]; then
         REPOSITORY="${DEFAULT_DEFINITIONS_REPOSITORY}"
     fi

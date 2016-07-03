@@ -39,10 +39,10 @@ load_sofin () {
                 build.fun
 
     # initial validations
-    setup_default_branch
-    setup_default_repository
+    setup_def_branch
+    setup_def_repo
     check_os
-    check_definition_dir
+    check_defs_dir
 }
 
 load_sofin

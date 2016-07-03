@@ -26,13 +26,13 @@ validate_env () {
 fail_on_bg_job () {
     _deps=$*
     debug "deps=$(distinct d $(echo ${_deps} | eval "${NEWLINES_TO_SPACES_GUARD}"))"
-    create_cache_directories
+    create_dirs
     acquire_lock_for "${_deps}"
     unset _deps
 }
 
 
-fail_on_any_background_jobs () {
+fail_any_bg_jobs () {
     # Traverse through locks, make sure that every pid from lock is dead before cleaning can continue
     for _a_lock in $(${FIND_BIN} "${LOCKS_DIR}" -type f -name "*${DEFAULT_LOCK_EXT}" -print 2>/dev/null); do
         _bundle_name="$(${BASENAME_BIN} ${_a_lock} 2>/dev/null)"
@@ -46,7 +46,7 @@ fail_on_any_background_jobs () {
 }
 
 
-validate_requirements () {
+validate_reqs () {
     if [ "${SYSTEM_NAME}" != "Darwin" ]; then
         if [ -d "/usr/local" ]; then
             _a_files="$(${FIND_BIN} /usr/local -maxdepth 3 -type f 2>/dev/null | ${WC_BIN} -l 2>/dev/null | ${SED_BIN} -e 's/^ *//g;s/ *$//g' 2>/dev/null)"
@@ -65,7 +65,7 @@ validate_requirements () {
 }
 
 
-check_definition_dir () {
+check_defs_dir () {
     if [ ! -d "${SOFTWARE_DIR}" ]; then
         debug "No $(distinct d ${SOFTWARE_DIR}) found. Creating one."
         "${MKDIR_BIN}" -p "${SOFTWARE_DIR}" >/dev/null 2>&1

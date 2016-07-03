@@ -21,7 +21,7 @@ if [ ! -z "${SOFIN_COMMAND_ARG}" ]; then
 
 
         hack|h)
-            hack_definition ${SOFIN_ARGS}
+            hack_def ${SOFIN_ARGS}
             ;;
 
 
@@ -88,7 +88,7 @@ if [ ! -z "${SOFIN_COMMAND_ARG}" ]; then
 
 
         i|install|get|pick|choose|use|switch)
-            create_cache_directories
+            create_dirs
             _list_maybe="$(lowercase "${2}")"
             if [ -z "${_list_maybe}" ]; then
                 error "Second argument, with at least one application (or list) name is required!"
@@ -101,14 +101,14 @@ if [ ! -z "${SOFIN_COMMAND_ARG}" ]; then
                 _pickd_bundls="${SOFIN_ARGS}"
             fi
             debug "Processing software: $(distinct d "${_pickd_bundls}") for: $(distinct d ${OS_TRIPPLE})"
-            build_all "${_pickd_bundls}"
+            build "${_pickd_bundls}"
             unset _pickd_bundls
-            cleanup_after_tasks
+            finalize
             ;;
 
 
         deps|dependencies|local)
-            create_cache_directories
+            create_dirs
             if [ "${USER}" = "root" ]; then
                 warn "Installation of project dependencies as root is immoral"
             fi
@@ -119,50 +119,50 @@ if [ ! -z "${SOFIN_COMMAND_ARG}" ]; then
             fi
             _pickd_bundls="$(${CAT_BIN} ./${DEPENDENCIES_FILE} 2>/dev/null | eval ${NEWLINES_TO_SPACES_GUARD})"
             note "Installing dependencies: $(distinct n ${_pickd_bundls})"
-            build_all "${_pickd_bundls}"
+            build "${_pickd_bundls}"
             unset _pickd_bundls
-            cleanup_after_tasks
+            finalize
             ;;
 
 
         p|push|binpush|send)
             fail_on_bg_job ${SOFIN_ARGS}
             push_binbuild ${SOFIN_ARGS}
-            cleanup_after_tasks
+            finalize
             ;;
 
 
         b|build)
-            create_cache_directories
+            create_dirs
             _to_be_built="${SOFIN_ARGS}"
             note "Software bundles to be built: $(distinct n ${_to_be_built})"
             fail_on_bg_job ${_to_be_built}
             USE_UPDATE=NO
             USE_BINBUILD=NO
-            build_all "${_to_be_built}"
+            build "${_to_be_built}"
             unset _to_be_built
-            cleanup_after_tasks
+            finalize
             ;;
 
 
         d|deploy)
             fail_on_bg_job ${SOFIN_ARGS}
             deploy_binbuild ${SOFIN_ARGS}
-            cleanup_after_tasks
+            finalize
             ;;
 
 
         reset)
             fail_on_bg_job ${SOFIN_ARGS}
-            reset_definitions
-            cleanup_after_tasks
+            reset_defs
+            finalize
             ;;
 
 
         rebuild)
             fail_on_bg_job ${SOFIN_ARGS}
             rebuild_bundle ${SOFIN_ARGS}
-            cleanup_after_tasks
+            finalize
             ;;
 
 
@@ -174,12 +174,12 @@ if [ ! -z "${SOFIN_COMMAND_ARG}" ]; then
         delete|remove|uninstall|rm)
             fail_on_bg_job ${SOFIN_ARGS}
             remove_bundles ${SOFIN_ARGS}
-            cleanup_after_tasks
+            finalize
             ;;
 
 
         reload|rehash)
-            cleanup_after_tasks
+            finalize
             ;;
 
 
@@ -196,7 +196,7 @@ if [ ! -z "${SOFIN_COMMAND_ARG}" ]; then
         exportapp|export|exp)
             fail_on_bg_job ${SOFIN_ARGS}
             make_exports ${SOFIN_ARGS}
-            cleanup_after_tasks
+            finalize
             ;;
 
 
