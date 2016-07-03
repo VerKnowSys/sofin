@@ -41,27 +41,34 @@ load_defs () {
                             "SYSTEM_VERSION=${SYSTEM_VERSION}" \
                             "OS_TRIPPLE=${OS_TRIPPLE}" \
                             "SYS_SPECIFIC_BINARY_REMOTE=${SYS_SPECIFIC_BINARY_REMOTE}";
-            do
-                for _check in   "DEF_NAME" \
-                                "DEF_NAME_DEF_POSTFIX" \
-                                "DEF_VERSION" \
-                                "DEF_SHA_OR_DEF_GIT_MODE" \
-                                "DEF_COMPLIANCE" \
-                                "DEF_HTTP_PATH" \
-                                "SYSTEM_VERSION" \
-                                "OS_TRIPPLE" \
-                                "SYS_SPECIFIC_BINARY_REMOTE";
-                    do
-                        if [ "${_check}=" = "${_required_field}" -o \
-                             "${_check}=." = "${_required_field}" -o \
-                             "${_check}=${DEFAULT_DEF_EXT}" = "${_required_field}" ]; then
-                            error "Empty or wrong value for required field: $(distinct e "${_check}") from definition: $(distinct e "${_def}")."
+        do
+            unset _valid_checks
+            for _check in   "DEF_NAME" \
+                            "DEF_NAME_DEF_POSTFIX" \
+                            "DEF_VERSION" \
+                            "DEF_SHA_OR_DEF_GIT_MODE" \
+                            "DEF_COMPLIANCE" \
+                            "DEF_HTTP_PATH" \
+                            "SYSTEM_VERSION" \
+                            "OS_TRIPPLE" \
+                            "SYS_SPECIFIC_BINARY_REMOTE";
+                do
+                    if [ "${_check}=" = "${_required_field}" -o \
+                         "${_check}=." = "${_required_field}" -o \
+                         "${_check}=${DEFAULT_DEF_EXT}" = "${_required_field}" ]; then
+                        error "Empty or wrong value for required field: $(distinct e "${_check}") from definition: $(distinct e "${_def}")."
+                    else
+                        # gather passed checks, but print it only once..
+                        if [ -z "${_valid_checks}" ]; then
+                            _valid_checks="${_check}"
                         else
-                            debug "validating requirement: $(distinct d ${_check})"
+                            _valid_checks="${_check}, ${_valid_checks}"
                         fi
+                    fi
                 done
-    done
-    unset _def _definitions _check _required_field _name_base _given_def
+        done
+    debug "Requirements validated: $(distinct d "${_valid_checks}")"
+    unset _def _definitions _check _required_field _name_base _given_def _valid_checks
 }
 
 
