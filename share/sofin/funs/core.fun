@@ -27,17 +27,17 @@ cecho () {
 
 debug () {
     _in="$@"
-    _dbfnin=""
-    _dbres=""
     if [ ! -z "${SHELL_FUNCNAME}" ]; then
         _dbres="${SHELL_FUNCNAME}"
         for _cee in ${_dbres}; do
+    unset _dbfnin
             case "${_cee}" in
                 debug|cecho|note|warn|error|distinct)
                     ;;
+
                 *)
                     if [ -z "${_dbfnin}" ]; then
-                        _dbfnin="${_cee}():"
+                        _dbfnin="${_cee}(): "
                     else
                         _dbfnin="${_cee}->${_dbfnin}"
                     fi

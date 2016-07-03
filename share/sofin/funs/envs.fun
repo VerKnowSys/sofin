@@ -4,7 +4,7 @@ compiler_setup () {
             ${LOGGER_BIN} "sofin: $@"
         }
     fi
-    debug "setup_sofin_compiler(): Compiler features enabled for definition: $(distinct d "${DEF_NAME}${DEF_POSTFIX}") on platform: $(distinct d ${SYSTEM_NAME})"
+    debug "Enabled compiler features for definition: $(distinct d "${DEF_NAME}${DEF_POSTFIX}") on platform: $(distinct d ${SYSTEM_NAME})"
     case "${SYSTEM_NAME}" in
         Minix)
             DEFAULT_COMPILER_FLAGS="${COMMON_COMPILER_FLAGS} -I/usr/pkg/include -fPIE"

@@ -1,22 +1,22 @@
 check_result () {
     if [ -z "$1" ]; then
-        error "Empty command given for: $(distinct e "check_command_result()")!"
+        error "Empty command given!"
     fi
     if [ "$1" = "0" ]; then
         shift
-        debug "Command successful: $(distinct d "$*")"
+        debug "$(distinct ${green} "${SUCCESS_CHAR}") $(distinct d "$*")"
     else
         shift
-        error "Command failed: $(distinct e "$*")"
+        error "$(distinct ${red} "${FAIL_CHAR}") $(distinct e "$*")"
     fi
 }
 
 
 def_error () {
     if [ -z "${2}" ]; then
-        error "Failed action for: $(distinct e $1)"
+        error "$(distinct ${red} "${FAIL_CHAR}") $(distinct e "${1}")"
     else
-        error "${2}"
+        error "$(distinct ${green} "${SUCCESS_CHAR}") $(distinct e "${2}")"
     fi
 }
 
@@ -100,10 +100,10 @@ retry () {
                     return 0
             fi
         else
-            error "retry(): Given an empty command to evaluate!"
+            error "Given an empty command to evaluate!"
         fi
         _ammo="$(echo "${_ammo}" | ${SED_BIN} 's/O//' 2>/dev/null)"
-        debug "retry(): Remaining attempts: $(distinct d ${_ammo})"
+        debug "Remaining attempts: $(distinct d ${_ammo})"
     done
     unset _ammo _targets
     error "All _ammo exhausted to invoke a command: $(distinct e "${_targets}")"
