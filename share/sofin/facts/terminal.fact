@@ -4,7 +4,7 @@
 # setaf => foreground
 # setab => background
 
-reset="$(${TPUT_BIN} setaf 0)"
+darkgray="$(${TPUT_BIN} setaf 0)"
 red="$(${TPUT_BIN} setaf 1)"
 green="$(${TPUT_BIN} setaf 2)"
 yellow="$(${TPUT_BIN} setaf 3)"
@@ -16,8 +16,8 @@ gray="$(${TPUT_BIN} setaf 7)"
 
 cyan2="$(${TPUT_BIN} setaf 12)"
 magenta2="$(${TPUT_BIN} setaf 97)"
-func="$(${TPUT_BIN} setaf 241)"
-
+func="$(${TPUT_BIN} setaf 163)"
+reset="${gray}"
 
 TTY="NO"
 MAX_COLS="80"
