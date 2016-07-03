@@ -93,7 +93,7 @@ if [ ! -z "${SOFIN_COMMAND_ARG}" ]; then
             if [ -z "${_list_maybe}" ]; then
                 error "Second argument, with at least one application (or list) name is required!"
             fi
-            fail_on_background_sofin_job ${SOFIN_ARGS}
+            fail_on_bg_job ${SOFIN_ARGS}
             # NOTE: trying a list first - it will have priority if file exists:
             if [ -f "${LISTS_DIR}${_list_maybe}" ]; then
                 _pickd_bundls="$(${CAT_BIN} "${LISTS_DIR}${_list_maybe}" 2>/dev/null | eval ${NEWLINES_TO_SPACES_GUARD})"
@@ -112,7 +112,7 @@ if [ ! -z "${SOFIN_COMMAND_ARG}" ]; then
             if [ "${USERNAME}" = "root" ]; then
                 warn "Installation of project dependencies as root is immoral"
             fi
-            fail_on_background_sofin_job ${SOFIN_ARGS}
+            fail_on_bg_job ${SOFIN_ARGS}
             note "Looking for a dependencies list file: $(distinct n ${DEPENDENCIES_FILE}) in current directory"
             if [ ! -e "./${DEPENDENCIES_FILE}" ]; then
                 error "Dependencies file not found!"
@@ -126,7 +126,7 @@ if [ ! -z "${SOFIN_COMMAND_ARG}" ]; then
 
 
         p|push|binpush|send)
-            fail_on_background_sofin_job ${SOFIN_ARGS}
+            fail_on_bg_job ${SOFIN_ARGS}
             push_binbuild ${SOFIN_ARGS}
             cleanup_after_tasks
             ;;
@@ -136,7 +136,7 @@ if [ ! -z "${SOFIN_COMMAND_ARG}" ]; then
             create_cache_directories
             _to_be_built="${SOFIN_ARGS}"
             note "Software bundles to be built: $(distinct n ${_to_be_built})"
-            fail_on_background_sofin_job ${_to_be_built}
+            fail_on_bg_job ${_to_be_built}
             USE_UPDATE=NO
             USE_BINBUILD=NO
             build_all "${_to_be_built}"
@@ -146,21 +146,21 @@ if [ ! -z "${SOFIN_COMMAND_ARG}" ]; then
 
 
         d|deploy)
-            fail_on_background_sofin_job ${SOFIN_ARGS}
+            fail_on_bg_job ${SOFIN_ARGS}
             deploy_binbuild ${SOFIN_ARGS}
             cleanup_after_tasks
             ;;
 
 
         reset)
-            fail_on_background_sofin_job ${SOFIN_ARGS}
+            fail_on_bg_job ${SOFIN_ARGS}
             reset_definitions
             cleanup_after_tasks
             ;;
 
 
         rebuild)
-            fail_on_background_sofin_job ${SOFIN_ARGS}
+            fail_on_bg_job ${SOFIN_ARGS}
             rebuild_bundle ${SOFIN_ARGS}
             cleanup_after_tasks
             ;;
@@ -172,7 +172,7 @@ if [ ! -z "${SOFIN_COMMAND_ARG}" ]; then
 
 
         delete|remove|uninstall|rm)
-            fail_on_background_sofin_job ${SOFIN_ARGS}
+            fail_on_bg_job ${SOFIN_ARGS}
             remove_bundles ${SOFIN_ARGS}
             cleanup_after_tasks
             ;;
@@ -194,14 +194,14 @@ if [ ! -z "${SOFIN_COMMAND_ARG}" ]; then
 
 
         exportapp|export|exp)
-            fail_on_background_sofin_job ${SOFIN_ARGS}
+            fail_on_bg_job ${SOFIN_ARGS}
             make_exports ${SOFIN_ARGS}
             cleanup_after_tasks
             ;;
 
 
         old|out|outdated|rusk)
-            fail_on_background_sofin_job ${SOFIN_ARGS}
+            fail_on_bg_job ${SOFIN_ARGS}
             show_outdated
             ;;
 
