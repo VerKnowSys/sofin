@@ -4,8 +4,8 @@
 
 # load configuration from sofin.conf
 . share/sofin/facts/paths.fact
-. share/sofin/facts/terminal.fact
 . share/sofin/facts/paths-$(uname).fact
+. share/sofin/facts/terminal.fact
 . share/sofin/facts/system.fact
 . share/sofin/facts/sofin.fact
 
@@ -106,7 +106,7 @@ Sofin requires read + write access for that path"
     note "$(distinct n $(${INSTALL_BIN} "bin/sofin-microseconds" "${PREFIX}usr/bin" && \
         echo "install: bin/sofin-microseconds -> ${PREFIX}usr/bin"))" && \
     note "$(distinct n $(${INSTALL_BIN} "src/sofin.sh" "${PREFIX}usr/bin/s" && \
-        echo "install: src/sofin.sh -> ${PREFIX}bin/s"))" && \
+        echo "install: src/sofin.sh -> ${PREFIX}usr/bin/s"))" && \
     note "Type: $(distinct n "s usage") for help." && \
     note "Read: $(distinct n "https://bitbucket.org/verknowsys/sofin") for more details." && \
     ${SED_BIN} -i -e "s#OS_TYPE#$(uname)#" ${PREFIX}usr/share/sofin/loader 2>/dev/null && \
