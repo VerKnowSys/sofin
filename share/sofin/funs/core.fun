@@ -29,24 +29,23 @@ debug () {
     _in="$@"
     _dbfnin=""
     _dbres=""
-    # if /bin/sh in system supports FUNCNAME..
     if [ ! -z "${SHELL_FUNCNAME}" ]; then
-        _dbres=${SHELL_FUNCNAME}
+        _dbres="${SHELL_FUNCNAME}"
+        for _cee in ${_dbres}; do
+            case "${_cee}" in
+                debug|cecho|note|warn|error|distinct)
+                    ;;
+                *)
+                    if [ -z "${_dbfnin}" ]; then
+                        _dbfnin="${_cee}():"
+                    else
+                        _dbfnin="${_cee}->${_dbfnin}"
+                    fi
+                    ;;
+            esac
+        done
     fi
-    for _cee in ${_dbres}; do
-        case "${_cee}" in
-            debug|cecho|note|warn|error)
-                ;;
-            *)
-                if [ -z "${_dbfnin}" ]; then
-                    _dbfnin="${_cee}()"
-                else
-                    _dbfnin="${_cee}->${_dbfnin}"
-                fi
-                ;;
-        esac
-    done
-    _dbfn="# ${func}${_dbfnin}${magenta2}: " # NOTE: "#" is required for debug mode to work properly
+    _dbfn="# ${func}${_dbfnin}${magenta2}" # NOTE: "#" is required for debug mode to work properly
     if [ -z "${DEBUG}" ]; then
         _dbgnme="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
         if [ ! -z "${_dbgnme}" -a \
@@ -67,7 +66,7 @@ debug () {
 
         fi
     else # DEBUG is set.
-        cecho "${_dbfn}${_in}" ${magenta}
+        cecho "${_dbfn}${_in}" ${magenta2}
     fi
     unset _dbgnme _in _dbfn _cee _dbfnin
 }
