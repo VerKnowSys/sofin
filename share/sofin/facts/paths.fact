@@ -1,5 +1,6 @@
 # default CA Root certs to be used by Sofin:
 DEFAULT_CACERT="/etc/ssl/cert.pem"
+DEFAULT_LEGACY_SHELL="/bin/sh"
 
 # POSIX base system binaries used internally by Sofin:
 PRINTF_BIN="/usr/bin/printf"
