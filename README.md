@@ -34,12 +34,12 @@ customizable software for HardenedBSD/FreeBSD servers. Darwin (Mac OS X) support
 * By default Sofin verbosity is limited to minimum. More detailed information is written to log files (located in ~/.cache/logs/. Quick access to them by `s log pattern`)
 * Exports. Each app has own ROOT_DIR/exports/ with symlinks to exported binaries. Exported binaries are just simple symlinks used to generate PATH environment variable.
 * Supports custom callbacks executed in order as follows:
-  - DEF_AFTER_UNPACK_CALLBACK (executed after software unpack process)
-  - DEF_AFTER_PATCH_CALLBACK (executed after software patch process)
-  - DEF_AFTER_CONFIGURE_CALLBACK (executed after software configuration process)
-  - DEF_AFTER_MAKE_CALLBACK (executed after software compilation process)
-  - DEF_AFTER_INSTALL_CALLBACK (executed after software installation process)
-  - DEF_AFTER_EXPORT_CALLBACK (executed after final stage of exporting software binaries)
+  - DEF_AFTER_UNPACK_METHOD (executed after software unpack process)
+  - DEF_AFTER_PATCH_METHOD (executed after software patch process)
+  - DEF_AFTER_CONFIGURE_METHOD (executed after software configuration process)
+  - DEF_AFTER_MAKE_METHOD (executed after software compilation process)
+  - DEF_AFTER_INSTALL_METHOD (executed after software installation process)
+  - DEF_AFTER_EXPORT_METHOD (executed after final stage of exporting software binaries)
   Each callback can be sh function itself and to be called by name. Look into [sbt.def](https://github.com/VerKnowSys/sofin-definitions/blob/stable/definitions/sbt.def) for an example createLaunchScript().
 * Supports collisions between definitions through DEF_CONFLICTS_WITH option since version 0.38.0. An example in [ruby.def](https://github.com/VerKnowSys/sofin-definitions/blob/stable/definitions/ruby.def)
 * Supports binary builds of software bundles since 0.47.2
@@ -141,8 +141,8 @@ space than it does with "old fasioned, system wide, shared software".
 
 ## Pitfalls/ Limitations:
 * Support for root software will be continuously dropped from support, because it's a bad habit.
-* Sofin assumes that /Software is owned by single non-root user. (In ServeD OS, each user has his own /Software mounted from 'zroot/Software/USERNAME' private dataset).
-* Sofin assumes that /User is user data directory. On OSX, if you don't have /User directory, you might want to do `sudo ln -s ~ /User`. It will be also required under vanilla versions of HardenedBSD. Under ServeD-OS each worker user is located under /User by default (mounted from 'zroot/User/USERNAME' dataset).
+* Sofin assumes that /Software is owned by single non-root user. (In ServeD OS, each user has his own /Software mounted from 'zroot/Software/USER' private dataset).
+* Sofin assumes that /User is user data directory. On OSX, if you don't have /User directory, you might want to do `sudo ln -s ~ /User`. It will be also required under vanilla versions of HardenedBSD. Under ServeD-OS each worker user is located under /User by default (mounted from 'zroot/User/USER' dataset).
 
 
 ## Installation info (platform specific):
