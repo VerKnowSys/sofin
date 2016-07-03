@@ -1,23 +1,9 @@
-# ANSI color definitions
+# Terminal definitions
 
-# tput:
-# setaf => foreground
-# setab => background
-
-darkgray="$(${TPUT_BIN} setaf 0)"
-red="$(${TPUT_BIN} setaf 1)"
-green="$(${TPUT_BIN} setaf 2)"
-yellow="$(${TPUT_BIN} setaf 3)"
-blue="$(${TPUT_BIN} setaf 4)"
-magenta="$(${TPUT_BIN} setaf 5)"
-cyan="$(${TPUT_BIN} setaf 6)"
-white="$(${TPUT_BIN} setaf 15)"
-gray="$(${TPUT_BIN} setaf 7)"
-
-cyan2="$(${TPUT_BIN} setaf 12)"
-magenta2="$(${TPUT_BIN} setaf 97)"
-func="$(${TPUT_BIN} setaf 163)"
-reset="${gray}"
+LANG="en_US.UTF-8"
+LANGUAGE="${LANG}"
+LC_ALL="${LANG}"
+TERM="xterm-256color"
 
 TTY="NO"
 MAX_COLS="80"
@@ -37,3 +23,23 @@ if [ -t 1 ]; then
     SEPARATOR_CHAR="┈"
 fi
 
+
+# ANSI color definitions
+
+# tput:
+# setaf => foreground
+# setab => background
+darkgray="$(${TPUT_BIN} setaf 0)"
+red="$(${TPUT_BIN} setaf 1)"
+green="$(${TPUT_BIN} setaf 2)"
+yellow="$(${TPUT_BIN} setaf 3)"
+blue="$(${TPUT_BIN} setaf 4)"
+magenta="$(${TPUT_BIN} setaf 5)"
+cyan="$(${TPUT_BIN} setaf 6)"
+white="$(${TPUT_BIN} setaf 15)"
+gray="$(${TPUT_BIN} setaf 7)"
+
+cyan2="$(${TPUT_BIN} setaf 12)"
+magenta2="$(${TPUT_BIN} setaf 97)"
+func="$(${TPUT_BIN} setaf 163)"
+reset="${gray}"
