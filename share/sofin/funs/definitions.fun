@@ -641,49 +641,49 @@ hack_definition () {
 
 
 after_update_callback () {
-    if [ ! -z "${DEF_AFTER_UNPACK_CALLBACK}" ]; then
-        debug "Evaluating callback: $(distinct d "${DEF_AFTER_UNPACK_CALLBACK}")"
-        run "${DEF_AFTER_UNPACK_CALLBACK}"
+    if [ ! -z "${DEF_AFTER_UNPACK_METHOD}" ]; then
+        debug "Evaluating callback: $(distinct d "${DEF_AFTER_UNPACK_METHOD}")"
+        run "${DEF_AFTER_UNPACK_METHOD}"
     fi
 }
 
 
 after_export_callback () {
-    if [ ! -z "${DEF_AFTER_EXPORT_CALLBACK}" ]; then
-        debug "Evaluating callback DEF_AFTER_EXPORT_CALLBACK: $(distinct d "${DEF_AFTER_EXPORT_CALLBACK}")"
-        run "${DEF_AFTER_EXPORT_CALLBACK}"
+    if [ ! -z "${DEF_AFTER_EXPORT_METHOD}" ]; then
+        debug "Evaluating callback DEF_AFTER_EXPORT_METHOD: $(distinct d "${DEF_AFTER_EXPORT_METHOD}")"
+        run "${DEF_AFTER_EXPORT_METHOD}"
     fi
 }
 
 
 after_patch_callback () {
-    if [ ! -z "${DEF_AFTER_PATCH_CALLBACK}" ]; then
-        debug "Evaluating callback: $(distinct d "${DEF_AFTER_PATCH_CALLBACK}")"
-        run "${DEF_AFTER_PATCH_CALLBACK}"
+    if [ ! -z "${DEF_AFTER_PATCH_METHOD}" ]; then
+        debug "Evaluating callback: $(distinct d "${DEF_AFTER_PATCH_METHOD}")"
+        run "${DEF_AFTER_PATCH_METHOD}"
     fi
 }
 
 
 after_configure_callback () {
-    if [ ! -z "${DEF_AFTER_CONFIGURE_CALLBACK}" ]; then
-        debug "Evaluating callback: $(distinct d "${DEF_AFTER_CONFIGURE_CALLBACK}")"
-        run "${DEF_AFTER_CONFIGURE_CALLBACK}"
+    if [ ! -z "${DEF_AFTER_CONFIGURE_METHOD}" ]; then
+        debug "Evaluating callback: $(distinct d "${DEF_AFTER_CONFIGURE_METHOD}")"
+        run "${DEF_AFTER_CONFIGURE_METHOD}"
     fi
 }
 
 
 after_make_callback () {
-    if [ ! -z "${DEF_AFTER_MAKE_CALLBACK}" ]; then
-        debug "Evaluating callback: $(distinct d "${DEF_AFTER_MAKE_CALLBACK}")"
-        run "${DEF_AFTER_MAKE_CALLBACK}"
+    if [ ! -z "${DEF_AFTER_MAKE_METHOD}" ]; then
+        debug "Evaluating callback: $(distinct d "${DEF_AFTER_MAKE_METHOD}")"
+        run "${DEF_AFTER_MAKE_METHOD}"
     fi
 }
 
 
 after_install_callback () {
-    if [ ! "${DEF_AFTER_INSTALL_CALLBACK}" = "" ]; then
-        debug "Evaluating callback: $(distinct d "${DEF_AFTER_INSTALL_CALLBACK}")"
-        run "${DEF_AFTER_INSTALL_CALLBACK}"
+    if [ ! "${DEF_AFTER_INSTALL_METHOD}" = "" ]; then
+        debug "Evaluating callback: $(distinct d "${DEF_AFTER_INSTALL_METHOD}")"
+        run "${DEF_AFTER_INSTALL_METHOD}"
     fi
 }
 
