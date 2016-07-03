@@ -28,7 +28,12 @@ cecho () {
 debug () {
     _in="$@"
     _dbfnin=""
-    for _cee in ${FUNCNAME[*]}; do
+    _dbres=""
+    # if /bin/sh in system supports FUNCNAME..
+    if [ ! -z "${SHELL_FUNCNAME}" ]; then
+        _dbres=${SHELL_FUNCNAME}
+    fi
+    for _cee in ${_dbres}; do
         case "${_cee}" in
             debug|cecho|note|warn|error)
                 ;;
