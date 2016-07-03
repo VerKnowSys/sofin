@@ -214,4 +214,6 @@ else
     usage_howto
 fi
 
+unset SOFIN_ARGS_FULL SOFIN_ARGS SOFIN_COMMAND_ARG SOFIN_PID
+
 exit
