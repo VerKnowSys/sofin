@@ -16,7 +16,7 @@ load_sofin () {
     # loading facts
     load_facts  \
                 paths.fact \
-                shell.fact \
+                terminal.fact \
                 paths-OS_TYPE.fact \
                 sofin.fact \
                 system.fact
