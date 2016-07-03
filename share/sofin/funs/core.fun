@@ -27,10 +27,9 @@ cecho () {
 
 debug () {
     _in="$@"
-    if [ ! -z "${SHELL_FUNCNAME}" ]; then
-        _dbres="${SHELL_FUNCNAME}"
-        for _cee in ${_dbres}; do
     unset _dbfnin
+    if [ ! -z "${USE_SHELL_FUNCNAME}" ]; then
+        for _cee in ${FUNCNAME[*]}; do
             case "${_cee}" in
                 debug|cecho|note|warn|error|distinct)
                     ;;
