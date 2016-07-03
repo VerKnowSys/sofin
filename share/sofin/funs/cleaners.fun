@@ -32,27 +32,28 @@ clean_binbuilds () {
 
 
 clean_failbuilds () {
-    if [ -d "${CACHE_DIR}cache" ]; then
-        number="0"
-        files=$(${FIND_BIN} "${CACHE_DIR}cache" -maxdepth 2 -mindepth 1 -type d 2>/dev/null)
-        if [ -z "${files}" ]; then
+    if [ -d "${BUILD_DIR}" ]; then
+        _cf_number="0"
+        _cf_files=$(${FIND_BIN} "${BUILD_DIR}" -maxdepth 2 -mindepth 1 -type d 2>/dev/null)
+        if [ -z "${_cf_files}" ]; then
             debug "No cache dirs. Skipped"
         else
-            num="$(echo "${files}" | eval ${FILES_COUNT_GUARD})"
+            num="$(echo "${_cf_files}" | eval ${FILES_COUNT_GUARD})"
             if [ ! -z "${num}" ]; then
-                number="${number} + ${num} - 1"
+                _cf_number="${_cf_number} + ${num} - 1"
             fi
-            for i in ${files}; do
+            for i in ${_cf_files}; do
                 if [ ! -f "${LOG}" ]; then
                     LOG="/dev/null"
                 fi
                 debug "Removing cache directory: ${i}"
                 ${RM_BIN} -rf "${i}" >> ${LOG} 2>> ${LOG}
             done
-            result="$(echo "${number}" | ${BC_BIN} 2>/dev/null)"
-            note "$(distinct n ${result}) directories cleaned."
+            _cf_result="$(echo "${_cf_number}" | ${BC_BIN} 2>/dev/null)"
+            note "$(distinct n ${_cf_result}) directories cleaned."
         fi
     fi
+    unset _cf_number _cf_files _cf_result
 }
 
 
