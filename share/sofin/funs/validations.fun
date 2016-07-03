@@ -121,7 +121,7 @@ validate_definition_postfix () {
     elif [ "${_l2}" -gt "${_l1}" ]; then
         _cispc_nme_diff="$(difftext "${_cigiven_name}" "${_cidefinition_name}")"
     else # equal
-        _cispc_nme_diff="$(difftext "${_cigiven_name}" "${DEF_NAME}")"
+        _cispc_nme_diff="$(difftext "${_cigiven_name}" "$(lowercase "${DEF_NAME}")")"
     fi
     if [ -z "${DEF_POSTFIX}" -a \
        ! -z "${_cispc_nme_diff}" ]; then
