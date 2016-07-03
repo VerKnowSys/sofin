@@ -33,4 +33,5 @@ if [ -z "${_legacy_sh_check}" -a \
 else
     USE_SHELL_FUNCNAME=YES
 fi
+unset _zsh_avail_check _legacy_sh_check
 

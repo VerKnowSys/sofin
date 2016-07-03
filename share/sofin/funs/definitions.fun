@@ -23,7 +23,7 @@ load_defs () {
 
             # if definition lacks definition of DEF_POSTFIX, after loading
             # the definition file, try to infer DEF_POSTFIX:
-            validate_definition_postfix "${_given_def}" "${DEF_NAME}"
+            validate_def_postfix "${_given_def}" "${DEF_NAME}"
 
             # check disabled definition state
             validate_definition_disabled "${DEF_DISABLE_ON}"

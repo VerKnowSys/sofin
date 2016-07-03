@@ -109,7 +109,7 @@ validate_archive_sha1 () {
 }
 
 
-validate_definition_postfix () {
+validate_def_postfix () {
     _cigiven_name="$(${BASENAME_BIN} "$(echo "$(lowercase "${1}")" | eval "${CUTOFF_DEF_EXT_GUARD}")")"
     _cidefinition_name="$(${BASENAME_BIN} "$(echo "$(lowercase "${2}")" | eval "${CUTOFF_DEF_EXT_GUARD}")")"
     debug "_cigiven_name: $(distinct d "${_cigiven_name}"), _cidefinition_name: $(distinct d "${_cidefinition_name}")"
