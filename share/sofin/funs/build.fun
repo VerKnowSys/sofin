@@ -272,7 +272,7 @@ build () {
                 fi
 
                 PREFIX="${SOFTWARE_DIR}$(capitalize "${_common_lowercase}")"
-                BUILD_DIR="${SOFTWARE_DIR}.src"
+                BUILD_DIR="${DEFAULT_BUILD_DIR}"
                 BUILD_NAMESUM="$(text_checksum "${DEF_NAME}${DEF_POSTFIX}-${DEF_VERSION}")"
                 BUILD_DIR_ROOT="${BUILD_DIR}/${BUILD_NAMESUM}"
                 SERVICE_DIR="${SERVICES_DIR}$(capitalize "${_common_lowercase}")"
