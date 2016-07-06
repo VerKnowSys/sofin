@@ -24,6 +24,20 @@ if [ -t 1 ]; then
 fi
 
 
+# determine TERM capabilities:
+determine_term_capabilites () {
+    # Check terminal capabilities
+    declare -f >/dev/null 2>/dev/null
+    if [ "$?" = "0" ]; then
+        # let's assume that if shell has support for "declare -f"
+        # then it also supports bashismed "arrays[*]":
+        export CAP_TERM_FUNCNAME=YES
+    else
+        unset CAP_TERM_FUNCNAME
+    fi
+}; determine_term_capabilites
+
+
 # ANSI color definitions
 
 # tput:
