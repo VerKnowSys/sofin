@@ -23,15 +23,3 @@ if [ -x "${SOFIN_VERSION_UTILITY_BIN}" ]; then
 else
     unset SYSTEM_VERSION OS_TRIPPLE SYS_SPECIFIC_BINARY_REMOTE
 fi
-
-# Handle legacy sh on FreeBSD:
-_legacy_sh_check="$(${DEFAULT_LEGACY_SHELL} -c --version 2>/dev/null)"
-_zsh_avail_check="$(${ZSH_BIN} -c --version 2>/dev/null)"
-if [ -z "${_legacy_sh_check}" -a \
-     -z "${_zsh_avail_check}" ]; then
-    unset USE_SHELL_FUNCNAME # legacy sh, cause no Zsh alternative found
-else
-    USE_SHELL_FUNCNAME=YES
-fi
-unset _zsh_avail_check _legacy_sh_check
-
