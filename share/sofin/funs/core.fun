@@ -28,7 +28,7 @@ cecho () {
 debug () {
     _in="$@"
     unset _dbfnin
-    if [ ! -z "${USE_SHELL_FUNCNAME}" ]; then
+    if [ "${CAP_TERM_FUNCNAME}" = "YES" ]; then
         for _cee in ${FUNCNAME[*]}; do
             case "${_cee}" in
                 debug|cecho|note|warn|error|distinct)
@@ -43,6 +43,8 @@ debug () {
                     ;;
             esac
         done
+    else
+        _dbfnin="():"
     fi
     _dbfn="# ${func}${_dbfnin}${magenta2}" # NOTE: "#" is required for debug mode to work properly
     if [ -z "${DEBUG}" ]; then
