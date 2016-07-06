@@ -1,3 +1,5 @@
+#!/usr/bin/env -S -P/Software/Zsh/exports:/bin sh
+
 load_facts () {
     for fact in $*; do
         . /usr/share/sofin/facts/${fact}
