@@ -13,9 +13,6 @@ load_funs () {
 
 
 load_sofin () {
-    if [ -z "${HOME}" ]; then
-        HOME="/tmp"
-    fi
 
     # loading facts
     load_facts  \
