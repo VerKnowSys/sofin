@@ -42,6 +42,7 @@ load_sofin () {
     setup_def_repo
     check_os
     check_defs_dir
+    trap_signals
 }
 
 load_sofin

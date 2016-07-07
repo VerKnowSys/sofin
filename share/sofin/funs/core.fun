@@ -214,3 +214,29 @@ setup_def_repo () {
         REPOSITORY="${DEFAULT_DEFINITIONS_REPOSITORY}"
     fi
 }
+
+
+interrupt_handler () {
+    warn "Sofin process terminated: $(distinct w "${SOFIN_PID}")!"
+    warn "Sofin process interrupted: $(distinct w "${SOFIN_PID}")!" >> ${LOG}
+    exit 2
+}
+
+
+terminate_handler () {
+    warn "Sofin process terminated: $(distinct w "${SOFIN_PID}")!"
+    warn "Sofin process terminated: $(distinct w "${SOFIN_PID}")!" >> ${LOG}
+    exit 3
+}
+
+
+noop_handler () {
+    debug "No-Op handler."
+}
+
+
+trap_signals () {
+    trap interrupt_handler INT
+    trap terminate_handler TERM
+    trap noop_handler USR2 # This signal is used to "reload shell"-feature. Sofin should ignore it
+}
