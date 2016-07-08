@@ -23,3 +23,15 @@ if [ -x "${SOFIN_VERSION_UTILITY_BIN}" ]; then
 else
     unset SYSTEM_VERSION OS_TRIPPLE SYS_SPECIFIC_BINARY_REMOTE
 fi
+
+
+determine_system_capabilites () {
+    ${ZPOOL_BIN} list >/dev/null 2>/dev/null
+    if [ "$?" = "0" ]; then
+        CAP_SYS_ZFS=YES
+    else
+        unset CAP_SYS_ZFS
+    fi
+}
+
+determine_system_capabilites
