@@ -495,7 +495,8 @@ process () {
                     if [ ! -e "${FILE_CACHE_DIR}/${_base}" ]; then
                         note "   ${NOTE_CHAR} Fetching required tarball source: $(distinct n ${_base})"
                         cd "${FILE_CACHE_DIR}"
-                        retry "${FETCH_BIN} ${FETCH_OPTS} ${DEF_HTTP_PATH}"
+                        retry "${FETCH_BIN} ${FETCH_OPTS} ${DEF_HTTP_PATH}" || \
+                            def_error "${DEF_NAME}" "Failed to fetch source: ${DEF_HTTP_PATH}"
                     fi
                     cd "${BUILD_DIR_ROOT}"
                     _dest_file="${FILE_CACHE_DIR}/${_base}"
