@@ -33,20 +33,6 @@ if [ -t 1 ]; then
 fi
 
 
-# determine TERM capabilities:
-determine_term_capabilites () {
-    # Check terminal capabilities
-    declare -f >/dev/null 2>/dev/null
-    if [ "$?" = "0" ]; then
-        # let's assume that if shell has support for "declare -f"
-        # then it also supports bashismed "arrays[*]":
-        export CAP_TERM_FUNCNAME=YES
-    else
-        unset CAP_TERM_FUNCNAME
-    fi
-}; determine_term_capabilites
-
-
 # ANSI color definitions
 
 # tput:
@@ -66,3 +52,27 @@ cyan2="$(${TPUT_BIN} setaf 12)"
 magenta2="$(${TPUT_BIN} setaf 97)"
 func="$(${TPUT_BIN} setaf 163)"
 reset="${gray}"
+
+
+# determine TERM capabilities:
+determine_term_capabilites () {
+    setopt >/dev/null 2>/dev/null # zsh only command
+    if [ "$?" = "0" ]; then
+        CAP_TERM_ZSH=YES
+        unset CAP_TERM_BASH
+    else
+        # Check bash specific command (but also available in zsh):
+        declare -f >/dev/null 2>/dev/null
+        if [ "$?" = "0" ]; then
+            # let's assume that if shell has support for "declare -f"
+            # then it also supports bashismed "arrays[*]":
+            CAP_TERM_BASH=YES
+            unset CAP_TERM_ZSH
+        else # fallback to most limited shell:
+            unset CAP_TERM_ZSH
+            unset CAP_TERM_BASH
+        fi
+    fi
+}
+
+determine_term_capabilites
