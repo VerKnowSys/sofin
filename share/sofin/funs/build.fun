@@ -83,12 +83,12 @@ push_binbuild () {
                             try "${ZFS_BIN} umount ${_full_dataset_name}" || \
                                 error "ZFS umount failed for: $(distinct e "${_full_dataset_name}"). Dataset shouldn't be locked nor used on build hosts."
                             ${ZFS_BIN} send "${_full_dataset_name}" \
-                                | ${XZ_BIN} > "${_final_snap_file}" 2>> "${LOG}-${_lowercase_element}" && \
-                                    _snap_size="$(file_size "${_final_snap_file}")" && \
+                                | ${XZ_BIN} > "${FILE_CACHE_DIR}${_final_snap_file}" 2>> "${LOG}-${_lowercase_element}" && \
+                                    _snap_size="$(file_size "${FILE_CACHE_DIR}${_final_snap_file}")" && \
                                     try "${ZFS_BIN} mount ${_full_dataset_name}"
                         fi
                         if [ "${_snap_size}" = "0" ]; then
-                            ${RM_BIN} -vf "${_final_snap_file}" >> "${LOG}-${_lowercase_element}" 2>> "${LOG}-${_lowercase_element}"
+                            ${RM_BIN} -vf "${FILE_CACHE_DIR}${_final_snap_file}" >> "${LOG}-${_lowercase_element}" 2>> "${LOG}-${_lowercase_element}"
                             note "Service dataset has no contents for bundle: $(distinct n ${_pbelement}-${_version_element}), hence upload will be skipped"
                         fi
                     fi
