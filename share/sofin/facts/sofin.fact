@@ -73,8 +73,10 @@ CUTOFF_DEF_EXT_GUARD="${SED_BIN} -e \"s#${DEFAULT_DEF_EXT}##\" 2>/dev/null"
 if [ -n "${SOFIN_TRACE}" ]; then
     if [ "YES" = "${CAP_TERM_ZSH}" ]; then
         setopt sourcetrace
+        setopt xtrace
     elif [ "YES" = "${CAP_TERM_BASH}" ]; then
         set -o sourcetrace
+        set -o xtrace
     else
         set -o xtrace
     fi
