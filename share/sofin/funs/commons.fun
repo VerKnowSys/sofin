@@ -106,7 +106,8 @@ retry () {
         debug "Remaining attempts: $(distinct d ${_ammo})"
     done
     unset _ammo _targets
-    error "All _ammo exhausted to invoke a command: $(distinct e "${_targets}")"
+    debug "All _ammo exhausted to invoke a command: $(distinct e "${_targets}")"
+    return 1
 }
 
 
