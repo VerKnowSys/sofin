@@ -109,7 +109,7 @@ push_binbuild () {
                     push_zfs_stream "${_final_snap_file}" "${_pbelement}" "${_mirror}"
 
                 done
-                ${RM_BIN} -f "${_element_name}" "${_element_name}${DEFAULT_CHKSUM_EXT}" "${_final_snap_file}" >> ${LOG}-${_lowercase_element} 2>> ${LOG}-${_lowercase_element}
+                # ${RM_BIN} -f "${_element_name}" "${_element_name}${DEFAULT_CHKSUM_EXT}" "${FILE_CACHE_DIR}${_final_snap_file}" >> ${LOG}-${_lowercase_element} 2>> ${LOG}-${_lowercase_element}
             fi
         else
             warn "No version file of software: $(distinct w ${_pbelement}) found! It seems to not be fully installed or broken."
