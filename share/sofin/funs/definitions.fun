@@ -503,10 +503,11 @@ clean_useless () {
             if [ -d "${PREFIX}/${_cu_dir}" ]; then
                 _cuall_binaries=$(${FIND_BIN} ${PREFIX}/${_cu_dir} -maxdepth 1 -type f -or -type l 2>/dev/null)
                 _tobermlist=""
+                _dbg_exp_lst=""
                 for _cufile in ${_cuall_binaries}; do
                     _cubase="$(${BASENAME_BIN} ${_cufile} 2>/dev/null)"
                     if [ -e "${PREFIX}/exports/${_cubase}" ]; then
-                        debug "Found export: $(distinct d ${_cubase})"
+                        _dbg_exp_lst="${_dbg_exp_lst} ${_cubase}"
                     else
                         # traverse through DEF_USEFUL for _cufile patterns required by software but not exported
                         _cu_commit_removal=""
@@ -527,14 +528,15 @@ clean_useless () {
                         fi
                     fi
                 done
-                debug "Removing useless files: $(distinct d "${_tobermlist}")"
-                ${RM_BIN} -f ${_tobermlist}
+                debug "Found exports: $(distinct d "${_dbg_exp_lst}")"
+                debug "Found useless files: $(distinct d "${_tobermlist}")"
+                ${RM_BIN} -f "${_tobermlist}" >/dev/null 2>> ${LOG}
             fi
         done
     else
         debug "Useless files cleanup skipped"
     fi
-    unset _cu_pattern _cufile _cuall_binaries _cu_commit_removal _cubase _tobermlist
+    unset _cu_pattern _cufile _cuall_binaries _cu_commit_removal _cubase _tobermlist _dbg_exp_lst
 }
 
 
