@@ -24,6 +24,7 @@ manage_datasets () {
         _all_soft="$(${FIND_BIN} ${SERVICES_DIR} -mindepth 1 -maxdepth 1 -type d -not -name '.*' -print 2>/dev/null | ${XARGS_BIN} ${BASENAME_BIN} 2>/dev/null)"
         debug "Checking for non-dataset directories in $(distinct d ${SERVICES_DIR}): EOF:\n$(echo "${_all_soft}" | eval "${NEWLINES_TO_SPACES_GUARD}")\nEOF\n"
         _full_bundname="$(${BASENAME_BIN} "${PREFIX}" 2>/dev/null)"
+        _all_ap_lc_list=""
         for _maybe_dataset in ${_all_soft}; do
             _aname="$(lowercase ${_full_bundname})"
             _app_name_lowercase="$(lowercase ${_maybe_dataset})"
@@ -64,8 +65,11 @@ manage_datasets () {
                 fi
 
             else # no name match
-                debug "No match for: $(distinct d ${_app_name_lowercase})"
+                _all_ap_lc_list="${_all_ap_lc_list} ${_app_name_lowercase}"
             fi
         done
+        if [ -n "${_all_ap_lc_list}" ]; then
+            debug "No match for: $(distinct d ${_all_ap_lc_list})"
+        fi
     fi
 }
