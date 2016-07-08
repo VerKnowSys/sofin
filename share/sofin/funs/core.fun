@@ -28,24 +28,33 @@ cecho () {
 debug () {
     _in="$@"
     unset _dbfnin
-    if [ "${CAP_TERM_FUNCNAME}" = "YES" ]; then
-        for _cee in ${FUNCNAME[*]}; do
-            case "${_cee}" in
-                debug|cecho|note|warn|error|distinct)
-                    ;;
+    if [ "${CAP_TERM_BASH}" = "YES" ]; then
+        if [ -n "${FUNCNAME[*]}" ]; then # bash based:
+            _elmz="${FUNCNAME[*]}"
+            for _cee in ${_elmz}; do
+                case "${_cee}" in
+                    debug|cecho|note|warn|error|distinct)
+                        ;;
 
-                *)
-                    if [ -z "${_dbfnin}" ]; then
-                        _dbfnin="${_cee}(): "
-                    else
-                        _dbfnin="${_cee}->${_dbfnin}"
-                    fi
-                    ;;
-            esac
-        done
+                    *)
+                        if [ -z "${_dbfnin}" ]; then
+                            _dbfnin="${_cee}(): "
+                        else
+                            _dbfnin="${_cee}->${_dbfnin}"
+                        fi
+                        ;;
+                esac
+            done
+        fi
+    elif [ -n "${CAP_TERM_ZSH}" ]; then
+        # typeset -f -T
+        setopt sourcetrace
+        setopt xtrace
+        PS4="${magenta2}# ${func}%N()${gray}:${cyan2}%i${magenta2} >> ${cyan}"
     else
         _dbfnin="():"
     fi
+
     _dbfn="# ${func}${_dbfnin}${magenta2}" # NOTE: "#" is required for debug mode to work properly
     if [ -z "${DEBUG}" ]; then
         _dbgnme="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
@@ -60,16 +69,14 @@ debug () {
             # Main log
             cecho "${_dbfn}${_in}" ${magenta2} \
                 >> "${LOG}" 2>> "${LOG}"
-
         elif [ ! -d "${LOGS_DIR}" ]; then
             # System logger fallback
             ${LOGGER_BIN} "sofin: ${_in}"
-
         fi
     else # DEBUG is set.
         cecho "${_dbfn}${_in}" ${magenta2}
     fi
-    unset _dbgnme _in _dbfn _cee _dbfnin
+    unset _dbgnme _in _dbfn _cee _dbfnin _elmz
 }
 
 
