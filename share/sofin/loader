@@ -18,6 +18,7 @@ load_sofin () {
 
     # loading facts
     load_facts  \
+                core.fact \
                 paths.fact \
                 paths-OS_TYPE.fact \
                 system.fact \

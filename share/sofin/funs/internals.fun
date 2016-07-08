@@ -48,7 +48,7 @@ sofin_header () {
 
 
 processes_all () {
-    ${PS_BIN} ${PS_DEFAULT_OPTS} 2>/dev/null | ${EGREP_BIN} -v "(grep|egrep)" 2>/dev/null
+    ${PS_BIN} ${DEFAULT_PS_OPTS} 2>/dev/null | ${EGREP_BIN} -v "(grep|egrep)" 2>/dev/null
 }
 
 
@@ -197,14 +197,14 @@ list_bundles_full () {
             echo
             _lbfapp_name="$(${BASENAME_BIN} "${_lbfapp}" 2>/dev/null)"
             _lbflowercase="$(lowercase "${_lbfapp_name}")"
-            _lbinstald_file="${SOFTWARE_DIR}/${_lbfapp_name}/${_lbflowercase}${INSTALLED_MARK}"
+            _lbinstald_file="${SOFTWARE_DIR}/${_lbfapp_name}/${_lbflowercase}${DEFAULT_INST_MARK_EXT}"
             if [ -e "${_lbinstald_file}" ]; then
                 note "${SUCCESS_CHAR} ${_lbfapp_name}"
             else
                 note "${red}${FAIL_CHAR} ${_lbfapp_name} ${reset}[${red}!${reset}]"
             fi
-            for _lbfreq in $(${FIND_BIN} ${_lbfapp} -maxdepth 1 -name *${INSTALLED_MARK} 2>/dev/null | ${SORT_BIN} 2>/dev/null); do
-                _lbpp="$(${PRINTF_BIN} "$(${BASENAME_BIN} "${_lbfreq}" 2>/dev/null)" | ${SED_BIN} "s/${INSTALLED_MARK}//" 2>/dev/null)"
+            for _lbfreq in $(${FIND_BIN} ${_lbfapp} -maxdepth 1 -name *${DEFAULT_INST_MARK_EXT} 2>/dev/null | ${SORT_BIN} 2>/dev/null); do
+                _lbpp="$(${PRINTF_BIN} "$(${BASENAME_BIN} "${_lbfreq}" 2>/dev/null)" | ${SED_BIN} "s/${DEFAULT_INST_MARK_EXT}//" 2>/dev/null)"
                 note "   ${NOTE_CHAR} ${_lbpp} $(distinct "${gray}" "[")$(distinct n $(${CAT_BIN} "${_lbfreq}" 2>/dev/null))$(distinct "${gray}" "]")"
             done
         done
@@ -306,16 +306,16 @@ mark_installed () {
     fi
     _softfile="$(lowercase "${_softname}")"
     debug "Marking definition: $(distinct d ${_softfile}) as installed"
-    ${TOUCH_BIN} "${PREFIX}/${_softfile}${INSTALLED_MARK}"
+    ${TOUCH_BIN} "${PREFIX}/${_softfile}${DEFAULT_INST_MARK_EXT}"
     debug "Writing version: $(distinct d ${_ver_to_write}) of software: $(distinct d ${_softfile}) installed in: $(distinct d ${PREFIX})"
-    ${PRINTF_BIN} "${_ver_to_write}" > "${PREFIX}/${_softfile}${INSTALLED_MARK}"
+    ${PRINTF_BIN} "${_ver_to_write}" > "${PREFIX}/${_softfile}${DEFAULT_INST_MARK_EXT}"
     unset _softname _ver_to_write _softfile
 }
 
 
 show_done () {
     _sd_low_name="$(lowercase "${1}")"
-    _sdver="$(${CAT_BIN} "${PREFIX}/${_sd_low_name}${INSTALLED_MARK}" 2>/dev/null)"
+    _sdver="$(${CAT_BIN} "${PREFIX}/${_sd_low_name}${DEFAULT_INST_MARK_EXT}" 2>/dev/null)"
     if [ -z "${_sdver}" ]; then
         _sdver="0"
     fi

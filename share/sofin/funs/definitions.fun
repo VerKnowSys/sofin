@@ -257,7 +257,7 @@ remove_bundles () {
             fi
 
             if [ ! -z "${_alternative}" -a \
-                   -f "${SOFTWARE_DIR}${_alternative}/$(lowercase ${_alternative})${INSTALLED_MARK}" ]; then
+                   -f "${SOFTWARE_DIR}${_alternative}/$(lowercase ${_alternative})${DEFAULT_INST_MARK_EXT}" ]; then
                 note "Updating environment with already installed alternative: $(distinct n ${_alternative})"
                 export_binaries "${_alternative}"
                 finalize
@@ -323,11 +323,11 @@ show_outdated () {
         for _prefix in $(${FIND_BIN} ${SOFTWARE_DIR} -mindepth 1 -maxdepth 1 -type d 2>/dev/null); do
             _bundle="$(${BASENAME_BIN} "${_prefix}" 2>/dev/null | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null)" # lowercase for case sensitive fs
 
-            if [ ! -f "${_prefix}/${_bundle}${INSTALLED_MARK}" ]; then
+            if [ ! -f "${_prefix}/${_bundle}${DEFAULT_INST_MARK_EXT}" ]; then
                 warn "Bundle: $(distinct w ${_bundle}) is not yet installed or damaged."
                 continue
             fi
-            _bund_vers="$(${CAT_BIN} "${_prefix}/${_bundle}${INSTALLED_MARK}" 2>/dev/null)"
+            _bund_vers="$(${CAT_BIN} "${_prefix}/${_bundle}${DEFAULT_INST_MARK_EXT}" 2>/dev/null)"
             if [ ! -f "${DEFINITIONS_DIR}${_bundle}${DEFAULT_DEF_EXT}" ]; then
                 warn "No such bundle found: $(distinct w ${_bundle})"
                 continue
@@ -338,7 +338,7 @@ show_outdated () {
     fi
 
     if [ "${FOUND_OUTDATED}" = "YES" ]; then
-        exit 1
+        exit ${ERRORCODE_TASK_FAILURE}
     else
         note "All installed bundles looks recent"
     fi
@@ -628,7 +628,7 @@ hack_def () {
         _currdir="$(${PWD_BIN} 2>/dev/null)"
         cd "${_a_dir}"
         _found_any=""
-        _log_viewer="${LESS_BIN} ${LESS_DEFAULT_OPTIONS} +/error:"
+        _log_viewer="${LESS_BIN} ${DEFAULT_LESS_OPTIONS} +/error:"
         for _logfile in config.log build.log CMakeFiles/CMakeError.log CMakeFiles/CMakeOutput.log; do
             if [ -f "${_logfile}" ]; then
                 _found_any="yes"

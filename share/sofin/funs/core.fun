@@ -104,7 +104,7 @@ error () {
     warn "\tBitbucket: $(distinct w "${DEFAULT_ISSUE_REPORT_SITE}")"
     warn "\tGithub: $(distinct w "${DEFAULT_ISSUE_REPORT_SITE_ALT}")"
     warn "\n$(fill "${SEPARATOR_CHAR}" 46)$(distinct w "  Daniel (dmilith) Dettlaff  ")$(fill "${SEPARATOR_CHAR}" 5)\n"
-    exit 1
+    exit ${ERRORCODE_TASK_FAILURE}
 }
 
 
@@ -217,16 +217,14 @@ setup_def_repo () {
 
 
 interrupt_handler () {
-    warn "Sofin process terminated: $(distinct w "${SOFIN_PID}")!"
-    warn "Sofin process interrupted: $(distinct w "${SOFIN_PID}")!" >> ${LOG}
-    exit 2
+    warn "Interrupted: $(distinct w "${SOFIN_PID}")!" >> ${LOG}
+    exit ${ERRORCODE_USER_INTERRUPT}
 }
 
 
 terminate_handler () {
-    warn "Sofin process terminated: $(distinct w "${SOFIN_PID}")!"
-    warn "Sofin process terminated: $(distinct w "${SOFIN_PID}")!" >> ${LOG}
-    exit 3
+    warn "Terminated: $(distinct w "${SOFIN_PID}")!" >> ${LOG}
+    exit ${ERRORCODE_TERMINATED}
 }
 
 

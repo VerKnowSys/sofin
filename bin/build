@@ -3,6 +3,7 @@
 
 
 # load configuration from sofin.conf
+. share/sofin/facts/core.fact
 . share/sofin/facts/paths.fact
 . share/sofin/facts/paths-$(uname).fact
 . share/sofin/facts/terminal.fact

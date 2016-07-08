@@ -42,7 +42,7 @@ push_binbuild () {
         if [ -z "${_lowercase_element}" ]; then
             error "push_binbuild(): _lowercase_element is empty!"
         fi
-        _install_indicator_file="${SOFTWARE_DIR}${_pbelement}/${_lowercase_element}${INSTALLED_MARK}"
+        _install_indicator_file="${SOFTWARE_DIR}${_pbelement}/${_lowercase_element}${DEFAULT_INST_MARK_EXT}"
         _version_element="$(${CAT_BIN} "${_install_indicator_file}" 2>/dev/null)"
         if [ ! -f "${_install_indicator_file}" ]; then
             error "push_binbuild(): _install_indicator_file: $(distinct e "${_install_indicator_file}") doesn't exists! You can't push a binary build of uncomplete build!"
@@ -300,7 +300,7 @@ build () {
                 ${MKDIR_BIN} -p "${BINBUILDS_CACHE_DIR}${_full_bund_name}" >/dev/null 2>&1
 
                 _an_archive="$(capitalize "${_common_lowercase}")-${DEF_VERSION}${DEFAULT_ARCHIVE_EXT}"
-                INSTALLED_INDICATOR="${PREFIX}/${_common_lowercase}${INSTALLED_MARK}"
+                INSTALLED_INDICATOR="${PREFIX}/${_common_lowercase}${DEFAULT_INST_MARK_EXT}"
                 if [ ! -e "${INSTALLED_INDICATOR}" ]; then
                     fetch_binbuild "${_full_bund_name}" "${_common_lowercase}" "${_an_archive}"
                 else
@@ -332,7 +332,7 @@ build () {
                             break
                         else
                             note "  ${_req} ($(distinct n ${_req_amount}) of $(distinct n ${_req_all}) remaining)"
-                            if [ ! -e "${PREFIX}/${_req}${INSTALLED_MARK}" ]; then
+                            if [ ! -e "${PREFIX}/${_req}${DEFAULT_INST_MARK_EXT}" ]; then
                                 CHANGED=YES
                                 process "${_req}"
                             fi
@@ -342,7 +342,7 @@ build () {
                 fi
 
                 if [ -z "${DONT_BUILD_BUT_DO_EXPORTS}" ]; then
-                    if [ -e "${PREFIX}/${_common_lowercase}${INSTALLED_MARK}" ]; then
+                    if [ -e "${PREFIX}/${_common_lowercase}${DEFAULT_INST_MARK_EXT}" ]; then
                         if [ "${CHANGED}" = "YES" ]; then
                             note "  ${_common_lowercase} ($(distinct n 1) of $(distinct n ${_req_all}))"
                             note "   ${NOTE_CHAR} App dependencies changed. Rebuilding: $(distinct n ${_common_lowercase})"
@@ -730,9 +730,9 @@ process () {
             after_install_callback
 
             debug "Marking $(distinct d ${_app_param}) as installed in: $(distinct d ${PREFIX})"
-            ${TOUCH_BIN} "${PREFIX}/${_app_param}${INSTALLED_MARK}"
+            ${TOUCH_BIN} "${PREFIX}/${_app_param}${DEFAULT_INST_MARK_EXT}"
             debug "Writing version: $(distinct d ${DEF_VERSION}) of software: $(distinct d ${DEF_NAME}) installed in: $(distinct d ${PREFIX})"
-            ${PRINTF_BIN} "${DEF_VERSION}" > "${PREFIX}/${_app_param}${INSTALLED_MARK}"
+            ${PRINTF_BIN} "${DEF_VERSION}" > "${PREFIX}/${_app_param}${DEFAULT_INST_MARK_EXT}"
 
             if [ -z "${DEVEL}" ]; then # if devel mode not set
                 debug "Cleaning build dir: $(distinct d ${BUILD_DIR_ROOT}) of bundle: $(distinct d ${DEF_NAME}${DEF_POSTFIX}), after successful build."
@@ -749,8 +749,8 @@ process () {
         if [ ! -d "${PREFIX}" ]; then # case when disabled requirement is first on list of dependencies
             ${MKDIR_BIN} -p "${PREFIX}"
         fi
-        ${TOUCH_BIN} "${PREFIX}/${_req}${INSTALLED_MARK}"
-        ${PRINTF_BIN} "os-default" > "${PREFIX}/${_req}${INSTALLED_MARK}"
+        ${TOUCH_BIN} "${PREFIX}/${_req}${DEFAULT_INST_MARK_EXT}"
+        ${PRINTF_BIN} "os-default" > "${PREFIX}/${_req}${DEFAULT_INST_MARK_EXT}"
     fi
     unset _req _current_branch
 }
