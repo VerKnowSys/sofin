@@ -46,11 +46,9 @@ debug () {
                 esac
             done
         fi
-    elif [ -n "${CAP_TERM_ZSH}" ]; then
-        # typeset -f -T
-        setopt sourcetrace
-        setopt xtrace
-        PS4="${magenta2}# ${func}%N()${gray}:${cyan2}%i${magenta2} >> ${cyan}"
+    elif [ "${CAP_TERM_ZSH}" = "YES" ]; then
+        setopt debugbeforecmd
+        setopt notify
     else
         _dbfnin="():"
     fi
@@ -224,13 +222,13 @@ setup_def_repo () {
 
 
 interrupt_handler () {
-    warn "Interrupted: $(distinct w "${SOFIN_PID}")!" >> ${LOG}
+    warn "Interrupting: $(distinct w "${SOFIN_PID}")!" >> ${LOG}
     exit ${ERRORCODE_USER_INTERRUPT}
 }
 
 
 terminate_handler () {
-    warn "Terminated: $(distinct w "${SOFIN_PID}")!" >> ${LOG}
+    warn "Terminating: $(distinct w "${SOFIN_PID}")!" >> ${LOG}
     exit ${ERRORCODE_TERMINATED}
 }
 
