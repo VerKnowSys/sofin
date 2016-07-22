@@ -320,8 +320,9 @@ show_outdated () {
     create_dirs
     load_defaults
     if [ -d "${SOFTWARE_DIR}" ]; then
-        for _prefix in $(${FIND_BIN} ${SOFTWARE_DIR} -mindepth 1 -maxdepth 1 -type d 2>/dev/null); do
+        for _prefix in $(${FIND_BIN} ${SOFTWARE_DIR} -mindepth 1 -maxdepth 1 -type d -not -name ".*" 2>/dev/null); do
             _bundle="$(${BASENAME_BIN} "${_prefix}" 2>/dev/null | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null)" # lowercase for case sensitive fs
+            debug "Bundle name: ${_bundle}, Prefix: ${_prefix}"
 
             if [ ! -f "${_prefix}/${_bundle}${DEFAULT_INST_MARK_EXT}" ]; then
                 warn "Bundle: $(distinct w ${_bundle}) is not yet installed or damaged."
