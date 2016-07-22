@@ -334,14 +334,14 @@ show_outdated () {
                 continue
             fi
             load_defs "${_bundle}"
-            check_version "${_bund_vers}" "${DEF_VERSION}"
+            check_version "${_bund_vers}" "${DEF_VERSION}" "${_bundle}"
         done
     fi
 
     if [ "${FOUND_OUTDATED}" = "YES" ]; then
         exit ${ERRORCODE_TASK_FAILURE}
     else
-        note "All installed bundles looks recent"
+        note "Installed bundles seems to be recent"
     fi
     unset _bund_vers
 }
