@@ -1,4 +1,4 @@
-#!/usr/bin/env -S -P/Software/Zsh/exports:/bin sh
+#!/usr/bin/env sh
 # helper functions to sync software tarballs between multiple hosts
 # @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
 
