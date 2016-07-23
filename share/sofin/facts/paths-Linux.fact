@@ -1,7 +1,6 @@
 # Linux specific configuration
 
 CHFLAGS_BIN="/usr/bin/chattr"
-FETCH_BIN="/usr/bin/wget"
 UNAME_BIN="/bin/uname"
 KLDLOAD_BIN="/sbin/modprobe"
 SHA_BIN="/usr/bin/sha1sum"
@@ -13,7 +12,6 @@ BC_BIN="/usr/bin/bc"
 CHOWN_BIN="/bin/chown"
 TEST_BIN="/usr/bin/test"
 AWK_BIN="/usr/bin/awk"
-ZFS_BIN="/bin/true"
 PGREP_BIN="/usr/bin/pgrep"
 
 if [ -f /etc/centos-release -o -f /etc/redhat-release ]; then
@@ -34,4 +32,3 @@ fi
 CPUS="$(${CAT_BIN} /proc/cpuinfo 2>/dev/null | ${EGREP_BIN} -c 'processor.*:' 2>/dev/null)"
 ALL_CPUS="${CPUS}"
 MAKE_OPTS="-j${CPUS}"
-FETCH_OPTS="--continue --no-verbose --progress=bar --ca-certificate=${DEFAULT_CACERT}"
