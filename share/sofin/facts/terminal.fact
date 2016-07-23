@@ -58,19 +58,19 @@ determine_term_capabilites () {
         unset CAP_TERM_TPUT
 
         # Use legacy ANSI definitions:
-        gray="\e[39m" # default color of terminal
+        gray="\033[39m" # default color of terminal
         reset="${gray}"
-        darkgray="\e[90m"
-        red="\e[31m"
-        green="\e[32m"
-        yellow="\e[33m"
-        blue="\e[34m"
-        magenta="\e[35m"
-        cyan="\e[36m"
-        white="\e[97m"
-        cyan2="\e[38;5;12m"
-        magenta2="\e[38;5;97m"
-        func="\e[38;5;163m"
+        darkgray="\033[90m"
+        red="\033[31m"
+        green="\033[32m"
+        yellow="\033[33m"
+        blue="\033[34m"
+        magenta="\033[35m"
+        cyan="\033[36m"
+        white="\033[97m"
+        cyan2="\033[38;5;12m"
+        magenta2="\033[38;5;97m"
+        func="\033[38;5;163m"
     else
         CAP_TERM_TPUT=YES
 
