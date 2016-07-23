@@ -22,6 +22,9 @@ KLDLOAD_BIN="/sbin/kldload"
 MDMFS_BIN="/sbin/mdmfs"
 LIMITS_BIN="/usr/bin/limits"
 
+# ServeD governor, FreeBSD specific:
+GVR_BIN="/usr/bin/gvr"
+
 # set core parameters:
 CPUS="$(${SYSCTL_BIN} -e kern.smp.cpus 2>/dev/null | ${CUT_BIN} -d'=' -f2 2>/dev/null)"
 ALL_CPUS="${CPUS}"
