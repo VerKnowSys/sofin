@@ -265,7 +265,7 @@ build () {
                 DEF_NAME="$(capitalize "${_common_lowercase}")"
 
                 # if definition requires root privileges, throw an "exception":
-                if [ ! -z "${REQUIRE_ROOT_ACCESS}" ]; then
+                if [ ! -z "${DEF_REQUIRE_ROOT_ACCESS}" ]; then
                     if [ "${USER}" != "root" ]; then
                         error "Definition requires superuser priviledges: $(distinct e ${_common_lowercase}). Installation aborted."
                     fi
