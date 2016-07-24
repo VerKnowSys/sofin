@@ -234,6 +234,9 @@ build () {
     # Update definitions and perform more checks
     validate_reqs
 
+    store_security_state
+    disable_security_features
+
     PATH="${DEFAULT_PATH}"
     for _bund_name in ${_build_list}; do
         _specified="${_bund_name}" # store original value of user input
