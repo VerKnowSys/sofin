@@ -9,6 +9,8 @@ LOG_LAST_ACCESS_OR_MOD_MINUTES=60
 # default CA Root certs to be used by Sofin:
 DEFAULT_CACERT="/etc/ssl/cert.pem"
 
+DEFAULT_FACTS_DIR="/usr/share/sofin/facts/"
+DEFAULT_FUNS_DIR="/usr/share/sofin/funs/"
 
 DEFAULT_DEF_EXT=".def"
 DEFAULT_LOCK_EXT=".lock"
