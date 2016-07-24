@@ -1,7 +1,6 @@
 # Linux specific configuration
 
 CHFLAGS_BIN="/usr/bin/chattr"
-UNAME_BIN="/bin/uname"
 KLDLOAD_BIN="/sbin/modprobe"
 SHA_BIN="/usr/bin/sha1sum"
 SED_BIN="/bin/sed"
@@ -14,19 +13,14 @@ TEST_BIN="/usr/bin/test"
 AWK_BIN="/usr/bin/awk"
 PGREP_BIN="/usr/bin/pgrep"
 
-if [ -f /etc/centos-release -o -f /etc/redhat-release ]; then
-    # Centos specific changes
-    BASENAME_BIN="/bin/basename"
-    TOUCH_BIN="/bin/touch"
-
-    #
-    # For Centos 5.x:
-    #
-    # DEFAULT_COMPILER_FLAGS="-w -O2 -fPIC"
-    # if [ ! -z "${DEBUGBUILD}" ]; then
-    #     DEFAULT_COMPILER_FLAGS="-O0 -fPIC -ggdb"
-    # fi
-fi
+# if [ -f /etc/centos-release -o -f /etc/redhat-release ]; then
+#     # Centos 5.x specific changes:
+#     #
+#     # DEFAULT_COMPILER_FLAGS="-w -O2 -fPIC"
+#     # if [ ! -z "${DEBUGBUILD}" ]; then
+#     #     DEFAULT_COMPILER_FLAGS="-O0 -fPIC -ggdb"
+#     # fi
+# fi
 
 # set core parameters:
 CPUS="$(${CAT_BIN} /proc/cpuinfo 2>/dev/null | ${EGREP_BIN} -c 'processor.*:' 2>/dev/null)"
