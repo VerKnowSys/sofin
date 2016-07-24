@@ -57,6 +57,30 @@ destroy_service_dir () {
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
         _dsname="${DEFAULT_ZPOOL}${SERVICES_DIR}${USER}/${_dset_destroy}"
         debug "ZFS feature enabled. Destroying dataset: $(distinct d "${_dsname}")"
+
+create_builddir () {
+    _dset_create="${1}"
+    _dset_namesum="${2}"
+    if [ "YES" = "${CAP_SYS_ZFS}" ]; then
+        if [ -z "${_dset_create}" ]; then
+            error "First argument with $(distinct e "BundleName") is required!"
+        fi
+        if [ -z "${_dset_namesum}" ]; then
+            error "Second argument with $(distinct e "bundle-sha-sum") is required!"
+        fi
+        _dsbase="${_dset_create}/${DEFAULT_SRC_EXT}${_dset_namesum}"
+        _dsname="${DEFAULT_ZPOOL}${SOFTWARE_DIR}${USER}/${_dsbase}"
+        debug "Creating ZFS build-dataset: $(distinct d "${_dsname}")"
+        run "${ZFS_BIN} create -o mountpoint=${SOFTWARE_DIR}${_dsbase} ${_dsname}"
+        try "${ZFS_BIN} mount ${_dsname}"
+        unset _dsname _dsbase
+    else
+        debug "Creating regular build-directory: $(distinct d "${SOFTWARE_DIR}${_dset_create}")"
+        try "${MKDIR_BIN} -p ${SOFTWARE_DIR}${_dset_create}"
+    fi
+    unset _dset_create _dset_namesum
+}
+
         try "${ZFS_BIN} umount -f ${_dsname}"
         run "${ZFS_BIN} destroy ${_dsname}"
         unset _dsname
