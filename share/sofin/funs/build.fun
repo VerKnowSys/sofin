@@ -256,7 +256,7 @@ build () {
                 BUILD_NAMESUM="$(text_checksum "${DEF_NAME}${DEF_POSTFIX}-${DEF_VERSION}")"
                 BUILD_DIR="${PREFIX}/${DEFAULT_SRC_EXT}${BUILD_NAMESUM}"
 
-                destroy_builddir "${BUILD_DIR}" "${BUILD_NAMESUM}"
+                recreate_builddir "${BUILD_DIR}" "${BUILD_NAMESUM}"
 
                 # These values has to be exported because external build mechanisms
                 # has to be able to reach these values to find dependencies and utilities

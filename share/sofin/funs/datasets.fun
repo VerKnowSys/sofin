@@ -119,3 +119,9 @@ destroy_builddir () {
     fi
     unset _dset_destroy
 }
+
+
+recreate_builddir () {
+    destroy_builddir "${1}" "${2}"
+    create_builddir "${1}" "${2}"
+}
