@@ -54,6 +54,7 @@ push_binbuild () {
                 if [ -z "${_version_element}" ]; then
                     error "No version information available for bundle: $(distinct e "${_pbelement}")"
                 fi
+                prepare_service_dataset "${_pbelement}"
                 _element_name="${_pbelement}-${_version_element}${DEFAULT_ARCHIVE_EXT}"
                 debug "element: $(distinct d ${_pbelement}) -> name: $(distinct d ${_element_name})"
                 _def_dig_query="$(${HOST_BIN} A ${MAIN_SOFTWARE_ADDRESS} 2>/dev/null | ${GREP_BIN} 'Address:' 2>/dev/null | eval "${HOST_ADDRESS_GUARD}")"
