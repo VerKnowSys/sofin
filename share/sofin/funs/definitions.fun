@@ -240,13 +240,9 @@ remove_bundles () {
             error "remove_bundles(): _given_name is empty!"
         fi
         if [ -d "${SOFTWARE_DIR}${_given_name}" ]; then
-            if [ "${_given_name}" = "/" ]; then
-                error "Czy Ty orzeszki?"
-            fi
             _aname="$(lowercase "${_given_name}")"
-            debug "Given name: _given_name: ${_given_name}, _aname: ${_aname}"
-            note "Removing bundle: $(distinct n "${_given_name}")"
-            ${RM_BIN} -rf "${SOFTWARE_DIR}${_given_name}" >/dev/null 2>> "${LOG}-${_aname}"
+            destroy_software_dir "${_given_name}" && \
+                debug "Removed bundle: $(distinct d "${_given_name}")"
 
             # if removing a single bundle, then look for alternatives. Otherwise, just remove bundle..
             debug "_picked_bundles: ${_picked_bundles}, _given_name: ${_given_name}"
