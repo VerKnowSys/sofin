@@ -250,18 +250,13 @@ build () {
                     fi
                 fi
 
-                PREFIX="${SOFTWARE_DIR}$(capitalize "${_common_lowercase}")"
-                BUILD_DIR="${DEFAULT_BUILD_DIR}"
-                BUILD_NAMESUM="$(text_checksum "${DEF_NAME}${DEF_POSTFIX}-${DEF_VERSION}")"
-                BUILD_DIR_ROOT="${PREFIX}.src_${BUILD_NAMESUM}"
                 _bundl_name="$(capitalize "${_common_lowercase}")"
+                PREFIX="${SOFTWARE_DIR}${_bundl_name}"
                 SERVICE_DIR="${SERVICES_DIR}${_bundl_name}"
+                BUILD_NAMESUM="$(text_checksum "${DEF_NAME}${DEF_POSTFIX}-${DEF_VERSION}")"
+                BUILD_DIR="${PREFIX}/${DEFAULT_SRC_EXT}${BUILD_NAMESUM}"
 
-                if [ -z "${DEVEL}" ]; then
-                    debug "Cleaning before PROD build in BUILD_DIR_ROOT: $(distinct d "${BUILD_DIR_ROOT}")"
-                    ${RM_BIN} -rf "${BUILD_DIR_ROOT}" >/dev/null 2>> ${LOG}
-                    ${MKDIR_BIN} -p "${BUILD_DIR_ROOT}" >/dev/null 2>> ${LOG}
-                fi
+                destroy_builddir "${BUILD_DIR}" "${BUILD_NAMESUM}"
 
                 # These values has to be exported because external build mechanisms
                 # has to be able to reach these values to find dependencies and utilities
@@ -272,8 +267,6 @@ build () {
                 if [ -n "${DEF_STANDALONE}" ]; then
                     create_service_dir "${_bundl_name}"
                 fi
-
-                destroy_service_dir "${BUILD_DIR_ROOT}"
 
                 # binary build of whole software bundle
                 _full_bund_name="${_common_lowercase}-${DEF_VERSION}"
@@ -370,7 +363,6 @@ dump_debug_info () {
     debug "CURRENT_DIR: $(distinct d $(${PWD_BIN} 2>/dev/null))"
     debug "BUILD_NAMESUM: $(distinct d ${BUILD_NAMESUM})"
     debug "BUILD_DIR: $(distinct d ${BUILD_DIR})"
-    debug "BUILD_DIR_ROOT: $(distinct d ${BUILD_DIR_ROOT})"
     debug "PATH: $(distinct d ${PATH})"
     debug "CC: $(distinct d ${CC})"
     debug "CXX: $(distinct d ${CXX})"
@@ -463,11 +455,10 @@ process () {
             note "NOTE: It's only valid for meta bundles. You may consider setting: $(distinct n "DEF_CONFIGURE=\"meta\"") in bundle definition file. Type: $(distinct n "s dev ${_definition_no_ext}"))"
         else
             _cwd="$(${PWD_BIN} 2>/dev/null)"
-            if [ ! -z "${BUILD_DIR_ROOT}" -a \
-                 ! -z "${BUILD_DIR}" -a \
+            if [ ! -z "${BUILD_DIR}" -a \
                  ! -z "${BUILD_NAMESUM}" ]; then
-                ${MKDIR_BIN} -p "${BUILD_DIR_ROOT}" 2>> ${LOG}
-                cd "${BUILD_DIR_ROOT}"
+                create_builddir "${BUILD_DIR}" "${BUILD_NAMESUM}"
+                cd "${BUILD_DIR}"
                 if [ -z "${DEF_GIT_MODE}" ]; then # Standard http tarball method:
                     _base="$(${BASENAME_BIN} ${DEF_HTTP_PATH} 2>/dev/null)"
                     debug "DEF_HTTP_PATH: $(distinct d ${DEF_HTTP_PATH}) base: $(distinct d ${_base})"
@@ -477,9 +468,9 @@ process () {
                         retry "${FETCH_BIN} ${FETCH_OPTS} ${DEF_HTTP_PATH}" || \
                             def_error "${DEF_NAME}" "Failed to fetch source: ${DEF_HTTP_PATH}"
                     fi
-                    cd "${BUILD_DIR_ROOT}"
+                    cd "${BUILD_DIR}"
                     _dest_file="${FILE_CACHE_DIR}/${_base}"
-                    debug "Build root: $(distinct d ${BUILD_DIR_ROOT}), file: $(distinct d ${_dest_file})"
+                    debug "Build root: $(distinct d ${BUILD_DIR}), file: $(distinct d ${_dest_file})"
                     if [ -z "${DEF_SHA}" ]; then
                         error "Missing SHA sum for source: $(distinct e ${_dest_file})!"
                     else
@@ -500,10 +491,10 @@ process () {
                     fi
 
                     note "   ${NOTE_CHAR} Unpacking source tarball of: $(distinct n "${DEF_NAME}${DEF_POSTFIX}")"
-                    debug "Build dir root: $(distinct d "${BUILD_DIR_ROOT}")"
-                    try "${TAR_BIN} --directory ${BUILD_DIR_ROOT} -xf ${_dest_file}" || \
-                    try "${TAR_BIN} --directory ${BUILD_DIR_ROOT} -xfj ${_dest_file}" || \
-                    run "${TAR_BIN} --directory ${BUILD_DIR_ROOT} -xfJ ${_dest_file}"
+                    debug "Build dir root: $(distinct d "${BUILD_DIR}")"
+                    try "${TAR_BIN} --directory ${BUILD_DIR} -xf ${_dest_file}" || \
+                    try "${TAR_BIN} --directory ${BUILD_DIR} -xfj ${_dest_file}" || \
+                    run "${TAR_BIN} --directory ${BUILD_DIR} -xfJ ${_dest_file}"
                 else
                     # git method:
                     # .cache/git-cache => git bare repos
@@ -539,10 +530,10 @@ process () {
                     debug "Cloned git respository from git bare cache repository"
                 fi
 
-                debug "_app_param: ${_app_param}, DEF_NAME: ${DEF_NAME}, BUILD_DIR_ROOT: ${BUILD_DIR_ROOT}"
+                debug "_app_param: ${_app_param}, DEF_NAME: ${DEF_NAME}, BUILD_DIR: ${BUILD_DIR}"
                 # NOTE: patterns sorted by safety
                 for _pati in "*${_app_param}*${DEF_VERSION}*" "*${_app_param}*" "*${DEF_NAME}*${DEF_VERSION}*"  "*${DEF_NAME}*${DEF_VERSION}*" "*${DEF_NAME}*" "*$(lowercase "${DEF_NAME}")*"; do
-                    _fd="$(${FIND_BIN} "${BUILD_DIR_ROOT}" -maxdepth 1 -mindepth 1 -type d -iname "${_pati}" 2>/dev/null)"
+                    _fd="$(${FIND_BIN} "${BUILD_DIR}" -maxdepth 1 -mindepth 1 -type d -iname "${_pati}" 2>/dev/null)"
                     if [ ! -z "${_fd}" ]; then
                         debug "Found build dir: $(distinct d "${_fd}"), for definition: $(distinct d "${DEF_NAME}")"
                         break
@@ -691,7 +682,7 @@ process () {
 
                 after_configure_callback
             else
-                error "These values cannot be empty: BUILD_DIR, BUILD_DIR_ROOT, BUILD_NAMESUM"
+                error "These values cannot be empty: BUILD_DIR, BUILD_NAMESUM"
             fi
 
             # and common part between normal and continue modes:
@@ -715,10 +706,10 @@ process () {
             ${PRINTF_BIN} "${DEF_VERSION}" > "${PREFIX}/${_app_param}${DEFAULT_INST_MARK_EXT}"
 
             if [ -z "${DEVEL}" ]; then # if devel mode not set
-                debug "Cleaning build dir: $(distinct d ${BUILD_DIR_ROOT}) of bundle: $(distinct d ${DEF_NAME}${DEF_POSTFIX}), after successful build."
-                ${RM_BIN} -rf "${BUILD_DIR_ROOT}" >/dev/null 2>> ${LOG}
+                debug "Cleaning build dir: $(distinct d ${BUILD_DIR}) of bundle: $(distinct d ${DEF_NAME}${DEF_POSTFIX}), after successful build."
+                destroy_builddir "${BUILD_DIR}" "${BUILD_NAMESUM}"
             else
-                debug "Leaving build dir intact when working in devel mode. Last build dir: $(distinct d ${BUILD_DIR_ROOT})"
+                debug "Leaving build dir intact when working in devel mode. Last build dir: $(distinct d ${BUILD_DIR})"
             fi
             cd "${_cwd}" 2>/dev/null
             unset _cwd

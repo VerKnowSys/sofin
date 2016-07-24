@@ -32,9 +32,10 @@ clean_binbuilds () {
 
 
 clean_failbuilds () {
-    if [ -d "${DEFAULT_BUILD_DIR}" ]; then
+    if [ -n ${BUILD_DIR} -a \
+         -d "${BUILD_DIR}" ]; then
         _cf_number="0"
-        _cf_files=$(${FIND_BIN} "${DEFAULT_BUILD_DIR}" -maxdepth 2 -mindepth 1 -type d 2>/dev/null)
+        _cf_files=$(${FIND_BIN} "${BUILD_DIR}" -maxdepth 2 -mindepth 1 -type d 2>/dev/null)
         if [ -z "${_cf_files}" ]; then
             debug "No cache dirs. Skipped"
         else
