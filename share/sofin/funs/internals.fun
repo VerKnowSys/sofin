@@ -335,7 +335,7 @@ create_or_receive () {
     retry "${FETCH_BIN} ${FETCH_OPTS} -o ${FILE_CACHE_DIR}${_final_snap_file} ${_commons_path}"
     if [ "$?" = "0" ]; then
         note "Common stream available for: $(distinct n "${_dataset_name}"). Creating service dataset: $(distinct n "${_dataset_name}"), from file stream: $(distinct n "${_final_snap_file}")."
-        try "${XZCAT_BIN} ${FILE_CACHE_DIR}${_final_snap_file} 2>/dev/null | ${ZFS_BIN} receive -e origin -v ${_dataset_name}" && \
+        try "${XZCAT_BIN} ${FILE_CACHE_DIR}${_final_snap_file} 2>/dev/null | ${ZFS_BIN} receive -v ${_dataset_name}" && \
             note "Received service dataset for: $(distinct n "${_dataset_name}")"
     else
         debug "Initial service dataset unavailable"
