@@ -87,7 +87,7 @@ create_builddir () {
         _dsbase="${_dset_create}/${DEFAULT_SRC_EXT}${_dset_namesum}"
         _dsname="${DEFAULT_ZPOOL}${SOFTWARE_DIR}${USER}/${_dsbase}"
         debug "Creating ZFS build-dataset: $(distinct d "${_dsname}")"
-        try "${ZFS_BIN} create -o mountpoint=${SOFTWARE_DIR}${_dsbase} ${_dsname}"
+        try "${ZFS_BIN} create ${_dsname}" # -o mountpoint=${SOFTWARE_DIR}${_dsbase}
         try "${ZFS_BIN} mount ${_dsname}"
         unset _dsname _dsbase
     else
