@@ -2,7 +2,6 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
 
 
-# load configuration from sofin.conf
 . share/sofin/loader
 
 
