@@ -50,3 +50,19 @@ create_service_dir () {
     try "${CHMOD_BIN} 0710 ${SERVICE_DIR}"
     unset _dset_create
 }
+
+
+destroy_service_dir () {
+    _dset_destroy="${1}"
+    if [ "YES" = "${CAP_SYS_ZFS}" ]; then
+        _dsname="${DEFAULT_ZPOOL}${SERVICES_DIR}${USER}/${_dset_destroy}"
+        debug "ZFS feature enabled. Destroying dataset: $(distinct d "${_dsname}")"
+        try "${ZFS_BIN} umount -f ${_dsname}"
+        run "${ZFS_BIN} destroy ${_dsname}"
+        unset _dsname
+    else
+        debug "No ZFS feature."
+        try "${MKDIR_BIN} -p ${_dset_destroy}"
+    fi
+    unset _dset_destroy
+}
