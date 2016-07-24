@@ -75,6 +75,25 @@ destroy_service_dir () {
 }
 
 
+create_base_datasets () {
+    if [ "YES" = "${CAP_SYS_ZFS}" ]; then
+        debug "Creating base software-dataset: $(distinct d "${DEFAULT_ZPOOL}${SOFTWARE_DIR}")"
+        _dsname="${DEFAULT_ZPOOL}${SOFTWARE_DIR}${USER}"
+        try "${ZFS_BIN} list ${_dsname}" || \
+            try "${ZFS_BIN} create -o mountpoint=${SOFTWARE_DIR} ${_dsname}"
+        try "${ZFS_BIN} mount ${_dsname}"
+        unset _dsname
+
+        debug "Creating base services-dataset: $(distinct d "${DEFAULT_ZPOOL}${SERVICES_DIR}")"
+        _dsname="${DEFAULT_ZPOOL}${SERVICES_DIR}${USER}"
+        try "${ZFS_BIN} list ${_dsname}" || \
+            try "${ZFS_BIN} create -o mountpoint=${SERVICES_DIR} ${_dsname}"
+        try "${ZFS_BIN} mount ${_dsname}"
+        unset _dsname
+    fi
+}
+
+
 create_software_dir () {
     _dset_create="${1}"
     if [ -z "${_dset_create}" ]; then
