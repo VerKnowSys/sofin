@@ -325,7 +325,7 @@ show_done () {
 
 
 create_or_receive () {
-    _dataset_name="$(capitalize "$1")"
+    _dataset_name="${1}"
     _final_snap_file="${2}"
     if [ -z "${_dataset_name}" -o \
          -z "${_final_snap_file}" ]; then
@@ -336,7 +336,7 @@ create_or_receive () {
         try "${FETCH_BIN} ${FETCH_OPTS} ${_commons_path}" || \
         try "${FETCH_BIN} ${FETCH_OPTS} ${_commons_path}"
     if [ "$?" = "0" ]; then
-        note "Common stream available for: $(distinct n "${_dataset_name}"). Creating service dataset: $(distinct n ${_dataset_name}), from file stream: $(distinct n ${_final_snap_file})."
+        note "Common stream available for: $(distinct n "${_dataset_name}"). Creating service dataset: $(distinct n "${_dataset_name}"), from file stream: $(distinct n "${_final_snap_file}")."
         try "${XZCAT_BIN} ${_final_snap_file} 2>/dev/null | ${ZFS_BIN} receive -e origin -v ${_dataset_name}" && \
             ${RM_BIN} -fv "${_final_snap_file}" >/dev/null 2>> ${LOG}
     else
