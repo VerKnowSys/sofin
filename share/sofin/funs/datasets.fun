@@ -37,6 +37,9 @@ prepare_service_dataset () {
 
 create_service_dir () {
     _dset_create="${1}"
+    if [ -z "${_dset_create}" ]; then
+        error "First argument with $(distinct e "BundleName") is required!"
+    fi
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
         _dsname="${DEFAULT_ZPOOL}${SERVICES_DIR}${USER}/${_dset_create}"
         debug "Creating ZFS build-dataset: $(distinct d "${_dsname}")"
@@ -54,10 +57,10 @@ create_service_dir () {
 
 destroy_service_dir () {
     _dset_destroy="${1}"
+    if [ -z "${_dset_destroy}" ]; then
+        error "First argument with $(distinct e "BundleName") to destroy is required!"
+    fi
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
-        if [ -z "${_dset_destroy}" ]; then
-            error "First argument with $(distinct e "BundleName") to destroy is required!"
-        fi
         _dsname="${DEFAULT_ZPOOL}${SERVICES_DIR}${USER}/${_dset_destroy}"
         debug "Destroying dataset: $(distinct d "${_dsname}")"
         try "${ZFS_BIN} umount -f ${_dsname}"
@@ -74,10 +77,10 @@ destroy_service_dir () {
 create_builddir () {
     _dset_create="${1}"
     _dset_namesum="${2}"
+    if [ -z "${_dset_create}" ]; then
+        error "First argument with $(distinct e "BundleName") is required!"
+    fi
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
-        if [ -z "${_dset_create}" ]; then
-            error "First argument with $(distinct e "BundleName") is required!"
-        fi
         if [ -z "${_dset_namesum}" ]; then
             error "Second argument with $(distinct e "bundle-sha-sum") is required!"
         fi
@@ -98,10 +101,10 @@ create_builddir () {
 destroy_builddir () {
     _dset_destroy="${1}"
     _dset_sum="${2}"
+    if [ -z "${_dset_destroy}" ]; then
+        error "First argument with $(distinct e "BundleName") is required!"
+    fi
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
-        if [ -z "${_dset_destroy}" ]; then
-            error "First argument with $(distinct e "BundleName") is required!"
-        fi
         if [ -z "${_dset_sum}" ]; then
             error "Second argument with $(distinct e "bundle-sha-sum") is required!"
         fi
