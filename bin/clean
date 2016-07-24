@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 # @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
 
-. /usr/share/sofin/loader
+. share/sofin/loader
 
 note "Cleaning natives"
-${RM_BIN} -fv bin/sofin-* src/.*.o
+${RM_BIN} -fv bin/s-* src/.*.o

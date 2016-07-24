@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 # @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
 
-. /usr/share/sofin/loader
+. share/sofin/loader
 
 readonly SOFIN_ORIGIN="git@bitbucket.org:verknowsys/sofin.git"
 readonly SOFIN_MIRROR="git@github.com:VerKnowSys/sofin.git"
