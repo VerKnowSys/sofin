@@ -1,5 +1,41 @@
+#
+# alternatives.fact - definitions of possible alternatives for base utilities
 
-# dylib bundle software:
+# base system alternatives:
+# uname:
+if [ -x "/usr/bin/uname" ]; then
+    UNAME_BIN="/usr/bin/uname"
+elif [ -x "/bin/uname" ]; then
+    UNAME_BIN="/bin/uname"
+elif [ -x "/usr/pkg/bin/uname" ]; then
+    UNAME_BIN="/usr/pkg/bin/uname"
+elif [ -x "/usr/local/bin/uname" ]; then
+    UNAME_BIN="/usr/local/bin/uname"
+fi
+
+# basename:
+if [ -x "/usr/bin/basename" ]; then
+    BASENAME_BIN="/usr/bin/basename"
+elif [ -x "/bin/basename" ]; then
+    BASENAME_BIN="/bin/basename"
+elif [ -x "/usr/pkg/bin/basename" ]; then
+    BASENAME_BIN="/usr/pkg/bin/basename"
+elif [ -x "/usr/local/bin/basename" ]; then
+    BASENAME_BIN="/usr/local/bin/basename"
+fi
+
+# touch:
+if [ -x "/usr/bin/touch" ]; then
+    TOUCH_BIN="/usr/bin/touch"
+elif [ -x "/bin/touch" ]; then
+    TOUCH_BIN="/bin/touch"
+elif [ -x "/usr/pkg/bin/touch" ]; then
+    TOUCH_BIN="/usr/pkg/bin/touch"
+elif [ -x "/usr/local/bin/touch" ]; then
+    TOUCH_BIN="/usr/local/bin/touch"
+fi
+
+# dylib bundle software (macOS specific):
 if [ -x "/Software/Dylibbundler/bin/dylibbundler" ]; then
     SOFIN_LIBBUNDLE_BIN="/Software/Dylibbundler/bin/dylibbundler"
 elif [ -x "/usr/bin/sofin-dylibbundler" ]; then # old sofin bundler
@@ -35,7 +71,7 @@ elif [ -x "/usr/local/bin/git" ]; then
     GIT_BIN="/usr/local/bin/git"
 fi
 
-# Zfs
+# Zfs: zfs
 if [ -x "/sbin/zfs" ]; then
     ZFS_BIN="/sbin/zfs"
 elif [ -x "/usr/sbin/zfs" ]; then
@@ -47,28 +83,34 @@ elif [ -x "/usr/pkg/sbin/zfs" ]; then
 else
     unset ZFS_BIN
 fi
+
+# Zfs: zpool
 if [ -x "/usr/bin/zpool" ]; then
     ZPOOL_BIN="/usr/bin/zpool"
-if [ -x "/usr/pkg/bin/zpool" ]; then
+elif [ -x "/usr/pkg/bin/zpool" ]; then
     ZPOOL_BIN="/usr/pkg/bin/zpool"
 elif [ -x "/usr/local/bin/zpool" ]; then
     ZPOOL_BIN="/usr/local/bin/zpool"
 else
     unset ZPOOL_BIN
 fi
+
+# Zfs: first available zpool name
 if [ -z "${ZPOOL_BIN}" ]; then
     unset DEFAULT_ZPOOL
 else
     DEFAULT_ZPOOL="$(${ZPOOL_BIN} list -H 2>/dev/null | ${CUT_BIN} -f1 2>/dev/null)"
 fi
 
-# Default shell - Zsh
+# Default shell - sh/zsh
 if [ -x "/Software/Zsh/bin/zsh" ]; then
     ZSH_BIN="/Software/Zsh/bin/zsh"
 elif [ -x "/usr/bin/zsh" ]; then
     ZSH_BIN="/usr/bin/zsh"
+elif [ -x "/usr/pkg/bin/zsh" ]; then
+    ZSH_BIN="/usr/pkg/bin/zsh"
 elif [ -x "/bin/zsh" ]; then
     ZSH_BIN="/bin/zsh"
-elif [ -x "${DEFAULT_LEGACY_SHELL}" ]; then
-    ZSH_BIN="${DEFAULT_LEGACY_SHELL}" # Fallback
+else
+    ZSH_BIN="${DEFAULT_FALLBACK_SHELL}"
 fi
