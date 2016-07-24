@@ -2,7 +2,17 @@
 # @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
 
 
-. share/sofin/loader
+# load base facts
+. share/sofin/facts/core.fact
+. share/sofin/facts/paths.fact
+
+# these two loaded only for colorful output:
+. share/sofin/facts/terminal.fact
+. share/sofin/facts/sofin.fact
+
+# load functions
+. share/sofin/funs/core.fun
+. share/sofin/funs/commons.fun
 
 
 # choose C compiler, if any
