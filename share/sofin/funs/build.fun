@@ -253,7 +253,7 @@ build () {
                 PREFIX="${SOFTWARE_DIR}$(capitalize "${_common_lowercase}")"
                 BUILD_DIR="${DEFAULT_BUILD_DIR}"
                 BUILD_NAMESUM="$(text_checksum "${DEF_NAME}${DEF_POSTFIX}-${DEF_VERSION}")"
-                BUILD_DIR_ROOT="${BUILD_DIR}/${BUILD_NAMESUM}"
+                BUILD_DIR_ROOT="${PREFIX}.src_${BUILD_NAMESUM}"
                 _bundl_name="$(capitalize "${_common_lowercase}")"
                 SERVICE_DIR="${SERVICES_DIR}${_bundl_name}"
 
