@@ -1,7 +1,6 @@
 # Security specific configuration
 
-DEFAULT_HARDEN_KEYS="kern.features.hbsd_hardening \
-hardening.procfs_harden \
+DEFAULT_HARDEN_KEYS="hardening.procfs_harden \
 hardening.log.ulog \
 hardening.log.log \
 hardening.version \
