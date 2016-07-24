@@ -270,6 +270,16 @@ store_security_state () {
             ${PRINTF_BIN} "${_content}\n" >> ${DEFAULT_SECURITY_STATE_FILE} 2</dev/null
         done
         unset _key _content _value
+
+
+disable_security_features () {
+    if [ "YES" = "${CAP_SYS_HARDENED}" ]; then
+        ${RM_BIN} -f "${DEFAULT_SECURITY_STATE_FILE}" 2>/dev/null
+        note "Storing current security state to file: $(distinct n "${DEFAULT_SECURITY_STATE_FILE}")"
+        for _key in ${DEFAULT_HARDEN_KEYS}; do
+            try "${SYSCTL_BIN} ${_key}=0"
+        done
+        unset _key _dsf_name
     else
         debug "No hardened capabilities in system"
     fi
