@@ -105,8 +105,8 @@ retry () {
         _ammo="$(echo "${_ammo}" | ${SED_BIN} 's/O//' 2>/dev/null)"
         debug "Remaining attempts: $(distinct d ${_ammo})"
     done
-    unset _ammo _targets
     debug "All _ammo exhausted to invoke a command: $(distinct e "${_targets}")"
+    unset _ammo _targets
     return 1
 }
 
