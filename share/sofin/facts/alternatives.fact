@@ -95,13 +95,6 @@ else
     unset ZPOOL_BIN
 fi
 
-# Zfs: first available zpool name
-if [ -z "${ZPOOL_BIN}" ]; then
-    unset DEFAULT_ZPOOL
-else
-    DEFAULT_ZPOOL="$(${ZPOOL_BIN} list -H 2>/dev/null | ${CUT_BIN} -f1 2>/dev/null)"
-fi
-
 # Default shell - sh/zsh
 if [ -x "/Software/Zsh/bin/zsh" ]; then
     ZSH_BIN="/Software/Zsh/bin/zsh"
