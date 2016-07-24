@@ -206,7 +206,7 @@ try () {
 }
 
 
-setup_def_branch () {
+setup_defs_branch () {
     # setting up definitions repository
     if [ -z "${BRANCH}" ]; then
         BRANCH="${DEFAULT_DEFINITIONS_BRANCH}"
@@ -214,7 +214,7 @@ setup_def_branch () {
 }
 
 
-setup_def_repo () {
+setup_defs_repo () {
     if [ -z "${REPOSITORY}" ]; then
         REPOSITORY="${DEFAULT_DEFINITIONS_REPOSITORY}"
     fi

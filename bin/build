@@ -65,8 +65,8 @@ install_base () {
         if [ "$(${ID_BIN} -u)" = "0" ]; then
             ${RM_BIN} -fv "${PREFIX}usr/bin/s" && \
             ${RM_BIN} -fv "${PREFIX}usr/bin/sofin" && \
-            ${RM_BIN} -fv "${PREFIX}usr/bin/sofin-version-utility" && \
-            ${RM_BIN} -fv "${PREFIX}usr/bin/sofin-microseconds" && \
+            ${RM_BIN} -fv "${PREFIX}usr/bin/s-osver" && \
+            ${RM_BIN} -fv "${PREFIX}usr/bin/s-usec" && \
             note "Preinstallation cleanup completed"
         fi
         install_sofin
@@ -78,10 +78,10 @@ build_natives () {
     note "Building native helpers"
     if [ -x "${CXX}" ]; then
         debug "C++ compiler available. Using: $(distinct n ${CXX})"
-        ${CXX} ${DEFAULT_COMPILER_FLAGS} -o bin/sofin-microseconds src/sofin_microseconds.cc && \
-        note "$(distinct n "bin/sofin-microseconds") has been successfully built" && \
-        ${CXX} ${DEFAULT_COMPILER_FLAGS} -o bin/sofin-version-utility src/sofin-version-utility.cc && \
-        note "$(distinct n "bin/sofin-version-utility") has been successfully built" && \
+        ${CXX} ${DEFAULT_COMPILER_FLAGS} -o bin/s-usec src/sofin_microseconds.cc && \
+        note "$(distinct n "bin/s-usec") has been successfully built" && \
+        ${CXX} ${DEFAULT_COMPILER_FLAGS} -o bin/s-osver src/sofin-version-utility.cc && \
+        note "$(distinct n "bin/s-osver") has been successfully built" && \
         return
         error "Failed to build native helpers!"
     else
@@ -103,15 +103,16 @@ Sofin requires read + write access for that path"
     note "Installing: $(distinct n Sof)tware $(distinct n In)staller, version: $(distinct n "${SOFIN_VERSION}") to prefix: $(distinct n ${PREFIX})" && \
     note "$(distinct n $(${CP_BIN} -fR "share/sofin" "${PREFIX}usr/share/" && \
         echo "install: share/sofin/* -> ${PREFIX}usr/share/sofin"))" && \
-    note "$(distinct n $(${INSTALL_BIN} "bin/sofin-version-utility" "${PREFIX}usr/bin" && \
-        echo "install: bin/sofin-version-utility -> ${PREFIX}usr/bin"))" && \
-    note "$(distinct n $(${INSTALL_BIN} "bin/sofin-microseconds" "${PREFIX}usr/bin" && \
-        echo "install: bin/sofin-microseconds -> ${PREFIX}usr/bin"))" && \
+    note "$(distinct n $(${INSTALL_BIN} "bin/s-osver" "${PREFIX}usr/bin" && \
+        echo "install: bin/s-osver -> ${PREFIX}usr/bin"))" && \
+    note "$(distinct n $(${INSTALL_BIN} "bin/s-usec" "${PREFIX}usr/bin" && \
+        echo "install: bin/s-usec -> ${PREFIX}usr/bin"))" && \
     note "$(distinct n $(${INSTALL_BIN} "src/sofin.sh" "${PREFIX}usr/bin/s" && \
         echo "install: src/sofin.sh -> ${PREFIX}usr/bin/s"))" && \
     note "Type: $(distinct n "s usage") for help." && \
     note "Read: $(distinct n "https://bitbucket.org/verknowsys/sofin") for more details." && \
     ${SED_BIN} -i -e "s#OS_TYPE#$(uname)#" ${PREFIX}usr/share/sofin/loader 2>/dev/null && \
     return
+
     error "Sofin installation failed!"
 }

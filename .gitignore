@@ -1,6 +1,6 @@
 .DS_Store
-/sofin
-/bin/sofin-*
+s-*
+sofin
 /releases/
 /Sofin.sublime-project
 /Sofin.sublime-workspace
