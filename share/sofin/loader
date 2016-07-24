@@ -18,32 +18,30 @@ load_funs () {
 
 load_sofin () {
 
-    # loading facts
-    load_facts  \
-                core.fact \
-                paths.fact \
-                paths-OS_TYPE.fact \
-                alternatives.fact \
-                system.fact \
-                terminal.fact \
-                sofin.fact
+    # determining facts:
+    load_facts \
+        core.fact \
+        paths.fact \
+        system.fact \
+        terminal.fact \
+        security.fact \
+        sofin.fact
 
-    # loading funs
+    # loading functions:
     load_funs \
-                core.fun \
-                validations.fun \
-                commons.fun \
-                envs.fun \
-                internals.fun \
-                cleaners.fun \
-                caches.fun \
-                definitions.fun \
-                datasets.fun \
-                build.fun
+        core.fun \
+        validations.fun \
+        commons.fun \
+        envs.fun \
+        internals.fun \
+        cleaners.fun \
+        caches.fun \
+        definitions.fun \
+        datasets.fun \
+        build.fun
 
-    # initial validations
-    setup_def_branch
-    setup_def_repo
+    setup_defs_branch
+    setup_defs_repo
     check_os
     check_defs_dir
     trap_signals
