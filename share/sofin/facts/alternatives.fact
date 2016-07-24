@@ -1,6 +1,6 @@
 
 # dylib bundle software:
-if [ -x "/Software/Dylibbundler/bin/dylibbundler" ]
+if [ -x "/Software/Dylibbundler/bin/dylibbundler" ]; then
     SOFIN_LIBBUNDLE_BIN="/Software/Dylibbundler/bin/dylibbundler"
 elif [ -x "/usr/bin/sofin-dylibbundler" ]; then # old sofin bundler
     SOFIN_LIBBUNDLE_BIN="/usr/bin/sofin-dylibbundler"
