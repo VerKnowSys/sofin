@@ -1,0 +1,15 @@
+# Security specific configuration
+
+DEFAULT_HARDEN_KEYS="kern.features.hbsd_hardening \
+hardening.procfs_harden \
+hardening.log.ulog \
+hardening.log.log \
+hardening.version \
+hardening.pax.segvguard.max_crashes \
+hardening.pax.segvguard.suspend_timeout \
+hardening.pax.segvguard.expiry_timeout \
+hardening.pax.segvguard.status \
+hardening.pax.mprotect.status \
+hardening.pax.pageexec.status \
+hardening.pax.disallow_map32bit.status \
+hardening.pax.aslr.status"
