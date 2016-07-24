@@ -15,7 +15,7 @@ build_bundle () {
     else
         if [ ! -e "./${_bsbname}${DEFAULT_CHKSUM_EXT}" ]; then
             debug "Found sha-less archive. It may be incomplete or damaged. Rebuilding.."
-            ${RM_BIN} -vf "${_bsbname}" >> ${LOG} 2>> ${LOG}
+            try "${RM_BIN} -vf ${_bsbname}"
             ${PRINTF_BIN} "${blue}"
             ${TAR_BIN} --totals -cJ --use-compress-program="${XZ_BIN} --threads=${CPUS}" -f "${_bsbname}" "./${_bsbelement}" || \
                 ${TAR_BIN} --totals -cJf "${_bsbname}" "./${_bsbelement}" || \
@@ -85,7 +85,7 @@ push_binbuild () {
                     push_zfs_stream "${_final_snap_file}" "${_pbelement}" "${_mirror}"
 
                 done
-                # ${RM_BIN} -f "${_element_name}" "${_element_name}${DEFAULT_CHKSUM_EXT}" "${FILE_CACHE_DIR}${_final_snap_file}" >> ${LOG}-${_lowercase_element} 2>> ${LOG}-${_lowercase_element}
+                try "${RM_BIN} -f ${_element_name} ${_element_name}${DEFAULT_CHKSUM_EXT}"
             fi
         else
             warn "No version file of software: $(distinct w ${_pbelement}) found! It seems to not be fully installed or broken."
@@ -195,7 +195,7 @@ fetch_binbuild () {
                 DONT_BUILD_BUT_DO_EXPORTS=YES
             else
                 debug "  ${NOTE_CHAR} No binary bundle available for: $(distinct n ${DEF_NAME}${DEF_POSTFIX})"
-                ${RM_BIN} -fr "${BINBUILDS_CACHE_DIR}${_full_name}"
+                try "${RM_BIN} -fr ${BINBUILDS_CACHE_DIR}${_full_name}"
             fi
         else
             debug "Binary build checksum doesn't match for: $(distinct n ${_full_name})"
@@ -223,7 +223,7 @@ build () {
         if [ "${DEF_DISABLED}" = "YES" ]; then
             _anm="$(capitalize "${_bund_name}")"
             warn "Bundle: $(distinct w "${_anm}") is disabled on: $(distinct w "${OS_TRIPPLE}")"
-            ${RM_BIN} -rf "${PREFIX}" >> ${LOG} 2>> ${LOG}
+            try "${RM_BIN} -rf ${PREFIX}"
             unset _pref_base
         else
             unset _pref_base
@@ -482,7 +482,7 @@ process () {
                             _bname="$(${BASENAME_BIN} "${_dest_file}" 2>/dev/null)"
                             warn "${WARN_CHAR} Removing file from cache: $(distinct w "${_bname}") and retrying.."
                             # remove corrupted file
-                            ${RM_BIN} -vf "${_dest_file}" >> ${LOG} 2>> ${LOG}
+                            try "${RM_BIN} -vf ${_dest_file}"
                             # and restart script with same arguments:
                             debug "Evaluating again: $(distinct d "process(${_app_param})")"
                             process "${_app_param}"

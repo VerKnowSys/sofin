@@ -483,7 +483,7 @@ clean_useless () {
                     if [ -n "${PREFIX}" -a \
                            -z "${DEF_USEFUL}" ]; then # TODO: implement ignoring DEF_USEFUL entries here!
                         debug "Pattern of DEF_DEFAULT_USELESS: $(distinct d ${_cu_pattern})"
-                        ${RM_BIN} -vrf ${PREFIX}/${_cu_pattern} >> ${LOG} 2>> ${LOG}
+                        try "${RM_BIN} -vrf ${PREFIX}/${_cu_pattern}"
                     fi
                 done
             fi
@@ -494,7 +494,7 @@ clean_useless () {
                     if [ -n "${PREFIX}" -a \
                          -n "${_cu_pattern}" ]; then
                         debug "Pattern of DEF_USELESS: $(distinct d ${PREFIX}/${_cu_pattern})"
-                        ${RM_BIN} -vrf ${PREFIX}/${_cu_pattern} >> ${LOG} 2>> ${LOG}
+                        try "${RM_BIN} -vrf ${PREFIX}/${_cu_pattern}"
                     fi
                 done
             fi
@@ -531,7 +531,7 @@ clean_useless () {
                 done
                 debug "Found exports: $(distinct d "${_dbg_exp_lst}")"
                 debug "Found useless files: $(distinct d "${_tobermlist}")"
-                ${RM_BIN} -f "${_tobermlist}" >/dev/null 2>> ${LOG}
+                try "${RM_BIN} -f ${_tobermlist}"
             fi
         done
     else

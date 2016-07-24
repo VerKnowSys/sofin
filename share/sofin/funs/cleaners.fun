@@ -4,7 +4,7 @@ clean_purge () {
         if [ ! -f "${LOG}" ]; then
             LOG="/dev/null"
         fi
-        ${RM_BIN} -rf "${CACHE_DIR}" >> ${LOG} 2>> ${LOG}
+        try "${RM_BIN} -rf ${CACHE_DIR}"
     fi
 }
 
@@ -15,7 +15,7 @@ clean_logs () {
         if [ ! -f "${LOG}" ]; then
             LOG="/dev/null"
         fi
-        ${RM_BIN} -rf "${LOGS_DIR}" >> ${LOG} 2>> ${LOG}
+        try "${RM_BIN} -rf ${LOGS_DIR}"
     fi
 }
 
@@ -26,7 +26,7 @@ clean_binbuilds () {
         if [ ! -f "${LOG}" ]; then
             LOG="/dev/null"
         fi
-        ${RM_BIN} -rf "${BINBUILDS_CACHE_DIR}" >> ${LOG} 2>> ${LOG}
+        try "${RM_BIN} -rf ${BINBUILDS_CACHE_DIR}"
     fi
 }
 
@@ -48,7 +48,7 @@ clean_failbuilds () {
                     LOG="/dev/null"
                 fi
                 debug "Removing cache directory: ${i}"
-                ${RM_BIN} -rf "${i}" >> ${LOG} 2>> ${LOG}
+                try "${RM_BIN} -rf ${i}"
             done
             _cf_result="$(echo "${_cf_number}" | ${BC_BIN} 2>/dev/null)"
             note "$(distinct n ${_cf_result}) directories cleaned."
