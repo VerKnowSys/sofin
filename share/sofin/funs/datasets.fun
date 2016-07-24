@@ -81,12 +81,25 @@ create_builddir () {
     unset _dset_create _dset_namesum
 }
 
+
+destroy_builddir () {
+    _dset_destroy="${1}"
+    _dset_sum="${2}"
+    if [ "YES" = "${CAP_SYS_ZFS}" ]; then
+        if [ -z "${_dset_destroy}" ]; then
+            error "First argument with $(distinct e "BundleName") is required!"
+        fi
+        if [ -z "${_dset_sum}" ]; then
+            error "Second argument with $(distinct e "bundle-sha-sum") is required!"
+        fi
+        _dsname="${DEFAULT_ZPOOL}${SOFTWARE_DIR}${USER}/${_dset_destroy}/${DEFAULT_SRC_EXT}${_dset_sum}"
+        debug "Destroying ZFS build-dataset: $(distinct d "${_dsname}")"
         try "${ZFS_BIN} umount -f ${_dsname}"
-        run "${ZFS_BIN} destroy ${_dsname}"
+        run "${ZFS_BIN} destroy -r ${_dsname}"
         unset _dsname
     else
-        debug "No ZFS feature."
-        try "${MKDIR_BIN} -p ${_dset_destroy}"
+        debug "Removing regular build-directory: $(distinct d "${SOFTWARE_DIR}${_dset_destroy}")"
+        try "${RM_BIN} -fr ${SOFTWARE_DIR}${_dset_destroy}"
     fi
     unset _dset_destroy
 }
