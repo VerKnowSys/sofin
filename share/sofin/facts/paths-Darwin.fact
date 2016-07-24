@@ -8,6 +8,7 @@ SYSCTL_BIN="/usr/sbin/sysctl"
 KLDLOAD_BIN="/sbin/kextload"
 XZCAT_BIN="/bin/cat"
 PGREP_BIN="/usr/bin/pgrep"
+DTRACE_BIN="/usr/sbin/dtrace"
 
 # set core parameters:
 ALL_CPUS="$(${SYSCTL_BIN} -e machdep.cpu.thread_count 2>/dev/null | ${CUT_BIN} -d'=' -f2 2>/dev/null)"

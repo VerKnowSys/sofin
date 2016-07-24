@@ -21,6 +21,7 @@ MERGEMASTER_BIN="/usr/sbin/mergemaster"
 KLDLOAD_BIN="/sbin/kldload"
 MDMFS_BIN="/sbin/mdmfs"
 LIMITS_BIN="/usr/bin/limits"
+DTRACE_BIN="/usr/sbin/dtrace"
 
 # ServeD governor, FreeBSD specific:
 GVR_BIN="/usr/bin/gvr"
