@@ -69,30 +69,6 @@ push_binbuild () {
                     ${SSH_BIN} ${DEFAULT_SSH_OPTS} -p "${MAIN_PORT}" "${MAIN_USER}@${_mirror}" \
                         "${MKDIR_BIN} -p ${SYS_SPECIFIC_BINARY_REMOTE}"
 
-                    if [ "${SYSTEM_NAME}" = "FreeBSD" ]; then # NOTE: feature designed for FBSD.
-                        _svcs_no_slashes="$(echo "${SERVICES_DIR}" | ${SED_BIN} 's/\///g' 2>/dev/null)"
-                        _inner_dir="$(${ZFS_BIN} list -H 2>/dev/null | ${GREP_BIN} "${_pbelement}$" 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null | ${SED_BIN} "s/.*${_svcs_no_slashes}\///; s/\/.*//" 2>/dev/null)/"
-                        _certain_dataset="${SERVICES_DIR}${_inner_dir}${_pbelement}"
-                        _full_dataset_name="${DEFAULT_ZPOOL}${_certain_dataset}"
-                        _snap_file="${_pbelement}-${_version_element}.${SERVICE_SNAPSHOT_POSTFIX}"
-                        _final_snap_file="${_snap_file}${DEFAULT_ARCHIVE_EXT}"
-                        _snap_size="0"
-                        note "Preparing service dataset: $(distinct n ${_full_dataset_name}), for bundle: $(distinct n ${_pbelement})"
-                        ${ZFS_BIN} list -H 2>/dev/null | ${GREP_BIN} "${_pbelement}\$" >/dev/null 2>&1
-                        if [ "$?" = "0" ]; then # if dataset exists, unmount it, send to file, and remount back
-                            ${PRINTF_BIN} "${blue}"
-                            try "${ZFS_BIN} umount ${_full_dataset_name}" || \
-                                error "ZFS umount failed for: $(distinct e "${_full_dataset_name}"). Dataset shouldn't be locked nor used on build hosts."
-                            ${ZFS_BIN} send -e -L "${_full_dataset_name}" | ${XZ_BIN} > "${FILE_CACHE_DIR}${_final_snap_file}" 2>> "${LOG}-${_lowercase_element}" && \
-                                    _snap_size="$(file_size "${FILE_CACHE_DIR}${_final_snap_file}")" && \
-                                    try "${ZFS_BIN} mount ${_full_dataset_name}"
-                        fi
-                        if [ "${_snap_size}" = "0" ]; then
-                            ${RM_BIN} -vf "${FILE_CACHE_DIR}${_final_snap_file}" >> "${LOG}-${_lowercase_element}" 2>> "${LOG}-${_lowercase_element}"
-                            note "Service dataset has no contents for bundle: $(distinct n ${_pbelement}-${_version_element}), hence upload will be skipped"
-                        fi
-                    fi
-
                     build_bundle "${_element_name}" "${_pbelement}"
                     store_checksum "${_element_name}"
 
@@ -278,7 +254,8 @@ build () {
                 BUILD_DIR="${DEFAULT_BUILD_DIR}"
                 BUILD_NAMESUM="$(text_checksum "${DEF_NAME}${DEF_POSTFIX}-${DEF_VERSION}")"
                 BUILD_DIR_ROOT="${BUILD_DIR}/${BUILD_NAMESUM}"
-                SERVICE_DIR="${SERVICES_DIR}$(capitalize "${_common_lowercase}")"
+                _bundl_name="$(capitalize "${_common_lowercase}")"
+                SERVICE_DIR="${SERVICES_DIR}${_bundl_name}"
 
                 if [ -z "${DEVEL}" ]; then
                     debug "Cleaning before PROD build in BUILD_DIR_ROOT: $(distinct d "${BUILD_DIR_ROOT}")"
@@ -291,12 +268,23 @@ build () {
                 export PATH="${PREFIX}/bin:${PREFIX}/sbin:${DEFAULT_PATH}"
                 export PKG_CONFIG_PATH="${PREFIX}/lib/pkgconfig"
 
-                if [ ! -z "${DEF_STANDALONE}" ]; then
-                    ${MKDIR_BIN} -p "${SERVICE_DIR}" >/dev/null 2>> ${LOG}
-                    ${CHMOD_BIN} 0710 "${SERVICE_DIR}"
+                # NOTE: standalone definition has own SERVICES_DIR/Bundlename/ prefix
+                if [ -n "${DEF_STANDALONE}" ]; then
+
+                    if [ "YES" = "${CAP_SYS_ZFS}" ]; then
+                        _dsname="${DEFAULT_ZPOOL}${SERVICES_DIR}${USER}/${_bundl_name}"
+                        debug "ZFS feature enabled. Creating dataset: $(distinct d "${_dsname}")"
+                        run "${ZFS_BIN} create -o mountpoint=${SERVICES_DIR}${_bundl_name} ${_dsname}"
+                        try "${ZFS_BIN} mount ${_dsname}"
+                        unset _dsname
+                    else
+                        debug "No ZFS feature."
+                        try "${MKDIR_BIN} -p ${SERVICE_DIR}"
+                    fi
+                    try "${CHMOD_BIN} 0710 ${SERVICE_DIR}"
                 fi
-                ${MKDIR_BIN} -p "${BUILD_DIR}" >/dev/null 2>> ${LOG}
-                ${MKDIR_BIN} -p "${BUILD_DIR_ROOT}" >/dev/null 2>> ${LOG}
+
+                try "${MKDIR_BIN} -p ${BUILD_DIR_ROOT}"
 
                 # binary build of whole software bundle
                 _full_bund_name="${_common_lowercase}-${DEF_VERSION}"
@@ -374,7 +362,6 @@ build () {
 
             clean_useless
             strip_bundle "${_common_lowercase}"
-            manage_datasets
             create_apple_bundle_if_necessary
         fi
     done
