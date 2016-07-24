@@ -49,6 +49,14 @@ determine_system_capabilites () {
         unset CAP_SYS_DTRACE
     fi
 
+    ${SYSCTL_BIN} -a 2>/dev/null | ${GREP_BIN} 'kern.features.linux64' >/dev/null 2>&1
+    if [ "$?" = "0" ]; then
+        CAP_SYS_LINUX64_ABI=YES
+        ${KLDLOAD_BIN} linux64 >/dev/null 2>&1|| true
+    else
+        unset CAP_SYS_LINUX64_ABI
+    fi
+
 }
 
 determine_system_capabilites
