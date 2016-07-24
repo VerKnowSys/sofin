@@ -270,21 +270,10 @@ build () {
 
                 # NOTE: standalone definition has own SERVICES_DIR/Bundlename/ prefix
                 if [ -n "${DEF_STANDALONE}" ]; then
-
-                    if [ "YES" = "${CAP_SYS_ZFS}" ]; then
-                        _dsname="${DEFAULT_ZPOOL}${SERVICES_DIR}${USER}/${_bundl_name}"
-                        debug "ZFS feature enabled. Creating dataset: $(distinct d "${_dsname}")"
-                        run "${ZFS_BIN} create -o mountpoint=${SERVICES_DIR}${_bundl_name} ${_dsname}"
-                        try "${ZFS_BIN} mount ${_dsname}"
-                        unset _dsname
-                    else
-                        debug "No ZFS feature."
-                        try "${MKDIR_BIN} -p ${SERVICE_DIR}"
-                    fi
-                    try "${CHMOD_BIN} 0710 ${SERVICE_DIR}"
+                    create_service_dir "${_bundl_name}"
                 fi
 
-                try "${MKDIR_BIN} -p ${BUILD_DIR_ROOT}"
+                destroy_service_dir "${BUILD_DIR_ROOT}"
 
                 # binary build of whole software bundle
                 _full_bund_name="${_common_lowercase}-${DEF_VERSION}"
