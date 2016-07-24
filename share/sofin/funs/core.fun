@@ -242,3 +242,33 @@ trap_signals () {
     trap terminate_handler TERM
     trap noop_handler USR2 # This signal is used to "reload shell"-feature. Sofin should ignore it
 }
+
+
+restore_security_state () {
+    if [ "YES" = "${CAP_SYS_HARDENED}" ]; then
+        if [ -f "${DEFAULT_SECURITY_STATE_FILE}" ]; then
+            note "Restoring pre-build security state"
+            . ${DEFAULT_SECURITY_STATE_FILE}
+        else
+            debug "No security state file found: ${DEFAULT_SECURITY_STATE_FILE}"
+        fi
+    else
+        debug "No hardened capabilities in system"
+    fi
+}
+
+
+store_security_state () {
+    if [ "YES" = "${CAP_SYS_HARDENED}" ]; then
+        ${RM_BIN} -f "${DEFAULT_SECURITY_STATE_FILE}" 2>/dev/null
+        note "Storing current security state to file: $(distinct n "${DEFAULT_SECURITY_STATE_FILE}")"
+        for _key in ${DEFAULT_HARDEN_KEYS}; do
+            _value="$(${SYSCTL_BIN} -n ${_key} 2>/dev/null)"
+            _content="${SYSCTL_BIN} ${fun}${_key}=${_value:-0}"
+            ${PRINTF_BIN} "${_content}\n" >> ${DEFAULT_SECURITY_STATE_FILE} 2</dev/null
+        done
+        unset _key _content _value
+    else
+        debug "No hardened capabilities in system"
+    fi
+}
