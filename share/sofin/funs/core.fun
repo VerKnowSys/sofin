@@ -250,7 +250,7 @@ restore_security_state () {
     if [ "YES" = "${CAP_SYS_HARDENED}" ]; then
         if [ -f "${DEFAULT_SECURITY_STATE_FILE}" ]; then
             note "Restoring pre-build security state"
-            . ${DEFAULT_SECURITY_STATE_FILE}
+            . ${DEFAULT_SECURITY_STATE_FILE} 2>> ${LOG}
         else
             debug "No security state file found: ${DEFAULT_SECURITY_STATE_FILE}"
         fi
@@ -265,11 +265,15 @@ store_security_state () {
         ${RM_BIN} -f "${DEFAULT_SECURITY_STATE_FILE}" 2>/dev/null
         note "Storing current security state to file: $(distinct n "${DEFAULT_SECURITY_STATE_FILE}")"
         for _key in ${DEFAULT_HARDEN_KEYS}; do
-            _value="$(${SYSCTL_BIN} -n ${_key} 2>/dev/null)"
-            _content="${SYSCTL_BIN} ${fun}${_key}=${_value:-0}"
-            ${PRINTF_BIN} "${_content}\n" >> ${DEFAULT_SECURITY_STATE_FILE} 2</dev/null
+            _sss_value="$(${SYSCTL_BIN} -n "${_key}" 2>/dev/null)"
+            _sss_cntnt="${SYSCTL_BIN} ${_key}=${_sss_value}"
+            ${PRINTF_BIN} "${_sss_cntnt}\n" >> ${DEFAULT_SECURITY_STATE_FILE} 2>/dev/null
         done
-        unset _key _content _value
+        unset _key _sss_cntnt _sss_value
+    else
+        debug "No hardened capabilities in system"
+    fi
+}
 
 
 disable_security_features () {
