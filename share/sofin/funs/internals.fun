@@ -332,17 +332,17 @@ create_or_receive () {
         error "create_or_receive(): Expected two aruments: $(distinct e dataset_name) and $(distinct e final_snapshot_file)."
     fi
     _commons_path="${MAIN_COMMON_REPOSITORY}/${_final_snap_file}"
-    try "${FETCH_BIN} ${FETCH_OPTS} ${_commons_path}" || \
-        try "${FETCH_BIN} ${FETCH_OPTS} ${_commons_path}" || \
-        try "${FETCH_BIN} ${FETCH_OPTS} ${_commons_path}"
+    try "${FETCH_BIN} ${FETCH_OPTS} ${_commons_path} -o ${FILE_CACHE_DIR}" || \
+        try "${FETCH_BIN} ${FETCH_OPTS} ${_commons_path} -o ${FILE_CACHE_DIR}" || \
+        try "${FETCH_BIN} ${FETCH_OPTS} ${_commons_path} -o ${FILE_CACHE_DIR}"
     if [ "$?" = "0" ]; then
         note "Common stream available for: $(distinct n "${_dataset_name}"). Creating service dataset: $(distinct n "${_dataset_name}"), from file stream: $(distinct n "${_final_snap_file}")."
-        try "${XZCAT_BIN} ${_final_snap_file} 2>/dev/null | ${ZFS_BIN} receive -e origin -v ${_dataset_name}" && \
-            ${RM_BIN} -fv "${_final_snap_file}" >/dev/null 2>> ${LOG}
+        try "${XZCAT_BIN} ${FILE_CACHE_DIR}${_final_snap_file} 2>/dev/null | ${ZFS_BIN} receive -e origin -v ${_dataset_name}" && \
+            note "Received service dataset for: $(distinct n "${_dataset_name}")"
     else
         debug "Initial service dataset unavailable"
         try "${ZFS_BIN} create ${_dataset_name}" && \
-            note "Created an empty service dataset for: $(distinct n ${_dataset_name})"
+            note "Created an empty service dataset for: $(distinct n "${_dataset_name}")"
     fi
     unset _dataset_name _final_snap_file _commons_path
 }
