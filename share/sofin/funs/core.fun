@@ -263,7 +263,7 @@ restore_security_state () {
 store_security_state () {
     if [ "YES" = "${CAP_SYS_HARDENED}" ]; then
         ${RM_BIN} -f "${DEFAULT_SECURITY_STATE_FILE}" 2>/dev/null
-        note "Storing current security state to file: $(distinct n "${DEFAULT_SECURITY_STATE_FILE}")"
+        debug "Storing current security state to file: $(distinct d "${DEFAULT_SECURITY_STATE_FILE}")"
         for _key in ${DEFAULT_HARDEN_KEYS}; do
             _sss_value="$(${SYSCTL_BIN} -n "${_key}" 2>/dev/null)"
             _sss_cntnt="${SYSCTL_BIN} ${_key}=${_sss_value}"
@@ -279,7 +279,7 @@ store_security_state () {
 disable_security_features () {
     if [ "YES" = "${CAP_SYS_HARDENED}" ]; then
         ${RM_BIN} -f "${DEFAULT_SECURITY_STATE_FILE}" 2>/dev/null
-        note "Storing current security state to file: $(distinct n "${DEFAULT_SECURITY_STATE_FILE}")"
+        debug "Disabling all security features.."
         for _key in ${DEFAULT_HARDEN_KEYS}; do
             try "${SYSCTL_BIN} ${_key}=0"
         done
