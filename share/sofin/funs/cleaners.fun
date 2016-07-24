@@ -80,6 +80,7 @@ perform_clean () {
 
 finalize () {
     debug "finalize()"
+    restore_security_state
     update_shell_vars
     reload_zsh_shells
     destroy_locks

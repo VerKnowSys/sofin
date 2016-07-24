@@ -88,6 +88,7 @@ note () {
 
 
 error () {
+    restore_security_state
     cecho
     cecho "$(fill)" ${red}
     cecho "${FAIL_CHAR} Error: $1" ${red}
