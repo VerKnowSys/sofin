@@ -10,6 +10,6 @@ SSH_BIN="/usr/pkg/bin/ssh"
 SCP_BIN="/usr/pkg/bin/scp"
 
 # set core parameters:
-CPUS="4" # XXX: hardcoded
-ALL_CPUS="${CPUS}"
-MAKE_OPTS="-j${CPUS}"
+CPUS="${CPUS:-${DEFAULT_CPUS}}" # XXX: hardcoded
+ALL_CPUS="${CPUS:-${DEFAULT_CPUS}}"
+MAKE_OPTS="-j${CPUS:-${DEFAULT_CPUS}}"

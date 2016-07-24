@@ -27,6 +27,5 @@ GVR_BIN="/usr/bin/gvr"
 
 # set core parameters:
 CPUS="$(${SYSCTL_BIN} -e kern.smp.cpus 2>/dev/null | ${CUT_BIN} -d'=' -f2 2>/dev/null)"
-ALL_CPUS="${CPUS}"
-MAKE_OPTS="-j${CPUS}"
-DEFAULT_ZPOOL="$(${ZPOOL_BIN} list -H 2>/dev/null | ${CUT_BIN} -w -f1 2>/dev/null)"
+ALL_CPUS="${CPUS:-${DEFAULT_CPUS}}"
+MAKE_OPTS="-j${CPUS:-${DEFAULT_CPUS}}"

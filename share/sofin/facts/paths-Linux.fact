@@ -30,5 +30,5 @@ fi
 
 # set core parameters:
 CPUS="$(${CAT_BIN} /proc/cpuinfo 2>/dev/null | ${EGREP_BIN} -c 'processor.*:' 2>/dev/null)"
-ALL_CPUS="${CPUS}"
-MAKE_OPTS="-j${CPUS}"
+ALL_CPUS="${CPUS:-${DEFAULT_CPUS}}"
+MAKE_OPTS="-j${CPUS:-${DEFAULT_CPUS}}"

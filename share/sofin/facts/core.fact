@@ -1,9 +1,14 @@
 # Core values required to be defined before *
 
+DEFAULT_CPUS=4
 MAX_OPEN_TAIL_LOGS=80
 LOG_LINES_AMOUNT=23
 LOG_LINES_AMOUNT_ON_ERR=17
 LOG_LAST_ACCESS_OR_MOD_MINUTES=60
+
+# default CA Root certs to be used by Sofin:
+DEFAULT_CACERT="/etc/ssl/cert.pem"
+
 
 DEFAULT_DEF_EXT=".def"
 DEFAULT_LOCK_EXT=".lock"
@@ -11,6 +16,7 @@ DEFAULT_ARCHIVE_EXT=".txz"
 DEFAULT_CHKSUM_EXT=".sha1"
 DEFAULT_INST_MARK_EXT=".installed"
 
+DEFAULT_FALLBACK_SHELL="/bin/sh"
 SERVICE_SNAPSHOT_POSTFIX="zfs-stream"
 DEFAULT_MANPATH="/usr/share/man"
 DEFAULT_SSH_OPTS="" #-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
