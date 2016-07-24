@@ -117,7 +117,7 @@ compiler_setup () {
     fi
 
     # Support for other definition options
-    if [ ! -z "${FORCE_GNU_COMPILER}" ]; then # force GNU compiler usage on definition side:
+    if [ -n "${FORCE_GNU_COMPILER}" ]; then # force GNU compiler usage on definition side:
         warn "Support for GNU compiler was recently dropped, and is ignored since Sofin 1.0. Try using $(distinct e Gcc) instead)?"
     fi
 
@@ -285,7 +285,7 @@ update_shell_vars () {
 
 
 reload_zsh_shells () {
-    if [ ! -z "${SHELL_PID}" ]; then
+    if [ -n "${SHELL_PID}" ]; then
         _shell_pattern="zsh"
         if [ "Darwin" = "${SYSTEM_NAME}" ]; then
             _shell_pattern="\d ${ZSH_BIN}" # NOTE: this fixes issue with SIGUSR2 signal sent to iTerm

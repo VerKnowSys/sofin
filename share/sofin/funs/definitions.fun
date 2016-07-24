@@ -112,7 +112,7 @@ store_checksum () {
 
 
 update_defs () {
-    if [ ! -z "${USE_UPDATE}" ]; then
+    if [ -n "${USE_UPDATE}" ]; then
         debug "Definitions update skipped on demand"
         return
     fi
@@ -256,7 +256,7 @@ remove_bundles () {
                 _alternative="$(${FIND_BIN} ${SOFTWARE_DIR} -mindepth 1 -maxdepth 1 -type d -iname "${_inname}*" -not -name "${_given_name}" 2>/dev/null | ${SED_BIN} 's/^.*\///g' 2>/dev/null | ${HEAD_BIN} -n1 2>/dev/null)"
             fi
 
-            if [ ! -z "${_alternative}" -a \
+            if [ -n "${_alternative}" -a \
                    -f "${SOFTWARE_DIR}${_alternative}/$(lowercase ${_alternative})${DEFAULT_INST_MARK_EXT}" ]; then
                 note "Updating environment with already installed alternative: $(distinct n ${_alternative})"
                 export_binaries "${_alternative}"
@@ -379,7 +379,7 @@ wipe_remote_archives () {
 
 
 create_apple_bundle_if_necessary () { # XXXXXX
-    if [ ! -z "${DEF_APPLE_BUNDLE}" ]; then
+    if [ -n "${DEF_APPLE_BUNDLE}" ]; then
         _aname="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
         DEF_NAME="$(${PRINTF_BIN} "${DEF_NAME}" | ${CUT_BIN} -c1 2>/dev/null | ${TR_BIN} '[a-z]' '[A-Z]' 2>/dev/null)$(${PRINTF_BIN} "${DEF_NAME}" | ${SED_BIN} 's/^[a-zA-Z]//' 2>/dev/null)"
         DEF_BUNDLE_NAME="${PREFIX}.app"
@@ -476,11 +476,11 @@ strip_bundle () {
 clean_useless () {
     if [ "${DEF_CLEAN_USELESS}" = "YES" ]; then
         # we shall clean the bundle, from useless files..
-        if [ ! -z "${PREFIX}" ]; then
+        if [ -n "${PREFIX}" ]; then
             # step 0: clean defaults side DEF_DEFAULT_USELESS entries only if DEF_USEFUL is empty
-            if [ ! -z "${DEF_DEFAULT_USELESS}" ]; then
+            if [ -n "${DEF_DEFAULT_USELESS}" ]; then
                 for _cu_pattern in ${DEF_DEFAULT_USELESS}; do
-                    if [ ! -z "${PREFIX}" -a \
+                    if [ -n "${PREFIX}" -a \
                            -z "${DEF_USEFUL}" ]; then # TODO: implement ignoring DEF_USEFUL entries here!
                         debug "Pattern of DEF_DEFAULT_USELESS: $(distinct d ${_cu_pattern})"
                         ${RM_BIN} -vrf ${PREFIX}/${_cu_pattern} >> ${LOG} 2>> ${LOG}
@@ -489,10 +489,10 @@ clean_useless () {
             fi
 
             # step 1: clean definition side DEF_USELESS entries only if DEF_USEFUL is empty
-            if [ ! -z "${DEF_USELESS}" ]; then
+            if [ -n "${DEF_USELESS}" ]; then
                 for _cu_pattern in ${DEF_USELESS}; do
-                    if [ ! -z "${PREFIX}" -a \
-                         ! -z "${_cu_pattern}" ]; then
+                    if [ -n "${PREFIX}" -a \
+                         -n "${_cu_pattern}" ]; then
                         debug "Pattern of DEF_USELESS: $(distinct d ${PREFIX}/${_cu_pattern})"
                         ${RM_BIN} -vrf ${PREFIX}/${_cu_pattern} >> ${LOG} 2>> ${LOG}
                     fi
@@ -543,7 +543,7 @@ clean_useless () {
 
 conflict_resolve () {
     debug "Resolving conflicts for: $(distinct d "${DEF_CONFLICTS_WITH}")"
-    if [ ! -z "${DEF_CONFLICTS_WITH}" ]; then
+    if [ -n "${DEF_CONFLICTS_WITH}" ]; then
         debug "Resolving possible conflicts with: $(distinct d ${DEF_CONFLICTS_WITH})"
         for _cr_app in ${DEF_CONFLICTS_WITH}; do
             _crfind_s="$(${FIND_BIN} ${SOFTWARE_DIR} -maxdepth 1 -type d -iname "${_cr_app}*" 2>/dev/null)"
@@ -651,7 +651,7 @@ hack_def () {
 
 
 after_update_callback () {
-    if [ ! -z "${DEF_AFTER_UNPACK_METHOD}" ]; then
+    if [ -n "${DEF_AFTER_UNPACK_METHOD}" ]; then
         debug "Evaluating callback: $(distinct d "${DEF_AFTER_UNPACK_METHOD}")"
         run "${DEF_AFTER_UNPACK_METHOD}"
     fi
@@ -659,7 +659,7 @@ after_update_callback () {
 
 
 after_export_callback () {
-    if [ ! -z "${DEF_AFTER_EXPORT_METHOD}" ]; then
+    if [ -n "${DEF_AFTER_EXPORT_METHOD}" ]; then
         debug "Evaluating callback DEF_AFTER_EXPORT_METHOD: $(distinct d "${DEF_AFTER_EXPORT_METHOD}")"
         run "${DEF_AFTER_EXPORT_METHOD}"
     fi
@@ -667,7 +667,7 @@ after_export_callback () {
 
 
 after_patch_callback () {
-    if [ ! -z "${DEF_AFTER_PATCH_METHOD}" ]; then
+    if [ -n "${DEF_AFTER_PATCH_METHOD}" ]; then
         debug "Evaluating callback: $(distinct d "${DEF_AFTER_PATCH_METHOD}")"
         run "${DEF_AFTER_PATCH_METHOD}"
     fi
@@ -675,7 +675,7 @@ after_patch_callback () {
 
 
 after_configure_callback () {
-    if [ ! -z "${DEF_AFTER_CONFIGURE_METHOD}" ]; then
+    if [ -n "${DEF_AFTER_CONFIGURE_METHOD}" ]; then
         debug "Evaluating callback: $(distinct d "${DEF_AFTER_CONFIGURE_METHOD}")"
         run "${DEF_AFTER_CONFIGURE_METHOD}"
     fi
@@ -683,7 +683,7 @@ after_configure_callback () {
 
 
 after_make_callback () {
-    if [ ! -z "${DEF_AFTER_MAKE_METHOD}" ]; then
+    if [ -n "${DEF_AFTER_MAKE_METHOD}" ]; then
         debug "Evaluating callback: $(distinct d "${DEF_AFTER_MAKE_METHOD}")"
         run "${DEF_AFTER_MAKE_METHOD}"
     fi

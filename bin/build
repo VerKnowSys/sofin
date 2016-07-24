@@ -90,7 +90,7 @@ build_natives () {
 
 
 install_sofin () {
-    if [ ! -z "${PREFIX}" ]; then
+    if [ -n "${PREFIX}" ]; then
         for a_path in "${PREFIX}" "${PREFIX}etc" "${PREFIX}usr/bin"; do
             ${MKDIR_BIN} -p "${a_path}" || error "Privileges sanity check failure!\
 No owner privileges for current user: $(distinct e ${USER}), found for path: $(distinct e ${a_path})\

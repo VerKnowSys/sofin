@@ -55,7 +55,7 @@ debug () {
     _dbfn="# ${func}${_dbfnin}${magenta2}" # NOTE: "#" is required for debug mode to work properly
     if [ -z "${DEBUG}" ]; then
         _dbgnme="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
-        if [ ! -z "${_dbgnme}" -a \
+        if [ -n "${_dbgnme}" -a \
                -d "${LOGS_DIR}" ]; then
             # Definition log
             cecho "${_dbfn}${_in}" ${magenta2} \
@@ -145,7 +145,7 @@ distinct () {
 
 
 run () {
-    if [ ! -z "$1" ]; then
+    if [ -n "$1" ]; then
         _run_params="$@"
         unset _run_show_stdout_progress
         echo "${_run_params}" | eval "${MATCH_FETCH_CMDS_GUARD}" && _run_show_stdout_progress=YES
@@ -178,7 +178,7 @@ run () {
 
 
 try () {
-    if [ ! -z "$1" ]; then
+    if [ -n "$1" ]; then
         _try_params="$@"
         unset _try_show_stdout_progress
         echo "${_try_params}" | eval "${MATCH_FETCH_CMDS_GUARD}" && \

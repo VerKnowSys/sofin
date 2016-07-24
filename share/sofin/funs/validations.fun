@@ -59,7 +59,7 @@ validate_reqs () {
         fi
         unset _a_files _pstfix
     fi
-    if [ ! -z "${DEBUGBUILD}" ]; then
+    if [ -n "${DEBUGBUILD}" ]; then
         warn "Debug build is enabled."
     fi
 }
@@ -124,10 +124,10 @@ validate_def_postfix () {
         _cispc_nme_diff="$(difftext "${_cigiven_name}" "$(lowercase "${DEF_NAME}")")"
     fi
     if [ -z "${DEF_POSTFIX}" -a \
-       ! -z "${_cispc_nme_diff}" ]; then
+       -n "${_cispc_nme_diff}" ]; then
        debug "Inferred DEF_POSTFIX=$(distinct d "${_cispc_nme_diff}") from definition: $(distinct d "${DEF_NAME}")"
        DEF_POSTFIX="${_cispc_nme_diff}"
-    elif [ ! -z "${_cispc_nme_diff}" ]; then
+    elif [ -n "${_cispc_nme_diff}" ]; then
         debug "Difference: $(distinct d "${_cispc_nme_diff}")"
     else
         debug "No difference."
@@ -140,7 +140,7 @@ validate_definition_disabled () {
     _ch_dis_name="${1}"
     unset DEF_DISABLED
     # check requirement for disabled state:
-    if [ ! -z "${_ch_dis_name}" ]; then
+    if [ -n "${_ch_dis_name}" ]; then
         for _def_disabled in ${_ch_dis_name}; do
             if [ "${SYSTEM_NAME}" = "${_def_disabled}" ]; then
                 debug "Disabled: $(distinct d "${_def_disabled}") on $(distinct d "${SYSTEM_NAME}")"

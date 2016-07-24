@@ -17,7 +17,7 @@ PGREP_BIN="/usr/bin/pgrep"
 #     # Centos 5.x specific changes:
 #     #
 #     # DEFAULT_COMPILER_FLAGS="-w -O2 -fPIC"
-#     # if [ ! -z "${DEBUGBUILD}" ]; then
+#     # if [ -n "${DEBUGBUILD}" ]; then
 #     #     DEFAULT_COMPILER_FLAGS="-O0 -fPIC -ggdb"
 #     # fi
 # fi

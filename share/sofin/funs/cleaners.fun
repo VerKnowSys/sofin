@@ -40,7 +40,7 @@ clean_failbuilds () {
             debug "No cache dirs. Skipped"
         else
             num="$(echo "${_cf_files}" | eval ${FILES_COUNT_GUARD})"
-            if [ ! -z "${num}" ]; then
+            if [ -n "${num}" ]; then
                 _cf_number="${_cf_number} + ${num} - 1"
             fi
             for i in ${_cf_files}; do

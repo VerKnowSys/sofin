@@ -49,7 +49,7 @@ push_binbuild () {
         fi
         if [ -d "${_pbelement}" -a \
              -f "${_install_indicator_file}" -a \
-             ! -z "${_version_element}" ]; then
+             -n "${_version_element}" ]; then
             if [ ! -L "${_pbelement}" ]; then
                 if [ -z "${_version_element}" ]; then
                     error "No version information available for bundle: $(distinct e "${_pbelement}")"
@@ -153,7 +153,7 @@ fetch_binbuild () {
     _full_name="${1}"
     _bbaname="${2}"
     _bb_archive="${3}"
-    if [ ! -z "${USE_BINBUILD}" ]; then
+    if [ -n "${USE_BINBUILD}" ]; then
         debug "Binary build check was skipped"
     else
         _bbaname="$(lowercase "${_bbaname}")"
@@ -244,7 +244,7 @@ build () {
                 DEF_NAME="$(capitalize "${_common_lowercase}")"
 
                 # if definition requires root privileges, throw an "exception":
-                if [ ! -z "${DEF_REQUIRE_ROOT_ACCESS}" ]; then
+                if [ -n "${DEF_REQUIRE_ROOT_ACCESS}" ]; then
                     if [ "${USER}" != "root" ]; then
                         error "Definition requires superuser priviledges: $(distinct e ${_common_lowercase}). Installation aborted."
                     fi
@@ -297,7 +297,7 @@ build () {
                     _req_amount="$(${PRINTF_BIN} "${_req_amount} + 1\n" | ${BC_BIN} 2>/dev/null)"
                     _req_all="${_req_amount}"
                     for _req in ${DEF_REQUIREMENTS}; do
-                        if [ ! -z "${DEF_USER_INFO}" ]; then
+                        if [ -n "${DEF_USER_INFO}" ]; then
                             warn "${DEF_USER_INFO}"
                         fi
                         if [ -z "${_req}" ]; then
@@ -455,8 +455,8 @@ process () {
             note "NOTE: It's only valid for meta bundles. You may consider setting: $(distinct n "DEF_CONFIGURE=\"meta\"") in bundle definition file. Type: $(distinct n "s dev ${_definition_no_ext}"))"
         else
             _cwd="$(${PWD_BIN} 2>/dev/null)"
-            if [ ! -z "${BUILD_DIR}" -a \
-                 ! -z "${BUILD_NAMESUM}" ]; then
+            if [ -n "${BUILD_DIR}" -a \
+                 -n "${BUILD_NAMESUM}" ]; then
                 create_builddir "${BUILD_DIR}" "${BUILD_NAMESUM}"
                 cd "${BUILD_DIR}"
                 if [ -z "${DEF_GIT_MODE}" ]; then # Standard http tarball method:
@@ -534,7 +534,7 @@ process () {
                 # NOTE: patterns sorted by safety
                 for _pati in "*${_app_param}*${DEF_VERSION}*" "*${_app_param}*" "*${DEF_NAME}*${DEF_VERSION}*"  "*${DEF_NAME}*${DEF_VERSION}*" "*${DEF_NAME}*" "*$(lowercase "${DEF_NAME}")*"; do
                     _fd="$(${FIND_BIN} "${BUILD_DIR}" -maxdepth 1 -mindepth 1 -type d -iname "${_pati}" 2>/dev/null)"
-                    if [ ! -z "${_fd}" ]; then
+                    if [ -n "${_fd}" ]; then
                         debug "Found build dir: $(distinct d "${_fd}"), for definition: $(distinct d "${DEF_NAME}")"
                         break
                     fi
@@ -545,14 +545,14 @@ process () {
                 cd "${_fd}"
 
                 # Handle DEF_SOURCE_DIR_POSTFIX here
-                if [ ! -z "${_fd}/${DEF_SOURCE_DIR_POSTFIX}" ]; then
+                if [ -n "${_fd}/${DEF_SOURCE_DIR_POSTFIX}" ]; then
                     ${MKDIR_BIN} -p "${_fd}/${DEF_SOURCE_DIR_POSTFIX}"
                     cd "${_fd}/${DEF_SOURCE_DIR_POSTFIX}"
                 fi
                 _pwd="$(${PWD_BIN} 2>/dev/null)"
                 debug "Switched to build dir root: $(distinct d "${_pwd}")"
 
-                if [ ! -z "${DEF_GIT_CHECKOUT}" ]; then
+                if [ -n "${DEF_GIT_CHECKOUT}" ]; then
                     note "   ${NOTE_CHAR} Definition branch: $(distinct n ${DEF_GIT_CHECKOUT})"
                     _current_branch="$(${GIT_BIN} rev-parse --abbrev-ref HEAD 2>/dev/null)"
                     if [ "${_current_branch}" != "${DEF_GIT_CHECKOUT}" ]; then
@@ -567,7 +567,7 @@ process () {
                 _pcpatch_dir="${DEFINITIONS_DIR}patches/${_app_param}"
                 if [ -d "${_pcpatch_dir}" ]; then
                     _ps_patches="$(${FIND_BIN} ${_pcpatch_dir}/* -maxdepth 0 -type f 2>/dev/null)"
-                    ${TEST_BIN} ! -z "${_ps_patches}" && \
+                    ${TEST_BIN} -n "${_ps_patches}" && \
                     note "   ${NOTE_CHAR} Applying common patches for: $(distinct n "${DEF_NAME}${DEF_POSTFIX}")"
                     for _patch in ${_ps_patches}; do
                         for _level in 0 1 2 3 4 5; do
@@ -584,7 +584,7 @@ process () {
                     if [ -d "${_pspatch_dir}" ]; then
                         note "   ${NOTE_CHAR} Applying platform specific patches for: $(distinct n ${DEF_NAME}${DEF_POSTFIX}/${SYSTEM_NAME})"
                         _ps_patches="$(${FIND_BIN} ${_pspatch_dir}/* -maxdepth 0 -type f 2>/dev/null)"
-                        ${TEST_BIN} ! -z "${_ps_patches}" && \
+                        ${TEST_BIN} -n "${_ps_patches}" && \
                         for _pspp in ${_ps_patches}; do
                             for _level in 0 1 2 3 4 5; do
                                 debug "Patching source code with pspatch: $(distinct d ${_pspp}) (p$(distinct d ${_level}))"

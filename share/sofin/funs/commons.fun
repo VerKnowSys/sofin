@@ -79,8 +79,8 @@ retry () {
     echo "${_targets}" | eval "${MATCH_FETCH_CMDS_GUARD}" && _rtry_show_stdout_progress=YES
 
     debug "Show stdout progress _rtry_show_stdout_progress=$(distinct d "${_rtry_show_stdout_progress}")"
-    while [ ! -z "${_ammo}" ]; do
-        if [ ! -z "${_targets}" ]; then
+    while [ -n "${_ammo}" ]; do
+        if [ -n "${_targets}" ]; then
             debug "${TIMESTAMP}: Invoking: retry($(distinct d "${_targets}")) [$(distinct d ${_ammo})]"
             if [ ! -f "${LOG}" -o \
                  ! -d "${LOGS_DIR}" ]; then

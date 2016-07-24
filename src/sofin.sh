@@ -12,7 +12,7 @@ SOFIN_COMMAND_ARG="${1}"
 SOFIN_PID="$$"
 
 env_reset
-if [ ! -z "${SOFIN_COMMAND_ARG}" ]; then
+if [ -n "${SOFIN_COMMAND_ARG}" ]; then
     case ${SOFIN_COMMAND_ARG} in
 
         dev)
