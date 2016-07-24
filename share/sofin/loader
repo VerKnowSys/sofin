@@ -34,8 +34,8 @@ load_sofin () {
         paths.fact \
         system.fact \
         terminal.fact \
-        security.fact \
-        sofin.fact
+        sofin.fact \
+        security.fact
 
     # loading functions:
     load_funs \
