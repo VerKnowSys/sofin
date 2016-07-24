@@ -33,3 +33,20 @@ prepare_service_dataset () {
         unset _snap_size _version_element _full_dataset_name _final_snap_file _pd_elem
     fi
 }
+
+
+create_service_dir () {
+    _dset_create="${1}"
+    if [ "YES" = "${CAP_SYS_ZFS}" ]; then
+        _dsname="${DEFAULT_ZPOOL}${SERVICES_DIR}${USER}/${_dset_create}"
+        debug "ZFS feature enabled. Creating dataset: $(distinct d "${_dsname}")"
+        try "${ZFS_BIN} create -o mountpoint=${SERVICES_DIR}${_dset_create} ${_dsname}"
+        try "${ZFS_BIN} mount ${_dsname}"
+        unset _dsname
+    else
+        debug "No ZFS feature."
+        try "${MKDIR_BIN} -p ${SERVICE_DIR}"
+    fi
+    try "${CHMOD_BIN} 0710 ${SERVICE_DIR}"
+    unset _dset_create
+}
