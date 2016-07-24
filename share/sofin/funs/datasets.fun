@@ -64,7 +64,7 @@ destroy_service_dir () {
         _dsname="${DEFAULT_ZPOOL}${SERVICES_DIR}${USER}/${_dset_destroy}"
         debug "Destroying dataset: $(distinct d "${_dsname}")"
         try "${ZFS_BIN} umount -f ${_dsname}"
-        run "${ZFS_BIN} destroy -r ${_dsname}"
+        try "${ZFS_BIN} destroy -r ${_dsname}"
         unset _dsname
     else
         debug "Removing regular service-directory: $(distinct d "${SOFTWARE_DIR}${_dset_destroy}")"
@@ -87,7 +87,7 @@ create_builddir () {
         _dsbase="${_dset_create}/${DEFAULT_SRC_EXT}${_dset_namesum}"
         _dsname="${DEFAULT_ZPOOL}${SOFTWARE_DIR}${USER}/${_dsbase}"
         debug "Creating ZFS build-dataset: $(distinct d "${_dsname}")"
-        run "${ZFS_BIN} create -o mountpoint=${SOFTWARE_DIR}${_dsbase} ${_dsname}"
+        try "${ZFS_BIN} create -o mountpoint=${SOFTWARE_DIR}${_dsbase} ${_dsname}"
         try "${ZFS_BIN} mount ${_dsname}"
         unset _dsname _dsbase
     else
@@ -111,7 +111,7 @@ destroy_builddir () {
         _dsname="${DEFAULT_ZPOOL}${SOFTWARE_DIR}${USER}/${_dset_destroy}/${DEFAULT_SRC_EXT}${_dset_sum}"
         debug "Destroying ZFS build-dataset: $(distinct d "${_dsname}")"
         try "${ZFS_BIN} umount -f ${_dsname}"
-        run "${ZFS_BIN} destroy -r ${_dsname}"
+        try "${ZFS_BIN} destroy -r ${_dsname}"
         unset _dsname
     else
         debug "Removing regular build-directory: $(distinct d "${SOFTWARE_DIR}${_dset_destroy}")"
