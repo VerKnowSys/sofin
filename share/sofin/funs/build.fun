@@ -82,7 +82,7 @@ push_binbuild () {
                             ${PRINTF_BIN} "${blue}"
                             try "${ZFS_BIN} umount ${_full_dataset_name}" || \
                                 error "ZFS umount failed for: $(distinct e "${_full_dataset_name}"). Dataset shouldn't be locked nor used on build hosts."
-                            ${ZFS_BIN} send "${_full_dataset_name}" \
+                            ${ZFS_BIN} send -e -L -D -R "${_full_dataset_name}" 2>> ${LOG} \
                                 | ${XZ_BIN} > "${FILE_CACHE_DIR}${_final_snap_file}" 2>> "${LOG}-${_lowercase_element}" && \
                                     _snap_size="$(file_size "${FILE_CACHE_DIR}${_final_snap_file}")" && \
                                     try "${ZFS_BIN} mount ${_full_dataset_name}"
