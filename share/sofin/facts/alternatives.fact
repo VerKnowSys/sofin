@@ -1,0 +1,74 @@
+
+# dylib bundle software:
+if [ -x "/Software/Dylibbundler/bin/dylibbundler" ]
+    SOFIN_LIBBUNDLE_BIN="/Software/Dylibbundler/bin/dylibbundler"
+elif [ -x "/usr/bin/sofin-dylibbundler" ]; then # old sofin bundler
+    SOFIN_LIBBUNDLE_BIN="/usr/bin/sofin-dylibbundler"
+else
+    unset SOFIN_LIBBUNDLE_BIN
+fi
+
+# Curl default options:
+FETCH_OPTS="--progress-bar --connect-timeout 3 --remote-name --cacert ${DEFAULT_CACERT}"
+if [ -x "/Software/Curl/bin/curl" ]; then
+    FETCH_BIN="/Software/Curl/bin/curl"
+elif [ -x "/usr/bin/curl" ]; then
+    FETCH_BIN="/usr/bin/curl"
+elif [ -x "/bin/curl" ]; then
+    FETCH_BIN="/bin/curl"
+elif [ -x "/usr/bin/fetch" ]; then
+    FETCH_BIN="/usr/bin/fetch"
+    FETCH_OPTS="--timeout=5 --retry --ca-cert=${DEFAULT_CACERT}"
+elif [ -x "/usr/bin/wget" ]; then
+    FETCH_BIN="/usr/bin/wget"
+    FETCH_OPTS="--continue --no-verbose --progress=bar --ca-certificate=${DEFAULT_CACERT}"
+fi
+
+# Git
+if [ -x "/Software/Git/bin/git" ]; then
+    GIT_BIN="/Software/Git/bin/git"
+elif [ -x "/usr/bin/git" ]; then
+    GIT_BIN="/usr/bin/git"
+elif [ -x "/usr/pkg/bin/git" ]; then
+    GIT_BIN="/usr/pkg/bin/git"
+elif [ -x "/usr/local/bin/git" ]; then
+    GIT_BIN="/usr/local/bin/git"
+fi
+
+# Zfs
+if [ -x "/sbin/zfs" ]; then
+    ZFS_BIN="/sbin/zfs"
+elif [ -x "/usr/sbin/zfs" ]; then
+    ZFS_BIN="/usr/sbin/zfs"
+elif [ -x "/usr/local/sbin/zfs" ]; then
+    ZFS_BIN="/usr/local/sbin/zfs"
+elif [ -x "/usr/pkg/sbin/zfs" ]; then
+    ZFS_BIN="/usr/pkg/sbin/zfs"
+else
+    unset ZFS_BIN
+fi
+if [ -x "/usr/bin/zpool" ]; then
+    ZPOOL_BIN="/usr/bin/zpool"
+if [ -x "/usr/pkg/bin/zpool" ]; then
+    ZPOOL_BIN="/usr/pkg/bin/zpool"
+elif [ -x "/usr/local/bin/zpool" ]; then
+    ZPOOL_BIN="/usr/local/bin/zpool"
+else
+    unset ZPOOL_BIN
+fi
+if [ -z "${ZPOOL_BIN}" ]; then
+    unset DEFAULT_ZPOOL
+else
+    DEFAULT_ZPOOL="$(${ZPOOL_BIN} list -H 2>/dev/null | ${CUT_BIN} -f1 2>/dev/null)"
+fi
+
+# Default shell - Zsh
+if [ -x "/Software/Zsh/bin/zsh" ]; then
+    ZSH_BIN="/Software/Zsh/bin/zsh"
+elif [ -x "/usr/bin/zsh" ]; then
+    ZSH_BIN="/usr/bin/zsh"
+elif [ -x "/bin/zsh" ]; then
+    ZSH_BIN="/bin/zsh"
+elif [ -x "${DEFAULT_LEGACY_SHELL}" ]; then
+    ZSH_BIN="${DEFAULT_LEGACY_SHELL}" # Fallback
+fi

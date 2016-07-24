@@ -21,6 +21,7 @@ load_sofin () {
                 core.fact \
                 paths.fact \
                 paths-OS_TYPE.fact \
+                alternatives.fact \
                 system.fact \
                 terminal.fact \
                 sofin.fact
