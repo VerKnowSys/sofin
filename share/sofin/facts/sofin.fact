@@ -40,7 +40,7 @@ SOFIN_BIN_SHORT="$(${BASENAME_BIN} ${SOFIN_BIN} 2>/dev/null)"
 DISTINCT_COLOUR="${cyan}"
 
 # Build timestamp in seconds since 1970
-TIMESTAMP="$(${DATE_BIN} ${DEFAULT_DATE_TS_OPTS} 2>/dev/null)"
+TIMESTAMP="${TIMESTAMP:-$(${DATE_BIN} ${DEFAULT_DATE_TS_OPTS} 2>/dev/null)}"
 
 # Hardened system support:
 DEFAULT_SECURITY_STATE_FILE="${SOFTWARE_DIR}/.sys-security-state-${TIMESTAMP}"
