@@ -58,6 +58,7 @@ load_sofin () {
     check_defs_dir
     trap_signals
     store_security_state
+    disable_security_features
 }
 
 load_sofin
