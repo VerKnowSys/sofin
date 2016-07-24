@@ -69,3 +69,9 @@ ENV_BIN="/usr/bin/env"
 REV_BIN="/usr/bin/rev"
 DD_BIN="/bin/dd"
 TPUT_BIN="/usr/bin/tput"
+
+# Pick best utilities available:
+. "${DEFAULT_FACTS_DIR}alternatives.fact"
+
+# Load system specific paths (using prepared alternatives):
+. "${DEFAULT_FACTS_DIR}paths-$(${UNAME_BIN} 2>/dev/null).fact"
