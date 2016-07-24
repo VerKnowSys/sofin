@@ -39,15 +39,15 @@ create_service_dir () {
     _dset_create="${1}"
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
         _dsname="${DEFAULT_ZPOOL}${SERVICES_DIR}${USER}/${_dset_create}"
-        debug "ZFS feature enabled. Creating dataset: $(distinct d "${_dsname}")"
+        debug "Creating ZFS build-dataset: $(distinct d "${_dsname}")"
         try "${ZFS_BIN} create -o mountpoint=${SERVICES_DIR}${_dset_create} ${_dsname}"
         try "${ZFS_BIN} mount ${_dsname}"
         unset _dsname
     else
-        debug "No ZFS feature."
-        try "${MKDIR_BIN} -p ${SERVICE_DIR}"
+        debug "Creating regular service-directory: $(distinct d "${SOFTWARE_DIR}${_dset_create}")"
+        try "${MKDIR_BIN} -p ${SOFTWARE_DIR}${_dset_create}"
     fi
-    try "${CHMOD_BIN} 0710 ${SERVICE_DIR}"
+    try "${CHMOD_BIN} 0710 ${SOFTWARE_DIR}${_dset_create}"
     unset _dset_create
 }
 
@@ -55,8 +55,21 @@ create_service_dir () {
 destroy_service_dir () {
     _dset_destroy="${1}"
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
+        if [ -z "${_dset_destroy}" ]; then
+            error "First argument with $(distinct e "BundleName") to destroy is required!"
+        fi
         _dsname="${DEFAULT_ZPOOL}${SERVICES_DIR}${USER}/${_dset_destroy}"
-        debug "ZFS feature enabled. Destroying dataset: $(distinct d "${_dsname}")"
+        debug "Destroying dataset: $(distinct d "${_dsname}")"
+        try "${ZFS_BIN} umount -f ${_dsname}"
+        run "${ZFS_BIN} destroy -r ${_dsname}"
+        unset _dsname
+    else
+        debug "Removing regular service-directory: $(distinct d "${SOFTWARE_DIR}${_dset_destroy}")"
+        try "${RM_BIN} -rf ${SOFTWARE_DIR}${_dset_destroy}"
+    fi
+    unset _dset_destroy
+}
+
 
 create_builddir () {
     _dset_create="${1}"
