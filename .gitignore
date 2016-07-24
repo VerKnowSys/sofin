@@ -1,12 +1,6 @@
-.DS_Store
 s-*
-sofin
-/releases/
-/Sofin.sublime-project
-/Sofin.sublime-workspace
+releases
+*.sublime-*
 src/.*.o
-.fseventsd
-.Spotlight-V100
-.VolumeIcon.icns
-.apdisk
+.*
 TheVolumeSettingsFolder
