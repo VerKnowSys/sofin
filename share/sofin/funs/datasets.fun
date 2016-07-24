@@ -42,15 +42,16 @@ create_service_dir () {
     fi
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
         _dsname="${DEFAULT_ZPOOL}${SERVICES_DIR}${USER}/${_dset_create}"
-        debug "Creating ZFS build-dataset: $(distinct d "${_dsname}")"
-        try "${ZFS_BIN} create -o mountpoint=${SERVICES_DIR}${_dset_create} ${_dsname}"
+        debug "Creating ZFS service-dataset: $(distinct d "${_dsname}")"
+        try "${ZFS_BIN} list ${_dsname}" || \
+            try "${ZFS_BIN} create -o mountpoint=${SERVICES_DIR}${_dset_create} ${_dsname}"
         try "${ZFS_BIN} mount ${_dsname}"
         unset _dsname
     else
-        debug "Creating regular service-directory: $(distinct d "${SOFTWARE_DIR}${_dset_create}")"
-        try "${MKDIR_BIN} -p ${SOFTWARE_DIR}${_dset_create}"
+        debug "Creating regular service-directory: $(distinct d "${SERVICES_DIR}${_dset_create}")"
+        try "${MKDIR_BIN} -p ${SERVICES_DIR}${_dset_create}"
     fi
-    try "${CHMOD_BIN} 0710 ${SOFTWARE_DIR}${_dset_create}"
+    try "${CHMOD_BIN} 0710 ${SERVICES_DIR}${_dset_create}"
     unset _dset_create
 }
 
@@ -67,7 +68,47 @@ destroy_service_dir () {
         try "${ZFS_BIN} destroy -r ${_dsname}"
         unset _dsname
     else
-        debug "Removing regular service-directory: $(distinct d "${SOFTWARE_DIR}${_dset_destroy}")"
+        debug "Removing regular software-directory: $(distinct d "${SERVICES_DIR}${_dset_destroy}")"
+        try "${RM_BIN} -rf ${SERVICES_DIR}${_dset_destroy}"
+    fi
+    unset _dset_destroy
+}
+
+
+create_software_dir () {
+    _dset_create="${1}"
+    if [ -z "${_dset_create}" ]; then
+        error "First argument with $(distinct e "BundleName") is required!"
+    fi
+    if [ "YES" = "${CAP_SYS_ZFS}" ]; then
+        _dsname="${DEFAULT_ZPOOL}${SOFTWARE_DIR}${USER}/${_dset_create}"
+        debug "Creating ZFS software-dataset: $(distinct d "${_dsname}")"
+        try "${ZFS_BIN} list ${_dsname}" || \
+            try "${ZFS_BIN} create -o mountpoint=${SOFTWARE_DIR}${_dset_create} ${_dsname}"
+        try "${ZFS_BIN} mount ${_dsname}"
+        unset _dsname
+    else
+        debug "Creating regular software-directory: $(distinct d "${SOFTWARE_DIR}${_dset_create}")"
+        try "${MKDIR_BIN} -p ${SOFTWARE_DIR}${_dset_create}"
+    fi
+    try "${CHMOD_BIN} 0710 ${SOFTWARE_DIR}${_dset_create}"
+    unset _dset_create
+}
+
+
+destroy_software_dir () {
+    _dset_destroy="${1}"
+    if [ -z "${_dset_destroy}" ]; then
+        error "First argument with $(distinct e "BundleName") to destroy is required!"
+    fi
+    if [ "YES" = "${CAP_SYS_ZFS}" ]; then
+        _dsname="${DEFAULT_ZPOOL}${SOFTWARE_DIR}${USER}/${_dset_destroy}"
+        debug "Destroying dataset: $(distinct d "${_dsname}")"
+        try "${ZFS_BIN} umount -f ${_dsname}"
+        try "${ZFS_BIN} destroy -r ${_dsname}"
+        unset _dsname
+    else
+        debug "Removing regular software-directory: $(distinct d "${SOFTWARE_DIR}${_dset_destroy}")"
         try "${RM_BIN} -rf ${SOFTWARE_DIR}${_dset_destroy}"
     fi
     unset _dset_destroy
