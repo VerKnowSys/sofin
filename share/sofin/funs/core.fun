@@ -221,12 +221,14 @@ setup_defs_repo () {
 
 
 interrupt_handler () {
+    restore_security_state
     warn "Interrupting: $(distinct w "${SOFIN_PID}")!" >> ${LOG}
     exit ${ERRORCODE_USER_INTERRUPT}
 }
 
 
 terminate_handler () {
+    restore_security_state
     warn "Terminating: $(distinct w "${SOFIN_PID}")!" >> ${LOG}
     exit ${ERRORCODE_TERMINATED}
 }
