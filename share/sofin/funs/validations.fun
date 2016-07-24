@@ -66,12 +66,12 @@ validate_reqs () {
 
 
 check_defs_dir () {
-    if [ ! -d "${SOFTWARE_DIR}" ]; then
-        debug "No $(distinct d ${SOFTWARE_DIR}) found. Creating one."
-        "${MKDIR_BIN}" -p "${SOFTWARE_DIR}" >/dev/null 2>&1
+    if [ ! -d "${SOFTWARE_DIR}" -o \
+         ! -d "${SERVICES_DIR}" ]; then
+        create_base_datasets
     fi
     if [ ! -d "${CACHE_DIR}" ]; then
-        debug "No cache folder found. Creating one at: $(distinct d ${CACHE_DIR})"
+        debug "No cache directory found. Creating one at: $(distinct d "${CACHE_DIR}")"
         "${MKDIR_BIN}" -p "${CACHE_DIR}" >/dev/null 2>&1
     fi
 }
