@@ -140,29 +140,29 @@ fetch_binbuild () {
             error "Cannot fetch binbuild! An empty archive name given!"
         fi
         _bbfull_name="$(capitalize "${_bbfull_name}")"
-        if [ ! -e "${BINBUILDS_CACHE_DIR}${_bb_archive}" ]; then
-            try "${MKDIR_BIN} -p ${BINBUILDS_CACHE_DIR}"
-            try "${FETCH_BIN} ${FETCH_OPTS} -o ${BINBUILDS_CACHE_DIR}${_bb_archive} '${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}${DEFAULT_CHKSUM_EXT}'" || \
-                try "${FETCH_BIN} ${FETCH_OPTS} -o ${BINBUILDS_CACHE_DIR}${_bb_archive} '${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}${DEFAULT_CHKSUM_EXT}'"
+        if [ ! -e "${FILE_CACHE_DIR}${_bb_archive}" ]; then
+            try "${MKDIR_BIN} -p ${FILE_CACHE_DIR}"
+            try "${FETCH_BIN} ${FETCH_OPTS} -o ${FILE_CACHE_DIR}${_bb_archive} '${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}${DEFAULT_CHKSUM_EXT}'" || \
+                try "${FETCH_BIN} ${FETCH_OPTS} -o ${FILE_CACHE_DIR}${_bb_archive} '${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}${DEFAULT_CHKSUM_EXT}'"
             if [ "$?" = "0" ]; then
-                try "${FETCH_BIN} ${FETCH_OPTS} -o ${BINBUILDS_CACHE_DIR}${_bb_archive} '${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}'" || \
-                    try "${FETCH_BIN} ${FETCH_OPTS} -o ${BINBUILDS_CACHE_DIR}${_bb_archive} '${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}'" || \
-                    try "${FETCH_BIN} ${FETCH_OPTS} -o ${BINBUILDS_CACHE_DIR}${_bb_archive} '${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}'" || \
+                try "${FETCH_BIN} ${FETCH_OPTS} -o ${FILE_CACHE_DIR}${_bb_archive} '${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}'" || \
+                    try "${FETCH_BIN} ${FETCH_OPTS} -o ${FILE_CACHE_DIR}${_bb_archive} '${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}'" || \
+                    try "${FETCH_BIN} ${FETCH_OPTS} -o ${FILE_CACHE_DIR}${_bb_archive} '${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}'" || \
                     error "Failure fetching available binary build for: $(distinct e "${_bb_archive}"). Please check your DNS / Network setup!"
             else
                 note "No binary build available for: $(distinct n "${OS_TRIPPLE}/${_full_name}-${_bb_ver}")"
             fi
         fi
 
-        debug "_bb_archive: $(distinct d ${_bb_archive}). Expecting binbuild to be available in: $(distinct d ${BINBUILDS_CACHE_DIR}${_bb_archive})"
+        debug "_bb_archive: $(distinct d ${_bb_archive}). Expecting binbuild to be available in: $(distinct d ${FILE_CACHE_DIR}${_bb_archive})"
 
         # validate binary build:
-        if [ -e "${BINBUILDS_CACHE_DIR}${_bb_archive}" ]; then
-            validate_archive_sha1 "${BINBUILDS_CACHE_DIR}${_bb_archive}"
+        if [ -e "${FILE_CACHE_DIR}${_bb_archive}" ]; then
+            validate_archive_sha1 "${FILE_CACHE_DIR}${_bb_archive}"
         fi
 
         # after sha1 validation we may continue with binary build if file still exists
-        if [ -e "${BINBUILDS_CACHE_DIR}${_bb_archive}" ]; then
+        if [ -e "${FILE_CACHE_DIR}${_bb_archive}" ]; then
             install_software_from_binbuild "${_bb_archive}" "${_bbfull_name}" "${_bb_ver}"
         else
             debug "Binary build checksum doesn't match for: $(distinct d "${_bbfull_name}")"
@@ -238,7 +238,7 @@ build () {
 
                 # binary build of whole software bundle
                 _full_bund_name="${_common_lowercase}-${DEF_VERSION}"
-                try "${MKDIR_BIN} -p ${BINBUILDS_CACHE_DIR}"
+                try "${MKDIR_BIN} -p ${FILE_CACHE_DIR}"
 
                 _an_archive="$(capitalize "${_common_lowercase}")-${DEF_VERSION}${DEFAULT_ARCHIVE_EXT}"
                 _installed_indicator="${PREFIX}/${_common_lowercase}${DEFAULT_INST_MARK_EXT}"
@@ -360,9 +360,9 @@ push_binary_archive () {
     if [ -z "${_bpaddress}" ]; then
         error "Fourth argument: $(distinct e "mirror-address") is empty!"
     fi
-    _bpshortsha="$(${CAT_BIN} "${BINBUILDS_CACHE_DIR}${_bpbundle_file}${DEFAULT_CHKSUM_EXT}" 2>/dev/null | ${CUT_BIN} -c -16 2>/dev/null)"
+    _bpshortsha="$(${CAT_BIN} "${FILE_CACHE_DIR}${_bpbundle_file}${DEFAULT_CHKSUM_EXT}" 2>/dev/null | ${CUT_BIN} -c -16 2>/dev/null)"
     if [ -z "${_bpshortsha}" ]; then
-        error "No sha checksum in file: $(distinct e "${BINBUILDS_CACHE_DIR}${_bpbundle_file}${DEFAULT_CHKSUM_EXT}")"
+        error "No sha checksum in file: $(distinct e "${FILE_CACHE_DIR}${_bpbundle_file}${DEFAULT_CHKSUM_EXT}")"
     fi
     debug "BundleName: $(distinct d "${_bpbundle_file}"), bundle_file: $(distinct d "${_bpbundle_file}"), repository address: $(distinct d "${_bpaddress}")"
     retry "${SCP_BIN} ${DEFAULT_SSH_OPTS} ${DEFAULT_SCP_OPTS} -P ${MAIN_PORT} ${_bpbundle_file} ${_bpaddress}/${_bpbundle_file}.partial" || \

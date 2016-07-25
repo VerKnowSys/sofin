@@ -43,10 +43,10 @@ make_local_bundle_copy () {
     if [ -z "${_mlelement_name}" ]; then
         error "First argument with $(distinct e "BundleName") is required!"
     fi
-    debug "Performing copy of binary bundle to: $(distinct d "${BINBUILDS_CACHE_DIR}")"
-    try "${MKDIR_BIN} -p ${BINBUILDS_CACHE_DIR}"
-    try "${CP_BIN} -v ${_mlelement_name} ${BINBUILDS_CACHE_DIR}/"
-    try "${CP_BIN} -v ${_mlelement_name}${DEFAULT_CHKSUM_EXT} ${BINBUILDS_CACHE_DIR}/"
+    debug "Performing copy of binary bundle to: $(distinct d "${FILE_CACHE_DIR}")"
+    try "${MKDIR_BIN} -p ${FILE_CACHE_DIR}"
+    try "${CP_BIN} -v ${_mlelement_name} ${FILE_CACHE_DIR}/"
+    try "${CP_BIN} -v ${_mlelement_name}${DEFAULT_CHKSUM_EXT} ${FILE_CACHE_DIR}/"
     unset _mlelement_name
 }
 
@@ -357,7 +357,7 @@ create_software_bundle_archive () {
     if [ -z "${_csversion}" ]; then
         error "Third argument with $(distinct e "version-string") is required!"
     fi
-    _cddestfile="${BINBUILDS_CACHE_DIR}${_csbelem}-${_csversion}${DEFAULT_ARCHIVE_EXT}"
+    _cddestfile="${FILE_CACHE_DIR}${_csbelem}-${_csversion}${DEFAULT_ARCHIVE_EXT}"
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
         _csbd_dataset="${DEFAULT_ZPOOL}${SOFTWARE_DIR}${USER}/${_csbname}"
         debug "Creating archive from dataset: $(distinct d "${_csbd_dataset}") to file: $(distinct d "${_cddestfile}")"
@@ -392,7 +392,7 @@ install_software_from_binbuild () {
         if [ "$?" != "0" ]; then
             debug "Installing ZFS based binary build to dataset: $(distinct d "${_isfb_dataset}")"
             ${PRINTF_BIN} "${blue}"
-            ${XZCAT_BIN} ${BINBUILDS_CACHE_DIR}${_isfb_archive} | ${ZFS_BIN} receive -F -v ${_isfb_dataset} && \
+            ${XZCAT_BIN} ${FILE_CACHE_DIR}${_isfb_archive} | ${ZFS_BIN} receive -F -v ${_isfb_dataset} && \
                 ${ZFS_BIN} rename ${_isfb_dataset}@--head-- ${ORIGIN_ZFS_SNAP_NAME} && \
                     note "Software bundle installed: $(distinct n "${_isfb_fullname}"), with version: $(distinct n "${_isfb_version}")" && \
                         DONT_BUILD_BUT_DO_EXPORTS=YES
@@ -401,13 +401,13 @@ install_software_from_binbuild () {
             DONT_BUILD_BUT_DO_EXPORTS=YES
         fi
     else
-        try "${TAR_BIN} -xJf ${BINBUILDS_CACHE_DIR}${_isfb_archive} --directory ${SOFTWARE_DIR}"
+        try "${TAR_BIN} -xJf ${FILE_CACHE_DIR}${_isfb_archive} --directory ${SOFTWARE_DIR}"
         if [ "$?" = "0" ]; then
             note "Software bundle installed: $(distinct n "${_isfb_fullname}"), with version: $(distinct n "${_isfb_version}")"
             DONT_BUILD_BUT_DO_EXPORTS=YES
         else
             debug "No binary bundle available for: $(distinct d ${_bbaname})"
-            try "${RM_BIN} -vf ${BINBUILDS_CACHE_DIR}${_isfb_archive} ${BINBUILDS_CACHE_DIR}${_isfb_archive}${DEFAULT_CHKSUM_EXT}"
+            try "${RM_BIN} -vf ${FILE_CACHE_DIR}${_isfb_archive} ${FILE_CACHE_DIR}${_isfb_archive}${DEFAULT_CHKSUM_EXT}"
         fi
     fi
 }
