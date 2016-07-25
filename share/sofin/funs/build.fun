@@ -357,7 +357,7 @@ push_binary_archive () {
     if [ -z "${_bpshortsha}" ]; then
         error "No sha checksum in file: $(distinct e "${FILE_CACHE_DIR}${_uniqname}${DEFAULT_CHKSUM_EXT}")"
     fi
-    debug "BundleName: $(distinct d ${_uniqname}), bundle_file: $(distinct d ${_bpbundle_file}), repository address: $(distinct d ${_bpaddress})"
+    debug "BundleName: $(distinct d "${_uniqname}"), bundle_file: $(distinct d "${_bpbundle_file}"), repository address: $(distinct d "${_bpaddress}")"
     retry "${SCP_BIN} ${DEFAULT_SSH_OPTS} ${DEFAULT_SCP_OPTS} -P ${MAIN_PORT} ${_uniqname} ${_bpaddress}/${_uniqname}.partial" || \
         def_error "${_uniqname}" "Unable to push: $(distinct e "${_bpbundle_file}") bundle to: $(distinct e "${_bpaddress}/${_bpbundle_file}")"
     if [ "$?" = "0" ]; then
@@ -367,7 +367,7 @@ push_binary_archive () {
         retry "${SCP_BIN} ${DEFAULT_SSH_OPTS} ${DEFAULT_SCP_OPTS} -P ${MAIN_PORT} ${_uniqname}${DEFAULT_CHKSUM_EXT} ${_bpaddress}/${_uniqname}${DEFAULT_CHKSUM_EXT}" || \
             def_error ${_uniqname}${DEFAULT_CHKSUM_EXT} "Error sending: $(distinct e ${_uniqname}${DEFAULT_CHKSUM_EXT}) file to: $(distinct e "${_bpaddress}/${_bpbundle_file}")"
     else
-        error "Failed to push binary build of: $(distinct e ${_uniqname}) to remote: $(distinct e ${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_uniqname})"
+        error "Failed to push binary build of: $(distinct e "${_uniqname}") to remote: $(distinct e "${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_uniqname}")"
     fi
     unset _bpbundle_file _uniqname _bpamirror _bpaddress _bpshortsha
 }
