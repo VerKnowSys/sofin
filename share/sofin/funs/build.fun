@@ -12,18 +12,17 @@ build_bundle () {
     if [ -z "${_bsversion}" ]; then
         error "Third argument with $(distinct e "version-string") is required!"
     fi
-    debug "build_bundle: $(distinct d "${_bsbname}"), should be in: ${SOFTWARE_DIR}${_bsbname}"
+    debug "build_bundle: $(distinct d "${_bsbname}"), should be in: $(distinct d "${SOFTWARE_DIR}${_bsbname}"), full-name: $(distinct d "${_bsbelement}")"
     if [ ! -d "${SOFTWARE_DIR}${_bsbname}" ]; then
         create_software_dir "${_bsbname}"
         create_software_bundle_archive "${_bsbname}" "${_bsbelement}" "${_bsversion}" && \
             note "Archived bundle: $(distinct n "${_bsbelement}") ready to deploy" && \
                 return
-
-        error "Failed to create bundle archives for: $(distinct e ${_bsbelement})"
+        error "Failed to create bundle archives for: $(distinct e "${_bsbelement}")"
     else
-        if [ ! -f "${FILE_CACHE_DIR}${_bsbname}${DEFAULT_CHKSUM_EXT}" ]; then
-            debug "Found sha-less archive. It may be incomplete or damaged. Rebuilding from: $(distinct d "${FILE_CACHE_DIR}${_bsbname}")"
-            try "${RM_BIN} -vf ${FILE_CACHE_DIR}${_bsbname}"
+        if [ ! -f "${FILE_CACHE_DIR}${_bsbelement}" ]; then
+            debug "Found incomplete or damaged bundle file. Rebuilding: $(distinct d "${_bsbelement}")"
+            try "${RM_BIN} -vf ${FILE_CACHE_DIR}${_bsbelement}"
             create_software_bundle_archive "${_bsbname}" "${_bsbelement}" "${_bsversion}" && \
                 note "Archived bundle: $(distinct n "${_bsbelement}") ready to deploy"
         else

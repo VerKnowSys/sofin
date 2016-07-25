@@ -423,7 +423,7 @@ push_binary_archive () {
         def_error "${_bpbundle_file}" "Unable to push file: $(distinct e "${_bpfn_chksum_file}") to: $(distinct e "${_bpaddress}/${_bpbundle_file}")"
     if [ "$?" = "0" ]; then
         ${PRINTF_BIN} "${blue}"
-        ${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} ${MAIN_USER}@${_bpamirror} \
+        ${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} "${MAIN_USER}@${_bpamirror}" \
             "cd ${MAIN_BINARY_PREFIX}/${SYS_SPECIFIC_BINARY_REMOTE} && mv ${_bpbundle_file}.partial ${_bpbundle_file}"
         retry "${SCP_BIN} ${DEFAULT_SSH_OPTS} ${DEFAULT_SCP_OPTS} -P ${MAIN_PORT} ${_bpfn_chksum_file} ${_bpaddress}/${_bpbundle_file}${DEFAULT_CHKSUM_EXT}" || \
             def_error "${_bpfn_chksum_file}" "Error sending: $(distinct e "${_bpfn_chksum_file}") file to: $(distinct e "${_bpaddress}/${_bpbundle_file}${DEFAULT_CHKSUM_EXT}")"
