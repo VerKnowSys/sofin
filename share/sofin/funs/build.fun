@@ -125,9 +125,10 @@ rebuild_bundle () {
 
 
 fetch_binbuild () {
-    _full_name="${1}"
+    _bbfull_name="${1}"
     _bbaname="${2}"
     _bb_archive="${3}"
+    _bb_ver="${4}"
     if [ -n "${USE_BINBUILD}" ]; then
         debug "Binary build check was skipped"
     else
@@ -138,7 +139,7 @@ fetch_binbuild () {
         if [ -z "${_bb_archive}" ]; then
             error "Cannot fetch binbuild! An empty archive name given!"
         fi
-        _full_name="$(capitalize "${_full_name}")"
+        _bbfull_name="$(capitalize "${_bbfull_name}")"
         if [ ! -e "${BINBUILDS_CACHE_DIR}${_bb_archive}" ]; then
             try "${MKDIR_BIN} -p ${BINBUILDS_CACHE_DIR}"
             try "${FETCH_BIN} ${FETCH_OPTS} -o ${BINBUILDS_CACHE_DIR}${_bb_archive} '${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}${DEFAULT_CHKSUM_EXT}'" || \
@@ -149,11 +150,10 @@ fetch_binbuild () {
                     try "${FETCH_BIN} ${FETCH_OPTS} -o ${BINBUILDS_CACHE_DIR}${_bb_archive} '${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}'" || \
                     error "Failure fetching available binary build for: $(distinct e "${_bb_archive}"). Please check your DNS / Network setup!"
             else
-                note "No binary build available for: $(distinct n "${OS_TRIPPLE}/${DEF_NAME}${DEF_POSTFIX}-${DEF_VERSION}")"
+                note "No binary build available for: $(distinct n "${OS_TRIPPLE}/${_full_name}-${_bb_ver}")"
             fi
         fi
 
-        cd "${SOFTWARE_DIR}"
         debug "_bb_archive: $(distinct d ${_bb_archive}). Expecting binbuild to be available in: $(distinct d ${BINBUILDS_CACHE_DIR}${_bb_archive})"
 
         # validate binary build:
@@ -163,18 +163,12 @@ fetch_binbuild () {
 
         # after sha1 validation we may continue with binary build if file still exists
         if [ -e "${BINBUILDS_CACHE_DIR}${_bb_archive}" ]; then
-            ${TAR_BIN} -xJf "${BINBUILDS_CACHE_DIR}${_bb_archive}" >> "${LOG}-${_bbaname}" 2>> "${LOG}-${_bbaname}"
-            if [ "$?" = "0" ]; then # if archive is valid
-                note "Software bundle installed: $(distinct n "${DEF_NAME}"), with version: $(distinct n "${DEF_VERSION}")"
-                DONT_BUILD_BUT_DO_EXPORTS=YES
-            else
-                debug "  ${NOTE_CHAR} No binary bundle available for: $(distinct n ${DEF_NAME}${DEF_POSTFIX})"
-                try "${RM_BIN} -fr ${BINBUILDS_CACHE_DIR}"
-            fi
+            install_software_from_binbuild "${_bb_archive}" "${_bbfull_name}" "${_bb_ver}"
         else
-            debug "Binary build checksum doesn't match for: $(distinct n ${_full_name})"
+            debug "Binary build checksum doesn't match for: $(distinct d "${_bbfull_name}")"
         fi
     fi
+    unset _bbfull_name _bbaname _bb_archive
 }
 
 
