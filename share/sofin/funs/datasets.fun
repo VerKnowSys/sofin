@@ -1,4 +1,45 @@
 
+push_to_all_mirrors () {
+    _pbelement="${1}"
+    _version_element="${2}"
+    _element_name="${_pbelement}-${_version_element}${DEFAULT_ARCHIVE_EXT}"
+    _def_dig_query="$(${HOST_BIN} A ${MAIN_SOFTWARE_ADDRESS} 2>/dev/null | ${GREP_BIN} 'Address:' 2>/dev/null | eval "${HOST_ADDRESS_GUARD}")"
+    debug "query: $(distinct d "${_def_dig_query}"), bundle: $(distinct d ${_pbelement}), name: $(distinct d ${_element_name})"
+    if [ -z "${_pbelement}" ]; then
+        error "First argument with a $(distinct e "BundleName") is required!"
+    fi
+    if [ -z "${_version_element}" ]; then
+        error "Second argument with a $(distinct e "version-string") is required!"
+    fi
+    if [ -z "${_def_dig_query}" ]; then
+        error "Unable to determine IP address from: $(distinct e ${MAIN_SOFTWARE_ADDRESS})"
+    else
+        debug "Processing mirror(s): $(distinct d "${_def_dig_query}")"
+    fi
+    for _mirror in ${_def_dig_query}; do
+        _address="${MAIN_USER}@${_mirror}:${SYS_SPECIFIC_BINARY_REMOTE}"
+        ${PRINTF_BIN} "${blue}"
+        ${SSH_BIN} ${DEFAULT_SSH_OPTS} -p "${MAIN_PORT}" "${MAIN_USER}@${_mirror}" \
+            "${MKDIR_BIN} -p ${SYS_SPECIFIC_BINARY_REMOTE}"
+
+        build_bundle "${_element_name}" "${_pbelement}"
+        store_checksum "${_element_name}"
+
+        try "${CHMOD_BIN} -v o+r ${_element_name} ${_element_name}${DEFAULT_CHKSUM_EXT}" && \
+            debug "Set read access for archives: $(distinct d ${_element_name}), $(distinct d ${_element_name}${DEFAULT_CHKSUM_EXT}) before we send them to public remote"
+
+        _bin_bundle="${BINBUILDS_CACHE_DIR}${_pbelement}-${_version_element}"
+        make_local_bundle_copy "${_bin_bundle}" "${_element_name}"
+        push_binary_archive "${_bin_bundle}" "${_element_name}" "${_mirror}" "${_address}"
+
+        _dset_snapshot="${_pbelement}-${_version_element}${SERVICE_SNAPSHOT_EXT}"
+        _dset_snap_file="${_dset_snapshot}${DEFAULT_ARCHIVE_EXT}"
+        push_dset_zfs_stream "${_dset_snap_file}" "${_pbelement}" "${_mirror}"
+    done
+    try "${RM_BIN} -f ${_element_name} ${_element_name}${DEFAULT_CHKSUM_EXT}"
+    unset _dset_snapshot _dset_snap_file _bin_bundle _address _mirror _version_element _element_name _def_dig_query
+}
+
 
 make_local_bundle_copy () {
     _bin_bundle="${1}"
