@@ -446,7 +446,7 @@ process () {
                     _git_cached="${GIT_CACHE_DIR}${DEF_NAME}${DEF_VERSION}.git"
                     note "   ${NOTE_CHAR} Fetching git repository: $(distinct n ${DEF_HTTP_PATH}${reset})"
                     try "${GIT_BIN} clone ${DEFAULT_GIT_OPTS} --depth 1 --bare ${DEF_HTTP_PATH} ${_git_cached}" || \
-                    try "${GIT_BIN} clone ${DEFAULT_GIT_OPTS} --depth 1 --bare ${DEF_HTTP_PATH} ${_git_cached}"
+                        try "${GIT_BIN} clone ${DEFAULT_GIT_OPTS} --depth 1 --bare ${DEF_HTTP_PATH} ${_git_cached}"
                     if [ "$?" = "0" ]; then
                         debug "Fetched bare repository: $(distinct d "${DEF_NAME}${DEF_VERSION}")"
                     else
@@ -455,7 +455,7 @@ process () {
                             ${TAIL_BIN} -n${LOG_LINES_AMOUNT_ON_ERR} ${LOG} 2>/dev/null
                             note "$(fill)"
                         else
-                            current="$(${PWD_BIN} 2>/dev/null)"
+                            _current_dir="$(${PWD_BIN} 2>/dev/null)"
                             debug "Trying to update existing bare repository cache in: $(distinct d ${_git_cached})"
                             cd "${_git_cached}"
                             try "${GIT_BIN} fetch ${DEFAULT_GIT_OPTS} origin ${DEF_GIT_CHECKOUT}" || \
@@ -466,12 +466,14 @@ process () {
                                 DEF_VERSION="$(${GIT_BIN} rev-parse HEAD 2>/dev/null | ${CUT_BIN} -c -16 2>/dev/null)"
                                 debug "Set DEF_VERSION=$(distinct d ${DEF_VERSION}) - based on git commit sha"
                             fi
-                            cd "${current}"
+                            cd "${_current_dir}"
+                            unset _current_dir
                         fi
                     fi
                     # bare repository is already cloned, so we just clone from it now..
                     run "${GIT_BIN} clone ${DEFAULT_GIT_OPTS} ${_git_cached} ${DEF_NAME}${DEF_VERSION}" && \
                     debug "Cloned git respository from git bare cache repository"
+                    unset _git_cached
                 fi
 
                 debug "_app_param: ${_app_param}, DEF_NAME: ${DEF_NAME}, BUILD_DIR: ${BUILD_DIR}"

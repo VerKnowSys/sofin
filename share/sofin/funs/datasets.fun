@@ -148,7 +148,21 @@ prepare_service_dataset () {
 }
 
 
-fetch_dset_zfs_stream () {
+# create_service_dataset () {
+#     _bund_name="${1}"
+#     if [ -z "${_bund_name}" ]; then
+#         error "First argument with: $(distinct e dataset_name) required!"
+#     fi
+#     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
+#         debug "Initial service dataset unavailable for: $(distinct d "${_bund_name}")"
+#         _dataset_name="${DEFAULT_ZPOOL}${SERVICES_DIR}${USER}/${_bund_name}"
+#         try "${ZFS_BIN} create -p ${_dataset_name}"
+#     else
+#         debug "ZFS feature disabled"
+#     fi
+#     unset _bund_name _final_snap_file _commons_path
+# }
+
 
 fetch_dset_zfs_stream_or_create_new () {
     _bund_name="${1}"

@@ -237,7 +237,7 @@ remove_bundles () {
     for _def in ${_picked_bundles}; do
         _given_name="$(capitalize "${_def}")"
         if [ -z "${_given_name}" ]; then
-            error "remove_bundles(): _given_name is empty!"
+            error "Empty bundle name given as first param!"
         fi
         if [ -d "${SOFTWARE_DIR}${_given_name}" ]; then
             _aname="$(lowercase "${_given_name}")"
