@@ -53,9 +53,9 @@ prepare_service_dataset () {
         _full_dataset_name="${DEFAULT_ZPOOL}${SERVICES_DIR}${USER}/${_pd_elem}"
         _snap_file="${_pd_elem}-${_version_element}${SERVICE_SNAPSHOT_EXT}"
         _final_snap_file="${_snap_file}${DEFAULT_ARCHIVE_EXT}"
+        debug "Dataset name: ${_full_dataset_name}, snapshot file: ${_snap_file}, final: ${_final_snap_file}"
 
-        debug "_pd_elem: ${_pd_elem}"
-        fetch_dset_zfs_stream "${_pd_elem}" "${_final_snap_file}"
+        fetch_dset_zfs_stream_or_create_new "${_pd_elem}" "${_final_snap_file}"
 
         ${ZFS_BIN} list -H 2>/dev/null | ${CUT_BIN} -f1 2>/dev/null | ${EGREP_BIN} "${_pd_elem}" >/dev/null 2>&1
         if [ "$?" = "0" ]; then
@@ -81,11 +81,13 @@ prepare_service_dataset () {
 
 
 fetch_dset_zfs_stream () {
+
+fetch_dset_zfs_stream_or_create_new () {
     _bund_name="${1}"
     _final_snap_file="${2}"
     if [ -z "${_bund_name}" -o \
          -z "${_final_snap_file}" ]; then
-        error "Expected two arguments: $(distinct e dataset_name) and $(distinct e final_snapshot_file)."
+        error "Expected two arguments: $(distinct e "bundle-name") and $(distinct e "abs-snapshot-file")."
     fi
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
         _commons_path="${MAIN_COMMON_REPOSITORY}/${_final_snap_file}"
