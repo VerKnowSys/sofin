@@ -34,7 +34,7 @@ push_to_all_mirrors () {
 
         _dset_snapshot="${_pbelement}-${_version_element}${SERVICE_SNAPSHOT_EXT}"
         _dset_snap_file="${_dset_snapshot}${DEFAULT_ARCHIVE_EXT}"
-        push_dset_zfs_stream "${_dset_snap_file}" "${_pbelement}" "${_mirror}"
+        push_dset_zfs_stream "${_dset_snap_file}" "${_pbelement}" "${_mirror}" "${_version_element}"
     done
     try "${RM_BIN} -f ${_element_name} ${_element_name}${DEFAULT_CHKSUM_EXT}"
     unset _dset_snapshot _dset_snap_file _bin_bundle _address _mirror _version_element _element_name _def_dig_query
@@ -62,6 +62,7 @@ push_dset_zfs_stream () {
     _fin_snapfile="${1}"
     _pselement="${2}"
     _psmirror="${3}"
+    _version_element="${4}"
     if [ -z "${_fin_snapfile}" ]; then
         error "First argument with a $(distinct e "some-snapshot-file.txz") is required!"
     fi
@@ -71,6 +72,9 @@ push_dset_zfs_stream () {
         fi
         if [ -z "${_psmirror}" ]; then
             error "Third argument with a $(distinct e "mirror-IP") is required!"
+        fi
+        if [ -z "${_version_element}" ]; then
+            error "Fourth argument with a $(distinct e "version-string") is required!"
         fi
         if [ -f "${FILE_CACHE_DIR}${_fin_snapfile}" ]; then
             ${PRINTF_BIN} "${blue}"
