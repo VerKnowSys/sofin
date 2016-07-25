@@ -347,39 +347,6 @@ dump_debug_info () {
 }
 
 
-push_binary_archive () {
-    _bpbundle_file="${1}"
-    _bpamirror="${2}"
-    _bpaddress="${3}"
-    if [ -z "${_bpbundle_file}" ]; then
-        error "First argument: $(distinct e "BundleName") is empty!"
-    fi
-    if [ -z "${_bpamirror}" ]; then
-        error "Third argument: $(distinct e "mirror-name") is empty!"
-    fi
-    if [ -z "${_bpaddress}" ]; then
-        error "Fourth argument: $(distinct e "mirror-address") is empty!"
-    fi
-    _bpshortsha="$(${CAT_BIN} "${FILE_CACHE_DIR}${_bpbundle_file}${DEFAULT_CHKSUM_EXT}" 2>/dev/null | ${CUT_BIN} -c -16 2>/dev/null)"
-    if [ -z "${_bpshortsha}" ]; then
-        error "No sha checksum in file: $(distinct e "${FILE_CACHE_DIR}${_bpbundle_file}${DEFAULT_CHKSUM_EXT}")"
-    fi
-    debug "BundleName: $(distinct d "${_bpbundle_file}"), bundle_file: $(distinct d "${_bpbundle_file}"), repository address: $(distinct d "${_bpaddress}")"
-    retry "${SCP_BIN} ${DEFAULT_SSH_OPTS} ${DEFAULT_SCP_OPTS} -P ${MAIN_PORT} ${_bpbundle_file} ${_bpaddress}/${_bpbundle_file}.partial" || \
-        def_error "${_bpbundle_file}" "Unable to push: $(distinct e "${_bpbundle_file}") bundle to: $(distinct e "${_bpaddress}/${_bpbundle_file}")"
-    if [ "$?" = "0" ]; then
-        ${PRINTF_BIN} "${blue}"
-        ${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} ${MAIN_USER}@${_bpamirror} \
-            "cd ${SYS_SPECIFIC_BINARY_REMOTE} && ${MV_BIN} ${_bpbundle_file}.partial ${_bpbundle_file}"
-        retry "${SCP_BIN} ${DEFAULT_SSH_OPTS} ${DEFAULT_SCP_OPTS} -P ${MAIN_PORT} ${_bpbundle_file}${DEFAULT_CHKSUM_EXT} ${_bpaddress}/${_bpbundle_file}${DEFAULT_CHKSUM_EXT}" || \
-            def_error ${_bpbundle_file}${DEFAULT_CHKSUM_EXT} "Error sending: $(distinct e ${_bpbundle_file}${DEFAULT_CHKSUM_EXT}) file to: $(distinct e "${_bpaddress}/${_bpbundle_file}")"
-    else
-        error "Failed to push binary build of: $(distinct e "${_bpbundle_file}") to remote: $(distinct e "${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bpbundle_file}")"
-    fi
-    unset _bpbundle_file _bpbundle_file _bpamirror _bpaddress _bpshortsha
-}
-
-
 process () {
     _app_param="$1"
     if [ -z "${_app_param}" ]; then
