@@ -124,7 +124,8 @@ prepare_service_dataset () {
 
         fetch_dset_zfs_stream_or_create_new "${_ps_elem}" "${_final_snap_file}"
 
-        ${ZFS_BIN} list -H 2>/dev/null | ${CUT_BIN} -f1 2>/dev/null | ${EGREP_BIN} "${_ps_elem}" >/dev/null 2>&1
+        debug "Grepping for dataset: $(distinct d "${DEFAULT_ZPOOL}${SERVICES_DIR}${USER}/${_ps_elem}")"
+        ${ZFS_BIN} list -H 2>/dev/null | ${CUT_BIN} -f1 2>/dev/null | ${EGREP_BIN} "${DEFAULT_ZPOOL}${SERVICES_DIR}${USER}/${_ps_elem}" >/dev/null 2>&1
         if [ "$?" = "0" ]; then
             note "Preparing to send service dataset: $(distinct n "${_full_dataset_name}"), for bundle: $(distinct n "${_ps_elem}")"
             try "${ZFS_BIN} umount -f ${_full_dataset_name}"
