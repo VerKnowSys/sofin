@@ -14,7 +14,7 @@
 
 ## About:
 This software is my way of how to get reliable, updatable, bundled, closed-dependency, secure and fully
-customizable software for HardenedBSD/FreeBSD servers. Darwin (Mac OS X) support started with version >=0.14.10. Linux support started with version >=0.24.4.
+customizable software for HardenedBSD/FreeBSD servers. Darwin (Mac OS X) support started with version >=0.14.10. Linux support started with version >=0.24.4, ended with version 1.0.17. No more Linux support is planned.
 
 
 ## Features:
