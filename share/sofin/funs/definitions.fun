@@ -368,7 +368,7 @@ wipe_remote_archives () {
                 note "Wiping out remote: $(distinct n ${_wr_mirr}) binary archives: $(distinct n "${_remote_ar_name}")"
                 ${PRINTF_BIN} "${blue}"
                 ${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} "${MAIN_USER}@${_wr_mirr}" \
-                    "${FIND_BIN} ${SYS_SPECIFIC_BINARY_REMOTE} -iname '${_remote_ar_name}' -print -delete" 2>> "${LOG}"
+                    "${FIND_BIN} ${MAIN_BINARY_PREFIX}${SYS_SPECIFIC_BINARY_REMOTE} -iname '${_remote_ar_name}' -print -delete" 2>> "${LOG}"
             done
         done
     else

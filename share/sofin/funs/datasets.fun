@@ -17,9 +17,9 @@ push_to_all_mirrors () {
         debug "Processing mirror(s): $(distinct d "${_def_dig_query}")"
     fi
     for _ptmirror in ${_def_dig_query}; do
-        _ptaddress="${MAIN_USER}@${_ptmirror}:${SYS_SPECIFIC_BINARY_REMOTE}"
+        _ptaddress="${MAIN_USER}@${_ptmirror}:${MAIN_BINARY_PREFIX}${SYS_SPECIFIC_BINARY_REMOTE}"
         debug "Remote address inspect: $(distinct d "${_ptaddress}")"
-        try "${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} ${MAIN_USER}@${_ptmirror} 'mkdir -p ${SYS_SPECIFIC_BINARY_REMOTE}'"
+        try "${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} ${MAIN_USER}@${_ptmirror} 'mkdir -p ${MAIN_BINARY_PREFIX}${SYS_SPECIFIC_BINARY_REMOTE}'"
 
         build_bundle "${_pbto_bundle_name}" "${_ptelement_name}" "${_pversion_element}"
         checksum_filecache_element "${_ptelement_name}"
@@ -424,7 +424,7 @@ push_binary_archive () {
     if [ "$?" = "0" ]; then
         ${PRINTF_BIN} "${blue}"
         ${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} ${MAIN_USER}@${_bpamirror} \
-            "cd ${SYS_SPECIFIC_BINARY_REMOTE} && mv ${_bpbundle_file}.partial ${_bpbundle_file}"
+            "cd ${MAIN_BINARY_PREFIX}${SYS_SPECIFIC_BINARY_REMOTE} && mv ${_bpbundle_file}.partial ${_bpbundle_file}"
         retry "${SCP_BIN} ${DEFAULT_SSH_OPTS} ${DEFAULT_SCP_OPTS} -P ${MAIN_PORT} ${_bpfn_chksum_file} ${_bpaddress}/${_bpbundle_file}${DEFAULT_CHKSUM_EXT}" || \
             def_error "${_bpfn_chksum_file}" "Error sending: $(distinct e "${_bpfn_chksum_file}") file to: $(distinct e "${_bpaddress}/${_bpbundle_file}${DEFAULT_CHKSUM_EXT}")"
     else
