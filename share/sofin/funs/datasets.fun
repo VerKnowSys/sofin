@@ -396,14 +396,20 @@ install_software_from_binbuild () {
     _isfb_fullname="${2}"
     _isfb_version="${3}"
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
-
         # On systems with ZFS capability, we use zfs receive instead of tarballing:
         _isfb_dataset="${DEFAULT_ZPOOL}${SOFTWARE_DIR}${USER}/${_isfb_archive}"
-        ${PRINTF_BIN} "${blue}"
-        ${XZCAT_BIN} ${BINBUILDS_CACHE_DIR}${_isfb_archive} | ${ZFS_BIN} receive -F -v ${_isfb_dataset} && \
-            ${ZFS_BIN} rename ${_isfb_dataset}@--head-- ${ORIGIN_ZFS_SNAP_NAME} && \
-                note "Software bundle installed: $(distinct n "${_isfb_fullname}"), with version: $(distinct n "${_isfb_version}")" && \
-                    DONT_BUILD_BUT_DO_EXPORTS=YES
+        ${ZFS_BIN} list -H 2>/dev/null | ${CUT_BIN} -f1 2>/dev/null | ${EGREP_BIN} "${_isfb_dataset}" >/dev/null 2>&1
+        if [ "$?" != "0" ]; then
+            debug "Installing ZFS based binary build to dataset: $(distinct d "${_isfb_dataset}")"
+            ${PRINTF_BIN} "${blue}"
+            ${XZCAT_BIN} ${BINBUILDS_CACHE_DIR}${_isfb_archive} | ${ZFS_BIN} receive -F -v ${_isfb_dataset} && \
+                ${ZFS_BIN} rename ${_isfb_dataset}@--head-- ${ORIGIN_ZFS_SNAP_NAME} && \
+                    note "Software bundle installed: $(distinct n "${_isfb_fullname}"), with version: $(distinct n "${_isfb_version}")" && \
+                        DONT_BUILD_BUT_DO_EXPORTS=YES
+        else
+            note "Bundle dataset exists. Skipped binary build installation for: $(distinct n "${_isfb_fullname}")"
+            DONT_BUILD_BUT_DO_EXPORTS=YES
+        fi
     else
         try "${TAR_BIN} -xJf ${BINBUILDS_CACHE_DIR}${_isfb_archive} --directory ${SOFTWARE_DIR}"
         if [ "$?" = "0" ]; then
