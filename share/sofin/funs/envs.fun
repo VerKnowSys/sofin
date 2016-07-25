@@ -5,7 +5,7 @@ compiler_setup () {
         }
     fi
     debug "---------------- COMPILER FEATURES DUMP -----------------"
-    debug "Compiler features for definition: $(distinct d "${DEF_NAME}${DEF_POSTFIX}") on platform: $(distinct d ${SYSTEM_NAME})"
+    debug "Listing compiler features for platform: $(distinct d "${SYSTEM_NAME}")"
     case "${SYSTEM_NAME}" in
         Minix)
             DEFAULT_COMPILER_FLAGS="${COMMON_COMPILER_FLAGS} -I/usr/pkg/include -fPIE"

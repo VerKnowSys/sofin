@@ -12,6 +12,7 @@ build_bundle () {
     if [ -z "${_bsversion}" ]; then
         error "Third argument with $(distinct e "version-string") is required!"
     fi
+    debug "build_bundle: $(distinct d "${_bsbname}"), should be in: ${SOFTWARE_DIR}${_bsbname}"
     if [ ! -d "${SOFTWARE_DIR}${_bsbname}" ]; then
         create_software_dir "${_bsbname}"
         create_software_bundle_archive "${_bsbname}" "${_bsbelement}" "${_bsversion}" && \

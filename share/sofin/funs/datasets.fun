@@ -373,6 +373,7 @@ install_software_from_binbuild () {
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
         # On systems with ZFS capability, we use zfs receive instead of tarballing:
         _isfb_dataset="${DEFAULT_ZPOOL}${SOFTWARE_DIR}${USER}/${_isfb_archive}"
+        debug "dataset check: ${_isfb_dataset}"
         ${ZFS_BIN} list -H 2>/dev/null | ${CUT_BIN} -f1 2>/dev/null | ${EGREP_BIN} "${_isfb_dataset}" >/dev/null 2>&1
         if [ "$?" != "0" ]; then
             debug "Installing ZFS based binary build to dataset: $(distinct d "${_isfb_dataset}")"
