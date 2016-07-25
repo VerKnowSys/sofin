@@ -112,7 +112,6 @@ validate_archive_sha1 () {
 validate_def_postfix () {
     _cigiven_name="$(${BASENAME_BIN} "$(echo "$(lowercase "${1}")" | eval "${CUTOFF_DEF_EXT_GUARD}")")"
     _cidefinition_name="$(${BASENAME_BIN} "$(echo "$(lowercase "${2}")" | eval "${CUTOFF_DEF_EXT_GUARD}")")"
-    debug "_cigiven_name: $(distinct d "${_cigiven_name}"), _cidefinition_name: $(distinct d "${_cidefinition_name}")"
     # case when DEF_POSTFIX was ommited => use definition file name difference as POSTFIX:
     _l1="$(${PRINTF_BIN} "${_cidefinition_name}" | ${WC_BIN} -c 2>/dev/null)"
     _l2="$(${PRINTF_BIN} "${_cigiven_name}" | ${WC_BIN} -c 2>/dev/null)"
@@ -124,13 +123,13 @@ validate_def_postfix () {
         _cispc_nme_diff="$(difftext "${_cigiven_name}" "$(lowercase "${DEF_NAME}")")"
     fi
     if [ -z "${DEF_POSTFIX}" -a \
-       -n "${_cispc_nme_diff}" ]; then
-       debug "Inferred DEF_POSTFIX=$(distinct d "${_cispc_nme_diff}") from definition: $(distinct d "${DEF_NAME}")"
-       DEF_POSTFIX="${_cispc_nme_diff}"
+         -n "${_cispc_nme_diff}" ]; then
+        debug "Inferred DEF_POSTFIX=$(distinct d "${_cispc_nme_diff}") from definition: $(distinct d "${DEF_NAME}")"
+        DEF_POSTFIX="${_cispc_nme_diff}"
     elif [ -n "${_cispc_nme_diff}" ]; then
-        debug "Difference: $(distinct d "${_cispc_nme_diff}")"
+        debug "Given-name and definition-name difference: $(distinct d "${_cispc_nme_diff}")"
     else
-        debug "No difference."
+        debug "No difference between given-name and definition-name."
     fi
     unset _cidefinition_name _cigiven_name _cispec_name_diff __cut_ext_guard _cispc_nme_diff _l1 _l2
 }
