@@ -80,7 +80,7 @@ fetch_dset_zfs_stream () {
     if [ "$?" = "0" ]; then
         _dataset_name="${DEFAULT_ZPOOL}${SERVICES_DIR}${USER}/${_bund_name}"
         debug "Creating service dataset: $(distinct d "${_dataset_name}"), from file stream: $(distinct d "${_final_snap_file}")."
-        try "${XZCAT_BIN} "${FILE_CACHE_DIR}${_final_snap_file}" | ${ZFS_BIN} receive -v ${_dataset_name}" && \
+        try "${XZCAT_BIN} ${FILE_CACHE_DIR}${_final_snap_file} | ${ZFS_BIN} receive -v ${_dataset_name}" && \
             note "Received service dataset for: $(distinct n "${_dataset_name}")"
         unset _dataset_name
     else
