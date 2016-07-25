@@ -69,7 +69,7 @@ push_dset_zfs_stream () {
         if [ -z "${_psversion_element}" ]; then
             error "Fourth argument with a $(distinct e "version-string") is required!"
         fi
-        _ffile="${_psfin_snapfile}${DEFAULT_SNAPSHOT_EXT}"
+        _ffile="${_psfin_snapfile}${DEFAULT_SOFTWARE_SNAPSHOT_EXT}"
         if [ -f "${FILE_CACHE_DIR}${_ffile}" ]; then
             ${PRINTF_BIN} "${blue}"
             ${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} "${MAIN_USER}@${_psmirror}" \

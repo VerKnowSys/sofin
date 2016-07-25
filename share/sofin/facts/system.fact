@@ -33,6 +33,9 @@ determine_system_capabilites () {
         # Zfs: set DEFAULT_ZPOOL to first available zpool
         DEFAULT_ZPOOL="$(${ZPOOL_BIN} list -H 2>/dev/null | ${CUT_BIN} -f1 2>/dev/null)"
         ORIGIN_ZFS_SNAP_NAME="origin"
+
+        # For ZFS we don't use tarballs anymore:
+        DEFAULT_ARCHIVE_EXT="${DEFAULT_SOFTWARE_SNAPSHOT_EXT}"
     else
         unset CAP_SYS_ZFS DEFAULT_ZPOOL ORIGIN_ZFS_SNAP_NAME
     fi
