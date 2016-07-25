@@ -349,3 +349,33 @@ recreate_builddir () {
     destroy_builddir "${1}" "${2}"
     create_builddir "${1}" "${2}"
 }
+
+
+create_software_bundle_archive () {
+    _csbname="${1}"
+    _csbelem="${2}"
+    if [ -z "${_csbname}" ]; then
+        error "First argument with $(distinct e "BundleName") is required!"
+    fi
+    if [ -z "${_csbelem}" ]; then
+        error "Second argument with $(distinct e "file-element-name") is required!"
+    fi
+    if [ "YES" = "${CAP_SYS_ZFS}" ]; then
+        _csbd_dataset="${DEFAULT_ZPOOL}${SOFTWARE_DIR}${USER}/${_csbname}"
+        try "${ZFS_BIN} umount -f ${_csbd_dataset}"
+        ${PRINTF_BIN} "${blue}"
+        ${ZFS_BIN} send ${_csbd_dataset} | ${XZ_BIN} > ${FILE_CACHE_DIR}${_csbelem} 2>> ${LOG} && \
+            debug "Created ZFS binbundle from dataset: $(distinct d "${_csbd_dataset}")"
+    else
+        debug "No ZFS-binbuilds feature. Falling back to tarballs.."
+        _cdir="$(${PWD_BIN} 2>/dev/null)"
+        cd "${SOFTWARE_DIR}"
+        ${PRINTF_BIN} "${blue}"
+        ${TAR_BIN} --use-compress-program="${XZ_BIN} --threads=${CPUS}" \
+            --totals -cJ -f "${_csbname}" "${FILE_CACHE_DIR}${_csbelem}" || \
+                ${TAR_BIN} --totals -cJf "${_csbname}" "${FILE_CACHE_DIR}${_csbelem}" || \
+                    error "Failed to create archive file: $(distinct e "${FILE_CACHE_DIR}${_csbelem}")"
+        cd "${_cdir}"
+    fi
+    unset _csbname _csbelem
+}
