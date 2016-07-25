@@ -3,7 +3,16 @@ push_dset_zfs_stream () {
     _fin_snapfile="${1}"
     _pselement="${2}"
     _psmirror="${3}"
+    if [ -z "${_fin_snapfile}" ]; then
+        error "First argument with a $(distinct e "some-snapshot-file.txz") is required!"
+    fi
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
+        if [ -z "${_pselement}" ]; then
+            error "Second argument with a $(distinct e "BundleName") is required!"
+        fi
+        if [ -z "${_psmirror}" ]; then
+            error "Third argument with a $(distinct e "mirror-IP") is required!"
+        fi
         if [ -f "${FILE_CACHE_DIR}${_fin_snapfile}" ]; then
             ${PRINTF_BIN} "${blue}"
             ${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} "${MAIN_USER}@${_psmirror}" \
@@ -18,12 +27,15 @@ push_dset_zfs_stream () {
                 ${PRINTF_BIN} "${blue}"
                 ${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} "${MAIN_USER}@${_psmirror}" \
                     "cd ${COMMON_BINARY_REMOTE} && ${MV_BIN} ${_fin_snapfile}.partial ${_fin_snapfile}"
+                debug "Successfully renamed partial file to: $(distinct d "${_fin_snapfile}")"
             else
-                error "Failed to send service snapshot archive file: $(distinct e "${_fin_snapfile}") to remote host: $(distinct e "${MAIN_USER}@${_psmirror}")!"
+                error "Failed to send snapshot of $(distinct e "${_pselement}") archive file: $(distinct e "${_fin_snapfile}") to remote host: $(distinct e "${MAIN_USER}@${_psmirror}")!"
             fi
         else
-            note "No service stream available for: $(distinct n ${_pselement})"
+            note "No service stream file available for: $(distinct n ${_pselement})"
         fi
+    else
+        debug "No ZFS support"
     fi
     unset _psmirror _pselement _fin_snapfile
 }
