@@ -1,11 +1,11 @@
 
 push_to_all_mirrors () {
-    _pbto_elem="${1}"
+    _pbto_bundle_name="${1}"
     _pversion_element="${2}"
-    _ptelement_name="${_pbto_elem}-${_pversion_element}${DEFAULT_ARCHIVE_EXT}"
+    _ptelement_name="${_pbto_bundle_name}-${_pversion_element}${DEFAULT_ARCHIVE_EXT}"
     _def_dig_query="$(${HOST_BIN} A ${MAIN_SOFTWARE_ADDRESS} 2>/dev/null | ${GREP_BIN} 'Address:' 2>/dev/null | eval "${HOST_ADDRESS_GUARD}")"
-    debug "query: $(distinct d "${_def_dig_query}"), bundle: $(distinct d "${_pbto_elem}"), name: $(distinct d ${_ptelement_name})"
-    if [ -z "${_pbto_elem}" ]; then
+    debug "Address: $(distinct d "${_def_dig_query}"), bundle: $(distinct d "${_pbto_bundle_name}"), name: $(distinct d ${_ptelement_name})"
+    if [ -z "${_pbto_bundle_name}" ]; then
         error "First argument with a $(distinct e "BundleName") is required!"
     fi
     if [ -z "${_pversion_element}" ]; then
@@ -21,7 +21,7 @@ push_to_all_mirrors () {
         debug "Remote address inspect: $(distinct d "${_ptaddress}")"
         try "${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} ${MAIN_USER}@${_ptmirror} 'mkdir -p ${SYS_SPECIFIC_BINARY_REMOTE}'"
 
-        build_bundle "${_ptelement_name}" "${_pbto_elem}" "${_pversion_element}"
+        build_bundle "${_ptelement_name}" "${_pbto_bundle_name}" "${_pversion_element}"
         checksum_filecache_element "${_ptelement_name}"
 
         try "${CHMOD_BIN} -v o+r ${FILE_CACHE_DIR}${_ptelement_name} ${FILE_CACHE_DIR}${_ptelement_name}${DEFAULT_CHKSUM_EXT}" && \
@@ -30,8 +30,8 @@ push_to_all_mirrors () {
         debug "Deploying bin-bundle: $(distinct d "${_ptelement_name}") to mirror: $(distinct d "${_ptmirror}")"
         push_binary_archive "${_ptelement_name}" "${_ptmirror}" "${_ptaddress}"
 
-        prepare_service_dataset "${_pbto_elem}" "${_pversion_element}"
-        push_dset_zfs_stream "${_ptelement_name}" "${_pbto_elem}" "${_ptmirror}" "${_pversion_element}"
+        prepare_service_dataset "${_pbto_bundle_name}" "${_pversion_element}"
+        push_dset_zfs_stream "${_ptelement_name}" "${_pbto_bundle_name}" "${_ptmirror}" "${_pversion_element}"
     done
     unset _ptaddress _ptmirror _pversion_element _ptelement_name _def_dig_query
 }
@@ -56,10 +56,11 @@ push_dset_zfs_stream () {
             error "Fourth argument with a $(distinct e "version-string") is required!"
         fi
         _ffile="${_psfin_snapfile}${DEFAULT_SERVICE_SNAPSHOT_EXT}"
+        debug "push_dset_zfs_stream file: ${_psfin_snapfile}, ${_ffile}"
         if [ -f "${FILE_CACHE_DIR}${_ffile}" ]; then
             ${PRINTF_BIN} "${blue}"
             ${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} "${MAIN_USER}@${_psmirror}" \
-                "${MKDIR_BIN} -p ${COMMON_BINARY_REMOTE} ; ${CHMOD_BIN} 755 ${COMMON_BINARY_REMOTE}"
+                "${MKDIR_BIN} -p ${COMMON_BINARY_REMOTE} ; ${CHMOD_BIN} 0755 ${COMMON_BINARY_REMOTE}"
 
             debug "Setting common access to archive files before we send it: $(distinct d "${_ffile}")"
             try "${CHMOD_BIN} -v a+r ${FILE_CACHE_DIR}${_ffile}"
