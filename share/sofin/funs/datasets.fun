@@ -105,40 +105,44 @@ push_dset_zfs_stream () {
 
 
 prepare_service_dataset () {
-    _pd_elem="${1}"
+    _ps_elem="${1}"
+    _ps_ver_elem="${2}"
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
-        if [ -z "${_pd_elem}" ]; then
+        if [ -z "${_ps_elem}" ]; then
             error "First argument with a $(distinct e "BundleName") is required!"
+        fi
+        if [ -z "${_ps_ver_elem}" ]; then
+            error "Second argument with a $(distinct e "version-string") is required!"
         fi
         if [ -z "${USER}" ]; then
             error "Second argument with env value for: $(distinct e "USER") is required!"
         fi
-        _full_dataset_name="${DEFAULT_ZPOOL}${SERVICES_DIR}${USER}/${_pd_elem}"
-        _snap_file="${_pd_elem}-${_version_element}${SERVICE_SNAPSHOT_EXT}"
+        _full_dataset_name="${DEFAULT_ZPOOL}${SERVICES_DIR}${USER}/${_ps_elem}"
+        _snap_file="${_ps_elem}-${_ps_ver_elem}${SERVICE_SNAPSHOT_EXT}"
         _final_snap_file="${_snap_file}${DEFAULT_ARCHIVE_EXT}"
         debug "Dataset name: ${_full_dataset_name}, snapshot file: ${_snap_file}, final: ${_final_snap_file}"
 
-        fetch_dset_zfs_stream_or_create_new "${_pd_elem}" "${_final_snap_file}"
+        fetch_dset_zfs_stream_or_create_new "${_ps_elem}" "${_final_snap_file}"
 
-        ${ZFS_BIN} list -H 2>/dev/null | ${CUT_BIN} -f1 2>/dev/null | ${EGREP_BIN} "${_pd_elem}" >/dev/null 2>&1
+        ${ZFS_BIN} list -H 2>/dev/null | ${CUT_BIN} -f1 2>/dev/null | ${EGREP_BIN} "${_ps_elem}" >/dev/null 2>&1
         if [ "$?" = "0" ]; then
-            note "Preparing to send service dataset: $(distinct n "${_full_dataset_name}"), for bundle: $(distinct n "${_pd_elem}")"
+            note "Preparing to send service dataset: $(distinct n "${_full_dataset_name}"), for bundle: $(distinct n "${_ps_elem}")"
             try "${ZFS_BIN} umount -f ${_full_dataset_name}"
             run "${ZFS_BIN} send ${_full_dataset_name} | ${XZ_BIN} > ${FILE_CACHE_DIR}${_final_snap_file}"
             try "${ZFS_BIN} mount ${_full_dataset_name}"
         else
-            run "${ZFS_BIN} create -p -o mountpoint=${SERVICES_DIR}${_pd_elem} ${_full_dataset_name}"
+            run "${ZFS_BIN} create -p -o mountpoint=${SERVICES_DIR}${_ps_elem} ${_full_dataset_name}"
             run "${ZFS_BIN} send ${_full_dataset_name} | ${XZ_BIN} > ${FILE_CACHE_DIR}${_final_snap_file}"
             try "${ZFS_BIN} mount ${_full_dataset_name}"
         fi
         _snap_size="$(file_size "${FILE_CACHE_DIR}${_final_snap_file}")"
         if [ "${_snap_size}" = "0" ]; then
             try "${RM_BIN} -vf ${FILE_CACHE_DIR}${_final_snap_file}"
-            debug "Service dataset dump is empty for bundle: $(distinct d "${_pd_elem}-${_version_element}")"
+            debug "Service dataset dump is empty for bundle: $(distinct d "${_ps_elem}-${_ps_ver_elem}")"
         else
-            debug "Snapshot of size: $(distinct d "${_snap_size}") is ready for bundle: $(distinct d "${_pd_elem}")"
+            debug "Snapshot of size: $(distinct d "${_snap_size}") is ready for bundle: $(distinct d "${_ps_elem}")"
         fi
-        unset _snap_size _version_element _full_dataset_name _final_snap_file _pd_elem
+        unset _snap_size _ps_ver_elem _full_dataset_name _final_snap_file _ps_elem
     fi
 }
 
