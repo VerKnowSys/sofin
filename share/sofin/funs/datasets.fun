@@ -34,6 +34,7 @@ push_to_all_mirrors () {
 
         _dset_snapshot="${_pbelement}-${_version_element}${SERVICE_SNAPSHOT_EXT}"
         _dset_snap_file="${_dset_snapshot}${DEFAULT_ARCHIVE_EXT}"
+        prepare_service_dataset "${_pbelement}" "${_version_element}"
         push_dset_zfs_stream "${_dset_snap_file}" "${_pbelement}" "${_mirror}" "${_version_element}"
     done
     try "${RM_BIN} -f ${_element_name} ${_element_name}${DEFAULT_CHKSUM_EXT}"
