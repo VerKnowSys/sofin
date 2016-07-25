@@ -33,12 +33,12 @@ push_to_all_mirrors () {
         make_local_bundle_copy "${_ptambin_bundle}" "${_ptelement_name}"
         push_binary_archive "${_ptambin_bundle}" "${_ptelement_name}" "${_ptmirror}" "${_ptaddress}"
 
-        _dset_snap_file="${_dset_snapshot}${DEFAULT_ARCHIVE_EXT}"
         prepare_service_dataset "${_pbelement}" "${_pversion_element}"
-        push_dset_zfs_stream "${_dset_snap_file}" "${_pbelement}" "${_ptmirror}" "${_pversion_element}"
+        push_dset_zfs_stream "${_ptelement_name}${DEFAULT_SNAPSHOT_EXT}" "${_pbelement}" "${_ptmirror}" "${_pversion_element}"
+
         try "${RM_BIN} -f ${_ptelement_name} ${_ptelement_name}${DEFAULT_CHKSUM_EXT} ${_ptelement_name}${DEFAULT_SNAPSHOT_EXT}"
     done
-    unset _dset_snapshot _dset_snap_file _ptambin_bundle _ptaddress _ptmirror _pversion_element _ptelement_name _def_dig_query
+    unset _ptambin_bundle _ptaddress _ptmirror _pversion_element _ptelement_name _def_dig_query
 }
 
 
