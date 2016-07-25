@@ -95,7 +95,7 @@ push_dset_zfs_stream () {
                 error "Failed to send snapshot of $(distinct e "${_pselement}") archive file: $(distinct e "${_fin_snapfile}") to remote host: $(distinct e "${MAIN_USER}@${_psmirror}")!"
             fi
         else
-            note "No service stream file available for: $(distinct n ${_pselement})"
+            warn "No service stream available for bundle: $(distinct w "${_pselement}")"
         fi
     else
         debug "No ZFS support"
