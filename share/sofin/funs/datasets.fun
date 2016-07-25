@@ -1,61 +1,53 @@
 
 push_to_all_mirrors () {
-    _pbelement="${1}"
+    _pbto_elem="${1}"
     _pversion_element="${2}"
-    _ptelement_name="${_pbelement}-${_pversion_element}${DEFAULT_ARCHIVE_EXT}"
+    _ptelement_name="${_pbto_elem}-${_pversion_element}${DEFAULT_ARCHIVE_EXT}"
     _def_dig_query="$(${HOST_BIN} A ${MAIN_SOFTWARE_ADDRESS} 2>/dev/null | ${GREP_BIN} 'Address:' 2>/dev/null | eval "${HOST_ADDRESS_GUARD}")"
-    debug "query: $(distinct d "${_def_dig_query}"), bundle: $(distinct d ${_pbelement}), name: $(distinct d ${_ptelement_name})"
-    if [ -z "${_pbelement}" ]; then
+    debug "query: $(distinct d "${_def_dig_query}"), bundle: $(distinct d "${_pbto_elem}"), name: $(distinct d ${_ptelement_name})"
+    if [ -z "${_pbto_elem}" ]; then
         error "First argument with a $(distinct e "BundleName") is required!"
     fi
     if [ -z "${_pversion_element}" ]; then
         error "Second argument with a $(distinct e "version-string") is required!"
     fi
     if [ -z "${_def_dig_query}" ]; then
-        error "Unable to determine IP address from: $(distinct e ${MAIN_SOFTWARE_ADDRESS})"
+        error "Unable to determine IP address of: $(distinct e "${MAIN_SOFTWARE_ADDRESS}")"
     else
         debug "Processing mirror(s): $(distinct d "${_def_dig_query}")"
     fi
     for _ptmirror in ${_def_dig_query}; do
         _ptaddress="${MAIN_USER}@${_ptmirror}:${SYS_SPECIFIC_BINARY_REMOTE}"
-        ${PRINTF_BIN} "${blue}"
-        ${SSH_BIN} ${DEFAULT_SSH_OPTS} -p "${MAIN_PORT}" "${MAIN_USER}@${_ptmirror}" \
-            "${MKDIR_BIN} -p ${SYS_SPECIFIC_BINARY_REMOTE}"
+        debug "Remote address inspect: $(distinct d "${_ptaddress}")"
+        try "${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} ${MAIN_USER}@${_ptmirror} 'mkdir -p ${SYS_SPECIFIC_BINARY_REMOTE}'"
 
-        build_bundle "${_ptelement_name}" "${_pbelement}" "${_pversion_element}"
+        build_bundle "${_ptelement_name}" "${_pbto_elem}" "${_pversion_element}"
         checksum_filecache_element "${_ptelement_name}"
 
         try "${CHMOD_BIN} -v o+r ${_ptelement_name} ${_ptelement_name}${DEFAULT_CHKSUM_EXT}" && \
             debug "Set read access for archives: $(distinct d ${_ptelement_name}), $(distinct d ${_ptelement_name}${DEFAULT_CHKSUM_EXT}) before we send them to public remote"
 
-        _ptambin_bundle="${BINBUILDS_CACHE_DIR}${_pbelement}-${_pversion_element}"
-        debug "Deploying bin-bundle: $(distinct d "${_ptambin_bundle}") to all available mirrors.."
-        make_local_bundle_copy "${_ptambin_bundle}" "${_ptelement_name}"
-        push_binary_archive "${_ptambin_bundle}" "${_ptelement_name}" "${_ptmirror}" "${_ptaddress}"
+        debug "Deploying bin-bundle: $(distinct d "${_ptelement_name}") to all available mirrors.."
+        make_local_bundle_copy "${_ptelement_name}"
+        push_binary_archive "${_ptelement_name}" "${_ptmirror}" "${_ptaddress}"
 
-        prepare_service_dataset "${_pbelement}" "${_pversion_element}"
-        push_dset_zfs_stream "${_ptelement_name}${DEFAULT_SNAPSHOT_EXT}" "${_pbelement}" "${_ptmirror}" "${_pversion_element}"
-
-        try "${RM_BIN} -f ${_ptelement_name} ${_ptelement_name}${DEFAULT_CHKSUM_EXT} ${_ptelement_name}${DEFAULT_SNAPSHOT_EXT}"
+        prepare_service_dataset "${_pbto_elem}" "${_pversion_element}"
+        push_dset_zfs_stream "${_ptelement_name}" "${_pbto_elem}" "${_ptmirror}" "${_pversion_element}"
     done
-    unset _ptambin_bundle _ptaddress _ptmirror _pversion_element _ptelement_name _def_dig_query
+    unset _ptaddress _ptmirror _pversion_element _ptelement_name _def_dig_query
 }
 
 
 make_local_bundle_copy () {
-    _lbin_bundle="${1}"
-    _lelement_name="${2}"
-    if [ -z "${_lbin_bundle}" ]; then
-        error "First argument with a $(distinct e "BundleName") is required!"
+    _mlelement_name="${1}"
+    if [ -z "${_mlelement_name}" ]; then
+        error "First argument with $(distinct e "BundleName") is required!"
     fi
-    if [ -z "${_lelement_name}" ]; then
-        error "Second argument with a $(distinct e "full-name") is required!"
-    fi
-    debug "Performing a copy of binary bundle to: $(distinct d ${_lbin_bundle})"
-    try "${MKDIR_BIN} -p ${_lbin_bundle}"
-    try "${CP_BIN} -v ${_lelement_name} ${_lbin_bundle}/"
-    try "${CP_BIN} -v ${_lelement_name}${DEFAULT_CHKSUM_EXT} ${_lbin_bundle}/"
-    unset _lbin_bundle _lelement_name
+    debug "Performing copy of binary bundle to: $(distinct d "${BINBUILDS_CACHE_DIR}")"
+    try "${MKDIR_BIN} -p ${BINBUILDS_CACHE_DIR}"
+    try "${CP_BIN} -v ${_mlelement_name} ${BINBUILDS_CACHE_DIR}/"
+    try "${CP_BIN} -v ${_mlelement_name}${DEFAULT_CHKSUM_EXT} ${BINBUILDS_CACHE_DIR}/"
+    unset _mlelement_name
 }
 
 
@@ -77,23 +69,24 @@ push_dset_zfs_stream () {
         if [ -z "${_psversion_element}" ]; then
             error "Fourth argument with a $(distinct e "version-string") is required!"
         fi
-        if [ -f "${FILE_CACHE_DIR}${_psfin_snapfile}" ]; then
+        _ffile="${_psfin_snapfile}${DEFAULT_SNAPSHOT_EXT}"
+        if [ -f "${FILE_CACHE_DIR}${_ffile}" ]; then
             ${PRINTF_BIN} "${blue}"
             ${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} "${MAIN_USER}@${_psmirror}" \
                 "${MKDIR_BIN} -p ${COMMON_BINARY_REMOTE} ; ${CHMOD_BIN} 755 ${COMMON_BINARY_REMOTE}"
 
-            debug "Setting common access to archive files before we send it: $(distinct d ${_psfin_snapfile})"
-            try "${CHMOD_BIN} -v a+r ${FILE_CACHE_DIR}${_psfin_snapfile}"
-            debug "Sending initial service stream to $(distinct d ${MAIN_COMMON_NAME}) repository: $(distinct d ${MAIN_COMMON_REPOSITORY}/${_psfin_snapfile})"
+            debug "Setting common access to archive files before we send it: $(distinct d "${_ffile}")"
+            try "${CHMOD_BIN} -v a+r ${FILE_CACHE_DIR}${_ffile}"
+            debug "Sending initial service stream to $(distinct d ${MAIN_COMMON_NAME}) repository: $(distinct d ${MAIN_COMMON_REPOSITORY}/${_ffile})"
 
-            retry "${SCP_BIN} ${DEFAULT_SSH_OPTS} ${DEFAULT_SCP_OPTS} -P ${MAIN_PORT} ${FILE_CACHE_DIR}${_psfin_snapfile} ${MAIN_USER}@${_psmirror}:${COMMON_BINARY_REMOTE}/${_psfin_snapfile}.partial"
+            retry "${SCP_BIN} ${DEFAULT_SSH_OPTS} ${DEFAULT_SCP_OPTS} -P ${MAIN_PORT} ${FILE_CACHE_DIR}${_ffile} ${MAIN_USER}@${_psmirror}:${COMMON_BINARY_REMOTE}/${_ffile}.partial"
             if [ "$?" = "0" ]; then
                 ${PRINTF_BIN} "${blue}"
                 ${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} "${MAIN_USER}@${_psmirror}" \
-                    "cd ${COMMON_BINARY_REMOTE} && ${MV_BIN} ${_psfin_snapfile}.partial ${_psfin_snapfile}"
-                debug "Successfully renamed partial file to: $(distinct d "${_psfin_snapfile}")"
+                    "cd ${COMMON_BINARY_REMOTE} && ${MV_BIN} ${_ffile}.partial ${_ffile}"
+                debug "Successfully renamed partial file to: $(distinct d "${_ffile}")"
             else
-                error "Failed to send snapshot of $(distinct e "${_pselement}") archive file: $(distinct e "${_psfin_snapfile}") to remote host: $(distinct e "${MAIN_USER}@${_psmirror}")!"
+                error "Failed to send snapshot of $(distinct e "${_pselement}") archive file: $(distinct e "${_ffile}") to remote host: $(distinct e "${MAIN_USER}@${_psmirror}")!"
             fi
         else
             warn "No service stream available for bundle: $(distinct w "${_pselement}")"
@@ -101,7 +94,7 @@ push_dset_zfs_stream () {
     else
         debug "No ZFS support"
     fi
-    unset _psmirror _pselement _psfin_snapfile
+    unset _psmirror _pselement _ffile _psfin_snapfile _psversion_element
 }
 
 
@@ -119,33 +112,31 @@ prepare_service_dataset () {
             error "Second argument with env value for: $(distinct e "USER") is required!"
         fi
         _full_dataset_name="${DEFAULT_ZPOOL}${SERVICES_DIR}${USER}/${_ps_elem}"
-        _snap_file="${_ps_elem}-${_ps_ver_elem}${DEFAULT_SNAPSHOT_EXT}"
-        _final_snap_file="${_snap_file}${DEFAULT_ARCHIVE_EXT}"
-        debug "Dataset name: ${_full_dataset_name}, snapshot file: ${_snap_file}, final: ${_final_snap_file}"
-
-        fetch_dset_zfs_stream_or_create_new "${_ps_elem}" "${_final_snap_file}"
+        _ps_snap_file="${_ps_elem}-${_ps_ver_elem}${DEFAULT_SERVICE_SNAPSHOT_EXT}"
+        debug "Dataset name: $(distinct d "${_full_dataset_name}"), snapshot file: $(distinct d "${_ps_snap_file}")"
+        fetch_dset_zfs_stream_or_create_new "${_ps_elem}" "${_ps_snap_file}"
 
         debug "Grepping for dataset: $(distinct d "${DEFAULT_ZPOOL}${SERVICES_DIR}${USER}/${_ps_elem}")"
         ${ZFS_BIN} list -H 2>/dev/null | ${CUT_BIN} -f1 2>/dev/null | ${EGREP_BIN} "${DEFAULT_ZPOOL}${SERVICES_DIR}${USER}/${_ps_elem}" >/dev/null 2>&1
         if [ "$?" = "0" ]; then
             note "Preparing to send service dataset: $(distinct n "${_full_dataset_name}"), for bundle: $(distinct n "${_ps_elem}")"
             try "${ZFS_BIN} umount -f ${_full_dataset_name}"
-            run "${ZFS_BIN} send ${_full_dataset_name} | ${XZ_BIN} > ${FILE_CACHE_DIR}${_final_snap_file}"
+            run "${ZFS_BIN} send ${_full_dataset_name} | ${XZ_BIN} > ${FILE_CACHE_DIR}${_ps_snap_file}"
             try "${ZFS_BIN} mount ${_full_dataset_name}"
         else
             run "${ZFS_BIN} create -p -o mountpoint=${SERVICES_DIR}${_ps_elem} ${_full_dataset_name}"
             try "${ZFS_BIN} umount -f ${_full_dataset_name}"
-            run "${ZFS_BIN} send ${_full_dataset_name} | ${XZ_BIN} > ${FILE_CACHE_DIR}${_final_snap_file}"
+            run "${ZFS_BIN} send ${_full_dataset_name} | ${XZ_BIN} > ${FILE_CACHE_DIR}${_ps_snap_file}"
             try "${ZFS_BIN} mount ${_full_dataset_name}"
         fi
-        _snap_size="$(file_size "${FILE_CACHE_DIR}${_final_snap_file}")"
+        _snap_size="$(file_size "${FILE_CACHE_DIR}${_ps_snap_file}")"
         if [ "${_snap_size}" = "0" ]; then
-            try "${RM_BIN} -vf ${FILE_CACHE_DIR}${_final_snap_file}"
+            try "${RM_BIN} -vf ${FILE_CACHE_DIR}${_ps_snap_file}"
             debug "Service dataset dump is empty for bundle: $(distinct d "${_ps_elem}-${_ps_ver_elem}")"
         else
             debug "Snapshot of size: $(distinct d "${_snap_size}") is ready for bundle: $(distinct d "${_ps_elem}")"
         fi
-        unset _snap_size _ps_ver_elem _full_dataset_name _final_snap_file _ps_elem
+        unset _snap_size _ps_ver_elem _full_dataset_name _ps_snap_file _ps_elem
     fi
 }
 
@@ -366,7 +357,7 @@ create_software_bundle_archive () {
     if [ -z "${_csversion}" ]; then
         error "Third argument with $(distinct e "version-string") is required!"
     fi
-    _cddestfile="${FILE_CACHE_DIR}${_csbelem}-${_csversion}${DEFAULT_ARCHIVE_EXT}"
+    _cddestfile="${BINBUILDS_CACHE_DIR}${_csbelem}-${_csversion}${DEFAULT_ARCHIVE_EXT}"
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
         _csbd_dataset="${DEFAULT_ZPOOL}${SOFTWARE_DIR}${USER}/${_csbname}"
         debug "Creating archive from dataset: $(distinct d "${_csbd_dataset}") to file: $(distinct d "${_cddestfile}")"
