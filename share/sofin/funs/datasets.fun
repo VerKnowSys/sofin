@@ -24,7 +24,7 @@ push_to_all_mirrors () {
         build_bundle "${_ptelement_name}" "${_pbto_elem}" "${_pversion_element}"
         checksum_filecache_element "${_ptelement_name}"
 
-        try "${CHMOD_BIN} -v o+r ${_ptelement_name} ${_ptelement_name}${DEFAULT_CHKSUM_EXT}" && \
+        try "${CHMOD_BIN} -v o+r ${FILE_CACHE_DIR}${_ptelement_name} ${FILE_CACHE_DIR}${_ptelement_name}${DEFAULT_CHKSUM_EXT}" && \
             debug "Set read access for archives: $(distinct d ${_ptelement_name}), $(distinct d ${_ptelement_name}${DEFAULT_CHKSUM_EXT}) before we send them to public remote"
 
         debug "Deploying bin-bundle: $(distinct d "${_ptelement_name}") to all available mirrors.."
