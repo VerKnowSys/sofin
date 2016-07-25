@@ -49,11 +49,11 @@ prepare_service_dataset () {
         ${ZFS_BIN} list -H 2>/dev/null | ${CUT_BIN} -f1 2>/dev/null | ${EGREP_BIN} "${_pd_elem}" >/dev/null 2>&1
         if [ "$?" = "0" ]; then
             try "${ZFS_BIN} umount -f ${_full_dataset_name}"
-            run "${ZFS_BIN} send -v -e -L ${_full_dataset_name} | ${XZ_BIN} > ${FILE_CACHE_DIR}${_final_snap_file}"
+            run "${ZFS_BIN} send -R -L ${_full_dataset_name} | ${XZ_BIN} > ${FILE_CACHE_DIR}${_final_snap_file}"
             try "${ZFS_BIN} mount ${_full_dataset_name}"
         else
-            run "${ZFS_BIN} send -v -e -L ${_full_dataset_name} | ${XZ_BIN} > ${FILE_CACHE_DIR}${_final_snap_file}"
             run "${ZFS_BIN} create -p -o mountpoint=${SERVICES_DIR}${_pd_elem} ${_full_dataset_name}"
+            run "${ZFS_BIN} send -R -L ${_full_dataset_name} | ${XZ_BIN} > ${FILE_CACHE_DIR}${_final_snap_file}"
             try "${ZFS_BIN} mount ${_full_dataset_name}"
         fi
         _snap_size="$(file_size "${FILE_CACHE_DIR}${_final_snap_file}")"
