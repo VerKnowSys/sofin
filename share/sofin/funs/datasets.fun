@@ -16,10 +16,10 @@ push_to_all_mirrors () {
     else
         debug "Processing mirror(s): $(distinct d "${_def_dig_query}")"
     fi
-    for _mirror in ${_def_dig_query}; do
-        _address="${MAIN_USER}@${_mirror}:${SYS_SPECIFIC_BINARY_REMOTE}"
+    for _ptmirror in ${_def_dig_query}; do
+        _ptaddress="${MAIN_USER}@${_ptmirror}:${SYS_SPECIFIC_BINARY_REMOTE}"
         ${PRINTF_BIN} "${blue}"
-        ${SSH_BIN} ${DEFAULT_SSH_OPTS} -p "${MAIN_PORT}" "${MAIN_USER}@${_mirror}" \
+        ${SSH_BIN} ${DEFAULT_SSH_OPTS} -p "${MAIN_PORT}" "${MAIN_USER}@${_ptmirror}" \
             "${MKDIR_BIN} -p ${SYS_SPECIFIC_BINARY_REMOTE}"
 
         build_bundle "${_ptelement_name}" "${_pbelement}" "${_pversion_element}"
@@ -31,15 +31,15 @@ push_to_all_mirrors () {
         _ptambin_bundle="${BINBUILDS_CACHE_DIR}${_pbelement}-${_pversion_element}"
         debug "Deploying bin-bundle: $(distinct d "${_ptambin_bundle}") to all available mirrors.."
         make_local_bundle_copy "${_ptambin_bundle}" "${_ptelement_name}"
-        push_binary_archive "${_ptambin_bundle}" "${_ptelement_name}" "${_mirror}" "${_address}"
+        push_binary_archive "${_ptambin_bundle}" "${_ptelement_name}" "${_ptmirror}" "${_ptaddress}"
 
         _dset_snapshot="${_pbelement}-${_pversion_element}${SERVICE_SNAPSHOT_EXT}"
         _dset_snap_file="${_dset_snapshot}${DEFAULT_ARCHIVE_EXT}"
         prepare_service_dataset "${_pbelement}" "${_pversion_element}"
-        push_dset_zfs_stream "${_dset_snap_file}" "${_pbelement}" "${_mirror}" "${_pversion_element}"
+        push_dset_zfs_stream "${_dset_snap_file}" "${_pbelement}" "${_ptmirror}" "${_pversion_element}"
     done
     try "${RM_BIN} -f ${_ptelement_name} ${_ptelement_name}${DEFAULT_CHKSUM_EXT}"
-    unset _dset_snapshot _dset_snap_file _ptambin_bundle _address _mirror _pversion_element _ptelement_name _def_dig_query
+    unset _dset_snapshot _dset_snap_file _ptambin_bundle _ptaddress _ptmirror _pversion_element _ptelement_name _def_dig_query
 }
 
 
@@ -61,11 +61,11 @@ make_local_bundle_copy () {
 
 
 push_dset_zfs_stream () {
-    _fin_snapfile="${1}"
+    _psfin_snapfile="${1}"
     _pselement="${2}"
     _psmirror="${3}"
-    _version_element="${4}"
-    if [ -z "${_fin_snapfile}" ]; then
+    _psversion_element="${4}"
+    if [ -z "${_psfin_snapfile}" ]; then
         error "First argument with a $(distinct e "some-snapshot-file.txz") is required!"
     fi
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
@@ -75,26 +75,26 @@ push_dset_zfs_stream () {
         if [ -z "${_psmirror}" ]; then
             error "Third argument with a $(distinct e "mirror-IP") is required!"
         fi
-        if [ -z "${_version_element}" ]; then
+        if [ -z "${_psversion_element}" ]; then
             error "Fourth argument with a $(distinct e "version-string") is required!"
         fi
-        if [ -f "${FILE_CACHE_DIR}${_fin_snapfile}" ]; then
+        if [ -f "${FILE_CACHE_DIR}${_psfin_snapfile}" ]; then
             ${PRINTF_BIN} "${blue}"
             ${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} "${MAIN_USER}@${_psmirror}" \
                 "${MKDIR_BIN} -p ${COMMON_BINARY_REMOTE} ; ${CHMOD_BIN} 755 ${COMMON_BINARY_REMOTE}"
 
-            debug "Setting common access to archive files before we send it: $(distinct d ${_fin_snapfile})"
-            try "${CHMOD_BIN} -v a+r ${FILE_CACHE_DIR}${_fin_snapfile}"
-            debug "Sending initial service stream to $(distinct d ${MAIN_COMMON_NAME}) repository: $(distinct d ${MAIN_COMMON_REPOSITORY}/${_fin_snapfile})"
+            debug "Setting common access to archive files before we send it: $(distinct d ${_psfin_snapfile})"
+            try "${CHMOD_BIN} -v a+r ${FILE_CACHE_DIR}${_psfin_snapfile}"
+            debug "Sending initial service stream to $(distinct d ${MAIN_COMMON_NAME}) repository: $(distinct d ${MAIN_COMMON_REPOSITORY}/${_psfin_snapfile})"
 
-            retry "${SCP_BIN} ${DEFAULT_SSH_OPTS} ${DEFAULT_SCP_OPTS} -P ${MAIN_PORT} ${FILE_CACHE_DIR}${_fin_snapfile} ${MAIN_USER}@${_psmirror}:${COMMON_BINARY_REMOTE}/${_fin_snapfile}.partial"
+            retry "${SCP_BIN} ${DEFAULT_SSH_OPTS} ${DEFAULT_SCP_OPTS} -P ${MAIN_PORT} ${FILE_CACHE_DIR}${_psfin_snapfile} ${MAIN_USER}@${_psmirror}:${COMMON_BINARY_REMOTE}/${_psfin_snapfile}.partial"
             if [ "$?" = "0" ]; then
                 ${PRINTF_BIN} "${blue}"
                 ${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} "${MAIN_USER}@${_psmirror}" \
-                    "cd ${COMMON_BINARY_REMOTE} && ${MV_BIN} ${_fin_snapfile}.partial ${_fin_snapfile}"
-                debug "Successfully renamed partial file to: $(distinct d "${_fin_snapfile}")"
+                    "cd ${COMMON_BINARY_REMOTE} && ${MV_BIN} ${_psfin_snapfile}.partial ${_psfin_snapfile}"
+                debug "Successfully renamed partial file to: $(distinct d "${_psfin_snapfile}")"
             else
-                error "Failed to send snapshot of $(distinct e "${_pselement}") archive file: $(distinct e "${_fin_snapfile}") to remote host: $(distinct e "${MAIN_USER}@${_psmirror}")!"
+                error "Failed to send snapshot of $(distinct e "${_pselement}") archive file: $(distinct e "${_psfin_snapfile}") to remote host: $(distinct e "${MAIN_USER}@${_psmirror}")!"
             fi
         else
             warn "No service stream available for bundle: $(distinct w "${_pselement}")"
@@ -102,7 +102,7 @@ push_dset_zfs_stream () {
     else
         debug "No ZFS support"
     fi
-    unset _psmirror _pselement _fin_snapfile
+    unset _psmirror _pselement _psfin_snapfile
 }
 
 

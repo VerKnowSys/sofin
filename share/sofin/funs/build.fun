@@ -42,26 +42,26 @@ push_binbuild () {
 
     cd "${SOFTWARE_DIR}"
     for _pbelement in ${_push_bundles}; do
-        _lowercase_element="$(lowercase "${_pbelement}")"
-        if [ -z "${_lowercase_element}" ]; then
+        _pblowercase_element="$(lowercase "${_pbelement}")"
+        if [ -z "${_pblowercase_element}" ]; then
             error "Lowercase bundle name is empty!"
         fi
-        _install_indicator_file="${SOFTWARE_DIR}${_pbelement}/${_lowercase_element}${DEFAULT_INST_MARK_EXT}"
-        _version_element="$(${CAT_BIN} "${_install_indicator_file}" 2>/dev/null)"
-        if [ ! -f "${_install_indicator_file}" ]; then
-            error "Missing install indicator: $(distinct e "${_install_indicator_file}"). You can't push a binary build of uncomplete build!"
+        _pbinstall_indicator_file="${SOFTWARE_DIR}${_pbelement}/${_pblowercase_element}${DEFAULT_INST_MARK_EXT}"
+        _pbbversion_element="$(${CAT_BIN} "${_pbinstall_indicator_file}" 2>/dev/null)"
+        if [ ! -f "${_pbinstall_indicator_file}" ]; then
+            error "Missing install indicator: $(distinct e "${_pbinstall_indicator_file}"). You can't push a binary build of uncomplete build!"
         fi
-        debug "_pbelement: ${_pbelement}, _install_indicator_file: ${_install_indicator_file}, _version_element: ${_version_element}"
+        debug "_pbelement: ${_pbelement}, _pbinstall_indicator_file: ${_pbinstall_indicator_file}, _pbbversion_element: ${_pbbversion_element}"
         if [ -n "${_pbelement}" -a \
              -d "${_pbelement}" -a \
-             -f "${_install_indicator_file}" -a \
-             -n "${_version_element}" ]; then
+             -f "${_pbinstall_indicator_file}" -a \
+             -n "${_pbbversion_element}" ]; then
 
-            if [ -z "${_version_element}" ]; then
+            if [ -z "${_pbbversion_element}" ]; then
                 error "No version element set for bundle: $(distinct e "${_pbelement}")"
             fi
-            note "Pushing binary bundle: $(distinct n "${_push_bundles}-${_version_element}") to remote: $(distinct n "${MAIN_BINARY_REPOSITORY}")"
-            push_to_all_mirrors "${_pbelement}" "${_version_element}"
+            note "Pushing binary bundle: $(distinct n "${_push_bundles}-${_pbbversion_element}") to remote: $(distinct n "${MAIN_BINARY_REPOSITORY}")"
+            push_to_all_mirrors "${_pbelement}" "${_pbbversion_element}"
         else
             warn "No version file of software: $(distinct w ${_pbelement}) found! It seems to not be fully installed or broken."
         fi
