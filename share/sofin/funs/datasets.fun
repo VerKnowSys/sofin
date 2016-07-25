@@ -209,6 +209,7 @@ destroy_service_dir () {
         debug "Destroying dataset: $(distinct d "${_dsname}")"
         try "${ZFS_BIN} umount -f ${_dsname}"
         try "${ZFS_BIN} destroy -r ${_dsname}"
+        try "${RM_BIN} -rf ${SERVICES_DIR}${_dset_destroy}"
         unset _dsname
     else
         debug "Removing regular software-directory: $(distinct d "${SERVICES_DIR}${_dset_destroy}")"
@@ -268,6 +269,7 @@ destroy_software_dir () {
         debug "Destroying software-dataset: $(distinct d "${_dsname}")"
         try "${ZFS_BIN} umount -f ${_dsname}"
         try "${ZFS_BIN} destroy -r ${_dsname}"
+        try "${RM_BIN} -rf ${SOFTWARE_DIR}${_dset_destroy}"
         unset _dsname
     else
         debug "Removing regular software-directory: $(distinct d "${SOFTWARE_DIR}${_dset_destroy}")"
@@ -315,6 +317,7 @@ destroy_builddir () {
             debug "Destroying ZFS build-dataset: $(distinct d "${_dsname}")"
             try "${ZFS_BIN} umount -f ${_dsname}"
             try "${ZFS_BIN} destroy -r ${_dsname}"
+            try "${RM_BIN} -fr ${SOFTWARE_DIR}${_deste_bund_name}"
         else
             debug "DEVEL mode enabled, skipped dataset destroy: $(distinct d "${_dsname}")"
         fi
