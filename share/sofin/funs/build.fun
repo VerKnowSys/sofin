@@ -2,25 +2,22 @@
 build_bundle () {
     _bsbname="${1}"
     _bsbelement="${2}"
-    if [ ! -e "./${_bsbname}" ]; then
-        ${PRINTF_BIN} "${blue}"
-        ${TAR_BIN} -cJ --totals --use-compress-program="${XZ_BIN} --threads=${CPUS}" -f "${_bsbname}" "./${_bsbelement}" && \
-            note "Bundle archive of: $(distinct n ${_bsbelement}) (using: $(distinct n ${CPUS}) threads) has been built." && \
-            return
-        ${PRINTF_BIN} "${blue}"
-        ${TAR_BIN} --totals -cJf "${_bsbname}" "./${_bsbelement}" && \
-            note "Bundle archive of: $(distinct n ${_bsbelement}) has been built." && \
-            return
-        error "Failed to create archives for: $(distinct e ${_bsbelement})"
+    if [ -z "${_bsbname}" ]; then
+        error "First argument with $(distinct e "BundleName") is required!"
+    fi
+    if [ ! -d "${SOFTWARE_DIR}${_bsbname}" ]; then
+        create_software_dir "${_bsbname}"
+        create_software_bundle_archive "${_bsbname}" "${_bsbelement}" && \
+            note "Archived bundle: $(distinct n "${_bsbelement}") ready to deploy" && \
+                return
+
+        error "Failed to create bundle archives for: $(distinct e ${_bsbelement})"
     else
-        if [ ! -e "./${_bsbname}${DEFAULT_CHKSUM_EXT}" ]; then
-            debug "Found sha-less archive. It may be incomplete or damaged. Rebuilding.."
-            try "${RM_BIN} -vf ${_bsbname}"
-            ${PRINTF_BIN} "${blue}"
-            ${TAR_BIN} --totals -cJ --use-compress-program="${XZ_BIN} --threads=${CPUS}" -f "${_bsbname}" "./${_bsbelement}" || \
-                ${TAR_BIN} --totals -cJf "${_bsbname}" "./${_bsbelement}" || \
-                error "Failed to create archives for: $(distinct e ${_bsbelement})"
-            note "Archived bundle: $(distinct n "${_bsbelement}") is ready to deploy"
+        if [ ! -f "${FILE_CACHE_DIR}${_bsbname}${DEFAULT_CHKSUM_EXT}" ]; then
+            debug "Found sha-less archive. It may be incomplete or damaged. Rebuilding from: $(distinct d "${FILE_CACHE_DIR}${_bsbname}")"
+            try "${RM_BIN} -vf ${FILE_CACHE_DIR}${_bsbname}"
+            create_software_bundle_archive "${_bsbname}" "${_bsbelement}" && \
+                note "Archived bundle: $(distinct n "${_bsbelement}") ready to deploy"
         else
             note "Archived bundle: $(distinct n "${_bsbelement}") already exists, and will be reused to deploy"
         fi
