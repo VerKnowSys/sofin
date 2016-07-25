@@ -2,7 +2,7 @@
 build_bundle () {
     _bsbname="${1}"
     _bsbelement="${2}"
-    _bsversion="${2}"
+    _bsversion="${3}"
     if [ -z "${_bsbname}" ]; then
         error "First argument with $(distinct e "BundleName") is required!"
     fi
