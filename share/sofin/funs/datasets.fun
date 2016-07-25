@@ -187,49 +187,52 @@ destroy_software_dir () {
 
 
 create_builddir () {
-    _dset_create="${1}"
+    _cb_bundle_name="${1}"
     _dset_namesum="${2}"
-    if [ -z "${_dset_create}" ]; then
+    if [ -z "${_cb_bundle_name}" ]; then
         error "First argument with $(distinct e "BundleName") is required!"
     fi
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
         if [ -z "${_dset_namesum}" ]; then
-            error "Second argument with $(distinct e "bundle-sha-sum") is required!"
+            error "Second argument with $(distinct e "dataset-checksum") is required!"
         fi
-        _dsname="${DEFAULT_ZPOOL}${_dset_create}"
-        debug "Creating ZFS build-dataset: $(distinct d "${_dsname}")"
-        try "${ZFS_BIN} list ${_dsname}" || \
-            try "${ZFS_BIN} create -o mountpoint=${SOFTWARE_DIR}${_dsname} ${_dsname}"
-        try "${ZFS_BIN} mount ${_dsname}"
-        unset _dsname
+        _dset="${DEFAULT_ZPOOL}${SOFTWARE_DIR}${USER}/${_cb_bundle_name}/${DEFAULT_SRC_EXT}${_dset_namesum}"
+        debug "Creating ZFS build-dataset with checksum: $(distinct d "${_dset_namesum}") of $(distinct d "${_dset}")"
+        try "${ZFS_BIN} create -p -o mountpoint=${SOFTWARE_DIR}${_cb_bundle_name}/${DEFAULT_SRC_EXT}${_dset_namesum} ${_dset}"
+        try "${ZFS_BIN} mount ${_dset}"
+        unset _dset _dset_namesum
     else
-        debug "Creating regular build-directory: $(distinct d "${SOFTWARE_DIR}${_dset_create}")"
-        try "${MKDIR_BIN} -p ${SOFTWARE_DIR}${_dset_create}"
+        debug "Creating regular build-directory: $(distinct d "${SOFTWARE_DIR}${_cb_bundle_name}")"
+        try "${MKDIR_BIN} -p ${SOFTWARE_DIR}${_cb_bundle_name}"
     fi
-    unset _dset_create _dset_namesum
+    unset _cb_bundle_name _dset_namesum
 }
 
 
 destroy_builddir () {
-    _dset_destroy="${1}"
+    _deste_bund_name="${1}"
     _dset_sum="${2}"
-    if [ -z "${_dset_destroy}" ]; then
-        error "First argument with $(distinct e "BundleName") is required!"
+    if [ -z "${_deste_bund_name}" ]; then
+        error "First argument with $(distinct e "build-bundle-directory") is required!"
     fi
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
         if [ -z "${_dset_sum}" ]; then
             error "Second argument with $(distinct e "bundle-sha-sum") is required!"
         fi
-        _dsname="${DEFAULT_ZPOOL}${_dset_destroy}"
-        debug "Destroying ZFS build-dataset: $(distinct d "${_dsname}")"
-        try "${ZFS_BIN} umount -f ${_dsname}"
-        try "${ZFS_BIN} destroy -r ${_dsname}"
+        _dsname="${DEFAULT_ZPOOL}${SOFTWARE_DIR}${USER}/${_deste_bund_name}/${DEFAULT_SRC_EXT}${_dset_sum}"
+        if [ -z "${DEVEL}" ]; then
+            debug "Destroying ZFS build-dataset: $(distinct d "${_dsname}")"
+            try "${ZFS_BIN} umount -f ${_dsname}"
+            try "${ZFS_BIN} destroy -r ${_dsname}"
+        else
+            debug "DEVEL mode enabled, skipped dataset destroy: $(distinct d "${_dsname}")"
+        fi
         unset _dsname
     else
-        debug "Removing regular build-directory: $(distinct d "${SOFTWARE_DIR}${_dset_destroy}")"
-        try "${RM_BIN} -fr ${SOFTWARE_DIR}${_dset_destroy}"
+        debug "Removing regular build-directory: $(distinct d "${SOFTWARE_DIR}${_deste_bund_name}")"
+        try "${RM_BIN} -fr ${SOFTWARE_DIR}${_deste_bund_name}"
     fi
-    unset _dset_destroy
+    unset _deste_bund_name
 }
 
 

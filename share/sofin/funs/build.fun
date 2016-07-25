@@ -256,7 +256,7 @@ build () {
                 BUILD_NAMESUM="$(text_checksum "${DEF_NAME}${DEF_POSTFIX}-${DEF_VERSION}")"
                 BUILD_DIR="${PREFIX}/${DEFAULT_SRC_EXT}${BUILD_NAMESUM}"
 
-                recreate_builddir "${BUILD_DIR}" "${BUILD_NAMESUM}"
+                recreate_builddir "${_bundl_name}" "${BUILD_NAMESUM}"
 
                 # These values has to be exported because external build mechanisms
                 # has to be able to reach these values to find dependencies and utilities
@@ -427,7 +427,7 @@ process () {
             _cwd="$(${PWD_BIN} 2>/dev/null)"
             if [ -n "${BUILD_DIR}" -a \
                  -n "${BUILD_NAMESUM}" ]; then
-                create_builddir "${BUILD_DIR}" "${BUILD_NAMESUM}"
+                create_builddir "$(${BASENAME_BIN} "${PREFIX}" 2>/dev/null)" "${BUILD_NAMESUM}"
                 cd "${BUILD_DIR}"
                 if [ -z "${DEF_GIT_MODE}" ]; then # Standard http tarball method:
                     _base="$(${BASENAME_BIN} ${DEF_HTTP_PATH} 2>/dev/null)"
@@ -677,7 +677,7 @@ process () {
 
             if [ -z "${DEVEL}" ]; then # if devel mode not set
                 debug "Cleaning build dir: $(distinct d ${BUILD_DIR}) of bundle: $(distinct d ${DEF_NAME}${DEF_POSTFIX}), after successful build."
-                destroy_builddir "${BUILD_DIR}" "${BUILD_NAMESUM}"
+                destroy_builddir "$(${BASENAME_BIN} "${PREFIX}" 2>/dev/null)" "${BUILD_NAMESUM}"
             else
                 debug "Leaving build dir intact when working in devel mode. Last build dir: $(distinct d ${BUILD_DIR})"
             fi
