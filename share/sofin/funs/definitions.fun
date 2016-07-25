@@ -104,9 +104,8 @@ checksum_filecache_element () {
     _file_chksum="$(file_checksum "${FILE_CACHE_DIR}${_file_to_checksum}")"
     if [ -z "${_file_chksum}" ]; then
         error "Empty checksum of file: $(distinct e "${FILE_CACHE_DIR}${_file_to_checksum}")"
-    elif [ -n "${_file_chksum}" -a \
-           ! -f "${FILE_CACHE_DIR}${_file_chksum}" ]; then
-        error "No such file found in file-cache: $(distinct e "${FILE_CACHE_DIR}${_file_chksum}")"
+    elif [ ! -f "${FILE_CACHE_DIR}${_file_to_checksum}" ]; then
+        error "No such file found in file-cache: $(distinct e "${FILE_CACHE_DIR}${_file_to_checksum}")"
     else
         _chksum_file="${FILE_CACHE_DIR}${_file_to_checksum}${DEFAULT_CHKSUM_EXT}"
         ${PRINTF_BIN} "${_file_chksum}" > "${_chksum_file}" && \
