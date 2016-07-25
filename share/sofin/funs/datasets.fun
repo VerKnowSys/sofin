@@ -100,7 +100,7 @@ prepare_service_dataset () {
         _full_dataset_name="${DEFAULT_ZPOOL}${SERVICES_DIR}${USER}/${_ps_elem}"
         _ps_snap_file="${_ps_elem}-${_ps_ver_elem}${DEFAULT_SERVICE_SNAPSHOT_EXT}"
         debug "Dataset name: $(distinct d "${_full_dataset_name}"), snapshot file: $(distinct d "${_ps_snap_file}")"
-        fetch_dset_zfs_stream_or_create_new "${_ps_elem}" "${_ps_snap_file}"
+        fetch_dset_zfs_stream "${_ps_elem}" "${_ps_snap_file}"
 
         debug "Grepping for dataset: $(distinct d "${DEFAULT_ZPOOL}${SERVICES_DIR}${USER}/${_ps_elem}")"
         ${ZFS_BIN} list -H 2>/dev/null | ${CUT_BIN} -f1 2>/dev/null | ${EGREP_BIN} "${DEFAULT_ZPOOL}${SERVICES_DIR}${USER}/${_ps_elem}" >/dev/null 2>&1
@@ -143,32 +143,31 @@ prepare_service_dataset () {
 # }
 
 
-fetch_dset_zfs_stream_or_create_new () {
-    _bund_name="${1}"
-    _final_snap_file="${2}"
-    if [ -z "${_bund_name}" -o \
-         -z "${_final_snap_file}" ]; then
-        error "Expected two arguments: $(distinct e "bundle-name") and $(distinct e "abs-snapshot-file")."
+fetch_dset_zfs_stream () {
+    _fdz_bund_name="${1}"
+    _fdz_out_file="${2}"
+    if [ -z "${_fdz_bund_name}" -o \
+         -z "${_fdz_out_file}" ]; then
+        error "Expected two arguments: $(distinct e "bundle-name") and $(distinct e "abs-out-file")."
     fi
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
-        _commons_path="${MAIN_COMMON_REPOSITORY}/${_final_snap_file}"
-        retry "${FETCH_BIN} ${FETCH_OPTS} -o ${FILE_CACHE_DIR}${_final_snap_file} ${_commons_path}"
+        _commons_path="${MAIN_COMMON_REPOSITORY}/${_fdz_out_file}"
+        retry "${FETCH_BIN} ${FETCH_OPTS} -o ${FILE_CACHE_DIR}${_fdz_out_file} ${_commons_path}"
         if [ "$?" = "0" ]; then
-            _dataset_name="${DEFAULT_ZPOOL}${SERVICES_DIR}${USER}/${_bund_name}"
-            debug "Creating service dataset: $(distinct d "${_dataset_name}"), from file stream: $(distinct d "${_final_snap_file}")."
+            _dataset_name="${DEFAULT_ZPOOL}${SERVICES_DIR}${USER}/${_fdz_bund_name}"
+            debug "Creating service dataset: $(distinct d "${_dataset_name}"), from file stream: $(distinct d "${_fdz_out_file}")."
             ${PRINTF_BIN} "${blue}"
-            ${XZCAT_BIN} ${FILE_CACHE_DIR}${_final_snap_file} | ${ZFS_BIN} receive -F -v ${_dataset_name} && \
+            ${XZCAT_BIN} ${FILE_CACHE_DIR}${_fdz_out_file} | ${ZFS_BIN} receive -F -v ${_dataset_name} && \
                 ${ZFS_BIN} rename "${_dataset_name}@${DEFAULT_GIT_SNAPSHOT_HEAD}" "${ORIGIN_ZFS_SNAP_NAME}" && \
                     note "Received service dataset for: $(distinct n "${_dataset_name}")"
             unset _dataset_name
         else
-            debug "Initial service dataset unavailable for: $(distinct d "${_bund_name}")"
-            try "${ZFS_BIN} create -p ${_dataset_name}"
+            debug "Initial service dataset unavailable for: $(distinct d "${_fdz_bund_name}"). Assuming it's not necessary.."
         fi
     else
         debug "ZFS feature disabled"
     fi
-    unset _bund_name _final_snap_file _commons_path
+    unset _fdz_bund_name _fdz_out_file _commons_path
 }
 
 
