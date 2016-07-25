@@ -1,4 +1,22 @@
 
+
+make_local_bundle_copy () {
+    _bin_bundle="${1}"
+    _element_name="${2}"
+    if [ -z "${_bin_bundle}" ]; then
+        error "First argument with a $(distinct e "BundleName") is required!"
+    fi
+    if [ -z "${_element_name}" ]; then
+        error "Second argument with a $(distinct e "full-name") is required!"
+    fi
+    debug "Performing a copy of binary bundle to: $(distinct d ${_bin_bundle})"
+    try "${MKDIR_BIN} -p ${_bin_bundle}"
+    try "${CP_BIN} -v ${_element_name} ${_bin_bundle}/"
+    try "${CP_BIN} -v ${_element_name}${DEFAULT_CHKSUM_EXT} ${_bin_bundle}/"
+    unset _bin_bundle _element_name
+}
+
+
 push_dset_zfs_stream () {
     _fin_snapfile="${1}"
     _pselement="${2}"
