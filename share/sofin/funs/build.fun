@@ -398,36 +398,6 @@ push_binary_archive () {
 }
 
 
-push_zfs_stream () {
-    _fin_snapfile="${1}"
-    _pselement="${2}"
-    _psmirror="${3}"
-    if [ "${SYSTEM_NAME}" = "FreeBSD" ]; then # NOTE: feature designed for FBSD.
-        if [ -f "${FILE_CACHE_DIR}${_fin_snapfile}" ]; then
-            ${PRINTF_BIN} "${blue}"
-            ${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} "${MAIN_USER}@${_psmirror}" \
-                "${MKDIR_BIN} -p ${COMMON_BINARY_REMOTE} ; ${CHMOD_BIN} 755 ${COMMON_BINARY_REMOTE}"
-
-            debug "Setting common access to archive files before we send it: $(distinct d ${_fin_snapfile})"
-            ${CHMOD_BIN} -v a+r "${FILE_CACHE_DIR}${_fin_snapfile}" >> ${LOG} 2>> ${LOG}
-            debug "Sending initial service stream to $(distinct d ${MAIN_COMMON_NAME}) repository: $(distinct d ${MAIN_COMMON_REPOSITORY}/${_fin_snapfile})"
-
-            retry "${SCP_BIN} ${DEFAULT_SSH_OPTS} ${DEFAULT_SCP_OPTS} -P ${MAIN_PORT} ${FILE_CACHE_DIR}${_fin_snapfile} ${MAIN_USER}@${_psmirror}:${COMMON_BINARY_REMOTE}/${_fin_snapfile}.partial"
-            if [ "$?" = "0" ]; then
-                ${PRINTF_BIN} "${blue}"
-                ${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} "${MAIN_USER}@${_psmirror}" \
-                    "cd ${COMMON_BINARY_REMOTE} && ${MV_BIN} ${_fin_snapfile}.partial ${_fin_snapfile}"
-            else
-                error "Failed to send service snapshot archive file: $(distinct e "${_fin_snapfile}") to remote host: $(distinct e "${MAIN_USER}@${_psmirror}")!"
-            fi
-        else
-            note "No service stream available for: $(distinct n ${_pselement})"
-        fi
-    fi
-    unset _psmirror _pselement _fin_snapfile
-}
-
-
 process () {
     _app_param="$1"
     if [ -z "${_app_param}" ]; then
