@@ -55,7 +55,6 @@ push_binbuild () {
             if [ -z "${_version_element}" ]; then
                 error "No version element set for bundle: $(distinct e "${_pbelement}")"
             fi
-            prepare_service_dataset "${_pbelement}" "${_version_element}"
             push_to_all_mirrors "${_pbelement}" "${_version_element}"
         else
             warn "No version file of software: $(distinct w ${_pbelement}) found! It seems to not be fully installed or broken."
