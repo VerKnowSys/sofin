@@ -4,7 +4,8 @@ compiler_setup () {
             ${LOGGER_BIN} "sofin: $@"
         }
     fi
-    debug "Enabled compiler features for definition: $(distinct d "${DEF_NAME}${DEF_POSTFIX}") on platform: $(distinct d ${SYSTEM_NAME})"
+    debug "---------------- COMPILER FEATURES DUMP -----------------"
+    debug "Compiler features for definition: $(distinct d "${DEF_NAME}${DEF_POSTFIX}") on platform: $(distinct d ${SYSTEM_NAME})"
     case "${SYSTEM_NAME}" in
         Minix)
             DEFAULT_COMPILER_FLAGS="${COMMON_COMPILER_FLAGS} -I/usr/pkg/include -fPIE"
@@ -191,7 +192,6 @@ compiler_setup () {
             debug " $(distinct d "${gray}${FAIL_CHAR}") $(distinct d "${gray}enable-new-dtags")"
         fi
     fi
-
     if [ -z "${DEF_NO_FAST_MATH}" ]; then
         debug " $(distinct d "${green}${SUCCESS_CHAR}") $(distinct d "${green}fast-math")"
         CFLAGS="${CFLAGS} -ffast-math"
@@ -199,17 +199,11 @@ compiler_setup () {
     else
         debug " $(distinct d "${gray}${FAIL_CHAR}") $(distinct d "${gray}fast-math")"
     fi
+    debug "-------------- COMPILER FEATURES DUMP ENDS --------------"
 
     unset default_c default_cxx default_cpp
 
-    export CFLAGS
-    export CXXFLAGS
-    export LDFLAGS
-    export LD
-    export NM
-    export CC
-    export CXX
-    export CPP
+    export CFLAGS CXXFLAGS LDFLAGS LD NM CC CXX CPP
 }
 
 
