@@ -82,8 +82,8 @@ push_binbuild () {
                     run "${CP_BIN} -v ${_element_name}${DEFAULT_CHKSUM_EXT} ${_bin_bundle}/"
 
                     push_binary_archive "${_bin_bundle}" "${_element_name}" "${_mirror}" "${_address}"
-                    push_zfs_stream "${_final_snap_file}" "${_pbelement}" "${_mirror}"
 
+                    push_dset_zfs_stream "${_dset_snap_file}" "${_pbelement}" "${_mirror}"
                 done
                 try "${RM_BIN} -f ${_element_name} ${_element_name}${DEFAULT_CHKSUM_EXT}"
             fi

@@ -1,5 +1,5 @@
 
-push_zfs_stream () {
+push_dset_zfs_stream () {
     _fin_snapfile="${1}"
     _pselement="${2}"
     _psmirror="${3}"
