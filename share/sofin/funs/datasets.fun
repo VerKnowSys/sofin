@@ -33,10 +33,10 @@ prepare_service_dataset () {
     _pd_elem="${1}"
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
         if [ -z "${_pd_elem}" ]; then
-            error "prepare_service_dataset() requires an argument with a $(distinct e "BundleName")!"
+            error "First argument with a $(distinct e "BundleName") is required!"
         fi
         if [ -z "${USER}" ]; then
-            error "prepare_service_dataset() requires an env value for: $(distinct e "USER")!"
+            error "Second argument with env value for: $(distinct e "USER") is required!"
         fi
         _full_dataset_name="${DEFAULT_ZPOOL}${SERVICES_DIR}${USER}/${_pd_elem}"
         _snap_file="${_pd_elem}-${_version_element}${SERVICE_SNAPSHOT_EXT}"
