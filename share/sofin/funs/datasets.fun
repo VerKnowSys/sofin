@@ -180,8 +180,9 @@ fetch_dset_zfs_stream_or_create_new () {
             _dataset_name="${DEFAULT_ZPOOL}${SERVICES_DIR}${USER}/${_bund_name}"
             debug "Creating service dataset: $(distinct d "${_dataset_name}"), from file stream: $(distinct d "${_final_snap_file}")."
             ${PRINTF_BIN} "${blue}"
-            ${XZCAT_BIN} ${FILE_CACHE_DIR}${_final_snap_file} 2>> ${LOG} | ${ZFS_BIN} receive -v ${_dataset_name} && \
-                note "Received service dataset for: $(distinct n "${_dataset_name}")"
+            ${XZCAT_BIN} ${FILE_CACHE_DIR}${_final_snap_file} | ${ZFS_BIN} receive -F -v ${_dataset_name} && \
+                ${ZFS_BIN} rename ${_dataset_name}@--head-- ${ORIGIN_ZFS_SNAP_NAME} && \
+                    note "Received service dataset for: $(distinct n "${_dataset_name}")"
             unset _dataset_name
         else
             debug "Initial service dataset unavailable for: $(distinct d "${_bund_name}")"
