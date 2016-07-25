@@ -134,6 +134,7 @@ prepare_service_dataset () {
             try "${ZFS_BIN} mount ${_full_dataset_name}"
         else
             run "${ZFS_BIN} create -p -o mountpoint=${SERVICES_DIR}${_ps_elem} ${_full_dataset_name}"
+            try "${ZFS_BIN} umount -f ${_full_dataset_name}"
             run "${ZFS_BIN} send ${_full_dataset_name} | ${XZ_BIN} > ${FILE_CACHE_DIR}${_final_snap_file}"
             try "${ZFS_BIN} mount ${_full_dataset_name}"
         fi
