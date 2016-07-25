@@ -402,7 +402,8 @@ install_software_from_binbuild () {
         ${PRINTF_BIN} "${blue}"
         ${XZCAT_BIN} ${BINBUILDS_CACHE_DIR}${_isfb_archive} | ${ZFS_BIN} receive -F -v ${_isfb_dataset} && \
             ${ZFS_BIN} rename ${_isfb_dataset}@--head-- ${ORIGIN_ZFS_SNAP_NAME} && \
-                note "Software bundle installed: $(distinct n "${_isfb_fullname}"), with version: $(distinct n "${_isfb_version}")"
+                note "Software bundle installed: $(distinct n "${_isfb_fullname}"), with version: $(distinct n "${_isfb_version}")" && \
+                    DONT_BUILD_BUT_DO_EXPORTS=YES
     else
         try "${TAR_BIN} -xJf ${BINBUILDS_CACHE_DIR}${_isfb_archive} --directory ${SOFTWARE_DIR}"
         if [ "$?" = "0" ]; then
