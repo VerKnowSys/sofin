@@ -28,26 +28,12 @@ push_to_all_mirrors () {
             debug "Set read access for archives: $(distinct d ${_ptelement_name}), $(distinct d ${_ptelement_name}${DEFAULT_CHKSUM_EXT}) before we send them to public remote"
 
         debug "Deploying bin-bundle: $(distinct d "${_ptelement_name}") to all available mirrors.."
-        make_local_bundle_copy "${_ptelement_name}"
         push_binary_archive "${_ptelement_name}" "${_ptmirror}" "${_ptaddress}"
 
         prepare_service_dataset "${_pbto_elem}" "${_pversion_element}"
         push_dset_zfs_stream "${_ptelement_name}" "${_pbto_elem}" "${_ptmirror}" "${_pversion_element}"
     done
     unset _ptaddress _ptmirror _pversion_element _ptelement_name _def_dig_query
-}
-
-
-make_local_bundle_copy () {
-    _mlelement_name="${1}"
-    if [ -z "${_mlelement_name}" ]; then
-        error "First argument with $(distinct e "BundleName") is required!"
-    fi
-    debug "Performing copy of binary bundle to: $(distinct d "${FILE_CACHE_DIR}")"
-    try "${MKDIR_BIN} -p ${FILE_CACHE_DIR}"
-    try "${CP_BIN} -v ${_mlelement_name} ${FILE_CACHE_DIR}/"
-    try "${CP_BIN} -v ${_mlelement_name}${DEFAULT_CHKSUM_EXT} ${FILE_CACHE_DIR}/"
-    unset _mlelement_name
 }
 
 
