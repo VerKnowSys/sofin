@@ -23,7 +23,7 @@ push_to_all_mirrors () {
             "${MKDIR_BIN} -p ${SYS_SPECIFIC_BINARY_REMOTE}"
 
         build_bundle "${_element_name}" "${_pbelement}"
-        store_checksum "${_element_name}"
+        checksum_filecache_element "${_element_name}"
 
         try "${CHMOD_BIN} -v o+r ${_element_name} ${_element_name}${DEFAULT_CHKSUM_EXT}" && \
             debug "Set read access for archives: $(distinct d ${_element_name}), $(distinct d ${_element_name}${DEFAULT_CHKSUM_EXT}) before we send them to public remote"

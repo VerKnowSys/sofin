@@ -96,7 +96,7 @@ inherit () {
 }
 
 
-store_checksum () {
+checksum_filecache_element () {
     _cksname="${1}"
     if [ -z "${_cksname}" ]; then
         error "Empty archive name!"
