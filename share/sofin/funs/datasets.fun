@@ -54,12 +54,12 @@ prepare_service_dataset () {
         _snap_file="${_pd_elem}-${_version_element}${SERVICE_SNAPSHOT_EXT}"
         _final_snap_file="${_snap_file}${DEFAULT_ARCHIVE_EXT}"
 
+        debug "_pd_elem: ${_pd_elem}"
         fetch_dset_zfs_stream "${_pd_elem}" "${_final_snap_file}"
 
-        note "Preparing service dataset: $(distinct n "${_full_dataset_name}"), for bundle: $(distinct n "${_pd_elem}")"
-        debug "_pd_elem: ${_pd_elem}"
         ${ZFS_BIN} list -H 2>/dev/null | ${CUT_BIN} -f1 2>/dev/null | ${EGREP_BIN} "${_pd_elem}" >/dev/null 2>&1
         if [ "$?" = "0" ]; then
+            note "Preparing to send service dataset: $(distinct n "${_full_dataset_name}"), for bundle: $(distinct n "${_pd_elem}")"
             try "${ZFS_BIN} umount -f ${_full_dataset_name}"
             run "${ZFS_BIN} send ${_full_dataset_name} | ${XZ_BIN} > ${FILE_CACHE_DIR}${_final_snap_file}"
             try "${ZFS_BIN} mount ${_full_dataset_name}"
@@ -91,12 +91,13 @@ fetch_dset_zfs_stream () {
     retry "${FETCH_BIN} ${FETCH_OPTS} -o ${FILE_CACHE_DIR}${_final_snap_file} ${_commons_path}"
     if [ "$?" = "0" ]; then
         _dataset_name="${DEFAULT_ZPOOL}${SERVICES_DIR}${USER}/${_bund_name}"
-        debug "Creating service dataset: $(distinct d "${_dataset_name}"), from file stream: $(distinct d "${_final_snap_file}")."
         try "${XZCAT_BIN} ${FILE_CACHE_DIR}${_final_snap_file} | ${ZFS_BIN} receive -v ${_dataset_name}" && \
-            note "Received service dataset for: $(distinct n "${_dataset_name}")"
         unset _dataset_name
+            debug "Creating service dataset: $(distinct d "${_dataset_name}"), from file stream: $(distinct d "${_final_snap_file}")."
+                note "Received service dataset for: $(distinct n "${_dataset_name}")"
+            debug "Initial service dataset unavailable for: $(distinct d "${_bund_name}")"
     else
-        debug "Initial service dataset unavailable for: $(distinct d "${_bund_name}")"
+        debug "ZFS feature disabled"
     fi
     unset _bund_name _final_snap_file _commons_path
 }
