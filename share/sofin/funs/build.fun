@@ -39,7 +39,7 @@ push_binbuild () {
         error "push_binbuild(): Arguments cannot be empty!"
     fi
     create_dirs
-    note "Pushing binary bundle: $(distinct n "${_push_bundles}") to remote: $(distinct n "${MAIN_BINARY_REPOSITORY}")"
+
     cd "${SOFTWARE_DIR}"
     for _pbelement in ${_push_bundles}; do
         _lowercase_element="$(lowercase "${_pbelement}")"
@@ -51,6 +51,7 @@ push_binbuild () {
         if [ ! -f "${_install_indicator_file}" ]; then
             error "Missing install indicator: $(distinct e "${_install_indicator_file}"). You can't push a binary build of uncomplete build!"
         fi
+        debug "_pbelement: ${_pbelement}, _install_indicator_file: ${_install_indicator_file}, _version_element: ${_version_element}"
         if [ -n "${_pbelement}" -a \
              -d "${_pbelement}" -a \
              -f "${_install_indicator_file}" -a \
@@ -59,6 +60,7 @@ push_binbuild () {
             if [ -z "${_version_element}" ]; then
                 error "No version element set for bundle: $(distinct e "${_pbelement}")"
             fi
+            note "Pushing binary bundle: $(distinct n "${_push_bundles}-${_version_element}") to remote: $(distinct n "${MAIN_BINARY_REPOSITORY}")"
             push_to_all_mirrors "${_pbelement}" "${_version_element}"
         else
             warn "No version file of software: $(distinct w ${_pbelement}) found! It seems to not be fully installed or broken."

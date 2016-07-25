@@ -367,7 +367,7 @@ create_software_bundle_archive () {
     _cddestfile="${FILE_CACHE_DIR}${_csbelem}-${_csversion}${DEFAULT_ARCHIVE_EXT}"
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
         _csbd_dataset="${DEFAULT_ZPOOL}${SOFTWARE_DIR}${USER}/${_csbname}"
-        debug "Creating archive from dataset: $(distinct d "${_csbd_dataset}")"
+        debug "Creating archive from dataset: $(distinct d "${_csbd_dataset}") to file: $(distinct d "${_cddestfile}")"
         try "${ZFS_BIN} umount -f ${_csbd_dataset}"
         try "${ZFS_BIN} send ${_csbd_dataset} | ${XZ_BIN} > ${_cddestfile}" && \
             debug "Created ZFS binbundle from dataset: $(distinct d "${_csbd_dataset}")"
