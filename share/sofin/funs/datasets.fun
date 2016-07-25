@@ -158,7 +158,7 @@ fetch_dset_zfs_stream_or_create_new () {
             debug "Creating service dataset: $(distinct d "${_dataset_name}"), from file stream: $(distinct d "${_final_snap_file}")."
             ${PRINTF_BIN} "${blue}"
             ${XZCAT_BIN} ${FILE_CACHE_DIR}${_final_snap_file} | ${ZFS_BIN} receive -F -v ${_dataset_name} && \
-                ${ZFS_BIN} rename ${_dataset_name}@--head-- ${ORIGIN_ZFS_SNAP_NAME} && \
+                ${ZFS_BIN} rename "${_dataset_name}@${DEFAULT_GIT_SNAPSHOT_HEAD}" "${ORIGIN_ZFS_SNAP_NAME}" && \
                     note "Received service dataset for: $(distinct n "${_dataset_name}")"
             unset _dataset_name
         else
@@ -379,7 +379,7 @@ install_software_from_binbuild () {
             debug "Installing ZFS based binary build to dataset: $(distinct d "${_isfb_dataset}")"
             ${PRINTF_BIN} "${blue}"
             ${XZCAT_BIN} ${FILE_CACHE_DIR}${_isfb_archive} | ${ZFS_BIN} receive -F -v ${_isfb_dataset} && \
-                ${ZFS_BIN} rename ${_isfb_dataset}@--head-- ${ORIGIN_ZFS_SNAP_NAME} && \
+                ${ZFS_BIN} rename "${_isfb_dataset}@${DEFAULT_GIT_SNAPSHOT_HEAD}" "${ORIGIN_ZFS_SNAP_NAME}" && \
                     note "Software bundle installed: $(distinct n "${_isfb_fullname}"), with version: $(distinct n "${_isfb_version}")" && \
                         DONT_BUILD_BUT_DO_EXPORTS=YES
         else
