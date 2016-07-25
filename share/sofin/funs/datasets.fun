@@ -22,7 +22,7 @@ push_to_all_mirrors () {
         ${SSH_BIN} ${DEFAULT_SSH_OPTS} -p "${MAIN_PORT}" "${MAIN_USER}@${_mirror}" \
             "${MKDIR_BIN} -p ${SYS_SPECIFIC_BINARY_REMOTE}"
 
-        build_bundle "${_element_name}" "${_pbelement}"
+        build_bundle "${_element_name}" "${_pbelement}" "${_version_element}"
         checksum_filecache_element "${_element_name}"
 
         try "${CHMOD_BIN} -v o+r ${_element_name} ${_element_name}${DEFAULT_CHKSUM_EXT}" && \
@@ -354,28 +354,34 @@ recreate_builddir () {
 create_software_bundle_archive () {
     _csbname="${1}"
     _csbelem="${2}"
+    _csversion="${3}"
     if [ -z "${_csbname}" ]; then
         error "First argument with $(distinct e "BundleName") is required!"
     fi
     if [ -z "${_csbelem}" ]; then
         error "Second argument with $(distinct e "file-element-name") is required!"
     fi
+    if [ -z "${_csversion}" ]; then
+        error "Third argument with $(distinct e "version-string") is required!"
+    fi
+    _cddestfile="${FILE_CACHE_DIR}${_csbelem}-${_csversion}${DEFAULT_ARCHIVE_EXT}"
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
         _csbd_dataset="${DEFAULT_ZPOOL}${SOFTWARE_DIR}${USER}/${_csbname}"
+        debug "Creating archive from dataset: $(distinct d "${_csbd_dataset}")"
         try "${ZFS_BIN} umount -f ${_csbd_dataset}"
-        ${PRINTF_BIN} "${blue}"
-        ${ZFS_BIN} send ${_csbd_dataset} | ${XZ_BIN} > ${FILE_CACHE_DIR}${_csbelem} 2>> ${LOG} && \
+        try "${ZFS_BIN} send ${_csbd_dataset} | ${XZ_BIN} > ${_cddestfile}" && \
             debug "Created ZFS binbundle from dataset: $(distinct d "${_csbd_dataset}")"
+        try "${ZFS_BIN} mount ${_csbd_dataset}"
     else
         debug "No ZFS-binbuilds feature. Falling back to tarballs.."
         _cdir="$(${PWD_BIN} 2>/dev/null)"
         cd "${SOFTWARE_DIR}"
         ${PRINTF_BIN} "${blue}"
         ${TAR_BIN} --use-compress-program="${XZ_BIN} --threads=${CPUS}" \
-            --totals -cJ -f "${_csbname}" "${FILE_CACHE_DIR}${_csbelem}" || \
-                ${TAR_BIN} --totals -cJf "${_csbname}" "${FILE_CACHE_DIR}${_csbelem}" || \
-                    error "Failed to create archive file: $(distinct e "${FILE_CACHE_DIR}${_csbelem}")"
+            --totals -cJ -f "${_csbname}" "${_cddestfile}" || \
+                ${TAR_BIN} --totals -cJf "${_csbname}" "${_cddestfile}" || \
+                    error "Failed to create archive file: $(distinct e "${_cddestfile}")"
         cd "${_cdir}"
     fi
-    unset _csbname _csbelem
+    unset _csbname _csbelem _cddestfile _cdir _csversion _csbd_dataset
 }

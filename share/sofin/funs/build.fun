@@ -2,12 +2,19 @@
 build_bundle () {
     _bsbname="${1}"
     _bsbelement="${2}"
+    _bsversion="${2}"
     if [ -z "${_bsbname}" ]; then
         error "First argument with $(distinct e "BundleName") is required!"
     fi
+    if [ -z "${_bsbelement}" ]; then
+        error "Second argument with $(distinct e "element-name") is required!"
+    fi
+    if [ -z "${_bsversion}" ]; then
+        error "Third argument with $(distinct e "version-string") is required!"
+    fi
     if [ ! -d "${SOFTWARE_DIR}${_bsbname}" ]; then
         create_software_dir "${_bsbname}"
-        create_software_bundle_archive "${_bsbname}" "${_bsbelement}" && \
+        create_software_bundle_archive "${_bsbname}" "${_bsbelement}" "${_bsversion}" && \
             note "Archived bundle: $(distinct n "${_bsbelement}") ready to deploy" && \
                 return
 
@@ -16,7 +23,7 @@ build_bundle () {
         if [ ! -f "${FILE_CACHE_DIR}${_bsbname}${DEFAULT_CHKSUM_EXT}" ]; then
             debug "Found sha-less archive. It may be incomplete or damaged. Rebuilding from: $(distinct d "${FILE_CACHE_DIR}${_bsbname}")"
             try "${RM_BIN} -vf ${FILE_CACHE_DIR}${_bsbname}"
-            create_software_bundle_archive "${_bsbname}" "${_bsbelement}" && \
+            create_software_bundle_archive "${_bsbname}" "${_bsbelement}" "${_bsversion}" && \
                 note "Archived bundle: $(distinct n "${_bsbelement}") ready to deploy"
         else
             note "Archived bundle: $(distinct n "${_bsbelement}") already exists, and will be reused to deploy"
