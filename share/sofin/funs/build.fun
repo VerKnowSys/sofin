@@ -717,10 +717,9 @@ process () {
     else
         warn "   ${WARN_CHAR} Requirement: $(distinct w "${DEF_NAME}${DEF_POSTFIX}") disabled on: $(distinct w ${SYSTEM_NAME})"
         if [ ! -d "${PREFIX}" ]; then # case when disabled requirement is first on list of dependencies
-            ${MKDIR_BIN} -p "${PREFIX}"
+            create_software_dir "${DEF_NAME}${DEF_POSTFIX}"
         fi
-        ${TOUCH_BIN} "${PREFIX}/${_req}${DEFAULT_INST_MARK_EXT}"
-        ${PRINTF_BIN} "os-default" > "${PREFIX}/${_req}${DEFAULT_INST_MARK_EXT}"
+        run "${TOUCH_BIN} ${PREFIX}/${_req}${DEFAULT_INST_MARK_EXT} && ${PRINTF_BIN} \"os-default\" > ${PREFIX}/${_req}${DEFAULT_INST_MARK_EXT}"
     fi
     unset _req _current_branch
 }
