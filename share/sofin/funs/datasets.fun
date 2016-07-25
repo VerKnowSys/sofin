@@ -1,14 +1,14 @@
 
 push_to_all_mirrors () {
     _pbelement="${1}"
-    _version_element="${2}"
-    _element_name="${_pbelement}-${_version_element}${DEFAULT_ARCHIVE_EXT}"
+    _pversion_element="${2}"
+    _ptelement_name="${_pbelement}-${_pversion_element}${DEFAULT_ARCHIVE_EXT}"
     _def_dig_query="$(${HOST_BIN} A ${MAIN_SOFTWARE_ADDRESS} 2>/dev/null | ${GREP_BIN} 'Address:' 2>/dev/null | eval "${HOST_ADDRESS_GUARD}")"
-    debug "query: $(distinct d "${_def_dig_query}"), bundle: $(distinct d ${_pbelement}), name: $(distinct d ${_element_name})"
+    debug "query: $(distinct d "${_def_dig_query}"), bundle: $(distinct d ${_pbelement}), name: $(distinct d ${_ptelement_name})"
     if [ -z "${_pbelement}" ]; then
         error "First argument with a $(distinct e "BundleName") is required!"
     fi
-    if [ -z "${_version_element}" ]; then
+    if [ -z "${_pversion_element}" ]; then
         error "Second argument with a $(distinct e "version-string") is required!"
     fi
     if [ -z "${_def_dig_query}" ]; then
@@ -22,41 +22,41 @@ push_to_all_mirrors () {
         ${SSH_BIN} ${DEFAULT_SSH_OPTS} -p "${MAIN_PORT}" "${MAIN_USER}@${_mirror}" \
             "${MKDIR_BIN} -p ${SYS_SPECIFIC_BINARY_REMOTE}"
 
-        build_bundle "${_element_name}" "${_pbelement}" "${_version_element}"
-        checksum_filecache_element "${_element_name}"
+        build_bundle "${_ptelement_name}" "${_pbelement}" "${_pversion_element}"
+        checksum_filecache_element "${_ptelement_name}"
 
-        try "${CHMOD_BIN} -v o+r ${_element_name} ${_element_name}${DEFAULT_CHKSUM_EXT}" && \
-            debug "Set read access for archives: $(distinct d ${_element_name}), $(distinct d ${_element_name}${DEFAULT_CHKSUM_EXT}) before we send them to public remote"
+        try "${CHMOD_BIN} -v o+r ${_ptelement_name} ${_ptelement_name}${DEFAULT_CHKSUM_EXT}" && \
+            debug "Set read access for archives: $(distinct d ${_ptelement_name}), $(distinct d ${_ptelement_name}${DEFAULT_CHKSUM_EXT}) before we send them to public remote"
 
-        _bin_bundle="${BINBUILDS_CACHE_DIR}${_pbelement}-${_version_element}"
-        debug "Deploying bin-bundle: $(distinct d "${_bin_bundle}") to all available mirrors.."
-        make_local_bundle_copy "${_bin_bundle}" "${_element_name}"
-        push_binary_archive "${_bin_bundle}" "${_element_name}" "${_mirror}" "${_address}"
+        _ptambin_bundle="${BINBUILDS_CACHE_DIR}${_pbelement}-${_pversion_element}"
+        debug "Deploying bin-bundle: $(distinct d "${_ptambin_bundle}") to all available mirrors.."
+        make_local_bundle_copy "${_ptambin_bundle}" "${_ptelement_name}"
+        push_binary_archive "${_ptambin_bundle}" "${_ptelement_name}" "${_mirror}" "${_address}"
 
-        _dset_snapshot="${_pbelement}-${_version_element}${SERVICE_SNAPSHOT_EXT}"
+        _dset_snapshot="${_pbelement}-${_pversion_element}${SERVICE_SNAPSHOT_EXT}"
         _dset_snap_file="${_dset_snapshot}${DEFAULT_ARCHIVE_EXT}"
-        prepare_service_dataset "${_pbelement}" "${_version_element}"
-        push_dset_zfs_stream "${_dset_snap_file}" "${_pbelement}" "${_mirror}" "${_version_element}"
+        prepare_service_dataset "${_pbelement}" "${_pversion_element}"
+        push_dset_zfs_stream "${_dset_snap_file}" "${_pbelement}" "${_mirror}" "${_pversion_element}"
     done
-    try "${RM_BIN} -f ${_element_name} ${_element_name}${DEFAULT_CHKSUM_EXT}"
-    unset _dset_snapshot _dset_snap_file _bin_bundle _address _mirror _version_element _element_name _def_dig_query
+    try "${RM_BIN} -f ${_ptelement_name} ${_ptelement_name}${DEFAULT_CHKSUM_EXT}"
+    unset _dset_snapshot _dset_snap_file _ptambin_bundle _address _mirror _pversion_element _ptelement_name _def_dig_query
 }
 
 
 make_local_bundle_copy () {
-    _bin_bundle="${1}"
-    _element_name="${2}"
-    if [ -z "${_bin_bundle}" ]; then
+    _lbin_bundle="${1}"
+    _lelement_name="${2}"
+    if [ -z "${_lbin_bundle}" ]; then
         error "First argument with a $(distinct e "BundleName") is required!"
     fi
-    if [ -z "${_element_name}" ]; then
+    if [ -z "${_lelement_name}" ]; then
         error "Second argument with a $(distinct e "full-name") is required!"
     fi
-    debug "Performing a copy of binary bundle to: $(distinct d ${_bin_bundle})"
-    try "${MKDIR_BIN} -p ${_bin_bundle}"
-    try "${CP_BIN} -v ${_element_name} ${_bin_bundle}/"
-    try "${CP_BIN} -v ${_element_name}${DEFAULT_CHKSUM_EXT} ${_bin_bundle}/"
-    unset _bin_bundle _element_name
+    debug "Performing a copy of binary bundle to: $(distinct d ${_lbin_bundle})"
+    try "${MKDIR_BIN} -p ${_lbin_bundle}"
+    try "${CP_BIN} -v ${_lelement_name} ${_lbin_bundle}/"
+    try "${CP_BIN} -v ${_lelement_name}${DEFAULT_CHKSUM_EXT} ${_lbin_bundle}/"
+    unset _lbin_bundle _lelement_name
 }
 
 
