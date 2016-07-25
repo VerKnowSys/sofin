@@ -29,6 +29,7 @@ push_to_all_mirrors () {
             debug "Set read access for archives: $(distinct d ${_element_name}), $(distinct d ${_element_name}${DEFAULT_CHKSUM_EXT}) before we send them to public remote"
 
         _bin_bundle="${BINBUILDS_CACHE_DIR}${_pbelement}-${_version_element}"
+        debug "Deploying bin-bundle: $(distinct d "${_bin_bundle}") to all available mirrors.."
         make_local_bundle_copy "${_bin_bundle}" "${_element_name}"
         push_binary_archive "${_bin_bundle}" "${_element_name}" "${_mirror}" "${_address}"
 
