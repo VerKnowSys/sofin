@@ -45,52 +45,18 @@ push_binbuild () {
         _install_indicator_file="${SOFTWARE_DIR}${_pbelement}/${_lowercase_element}${DEFAULT_INST_MARK_EXT}"
         _version_element="$(${CAT_BIN} "${_install_indicator_file}" 2>/dev/null)"
         if [ ! -f "${_install_indicator_file}" ]; then
-            error "push_binbuild(): _install_indicator_file: $(distinct e "${_install_indicator_file}") doesn't exists! You can't push a binary build of uncomplete build!"
+            error "Missing install indicator: $(distinct e "${_install_indicator_file}"). You can't push a binary build of uncomplete build!"
         fi
-        if [ -d "${_pbelement}" -a \
+        if [ -n "${_pbelement}" -a \
+             -d "${_pbelement}" -a \
              -f "${_install_indicator_file}" -a \
              -n "${_version_element}" ]; then
-            if [ ! -L "${_pbelement}" ]; then
-                if [ -z "${_version_element}" ]; then
-                    error "No version information available for bundle: $(distinct e "${_pbelement}")"
-                fi
-                prepare_service_dataset "${_pbelement}"
-                _element_name="${_pbelement}-${_version_element}${DEFAULT_ARCHIVE_EXT}"
-                debug "element: $(distinct d ${_pbelement}) -> name: $(distinct d ${_element_name})"
-                _def_dig_query="$(${HOST_BIN} A ${MAIN_SOFTWARE_ADDRESS} 2>/dev/null | ${GREP_BIN} 'Address:' 2>/dev/null | eval "${HOST_ADDRESS_GUARD}")"
 
-                if [ -z "${_def_dig_query}" ]; then
-                    error "No mirrors found in address: $(distinct e ${MAIN_SOFTWARE_ADDRESS})"
-                fi
-                debug "Using defined mirror(s): $(distinct d "${_def_dig_query}")"
-                for _mirror in ${_def_dig_query}; do
-                    _address="${MAIN_USER}@${_mirror}:${SYS_SPECIFIC_BINARY_REMOTE}"
-                    ${PRINTF_BIN} "${blue}"
-                    ${SSH_BIN} ${DEFAULT_SSH_OPTS} -p "${MAIN_PORT}" "${MAIN_USER}@${_mirror}" \
-                        "${MKDIR_BIN} -p ${SYS_SPECIFIC_BINARY_REMOTE}"
-
-                    build_bundle "${_element_name}" "${_pbelement}"
-                    store_checksum "${_element_name}"
-
-                    try "${CHMOD_BIN} -v o+r ${_element_name} ${_element_name}${DEFAULT_CHKSUM_EXT}" && \
-                        debug "Set read access for archives: $(distinct d ${_element_name}), $(distinct d ${_element_name}${DEFAULT_CHKSUM_EXT}) before we send them to public remote"
-
-                    _bin_bundle="${BINBUILDS_CACHE_DIR}${_pbelement}-${_version_element}"
-                    debug "Performing a copy of binary bundle to: $(distinct d ${_bin_bundle})"
-                    ${MKDIR_BIN} -p ${_bin_bundle} >/dev/null 2>&1
-                    run "${CP_BIN} -v ${_element_name} ${_bin_bundle}/"
-                    run "${CP_BIN} -v ${_element_name}${DEFAULT_CHKSUM_EXT} ${_bin_bundle}/"
-
-                    push_binary_archive "${_bin_bundle}" "${_element_name}" "${_mirror}" "${_address}"
-
-                    _dset_snapshot="${_pbelement}-${_version_element}${SERVICE_SNAPSHOT_EXT}"
-                    _dset_snap_file="${_dset_snapshot}${DEFAULT_ARCHIVE_EXT}"
-                    push_dset_zfs_stream "${_dset_snap_file}" "${_pbelement}" "${_mirror}"
-
-                    unset _dset_snapshot _dset_snap_file
-                done
-                try "${RM_BIN} -f ${_element_name} ${_element_name}${DEFAULT_CHKSUM_EXT}"
+            if [ -z "${_version_element}" ]; then
+                error "No version element set for bundle: $(distinct e "${_pbelement}")"
             fi
+            prepare_service_dataset "${_pbelement}"
+            push_to_all_mirrors "${_pbelement}" "${_version_element}"
         else
             warn "No version file of software: $(distinct w ${_pbelement}) found! It seems to not be fully installed or broken."
         fi
