@@ -369,7 +369,8 @@ create_software_bundle_archive () {
         _csbd_dataset="${DEFAULT_ZPOOL}${SOFTWARE_DIR}${USER}/${_csbname}"
         debug "Creating archive from dataset: $(distinct d "${_csbd_dataset}") to file: $(distinct d "${_cddestfile}")"
         try "${ZFS_BIN} umount -f ${_csbd_dataset}"
-        try "${ZFS_BIN} send ${_csbd_dataset} | ${XZ_BIN} > ${_cddestfile}" && \
+        ${PRINTF_BIN} "${blue}"
+        ${ZFS_BIN} send ${_csbd_dataset} | ${XZ_BIN} > ${_cddestfile} && \
             debug "Created ZFS binbundle from dataset: $(distinct d "${_csbd_dataset}")"
         try "${ZFS_BIN} mount ${_csbd_dataset}"
     else
