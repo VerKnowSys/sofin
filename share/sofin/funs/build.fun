@@ -141,12 +141,12 @@ fetch_binbuild () {
         _full_name="$(capitalize "${_full_name}")"
         if [ ! -e "${BINBUILDS_CACHE_DIR}${_bb_archive}" ]; then
             try "${MKDIR_BIN} -p ${BINBUILDS_CACHE_DIR}"
-            try "${FETCH_BIN} ${FETCH_OPTS} -o ${BINBUILDS_CACHE_DIR} '${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}${DEFAULT_CHKSUM_EXT}'" || \
-                try "${FETCH_BIN} ${FETCH_OPTS} -o ${BINBUILDS_CACHE_DIR} '${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}${DEFAULT_CHKSUM_EXT}'"
+            try "${FETCH_BIN} ${FETCH_OPTS} -o ${BINBUILDS_CACHE_DIR}${_bb_archive} '${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}${DEFAULT_CHKSUM_EXT}'" || \
+                try "${FETCH_BIN} ${FETCH_OPTS} -o ${BINBUILDS_CACHE_DIR}${_bb_archive} '${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}${DEFAULT_CHKSUM_EXT}'"
             if [ "$?" = "0" ]; then
-                try "${FETCH_BIN} ${FETCH_OPTS} -o ${BINBUILDS_CACHE_DIR} '${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}'" || \
-                    try "${FETCH_BIN} ${FETCH_OPTS} -o ${BINBUILDS_CACHE_DIR} '${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}'" || \
-                    try "${FETCH_BIN} ${FETCH_OPTS} -o ${BINBUILDS_CACHE_DIR} '${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}'" || \
+                try "${FETCH_BIN} ${FETCH_OPTS} -o ${BINBUILDS_CACHE_DIR}${_bb_archive} '${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}'" || \
+                    try "${FETCH_BIN} ${FETCH_OPTS} -o ${BINBUILDS_CACHE_DIR}${_bb_archive} '${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}'" || \
+                    try "${FETCH_BIN} ${FETCH_OPTS} -o ${BINBUILDS_CACHE_DIR}${_bb_archive} '${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}'" || \
                     error "Failure fetching available binary build for: $(distinct e "${_bb_archive}"). Please check your DNS / Network setup!"
             else
                 note "No binary build available for: $(distinct n "${OS_TRIPPLE}/${DEF_NAME}${DEF_POSTFIX}-${DEF_VERSION}")"
