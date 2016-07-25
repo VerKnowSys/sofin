@@ -169,7 +169,7 @@ destroy_builddir () {
         if [ -z "${_dset_sum}" ]; then
             error "Second argument with $(distinct e "bundle-sha-sum") is required!"
         fi
-        _dsname="${DEFAULT_ZPOOL}${SOFTWARE_DIR}${USER}/${_dset_destroy}/${DEFAULT_SRC_EXT}${_dset_sum}"
+        _dsname="${DEFAULT_ZPOOL}${_dset_destroy}/${DEFAULT_SRC_EXT}${_dset_sum}"
         debug "Destroying ZFS build-dataset: $(distinct d "${_dsname}")"
         try "${ZFS_BIN} umount -f ${_dsname}"
         try "${ZFS_BIN} destroy -r ${_dsname}"
