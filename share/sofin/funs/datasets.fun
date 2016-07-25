@@ -27,7 +27,7 @@ push_to_all_mirrors () {
         try "${CHMOD_BIN} -v o+r ${FILE_CACHE_DIR}${_ptelement_name} ${FILE_CACHE_DIR}${_ptelement_name}${DEFAULT_CHKSUM_EXT}" && \
             debug "Set read access for archives: $(distinct d ${_ptelement_name}), $(distinct d ${_ptelement_name}${DEFAULT_CHKSUM_EXT}) before we send them to public remote"
 
-        debug "Deploying bin-bundle: $(distinct d "${_ptelement_name}") to all available mirrors.."
+        debug "Deploying bin-bundle: $(distinct d "${_ptelement_name}") to mirror: $(distinct d "${_ptmirror}")"
         push_binary_archive "${_ptelement_name}" "${_ptmirror}" "${_ptaddress}"
 
         prepare_service_dataset "${_pbto_elem}" "${_pversion_element}"
