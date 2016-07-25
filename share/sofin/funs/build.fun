@@ -245,14 +245,14 @@ build () {
 
                 # binary build of whole software bundle
                 _full_bund_name="${_common_lowercase}-${DEF_VERSION}"
-                ${MKDIR_BIN} -p "${BINBUILDS_CACHE_DIR}${_full_bund_name}" >/dev/null 2>&1
+                try "${MKDIR_BIN} -p ${BINBUILDS_CACHE_DIR}"
 
                 _an_archive="$(capitalize "${_common_lowercase}")-${DEF_VERSION}${DEFAULT_ARCHIVE_EXT}"
-                INSTALLED_INDICATOR="${PREFIX}/${_common_lowercase}${DEFAULT_INST_MARK_EXT}"
-                if [ ! -e "${INSTALLED_INDICATOR}" ]; then
+                _installed_indicator="${PREFIX}/${_common_lowercase}${DEFAULT_INST_MARK_EXT}"
+                if [ ! -e "${_installed_indicator}" ]; then
                     fetch_binbuild "${_full_bund_name}" "${_common_lowercase}" "${_an_archive}"
                 else
-                    _already_installed_version="$(${CAT_BIN} ${INSTALLED_INDICATOR} 2>/dev/null)"
+                    _already_installed_version="$(${CAT_BIN} ${_installed_indicator} 2>/dev/null)"
                     if [ "${DEF_VERSION}" = "${_already_installed_version}" ]; then
                         debug "$(distinct d ${_common_lowercase}) bundle is installed with version: $(distinct d ${_already_installed_version})"
                     else
