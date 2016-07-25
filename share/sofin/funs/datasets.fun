@@ -389,3 +389,28 @@ create_software_bundle_archive () {
     fi
     unset _csbname _csbelem _cddestfile _cdir _csversion _csbd_dataset
 }
+
+
+install_software_from_binbuild () {
+    _isfb_archive="${1}"
+    _isfb_fullname="${2}"
+    _isfb_version="${3}"
+    if [ "YES" = "${CAP_SYS_ZFS}" ]; then
+
+        # On systems with ZFS capability, we use zfs receive instead of tarballing:
+        _isfb_dataset="${DEFAULT_ZPOOL}${SOFTWARE_DIR}${USER}/${_isfb_archive}"
+        ${PRINTF_BIN} "${blue}"
+        ${XZCAT_BIN} ${BINBUILDS_CACHE_DIR}${_isfb_archive} | ${ZFS_BIN} receive -F -v ${_isfb_dataset} && \
+            ${ZFS_BIN} rename ${_isfb_dataset}@--head-- ${ORIGIN_ZFS_SNAP_NAME} && \
+                note "Software bundle installed: $(distinct n "${_isfb_fullname}"), with version: $(distinct n "${_isfb_version}")"
+    else
+        try "${TAR_BIN} -xJf ${BINBUILDS_CACHE_DIR}${_isfb_archive} --directory ${SOFTWARE_DIR}"
+        if [ "$?" = "0" ]; then
+            note "Software bundle installed: $(distinct n "${_isfb_fullname}"), with version: $(distinct n "${_isfb_version}")"
+            DONT_BUILD_BUT_DO_EXPORTS=YES
+        else
+            debug "No binary bundle available for: $(distinct d ${_bbaname})"
+            try "${RM_BIN} -vf ${BINBUILDS_CACHE_DIR}${_isfb_archive} ${BINBUILDS_CACHE_DIR}${_isfb_archive}${DEFAULT_CHKSUM_EXT}"
+        fi
+    fi
+}
