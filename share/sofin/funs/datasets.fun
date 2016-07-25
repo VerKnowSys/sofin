@@ -33,12 +33,11 @@ push_to_all_mirrors () {
         make_local_bundle_copy "${_ptambin_bundle}" "${_ptelement_name}"
         push_binary_archive "${_ptambin_bundle}" "${_ptelement_name}" "${_ptmirror}" "${_ptaddress}"
 
-        _dset_snapshot="${_pbelement}-${_pversion_element}${SERVICE_SNAPSHOT_EXT}"
         _dset_snap_file="${_dset_snapshot}${DEFAULT_ARCHIVE_EXT}"
         prepare_service_dataset "${_pbelement}" "${_pversion_element}"
         push_dset_zfs_stream "${_dset_snap_file}" "${_pbelement}" "${_ptmirror}" "${_pversion_element}"
+        try "${RM_BIN} -f ${_ptelement_name} ${_ptelement_name}${DEFAULT_CHKSUM_EXT} ${_ptelement_name}${DEFAULT_SNAPSHOT_EXT}"
     done
-    try "${RM_BIN} -f ${_ptelement_name} ${_ptelement_name}${DEFAULT_CHKSUM_EXT}"
     unset _dset_snapshot _dset_snap_file _ptambin_bundle _ptaddress _ptmirror _pversion_element _ptelement_name _def_dig_query
 }
 
@@ -120,7 +119,7 @@ prepare_service_dataset () {
             error "Second argument with env value for: $(distinct e "USER") is required!"
         fi
         _full_dataset_name="${DEFAULT_ZPOOL}${SERVICES_DIR}${USER}/${_ps_elem}"
-        _snap_file="${_ps_elem}-${_ps_ver_elem}${SERVICE_SNAPSHOT_EXT}"
+        _snap_file="${_ps_elem}-${_ps_ver_elem}${DEFAULT_SNAPSHOT_EXT}"
         _final_snap_file="${_snap_file}${DEFAULT_ARCHIVE_EXT}"
         debug "Dataset name: ${_full_dataset_name}, snapshot file: ${_snap_file}, final: ${_final_snap_file}"
 
