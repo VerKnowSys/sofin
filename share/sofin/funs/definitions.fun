@@ -97,17 +97,22 @@ inherit () {
 
 
 checksum_filecache_element () {
-    _cksname="${1}"
-    if [ -z "${_cksname}" ]; then
-        error "Empty archive name!"
+    _file_to_checksum="${1}"
+    if [ -z "${_file_to_checksum}" ]; then
+        error "First argument with $(distinct e "file-name-to-chksum") is required!"
     fi
-    _cksarchive_sha1="$(file_checksum "${_cksname}")"
-    if [ -z "${_cksarchive_sha1}" ]; then
-        error "Empty checksum for archive: $(distinct e "${_cksname}")"
+    _file_chksum="$(file_checksum "${FILE_CACHE_DIR}${_file_to_checksum}")"
+    if [ -z "${_file_chksum}" ]; then
+        error "Empty checksum of file: $(distinct e "${FILE_CACHE_DIR}${_file_to_checksum}")"
+    elif [ -n "${_file_chksum}" -a \
+           ! -f "${FILE_CACHE_DIR}${_file_chksum}" ]; then
+        error "No such file found in file-cache: $(distinct e "${FILE_CACHE_DIR}${_file_chksum}")"
+    else
+        _chksum_file="${FILE_CACHE_DIR}${_file_to_checksum}${DEFAULT_CHKSUM_EXT}"
+        ${PRINTF_BIN} "${_file_chksum}" > "${_chksum_file}" && \
+            debug "Stored chksum: $(distinct d "${_file_chksum}") of file: $(distinct d "${_file_to_checksum}") in path: $(distinct d "${FILE_CACHE_DIR}${_file_to_checksum}")"
     fi
-    ${PRINTF_BIN} "${_cksarchive_sha1}" > "${_cksname}${DEFAULT_CHKSUM_EXT}" 2>> ${LOG} && \
-    debug "Stored checksum: $(distinct d ${_cksarchive_sha1}) for bundle file: $(distinct d "${_cksname}")"
-    unset _cksarchive_sha1 _cksname
+    unset _file_chksum _file_to_checksum _chksum_file
 }
 
 
