@@ -41,6 +41,9 @@ prepare_service_dataset () {
         _full_dataset_name="${DEFAULT_ZPOOL}${SERVICES_DIR}${USER}/${_pd_elem}"
         _snap_file="${_pd_elem}-${_version_element}${SERVICE_SNAPSHOT_EXT}"
         _final_snap_file="${_snap_file}${DEFAULT_ARCHIVE_EXT}"
+
+        create_or_receive_dataset "${_pd_elem}" "${_final_snap_file}"
+
         note "Preparing service dataset: $(distinct n "${_full_dataset_name}"), for bundle: $(distinct n "${_pd_elem}")"
         debug "_pd_elem: ${_pd_elem}"
         ${ZFS_BIN} list -H 2>/dev/null | ${CUT_BIN} -f1 2>/dev/null | ${EGREP_BIN} "${_pd_elem}" >/dev/null 2>&1
