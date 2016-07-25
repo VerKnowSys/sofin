@@ -355,6 +355,18 @@ push_binary_archive () {
     _uniqname="${2}"
     _bpamirror="${3}"
     _bpaddress="${4}"
+    if [ -z "${_bpbundle_file}" ]; then
+        error "First argument: $(distinct e "BundleName") is empty!"
+    fi
+    if [ -z "${_uniqname}" ]; then
+        error "Second argument: $(distinct e "unique-name") is empty!"
+    fi
+    if [ -z "${_bpamirror}" ]; then
+        error "Third argument: $(distinct e "mirror-name") is empty!"
+    fi
+    if [ -z "${_bpaddress}" ]; then
+        error "Fourth argument: $(distinct e "mirror-address") is empty!"
+    fi
     _bpshortsha="$(${CAT_BIN} "${FILE_CACHE_DIR}${_uniqname}${DEFAULT_CHKSUM_EXT}" 2>/dev/null | ${CUT_BIN} -c -16 2>/dev/null)"
     if [ -z "${_bpshortsha}" ]; then
         error "No sha checksum in file: $(distinct e "${FILE_CACHE_DIR}${_uniqname}${DEFAULT_CHKSUM_EXT}")"
