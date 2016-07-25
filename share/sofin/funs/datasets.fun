@@ -21,7 +21,7 @@ push_to_all_mirrors () {
         debug "Remote address inspect: $(distinct d "${_ptaddress}")"
         try "${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} ${MAIN_USER}@${_ptmirror} 'mkdir -p ${SYS_SPECIFIC_BINARY_REMOTE}'"
 
-        build_bundle "${_ptelement_name}" "${_pbto_bundle_name}" "${_pversion_element}"
+        build_bundle "${_pbto_bundle_name}" "${_ptelement_name}" "${_pversion_element}"
         checksum_filecache_element "${_ptelement_name}"
 
         try "${CHMOD_BIN} -v o+r ${FILE_CACHE_DIR}${_ptelement_name} ${FILE_CACHE_DIR}${_ptelement_name}${DEFAULT_CHKSUM_EXT}" && \
