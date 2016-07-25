@@ -317,7 +317,7 @@ destroy_builddir () {
             debug "Destroying ZFS build-dataset: $(distinct d "${_dsname}")"
             try "${ZFS_BIN} umount -f ${_dsname}"
             try "${ZFS_BIN} destroy -r ${_dsname}"
-            try "${RM_BIN} -fr ${SOFTWARE_DIR}${_deste_bund_name}"
+            try "${RM_BIN} -fr ${SOFTWARE_DIR}${_deste_bund_name}/${DEFAULT_SRC_EXT}${_dset_sum}"
         else
             debug "DEVEL mode enabled, skipped dataset destroy: $(distinct d "${_dsname}")"
         fi
