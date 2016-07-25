@@ -35,12 +35,12 @@ push_binbuild () {
         error "push_binbuild(): Arguments cannot be empty!"
     fi
     create_dirs
-    note "Pushing binary bundle: $(distinct n ${_push_bundles}) to remote: $(distinct n ${MAIN_BINARY_REPOSITORY})"
+    note "Pushing binary bundle: $(distinct n "${_push_bundles}") to remote: $(distinct n "${MAIN_BINARY_REPOSITORY}")"
     cd "${SOFTWARE_DIR}"
     for _pbelement in ${_push_bundles}; do
         _lowercase_element="$(lowercase "${_pbelement}")"
         if [ -z "${_lowercase_element}" ]; then
-            error "push_binbuild(): _lowercase_element is empty!"
+            error "Lowercase bundle name is empty!"
         fi
         _install_indicator_file="${SOFTWARE_DIR}${_pbelement}/${_lowercase_element}${DEFAULT_INST_MARK_EXT}"
         _version_element="$(${CAT_BIN} "${_install_indicator_file}" 2>/dev/null)"
