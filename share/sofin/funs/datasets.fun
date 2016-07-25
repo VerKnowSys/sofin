@@ -49,8 +49,8 @@ prepare_service_dataset () {
             run "${ZFS_BIN} send -v -e -L ${_full_dataset_name} | ${XZ_BIN} > ${FILE_CACHE_DIR}${_final_snap_file}"
             try "${ZFS_BIN} mount ${_full_dataset_name}"
         else
-            run "${ZFS_BIN} create -o mountpoint=${SERVICES_DIR}${_pd_elem} ${_full_dataset_name}"
             run "${ZFS_BIN} send -v -e -L ${_full_dataset_name} | ${XZ_BIN} > ${FILE_CACHE_DIR}${_final_snap_file}"
+            run "${ZFS_BIN} create -p -o mountpoint=${SERVICES_DIR}${_pd_elem} ${_full_dataset_name}"
             try "${ZFS_BIN} mount ${_full_dataset_name}"
         fi
         _snap_size="$(file_size "${FILE_CACHE_DIR}${_final_snap_file}")"
@@ -96,7 +96,7 @@ create_service_dir () {
         _dsname="${DEFAULT_ZPOOL}${SERVICES_DIR}${USER}/${_dset_create}"
         debug "Creating ZFS service-dataset: $(distinct d "${_dsname}")"
         try "${ZFS_BIN} list ${_dsname}" || \
-            try "${ZFS_BIN} create -o mountpoint=${SERVICES_DIR}${_dset_create} ${_dsname}"
+            try "${ZFS_BIN} create -p -o mountpoint=${SERVICES_DIR}${_dset_create} ${_dsname}"
         try "${ZFS_BIN} mount ${_dsname}"
         unset _dsname
     else
@@ -132,14 +132,14 @@ create_base_datasets () {
         debug "Creating base software-dataset: $(distinct d "${DEFAULT_ZPOOL}${SOFTWARE_DIR}")"
         _dsname="${DEFAULT_ZPOOL}${SOFTWARE_DIR}${USER}"
         try "${ZFS_BIN} list ${_dsname}" || \
-            try "${ZFS_BIN} create -o mountpoint=${SOFTWARE_DIR} ${_dsname}"
+            try "${ZFS_BIN} create -p -o mountpoint=${SOFTWARE_DIR} ${_dsname}"
         try "${ZFS_BIN} mount ${_dsname}"
         unset _dsname
 
         debug "Creating base services-dataset: $(distinct d "${DEFAULT_ZPOOL}${SERVICES_DIR}")"
         _dsname="${DEFAULT_ZPOOL}${SERVICES_DIR}${USER}"
         try "${ZFS_BIN} list ${_dsname}" || \
-            try "${ZFS_BIN} create -o mountpoint=${SERVICES_DIR} ${_dsname}"
+            try "${ZFS_BIN} create -p -o mountpoint=${SERVICES_DIR} ${_dsname}"
         try "${ZFS_BIN} mount ${_dsname}"
         unset _dsname
     fi
@@ -155,7 +155,7 @@ create_software_dir () {
         _dsname="${DEFAULT_ZPOOL}${SOFTWARE_DIR}${USER}/${_dset_create}"
         debug "Creating ZFS software-dataset: $(distinct d "${_dsname}")"
         try "${ZFS_BIN} list ${_dsname}" || \
-            try "${ZFS_BIN} create -o mountpoint=${SOFTWARE_DIR}${_dset_create} ${_dsname}"
+            try "${ZFS_BIN} create -p -o mountpoint=${SOFTWARE_DIR}${_dset_create} ${_dsname}"
         try "${ZFS_BIN} mount ${_dsname}"
         unset _dsname
     else
