@@ -144,13 +144,12 @@ create_builddir () {
         if [ -z "${_dset_namesum}" ]; then
             error "Second argument with $(distinct e "bundle-sha-sum") is required!"
         fi
-        _dsbase="${_dset_create}/${DEFAULT_SRC_EXT}${_dset_namesum}"
-        _dsname="${DEFAULT_ZPOOL}${SOFTWARE_DIR}${USER}/${_dsbase}"
+        _dsname="${DEFAULT_ZPOOL}${_dset_create}"
         debug "Creating ZFS build-dataset: $(distinct d "${_dsname}")"
         try "${ZFS_BIN} list ${_dsname}" || \
-            try "${ZFS_BIN} create ${_dsname}"
+            try "${ZFS_BIN} create -o mountpoint=${SOFTWARE_DIR}${_dsname} ${_dsname}"
         try "${ZFS_BIN} mount ${_dsname}"
-        unset _dsname _dsbase
+        unset _dsname
     else
         debug "Creating regular build-directory: $(distinct d "${SOFTWARE_DIR}${_dset_create}")"
         try "${MKDIR_BIN} -p ${SOFTWARE_DIR}${_dset_create}"
