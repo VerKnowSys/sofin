@@ -385,7 +385,11 @@ process () {
     compiler_setup
     dump_debug_info
 
-    PATH="${PREFIX}/bin:${PREFIX}/sbin:${DEFAULT_PATH}"
+    if [ -z "${PREFIX}" ]; then
+        PATH="${DEFAULT_PATH}"
+    else
+        PATH="${PREFIX}/bin:${PREFIX}/sbin:${DEFAULT_PATH}"
+    fi
     if [ -z "${DEF_DISABLED}" ]; then
         if [ -z "${DEF_HTTP_PATH}" ]; then
             _definition_no_ext="\
