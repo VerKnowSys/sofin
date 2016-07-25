@@ -349,9 +349,11 @@ push_binary_archive () {
     _uniqname="${2}"
     _bpamirror="${3}"
     _bpaddress="${4}"
-    _bpshortsha="$(${CAT_BIN} "${_uniqname}${DEFAULT_CHKSUM_EXT}" 2>/dev/null | ${CUT_BIN} -c -16 2>/dev/null)…"
-    note "Pushing archive sha1: $(distinct n ${_bpshortsha}) to remote.."
-    debug "name: $(distinct d ${_uniqname}), bundle_file: $(distinct d ${_bpbundle_file}), repository address: $(distinct d ${_bpaddress})"
+    _bpshortsha="$(${CAT_BIN} "${FILE_CACHE_DIR}${_uniqname}${DEFAULT_CHKSUM_EXT}" 2>/dev/null | ${CUT_BIN} -c -16 2>/dev/null)"
+    if [ -z "${_bpshortsha}" ]; then
+        error "No sha checksum in file: $(distinct e "${FILE_CACHE_DIR}${_uniqname}${DEFAULT_CHKSUM_EXT}")"
+    fi
+    debug "BundleName: $(distinct d ${_uniqname}), bundle_file: $(distinct d ${_bpbundle_file}), repository address: $(distinct d ${_bpaddress})"
     retry "${SCP_BIN} ${DEFAULT_SSH_OPTS} ${DEFAULT_SCP_OPTS} -P ${MAIN_PORT} ${_uniqname} ${_bpaddress}/${_uniqname}.partial" || \
         def_error "${_uniqname}" "Unable to push: $(distinct e "${_bpbundle_file}") bundle to: $(distinct e "${_bpaddress}/${_bpbundle_file}")"
     if [ "$?" = "0" ]; then
