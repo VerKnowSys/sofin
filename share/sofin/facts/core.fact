@@ -6,6 +6,25 @@
 #   s-usec   -> time counted in ųs since 1970
 SOFIN_PROVIDES="s s-osver s-usec"
 
+# Base values:
+DEFAULT_HOME="/User"
+DEFAULT_NAME="sofin"
+DEFAULT_CPUS=4
+MAX_OPEN_TAIL_LOGS=80
+LOG_LINES_AMOUNT=23
+LOG_LINES_AMOUNT_ON_ERR=17
+LOG_LAST_ACCESS_OR_MOD_MINUTES=60
+
+# Determine CACHE_DIR LOGS_DIR and LOG:
+if [ -d "${DEFAULT_HOME}/.${DEFAULT_NAME}/" ]; then
+    CACHE_DIR="${DEFAULT_HOME}/.${DEFAULT_NAME}/"
+else
+    CACHE_DIR="/tmp/"
+fi
+LOGS_DIR="${CACHE_DIR}logs/"
+LOG="${LOG:-${LOGS_DIR}${DEFAULT_NAME}}"
+
+
 # default CA Root certs to be used by Sofin:
 DEFAULT_CACERT="/etc/ssl/cert.pem"
 
@@ -13,14 +32,6 @@ FUNS_LOCAL_DIR="share/sofin/funs/"
 FACTS_LOCAL_DIR="share/sofin/facts/"
 DEFAULT_FACTS_DIR="/usr/${FACTS_LOCAL_DIR}"
 DEFAULT_FUNS_DIR="/usr/${FUNS_LOCAL_DIR}"
-
-LOG="${LOG:-/var/log/sofin}" # default fallback if no /User is present - f.i. fresh OS installation
-
-DEFAULT_CPUS=4
-MAX_OPEN_TAIL_LOGS=80
-LOG_LINES_AMOUNT=23
-LOG_LINES_AMOUNT_ON_ERR=17
-LOG_LAST_ACCESS_OR_MOD_MINUTES=60
 
 DEFAULT_DEF_EXT=".def"
 DEFAULT_LOCK_EXT=".lock"
@@ -33,24 +44,22 @@ DEFAULT_SOFTWARE_SNAPSHOT_EXT=".zfsx"
 DEFAULT_SERVICE_SNAPSHOT_EXT=".zfsp"
 DEFAULT_GIT_SNAPSHOT_HEAD="--head--"
 DEFAULT_SRC_EXT=".src_"
-
-GIT_DIR_NAME=".git"
-PROJECT_DEPENDENCIES_LIST_FILE=".dependencies"
+DEFAULT_GIT_DIR_NAME=".git"
+DEFAULT_PROJECT_DEPS_LIST_FILE=".dependencies"
 DEFAULT_FALLBACK_SHELL="/bin/sh"
 DEFAULT_MANPATH="/usr/share/man"
 DEFAULT_SSH_OPTS="" #-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
 DEFAULT_SCP_OPTS="-C -B"
 DEFAULT_PS_OPTS="-axS"
 DEFAULT_XZ_OPTS="--threads=${DEFAULT_CPUS}"
-
 DEFAULT_LESS_OPTIONS="--hilite-search -K -N -M -R --follow-name -c"
 DEFAULT_GIT_OPTS="--no-verbose --progress"
 DEFAULT_ID_USER_NAME_OPTS="-un"
 DEFAULT_DATE_TS_OPTS="+%s"
 DEFAULT_DATE_TRYRUN_OPTS="+%F-%H%M%S"
 DEFAULT_STRIP_OPTS="--strip-debug --strip-unneeded --preserve-dates"
-DEFAULT_HOME="/User"
 
+# Shell error code meanings:
 ERRORCODE_TASK_FAILURE=1
 ERRORCODE_USER_INTERRUPT=2
 ERRORCODE_TERMINATED=3
