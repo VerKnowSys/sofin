@@ -1,7 +1,7 @@
 usage_howto () {
     note "Built in tasks:"
     note "  $(distinct n "install | get | pick | choose | use  ") installs software from list or from definition and switches exports for it (example: ${SOFIN_BIN_SHORT} install Rubinius)"
-    note "  $(distinct n "dependencies | deps | local          ") installs software from list defined in '$(distinct n ${DEPENDENCIES_FILE})' file in current directory"
+    note "  $(distinct n "dependencies | deps | local          ") installs software from list defined in '$(distinct n ${PROJECT_DEPENDENCIES_LIST_FILE})' file in current directory"
     note "  $(distinct n "uninstall | remove | delete          ") removes an application or list (example: ${SOFIN_BIN_SHORT} uninstall Rubinius)"
     note "  $(distinct n "list | installed                     ") gives short list of installed software"
     note "  $(distinct n "full | fulllist | fullinstalled      ") gives detailed list with installed software including requirements"
