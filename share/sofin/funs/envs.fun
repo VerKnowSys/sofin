@@ -119,9 +119,10 @@ compiler_setup () {
 
     # Support for other definition options
     if [ -n "${FORCE_GNU_COMPILER}" ]; then # force GNU compiler usage on definition side:
-        warn "Support for GNU compiler was recently dropped, and is ignored since Sofin 1.0. Try using $(distinct e Gcc) instead)?"
+        warn "Support for GNU compiler was recently dropped, and is ignored since Sofin 1.0. Try using $(distinct e Gcc) instead?"
     fi
 
+    # TODO: make a alternatives / or capability
     if [ -z "${DEF_NO_CCACHE}" ]; then # ccache is supported by default but it's optional
         if [ -x "${CCACHE_BIN_OPTIONAL}" ]; then # check for CCACHE availability
             debug " $(distinct d "${green}${SUCCESS_CHAR}") $(distinct d "${green}ccache")"
