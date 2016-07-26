@@ -33,14 +33,12 @@ build_bundle () {
 }
 
 
-push_binbuild () {
+push_binbuilds () {
     _push_bundles="$*"
     if [ -z "${_push_bundles}" ]; then
-        error "push_binbuild(): Arguments cannot be empty!"
+        error "At least single argument with $(distinct e "BundleName") to push is required!"
     fi
     create_dirs
-
-    cd "${SOFTWARE_DIR}"
     for _pbelement in ${_push_bundles}; do
         _pblowercase_element="$(lowercase "${_pbelement}")"
         if [ -z "${_pblowercase_element}" ]; then
@@ -79,7 +77,7 @@ deploy_binbuild () {
         build "${_dbbundle}" || \
             def_error "${_dbbundle}" "Bundle build failed."
     done
-    push_binbuild ${_dbbundles} || \
+    push_binbuilds ${_dbbundles} || \
         def_error "${_dbbundle}" "Push failure"
     note "Software bundle deployed successfully: $(distinct n ${_dbbundle})"
     note "$(fill)"
@@ -118,7 +116,7 @@ rebuild_bundle () {
         build "${_reb_ap_bundle}" || def_error "${_reb_ap_bundle}" "Bundle build failed."
         USE_FORCE=YES
         wipe_remote_archives ${_reb_ap_bundle} || def_error "${_reb_ap_bundle}" "Wipe failed"
-        push_binbuild ${_reb_ap_bundle} || def_error "${_reb_ap_bundle}" "Push failure"
+        push_binbuilds ${_reb_ap_bundle} || def_error "${_reb_ap_bundle}" "Push failure"
     done
     unset _reb_ap_bundle _those_to_rebuild _a_dependency _dep _alldefs_avail _idep _irawname _an_def_nam
 }

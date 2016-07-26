@@ -127,7 +127,7 @@ if [ -n "${SOFIN_COMMAND_ARG}" ]; then
 
         p|push|binpush|send)
             fail_on_bg_job ${SOFIN_ARGS}
-            push_binbuild ${SOFIN_ARGS}
+            push_binbuilds ${SOFIN_ARGS}
             finalize
             ;;
 
