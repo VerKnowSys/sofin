@@ -9,8 +9,10 @@ SOFIN_PROVIDES="s s-osver s-usec"
 # default CA Root certs to be used by Sofin:
 DEFAULT_CACERT="/etc/ssl/cert.pem"
 
-DEFAULT_FACTS_DIR="/usr/share/sofin/facts/"
-DEFAULT_FUNS_DIR="/usr/share/sofin/funs/"
+FUNS_LOCAL_DIR="share/sofin/funs/"
+FACTS_LOCAL_DIR="share/sofin/facts/"
+DEFAULT_FACTS_DIR="/usr/${FACTS_LOCAL_DIR}"
+DEFAULT_FUNS_DIR="/usr/${FUNS_LOCAL_DIR}"
 
 DEFAULT_CPUS=4
 MAX_OPEN_TAIL_LOGS=80
