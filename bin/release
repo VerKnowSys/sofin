@@ -3,8 +3,8 @@
 
 . share/sofin/loader
 
-readonly SOFIN_ORIGIN="git@bitbucket.org:verknowsys/sofin${GIT_DIR_NAME}"
-readonly SOFIN_MIRROR="git@github.com:VerKnowSys/sofin${GIT_DIR_NAME}"
+readonly SOFIN_ORIGIN="git@bitbucket.org:verknowsys/sofin${DEFAULT_GIT_DIR_NAME}"
+readonly SOFIN_MIRROR="git@github.com:VerKnowSys/sofin${DEFAULT_GIT_DIR_NAME}"
 
 note "Pulling from origin and mirror.."
 ${GIT_BIN} pull "${SOFIN_ORIGIN}" >/dev/null
@@ -44,8 +44,8 @@ else
     DEST_USER="sofin"
     DEST_PATH="/home/dmilith/Web/Public/Sofin-releases"
     HTTP_PATH="http://dmilith.verknowsys.com/Public/Sofin-releases"
-    DEFAULT_REPOSITORY="https://verknowsys@bitbucket.org/verknowsys/sofin-definitions${GIT_DIR_NAME}" # main sofin definitions repository
-    DEFAULT_REPOSITORY_MIRROR="git@github.com:VerKnowSys/sofin-definitions${GIT_DIR_NAME}" # alternative sofin definitions repository
+    DEFAULT_REPOSITORY="https://verknowsys@bitbucket.org/verknowsys/sofin-definitions${DEFAULT_GIT_DIR_NAME}" # main sofin definitions repository
+    DEFAULT_REPOSITORY_MIRROR="git@github.com:VerKnowSys/sofin-definitions${DEFAULT_GIT_DIR_NAME}" # alternative sofin definitions repository
     INITIALS="${DEFINITIONS_INITIAL_FILE_NAME}"
     DEST_NAME="sofin-${version}${DEFAULT_ARCHIVE_TARBALL_EXT}"
 

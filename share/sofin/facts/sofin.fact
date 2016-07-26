@@ -1,7 +1,7 @@
 SOFIN_VERSION="1.1.4"
 
 
-DEFAULT_DEFINITIONS_REPOSITORY="${DEFAULT_DEFINITIONS_REPOSITORY:-https://verknowsys@bitbucket.org/verknowsys/sofin-definitions${GIT_DIR_NAME}}"
+DEFAULT_DEFINITIONS_REPOSITORY="${DEFAULT_DEFINITIONS_REPOSITORY:-https://verknowsys@bitbucket.org/verknowsys/sofin-definitions${DEFAULT_GIT_DIR_NAME}}"
 DEFAULT_DEFINITIONS_BRANCH="${DEFAULT_DEFINITIONS_BRANCH:-stable}"
 
 DEFAULT_ISSUE_REPORT_SITE="https://bitbucket.org/verknowsys/sofin/issues"
