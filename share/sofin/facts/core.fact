@@ -21,9 +21,11 @@ if [ -d "${DEFAULT_HOME}/.${DEFAULT_NAME}/" ]; then
 else
     CACHE_DIR="/tmp/"
 fi
+LOCKS_DIR="${CACHE_DIR}locks/"
 LOGS_DIR="${CACHE_DIR}logs/"
 LOG="${LOG:-${LOGS_DIR}${DEFAULT_NAME}}"
-
+FILE_CACHE_DIR="${CACHE_DIR}file-cache/"
+GIT_CACHE_DIR="${CACHE_DIR}git-cache/"
 
 # default CA Root certs to be used by Sofin:
 DEFAULT_CACERT="/etc/ssl/cert.pem"
