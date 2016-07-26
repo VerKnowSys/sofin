@@ -133,11 +133,11 @@ update_defs () {
                 try "${RM_BIN} -vrf ${_initial_defs}" && \
                     return
     fi
-    if [ -d "${CACHE_DIR}${DEFINITIONS_BASE}/.git" -a \
+    if [ -d "${CACHE_DIR}${DEFINITIONS_BASE}/${GIT_DIR_NAME}" -a \
          -f "${DEFINITIONS_DEFAULTS}" ]; then
         cd "${CACHE_DIR}${DEFINITIONS_BASE}"
         _def_cur_branch="$(${GIT_BIN} rev-parse --abbrev-ref HEAD 2>/dev/null)"
-        _def_head="$(${CAT_BIN} "${CACHE_DIR}${DEFINITIONS_BASE}/.git/refs/heads/${_def_cur_branch}" 2>/dev/null)"
+        _def_head="$(${CAT_BIN} "${CACHE_DIR}${DEFINITIONS_BASE}/${GIT_DIR_NAME}/refs/heads/${_def_cur_branch}" 2>/dev/null)"
         if [ -z "${_def_head}" ]; then
             _def_head="HEAD"
         fi
@@ -186,7 +186,7 @@ update_defs () {
                 try "${GIT_BIN} checkout ${DEFAULT_GIT_OPTS} ${BRANCH}" || \
                     warn "Can't checkout branch: $(distinct w ${BRANCH})"
         fi
-        _def_head="$(${CAT_BIN} "${CACHE_DIR}${DEFINITIONS_BASE}/.git/refs/heads/${_def_cur_branch}" 2>/dev/null)"
+        _def_head="$(${CAT_BIN} "${CACHE_DIR}${DEFINITIONS_BASE}/${GIT_DIR_NAME}/refs/heads/${_def_cur_branch}" 2>/dev/null)"
         if [ -z "${_def_head}" ]; then
             _def_head="HEAD"
         fi
@@ -207,7 +207,7 @@ reset_defs () {
     if [ -z "${BRANCH}" ]; then
         BRANCH="stable"
     fi
-    _rdefs_branch="$(${CAT_BIN} "${CACHE_DIR}${DEFINITIONS_BASE}/.git/refs/heads/${BRANCH}" 2>/dev/null)"
+    _rdefs_branch="$(${CAT_BIN} "${CACHE_DIR}${DEFINITIONS_BASE}/${GIT_DIR_NAME}/refs/heads/${BRANCH}" 2>/dev/null)"
     if [ -z "${_rdefs_branch}" ]; then
         _rdefs_branch="HEAD"
     fi

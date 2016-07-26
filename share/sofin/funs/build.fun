@@ -414,7 +414,7 @@ process () {
                     # git method:
                     # .cache/git-cache => git bare repos
                     ${MKDIR_BIN} -p ${GIT_CACHE_DIR}
-                    _git_cached="${GIT_CACHE_DIR}${DEF_NAME}${DEF_VERSION}.git"
+                    _git_cached="${GIT_CACHE_DIR}${DEF_NAME}${DEF_VERSION}${GIT_DIR_NAME}"
                     note "   ${NOTE_CHAR} Fetching git repository: $(distinct n ${DEF_HTTP_PATH}${reset})"
                     try "${GIT_BIN} clone ${DEFAULT_GIT_OPTS} --depth 1 --bare ${DEF_HTTP_PATH} ${_git_cached}" || \
                         try "${GIT_BIN} clone ${DEFAULT_GIT_OPTS} --depth 1 --bare ${DEF_HTTP_PATH} ${_git_cached}"
