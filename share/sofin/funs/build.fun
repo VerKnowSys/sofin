@@ -637,7 +637,7 @@ process () {
              ! -d "${PREFIX}" ]; then # case when disabled requirement is first on list of dependencies
             create_software_dir "$(${BASENAME_BIN} "${PREFIX}" 2>/dev/null)"
         fi
-        run "${TOUCH_BIN} ${PREFIX}/${_req}${DEFAULT_INST_MARK_EXT} && ${PRINTF_BIN} \"os-default\" > ${PREFIX}/${_req}${DEFAULT_INST_MARK_EXT}"
+        run "${TOUCH_BIN} ${PREFIX}/${_req}${DEFAULT_INST_MARK_EXT} && ${PRINTF_BIN} \"${DEFAULT_REQ_OS_PROVIDED}\" > ${PREFIX}/${_req}${DEFAULT_INST_MARK_EXT}"
     fi
     unset _req _current_branch
 }

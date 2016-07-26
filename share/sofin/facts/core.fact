@@ -25,6 +25,7 @@ DEFAULT_LOCK_EXT=".lock"
 DEFAULT_ARCHIVE_EXT=".txz" # gets value of DEFAULT_SOFTWARE_SNAPSHOT_EXT under systems with ZFS support
 DEFAULT_ARCHIVE_TARBALL_EXT=".txz" # can be used for files that have to be delivered in tarball format
 DEFAULT_CHKSUM_EXT=".sha1"
+DEFAULT_REQ_OS_PROVIDED="os-provided"
 DEFAULT_INST_MARK_EXT=".installed"
 DEFAULT_SOFTWARE_SNAPSHOT_EXT=".zfsx"
 DEFAULT_SERVICE_SNAPSHOT_EXT=".zfsp"
