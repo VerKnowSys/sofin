@@ -120,7 +120,6 @@ update_defs () {
         debug "Definitions update skipped on demand"
         return
     fi
-    note "$(sofin_header)"
     if [ ! -x "${GIT_BIN}" ]; then
         note "Installing initial definition list from tarball to cache dir: $(distinct n ${CACHE_DIR})"
         ${RM_BIN} -rf "${CACHE_DIR}definitions" >> ${LOG} 2>> ${LOG}
