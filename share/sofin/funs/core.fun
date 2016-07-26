@@ -26,6 +26,7 @@ cecho () {
 
 debug () {
     _in="$@"
+    touch_logsdir_and_logfile
     unset _dbfnin
     if [ "${CAP_TERM_BASH}" = "YES" ]; then
         if [ -n "${FUNCNAME[*]}" ]; then # bash based:
@@ -147,6 +148,7 @@ distinct () {
 run () {
     if [ -n "$1" ]; then
         _run_params="$@"
+        touch_logsdir_and_logfile
         unset _run_shw_prgr
         echo "${_run_params}" | eval "${MATCH_FETCH_CMDS_GUARD}" && _run_shw_prgr=YES
         _rnm="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
@@ -181,6 +183,7 @@ run () {
 try () {
     if [ -n "$1" ]; then
         _try_params="$@"
+        touch_logsdir_and_logfile
         unset _show_prgrss
         echo "${_try_params}" | eval "${MATCH_FETCH_CMDS_GUARD}" && _show_prgrss=YES
         _try_aname="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
