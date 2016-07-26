@@ -296,19 +296,18 @@ make_exports () {
     _export_bin="${1}"
     _bundle_name="$(capitalize "${2}")"
     for _bindir in "/bin/" "/sbin/" "/libexec/"; do
-        debug "Looking into bundle binary dir: $(distinct d ${SOFTWARE_DIR}${_bundle_name}${_bindir})"
+        debug "Looking into bundle binary dir: $(distinct d "${SOFTWARE_DIR}${_bundle_name}${_bindir}")"
         if [ -e "${SOFTWARE_DIR}${_bundle_name}${_bindir}${_export_bin}" ]; then
-            note "Exporting binary: $(distinct n ${SOFTWARE_DIR}${_bundle_name}${_bindir}${_export_bin})"
+            note "Exporting binary: $(distinct n "${SOFTWARE_DIR}${_bundle_name}${_bindir}${_export_bin}")"
+            _cdir="$(${PWD_BIN} 2>/dev/null)"
             cd "${SOFTWARE_DIR}${_bundle_name}${_bindir}"
-            ${MKDIR_BIN} -p "${SOFTWARE_DIR}${_bundle_name}/exports" # make sure exports dir exists
-            _aname="$(lowercase ${_bundle_name})"
-            ${LN_BIN} -vfs "..${_bindir}/${_export_bin}" "../exports/${_export_bin}" >> "${LOG}-${_aname}"
-
-            cd / # Go outside of bundle directory after exports
-            unset _aname _bindir _bundle_name _export_bin
-            return 0
+            try "${MKDIR_BIN} -p ${SOFTWARE_DIR}${_bundle_name}/exports" # make sure exports dir exists
+            try "${LN_BIN} -vfs ..${_bindir}/${_export_bin} ../exports/${_export_bin}"
+            cd "${_cdir}"
+            unset _cdir _bindir _bundle_name _export_bin
+            return
         else
-            debug "Export not found: $(distinct d ${SOFTWARE_DIR}${_bundle_name}${_bindir}${_export_bin})"
+            debug "Export not found: $(distinct d "${SOFTWARE_DIR}${_bundle_name}${_bindir}${_export_bin}")"
         fi
     done
     error "No executable to export from bin paths of: $(distinct e "${_bundle_name}/\{bin,sbin,libexec\}/${_export_bin}")"
@@ -367,7 +366,7 @@ wipe_remote_archives () {
                 note "Wiping out remote: $(distinct n ${_wr_mirr}) binary archives: $(distinct n "${_remote_ar_name}")"
                 ${PRINTF_BIN} "${ColorBlue}"
                 ${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} "${MAIN_USER}@${_wr_mirr}" \
-                    "${FIND_BIN} ${MAIN_BINARY_PREFIX}/${SYS_SPECIFIC_BINARY_REMOTE} -iname '${_remote_ar_name}' -print -delete" 2>> "${LOG}"
+                    "${FIND_BIN} ${MAIN_BINARY_PREFIX}/${SYS_SPECIFIC_BINARY_REMOTE} -iname '${_remote_ar_name}' -print -delete"
             done
         done
     else
@@ -401,8 +400,8 @@ create_apple_bundle_if_necessary () { # XXXXXX
         cd "${DEF_BUNDLE_NAME}/Contents"
         try "${TEST_BIN} -L MacOS || ${LN_BIN} -s ../exports MacOS"
         debug "Creating relative libraries search path"
-        cd ${DEF_BUNDLE_NAME}
-        note "Processing exported binary: $(distinct n ${i})"
+        cd "${DEF_BUNDLE_NAME}"
+        note "Processing exported binary: $(distinct n "${i}")" # XXX: i?
         try "${SOFIN_LIBBUNDLE_BIN} -x ${DEF_BUNDLE_NAME}/Contents/MacOS/${_aname}"
     fi
 }
@@ -572,14 +571,14 @@ export_binaries () {
 
     if [ -z "${PREFIX}" ]; then
         PREFIX="${SOFTWARE_DIR}$(capitalize "${DEF_NAME}${DEF_POSTFIX}")"
-        debug "An empty prefix in export_binaries() for $(distinct d ${_ebdef_name}). Resetting to: $(distinct d ${PREFIX})"
+        debug "An empty prefix in export_binaries() for $(distinct d "${_ebdef_name}"). Resetting to: $(distinct d "${PREFIX}")"
     fi
     if [ -d "${PREFIX}/exports-disabled" ]; then # just bring back disabled exports
-        debug "Moving $(distinct d ${PREFIX}/exports-disabled) to $(distinct d ${PREFIX}/exports)"
+        debug "Moving $(distinct d "${PREFIX}/exports-disabled") to $(distinct d "${PREFIX}/exports")"
         try "${MV_BIN} -v ${PREFIX}/exports-disabled ${PREFIX}/exports"
     fi
     if [ -z "${DEF_EXPORTS}" ]; then
-        note "Defined no binaries to export of prefix: $(distinct n ${PREFIX})"
+        note "Defined no exports of prefix: $(distinct n "${PREFIX}")"
     else
         _a_name="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
         _an_amount="$(echo "${DEF_EXPORTS}" | ${WC_BIN} -w 2>/dev/null | ${TR_BIN} -d '\t|\r|\ ' 2>/dev/null)"
