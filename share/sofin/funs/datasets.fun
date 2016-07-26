@@ -103,7 +103,7 @@ prepare_service_dataset () {
         fetch_dset_zfs_stream "${_ps_elem}" "${_ps_snap_file}"
 
         debug "Grepping for dataset: $(distinct d "${DEFAULT_ZPOOL}${SERVICES_DIR}${USER}/${_ps_elem}")"
-        ${ZFS_BIN} list -H 2>/dev/null | ${CUT_BIN} -f1 2>/dev/null | ${EGREP_BIN} "${DEFAULT_ZPOOL}${SERVICES_DIR}${USER}/${_ps_elem}" >/dev/null 2>&1
+        ${ZFS_BIN} list -H 2>/dev/null | eval "${FIRST_ARG_GUARD}" | ${EGREP_BIN} "${DEFAULT_ZPOOL}${SERVICES_DIR}${USER}/${_ps_elem}" >/dev/null 2>&1
         if [ "$?" = "0" ]; then
             note "Preparing to send service dataset: $(distinct n "${_full_dataset_name}"), for bundle: $(distinct n "${_ps_elem}")"
             try "${ZFS_BIN} umount -f ${_full_dataset_name}"
@@ -374,7 +374,7 @@ install_software_from_binbuild () {
         # On systems with ZFS capability, we use zfs receive instead of tarballing:
         _isfb_dataset="${DEFAULT_ZPOOL}${SOFTWARE_DIR}${USER}/${_isfb_archive}"
         debug "dataset check: ${_isfb_dataset}"
-        ${ZFS_BIN} list -H 2>/dev/null | ${CUT_BIN} -f1 2>/dev/null | ${EGREP_BIN} "${_isfb_dataset}" >/dev/null 2>&1
+        ${ZFS_BIN} list -H 2>/dev/null | eval "${FIRST_ARG_GUARD}" | ${EGREP_BIN} "${_isfb_dataset}" >/dev/null 2>&1
         if [ "$?" != "0" ]; then
             debug "Installing ZFS based binary build to dataset: $(distinct d "${_isfb_dataset}")"
             ${PRINTF_BIN} "${blue}"
