@@ -45,7 +45,7 @@ else
     HTTP_PATH="http://dmilith.verknowsys.com/Public/Sofin-releases"
     DEFAULT_REPOSITORY="https://verknowsys@bitbucket.org/verknowsys/sofin-definitions.git" # main sofin definitions repository
     DEFAULT_REPOSITORY_MIRROR="git@github.com:VerKnowSys/sofin-definitions.git" # alternative sofin definitions repository
-    INITIALS="initial-definitions"
+    INITIALS="${DEFINITIONS_INITIAL_FILE_NAME}"
     DEST_NAME="sofin-${version}${DEFAULT_ARCHIVE_EXT}"
 
     note "Pushing Sofin package to remote server: "
