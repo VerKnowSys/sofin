@@ -308,22 +308,22 @@ reload_zsh_shells () {
 
 
 update_env_files () {
-    _default_envs="${HOME:-${DEFAULT_HOME}}/.profile"
-    if [ "${USER}" = "root" ]; then
-        _default_envs="${_default_envs} /etc/profile /etc/zshenv /etc/bashrc"
-    fi
+    update_shell_vars
+    _default_envs="/etc/profile /etc/zshenv /etc/bashrc"
     for _env_file in ${_default_envs}; do
         if [ -f "${_env_file}" ]; then
-            ${EGREP_BIN} "SHELL_PID=" "${_env_file}" >/dev/null 2>&1
+            debug "Processing existing env file: $(distinct d "${_env_file}")"
+            ${GREP_BIN} -R "SHELL_PID=" "${_env_file}" >/dev/null 2>&1
             if [ "$?" = "0" ]; then
                 continue
             else
-                echo "${SOFIN_SHELL_BLOCK}" >> "${_env_file}" && \
-                    note "Environment block appended to file: $(distinct n "${_env_file}")"
+                ${PRINTF_BIN} "${SOFIN_SHELL_BLOCK}" >> "${_env_file}" && \
+                    debug "Environment block appended to file: $(distinct d "${_env_file}")"
+
             fi
         else
-            echo "${SOFIN_SHELL_BLOCK}" >> "${_env_file}" && \
-                note "Environment block written to file: $(distinct n "${_env_file}")"
+            ${PRINTF_BIN} "${SOFIN_SHELL_BLOCK}" >> "${_env_file}" && \
+                debug "Environment block written to file: $(distinct d "${_env_file}")"
         fi
     done
     unset _default_envs _env_file
