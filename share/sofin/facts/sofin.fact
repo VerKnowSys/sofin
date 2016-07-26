@@ -26,12 +26,18 @@ SOFIN_PROFILE="${HOME}/.profile"
 SOFIN_ENV_DISABLED_INDICATOR_FILE="${HOME}/.sofin-disabled"
 FILE_CACHE_DIR="${CACHE_DIR}file-cache/"
 GIT_CACHE_DIR="${CACHE_DIR}git-cache/"
-DEFINITIONS_DIR="${CACHE_DIR}definitions/definitions/"
+
+DEFINITIONS_DEFAULT_FILE_NAME="defaults" # NOTE: Base "def" file, loaded before each software definition
+DEFINITIONS_LISTS_FILE_NAME="lists" # NOTE: It's name of lists directory from "Sofin-definitions" repository
+DEFINITIONS_BASE="definitions" # NOTE: It's main directory in "Sofin-definitions" repository
+
+DEFINITIONS_DIR="${CACHE_DIR}${DEFINITIONS_BASE}/${DEFINITIONS_BASE}/"
+DEFINITIONS_DEFAULTS="${DEFINITIONS_DIR}${DEFINITIONS_DEFAULT_FILE_NAME}${DEFAULT_DEF_EXT}"
+DEFINITIONS_LISTS_DIR="${CACHE_DIR}${DEFINITIONS_BASE}/${DEFINITIONS_LISTS_FILE_NAME}/"
+
 LOGS_DIR="${CACHE_DIR}logs/"
 LOG="${LOGS_DIR}sofin"
 LOCKS_DIR="${CACHE_DIR}locks/"
-LISTS_DIR="${CACHE_DIR}definitions/lists/"
-DEFAULTS="${DEFINITIONS_DIR}defaults${DEFAULT_DEF_EXT}"
 CCACHE_BIN_OPTIONAL="${SOFTWARE_DIR}Ccache/exports/ccache"
 DEFAULT_PATH="${DEFAULT_PATH:-/bin:/usr/bin:/sbin:/usr/sbin:/usr/pkg/bin:/usr/pkg/sbin}"
 SOFIN_BIN_SHORT="$(${BASENAME_BIN} ${SOFIN_BIN} 2>/dev/null)"

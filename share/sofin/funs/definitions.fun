@@ -74,7 +74,7 @@ load_defs () {
 
 load_defaults () {
     debug "Loading definition defaults"
-    . "${DEFAULTS}"
+    . "${DEFINITIONS_DEFAULTS}"
     if [ -z "${COMPLIANCE_CHECK}" ]; then
         # check definition/defaults compliance version
         debug "Version compliance test $(distinct d "${DEF_COMPLIANCE}") vs $(distinct d "${SOFIN_VERSION}")"
@@ -134,7 +134,7 @@ update_defs () {
             return
     fi
     if [ -d "${CACHE_DIR}definitions/.git" -a \
-         -f "${DEFAULTS}" ]; then
+         -f "${DEFINITIONS_DEFAULTS}" ]; then
         cd "${CACHE_DIR}definitions"
         _current_branch="$(${GIT_BIN} rev-parse --abbrev-ref HEAD 2>/dev/null)"
         _latestsha="$(${CAT_BIN} "${CACHE_DIR}definitions/.git/refs/heads/${_current_branch}" 2>/dev/null)"
@@ -229,8 +229,8 @@ remove_bundles () {
         error "Second argument with at least one bundle name is required!"
     fi
     # first look for a list with that name:
-    if [ -e "${LISTS_DIR}$(lowercase "${_bundle_nam}")" ]; then
-        _picked_bundles="$(${CAT_BIN} ${LISTS_DIR}${_bundle_nam} 2>/dev/null | eval "${NEWLINES_TO_SPACES_GUARD}")"
+    if [ -e "${DEFINITIONS_LISTS_DIR}$(lowercase "${_bundle_nam}")" ]; then
+        _picked_bundles="$(${CAT_BIN} ${DEFINITIONS_LISTS_DIR}${_bundle_nam} 2>/dev/null | eval "${NEWLINES_TO_SPACES_GUARD}")"
         debug "Removing list of bundles: $(distinct d ${_picked_bundles})"
     else
         _picked_bundles="${_bundle_nam}"
@@ -281,7 +281,7 @@ available_definitions () {
     ${LS_BIN} -m *def 2>/dev/null | ${SED_BIN} "s/${DEFAULT_DEF_EXT}//g" 2>/dev/null
     note "Definitions count:"
     ${LS_BIN} -a *def 2>/dev/null | ${WC_BIN} -l 2>/dev/null
-    cd "${LISTS_DIR}"
+    cd "${DEFINITIONS_LISTS_DIR}"
     note "Available lists:"
     ${LS_BIN} -m * 2>/dev/null | ${SED_BIN} "s/${DEFAULT_DEF_EXT}//g" 2>/dev/null
 }

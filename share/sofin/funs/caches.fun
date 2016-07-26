@@ -14,7 +14,7 @@ create_dirs () {
          done
     fi
     if [ ! -d "${DEFINITIONS_DIR}" -o \
-         ! -f "${DEFAULTS}" ]; then
+         ! -f "${DEFINITIONS_DEFAULTS}" ]; then
         debug "No valid definitions cache found in: $(distinct d "${DEFINITIONS_DIR}"). Creating one."
         clean_purge
         update_defs

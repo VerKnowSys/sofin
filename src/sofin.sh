@@ -95,8 +95,8 @@ if [ -n "${SOFIN_COMMAND_ARG}" ]; then
             fi
             fail_on_bg_job ${SOFIN_ARGS}
             # NOTE: trying a list first - it will have priority if file exists:
-            if [ -f "${LISTS_DIR}${_list_maybe}" ]; then
-                _pickd_bundls="$(${CAT_BIN} "${LISTS_DIR}${_list_maybe}" 2>/dev/null | eval ${NEWLINES_TO_SPACES_GUARD})"
+            if [ -f "${DEFINITIONS_LISTS_DIR}${_list_maybe}" ]; then
+                _pickd_bundls="$(${CAT_BIN} "${DEFINITIONS_LISTS_DIR}${_list_maybe}" 2>/dev/null | eval ${NEWLINES_TO_SPACES_GUARD})"
             else
                 _pickd_bundls="${SOFIN_ARGS}"
             fi
