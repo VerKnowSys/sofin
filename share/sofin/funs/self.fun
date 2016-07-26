@@ -25,7 +25,7 @@ install_sofin () {
 
 
 build_sofin_natives () {
-    _okch="$(distinct n "${yellow}${SUCCESS_CHAR}")"
+    _okch="$(distinct n "${ColorParams}${SUCCESS_CHAR}")"
     note "Building.."
     for _prov in ${SOFIN_PROVIDES}; do
         if [ -f "src/${_prov}.cc" ]; then
@@ -37,7 +37,7 @@ build_sofin_natives () {
 
 
 install_sofin_files () {
-    _okch="$(distinct n "${yellow}${SUCCESS_CHAR}")"
+    _okch="$(distinct n "${ColorParams}${SUCCESS_CHAR}")"
     note "Installing.."
     if [ -n "${PREFIX}" ]; then
         for _a_destph in "${PREFIX}" "${PREFIX}etc" "${PREFIX}usr/bin"; do

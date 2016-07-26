@@ -141,7 +141,7 @@ update_defs () {
         if [ -z "${_def_head}" ]; then
             _def_head="HEAD"
         fi
-        debug "State of definitions repository was reset to: $(distinct d "${_def_head}")"
+        debug "State of definitions repository was re-set to: $(distinct d "${_def_head}")"
         if [ "${_def_cur_branch}" != "${BRANCH}" ]; then # use _def_cur_branch value if branch isn't matching default branch
             debug "Checking out branch: $(distinct d ${_def_cur_branch})"
             try "${GIT_BIN} checkout ${DEFAULT_GIT_OPTS} -b ${_def_cur_branch}" || \
@@ -152,7 +152,7 @@ update_defs () {
                 note "Branch: $(distinct n ${_def_cur_branch}) is at: $(distinct n ${_def_head})" && \
                 return
 
-            note "${red}Error occured: Update from branch: $(distinct e "${BRANCH}") of repository: $(distinct e "${REPOSITORY}") wasn't possible. Log below:${reset}"
+            note "${ColorRed}Error occured: Update from branch: $(distinct e "${BRANCH}") of repository: $(distinct e "${REPOSITORY}") wasn't possible. Log below:${ColorReset}"
             ${TAIL_BIN} -n${LOG_LINES_AMOUNT_ON_ERR} "${LOG}" 2>/dev/null
             return
 
@@ -167,7 +167,7 @@ update_defs () {
                 note "Branch: $(distinct n "${BRANCH}") is at: $(distinct n ${_def_head})" && \
                     return
 
-            note "${red}Error occured: Update from branch: $(distinct e "${BRANCH}") of repository: $(distinct e "${REPOSITORY}") wasn't possible. Log's below:${reset}"
+            note "${ColorRed}Error occured: Update from branch: $(distinct e "${BRANCH}") of repository: $(distinct e "${REPOSITORY}") wasn't possible. Log's below:${ColorReset}"
             ${TAIL_BIN} -n${LOG_LINES_AMOUNT_ON_ERR} ${LOG} 2>/dev/null
             return
         fi
@@ -365,7 +365,7 @@ wipe_remote_archives () {
             debug "Using defined mirror(s): $(distinct d "${_wr_dig}")"
             for _wr_mirr in ${_wr_dig}; do
                 note "Wiping out remote: $(distinct n ${_wr_mirr}) binary archives: $(distinct n "${_remote_ar_name}")"
-                ${PRINTF_BIN} "${blue}"
+                ${PRINTF_BIN} "${ColorBlue}"
                 ${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} "${MAIN_USER}@${_wr_mirr}" \
                     "${FIND_BIN} ${MAIN_BINARY_PREFIX}/${SYS_SPECIFIC_BINARY_REMOTE} -iname '${_remote_ar_name}' -print -delete" 2>> "${LOG}"
             done
@@ -413,7 +413,7 @@ strip_bundle () {
     if [ -z "${_sbfdefinition_name}" ]; then
         error "No definition name specified as first param!"
     fi
-    load_defaults # reset possible cached values
+    load_defaults
     load_defs "${_sbfdefinition_name}"
     if [ -z "${PREFIX}" ]; then
         PREFIX="${SOFTWARE_DIR}$(capitalize "${DEF_NAME}${DEF_POSTFIX}")"

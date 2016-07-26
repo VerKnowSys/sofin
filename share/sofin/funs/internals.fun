@@ -201,11 +201,11 @@ list_bundles_full () {
             if [ -e "${_lbinstald_file}" ]; then
                 note "${SUCCESS_CHAR} ${_lbfapp_name}"
             else
-                note "${red}${FAIL_CHAR} ${_lbfapp_name} ${reset}[${red}!${reset}]"
+                note "${ColorRed}${FAIL_CHAR} ${_lbfapp_name} ${ColorReset}[${ColorRed}!${ColorReset}]"
             fi
             for _lbfreq in $(${FIND_BIN} ${_lbfapp} -maxdepth 1 -name *${DEFAULT_INST_MARK_EXT} 2>/dev/null | ${SORT_BIN} 2>/dev/null); do
                 _lbpp="$(${PRINTF_BIN} "$(${BASENAME_BIN} "${_lbfreq}" 2>/dev/null)" | ${SED_BIN} "s/${DEFAULT_INST_MARK_EXT}//" 2>/dev/null)"
-                note "   ${NOTE_CHAR} ${_lbpp} $(distinct "${gray}" "[")$(distinct n $(${CAT_BIN} "${_lbfreq}" 2>/dev/null))$(distinct "${gray}" "]")"
+                note "   ${NOTE_CHAR} ${_lbpp} $(distinct "${ColorGray}" "[")$(distinct n $(${CAT_BIN} "${_lbfreq}" 2>/dev/null))$(distinct "${ColorGray}" "]")"
             done
         done
         unset _lbfreq _lbfapp _lbflowercase _lbfapp_name _lbinstald_file _lbpp
@@ -279,9 +279,9 @@ disable_sofin_env () {
 
 sofin_status () {
     if [ -f ${SOFIN_ENV_DISABLED_INDICATOR_FILE} ]; then
-        note "Sofin shell environment is: ${red}disabled${reset}"
+        note "Sofin shell environment is: ${ColorRed}disabled${ColorReset}"
     else
-        note "Sofin shell environment is: $(distinct n enabled${reset})"
+        note "Sofin shell environment is: $(distinct n enabled${ColorReset})"
     fi
 }
 

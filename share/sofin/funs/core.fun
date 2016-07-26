@@ -16,7 +16,7 @@ cecho () {
     _cein="${1}" # content
     _cecol="${2}" # color
     if [ "${TTY}" = "YES" ]; then # if it's terminal then use colors
-        ${PRINTF_BIN} "${_cecol}${_cein}${reset}\n"
+        ${PRINTF_BIN} "${_cecol}${_cein}${ColorReset}\n"
     else
         ${PRINTF_BIN} "${_cein}\n"
     fi
@@ -52,47 +52,47 @@ debug () {
         _dbfnin="():"
     fi
 
-    _dbfn="# ${func}${_dbfnin}${magenta2}" # NOTE: "#" is required for debug mode to work properly
+    _dbfn="# ${ColorFunction}${_dbfnin}${ColorViolet}" # NOTE: "#" is required for debug mode to work properly
     if [ -z "${DEBUG}" ]; then
         _dbgnme="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
         if [ -n "${_dbgnme}" -a \
                -d "${LOGS_DIR}" ]; then
             # Definition log
-            cecho "${_dbfn}${_in}" ${magenta2} \
+            cecho "${_dbfn}${_in}" ${ColorViolet} \
                 >> "${LOG}-${_dbgnme}" 2>> "${LOG}-${_dbgnme}"
-
+# XXX: sprawdzać istnienie pliku loga i katalogów i zrobić fallback na /var/log
         elif [ -z "${_dbgnme}" -a \
                -d "${LOGS_DIR}" ]; then
             # Main log
-            cecho "${_dbfn}${_in}" ${magenta2} \
+            cecho "${_dbfn}${_in}" ${ColorViolet} \
                 >> "${LOG}" 2>> "${LOG}"
         elif [ ! -d "${LOGS_DIR}" ]; then
             # System logger fallback
             ${LOGGER_BIN} "sofin: ${_in}"
         fi
     else # DEBUG is set.
-        cecho "${_dbfn}${_in}" ${magenta2}
+        cecho "${_dbfn}${_in}" ${ColorViolet}
     fi
     unset _dbgnme _in _dbfn _cee _dbfnin _elmz
 }
 
 
 warn () {
-    cecho "$1" ${yellow}
+    cecho "$1" ${ColorYellow}
 }
 
 
 note () {
-    cecho "$1" ${green}
+    cecho "$1" ${ColorGreen}
 }
 
 
 error () {
     restore_security_state
     cecho
-    cecho "$(fill)" ${red}
-    cecho "${FAIL_CHAR} Error: $1" ${red}
-    cecho "$(fill)" ${red}
+    cecho "$(fill)" ${ColorRed}
+    cecho "${FAIL_CHAR} Error: $1" ${ColorRed}
+    cecho "$(fill)" ${ColorRed}
     warn "\n$(fill)"
     warn "${NOTE_CHAR2} Since I'm very serious about software code quality overall,"
     warn "  please don't hesitate to report an issue(s) if you encounter a problem,"
@@ -118,27 +118,27 @@ distinct () {
     shift
     content="$*"
     if [ -z "${msg_type}" ]; then
-        error "No message type given as first param for: ${DISTINCT_COLOUR}distinct()${red}!"
+        error "No message type given as first param for: ${DISTINCT_COLOUR}distinct()${ColorRed}!"
     fi
     case ${msg_type} in
         n|note)
-            ${PRINTF_BIN} "${DISTINCT_COLOUR}${content}${green}"
+            ${PRINTF_BIN} "${DISTINCT_COLOUR}${content}${ColorGreen}"
             ;;
 
         d|debug)
-            ${PRINTF_BIN} "${DISTINCT_COLOUR}${content}${magenta2}"
+            ${PRINTF_BIN} "${DISTINCT_COLOUR}${content}${ColorViolet}"
             ;;
 
         w|warn)
-            ${PRINTF_BIN} "${DISTINCT_COLOUR}${content}${yellow}"
+            ${PRINTF_BIN} "${DISTINCT_COLOUR}${content}${ColorYellow}"
             ;;
 
         e|error)
-            ${PRINTF_BIN} "${DISTINCT_COLOUR}${content}${red}"
+            ${PRINTF_BIN} "${DISTINCT_COLOUR}${content}${ColorRed}"
             ;;
 
         *)
-            ${PRINTF_BIN} "${msg_type}${content}${reset}"
+            ${PRINTF_BIN} "${msg_type}${content}${ColorReset}"
             ;;
     esac
 }
@@ -156,7 +156,7 @@ run () {
                 eval PATH="${PATH}" "${_run_params}" >> "${LOG}" 2>> "${LOG}"
                 check_result $? "${_run_params}"
             else
-                ${PRINTF_BIN} "${blue}"
+                ${PRINTF_BIN} "${ColorBlue}"
                 eval PATH="${PATH}" "${_run_params}" >> "${LOG}"
                 check_result $? "${_run_params}"
             fi
@@ -165,7 +165,7 @@ run () {
                 eval PATH="${PATH}" "${_run_params}" >> "${LOG}-${_rnm}" 2>> "${LOG}-${_rnm}"
                 check_result $? "${_run_params}"
             else
-                ${PRINTF_BIN} "${blue}"
+                ${PRINTF_BIN} "${ColorBlue}"
                 eval PATH="${PATH}" "${_run_params}" >> "${LOG}-${_rnm}"
                 check_result $? "${_run_params}"
             fi
@@ -188,14 +188,14 @@ try () {
             if [ -z "${_show_prgrss}" ]; then
                 eval PATH="${PATH}" "${_try_params}" >> "${LOG}" 2>> "${LOG}"
             else
-                ${PRINTF_BIN} "${blue}"
+                ${PRINTF_BIN} "${ColorBlue}"
                 eval PATH="${PATH}" "${_try_params}" >> "${LOG}" # show progress on stderr
             fi
         else
             if [ -z "${_show_prgrss}" ]; then
                 eval PATH="${PATH}" "${_try_params}" >> "${LOG}-${_try_aname}" 2>> "${LOG}-${_try_aname}"
             else
-                ${PRINTF_BIN} "${blue}"
+                ${PRINTF_BIN} "${ColorBlue}"
                 eval PATH="${PATH}" "${_try_params}" >> "${LOG}-${_try_aname}"
             fi
         fi

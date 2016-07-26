@@ -1,4 +1,5 @@
 compiler_setup () {
+    #XXX
     if [ "${1}" = "silent" ]; then
         debug () {
             ${LOGGER_BIN} "sofin: $@"
@@ -29,12 +30,12 @@ compiler_setup () {
     esac
 
     if [ "YES" = "${DEBUGBUILD}" ]; then
-        debug " $(distinct d "${green}${SUCCESS_CHAR}") $(distinct d "${green}debug-build")"
-        debug " $(distinct d "${gray}${FAIL_CHAR}") $(distinct d "${gray}production-build")"
+        debug " $(distinct d "${ColorGreen}${SUCCESS_CHAR}") $(distinct d "${ColorGreen}debug-build")"
+        debug " $(distinct d "${ColorYellow}${FAIL_CHAR}") $(distinct d "${ColorGray}production-build")"
         DEFAULT_COMPILER_FLAGS="${DEFAULT_COMPILER_FLAGS} -O0 -ggdb"
     else
-        debug " $(distinct d "${green}${SUCCESS_CHAR}") $(distinct d "${green}production-build")"
-        debug " $(distinct d "${gray}${FAIL_CHAR}") $(distinct d "${gray}debug-build")"
+        debug " $(distinct d "${ColorGreen}${SUCCESS_CHAR}") $(distinct d "${ColorGreen}production-build")"
+        debug " $(distinct d "${ColorYellow}${FAIL_CHAR}") $(distinct d "${ColorGray}debug-build")"
         DEFAULT_COMPILER_FLAGS="${DEFAULT_COMPILER_FLAGS} -O2"
     fi
 
@@ -51,7 +52,7 @@ compiler_setup () {
     BASE_COMPILER="${SOFTWARE_DIR}$(capitalize ${C_COMPILER_NAME})" # /Software/Clang
     if [ -x "${BASE_COMPILER}/bin/${default_c}" -a \
          -x "${BASE_COMPILER}/bin/${default_cxx}" ]; then
-        debug " $(distinct d "${green}${SUCCESS_CHAR}") $(distinct d "${green}base-compiler: ${default_c}")"
+        debug " $(distinct d "${ColorGreen}${SUCCESS_CHAR}") $(distinct d "${ColorGreen}base-compiler: ${default_c}")"
     else # /usr/bin/clang
         BASE_COMPILER="/usr"
         if [ "${SYSTEM_NAME}" = "Minix" ]; then
@@ -59,7 +60,7 @@ compiler_setup () {
         fi
         if [ -x "${BASE_COMPILER}/bin/${default_c}" -a \
              -x "${BASE_COMPILER}/bin/${default_cxx}" ]; then
-            debug " $(distinct d "${green}${SUCCESS_CHAR}") $(distinct d "${green}base-compiler: ${default_c}")"
+            debug " $(distinct d "${ColorGreen}${SUCCESS_CHAR}") $(distinct d "${ColorGreen}base-compiler: ${default_c}")"
         else
             if [ -x "${BASE_COMPILER}/bin/${C_COMPILER_NAME_ALT}" -a \
                  -x "${BASE_COMPILER}/bin/${CXX_COMPILER_NAME_ALT}" -a \
@@ -67,9 +68,9 @@ compiler_setup () {
                 default_c="${C_COMPILER_NAME_ALT}"
                 default_cxx="${CXX_COMPILER_NAME_ALT}"
                 default_cpp="${CPP_PREPROCESSOR_NAME_ALT}"
-                debug " $(distinct d "${green}${SUCCESS_CHAR}") $(distinct d "${green}base-compiler: ${default_c}")"
+                debug " $(distinct d "${ColorGreen}${SUCCESS_CHAR}") $(distinct d "${ColorGreen}base-compiler: ${default_c}")"
             else
-                debug " $(distinct d "${gray}${FAIL_CHAR}") $(distinct d "${gray}base-compiler: ${default_c}")"
+                debug " $(distinct d "${ColorYellow}${FAIL_CHAR}") $(distinct d "${ColorGray}base-compiler: ${default_c}")"
             fi
         fi
     fi
@@ -91,30 +92,30 @@ compiler_setup () {
 
     # -fPIC check:
     echo "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'f[Pp][Ii][Cc]' >/dev/null 2>/dev/null && \
-        debug " $(distinct d "${green}${SUCCESS_CHAR}") $(distinct d "${green}position-independent-code")" || \
-        debug " $(distinct d "${gray}${FAIL_CHAR}") $(distinct d "${gray}position-independent-code")"
+        debug " $(distinct d "${ColorGreen}${SUCCESS_CHAR}") $(distinct d "${ColorGreen}position-independent-code")" || \
+        debug " $(distinct d "${ColorYellow}${FAIL_CHAR}") $(distinct d "${ColorGray}position-independent-code")"
 
     # -fPIE check:
     echo "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'f[Pp][Ii][Ee]' >/dev/null 2>/dev/null && \
-        debug " $(distinct d "${green}${SUCCESS_CHAR}") $(distinct d "${green}position-independent-executable")" || \
-        debug " $(distinct d "${gray}${FAIL_CHAR}") $(distinct d "${gray}position-independent-executable")"
+        debug " $(distinct d "${ColorGreen}${SUCCESS_CHAR}") $(distinct d "${ColorGreen}position-independent-executable")" || \
+        debug " $(distinct d "${ColorYellow}${FAIL_CHAR}") $(distinct d "${ColorGray}position-independent-executable")"
 
     # -fstack-protector-all check:
     echo "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'fstack-protector-all' >/dev/null 2>/dev/null && \
-        debug " $(distinct d "${green}${SUCCESS_CHAR}") $(distinct d "${green}stack-protector-all")" || \
-        debug " $(distinct d "${gray}${FAIL_CHAR}") $(distinct d "${gray}stack-protector-all")"
+        debug " $(distinct d "${ColorGreen}${SUCCESS_CHAR}") $(distinct d "${ColorGreen}stack-protector-all")" || \
+        debug " $(distinct d "${ColorYellow}${FAIL_CHAR}") $(distinct d "${ColorGray}stack-protector-all")"
 
     # -fno-strict-overflow check:
     echo "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'fno-strict-overflow' >/dev/null 2>/dev/null && \
-        debug " $(distinct d "${green}${SUCCESS_CHAR}") $(distinct d "${green}no-strict-overflow")" || \
-        debug " $(distinct d "${gray}${FAIL_CHAR}") $(distinct d "${gray}no-strict-overflow")"
+        debug " $(distinct d "${ColorGreen}${SUCCESS_CHAR}") $(distinct d "${ColorGreen}no-strict-overflow")" || \
+        debug " $(distinct d "${ColorYellow}${FAIL_CHAR}") $(distinct d "${ColorGray}no-strict-overflow")"
 
     if [ "${default_c}" = "${C_COMPILER_NAME}" ]; then
-        debug " $(distinct d "${green}${SUCCESS_CHAR}") $(distinct d "${green}clang-compiler")"
-        debug " $(distinct d "${gray}${FAIL_CHAR}") $(distinct d "${gray}gnu-c-compiler")"
+        debug " $(distinct d "${ColorGreen}${SUCCESS_CHAR}") $(distinct d "${ColorGreen}clang-compiler")"
+        debug " $(distinct d "${ColorYellow}${FAIL_CHAR}") $(distinct d "${ColorGray}gnu-c-compiler")"
     elif [ "${default_c}" = "${C_COMPILER_NAME_ALT}" ]; then
-        debug " $(distinct d "${green}${SUCCESS_CHAR}") $(distinct d "${green}gnu-c-compiler")"
-        debug " $(distinct d "${gray}${FAIL_CHAR}") $(distinct d "${gray}clang-compiler")"
+        debug " $(distinct d "${ColorGreen}${SUCCESS_CHAR}") $(distinct d "${ColorGreen}gnu-c-compiler")"
+        debug " $(distinct d "${ColorYellow}${FAIL_CHAR}") $(distinct d "${ColorGray}clang-compiler")"
     fi
 
     # Support for other definition options
@@ -125,12 +126,12 @@ compiler_setup () {
     # TODO: make a alternatives / or capability
     if [ -z "${DEF_NO_CCACHE}" ]; then # ccache is supported by default but it's optional
         if [ -x "${CCACHE_BIN_OPTIONAL}" ]; then # check for CCACHE availability
-            debug " $(distinct d "${green}${SUCCESS_CHAR}") $(distinct d "${green}ccache")"
+            debug " $(distinct d "${ColorGreen}${SUCCESS_CHAR}") $(distinct d "${ColorGreen}ccache")"
             CC="${CCACHE_BIN_OPTIONAL} ${CC}"
             CXX="${CCACHE_BIN_OPTIONAL} ${CXX}"
             CPP="${CCACHE_BIN_OPTIONAL} ${CPP}"
         else
-            debug " $(distinct d "${gray}${FAIL_CHAR}") $(distinct d "${gray}ccache")"
+            debug " $(distinct d "${ColorYellow}${FAIL_CHAR}") $(distinct d "${ColorGray}ccache")"
         fi
     fi
 
@@ -177,10 +178,10 @@ compiler_setup () {
                 fi
                 ;;
         esac
-        debug " $(distinct d "${green}${SUCCESS_CHAR}") $(distinct d "${green}gold-linker")"
+        debug " $(distinct d "${ColorGreen}${SUCCESS_CHAR}") $(distinct d "${ColorGreen}gold-linker")"
     else # Golden linker causes troubles with some build systems like Qt, so we give option to disable it
         unset NM LD
-        debug " $(distinct d "${gray}${FAIL_CHAR}") $(distinct d "${gray}gold-linker")"
+        debug " $(distinct d "${ColorYellow}${FAIL_CHAR}") $(distinct d "${ColorGray}gold-linker")"
     fi
 
     if [ -z "${DEF_LINKER_NO_DTAGS}" ]; then
@@ -188,17 +189,17 @@ compiler_setup () {
             CFLAGS="${CFLAGS} -Wl,-rpath=${PREFIX}/lib,--enable-new-dtags"
             CXXFLAGS="${CXXFLAGS} -Wl,-rpath=${PREFIX}/lib,--enable-new-dtags"
             LDFLAGS="${LDFLAGS} -Wl,-rpath=${PREFIX}/lib,--enable-new-dtags"
-            debug " $(distinct d "${green}${SUCCESS_CHAR}") $(distinct d "${green}enable-new-dtags")"
+            debug " $(distinct d "${ColorGreen}${SUCCESS_CHAR}") $(distinct d "${ColorGreen}enable-new-dtags")"
         else
-            debug " $(distinct d "${gray}${FAIL_CHAR}") $(distinct d "${gray}enable-new-dtags")"
+            debug " $(distinct d "${ColorYellow}${FAIL_CHAR}") $(distinct d "${ColorGray}enable-new-dtags")"
         fi
     fi
     if [ -z "${DEF_NO_FAST_MATH}" ]; then
-        debug " $(distinct d "${green}${SUCCESS_CHAR}") $(distinct d "${green}fast-math")"
+        debug " $(distinct d "${ColorGreen}${SUCCESS_CHAR}") $(distinct d "${ColorGreen}fast-math")"
         CFLAGS="${CFLAGS} -ffast-math"
         CXXFLAGS="${CXXFLAGS} -ffast-math"
     else
-        debug " $(distinct d "${gray}${FAIL_CHAR}") $(distinct d "${gray}fast-math")"
+        debug " $(distinct d "${ColorYellow}${FAIL_CHAR}") $(distinct d "${ColorGray}fast-math")"
     fi
     debug "-------------- COMPILER FEATURES DUMP ENDS --------------"
 

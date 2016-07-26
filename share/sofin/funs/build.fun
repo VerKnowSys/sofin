@@ -415,14 +415,14 @@ process () {
                     # .cache/git-cache => git bare repos
                     ${MKDIR_BIN} -p ${GIT_CACHE_DIR}
                     _git_cached="${GIT_CACHE_DIR}${DEF_NAME}${DEF_VERSION}${GIT_DIR_NAME}"
-                    note "   ${NOTE_CHAR} Fetching git repository: $(distinct n ${DEF_HTTP_PATH}${reset})"
+                    note "   ${NOTE_CHAR} Fetching git repository: $(distinct n ${DEF_HTTP_PATH}${ColorReset})"
                     try "${GIT_BIN} clone ${DEFAULT_GIT_OPTS} --depth 1 --bare ${DEF_HTTP_PATH} ${_git_cached}" || \
                         try "${GIT_BIN} clone ${DEFAULT_GIT_OPTS} --depth 1 --bare ${DEF_HTTP_PATH} ${_git_cached}"
                     if [ "$?" = "0" ]; then
                         debug "Fetched bare repository: $(distinct d "${DEF_NAME}${DEF_VERSION}")"
                     else
                         if [ ! -d "${_git_cached}/branches" -a ! -f "${_git_cached}/config" ]; then
-                            note "\n${red}Definitions were not updated. Showing $(distinct n ${LOG_LINES_AMOUNT_ON_ERR}) lines of internal log:${reset}"
+                            note "\n${ColorRed}Definitions were not updated. Showing $(distinct n ${LOG_LINES_AMOUNT_ON_ERR}) lines of internal log:${ColorReset}"
                             ${TAIL_BIN} -n${LOG_LINES_AMOUNT_ON_ERR} ${LOG} 2>/dev/null
                             note "$(fill)"
                         else

@@ -4,19 +4,19 @@ check_result () {
     fi
     if [ "$1" = "0" ]; then
         shift
-        debug "$(distinct ${green} "${SUCCESS_CHAR}") $(distinct d "$*")"
+        debug "$(distinct ${ColorGreen} "${SUCCESS_CHAR}") $(distinct d "$*")"
     else
         shift
-        error "$(distinct ${red} "${FAIL_CHAR}") $(distinct e "$*")"
+        error "$(distinct ${ColorRed} "${FAIL_CHAR}") $(distinct e "$*")"
     fi
 }
 
 
 def_error () {
     if [ -z "${2}" ]; then
-        error "$(distinct ${red} "${FAIL_CHAR}") $(distinct e "${1}")"
+        error "$(distinct ${ColorRed} "${FAIL_CHAR}") $(distinct e "${1}")"
     else
-        error "$(distinct ${green} "${SUCCESS_CHAR}") $(distinct e "${2}")"
+        error "$(distinct ${ColorGreen} "${SUCCESS_CHAR}") $(distinct e "${2}")"
     fi
 }
 
@@ -93,7 +93,7 @@ retry () {
                     unset _gitroot _ammo _targets && \
                     return 0
             else
-                ${PRINTF_BIN} "${blue}"
+                ${PRINTF_BIN} "${ColorBlue}"
                 eval PATH="${_gitroot}/bin:${_gitroot}/libexec/git-core:${DEFAULT_PATH}" \
                     "${_targets}" >> "${LOG}" && \
                     unset _gitroot _ammo _targets && \
@@ -267,9 +267,9 @@ file_checksum () {
 
 
 print_rainbow () {
-    ${PRINTF_BIN} "${reset}reset${red}red${green}green${yellow}yellow${blue}blue${magenta}magenta${cyan}cyan${gray}gray${white}white"
+    ${PRINTF_BIN} "${ColorReset}ColorReset${ColorRed}ColorRed${ColorGreen}ColorGreen${ColorYellow}ColorYellow${ColorBlue}ColorBlue${ColorMagenta}ColorMagenta${ColorCyan}ColorCyan${ColorGray}ColorGray${ColorWhite}ColorWhite"
 
     for i in $(seq 0 $(${TPUT_BIN} colors)); do
-        ${PRINTF_BIN} "$(${TPUT_BIN} setaf ${i}):${i}:TEXT-COLORFUL${reset}\t"
+        ${PRINTF_BIN} "$(${TPUT_BIN} setaf ${i}):${i}:TEXT-COLORFUL${ColorReset}\t"
     done
 }

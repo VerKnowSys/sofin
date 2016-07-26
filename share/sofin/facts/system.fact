@@ -8,14 +8,14 @@ SYSTEM_NAME="$(${UNAME_BIN} -s 2>/dev/null)"
 SYSTEM_ARCH="$(${UNAME_BIN} -m 2>/dev/null)"
 if [ -z "${SYSTEM_NAME}" -o \
      -z "${SYSTEM_ARCH}" ]; then
-    echo "${red}FATAL: \$SYSTEM_NAME and \$SYSTEM_ARCH environment variables, require a value!"
+    echo "${ColorRed}FATAL: \$SYSTEM_NAME and \$SYSTEM_ARCH environment variables, require a value!"
     exit ${ERRORCODE_TASK_FAILURE}
 fi
 
 if [ -x "${SOFIN_VERSION_UTILITY_BIN}" ]; then
     SYSTEM_VERSION="$(${SOFIN_VERSION_UTILITY_BIN} 2>/dev/null)"
     if [ -z "${SYSTEM_VERSION}" ]; then
-        echo "${red}FATAL: \$SYSTEM_VERSION environment variable, requires a value! You may check if Sofin is correctly installed before continue."
+        echo "${ColorRed}FATAL: \$SYSTEM_VERSION environment variable, requires a value! You may check if Sofin is correctly installed before continue."
         exit ${ERRORCODE_TASK_FAILURE}
     fi
     OS_TRIPPLE="${SYSTEM_NAME}-${SYSTEM_VERSION}-${SYSTEM_ARCH}"
