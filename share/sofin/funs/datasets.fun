@@ -107,12 +107,12 @@ prepare_service_dataset () {
         if [ "$?" = "0" ]; then
             note "Preparing to send service dataset: $(distinct n "${_full_dataset_name}"), for bundle: $(distinct n "${_ps_elem}")"
             try "${ZFS_BIN} umount -f ${_full_dataset_name}"
-            run "${ZFS_BIN} send ${_full_dataset_name} | ${XZ_BIN} > ${FILE_CACHE_DIR}${_ps_snap_file}"
+            run "${ZFS_BIN} send ${_full_dataset_name} | ${XZ_BIN} ${DEFAULT_XZ_OPTS} > ${FILE_CACHE_DIR}${_ps_snap_file}"
             try "${ZFS_BIN} mount ${_full_dataset_name}"
         else
             run "${ZFS_BIN} create -p -o mountpoint=${SERVICES_DIR}${_ps_elem} ${_full_dataset_name}"
             try "${ZFS_BIN} umount -f ${_full_dataset_name}"
-            run "${ZFS_BIN} send ${_full_dataset_name} | ${XZ_BIN} > ${FILE_CACHE_DIR}${_ps_snap_file}"
+            run "${ZFS_BIN} send ${_full_dataset_name} | ${XZ_BIN} ${DEFAULT_XZ_OPTS} > ${FILE_CACHE_DIR}${_ps_snap_file}"
             try "${ZFS_BIN} mount ${_full_dataset_name}"
         fi
         _snap_size="$(file_size "${FILE_CACHE_DIR}${_ps_snap_file}")"
@@ -348,17 +348,16 @@ create_software_bundle_archive () {
         debug "Creating archive from dataset: $(distinct d "${_csbd_dataset}") to file: $(distinct d "${_cddestfile}")"
         try "${ZFS_BIN} umount -f ${_csbd_dataset}"
         ${PRINTF_BIN} "${blue}"
-        ${ZFS_BIN} send ${_csbd_dataset} | ${XZ_BIN} > ${_cddestfile} && \
+        ${ZFS_BIN} send ${_csbd_dataset} | ${XZ_BIN} ${DEFAULT_XZ_OPTS} > ${_cddestfile} && \
             debug "Created ZFS binbundle from dataset: $(distinct d "${_csbd_dataset}")"
         try "${ZFS_BIN} mount ${_csbd_dataset}"
     else
         debug "No ZFS-binbuilds feature. Falling back to tarballs.."
         _cdir="$(${PWD_BIN} 2>/dev/null)"
         cd "${SOFTWARE_DIR}"
-        ${PRINTF_BIN} "${blue}"
-        ${TAR_BIN} --use-compress-program="${XZ_BIN} --threads=${CPUS}" \
-            --totals -cJ -f "${_csbname}" "${_cddestfile}" || \
-                ${TAR_BIN} --totals -cJf "${_csbname}" "${_cddestfile}" || \
+        try "${TAR_BIN} --use-compress-program='${XZ_BIN} ${DEFAULT_XZ_OPTS}' \
+            --totals -cJf ${_csbname} ${_cddestfile}" || \
+                try "${TAR_BIN} --totals -cJf ${_csbname} ${_cddestfile}" || \
                     error "Failed to create archive file: $(distinct e "${_cddestfile}")"
         cd "${_cdir}"
     fi
