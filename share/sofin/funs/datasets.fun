@@ -60,7 +60,7 @@ push_dset_zfs_stream () {
         if [ -f "${FILE_CACHE_DIR}${_ffile}" ]; then
             ${PRINTF_BIN} "${blue}"
             ${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} "${MAIN_USER}@${_psmirror}" \
-                "${MKDIR_BIN} -p ${COMMON_BINARY_REMOTE} ; ${CHMOD_BIN} 0755 ${COMMON_BINARY_REMOTE}"
+                "mkdir -p '${COMMON_BINARY_REMOTE}'; chmod 0755 '${COMMON_BINARY_REMOTE}'"
 
             debug "Setting common access to archive files before we send it: $(distinct d "${_ffile}")"
             try "${CHMOD_BIN} -v a+r ${FILE_CACHE_DIR}${_ffile}"
@@ -70,8 +70,7 @@ push_dset_zfs_stream () {
             if [ "$?" = "0" ]; then
                 ${PRINTF_BIN} "${blue}"
                 ${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} "${MAIN_USER}@${_psmirror}" \
-                    "cd ${COMMON_BINARY_REMOTE} && ${MV_BIN} ${_ffile}.partial ${_ffile}"
-                debug "Successfully renamed partial file to: $(distinct d "${_ffile}")"
+                    "cd ${COMMON_BINARY_REMOTE} && mv ${_ffile}.partial ${_ffile}"
             else
                 error "Failed to send snapshot of $(distinct e "${_pselement}") archive file: $(distinct e "${_ffile}") to remote host: $(distinct e "${MAIN_USER}@${_psmirror}")!"
             fi
