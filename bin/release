@@ -15,7 +15,8 @@ ${GIT_BIN} push --all "${SOFIN_ORIGIN}" >/dev/null && \
 ${GIT_BIN} push --tags "${SOFIN_ORIGIN}" >/dev/null && \
 ${GIT_BIN} push --all "${SOFIN_MIRROR}" >/dev/null && \
 ${GIT_BIN} push --tags "${SOFIN_MIRROR}" >/dev/null && \
-bin/clean
+note "Cleaning natives"
+${RM_BIN} -fv bin/s-* src/.*.o
 ${MKDIR_BIN} -p releases
 version="$(${GREP_BIN} 'SOFIN_VERSION=' share/sofin/facts/sofin.fact | ${AWK_BIN} '{ gsub(/\"/, "", $1); gsub(/SOFIN_VERSION=/, "", $1); print $1; }')"
 if [ -z "${version}" ]; then
