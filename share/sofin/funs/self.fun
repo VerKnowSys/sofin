@@ -13,6 +13,7 @@ load_requirements () {
     . share/sofin/funs/commons.fun
     . share/sofin/funs/envs.fun
     . share/sofin/funs/internals.fun
+    . share/sofin/funs/cleaners.fun
     . share/sofin/funs/caches.fun
 }
 
