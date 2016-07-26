@@ -288,10 +288,11 @@ create_builddir () {
         try "${ZFS_BIN} mount ${_dset}"
         unset _dset _dset_namesum
     else
-        debug "Creating regular build-directory: $(distinct d "${SOFTWARE_DIR}${_cb_bundle_name}")"
-        try "${MKDIR_BIN} -p ${SOFTWARE_DIR}${_cb_bundle_name}"
+        _bdir="${SOFTWARE_DIR}${_cb_bundle_name}/${DEFAULT_SRC_EXT}${_dset_namesum}"
+        debug "Creating regular build-directory: $(distinct d "${_bdir}")"
+        try "${MKDIR_BIN} -p ${_bdir}"
     fi
-    unset _cb_bundle_name _dset_namesum
+    unset _bdir _cb_bundle_name _dset_namesum
 }
 
 
