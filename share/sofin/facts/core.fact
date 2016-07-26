@@ -38,6 +38,8 @@ DEFAULT_MANPATH="/usr/share/man"
 DEFAULT_SSH_OPTS="" #-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
 DEFAULT_SCP_OPTS="-C -B"
 DEFAULT_PS_OPTS="-axS"
+DEFAULT_XZ_OPTS="--threads=${DEFAULT_CPUS}"
+
 DEFAULT_LESS_OPTIONS="--hilite-search -K -N -M -R --follow-name -c"
 DEFAULT_GIT_OPTS="--no-verbose --progress"
 DEFAULT_ID_USER_NAME_OPTS="-un"
