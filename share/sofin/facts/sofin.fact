@@ -1,4 +1,4 @@
-SOFIN_VERSION="1.1.2"
+SOFIN_VERSION="1.1.3"
 
 
 DEFAULT_DEFINITIONS_REPOSITORY="${DEFAULT_DEFINITIONS_REPOSITORY:-https://verknowsys@bitbucket.org/verknowsys/sofin-definitions${GIT_DIR_NAME}}"
