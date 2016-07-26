@@ -14,7 +14,7 @@ FACTS_LOCAL_DIR="share/sofin/facts/"
 DEFAULT_FACTS_DIR="/usr/${FACTS_LOCAL_DIR}"
 DEFAULT_FUNS_DIR="/usr/${FUNS_LOCAL_DIR}"
 
-LOG="${LOG:-/var/log/sofin.log}" # default fallback if no /User is present - f.i. fresh OS installation
+LOG="${LOG:-/var/log/sofin}" # default fallback if no /User is present - f.i. fresh OS installation
 
 DEFAULT_CPUS=4
 MAX_OPEN_TAIL_LOGS=80
