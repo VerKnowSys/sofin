@@ -147,12 +147,13 @@ distinct () {
 run () {
     if [ -n "$1" ]; then
         _run_params="$@"
-        unset _run_show_stdout_progress
-        echo "${_run_params}" | eval "${MATCH_FETCH_CMDS_GUARD}" && _run_show_stdout_progress=YES
+        unset _run_shw_prgr
+        echo "${_run_params}" | eval "${MATCH_FETCH_CMDS_GUARD}" && _run_shw_prgr=YES
         _rnm="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
-        debug "$(distinct d "${yellow}${RUN_CHAR}") $(${DATE_BIN} +%s 2>/dev/null): $(distinct d "${_run_params}") [${_run_show_stdout_progress:-NO}]"
+        _dt="$(${DATE_BIN} ${DEFAULT_DATE_TRYRUN_OPTS} 2>/dev/null)"
+        debug "${_dt}: ${ColorWhite}(${RUN_CHAR}${ColorWhite}) $(distinct d "${param}${_run_params}") [${_run_shw_prgr:-NO}]"
         if [ -z "${_rnm}" ]; then
-            if [ -z "${_run_show_stdout_progress}" ]; then
+            if [ -z "${_run_shw_prgr}" ]; then
                 eval PATH="${PATH}" "${_run_params}" >> "${LOG}" 2>> "${LOG}"
                 check_result $? "${_run_params}"
             else
@@ -161,7 +162,7 @@ run () {
                 check_result $? "${_run_params}"
             fi
         else
-            if [ -z "${_run_show_stdout_progress}" ]; then
+            if [ -z "${_run_shw_prgr}" ]; then
                 eval PATH="${PATH}" "${_run_params}" >> "${LOG}-${_rnm}" 2>> "${LOG}-${_rnm}"
                 check_result $? "${_run_params}"
             else
@@ -173,7 +174,7 @@ run () {
     else
         error "Specified an empty command to run()!"
     fi
-    unset _rnm _run_show_stdout_progress _run_params
+    unset _rnm _run_shw_prgr _run_params _dt
 }
 
 
@@ -183,7 +184,8 @@ try () {
         unset _show_prgrss
         echo "${_try_params}" | eval "${MATCH_FETCH_CMDS_GUARD}" && _show_prgrss=YES
         _try_aname="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
-        debug "$(distinct d "${yellow}${TRY_CHAR}") $(${DATE_BIN} +%s 2>/dev/null): $(distinct d "${_try_params}") [${_show_prgrss:-NO}]"
+        _dt="$(${DATE_BIN} ${DEFAULT_DATE_TRYRUN_OPTS} 2>/dev/null)"
+        debug "${_dt}: ${ColorWhite}(${TRY_CHAR}${ColorWhite}) $(distinct d "${params}${_try_params}") [${_show_prgrss:-NO}]"
         if [ -z "${_try_aname}" ]; then
             if [ -z "${_show_prgrss}" ]; then
                 eval PATH="${PATH}" "${_try_params}" >> "${LOG}" 2>> "${LOG}"
@@ -202,6 +204,7 @@ try () {
     else
         error "Specified an empty command to try()!"
     fi
+    unset _dt _try_aname _try_params
 }
 
 
