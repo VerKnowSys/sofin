@@ -487,9 +487,9 @@ process () {
                     ${TEST_BIN} -n "${_ps_patches}" && \
                     note "   ${NOTE_CHAR} Applying common patches for: $(distinct n "${DEF_NAME}${DEF_POSTFIX}")"
                     for _patch in ${_ps_patches}; do
-                        for _level in 0 1 2 3 4 5; do
+                        for _level in 0 1 2 3 4 5; do # Up to:--p5
                             debug "Trying to patch source with patch: $(distinct d ${_patch}), level: $(distinct d ${_level})"
-                            ${PATCH_BIN} -p${_level} -N -f -i "${_patch}" >> "${LOG}-${_pcpaname}" 2>> "${LOG}-${_pcpaname}" # don't use run.. it may fail - we don't care
+                            try "${PATCH_BIN} -p${_level} -N -f -i ${_patch}"
                             if [ "$?" = "0" ]; then # skip applying single patch if it already passed
                                 debug "Patch: $(distinct d ${_patch}) applied successfully!"
                                 break;
@@ -501,11 +501,11 @@ process () {
                     if [ -d "${_pspatch_dir}" ]; then
                         note "   ${NOTE_CHAR} Applying platform specific patches for: $(distinct n ${DEF_NAME}${DEF_POSTFIX}/${SYSTEM_NAME})"
                         _ps_patches="$(${FIND_BIN} ${_pspatch_dir}/* -maxdepth 0 -type f 2>/dev/null)"
-                        ${TEST_BIN} -n "${_ps_patches}" && \
+                        try "${TEST_BIN} -n ${_ps_patches}" && \
                         for _pspp in ${_ps_patches}; do
-                            for _level in 0 1 2 3 4 5; do
+                            for _level in 0 1 2 3 4 5; do # Up to -p5
                                 debug "Patching source code with pspatch: $(distinct d ${_pspp}) (p$(distinct d ${_level}))"
-                                ${PATCH_BIN} -p${_level} -N -f -i "${_pspp}" >> "${LOG}-${_pcpaname}" 2>> "${LOG}-${_pcpaname}"
+                                try "${PATCH_BIN} -p${_level} -N -f -i ${_pspp}"
                                 if [ "$?" = "0" ]; then # skip applying single patch if it already passed
                                     debug "Patch: $(distinct d ${_pspp}) applied successfully!"
                                     break;
@@ -513,6 +513,7 @@ process () {
                             done
                         done
                     fi
+                    unset _ps_patches
                 fi
 
                 after_patch_callback
