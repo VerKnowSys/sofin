@@ -1,12 +1,5 @@
 # Terminal definitions
 
-# Legacy sh compliant method for Default Values:
-if [ -d "/User" ]; then
-    HOME="${HOME:-/User}"
-else
-    HOME="${HOME:-/tmp}"
-fi
-
 LOGNAME="${LOGNAME:-${USER}}"
 SHELL="${SHELL:-${ZSH_BIN}}"
 TERM="${TERM:-xterm-256color}"

@@ -1,5 +1,7 @@
 # System specific configuration
 
+HOME="${HOME:-${DEFAULT_HOME}}"
+
 if [ -z "${USER}" ]; then
     USER="$(${ID_BIN} ${DEFAULT_ID_USER_NAME_OPTS} 2>/dev/null)"
 fi
