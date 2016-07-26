@@ -71,7 +71,9 @@ DD_BIN="/bin/dd"
 TPUT_BIN="/usr/bin/tput"
 
 # Pick best utilities available:
-. "${DEFAULT_FACTS_DIR}alternatives.fact"
+. "${FACTS_LOCAL_DIR}alternatives.fact" || \
+    . "${DEFAULT_FACTS_DIR}alternatives.fact"
 
 # Load system specific paths (using prepared alternatives):
-. "${DEFAULT_FACTS_DIR}paths-$(${UNAME_BIN} 2>/dev/null).fact"
+. "${FACTS_LOCAL_DIR}paths-$(${UNAME_BIN} 2>/dev/null).fact" || \
+    . "${DEFAULT_FACTS_DIR}paths-$(${UNAME_BIN} 2>/dev/null).fact"
