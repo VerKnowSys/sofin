@@ -120,105 +120,105 @@ update_defs () {
         debug "Definitions update skipped on demand"
         return
     fi
+    _cwd="$(${PWD_BIN} 2>/dev/null)"
     if [ ! -x "${GIT_BIN}" ]; then
         note "Installing initial definition list from tarball to cache dir: $(distinct n ${CACHE_DIR})"
-        ${RM_BIN} -rf "${CACHE_DIR}definitions" >> ${LOG} 2>> ${LOG}
-        ${MKDIR_BIN} -p "${LOGS_DIR}" "${CACHE_DIR}definitions"
-        cd "${CACHE_DIR}definitions"
-        _initial_defs="${MAIN_SOURCE_REPOSITORY}initial-definitions${DEFAULT_ARCHIVE_EXT}"
+        try "${RM_BIN} -rf ${CACHE_DIR}${DEFINITIONS_BASE}"
+        try "${MKDIR_BIN} -p ${LOGS_DIR} ${CACHE_DIR}${DEFINITIONS_BASE}"
+        _initial_defs="${MAIN_SOURCE_REPOSITORY}${DEFINITIONS_INITIAL_FILE_NAME}${DEFAULT_TARBALL_EXT}"
         debug "Fetching latest tarball with initial definitions from: $(distinct d ${_initial_defs})"
-        retry "${FETCH_BIN} ${FETCH_OPTS} ${_initial_defs}" && \
-            ${TAR_BIN} -xJf *${DEFAULT_ARCHIVE_EXT} >> ${LOG} 2>> ${LOG} && \
-            ${RM_BIN} -vrf "$(${BASENAME_BIN} ${_initial_defs} 2>/dev/null)" >> ${LOG} 2>> ${LOG}
-            return
+        _out_file="${FILE_CACHE_DIR}/${DEFINITIONS_INITIAL_FILE_NAME}${DEFAULT_TARBALL_EXT}"
+        retry "${FETCH_BIN} ${FETCH_OPTS} -o ${_out_file} ${_initial_defs}" && \
+            ${TAR_BIN} -xJf ${_out_file} --directory "${CACHE_DIR}${DEFINITIONS_BASE}" && \
+                try "${RM_BIN} -vrf ${_initial_defs}" && \
+                    return
     fi
-    if [ -d "${CACHE_DIR}definitions/.git" -a \
+    if [ -d "${CACHE_DIR}${DEFINITIONS_BASE}/.git" -a \
          -f "${DEFINITIONS_DEFAULTS}" ]; then
-        cd "${CACHE_DIR}definitions"
-        _current_branch="$(${GIT_BIN} rev-parse --abbrev-ref HEAD 2>/dev/null)"
-        _latestsha="$(${CAT_BIN} "${CACHE_DIR}definitions/.git/refs/heads/${_current_branch}" 2>/dev/null)"
-        if [ -z "${_latestsha}" ]; then
-            _latestsha="HEAD"
+        cd "${CACHE_DIR}${DEFINITIONS_BASE}"
+        _def_cur_branch="$(${GIT_BIN} rev-parse --abbrev-ref HEAD 2>/dev/null)"
+        _def_head="$(${CAT_BIN} "${CACHE_DIR}${DEFINITIONS_BASE}/.git/refs/heads/${_def_cur_branch}" 2>/dev/null)"
+        if [ -z "${_def_head}" ]; then
+            _def_head="HEAD"
         fi
-        debug "State of definitions repository was reset to: $(distinct d "${_latestsha}")"
-        if [ "${_current_branch}" != "${BRANCH}" ]; then # use _current_branch value if branch isn't matching default branch
-            debug "Checking out branch: $(distinct d ${_current_branch})"
-            try "${GIT_BIN} checkout ${DEFAULT_GIT_OPTS} -b ${_current_branch}" || \
-                try "${GIT_BIN} checkout ${DEFAULT_GIT_OPTS} ${_current_branch}" || \
-                    warn "Can't checkout branch: $(distinct w ${_current_branch})"
+        debug "State of definitions repository was reset to: $(distinct d "${_def_head}")"
+        if [ "${_def_cur_branch}" != "${BRANCH}" ]; then # use _def_cur_branch value if branch isn't matching default branch
+            debug "Checking out branch: $(distinct d ${_def_cur_branch})"
+            try "${GIT_BIN} checkout ${DEFAULT_GIT_OPTS} -b ${_def_cur_branch}" || \
+                try "${GIT_BIN} checkout ${DEFAULT_GIT_OPTS} ${_def_cur_branch}" || \
+                    warn "Can't checkout branch: $(distinct w ${_def_cur_branch})"
 
-            ${GIT_BIN} pull ${DEFAULT_GIT_OPTS} origin ${_current_branch} && \
-                note "Branch: $(distinct n ${_current_branch}) is at: $(distinct n ${_latestsha})" && \
+            try "${GIT_BIN} pull ${DEFAULT_GIT_OPTS} origin ${_def_cur_branch}" && \
+                note "Branch: $(distinct n ${_def_cur_branch}) is at: $(distinct n ${_def_head})" && \
                 return
 
-            note "${red}Error occured: Update from branch: $(distinct e ${BRANCH}) of repository: $(distinct e ${REPOSITORY}) wasn't possible. Log below:${reset}"
+            note "${red}Error occured: Update from branch: $(distinct e "${BRANCH}") of repository: $(distinct e "${REPOSITORY}") wasn't possible. Log below:${reset}"
             ${TAIL_BIN} -n${LOG_LINES_AMOUNT_ON_ERR} "${LOG}" 2>/dev/null
             return
 
         else # else use default branch
             debug "Using default branch: $(distinct d ${BRANCH})"
-            if [ "${_current_branch}" != "${BRANCH}" ]; then
+            if [ "${_def_cur_branch}" != "${BRANCH}" ]; then
                 try "${GIT_BIN} checkout ${DEFAULT_GIT_OPTS} -b ${BRANCH}" || \
                     try "${GIT_BIN} checkout ${DEFAULT_GIT_OPTS} ${BRANCH}" || \
                         warn "Can't checkout branch: $(distinct w ${BRANCH})"
             fi
             try "${GIT_BIN} pull ${DEFAULT_GIT_OPTS} origin ${BRANCH}" && \
-                note "Branch: $(distinct n ${BRANCH}) is at: $(distinct n ${_latestsha})" && \
-                return
+                note "Branch: $(distinct n "${BRANCH}") is at: $(distinct n ${_def_head})" && \
+                    return
 
-            note "${red}Error occured: Update from branch: $(distinct e ${BRANCH}) of repository: $(distinct e ${REPOSITORY}) wasn't possible. Log's below:${reset}"
+            note "${red}Error occured: Update from branch: $(distinct e "${BRANCH}") of repository: $(distinct e "${REPOSITORY}") wasn't possible. Log's below:${reset}"
             ${TAIL_BIN} -n${LOG_LINES_AMOUNT_ON_ERR} ${LOG} 2>/dev/null
             return
         fi
     else
         # create cache; clone definitions repository:
-        ${MKDIR_BIN} -p "${CACHE_DIR}" 2>/dev/null
-        ${MKDIR_BIN} -p "${LOGS_DIR}" 2>/dev/null
-
+        try "${MKDIR_BIN} -p ${CACHE_DIR} ${LOGS_DIR}"
         cd "${CACHE_DIR}"
-        debug "Cloning repository: $(distinct d ${REPOSITORY}) from branch: $(distinct d ${BRANCH}); LOGS_DIR: $(distinct d ${LOGS_DIR}), CACHE_DIR: $(distinct d ${CACHE_DIR})"
-        ${RM_BIN} -vrf definitions >> ${LOG} 2>> ${LOG} # if something is already here, wipe it out from cache
-        try "${GIT_BIN} clone ${DEFAULT_GIT_OPTS} ${REPOSITORY} definitions" || \
-            error "Error cloning branch: $(distinct e ${BRANCH}) of repository: $(distinct e ${REPOSITORY}). Please make sure that given repository and branch are valid!"
-        cd "${CACHE_DIR}definitions"
-        _current_branch="$(${GIT_BIN} rev-parse --abbrev-ref HEAD 2>/dev/null)"
-        if [ "${BRANCH}" != "${_current_branch}" ]; then
+        debug "Cloning repository: $(distinct d "${REPOSITORY}") from branch: $(distinct d "${BRANCH}"); LOGS_DIR: $(distinct d ${LOGS_DIR}), CACHE_DIR: $(distinct d ${CACHE_DIR})"
+        try "${RM_BIN} -vrf ${DEFINITIONS_BASE}"
+        try "${GIT_BIN} clone ${DEFAULT_GIT_OPTS} ${REPOSITORY} ${DEFINITIONS_BASE}" || \
+            error "Error cloning branch: $(distinct e "${BRANCH}") of repository: $(distinct e "${REPOSITORY}"). Please make sure that given repository and branch are valid!"
+        cd "${CACHE_DIR}${DEFINITIONS_BASE}"
+        _def_cur_branch="$(${GIT_BIN} rev-parse --abbrev-ref HEAD 2>/dev/null)"
+        if [ "${BRANCH}" != "${_def_cur_branch}" ]; then
             try "${GIT_BIN} checkout ${DEFAULT_GIT_OPTS} -b ${BRANCH}" || \
                 try "${GIT_BIN} checkout ${DEFAULT_GIT_OPTS} ${BRANCH}" || \
                     warn "Can't checkout branch: $(distinct w ${BRANCH})"
         fi
-        _latestsha="$(${CAT_BIN} "${CACHE_DIR}definitions/.git/refs/heads/${_current_branch}" 2>/dev/null)"
-        if [ -z "${_latestsha}" ]; then
-            _latestsha="HEAD"
+        _def_head="$(${CAT_BIN} "${CACHE_DIR}${DEFINITIONS_BASE}/.git/refs/heads/${_def_cur_branch}" 2>/dev/null)"
+        if [ -z "${_def_head}" ]; then
+            _def_head="HEAD"
         fi
         try "${GIT_BIN} pull --progress origin ${BRANCH}" && \
-            note "Branch: $(distinct n ${BRANCH}) is currenly at: $(distinct n "${_latestsha}") in repository: $(distinct n ${REPOSITORY})" && \
-            return
-
-        note "${red}Error occured: Update from branch: $(distinct n ${BRANCH}) of repository: $(distinct n ${REPOSITORY}) wasn't possible. Log below:${reset}"
-        ${TAIL_BIN} -n${LOG_LINES_AMOUNT_ON_ERR} ${LOG} 2>/dev/null
-        return
+            note "Branch: $(distinct n "${BRANCH}") is currenly at: $(distinct n "${_def_head}") in repository: $(distinct n "${REPOSITORY}")" && \
+                    return
     fi
+    cd "${_cwd}"
+    unset _def_head _def_branch _def_cur_branch _out_file _cwd
 }
 
 
 reset_defs () {
     create_dirs
+    _cwd="$(${PWD_BIN} 2>/dev/null)"
     cd "${DEFINITIONS_DIR}"
-    ${GIT_BIN} reset --hard HEAD >/dev/null 2>&1
+    try "${GIT_BIN} reset --hard HEAD"
     if [ -z "${BRANCH}" ]; then
         BRANCH="stable"
     fi
-    _branch="$(${CAT_BIN} ${CACHE_DIR}definitions/.git/refs/heads/${BRANCH} 2>/dev/null)"
-    if [ -z "${_branch}" ]; then
-        _branch="HEAD"
+    _rdefs_branch="$(${CAT_BIN} "${CACHE_DIR}${DEFINITIONS_BASE}/.git/refs/heads/${BRANCH}" 2>/dev/null)"
+    if [ -z "${_rdefs_branch}" ]; then
+        _rdefs_branch="HEAD"
     fi
-    note "State of definitions repository was reset to: $(distinct n "${_branch}")"
+    note "Definitions repository reset to: $(distinct n "${_rdefs_branch}")"
     for line in $(${GIT_BIN} status --short 2>/dev/null | ${CUT_BIN} -f2 -d' ' 2>/dev/null); do
-        ${RM_BIN} -fv "${line}" >> "${LOG}" 2>> "${LOG}" && \
-            debug "Removed untracked file: $(distinct d "${line}")"
+        try "${RM_BIN} -fv '${line}'" && \
+            debug "Removed untracked file from definition repository: $(distinct d "${line}")"
     done
     update_defs
+    cd "${_cwd}"
+    unset _rdefs_branch _cwd
 }
 
 
