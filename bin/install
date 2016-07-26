@@ -4,5 +4,4 @@
 . share/sofin/funs/self.fun
 
 load_requirements
-install_base
-update_env_files
+install_sofin
