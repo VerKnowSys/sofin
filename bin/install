@@ -1,9 +1,8 @@
 #!/usr/bin/env sh
 # @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
 
-export PREFIX="${PREFIX}"
-export INSTALL="YES"
-. "bin/build"
+. share/sofin/funs/self.fun
 
+load_requirements
 install_base
 update_env_files
