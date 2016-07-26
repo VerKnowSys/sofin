@@ -2,7 +2,7 @@ compiler_setup () {
     #XXX
     if [ "${1}" = "silent" ]; then
         debug () {
-            ${LOGGER_BIN} "sofin: $@"
+            ${LOGGER_BIN} "${DEFAULT_NAME}: $@"
         }
     fi
     debug "---------------- COMPILER FEATURES DUMP -----------------"

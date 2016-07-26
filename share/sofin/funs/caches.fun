@@ -26,9 +26,9 @@ log_helper () {
     _log_h_pattern="$1"
     create_dirs
     if [ -z "${_log_h_pattern}" ]; then
-        _log_files="$(find_all "${LOGS_DIR}" "sofin*")"
+        _log_files="$(find_all "${LOGS_DIR}" "${DEFAULT_NAME}*")"
     else
-        _log_files="$(find_all "${LOGS_DIR}" "sofin*${_log_h_pattern}*")"
+        _log_files="$(find_all "${LOGS_DIR}" "${DEFAULT_NAME}*${_log_h_pattern}*")"
     fi
     _lognum_f="$(echo "${_log_files}" | eval ${FILES_COUNT_GUARD})"
     if [ -z "${_lognum_f}" ]; then
@@ -65,20 +65,20 @@ show_logs () {
     _logf_pattern="$*"
     _logf_minutes="${LOG_LAST_ACCESS_OR_MOD_MINUTES}"
     debug "show_logs(): _logf_minutes: $(distinct d ${_logf_minutes}), pattern: $(distinct d "${_logf_pattern}")"
-    _files_x_min=$(${FIND_BIN} "${LOGS_DIR}" -maxdepth 1 -mindepth 1 -mmin -${_logf_minutes} -amin -${_logf_minutes} -iname "sofin*${_logf_pattern}*" -print 2>/dev/null)
+    _files_x_min=$(${FIND_BIN} "${LOGS_DIR}" -maxdepth 1 -mindepth 1 -mmin -${_logf_minutes} -amin -${_logf_minutes} -iname "${DEFAULT_NAME}*${_logf_pattern}*" -print 2>/dev/null)
     try "${MKDIR_BIN} ${LOGS_DIR}"
     try "${TOUCH_BIN} ${LOG}"
     if [ "-" = "${_logf_pattern}" -o \
-         "sofin" = "${_logf_pattern}" ]; then
+         "${DEFAULT_NAME}" = "${_logf_pattern}" ]; then
         ${TAIL_BIN} -n ${LOG_LINES_AMOUNT} "${LOG}" 2>&1
 
     elif [ "+" = "${_logf_pattern}" ]; then
         if [ -d "${LOGS_DIR}" ]; then
             debug "LOGS_DIR: $(distinct d ${LOGS_DIR})"
             if [ "${SYSTEM_NAME}" = "Linux" ]; then
-                _files_list="$(find_all "${LOGS_DIR}" "sofin*")"
+                _files_list="$(find_all "${LOGS_DIR}" "${DEFAULT_NAME}*")"
             else
-                _files_list="$(find_most_recent "${LOGS_DIR}" "sofin*")"
+                _files_list="$(find_most_recent "${LOGS_DIR}" "${DEFAULT_NAME}*")"
             fi
             debug "_files_list: ${_files_list}"
             _files_abspaths="$(${PRINTF_BIN} "${_files_list}" | eval "${NEWLINES_TO_SPACES_GUARD}")"
@@ -127,7 +127,7 @@ pretouch_logs () {
     _params="$*"
     create_dirs
     debug "Logs pretouch called with params: $(distinct d ${_params})"
-    try "${TOUCH_BIN} ${LOGS_DIR}sofin"
+    try "${TOUCH_BIN} ${LOGS_DIR}${DEFAULT_NAME}"
     _pret_list=""
     for _app in ${_params}; do
         if [ -z "${_app}" ]; then
@@ -135,9 +135,9 @@ pretouch_logs () {
         else
             _lapp="$(lowercase ${_app})"
             if [ -z "${_pret_list}" ]; then
-                _pret_list="${LOGS_DIR}sofin-${_lapp}"
+                _pret_list="${LOGS_DIR}${DEFAULT_NAME}-${_lapp}"
             else
-                _pret_list="${LOGS_DIR}sofin-${_lapp} ${_pret_list}"
+                _pret_list="${LOGS_DIR}${DEFAULT_NAME}-${_lapp} ${_pret_list}"
             fi
         fi
     done
