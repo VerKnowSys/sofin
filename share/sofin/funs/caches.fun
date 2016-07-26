@@ -2,7 +2,7 @@ create_dirs () {
     # special threatment for LOGS_DIR
     if [ ! -d "${LOGS_DIR}" ]; then
         debug "LOGS_DIR: $(distinct d "${LOGS_DIR}")"
-        ${MKDIR_BIN} -p "${LOGS_DIR}" >/dev/null 2>&1
+        try "${MKDIR_BIN} -p ${LOGS_DIR}"
     fi
 
     # check for regular cache dirs for existence:
@@ -10,7 +10,7 @@ create_dirs () {
          ! -d "${FILE_CACHE_DIR}" -o \
          ! -d "${LOCKS_DIR}" ]; then
          for dir in "${FILE_CACHE_DIR}" "${CACHE_DIR}" "${LOCKS_DIR}"; do
-            ${MKDIR_BIN} -p "${dir}" >/dev/null 2>&1
+            try "${MKDIR_BIN} -p ${dir}"
          done
     fi
     if [ ! -d "${DEFINITIONS_DIR}" -o \
@@ -66,7 +66,8 @@ show_logs () {
     _logf_minutes="${LOG_LAST_ACCESS_OR_MOD_MINUTES}"
     debug "show_logs(): _logf_minutes: $(distinct d ${_logf_minutes}), pattern: $(distinct d "${_logf_pattern}")"
     _files_x_min=$(${FIND_BIN} "${LOGS_DIR}" -maxdepth 1 -mindepth 1 -mmin -${_logf_minutes} -amin -${_logf_minutes} -iname "sofin*${_logf_pattern}*" -print 2>/dev/null)
-    ${TOUCH_BIN} ${LOG} >/dev/null 2>&1
+    try "${MKDIR_BIN} ${LOGS_DIR}"
+    try "${TOUCH_BIN} ${LOG}"
     if [ "-" = "${_logf_pattern}" -o \
          "sofin" = "${_logf_pattern}" ]; then
         ${TAIL_BIN} -n ${LOG_LINES_AMOUNT} "${LOG}" 2>&1
@@ -126,7 +127,7 @@ pretouch_logs () {
     _params="$*"
     create_dirs
     debug "Logs pretouch called with params: $(distinct d ${_params})"
-    ${TOUCH_BIN} ${LOGS_DIR}sofin >/dev/null 2>&1
+    try "${TOUCH_BIN} ${LOGS_DIR}sofin"
     _pret_list=""
     for _app in ${_params}; do
         if [ -z "${_app}" ]; then
@@ -141,7 +142,7 @@ pretouch_logs () {
         fi
     done
     debug "pretouch_logs(): $(distinct d "${_pret_list}")"
-    ${TOUCH_BIN} ${_pret_list} >/dev/null 2>&1
+    try "${TOUCH_BIN} ${_pret_list}"
     unset _app _params _lapp _pret_list
 }
 

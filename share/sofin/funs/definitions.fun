@@ -120,6 +120,7 @@ update_defs () {
         debug "Definitions update skipped on demand"
         return
     fi
+    try "${MKDIR_BIN} -p ${LOGS_DIR}"
     _cwd="$(${PWD_BIN} 2>/dev/null)"
     if [ ! -x "${GIT_BIN}" ]; then
         note "Installing initial definition list from tarball to cache dir: $(distinct n ${CACHE_DIR})"
@@ -173,7 +174,6 @@ update_defs () {
         fi
     else
         # create cache; clone definitions repository:
-        try "${MKDIR_BIN} -p ${CACHE_DIR} ${LOGS_DIR}"
         cd "${CACHE_DIR}"
         debug "Cloning repository: $(distinct d "${REPOSITORY}") from branch: $(distinct d "${BRANCH}"); LOGS_DIR: $(distinct d ${LOGS_DIR}), CACHE_DIR: $(distinct d ${CACHE_DIR})"
         try "${RM_BIN} -vrf ${DEFINITIONS_BASE}"
@@ -384,26 +384,26 @@ create_apple_bundle_if_necessary () { # XXXXXX
         DEF_BUNDLE_NAME="${PREFIX}.app"
         note "Creating Apple bundle: $(distinct n ${DEF_NAME} )in: $(distinct n ${DEF_BUNDLE_NAME})"
         ${MKDIR_BIN} -p "${DEF_BUNDLE_NAME}/libs" "${DEF_BUNDLE_NAME}/Contents" "${DEF_BUNDLE_NAME}/Contents/Resources/${_aname}" "${DEF_BUNDLE_NAME}/exports" "${DEF_BUNDLE_NAME}/share"
-        ${CP_BIN} -R ${PREFIX}/${DEF_NAME}.app/Contents/* "${DEF_BUNDLE_NAME}/Contents/"
-        ${CP_BIN} -R ${PREFIX}/bin/${_aname} "${DEF_BUNDLE_NAME}/exports/"
+        try "${CP_BIN} -R ${PREFIX}/${DEF_NAME}.app/Contents/* ${DEF_BUNDLE_NAME}/Contents/"
+        try "${CP_BIN} -R ${PREFIX}/bin/${_aname} ${DEF_BUNDLE_NAME}/exports/"
         for lib in $(${FIND_BIN} "${PREFIX}" -name '*.dylib' -type f 2>/dev/null); do
-            ${CP_BIN} -vf ${lib} ${DEF_BUNDLE_NAME}/libs/ >> ${LOG}-${_aname} 2>> ${LOG}-${_aname}
+            try "${CP_BIN} -vf ${lib} ${DEF_BUNDLE_NAME}/libs/"
         done
 
         # if symlink exists, remove it.
-        ${RM_BIN} -vf ${DEF_BUNDLE_NAME}/lib >> ${LOG} 2>> ${LOG}
-        ${LN_BIN} -vs "${DEF_BUNDLE_NAME}/libs ${DEF_BUNDLE_NAME}/lib" >> ${LOG} 2>> ${LOG}
+        try "${RM_BIN} -vf ${DEF_BUNDLE_NAME}/lib"
+        try "${LN_BIN} -vs ${DEF_BUNDLE_NAME}/libs ${DEF_BUNDLE_NAME}/lib"
 
         # move data, and support files from origin:
-        ${CP_BIN} -vR "${PREFIX}/share/${_aname}" "${DEF_BUNDLE_NAME}/share/" >> ${LOG} 2>> ${LOG}
-        ${CP_BIN} -vR "${PREFIX}/lib/${_aname}" "${DEF_BUNDLE_NAME}/libs/" >> ${LOG} 2>> ${LOG}
+        try "${CP_BIN} -vR ${PREFIX}/share/${_aname} ${DEF_BUNDLE_NAME}/share/"
+        try "${CP_BIN} -vR ${PREFIX}/lib/${_aname} ${DEF_BUNDLE_NAME}/libs/"
 
         cd "${DEF_BUNDLE_NAME}/Contents"
-        ${TEST_BIN} -L MacOS || ${LN_BIN} -s ../exports MacOS >> ${LOG}-${_aname} 2>> ${LOG}-${_aname}
+        try "${TEST_BIN} -L MacOS || ${LN_BIN} -s ../exports MacOS"
         debug "Creating relative libraries search path"
         cd ${DEF_BUNDLE_NAME}
         note "Processing exported binary: $(distinct n ${i})"
-        ${SOFIN_LIBBUNDLE_BIN} -x "${DEF_BUNDLE_NAME}/Contents/MacOS/${_aname}" >> ${LOG}-${_aname} 2>> ${LOG}-${_aname}
+        try "${SOFIN_LIBBUNDLE_BIN} -x ${DEF_BUNDLE_NAME}/Contents/MacOS/${_aname}"
     fi
 }
 
@@ -449,7 +449,7 @@ strip_bundle () {
                 if [ -d "${_stripdir}" ]; then
                     _tbstripfiles=$(${FIND_BIN} ${_stripdir} -maxdepth 1 -type f 2>/dev/null)
                     for _file in ${_tbstripfiles}; do
-                        ${STRIP_BIN} "${_file}" >> "${LOG}-${_bundlower}.strip" 2>> "${LOG}-${_bundlower}.strip"
+                        try "${STRIP_BIN} ${DEFAULT_STRIP_OPTS} ${_file}"
                         if [ "$?" = "0" ]; then
                             _counter="${_counter} + 1"
                         else
@@ -576,7 +576,7 @@ export_binaries () {
     fi
     if [ -d "${PREFIX}/exports-disabled" ]; then # just bring back disabled exports
         debug "Moving $(distinct d ${PREFIX}/exports-disabled) to $(distinct d ${PREFIX}/exports)"
-        ${MV_BIN} "${PREFIX}/exports-disabled" "${PREFIX}/exports"
+        try "${MV_BIN} -v ${PREFIX}/exports-disabled ${PREFIX}/exports"
     fi
     if [ -z "${DEF_EXPORTS}" ]; then
         note "Defined no binaries to export of prefix: $(distinct n ${PREFIX})"
@@ -584,7 +584,7 @@ export_binaries () {
         _a_name="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
         _an_amount="$(echo "${DEF_EXPORTS}" | ${WC_BIN} -w 2>/dev/null | ${TR_BIN} -d '\t|\r|\ ' 2>/dev/null)"
         debug "Exporting $(distinct d ${_an_amount}) binaries of prefix: $(distinct d ${PREFIX})"
-        ${MKDIR_BIN} -p "${PREFIX}/exports" >/dev/null 2>&1
+        try "${MKDIR_BIN} -p ${PREFIX}/exports"
         _expolist=""
         for exp in ${DEF_EXPORTS}; do
             for dir in "/bin/" "/sbin/" "/libexec/"; do
@@ -593,7 +593,7 @@ export_binaries () {
                     if [ -x "${_afile_to_exp}" ]; then # and it's executable'
                         _acurrdir="$(${PWD_BIN} 2>/dev/null)"
                         cd "${PREFIX}${dir}"
-                        ${LN_BIN} -vfs "..${dir}${exp}" "../exports/${exp}" >> "${LOG}-${_a_name}" 2>> "${LOG}-${_a_name}"
+                        try "${LN_BIN} -vfs ..${dir}${exp} ../exports/${exp}"
                         cd "${_acurrdir}"
                         _expo_elem="$(${BASENAME_BIN} ${_afile_to_exp} 2>/dev/null)"
                         _expolist="${_expolist} ${_expo_elem}"
