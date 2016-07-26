@@ -1,4 +1,4 @@
-s-*
+bin/s-*
 releases
 *.sublime-*
 src/.*.o
