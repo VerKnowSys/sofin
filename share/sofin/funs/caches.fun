@@ -66,8 +66,7 @@ show_logs () {
     _logf_minutes="${LOG_LAST_ACCESS_OR_MOD_MINUTES}"
     debug "show_logs(): _logf_minutes: $(distinct d ${_logf_minutes}), pattern: $(distinct d "${_logf_pattern}")"
     _files_x_min=$(${FIND_BIN} "${LOGS_DIR}" -maxdepth 1 -mindepth 1 -mmin -${_logf_minutes} -amin -${_logf_minutes} -iname "${DEFAULT_NAME}*${_logf_pattern}*" -print 2>/dev/null)
-    try "${MKDIR_BIN} ${LOGS_DIR}"
-    try "${TOUCH_BIN} ${LOG}"
+    touch_logsdir_and_logfile
     if [ "-" = "${_logf_pattern}" -o \
          "${DEFAULT_NAME}" = "${_logf_pattern}" ]; then
         ${TAIL_BIN} -n ${LOG_LINES_AMOUNT} "${LOG}" 2>&1
