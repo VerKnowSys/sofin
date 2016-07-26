@@ -25,7 +25,19 @@ else
 fi
 
 
+SOFIN_SHELL_BLOCK=$(${CAT_BIN} <<EOF
+#------Sofin-Environment-Block------#
+trap 'source "\$HOME/.profile"' USR2
+if [ -e "\$HOME/.profile" ]; then
+    source "\$HOME/.profile"
+fi
+export SHELL_PID="\$\$"
+EOF
+)
+
+
 determine_system_capabilites () {
+    # TODO: add ability to run on systems without present C_COMPILER_NAME
     ${ZPOOL_BIN} list >/dev/null 2>/dev/null
     if [ "$?" = "0" ]; then
         CAP_SYS_ZFS=YES
