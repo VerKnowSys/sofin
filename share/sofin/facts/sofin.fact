@@ -7,6 +7,9 @@ DEFAULT_DEFINITIONS_BRANCH="${DEFAULT_DEFINITIONS_BRANCH:-stable}"
 DEFAULT_ISSUE_REPORT_SITE="https://bitbucket.org/verknowsys/sofin/issues"
 DEFAULT_ISSUE_REPORT_SITE_ALT="https://github.com/VerKnowSys/sofin/issues"
 
+# default value for HOME
+HOME="${HOME:-${DEFAULT_HOME}}"
+
 MAIN_SOFTWARE_ADDRESS="${MAIN_SOFTWARE_ADDRESS:-software.verknowsys.com}"
 MAIN_COMMON_NAME="${MAIN_COMMON_NAME:-Common}"
 MAIN_SOFTWARE_PREFIX="${MAIN_SOFTWARE_PREFIX:-/Mirror}"
