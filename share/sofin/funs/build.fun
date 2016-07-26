@@ -49,19 +49,13 @@ push_binbuilds () {
         if [ ! -f "${_pbinstall_indicator_file}" ]; then
             error "Missing install indicator: $(distinct e "${_pbinstall_indicator_file}"). You can't push a binary build of uncomplete build!"
         fi
-        debug "_pbelement: ${_pbelement}, _pbinstall_indicator_file: ${_pbinstall_indicator_file}, _pbbversion_element: ${_pbbversion_element}"
+        debug "About to push: $(distinct d "${_pbelement}"), install-indicator: $(distinct d "${_pbinstall_indicator_file}"), soft-version: $(distinct d "${_pbbversion_element}")"
         if [ -n "${_pbelement}" -a \
-             -d "${_pbelement}" -a \
-             -f "${_pbinstall_indicator_file}" -a \
+             -d "${SOFTWARE_DIR}${_pbelement}" -a \
              -n "${_pbbversion_element}" ]; then
-
-            if [ -z "${_pbbversion_element}" ]; then
-                error "No version element set for bundle: $(distinct e "${_pbelement}")"
-            fi
-            note "Pushing binary bundle: $(distinct n "${_push_bundles}-${_pbbversion_element}") to remote: $(distinct n "${MAIN_BINARY_REPOSITORY}")"
             push_to_all_mirrors "${_pbelement}" "${_pbbversion_element}"
         else
-            warn "No version file of software: $(distinct w ${_pbelement}) found! It seems to not be fully installed or broken."
+            error "Push validations failed for bundle: $(distinct e "${_pbelement}")! It might not be fully installed or broken."
         fi
     done
 }
@@ -152,7 +146,7 @@ fetch_binbuild () {
             fi
         fi
 
-        debug "_bb_archive: $(distinct d ${_bb_archive}). Expecting binbuild to be available in: $(distinct d ${FILE_CACHE_DIR}${_bb_archive})"
+        debug "_bb_archive: $(distinct d "${_bb_archive}"). Expecting binbuild to be available in: $(distinct d "${FILE_CACHE_DIR}${_bb_archive}")"
 
         # validate binary build:
         if [ -e "${FILE_CACHE_DIR}${_bb_archive}" ]; then
