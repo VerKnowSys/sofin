@@ -1,16 +1,22 @@
-# Core values required to be defined before *
+# Core facts
 
-DEFAULT_CPUS=4
-MAX_OPEN_TAIL_LOGS=80
-LOG_LINES_AMOUNT=23
-LOG_LINES_AMOUNT_ON_ERR=17
-LOG_LAST_ACCESS_OR_MOD_MINUTES=60
+# executables provided with Sofin:
+#   s        -> Sofin main and the only script
+#   s-osver  -> system version printer
+#   s-usec   -> time counted in ųs since 1970
+SOFIN_PROVIDES="s s-osver s-usec"
 
 # default CA Root certs to be used by Sofin:
 DEFAULT_CACERT="/etc/ssl/cert.pem"
 
 DEFAULT_FACTS_DIR="/usr/share/sofin/facts/"
 DEFAULT_FUNS_DIR="/usr/share/sofin/funs/"
+
+DEFAULT_CPUS=4
+MAX_OPEN_TAIL_LOGS=80
+LOG_LINES_AMOUNT=23
+LOG_LINES_AMOUNT_ON_ERR=17
+LOG_LAST_ACCESS_OR_MOD_MINUTES=60
 
 DEFAULT_DEF_EXT=".def"
 DEFAULT_LOCK_EXT=".lock"
@@ -23,6 +29,7 @@ DEFAULT_SERVICE_SNAPSHOT_EXT=".zfsp"
 DEFAULT_GIT_SNAPSHOT_HEAD="--head--"
 DEFAULT_SRC_EXT=".src_"
 
+PROJECT_DEPENDENCIES_LIST_FILE=".dependencies"
 DEFAULT_FALLBACK_SHELL="/bin/sh"
 DEFAULT_MANPATH="/usr/share/man"
 DEFAULT_SSH_OPTS="" #-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
@@ -32,8 +39,6 @@ DEFAULT_LESS_OPTIONS="--hilite-search -K -N -M -R --follow-name -c"
 DEFAULT_GIT_OPTS="--no-verbose --progress"
 DEFAULT_ID_USER_NAME_OPTS="-un"
 DEFAULT_DATE_TS_OPTS="+%s"
-
-DEPENDENCIES_FILE=".dependencies"
 
 ERRORCODE_TASK_FAILURE=1
 ERRORCODE_USER_INTERRUPT=2
