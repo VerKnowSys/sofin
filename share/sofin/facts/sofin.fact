@@ -29,6 +29,7 @@ GIT_CACHE_DIR="${CACHE_DIR}git-cache/"
 
 DEFINITIONS_DEFAULT_FILE_NAME="defaults" # NOTE: Base "def" file, loaded before each software definition
 DEFINITIONS_LISTS_FILE_NAME="lists" # NOTE: It's name of lists directory from "Sofin-definitions" repository
+DEFINITIONS_INITIAL_FILE_NAME="initial-definitions" # NOTE: if no git vailable in system, use initial snapshot
 DEFINITIONS_BASE="definitions" # NOTE: It's main directory in "Sofin-definitions" repository
 
 DEFINITIONS_DIR="${CACHE_DIR}${DEFINITIONS_BASE}/${DEFINITIONS_BASE}/"
