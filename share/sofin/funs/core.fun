@@ -150,7 +150,7 @@ run () {
         unset _run_show_stdout_progress
         echo "${_run_params}" | eval "${MATCH_FETCH_CMDS_GUARD}" && _run_show_stdout_progress=YES
         _rnm="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
-        debug "$(${DATE_BIN} +%s 2>/dev/null): $(distinct d "${_run_params}") [${_run_show_stdout_progress:-NO}]"
+        debug "$(distinct d "${yellow}${RUN_CHAR}") $(${DATE_BIN} +%s 2>/dev/null): $(distinct d "${_run_params}") [${_run_show_stdout_progress:-NO}]"
         if [ -z "${_rnm}" ]; then
             if [ -z "${_run_show_stdout_progress}" ]; then
                 eval PATH="${PATH}" "${_run_params}" >> "${LOG}" 2>> "${LOG}"
@@ -183,7 +183,7 @@ try () {
         unset _show_prgrss
         echo "${_try_params}" | eval "${MATCH_FETCH_CMDS_GUARD}" && _show_prgrss=YES
         _try_aname="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
-        debug "$(${DATE_BIN} +%s 2>/dev/null): $(distinct d "${_try_params}") [${_show_prgrss:-NO}]"
+        debug "$(distinct d "${yellow}${TRY_CHAR}") $(${DATE_BIN} +%s 2>/dev/null): $(distinct d "${_try_params}") [${_show_prgrss:-NO}]"
         if [ -z "${_try_aname}" ]; then
             if [ -z "${_show_prgrss}" ]; then
                 eval PATH="${PATH}" "${_try_params}" >> "${LOG}" 2>> "${LOG}"
