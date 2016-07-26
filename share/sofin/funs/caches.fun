@@ -155,3 +155,9 @@ show_log_if_available () {
         debug "No log available to attach tail to.."
     fi
 }
+
+
+touch_logsdir_and_logfile () {
+    try "${MKDIR_BIN} -p ${LOGS_DIR}"
+    try "${TOUCH_BIN} ${LOG}"
+}
