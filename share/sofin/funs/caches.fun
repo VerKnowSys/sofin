@@ -144,3 +144,13 @@ pretouch_logs () {
     ${TOUCH_BIN} ${_pret_list} >/dev/null 2>&1
     unset _app _params _lapp _pret_list
 }
+
+
+show_log_if_available () {
+    if [ -f "${LOG}" ]; then
+        note $(fill)
+        ${TAIL_BIN} -n${LOG_LINES_AMOUNT_ON_ERR} "${LOG}" 2>/dev/null
+    else
+        debug "No log available to attach tail to.."
+    fi
+}

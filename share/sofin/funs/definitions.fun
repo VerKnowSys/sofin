@@ -153,7 +153,7 @@ update_defs () {
                 return
 
             note "${ColorRed}Error occured: Update from branch: $(distinct e "${BRANCH}") of repository: $(distinct e "${REPOSITORY}") wasn't possible. Log below:${ColorReset}"
-            ${TAIL_BIN} -n${LOG_LINES_AMOUNT_ON_ERR} "${LOG}" 2>/dev/null
+            show_log_if_available
             return
 
         else # else use default branch
@@ -168,7 +168,7 @@ update_defs () {
                     return
 
             note "${ColorRed}Error occured: Update from branch: $(distinct e "${BRANCH}") of repository: $(distinct e "${REPOSITORY}") wasn't possible. Log's below:${ColorReset}"
-            ${TAIL_BIN} -n${LOG_LINES_AMOUNT_ON_ERR} ${LOG} 2>/dev/null
+            show_log_if_available
             return
         fi
     else
