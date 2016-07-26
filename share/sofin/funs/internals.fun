@@ -27,7 +27,7 @@ usage_howto () {
     note "  $(distinct n "enable                               ") enables Sofin developer environment (full environment stored in ~/.profile). It's the default"
     note "  $(distinct n "disable                              ") disables Sofin developer environment (only PATH, PKG_CONFIG_PATH and MANPATH written to ~/.profile)"
     note "  $(distinct n "status                               ") shows Sofin status"
-    note "  $(distinct n "dev                                  ") puts definition content on the fly. Second argument is (lowercase) definition name (no extension). (example: sofin dev rubinius)"
+    note "  $(distinct n "dev                                  ") puts definition content on the fly. Second argument is (lowercase) definition name (no extension). (example: ${SOFIN_BIN_SHORT} dev rubinius)"
     note "  $(distinct n "rebuild                              ") rebuilds and pushes each software bundle that depends on definition given as a param. (example: ${SOFIN_BIN_SHORT} rebuild openssl - will rebuild all bundles that have 'openssl' dependency)"
     note "  $(distinct n "reset                               ") resets local definitions repository"
     note "  $(distinct n "diff                                ") displays changes in current definitions cache. Accepts any part of definition name"
