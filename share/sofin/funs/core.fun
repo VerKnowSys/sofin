@@ -57,19 +57,16 @@ debug () {
     if [ -z "${DEBUG}" ]; then
         _dbgnme="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
         if [ -n "${_dbgnme}" -a \
-               -d "${LOGS_DIR}" ]; then
+             -d "${LOGS_DIR}" ]; then
             # Definition log
-            cecho "${_dbfn}${_in}" ${ColorViolet} \
-                >> "${LOG}-${_dbgnme}" 2>> "${LOG}-${_dbgnme}"
-# XXX: sprawdzać istnienie pliku loga i katalogów i zrobić fallback na /var/log
+            cecho "${_dbfn}${_in}" ${ColorViolet} >> "${LOG}-${_dbgnme}" 2>> "${LOG}-${_dbgnme}"
         elif [ -z "${_dbgnme}" -a \
                -d "${LOGS_DIR}" ]; then
             # Main log
-            cecho "${_dbfn}${_in}" ${ColorViolet} \
-                >> "${LOG}" 2>> "${LOG}"
+            cecho "${_dbfn}${_in}" ${ColorViolet} >> "${LOG}" 2>> "${LOG}"
         elif [ ! -d "${LOGS_DIR}" ]; then
             # System logger fallback
-            ${LOGGER_BIN} "sofin: ${_in}"
+            ${LOGGER_BIN} "${DEFAULT_NAME}: ${_in}"
         fi
     else # DEBUG is set.
         cecho "${_dbfn}${_in}" ${ColorViolet}
