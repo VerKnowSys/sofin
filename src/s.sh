@@ -113,14 +113,14 @@ if [ -n "${SOFIN_COMMAND_ARG}" ]; then
                 warn "Installation of project dependencies as root is immoral"
             fi
             fail_on_bg_job ${SOFIN_ARGS}
-            note "Looking for a dependencies list file: $(distinct n ${DEPENDENCIES_FILE}) in current directory"
-            if [ ! -e "./${DEPENDENCIES_FILE}" ]; then
-                error "Dependencies file not found!"
+            if [ ! -f "${PROJECT_DEPENDENCIES_LIST_FILE}" ]; then
+                error "Dependencies file not found! Expected file: $(distinct e "${PROJECT_DEPENDENCIES_LIST_FILE}") in current directory!"
             fi
-            _pickd_bundls="$(${CAT_BIN} ./${DEPENDENCIES_FILE} 2>/dev/null | eval ${NEWLINES_TO_SPACES_GUARD})"
-            note "Installing dependencies: $(distinct n ${_pickd_bundls})"
+            _pickd_bundls="$(${CAT_BIN} "${PROJECT_DEPENDENCIES_LIST_FILE}" 2>/dev/null | eval ${NEWLINES_TO_SPACES_GUARD})"
+            _bundls_amount="$(echo "${_pickd_bundls}" | eval ${WORDS_COUNT_GUARD})"
+            note "Dependencies list file found with $(distinct n "${_bundls_amount}") elements in order: $(distinct n "${_pickd_bundls}")"
             build "${_pickd_bundls}"
-            unset _pickd_bundls
+            unset _pickd_bundls _bundls_amount
             finalize
             ;;
 
