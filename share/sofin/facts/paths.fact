@@ -69,6 +69,7 @@ ENV_BIN="/usr/bin/env"
 REV_BIN="/usr/bin/rev"
 DD_BIN="/bin/dd"
 TPUT_BIN="/usr/bin/tput"
+TEE_BIN="/usr/bin/tee"
 
 # Pick best utilities available:
 if [ -f "${DEFAULT_FACTS_DIR}alternatives.fact" ]; then
