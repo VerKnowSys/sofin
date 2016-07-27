@@ -34,6 +34,7 @@ FUNS_LOCAL_DIR="share/sofin/funs/"
 FACTS_LOCAL_DIR="share/sofin/facts/"
 DEFAULT_FACTS_DIR="/usr/${FACTS_LOCAL_DIR}"
 DEFAULT_FUNS_DIR="/usr/${FUNS_LOCAL_DIR}"
+DEFAULT_SOFIN_DEFINITIONS_NAME="sofin-definitions"
 
 DEFAULT_DEF_EXT=".def"
 DEFAULT_LOCK_EXT=".lock"
