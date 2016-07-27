@@ -87,7 +87,7 @@ fi
 # Zfs: zpool
 if [ -x "/sbin/zpool" ]; then
     ZPOOL_BIN="/sbin/zpool"
-if [ -x "/usr/sbin/zpool" ]; then
+elif [ -x "/usr/sbin/zpool" ]; then
     ZPOOL_BIN="/usr/sbin/zpool"
 elif [ -x "/usr/pkg/sbin/zpool" ]; then
     ZPOOL_BIN="/usr/pkg/sbin/zpool"
