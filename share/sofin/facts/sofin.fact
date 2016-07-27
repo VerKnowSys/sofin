@@ -85,13 +85,22 @@ DUP_ERR_TO_OUT_GUARD="${TEE_BIN} /dev/stdout"
 
 # Tracing of Sofin itself:
 if [ -n "${SOFIN_TRACE}" ]; then
-    if [ "YES" = "${CAP_TERM_ZSH}" ]; then
-        setopt sourcetrace
-        setopt xtrace
-    elif [ "YES" = "${CAP_TERM_BASH}" ]; then
-        set -o sourcetrace
-        set -o xtrace
-    else
-        set -o xtrace
-    fi
+    # NOTE: may be useful later:
+    #
+    # if [ "YES" = "${CAP_TERM_ZSH}" ]; then
+    #     setopt sourcetrace
+    #     setopt xtrace
+    # elif [ "YES" = "${CAP_TERM_BASH}" ]; then
+    #     set -o sourcetrace
+    #     set -o xtrace
+    # else
+    #     set -o xtrace
+    # fi
+    set -x
+    echo "Enabled trace mode"
+fi
+
+if [ -n "${SOFIN_VERBOSE}" ]; then
+    set -v
+    echo "Enabled verbose mode"
 fi
