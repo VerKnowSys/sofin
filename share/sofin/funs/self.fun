@@ -5,6 +5,7 @@ load_requirements () {
     . share/sofin/facts/paths.fact
 
     # these two loaded only for colorful output:
+    . share/sofin/facts/system.fact
     . share/sofin/facts/terminal.fact
     . share/sofin/facts/sofin.fact
 
