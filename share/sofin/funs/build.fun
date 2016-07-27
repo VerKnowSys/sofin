@@ -339,7 +339,11 @@ dump_debug_info () {
     debug "CXXFLAGS: $(distinct d ${CXXFLAGS})"
     debug "CFLAGS: $(distinct d ${CFLAGS})"
     debug "LDFLAGS: $(distinct d ${LDFLAGS})"
-    debug "LD_LIBRARY_PATH: $(distinct d ${LD_LIBRARY_PATH})"
+    if [ "Darwin" = "${SYSTEM_NAME}" ]; then
+        debug "DYLD_LIBRARY_PATH: $(distinct d ${DYLD_LIBRARY_PATH})"
+    else
+        debug "LD_LIBRARY_PATH: $(distinct d ${LD_LIBRARY_PATH})"
+    fi
     debug "-------------- PRE CONFIGURE SETTINGS DUMP ENDS ---------"
 }
 

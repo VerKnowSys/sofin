@@ -106,7 +106,7 @@ get_shell_vars () {
         process ${SOFTWARE_DIR}
     fi
 
-    # LD_LIBRARY_PATH, LDFLAGS, PKG_CONFIG_PATH:
+    # LDFLAGS, PKG_CONFIG_PATH:
     # ldresult="/lib:/usr/lib"
     pkg_config_path="."
     ldflags="${LDFLAGS} ${DEFAULT_LDFLAGS}"
