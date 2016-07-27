@@ -36,8 +36,11 @@ usage_howto () {
 
 
 write_info_about_shell_configuration () {
-    warn "$(distinct n SHELL_PID) has no value (normally contains pid of current shell)"
-    warn "Shell auto reload function is disabled for this session"
+    if [ "YES" = "${TTY}" ]; then
+        warn "$(distinct w SHELL_PID) has no value (normally contains pid of current shell)\nShell auto reload function is disabled for this session"
+    else
+        debug "$(distinct d SHELL_PID) has no value (normally contains pid of current shell)\nShell auto reload function is disabled for this session"
+    fi
 }
 
 
