@@ -223,26 +223,37 @@ setup_defs_repo () {
 }
 
 
+cleanup_handler () {
+    restore_security_state
+    debug "Normal exit: $(distinct d "${SOFIN_PID}")!" | eval ${DUP_OUT_TO_ERR_GUARD} 2>>${LOG}
+    finalize
+    exit ${ERRORCODE_USER_INTERRUPT}
+}
+
+
 interrupt_handler () {
     restore_security_state
-    warn "Interrupting: $(distinct w "${SOFIN_PID}")!" >> ${LOG}
+    warn "Interrupted: $(distinct w "${SOFIN_PID}")!" | eval ${DUP_OUT_TO_ERR_GUARD} 2>>${LOG}
+    finalize
     exit ${ERRORCODE_USER_INTERRUPT}
 }
 
 
 terminate_handler () {
     restore_security_state
-    warn "Terminating: $(distinct w "${SOFIN_PID}")!" >> ${LOG}
+    warn "Terminated: $(distinct w "${SOFIN_PID}")!" | eval ${DUP_OUT_TO_ERR_GUARD} 2>>${LOG}
+    finalize
     exit ${ERRORCODE_TERMINATED}
 }
 
 
 noop_handler () {
-    debug "No-Op handler."
+    warn "Got signal: USR2 (NO-OP)" | eval ${DUP_OUT_TO_ERR_GUARD} 2>>${LOG}
 }
 
 
 trap_signals () {
+    trap cleanup_handler 0
     trap interrupt_handler INT
     trap terminate_handler TERM
     trap noop_handler USR2 # This signal is used to "reload shell"-feature. Sofin should ignore it
