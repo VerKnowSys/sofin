@@ -157,6 +157,6 @@ show_log_if_available () {
 
 
 touch_logsdir_and_logfile () {
-    try "${MKDIR_BIN} -p ${LOGS_DIR}"
-    try "${TOUCH_BIN} ${LOG}"
+    ${MKDIR_BIN} -p "${LOGS_DIR}" >/dev/null 2>&1
+    ${TOUCH_BIN} "${LOG}" >/dev/null 2>&1
 }
