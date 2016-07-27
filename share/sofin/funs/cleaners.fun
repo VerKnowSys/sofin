@@ -1,6 +1,6 @@
 clean_purge () {
     if [ -d "${CACHE_DIR}" ]; then
-        note "Purging all caches from: $(distinct n "${CACHE_DIR}")"
+        debug "Purging all caches from: $(distinct n "${CACHE_DIR}")"
         try "${RM_BIN} -rf ${CACHE_DIR}"
     fi
 }
@@ -8,7 +8,7 @@ clean_purge () {
 
 clean_logs () {
     if [ -d "${LOGS_DIR}" ]; then
-        note "Removing build logs from: $(distinct n "${LOGS_DIR}")"
+        debug "Removing build logs from: $(distinct n "${LOGS_DIR}")"
         try "${RM_BIN} -rf ${LOGS_DIR}"
     fi
 }
@@ -16,7 +16,7 @@ clean_logs () {
 
 clean_filecache () {
     if [ -d "${FILE_CACHE_DIR}" ]; then
-        note "Removing file-caches from: $(distinct n "${FILE_CACHE_DIR}")"
+        debug "Removing file-caches from: $(distinct n "${FILE_CACHE_DIR}")"
         try "${RM_BIN} -rf ${FILE_CACHE_DIR}"
     fi
 }
