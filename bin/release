@@ -3,28 +3,23 @@
 
 . share/sofin/loader
 
-readonly SOFIN_ORIGIN="git@bitbucket.org:verknowsys/sofin${DEFAULT_GIT_DIR_NAME}"
-readonly SOFIN_MIRROR="git@github.com:VerKnowSys/sofin${DEFAULT_GIT_DIR_NAME}"
-
 note "Pulling from origin and mirror.."
 ${GIT_BIN} pull "${SOFIN_ORIGIN}" >/dev/null
-${GIT_BIN} pull "${SOFIN_MIRROR}" >/dev/null
+${GIT_BIN} pull "${SOFIN_ORIGIN_ALT}" >/dev/null
 
-note "Pushing repo to origin: ${SOFIN_ORIGIN} and mirror: ${SOFIN_MIRROR}"
+note "Pushing repo to origin: ${SOFIN_ORIGIN} and mirror: ${SOFIN_ORIGIN_ALT}"
 ${GIT_BIN} push --all "${SOFIN_ORIGIN}" >/dev/null && \
 ${GIT_BIN} push --tags "${SOFIN_ORIGIN}" >/dev/null && \
-${GIT_BIN} push --all "${SOFIN_MIRROR}" >/dev/null && \
-${GIT_BIN} push --tags "${SOFIN_MIRROR}" >/dev/null && \
+${GIT_BIN} push --all "${SOFIN_ORIGIN_ALT}" >/dev/null && \
+${GIT_BIN} push --tags "${SOFIN_ORIGIN_ALT}" >/dev/null
+
 note "Cleaning natives"
 ${RM_BIN} -fv bin/s-* src/.*.o
 ${MKDIR_BIN} -p releases
-version="$(${GREP_BIN} 'SOFIN_VERSION=' share/sofin/facts/sofin.fact | ${AWK_BIN} '{ gsub(/\"/, "", $1); gsub(/SOFIN_VERSION=/, "", $1); print $1; }')"
-if [ -z "${version}" ]; then
-    error "Fail: Empty version."
-fi
-base_name="sofin-${version}"
-archive_name="${base_name}.txz"
-note "Preparing package: ${archive_name} with version: ${version}"
+
+base_name="${DEFAULT_NAME}-${SOFIN_VERSION}"
+archive_name="${base_name}${DEFAULT_ARCHIVE_TARBALL_EXT}"
+note "Preparing package: ${archive_name} with version: ${SOFIN_VERSION}"
 
 ${TAR_BIN} cJf releases/${archive_name} README.md src bin
 ${MKDIR_BIN} -p releases/${base_name}
@@ -40,32 +35,26 @@ cd ..
 if [ "${USER}" != "dmilith" ]; then
     warn "You should be dmilith, to push a release."
 else
-    DEST_HOST="v"
-    DEST_USER="sofin"
-    DEST_PATH="/home/dmilith/Web/Public/Sofin-releases"
-    HTTP_PATH="http://dmilith.verknowsys.com/Public/Sofin-releases"
-    DEFAULT_REPOSITORY="https://verknowsys@bitbucket.org/verknowsys/sofin-definitions${DEFAULT_GIT_DIR_NAME}" # main sofin definitions repository
-    DEFAULT_REPOSITORY_MIRROR="git@github.com:VerKnowSys/sofin-definitions${DEFAULT_GIT_DIR_NAME}" # alternative sofin definitions repository
-    INITIALS="${DEFINITIONS_INITIAL_FILE_NAME}"
-    DEST_NAME="sofin-${version}${DEFAULT_ARCHIVE_TARBALL_EXT}"
+    DEST_NAME="${DEFAULT_NAME}-${SOFIN_VERSION}${DEFAULT_ARCHIVE_TARBALL_EXT}"
 
     note "Pushing Sofin package to remote server: "
     ${CHMOD_BIN} a+r releases/${DEST_NAME}
-    ${SCP_BIN} releases/${DEST_NAME} "${DEST_HOST}:${DEST_PATH}" >/dev/null
-    ${SSH_BIN} ${DEST_USER}@${DEST_HOST} "source ~/.functions.sh && gather-source ${HTTP_PATH}/${DEST_NAME}"
+    ${SCP_BIN} releases/${DEST_NAME} "${DEFAULT_RELEASE_HOST}:${DEFAULT_RELEASE_REMOTE_PATH}" >/dev/null
+    ${SSH_BIN} ${DEFAULT_NAME}@${DEFAULT_RELEASE_HOST} "source ~/.functions.sh && gather-source ${DEFAULT_RELEASE_PATH}/${DEST_NAME}"
 
-    note "Preparing initial snapshot from repository: ${DEFAULT_REPOSITORY}"
-    ${GIT_BIN} clone ${DEFAULT_REPOSITORY} sofin-definitions >/dev/null
-    cd ./sofin-definitions
-    ${GIT_BIN} push --all "${DEFAULT_REPOSITORY_MIRROR}" >/dev/null
-    ${GIT_BIN} push --tags "${DEFAULT_REPOSITORY_MIRROR}" >/dev/null
-    ${TAR_BIN} cJf ../releases/${INITIALS}${DEFAULT_ARCHIVE_TARBALL_EXT} definitions lists README.md >/dev/null
+    note "Preparing initial snapshot from repository: ${DEFAULT_DEFINITIONS_REPOSITORY}"
+    ${GIT_BIN} clone ${DEFAULT_DEFINITIONS_REPOSITORY} ${DEFAULT_SOFIN_DEFINITIONS_NAME} >/dev/null
+    cd ./${DEFAULT_SOFIN_DEFINITIONS_NAME}
+    ${GIT_BIN} push --all "${DEFAULT_DEFINITIONS_REPOSITORY_ALT}" >/dev/null
+    ${GIT_BIN} push --tags "${DEFAULT_DEFINITIONS_REPOSITORY_ALT}" >/dev/null
+    ${TAR_BIN} cJf ../releases/${DEFINITIONS_INITIAL_FILE_NAME}${DEFAULT_ARCHIVE_TARBALL_EXT} definitions lists README.md >/dev/null
     cd ..
 
     note "Pushing snapshot to remote server(s)"
-    ${CHMOD_BIN} a+r releases/${INITIALS}${DEFAULT_ARCHIVE_TARBALL_EXT}
-    ${SCP_BIN} releases/${INITIALS}${DEFAULT_ARCHIVE_TARBALL_EXT} "${DEST_HOST}:${DEST_PATH}" >/dev/null
-    ${SSH_BIN} ${DEST_USER}@${DEST_HOST} "${RM_BIN} /Mirror/software/source/${INITIALS}${DEFAULT_ARCHIVE_TARBALL_EXT} ; source ~/.functions.sh && gather-source ${HTTP_PATH}/${INITIALS}${DEFAULT_ARCHIVE_TARBALL_EXT}" >/dev/null
-    ${RM_BIN} -rf ./sofin-definitions ${INITIALS}${DEFAULT_ARCHIVE_TARBALL_EXT}
-    note "Sofin v${version} deployed to: ${HTTP_PATH}"
+    ${CHMOD_BIN} a+r releases/${DEFINITIONS_INITIAL_FILE_NAME}${DEFAULT_ARCHIVE_TARBALL_EXT}
+    ${SCP_BIN} releases/${DEFINITIONS_INITIAL_FILE_NAME}${DEFAULT_ARCHIVE_TARBALL_EXT} "${DEFAULT_RELEASE_HOST}:${DEFAULT_RELEASE_REMOTE_PATH}" >/dev/null
+    ${SSH_BIN} ${DEFAULT_NAME}@${DEFAULT_RELEASE_HOST} "rm /Mirror/software/source/${DEFINITIONS_INITIAL_FILE_NAME}${DEFAULT_ARCHIVE_TARBALL_EXT} ; source ~/.functions.sh && gather-source ${DEFAULT_RELEASE_PATH}/${DEFINITIONS_INITIAL_FILE_NAME}${DEFAULT_ARCHIVE_TARBALL_EXT}" >/dev/null
+    ${RM_BIN} -rf ./${DEFAULT_SOFIN_DEFINITIONS_NAME} ${DEFINITIONS_INITIAL_FILE_NAME}${DEFAULT_ARCHIVE_TARBALL_EXT}
+
+    note "Sofin v$(distinct n "${SOFIN_VERSION}") deployed to: $(distinct n "${DEFAULT_RELEASE_PATH}")"
 fi
