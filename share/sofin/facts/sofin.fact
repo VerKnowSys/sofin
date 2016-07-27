@@ -4,6 +4,9 @@ SOFIN_VERSION="1.1.5"
 DEFAULT_DEFINITIONS_REPOSITORY="${DEFAULT_DEFINITIONS_REPOSITORY:-https://verknowsys@bitbucket.org/verknowsys/sofin-definitions${DEFAULT_GIT_DIR_NAME}}"
 DEFAULT_DEFINITIONS_BRANCH="${DEFAULT_DEFINITIONS_BRANCH:-stable}"
 
+DEFAULT_RELEASE_HOST="v" # NOTE: use value for v from /etc/hosts
+DEFAULT_RELEASE_PATH="http://dmilith.verknowsys.com/Public/Sofin-releases"
+DEFAULT_RELEASE_REMOTE_PATH="/home/dmilith/Web/Public/Sofin-releases"
 DEFAULT_ISSUE_REPORT_SITE="https://bitbucket.org/verknowsys/sofin/issues"
 DEFAULT_ISSUE_REPORT_SITE_ALT="https://github.com/VerKnowSys/sofin/issues"
 
