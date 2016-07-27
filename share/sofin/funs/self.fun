@@ -26,6 +26,12 @@ install_sofin () {
 }
 
 
+# No-Op one for installer:
+update_defs () {
+    debug "Skipping definitions update in installation process."
+}
+
+
 build_sofin_natives () {
     _okch="$(distinct n "${ColorParams}${SUCCESS_CHAR}")"
     note "Building.."
