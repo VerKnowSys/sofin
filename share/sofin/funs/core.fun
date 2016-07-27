@@ -227,7 +227,7 @@ cleanup_handler () {
     restore_security_state
     debug "Normal exit: $(distinct d "${SOFIN_PID}")!" | eval ${DUP_OUT_TO_ERR_GUARD} 2>>${LOG}
     finalize
-    exit ${ERRORCODE_USER_INTERRUPT}
+    exit
 }
 
 
