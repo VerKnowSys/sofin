@@ -66,7 +66,7 @@ debug () {
             cecho "${_dbfn}${_in}" ${ColorViolet} >> "${LOG}" 2>> "${LOG}"
         elif [ ! -d "${LOGS_DIR}" ]; then
             # System logger fallback
-            ${LOGGER_BIN} "${DEFAULT_NAME}: ${_in}"
+            ${LOGGER_BIN} "${ColorReset}${DEFAULT_NAME}: ${ColorViolet}${_dbfn}${_in}${ColorReset}"
         fi
     else # DEBUG is set.
         cecho "${_dbfn}${_in}" ${ColorViolet}
