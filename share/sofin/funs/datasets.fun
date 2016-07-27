@@ -317,10 +317,11 @@ destroy_builddir () {
         fi
         unset _dsname
     else
-        debug "Removing regular build-directory: $(distinct d "${SOFTWARE_DIR}${_deste_bund_name}")"
-        try "${RM_BIN} -fr ${SOFTWARE_DIR}${_deste_bund_name}"
+        _bdir="${SOFTWARE_DIR}${_cb_bundle_name}/${DEFAULT_SRC_EXT}${_dset_namesum}"
+        debug "Removing regular build-directory: $(distinct d "${_bdir}")"
+        try "${RM_BIN} -fr ${_bdir}"
     fi
-    unset _deste_bund_name
+    unset _deste_bund_name _bdir _deste_bund_name _dset_sum _dsname
 }
 
 
