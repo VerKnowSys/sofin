@@ -80,6 +80,8 @@ MATCH_FETCH_CMDS_GUARD="${EGREP_BIN} '^.*(\/zfs send|\/zfs rec|\/zpool|\/fetch|\
 CALCULATE_SHA_GUARD="${SHA_BIN} 2>/dev/null | ${CUT_BIN} -d' ' -f1 2>/dev/null"
 HOST_ADDRESS_GUARD="${CUT_BIN} -d' ' -f2 2>/dev/null | ${CUT_BIN} -d'#' -f1 2>/dev/null"
 CUTOFF_DEF_EXT_GUARD="${SED_BIN} -e \"s#${DEFAULT_DEF_EXT}##\" 2>/dev/null"
+DUP_OUT_TO_ERR_GUARD="${TEE_BIN} /dev/stderr"
+DUP_ERR_TO_OUT_GUARD="${TEE_BIN} /dev/stdout"
 
 # Tracing of Sofin itself:
 if [ -n "${SOFIN_TRACE}" ]; then
