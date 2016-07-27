@@ -306,11 +306,16 @@ build () {
             strip_bundle "${_common_lowercase}"
             create_apple_bundle_if_necessary
 
-            if [ -z "${DEVEL}" ]; then
-                destroy_builddir "$(${BASENAME_BIN} "${PREFIX}" 2>/dev/null)" "${BUILD_NAMESUM}"
-            fi
         fi
     done
+
+    # Cleanup build dirs..
+    if [ -z "${DEVEL}" ]; then
+        destroy_builddir "$(${BASENAME_BIN} "${PREFIX}" 2>/dev/null)" "${BUILD_NAMESUM}"
+    else
+        # TODO: dump srcdir? here?
+        debug "No-Op - not yet implemented"
+    fi
     update_shell_vars
     unset _build_list _common_lowercase _req_all _req
 }
