@@ -15,21 +15,10 @@ LOG_LINES_AMOUNT=23
 LOG_LINES_AMOUNT_ON_ERR=17
 LOG_LAST_ACCESS_OR_MOD_MINUTES=60
 
-# Determine CACHE_DIR LOGS_DIR and LOG:
-if [ -d "${DEFAULT_HOME}/.${DEFAULT_NAME}/" ]; then
-    CACHE_DIR="${DEFAULT_HOME}/.${DEFAULT_NAME}/"
-else
-    CACHE_DIR="/tmp/"
-fi
-LOCKS_DIR="${CACHE_DIR}locks/"
-LOGS_DIR="${CACHE_DIR}logs/"
-LOG="${LOG:-${LOGS_DIR}${DEFAULT_NAME}}"
-FILE_CACHE_DIR="${CACHE_DIR}file-cache/"
-GIT_CACHE_DIR="${CACHE_DIR}git-cache/"
-
 # default CA Root certs to be used by Sofin:
 DEFAULT_CACERT="/etc/ssl/cert.pem"
 
+# other default values:
 FUNS_LOCAL_DIR="share/sofin/funs/"
 FACTS_LOCAL_DIR="share/sofin/facts/"
 DEFAULT_FACTS_DIR="/usr/${FACTS_LOCAL_DIR}"
@@ -50,6 +39,7 @@ DEFAULT_SRC_EXT=".src_"
 DEFAULT_GIT_DIR_NAME=".git"
 DEFAULT_PROJECT_DEPS_LIST_FILE=".dependencies"
 DEFAULT_FALLBACK_SHELL="/bin/sh"
+DEFAULT_SYSTEM_CACHE_DIR="/var/cache/"
 DEFAULT_MANPATH="/usr/share/man"
 DEFAULT_SSH_OPTS="" #-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
 DEFAULT_SCP_OPTS="-C -B"
@@ -67,5 +57,27 @@ ERRORCODE_TASK_FAILURE=1
 ERRORCODE_USER_INTERRUPT=2
 ERRORCODE_TERMINATED=3
 ERRORCODE_VALIDATE_ENV_FAILURE=4
+
+# NOTE: Handle default value for critical env values like HOME or LOGNAME, to forbid empty values:
+HOME="${HOME:-${DEFAULT_HOME}}"
 LANG="${LANG:-${DEFAULT_LOCALE}}"
 LANGUAGE="${LANGUAGE:-${DEFAULT_LOCALE}}"
+
+# Determine CACHE_DIR and related core settings:
+if [ -d "${DEFAULT_HOME}/.${DEFAULT_NAME}" -o -d "${DEFAULT_HOME}" ]; then
+    # ServeD-OS support:
+    CACHE_DIR="${DEFAULT_HOME}/.${DEFAULT_NAME}/"
+
+elif [ -d "${HOME}/.${DEFAULT_NAME}" -o -d "${HOME}" ]; then
+    # Use POSIX-like HOME dir support:
+    CACHE_DIR="${HOME}/.${DEFAULT_NAME}/"
+else
+    # any POSIX-legacy system support:
+    CACHE_DIR="${DEFAULT_SYSTEM_CACHE_DIR}${DEFAULT_NAME}/"
+fi
+
+FILE_CACHE_DIR="${CACHE_DIR}file-cache/"
+GIT_CACHE_DIR="${CACHE_DIR}git-cache/"
+LOCKS_DIR="${CACHE_DIR}locks/"
+LOGS_DIR="${CACHE_DIR}logs/"
+LOG="${LOGS_DIR}${DEFAULT_NAME}"
