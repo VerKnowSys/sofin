@@ -262,16 +262,12 @@ acquire_lock_for () {
 
 destroy_locks () {
     debug "Cleaning file locks that belong to pid: $(distinct d ${SOFIN_PID}).."
-    for f in $(${FIND_BIN} ${LOCKS_DIR} -mindepth 1 -maxdepth 1 -name "*${DEFAULT_LOCK_EXT}" -print 2>/dev/null); do
-        if [ ! -f "${LOG}" ]; then
-            LOG="/dev/null"
-        fi
-        ${GREP_BIN} "${SOFIN_PID}" "${f}" >> ${LOG} 2>> ${LOG}
-        if [ "$?" = "0" ]; then
-            debug "Removing lock file: $(distinct d ${f})"
-            ${RM_BIN} -fv "${f}" >> ${LOG} 2>> ${LOG}
-        fi
+    for _dlf in $(${FIND_BIN} ${LOCKS_DIR} -mindepth 1 -maxdepth 1 -name "*${DEFAULT_LOCK_EXT}" -print 2>/dev/null); do
+        try "${GREP_BIN} ${SOFIN_PID} ${_dlf}" && \
+            try "${RM_BIN} -f ${_dlf}" && \
+                debug "Lock file removed: $(distinct d "${_dlf}")"
     done
+    unset _dlf
 }
 
 
