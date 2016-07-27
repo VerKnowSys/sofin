@@ -1,6 +1,18 @@
 #!/usr/bin/env sh
 # @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
 
+if [ "${1}" = "trace" -o \
+     -n "${SOFIN_TRACE}" ]; then
+    echo "Enabling trace mode"
+    set -x
+fi
+
+if [ "${1}" = "verbose" -o \
+     -n "${SOFIN_TRACE}" ]; then
+    echo "Enabling verbose mode"
+    set -v
+fi
+
 . share/sofin/funs/self.fun
 
 load_requirements
