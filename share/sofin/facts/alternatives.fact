@@ -85,12 +85,14 @@ else
 fi
 
 # Zfs: zpool
-if [ -x "/usr/bin/zpool" ]; then
-    ZPOOL_BIN="/usr/bin/zpool"
-elif [ -x "/usr/pkg/bin/zpool" ]; then
-    ZPOOL_BIN="/usr/pkg/bin/zpool"
-elif [ -x "/usr/local/bin/zpool" ]; then
-    ZPOOL_BIN="/usr/local/bin/zpool"
+if [ -x "/sbin/zpool" ]; then
+    ZPOOL_BIN="/sbin/zpool"
+if [ -x "/usr/sbin/zpool" ]; then
+    ZPOOL_BIN="/usr/sbin/zpool"
+elif [ -x "/usr/pkg/sbin/zpool" ]; then
+    ZPOOL_BIN="/usr/pkg/sbin/zpool"
+elif [ -x "/usr/local/sbin/zpool" ]; then
+    ZPOOL_BIN="/usr/local/sbin/zpool"
 else
     unset ZPOOL_BIN
 fi
