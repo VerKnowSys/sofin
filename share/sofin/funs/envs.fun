@@ -210,22 +210,22 @@ compiler_setup () {
 
 
 create_lock () {
-    bundle_name="${1}"
-    if [ -z "${bundle_name}" ]; then
+    _bundle_name="${1}"
+    if [ -z "${_bundle_name}" ]; then
         error "No bundle name specified to lock!"
     else
-        debug "Acquring bundle lock for: $(distinct d ${bundle_name})"
+        debug "Acquring bundle lock for: $(distinct d "${_bundle_name}")"
     fi
     if [ -z "${SOFIN_PID}" ]; then
         SOFIN_PID="$$"
-        debug "\$SOFIN_PID is empty! Assigned as current process pid: $(distinct d ${SOFIN_PID})"
+        debug "\$SOFIN_PID is empty! Assigned as current process pid: $(distinct d "${SOFIN_PID}")"
     else
-        debug "create_lock(): Pid of current Sofin session is: $(distinct d ${SOFIN_PID})"
+        debug "create_lock(): Pid of current Sofin session is: $(distinct d "${SOFIN_PID}")"
     fi
-    bundle="$(capitalize ${bundle_name})"
-    ${MKDIR_BIN} -p ${LOCKS_DIR}
-    ${PRINTF_BIN} "${SOFIN_PID}" > ${LOCKS_DIR}${bundle}${DEFAULT_LOCK_EXT}
-    unset bundle bundle_name
+    _bundle="$(capitalize "${_bundle_name}")"
+    ${MKDIR_BIN} -p ${LOCKS_DIR} 2>/dev/null
+    ${PRINTF_BIN} "${SOFIN_PID}" > "${LOCKS_DIR}${_bundle}${DEFAULT_LOCK_EXT}"
+    unset _bundle _bundle_name
 }
 
 
