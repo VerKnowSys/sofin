@@ -383,14 +383,14 @@ process () {
                 if [ -z "${DEF_GIT_MODE}" ]; then # Standard "fetch source archive" method
                     _base="$(${BASENAME_BIN} "${DEF_HTTP_PATH}" 2>/dev/null)"
                     debug "DEF_HTTP_PATH: $(distinct d "${DEF_HTTP_PATH}") base: $(distinct d "${_base}")"
-                    if [ ! -e "${FILE_CACHE_DIR}/${_base}" ]; then
+                    if [ ! -e "${FILE_CACHE_DIR}${_base}" ]; then
                         note "   ${NOTE_CHAR} Fetching required source: $(distinct n "${_base}")"
                         cd "${FILE_CACHE_DIR}"
                         retry "${FETCH_BIN} ${FETCH_OPTS} ${DEF_HTTP_PATH}" || \
                             def_error "${DEF_NAME}" "Failed to fetch source: "${DEF_HTTP_PATH}""
                     fi
                     cd "${BUILD_DIR}"
-                    _dest_file="${FILE_CACHE_DIR}/${_base}"
+                    _dest_file="${FILE_CACHE_DIR}${_base}"
                     debug "Build root: $(distinct d ${BUILD_DIR}), file: $(distinct d "${_dest_file}")"
                     if [ -z "${DEF_SHA}" ]; then
                         error "Missing SHA sum for source: $(distinct e "${_dest_file}")!"
