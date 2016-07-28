@@ -73,43 +73,6 @@ file_size () {
 }
 
 
-retry () {
-    _targets="${*}"
-    _ammo="OOO"
-
-    touch_logsdir_and_logfile
-
-    # check for commands that puts something important/intersting on stdout
-    unset _rtry_show_stdout_progress
-    echo "${_targets}" | eval "${MATCH_PRINT_STDOUT_GUARD}" && _rtry_show_stdout_progress=YES
-
-    debug "Show stdout progress _rtry_show_stdout_progress=$(distinct d "${_rtry_show_stdout_progress}")"
-    while [ -n "${_ammo}" ]; do
-        if [ -n "${_targets}" ]; then
-            debug "${TIMESTAMP}: Invoking: retry($(distinct d "${_targets}")) [$(distinct d ${_ammo})]"
-            _gitroot="$(${BASENAME_BIN} $(${BASENAME_BIN} ${GIT_BIN} 2>/dev/null) 2>/dev/null)"
-            if [ -z "${_rtry_show_stdout_progress}" ]; then
-                eval "PATH=${_gitroot}/bin:${_gitroot}/libexec/git-core:${DEFAULT_PATH} ${_targets}" >> "${LOG}" 2>> "${LOG}" && \
-                    unset _gitroot _ammo _targets && \
-                    return 0
-            else
-                ${PRINTF_BIN} "${ColorBlue}"
-                eval "PATH=${_gitroot}/bin:${_gitroot}/libexec/git-core:${DEFAULT_PATH} ${_targets}" >> "${LOG}" && \
-                    unset _gitroot _ammo _targets && \
-                    return 0
-            fi
-        else
-            error "Given an empty command to evaluate!"
-        fi
-        _ammo="$(echo "${_ammo}" | ${SED_BIN} 's/O//' 2>/dev/null)"
-        debug "Remaining attempts: $(distinct d "${_ammo}")"
-    done
-    debug "All _ammo exhausted to invoke a command: $(distinct e "${_targets}")"
-    unset _ammo _targets
-    return 1
-}
-
-
 capitalize () {
     _capi_name="${*}"
     _capi_head="$(${PRINTF_BIN} "${_capi_name}" 2>/dev/null | ${CUT_BIN} -c1 2>/dev/null | ${TR_BIN} '[a-z]' '[A-Z]' 2>/dev/null)"
