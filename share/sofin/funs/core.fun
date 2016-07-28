@@ -257,7 +257,7 @@ noop_handler () {
 
 
 trap_signals () {
-    trap cleanup_handler 0
+    trap cleanup_handler EXIT
     trap interrupt_handler INT
     trap terminate_handler TERM
     trap noop_handler USR2 # This signal is used to "reload shell"-feature. Sofin should ignore it
