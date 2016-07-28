@@ -152,7 +152,7 @@ fetch_dset_zfs_stream () {
     fi
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
         _commons_path="${MAIN_COMMON_REPOSITORY}/${_fdz_out_file}"
-        retry "${FETCH_BIN} ${FETCH_OPTS} -o ${FILE_CACHE_DIR}${_fdz_out_file} ${_commons_path}"
+        retry "${FETCH_BIN} -o ${FILE_CACHE_DIR}${_fdz_out_file} ${FETCH_OPTS} '${_commons_path}'"
         if [ "$?" = "0" ]; then
             _dataset_name="${DEFAULT_ZPOOL}${SERVICES_DIR}${USER}/${_fdz_bund_name}"
             debug "Creating service dataset: $(distinct d "${_dataset_name}"), from file stream: $(distinct d "${_fdz_out_file}")."

@@ -134,12 +134,12 @@ fetch_binbuild () {
         _bbfull_name="$(capitalize "${_bbfull_name}")"
         if [ ! -e "${FILE_CACHE_DIR}${_bb_archive}" ]; then
             try "${MKDIR_BIN} -p ${FILE_CACHE_DIR}"
-            try "${FETCH_BIN} ${FETCH_OPTS} -o ${FILE_CACHE_DIR}${_bb_archive} '${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}${DEFAULT_CHKSUM_EXT}'" || \
-                try "${FETCH_BIN} ${FETCH_OPTS} -o ${FILE_CACHE_DIR}${_bb_archive} '${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}${DEFAULT_CHKSUM_EXT}'"
+            try "${FETCH_BIN} -o ${FILE_CACHE_DIR}${_bb_archive} ${FETCH_OPTS} '${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}${DEFAULT_CHKSUM_EXT}'" || \
+                try "${FETCH_BIN} -o ${FILE_CACHE_DIR}${_bb_archive} ${FETCH_OPTS} '${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}${DEFAULT_CHKSUM_EXT}'"
             if [ "$?" = "0" ]; then
-                try "${FETCH_BIN} ${FETCH_OPTS} -o ${FILE_CACHE_DIR}${_bb_archive} '${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}'" || \
-                    try "${FETCH_BIN} ${FETCH_OPTS} -o ${FILE_CACHE_DIR}${_bb_archive} '${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}'" || \
-                    try "${FETCH_BIN} ${FETCH_OPTS} -o ${FILE_CACHE_DIR}${_bb_archive} '${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}'" || \
+                try "${FETCH_BIN} -o ${FILE_CACHE_DIR}${_bb_archive} ${FETCH_OPTS} '${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}'" || \
+                    try "${FETCH_BIN} -o ${FILE_CACHE_DIR}${_bb_archive} ${FETCH_OPTS} '${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}'" || \
+                    try "${FETCH_BIN} -o ${FILE_CACHE_DIR}${_bb_archive} ${FETCH_OPTS} '${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}'" || \
                     error "Failure fetching available binary build for: $(distinct e "${_bb_archive}"). Please check your DNS / Network setup!"
             else
                 note "No binary build available for: $(distinct n "${OS_TRIPPLE}/${_full_name}-${_bb_ver}")"
@@ -383,13 +383,13 @@ process () {
                 if [ -z "${DEF_GIT_MODE}" ]; then # Standard "fetch source archive" method
                     _base="$(${BASENAME_BIN} "${DEF_SOURCE_PATH}" 2>/dev/null)"
                     debug "DEF_SOURCE_PATH: $(distinct d "${DEF_SOURCE_PATH}") base: $(distinct d "${_base}")"
+                    _dest_file="${FILE_CACHE_DIR}${_base}"
                     # TODO: implement auto picking fetch method based on DEF_SOURCE_PATH contents
-                    if [ ! -e "${FILE_CACHE_DIR}${_base}" ]; then
-                        retry "${FETCH_BIN} ${FETCH_OPTS} -o ${FILE_CACHE_DIR}${_base} ${DEF_SOURCE_PATH}" || \
+                    if [ ! -e "${_dest_file}" ]; then
+                        retry "${FETCH_BIN} -o ${_dest_file} ${FETCH_OPTS} '${DEF_SOURCE_PATH}'" || \
                             def_error "${DEF_NAME}${DEF_POSTFIX}" "Failed source fetch: $(distinct e "${DEF_SOURCE_PATH}${_base}")"
                         note "   ${NOTE_CHAR} Source fetched for: $(distinct n "${_base}")"
                     fi
-                    _dest_file="${FILE_CACHE_DIR}${_base}"
                     debug "Build root: $(distinct d ${BUILD_DIR}), file: $(distinct d "${_dest_file}")"
                     if [ -z "${DEF_SHA}" ]; then
                         error "Missing SHA sum for source: $(distinct e "${_dest_file}")!"
