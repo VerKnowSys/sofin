@@ -385,20 +385,20 @@ process () {
                 cd "${BUILD_DIR}"
                 if [ -z "${DEF_GIT_MODE}" ]; then # Standard http tarball method:
                     _base="$(${BASENAME_BIN} ${DEF_HTTP_PATH} 2>/dev/null)"
-                    debug "DEF_HTTP_PATH: $(distinct d ${DEF_HTTP_PATH}) base: $(distinct d ${_base})"
+                    debug "DEF_HTTP_PATH: $(distinct d ${DEF_HTTP_PATH}) base: $(distinct d "${_base}")"
                     if [ ! -e "${FILE_CACHE_DIR}/${_base}" ]; then
-                        note "   ${NOTE_CHAR} Fetching required tarball source: $(distinct n ${_base})"
+                        note "   ${NOTE_CHAR} Fetching required tarball source: $(distinct n "${_base}")"
                         cd "${FILE_CACHE_DIR}"
                         retry "${FETCH_BIN} ${FETCH_OPTS} ${DEF_HTTP_PATH}" || \
                             def_error "${DEF_NAME}" "Failed to fetch source: ${DEF_HTTP_PATH}"
                     fi
                     cd "${BUILD_DIR}"
                     _dest_file="${FILE_CACHE_DIR}/${_base}"
-                    debug "Build root: $(distinct d ${BUILD_DIR}), file: $(distinct d ${_dest_file})"
+                    debug "Build root: $(distinct d ${BUILD_DIR}), file: $(distinct d "${_dest_file}")"
                     if [ -z "${DEF_SHA}" ]; then
-                        error "Missing SHA sum for source: $(distinct e ${_dest_file})!"
+                        error "Missing SHA sum for source: $(distinct e "${_dest_file}")!"
                     else
-                        _a_file_checksum="$(file_checksum ${_dest_file})"
+                        _a_file_checksum="$(file_checksum "${_dest_file}")"
                         if [ "${_a_file_checksum}" = "${DEF_SHA}" ]; then
                             debug "Source tarball checksum is fine"
                         else
@@ -627,9 +627,9 @@ process () {
             run "${DEF_INSTALL_METHOD}"
             after_install_callback
 
-            debug "Marking $(distinct d "${_app_param}") as installed in: $(distinct d ${PREFIX})"
+            debug "Marking $(distinct d "${_app_param}") as installed in: $(distinct d "${PREFIX}")"
             ${TOUCH_BIN} "${PREFIX}/${_app_param}${DEFAULT_INST_MARK_EXT}"
-            debug "Writing version: $(distinct d ${DEF_VERSION}) of software: $(distinct d ${DEF_NAME}) installed in: $(distinct d ${PREFIX})"
+            debug "Writing version: $(distinct d "${DEF_VERSION}") of software: $(distinct d "${DEF_NAME}") installed in: $(distinct d "${PREFIX}")"
             ${PRINTF_BIN} "${DEF_VERSION}" > "${PREFIX}/${_app_param}${DEFAULT_INST_MARK_EXT}"
             cd "${_cwd}" 2>/dev/null
             unset _cwd
