@@ -36,12 +36,10 @@ log_helper () {
     fi
     debug "Log helper, files found: $(distinct d "${_lognum_f}")"
     if [ -z "${_log_files}" ]; then
-        ${SLEEP_BIN} 2
         log_helper ${_log_h_pattern}
     else
         case ${_lognum_f} in
             0)
-                ${SLEEP_BIN} 2
                 log_helper ${_log_h_pattern}
                 ;;
 
