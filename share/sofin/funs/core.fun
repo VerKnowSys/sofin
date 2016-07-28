@@ -225,7 +225,7 @@ setup_defs_repo () {
 
 cleanup_handler () {
     restore_security_state
-    debug "Normal exit: $(distinct d "${SOFIN_PID}")!" | eval ${DUP_OUT_TO_ERR_GUARD} 2>>${LOG}
+    debug "Normal exit: $(distinct d "${SOFIN_PID}")!"
     finalize
     exit
 }
@@ -233,7 +233,7 @@ cleanup_handler () {
 
 interrupt_handler () {
     restore_security_state
-    warn "Interrupted: $(distinct w "${SOFIN_PID}")!" | eval ${DUP_OUT_TO_ERR_GUARD} 2>>${LOG}
+    warn "Interrupted: $(distinct w "${SOFIN_PID}")!"
     finalize
     exit ${ERRORCODE_USER_INTERRUPT}
 }
@@ -241,14 +241,14 @@ interrupt_handler () {
 
 terminate_handler () {
     restore_security_state
-    warn "Terminated: $(distinct w "${SOFIN_PID}")!" | eval ${DUP_OUT_TO_ERR_GUARD} 2>>${LOG}
+    warn "Terminated: $(distinct w "${SOFIN_PID}")!"
     finalize
     exit ${ERRORCODE_TERMINATED}
 }
 
 
 noop_handler () {
-    warn "Got signal: USR2 (NO-OP)" | eval ${DUP_OUT_TO_ERR_GUARD} 2>>${LOG}
+    warn "Got signal: USR2 (NO-OP)"
 }
 
 
