@@ -240,7 +240,7 @@ build () {
                     if [ "${DEF_VERSION}" = "${_already_installed_version}" ]; then
                         debug "$(distinct d ${_common_lowercase}) bundle is installed with version: $(distinct d ${_already_installed_version})"
                     else
-                        warn "$(distinct w ${_common_lowercase}) bundle is installed with version: $(distinct w ${_already_installed_version}), different from defined: $(distinct w "${DEF_VERSION}")"
+                        warn "$(distinct w "${_common_lowercase}") bundle is installed with version: $(distinct w "${_already_installed_version}"), different from defined: $(distinct w "${DEF_VERSION}")"
                     fi
                     DONT_BUILD_BUT_DO_EXPORTS=YES
                     unset _already_installed_version
@@ -248,9 +248,9 @@ build () {
 
                 if [ -z "${DONT_BUILD_BUT_DO_EXPORTS}" ]; then
                     if [ -z "${DEF_REQUIREMENTS}" ]; then
-                        note "Installing: $(distinct n ${DEF_FULL_NAME}), version: $(distinct n ${DEF_VERSION})"
+                        note "Installing: $(distinct n "${DEF_FULL_NAME}"), version: $(distinct n "${DEF_VERSION}")"
                     else
-                        note "Installing: $(distinct n ${DEF_FULL_NAME}), version: $(distinct n ${DEF_VERSION}), with requirements: $(distinct n ${DEF_REQUIREMENTS})"
+                        note "Installing: $(distinct n "${DEF_FULL_NAME}"), version: $(distinct n "${DEF_VERSION}"), with requirements: $(distinct n "${DEF_REQUIREMENTS}")"
                     fi
                     _req_amount="$(${PRINTF_BIN} "${DEF_REQUIREMENTS}" | ${WC_BIN} -w 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)"
                     _req_amount="$(${PRINTF_BIN} "${_req_amount} + 1\n" | ${BC_BIN} 2>/dev/null)"
@@ -438,15 +438,15 @@ process () {
                             note "$(fill)"
                         else
                             _current_dir="$(${PWD_BIN} 2>/dev/null)"
-                            debug "Trying to update existing bare repository cache in: $(distinct d ${_git_cached})"
+                            debug "Trying to update existing bare repository cache in: $(distinct d "${_git_cached}")"
                             cd "${_git_cached}"
                             try "${GIT_BIN} fetch ${DEFAULT_GIT_OPTS} origin ${DEF_GIT_CHECKOUT}" || \
                                 try "${GIT_BIN} fetch ${DEFAULT_GIT_OPTS} origin" || \
-                                warn "   ${WARN_CHAR} Failed to fetch an update from bare repository: $(distinct w ${_git_cached})"
-                            # for empty DEF_VERSION it will fill it with first 16 chars of repository HEAD SHA1:
+                                    warn "   ${WARN_CHAR} Failed to fetch an update from bare repository: $(distinct w "${_git_cached}")"
+                            # for empty DEF_VERSION, it will fill it with first 16 chars of repository HEAD SHA1:
                             if [ -z "${DEF_VERSION}" ]; then
                                 DEF_VERSION="$(${GIT_BIN} rev-parse HEAD 2>/dev/null | ${CUT_BIN} -c -16 2>/dev/null)"
-                                debug "Set DEF_VERSION=$(distinct d ${DEF_VERSION}) - based on git commit sha"
+                                debug "Set DEF_VERSION=$(distinct d "${DEF_VERSION}") - based on most recent commit shasum"
                             fi
                             cd "${_current_dir}"
                             unset _current_dir
@@ -454,7 +454,7 @@ process () {
                     fi
                     # bare repository is already cloned, so we just clone from it now..
                     run "${GIT_BIN} clone ${DEFAULT_GIT_OPTS} ${_git_cached} ${DEF_NAME}${DEF_VERSION}" && \
-                    debug "Cloned git respository from git bare cache repository"
+                        debug "Cloned git respository from git bare cache repository"
                     unset _git_cached
                 fi
 
