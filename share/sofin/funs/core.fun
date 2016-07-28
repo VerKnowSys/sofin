@@ -157,7 +157,7 @@ run () {
                 _git_path_addon=":${_git_root}/bin:${_git_root}/libexec/git-core"
             fi
         fi
-        debug "${_dt}: ${ColorWhite}(${RUN_CHAR}${ColorWhite}) $(distinct d "${param}${_run_params}") [show-blueout:${_run_shw_prgr:-NO}, git:${_git_root:-NO}]"
+        debug "${_dt}: ${ColorWhite}${RUN_CHAR}: $(distinct d "${param}${_run_params}") [show-blueout:${_run_shw_prgr:-NO}, git:${_git_root:-NO}]"
         if [ -z "${_rnm}" ]; then
             if [ -z "${_run_shw_prgr}" ]; then
                 eval "PATH=${PATH}${_git_path_addon} ${_run_params} >> ${LOG} 2>> ${LOG}"
@@ -190,7 +190,7 @@ try () {
         touch_logsdir_and_logfile
         echo "${_try_params}" | eval "${MATCH_PRINT_STDOUT_GUARD}" && _show_prgrss=YES
         _dt="${ColorDarkgray}$(${DATE_BIN} ${DEFAULT_DATE_TRYRUN_OPTS} 2>/dev/null)${ColorReset}"
-        debug "${_dt}: ${ColorWhite}(${TRY_CHAR}${ColorWhite}) $(distinct d "${params}${_try_params}") [${_show_prgrss:-NO}]"
+        debug "${_dt}: ${ColorWhite}${TRY_CHAR}: $(distinct d "${params}${_try_params}") [${_show_prgrss:-NO}]"
         _try_aname="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
         if [ -z "${_try_aname}" ]; then
             if [ -z "${_show_prgrss}" ]; then
