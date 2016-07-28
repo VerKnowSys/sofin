@@ -232,15 +232,15 @@ retry () {
     debug "Show stdout progress _rtry_show_blueout=$(distinct d "${_rtry_show_blueout}")"
     while [ -n "${_ammo}" ]; do
         if [ -n "${_targets}" ]; then
-            debug "${TIMESTAMP}: Invoking: retry($(distinct d "${_targets}")) [$(distinct d "${_ammo}")]"
-            _rgit_root="$(${BASENAME_BIN} $(${BASENAME_BIN} ${GIT_BIN} 2>/dev/null) 2>/dev/null)"
+            debug "Invoking: retry($(distinct ${ColorParams} "${_targets}")) [$(distinct d "${_ammo}")]"
+            _rgit_root="$(${BASENAME_BIN} $(${BASENAME_BIN} "${GIT_BIN}" 2>/dev/null) 2>/dev/null)"
             if [ -z "${_rtry_show_blueout}" ]; then
-                eval "PATH=${_rgit_root}/bin:${_rgit_root}/libexec/git-core:${DEFAULT_PATH} ${_targets} >> ${LOG} 2>> ${LOG}" && \
+                eval "PATH=${_rgit_root}/bin:${_rgit_root}/libexec/git-core:${DEFAULT_PATH} ${_targets}" >> ${LOG} 2>> ${LOG} && \
                     unset _rgit_root _ammo _targets && \
                         return 0
             else
                 ${PRINTF_BIN} "${ColorBlue}"
-                eval "PATH=${_rgit_root}/bin:${_rgit_root}/libexec/git-core:${DEFAULT_PATH} ${_targets} >> ${LOG}" && \
+                eval "PATH=${_rgit_root}/bin:${_rgit_root}/libexec/git-core:${DEFAULT_PATH} ${_targets}" >> ${LOG} && \
                     unset _rgit_root _ammo _targets && \
                         return 0
             fi
@@ -298,8 +298,14 @@ noop_handler () {
 }
 
 
+handle_error () {
+    echo "HE: ${*}"
+}
+
+
 trap_signals () {
     trap cleanup_handler EXIT
+    # trap handle_error ERR
     trap interrupt_handler INT
     trap terminate_handler TERM
     trap noop_handler USR2 # This signal is used to "reload shell"-feature. Sofin should ignore it
