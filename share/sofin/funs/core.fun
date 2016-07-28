@@ -147,7 +147,7 @@ run () {
         _run_params="$@"
         touch_logsdir_and_logfile
         unset _run_shw_prgr
-        echo "${_run_params}" | eval "${MATCH_FETCH_CMDS_GUARD}" && _run_shw_prgr=YES
+        echo "${_run_params}" | eval "${MATCH_PRINT_STDOUT_GUARD}" && _run_shw_prgr=YES
         _rnm="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
         _dt="${ColorDarkgray}$(${DATE_BIN} ${DEFAULT_DATE_TRYRUN_OPTS} 2>/dev/null)${ColorReset}"
         debug "${_dt}: ${ColorWhite}(${RUN_CHAR}${ColorWhite}) $(distinct d "${param}${_run_params}") [${_run_shw_prgr:-NO}]"
@@ -182,8 +182,8 @@ try () {
         _try_params="$@"
         touch_logsdir_and_logfile
         unset _show_prgrss
-        echo "${_try_params}" | eval "${MATCH_FETCH_CMDS_GUARD}" && _show_prgrss=YES
         _try_aname="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
+        echo "${_try_params}" | eval "${MATCH_PRINT_STDOUT_GUARD}" && _show_prgrss=YES
         _dt="${ColorDarkgray}$(${DATE_BIN} ${DEFAULT_DATE_TRYRUN_OPTS} 2>/dev/null)${ColorReset}"
         debug "${_dt}: ${ColorWhite}(${TRY_CHAR}${ColorWhite}) $(distinct d "${params}${_try_params}") [${_show_prgrss:-NO}]"
         if [ -z "${_try_aname}" ]; then
