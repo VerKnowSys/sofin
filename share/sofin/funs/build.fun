@@ -370,9 +370,9 @@ process () {
         PATH="${PREFIX}/bin:${PREFIX}/sbin:${DEFAULT_PATH}"
     fi
     if [ -z "${DEF_DISABLED}" ]; then
-        if [ -z "${DEF_HTTP_PATH}" ]; then
+        if [ -z "${DEF_SOURCE_PATH}" ]; then
             _defn_no_ext="$(echo "$(${BASENAME_BIN} "${_req_definition}" 2>/dev/null)" | ${SED_BIN} -e 's/\..*$//g' 2>/dev/null)"
-            note "   ${NOTE_CHAR2} $(distinct n "DEF_HTTP_PATH=\"\"") is undefined for: $(distinct n "${_defn_no_ext}")."
+            note "   ${NOTE_CHAR2} $(distinct n "DEF_SOURCE_PATH=\"\"") is undefined for: $(distinct n "${_defn_no_ext}")."
             note "NOTE: It's only valid for meta bundles. You may consider setting: $(distinct n "DEF_CONFIGURE=\"meta\"") in bundle definition file. Type: $(distinct n "s dev ${_defn_no_ext}"))"
         else
             _cwd="$(${PWD_BIN} 2>/dev/null)"
@@ -381,13 +381,13 @@ process () {
                 create_builddir "$(${BASENAME_BIN} "${PREFIX}" 2>/dev/null)" "${BUILD_NAMESUM}"
                 cd "${BUILD_DIR}"
                 if [ -z "${DEF_GIT_MODE}" ]; then # Standard "fetch source archive" method
-                    _base="$(${BASENAME_BIN} "${DEF_HTTP_PATH}" 2>/dev/null)"
-                    debug "DEF_HTTP_PATH: $(distinct d "${DEF_HTTP_PATH}") base: $(distinct d "${_base}")"
+                    _base="$(${BASENAME_BIN} "${DEF_SOURCE_PATH}" 2>/dev/null)"
+                    debug "DEF_SOURCE_PATH: $(distinct d "${DEF_SOURCE_PATH}") base: $(distinct d "${_base}")"
                     if [ ! -e "${FILE_CACHE_DIR}${_base}" ]; then
                         note "   ${NOTE_CHAR} Fetching required source: $(distinct n "${_base}")"
                         cd "${FILE_CACHE_DIR}"
-                        retry "${FETCH_BIN} ${FETCH_OPTS} ${DEF_HTTP_PATH}" || \
-                            def_error "${DEF_NAME}" "Failed to fetch source: "${DEF_HTTP_PATH}""
+                        retry "${FETCH_BIN} ${FETCH_OPTS} ${DEF_SOURCE_PATH}" || \
+                            def_error "${DEF_NAME}" "Failed to fetch source: "${DEF_SOURCE_PATH}""
                     fi
                     cd "${BUILD_DIR}"
                     _dest_file="${FILE_CACHE_DIR}${_base}"
@@ -421,9 +421,10 @@ process () {
                     # .cache/git-cache => git bare repos
                     ${MKDIR_BIN} -p "${GIT_CACHE_DIR}"
                     _git_cached="${GIT_CACHE_DIR}${DEF_NAME}${DEF_VERSION}${DEFAULT_GIT_DIR_NAME}"
-                    note "   ${NOTE_CHAR} Fetching git repository: $(distinct n "${DEF_HTTP_PATH}${ColorReset}")"
-                    try "${GIT_BIN} clone ${DEFAULT_GIT_OPTS} --depth 1 --bare ${DEF_HTTP_PATH} ${_git_cached}" || \
-                        try "${GIT_BIN} clone ${DEFAULT_GIT_OPTS} --depth 1 --bare ${DEF_HTTP_PATH} ${_git_cached}"
+
+                    note "   ${NOTE_CHAR} Fetching git repository: $(distinct n "${DEF_SOURCE_PATH}${ColorReset}")"
+                    try "${GIT_BIN} clone ${DEFAULT_GIT_OPTS} --depth 1 --bare ${DEF_SOURCE_PATH} ${_git_cached}" || \
+                        try "${GIT_BIN} clone ${DEFAULT_GIT_OPTS} --depth 1 --bare ${DEF_SOURCE_PATH} ${_git_cached}"
                     if [ "$?" = "0" ]; then
                         debug "Fetched bare repository: $(distinct d "${DEF_NAME}${DEF_VERSION}")"
                     else
@@ -478,10 +479,10 @@ process () {
                 fi
                 cd "${_fd}"
 
-                # Handle DEF_SOURCE_DIR_POSTFIX here
-                if [ -n "${_fd}/${DEF_SOURCE_DIR_POSTFIX}" ]; then
-                    try "${MKDIR_BIN} -p ${_fd}/${DEF_SOURCE_DIR_POSTFIX}"
-                    cd "${_fd}/${DEF_SOURCE_DIR_POSTFIX}"
+                # Handle DEF_BUILD_DIR_POSTFIX here
+                if [ -n "${_fd}/${DEF_BUILD_DIR_POSTFIX}" ]; then
+                    try "${MKDIR_BIN} -p ${_fd}/${DEF_BUILD_DIR_POSTFIX}"
+                    cd "${_fd}/${DEF_BUILD_DIR_POSTFIX}"
                 fi
                 _pwd="$(${PWD_BIN} 2>/dev/null)"
                 debug "Switched to build dir root: $(distinct d "${_pwd}")"

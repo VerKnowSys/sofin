@@ -37,7 +37,7 @@ load_defs () {
                             "DEF_VERSION=${DEF_VERSION}" \
                             "DEF_SHA_OR_DEF_GIT_MODE=${DEF_SHA}${DEF_GIT_MODE}" \
                             "DEF_COMPLIANCE=${DEF_COMPLIANCE}" \
-                            "DEF_HTTP_PATH=${DEF_HTTP_PATH}" \
+                            "DEF_SOURCE_PATH=${DEF_SOURCE_PATH}" \
                             "SYSTEM_VERSION=${SYSTEM_VERSION}" \
                             "OS_TRIPPLE=${OS_TRIPPLE}" \
                             "SYS_SPECIFIC_BINARY_REMOTE=${SYS_SPECIFIC_BINARY_REMOTE}";
@@ -48,7 +48,7 @@ load_defs () {
                             "DEF_VERSION" \
                             "DEF_SHA_OR_DEF_GIT_MODE" \
                             "DEF_COMPLIANCE" \
-                            "DEF_HTTP_PATH" \
+                            "DEF_SOURCE_PATH" \
                             "SYSTEM_VERSION" \
                             "OS_TRIPPLE" \
                             "SYS_SPECIFIC_BINARY_REMOTE";
