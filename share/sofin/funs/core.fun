@@ -160,20 +160,20 @@ run () {
         debug "${_dt}: ${ColorWhite}${RUN_CHAR}: $(distinct d "${param}${_run_params}") [show-blueout:${_run_shw_prgr:-NO}, git:${_git_root:-NO}]"
         if [ -z "${_rnm}" ]; then
             if [ -z "${_run_shw_prgr}" ]; then
-                eval "PATH=${PATH}${_git_path_addon} ${_run_params} >> ${LOG} 2>> ${LOG}"
+                eval "PATH=${PATH}${_git_path_addon} ${_run_params}" >> ${LOG} 2>> ${LOG}
                 check_result $? "${_run_params}"
             else
                 ${PRINTF_BIN} "${ColorBlue}"
-                eval "PATH=${PATH}${_git_path_addon} ${_run_params} >> ${LOG}"
+                eval "PATH=${PATH}${_git_path_addon} ${_run_params}" >> ${LOG}
                 check_result $? "${_run_params}"
             fi
         else
             if [ -z "${_run_shw_prgr}" ]; then
-                eval "PATH=${PATH}${_git_path_addon} ${_run_params} >> ${LOG}-${_rnm} 2>> ${LOG}-${_rnm}"
+                eval "PATH=${PATH}${_git_path_addon} ${_run_params}" >> ${LOG}-${_rnm} 2>> ${LOG}-${_rnm}
                 check_result $? "${_run_params}"
             else
                 ${PRINTF_BIN} "${ColorBlue}"
-                eval "PATH=${PATH}${_git_path_addon} ${_run_params} >> ${LOG}-${_rnm}"
+                eval "PATH=${PATH}${_git_path_addon} ${_run_params}" >> ${LOG}-${_rnm}
                 check_result $? "${_run_params}"
             fi
         fi
