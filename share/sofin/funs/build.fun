@@ -353,10 +353,11 @@ process () {
         error "No param given for process()!"
     fi
     _req_definition="${DEFINITIONS_DIR}$(lowercase "${_app_param}")${DEFAULT_DEF_EXT}"
-    debug "Checking requirement: $(distinct d "${_app_param}") file: $(distinct d ${_req_definition})"
     if [ ! -e "${_req_definition}" ]; then
         error "Cannot fetch definition: $(distinct e ${_req_definition})! Aborting!"
     fi
+    _req_defname="$(echo "$(${BASENAME_BIN} "${_req_definition}" 2>/dev/null)" | ${SED_BIN} -e 's/\..*$//g' 2>/dev/null)"
+    debug "Requirement: $(distinct d "${_app_param}") file: $(distinct d "${_req_definition}"), req-name: $(distinct d "${_req_defname}")"
 
     load_defaults
     load_defs "${_req_definition}"
@@ -371,9 +372,8 @@ process () {
     fi
     if [ -z "${DEF_DISABLED}" ]; then
         if [ -z "${DEF_SOURCE_PATH}" ]; then
-            _defn_no_ext="$(echo "$(${BASENAME_BIN} "${_req_definition}" 2>/dev/null)" | ${SED_BIN} -e 's/\..*$//g' 2>/dev/null)"
-            note "   ${NOTE_CHAR2} $(distinct n "DEF_SOURCE_PATH=\"\"") is undefined for: $(distinct n "${_defn_no_ext}")."
-            note "NOTE: It's only valid for meta bundles. You may consider setting: $(distinct n "DEF_CONFIGURE=\"meta\"") in bundle definition file. Type: $(distinct n "s dev ${_defn_no_ext}"))"
+            note "   ${NOTE_CHAR2} $(distinct n "DEF_SOURCE_PATH=\"\"") is undefined for: $(distinct n "${_req_defname}")."
+            note "NOTE: It's only valid for meta bundles. You may consider setting: $(distinct n "DEF_CONFIGURE=\"meta\"") in bundle definition file. Type: $(distinct n "s dev ${_req_defname}"))"
         else
             _cwd="$(${PWD_BIN} 2>/dev/null)"
             if [ -n "${BUILD_DIR}" -a \
@@ -582,14 +582,14 @@ process () {
             unset _cwd
         fi
     else
-        note "   ${WARN_CHAR} Requirement: $(distinct n "${_req_definition}") skipped for: $(distinct n "${SYSTEM_NAME}")"
+        note "   ${WARN_CHAR} Requirement: $(distinct n "${_req_defname}") skipped for: $(distinct n "${SYSTEM_NAME}")"
         if [ -n "${PREFIX}" -a \
              ! -d "${PREFIX}" ]; then # case when disabled requirement is first on list of dependencies
             create_software_dir "$(${BASENAME_BIN} "${PREFIX}" 2>/dev/null)"
         fi
-        _dis_def="${PREFIX}/${_req_definition}${DEFAULT_INST_MARK_EXT}"
-        debug "Disabled requirement: $(distinct d "${_req_definition}"), writing ${DEFAULT_REQ_OS_PROVIDED} to: $(distinct d "${_dis_def}")"
+        _dis_def="${PREFIX}/${_req_defname}${DEFAULT_INST_MARK_EXT}"
+        debug "Disabled requirement: $(distinct d "${_req_defname}"), writing '${DEFAULT_REQ_OS_PROVIDED}' to: $(distinct d "${_dis_def}")"
         run "${PRINTF_BIN} \"${DEFAULT_REQ_OS_PROVIDED}\" > ${_dis_def}"
     fi
-    unset _current_branch _dis_def
+    unset _current_branch _dis_def _req_defname
 }
