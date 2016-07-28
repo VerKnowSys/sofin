@@ -354,7 +354,7 @@ process () {
         error "No param given for process()!"
     fi
     _req_definition="${DEFINITIONS_DIR}$(lowercase "${_app_param}")${DEFAULT_DEF_EXT}"
-    debug "Checking requirement: $(distinct d ${_app_param}) file: $(distinct d ${_req_definition})"
+    debug "Checking requirement: $(distinct d "${_app_param}") file: $(distinct d ${_req_definition})"
     if [ ! -e "${_req_definition}" ]; then
         error "Cannot fetch definition: $(distinct e ${_req_definition})! Aborting!"
     fi
@@ -422,7 +422,7 @@ process () {
                 else
                     # git method:
                     # .cache/git-cache => git bare repos
-                    ${MKDIR_BIN} -p ${GIT_CACHE_DIR}
+                    ${MKDIR_BIN} -p "${GIT_CACHE_DIR}"
                     _git_cached="${GIT_CACHE_DIR}${DEF_NAME}${DEF_VERSION}${DEFAULT_GIT_DIR_NAME}"
                     note "   ${NOTE_CHAR} Fetching git repository: $(distinct n ${DEF_HTTP_PATH}${ColorReset})"
                     try "${GIT_BIN} clone ${DEFAULT_GIT_OPTS} --depth 1 --bare ${DEF_HTTP_PATH} ${_git_cached}" || \
@@ -527,21 +527,21 @@ process () {
 
                 after_patch_callback
 
-                note "   ${NOTE_CHAR} Configuring: $(distinct n ${_app_param}), version: $(distinct n ${DEF_VERSION})"
+                note "   ${NOTE_CHAR} Configuring: $(distinct n "${_app_param}"), version: $(distinct n "${DEF_VERSION}")"
                 case "${DEF_CONFIGURE}" in
 
                     ignore)
-                        note "   ${NOTE_CHAR} Configuration skipped for definition: $(distinct n ${_app_param})"
+                        note "   ${NOTE_CHAR} Configuration skipped for definition: $(distinct n "${_app_param}")"
                         ;;
 
                     no-conf)
-                        note "   ${NOTE_CHAR} No configuration for definition: $(distinct n ${_app_param})"
+                        note "   ${NOTE_CHAR} No configuration for definition: $(distinct n "${_app_param}")"
                         DEF_MAKE_METHOD="${DEF_MAKE_METHOD} PREFIX=${PREFIX}"
                         DEF_INSTALL_METHOD="${DEF_INSTALL_METHOD} PREFIX=${PREFIX}"
                         ;;
 
                     binary)
-                        note "   ${NOTE_CHAR} Prebuilt definition of: $(distinct n ${_app_param})"
+                        note "   ${NOTE_CHAR} Prebuilt definition of: $(distinct n "${_app_param}")"
                         DEF_MAKE_METHOD="true"
                         DEF_INSTALL_METHOD="true"
                         ;;
@@ -613,7 +613,7 @@ process () {
             fi
 
             # and common part between normal and continue modes:
-            note "   ${NOTE_CHAR} Building requirement: $(distinct n ${_app_param})"
+            note "   ${NOTE_CHAR} Building requirement: $(distinct n "${_app_param}")"
             try "${DEF_MAKE_METHOD}" || \
             run "${DEF_MAKE_METHOD}"
             after_make_callback
@@ -623,11 +623,11 @@ process () {
                 ${FIND_BIN} "${PREFIX}/${place}" -delete 2>/dev/null
             done
 
-            note "   ${NOTE_CHAR} Installing requirement: $(distinct n ${_app_param})"
+            note "   ${NOTE_CHAR} Installing requirement: $(distinct n "${_app_param}")"
             run "${DEF_INSTALL_METHOD}"
             after_install_callback
 
-            debug "Marking $(distinct d ${_app_param}) as installed in: $(distinct d ${PREFIX})"
+            debug "Marking $(distinct d "${_app_param}") as installed in: $(distinct d ${PREFIX})"
             ${TOUCH_BIN} "${PREFIX}/${_app_param}${DEFAULT_INST_MARK_EXT}"
             debug "Writing version: $(distinct d ${DEF_VERSION}) of software: $(distinct d ${DEF_NAME}) installed in: $(distinct d ${PREFIX})"
             ${PRINTF_BIN} "${DEF_VERSION}" > "${PREFIX}/${_app_param}${DEFAULT_INST_MARK_EXT}"
