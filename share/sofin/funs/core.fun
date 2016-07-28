@@ -274,7 +274,7 @@ setup_defs_repo () {
 
 cleanup_handler () {
     restore_security_state
-    debug "Normal exit: $(distinct d "${SOFIN_PID}")!"
+    debug "Normal exit."
     finalize
     exit
 }
@@ -282,7 +282,7 @@ cleanup_handler () {
 
 interrupt_handler () {
     restore_security_state
-    warn "Interrupted: $(distinct w "${SOFIN_PID}")!"
+    warn "Interrupted: $(distinct w "${SOFIN_PID:-??}")"
     finalize
     exit ${ERRORCODE_USER_INTERRUPT}
 }
@@ -290,7 +290,7 @@ interrupt_handler () {
 
 terminate_handler () {
     restore_security_state
-    warn "Terminated: $(distinct w "${SOFIN_PID}")!"
+    warn "Terminated: $(distinct w "${SOFIN_PID:-??}")"
     finalize
     exit ${ERRORCODE_TERMINATED}
 }
