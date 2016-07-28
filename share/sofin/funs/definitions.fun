@@ -34,7 +34,7 @@ load_defs () {
     # Perform several sanity checks here..
     for _required_field in  "DEF_NAME=${DEF_NAME}" \
                             "DEF_NAME_DEF_POSTFIX=${DEF_NAME}${DEF_POSTFIX}" \
-                            "DEF_VERSION=${DEF_VERSION}" \
+                            "DEF_VERSION_OR_DEF_GIT_MODE=${DEF_VERSION}${DEF_GIT_MODE}" \
                             "DEF_SHA_OR_DEF_GIT_MODE=${DEF_SHA}${DEF_GIT_MODE}" \
                             "DEF_COMPLIANCE=${DEF_COMPLIANCE}" \
                             "DEF_SOURCE_PATH=${DEF_SOURCE_PATH}" \
@@ -45,7 +45,7 @@ load_defs () {
             unset _valid_checks
             for _check in   "DEF_NAME" \
                             "DEF_NAME_DEF_POSTFIX" \
-                            "DEF_VERSION" \
+                            "DEF_VERSION_OR_DEF_GIT_MODE" \
                             "DEF_SHA_OR_DEF_GIT_MODE" \
                             "DEF_COMPLIANCE" \
                             "DEF_SOURCE_PATH" \

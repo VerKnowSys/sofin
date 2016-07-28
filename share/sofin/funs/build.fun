@@ -419,6 +419,10 @@ process () {
                 else
                     # git method:
                     # .cache/git-cache => git bare repos
+
+                    # infer DEF_VERSION based on git DEF_GIT_CHECKOUT value given:
+                    DEF_VERSION="${DEF_GIT_CHECKOUT}"
+
                     ${MKDIR_BIN} -p "${GIT_CACHE_DIR}"
                     _git_cached="${GIT_CACHE_DIR}${DEF_NAME}${DEF_VERSION}${DEFAULT_GIT_DIR_NAME}"
 
