@@ -273,15 +273,13 @@ setup_defs_repo () {
 
 
 cleanup_handler () {
-    restore_security_state
-    debug "Normal exit."
     finalize
-    exit
+    debug "Normal exit."
+    return 0
 }
 
 
 interrupt_handler () {
-    restore_security_state
     warn "Interrupted: $(distinct w "${SOFIN_PID:-??}")"
     finalize
     exit ${ERRORCODE_USER_INTERRUPT}
@@ -289,7 +287,6 @@ interrupt_handler () {
 
 
 terminate_handler () {
-    restore_security_state
     warn "Terminated: $(distinct w "${SOFIN_PID:-??}")"
     finalize
     exit ${ERRORCODE_TERMINATED}
@@ -318,7 +315,7 @@ restore_security_state () {
             debug "No security state file found: ${DEFAULT_SECURITY_STATE_FILE}"
         fi
     else
-        debug "No hardened capabilities in system"
+        debug "No hardening capabilities in system"
     fi
 }
 
@@ -334,7 +331,7 @@ store_security_state () {
         done
         unset _key _sss_cntnt _sss_value
     else
-        debug "No hardened capabilities in system"
+        debug "No hardening capabilities in system"
     fi
 }
 
@@ -348,6 +345,6 @@ disable_security_features () {
         done
         unset _key _dsf_name
     else
-        debug "No hardened capabilities in system"
+        debug "No hardening capabilities in system"
     fi
 }
