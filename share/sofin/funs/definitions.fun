@@ -694,3 +694,45 @@ after_install_callback () {
         run "${DEF_AFTER_INSTALL_METHOD}"
     fi
 }
+
+
+traverse_patchlevels () {
+    _trav_patches=${*}
+    for _patch in ${_trav_patches}; do
+        for _level in 0 1 2 3 4 5; do # Up to: -p5
+            debug "Applying patch: $(distinct d "${_patch}"), level: $(distinct d ${_level})"
+            try "${PATCH_BIN} -p${_level} -N -f -i ${_patch}"
+            if [ "$?" = "0" ]; then # skip applying single patch if it already passed
+                debug "Patch: $(distinct d "${_patch}") applied successfully!"
+                break;
+            fi
+        done
+    done
+    unset _trav_patches
+}
+
+
+apply_definition_patches () {
+    _pcpaname="$(lowercase "${1}")"
+    if [ -z "${_pcpaname}" ]; then
+        error "First argument with definition name is required!"
+    fi
+    _common_patches_dir="${DEFINITIONS_DIR}patches/${_app_param}/"
+    _platform_patches_dir="${_common_patches_dir}${SYSTEM_NAME}/"
+    if [ -d "${_common_patches_dir}" ]; then
+        _ps_patches="$(${FIND_BIN} ${_common_patches_dir}* -maxdepth 0 -type f 2>/dev/null)"
+        if [ -n "${_ps_patches}" ]; then
+            note "   ${NOTE_CHAR} Applying common patches for: $(distinct n "${_pcpaname}")"
+            traverse_patchlevels ${_ps_patches}
+        fi
+        debug "Checking psp dir: $(distinct d "${_platform_patches_dir}")"
+        if [ -d "${_platform_patches_dir}" ]; then
+            _ps_patches="$(${FIND_BIN} ${_platform_patches_dir}* -maxdepth 0 -type f 2>/dev/null)"
+            if [ -n "${_ps_patches}" ]; then
+                note "   ${NOTE_CHAR} Applying platform specific patches for: $(distinct n "${_pcpaname}/${SYSTEM_NAME}")"
+                traverse_patchlevels ${_ps_patches}
+            fi
+        fi
+    fi
+    unset _ps_patches _pspp _level _patch _platform_patches_dir _pcpaname _common_patches_dir
+}

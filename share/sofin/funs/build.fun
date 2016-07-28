@@ -502,42 +502,7 @@ process () {
 
                 after_update_callback
 
-                _pcpaname="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
-                _pcpatch_dir="${DEFINITIONS_DIR}patches/${_app_param}"
-                if [ -d "${_pcpatch_dir}" ]; then
-                    _ps_patches="$(${FIND_BIN} ${_pcpatch_dir}/* -maxdepth 0 -type f 2>/dev/null)"
-                    ${TEST_BIN} -n "${_ps_patches}" && \
-                    note "   ${NOTE_CHAR} Applying common patches for: $(distinct n "${DEF_NAME}${DEF_POSTFIX}")"
-                    for _patch in ${_ps_patches}; do
-                        for _level in 0 1 2 3 4 5; do # Up to:--p5
-                            debug "Trying to patch source with patch: $(distinct d ${_patch}), level: $(distinct d ${_level})"
-                            try "${PATCH_BIN} -p${_level} -N -f -i ${_patch}"
-                            if [ "$?" = "0" ]; then # skip applying single patch if it already passed
-                                debug "Patch: $(distinct d ${_patch}) applied successfully!"
-                                break;
-                            fi
-                        done
-                    done
-                    _pspatch_dir="${_pcpatch_dir}/${SYSTEM_NAME}"
-                    debug "Checking psp dir: $(distinct d ${_pspatch_dir})"
-                    if [ -d "${_pspatch_dir}" ]; then
-                        note "   ${NOTE_CHAR} Applying platform specific patches for: $(distinct n ${DEF_NAME}${DEF_POSTFIX}/${SYSTEM_NAME})"
-                        _ps_patches="$(${FIND_BIN} ${_pspatch_dir}/* -maxdepth 0 -type f 2>/dev/null)"
-                        try "${TEST_BIN} -n ${_ps_patches}" && \
-                        for _pspp in ${_ps_patches}; do
-                            for _level in 0 1 2 3 4 5; do # Up to -p5
-                                debug "Patching source code with pspatch: $(distinct d ${_pspp}) (p$(distinct d ${_level}))"
-                                try "${PATCH_BIN} -p${_level} -N -f -i ${_pspp}"
-                                if [ "$?" = "0" ]; then # skip applying single patch if it already passed
-                                    debug "Patch: $(distinct d ${_pspp}) applied successfully!"
-                                    break;
-                                fi
-                            done
-                        done
-                    fi
-                    unset _ps_patches
-                fi
-
+                apply_definition_patches "${DEF_NAME}${DEF_POSTFIX}"
                 after_patch_callback
 
                 note "   ${NOTE_CHAR} Configuring: $(distinct n "${_app_param}"), version: $(distinct n "${DEF_VERSION}")"
