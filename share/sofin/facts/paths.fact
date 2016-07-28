@@ -79,10 +79,10 @@ if [ -f "${FACTS_LOCAL_DIR}alternatives.fact" ]; then
     . "${FACTS_LOCAL_DIR}alternatives.fact"
 fi
 
-# Load system specific paths (using prepared alternatives):
-if [ -f "${DEFAULT_FACTS_DIR}paths-$(${UNAME_BIN} 2>/dev/null).fact" ]; then
-    . "${DEFAULT_FACTS_DIR}paths-$(${UNAME_BIN} 2>/dev/null).fact"
+# Load system specific facts (using prepared alternatives):
+if [ -f "${DEFAULT_FACTS_DIR}facts-$(${UNAME_BIN} 2>/dev/null).fact" ]; then
+    . "${DEFAULT_FACTS_DIR}facts-$(${UNAME_BIN} 2>/dev/null).fact"
 fi
-if [ -f "${FACTS_LOCAL_DIR}paths-$(${UNAME_BIN} 2>/dev/null).fact" ]; then
-    . "${FACTS_LOCAL_DIR}paths-$(${UNAME_BIN} 2>/dev/null).fact"
+if [ -f "${FACTS_LOCAL_DIR}facts-$(${UNAME_BIN} 2>/dev/null).fact" ]; then
+    . "${FACTS_LOCAL_DIR}facts-$(${UNAME_BIN} 2>/dev/null).fact"
 fi
