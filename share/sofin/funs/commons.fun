@@ -1,7 +1,4 @@
 check_result () {
-    if [ -z "$1" ]; then
-        error "Empty command given!"
-    fi
     if [ "$1" = "0" ]; then
         shift
         debug "$(distinct ${ColorGreen} "${SUCCESS_CHAR}") $(distinct d "${*}")"
