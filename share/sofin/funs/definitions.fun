@@ -742,6 +742,7 @@ clone_or_fetch_git_bare_repo () {
     _source_path="${1}"
     _bare_name="${2}"
     _chk_branch="${3}"
+    _build_dir="${4}"
     _git_cached="${GIT_CACHE_DIR}${_bare_name}${DEFAULT_GIT_DIR_NAME}"
     try "${MKDIR_BIN} -p ${GIT_CACHE_DIR}"
     note "   ${NOTE_CHAR} Fetching git repository: $(distinct n "${_source_path}")"
@@ -770,8 +771,10 @@ clone_or_fetch_git_bare_repo () {
             unset _current_dir
         fi
     fi
+
     # bare repository is already cloned, so we just clone from it now..
-    run "${GIT_BIN} clone ${DEFAULT_GIT_OPTS} ${_git_cached} ${_bare_name}" && \
-        debug "Cloned git respository from git bare cache repository"
-    unset _git_cached _bare_name _chk_branch
+    _dest_repo="${_build_dir}/${_bare_name}"
+    run "${GIT_BIN} clone ${DEFAULT_GIT_OPTS} ${_git_cached} ${_dest_repo}" && \
+        debug "Cloned git respository from cached git bare: $(distinct d "${_git_cached}")"
+    unset _git_cached _bare_name _chk_branch _build_dir _dest_repo
 }
