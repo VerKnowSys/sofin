@@ -261,7 +261,7 @@ remove_bundles () {
                 export_binaries "${_alternative}"
                 finalize
                 unset _given_name _inname _alternative _aname _def
-                exit # Just pick first available alternative bundle
+                return 0 # Just pick first available alternative bundle
 
             elif [ -z "${_alternative}" ]; then
                 debug "No alternative: $(distinct d ${_alternative}) != $(distinct d ${_given_name})"
