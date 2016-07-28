@@ -23,13 +23,19 @@ check_os () {
         FreeBSD)
             ;;
 
+        OpenBSD)
+            ;;
+
+        NetBSD)
+            ;;
+
         Darwin)
             ;;
 
-        Linux)
+        Minix)
             ;;
 
-        Minix)
+        Linux)
             ;;
 
         *)
