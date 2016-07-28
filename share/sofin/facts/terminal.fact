@@ -82,7 +82,7 @@ determine_term_capabilites () {
         ColorMagenta="$(${TPUT_BIN} setaf 5)"
         ColorCyan="$(${TPUT_BIN} setaf 6)"
         ColorWhite="$(${TPUT_BIN} setaf 15)"
-        ColorParams="\033[38;5;12m"
+        ColorParams="$(${TPUT_BIN} setaf 12)"
         ColorViolet="$(${TPUT_BIN} setaf 97)"
         ColorFunction="$(${TPUT_BIN} setaf 163)"
     fi
