@@ -412,6 +412,10 @@ process () {
                         unset _bname _a_file_checksum
                     fi
 
+                    _might_be_dir="${BUILD_DIR}/${DEF_NAME}${DEF_POSTFIX}"
+                    try "${MV_BIN} ${_might_be_dir} ${_might_be_dir}-${TIMESTAMP}.old" && \
+                        debug "Moved previous build dir to: $(distinct d "${_might_be_dir}-${TIMESTAMP}.old")"
+
                     note "   ${NOTE_CHAR} Unpacking source of: $(distinct n "${DEF_NAME}${DEF_POSTFIX}")"
                     debug "Build dir: $(distinct d "${BUILD_DIR}")"
                     try "${TAR_BIN} --directory ${BUILD_DIR} -xf ${_dest_file}" || \

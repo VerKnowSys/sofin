@@ -774,6 +774,8 @@ clone_or_fetch_git_bare_repo () {
 
     # bare repository is already cloned, so we just clone from it now..
     _dest_repo="${_build_dir}/${_bare_name}"
+    try "${MV_BIN} -f ${_dest_repo} ${_dest_repo}-${TIMESTAMP}.old" && \
+        debug "Renamed already existing build directory: $(distinct d "${_dest_repo}") to: $(distinct d "${_bare_name}-${TIMESTAMP}.old")"
     run "${GIT_BIN} clone ${DEFAULT_GIT_OPTS} ${_git_cached} ${_dest_repo}" && \
         debug "Cloned git respository from cached git bare: $(distinct d "${_git_cached}")"
     unset _git_cached _bare_name _chk_branch _build_dir _dest_repo
