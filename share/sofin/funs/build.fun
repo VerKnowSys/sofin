@@ -419,43 +419,7 @@ process () {
                 else
                     # git method:
                     # .cache/git-cache => git bare repos
-
-                    # infer DEF_VERSION based on git DEF_GIT_CHECKOUT value given:
-                    DEF_VERSION="${DEF_GIT_CHECKOUT}"
-
-                    ${MKDIR_BIN} -p "${GIT_CACHE_DIR}"
-                    _git_cached="${GIT_CACHE_DIR}${DEF_NAME}${DEF_VERSION}${DEFAULT_GIT_DIR_NAME}"
-
-                    note "   ${NOTE_CHAR} Fetching git repository: $(distinct n "${DEF_SOURCE_PATH}${ColorReset}")"
-                    try "${GIT_BIN} clone ${DEFAULT_GIT_OPTS} --depth 1 --bare ${DEF_SOURCE_PATH} ${_git_cached}" || \
-                        try "${GIT_BIN} clone ${DEFAULT_GIT_OPTS} --depth 1 --bare ${DEF_SOURCE_PATH} ${_git_cached}"
-                    if [ "$?" = "0" ]; then
-                        debug "Fetched bare repository: $(distinct d "${DEF_NAME}${DEF_VERSION}")"
-                    else
-                        if [ ! -d "${_git_cached}/branches" -a ! -f "${_git_cached}/config" ]; then
-                            note "\n${ColorRed}Definitions were not updated. Showing $(distinct n ${LOG_LINES_AMOUNT_ON_ERR}) lines of internal log:${ColorReset}"
-                            ${TAIL_BIN} -n${LOG_LINES_AMOUNT_ON_ERR} ${LOG} 2>/dev/null
-                            note "$(fill)"
-                        else
-                            _current_dir="$(${PWD_BIN} 2>/dev/null)"
-                            debug "Trying to update existing bare repository cache in: $(distinct d "${_git_cached}")"
-                            cd "${_git_cached}"
-                            try "${GIT_BIN} fetch ${DEFAULT_GIT_OPTS} origin ${DEF_GIT_CHECKOUT}" || \
-                                try "${GIT_BIN} fetch ${DEFAULT_GIT_OPTS} origin" || \
-                                    warn "   ${WARN_CHAR} Failed to fetch an update from bare repository: $(distinct w "${_git_cached}")"
-                            # for empty DEF_VERSION, it will fill it with first 16 chars of repository HEAD SHA1:
-                            if [ -z "${DEF_VERSION}" ]; then
-                                DEF_VERSION="$(${GIT_BIN} rev-parse HEAD 2>/dev/null | ${CUT_BIN} -c -16 2>/dev/null)"
-                                debug "Set DEF_VERSION=$(distinct d "${DEF_VERSION}") - based on most recent commit shasum"
-                            fi
-                            cd "${_current_dir}"
-                            unset _current_dir
-                        fi
-                    fi
-                    # bare repository is already cloned, so we just clone from it now..
-                    run "${GIT_BIN} clone ${DEFAULT_GIT_OPTS} ${_git_cached} ${DEF_NAME}${DEF_VERSION}" && \
-                        debug "Cloned git respository from git bare cache repository"
-                    unset _git_cached
+                    clone_or_fetch_git_bare_repo "${DEF_SOURCE_PATH}" "${DEF_NAME}-${DEF_VERSION}" "${DEF_GIT_CHECKOUT}"
                 fi
 
                 unset _fd
