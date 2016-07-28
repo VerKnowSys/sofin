@@ -480,7 +480,7 @@ process () {
 
                 # Handle DEF_SOURCE_DIR_POSTFIX here
                 if [ -n "${_fd}/${DEF_SOURCE_DIR_POSTFIX}" ]; then
-                    ${MKDIR_BIN} -p "${_fd}/${DEF_SOURCE_DIR_POSTFIX}"
+                    try "${MKDIR_BIN} -p ${_fd}/${DEF_SOURCE_DIR_POSTFIX}"
                     cd "${_fd}/${DEF_SOURCE_DIR_POSTFIX}"
                 fi
                 _pwd="$(${PWD_BIN} 2>/dev/null)"
