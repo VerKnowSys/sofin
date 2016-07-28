@@ -256,8 +256,8 @@ remove_bundles () {
             fi
 
             if [ -n "${_alternative}" -a \
-                   -f "${SOFTWARE_DIR}${_alternative}/$(lowercase ${_alternative})${DEFAULT_INST_MARK_EXT}" ]; then
-                note "Updating environment with already installed alternative: $(distinct n ${_alternative})"
+                 -f "${SOFTWARE_DIR}${_alternative}/$(lowercase "${_alternative}")${DEFAULT_INST_MARK_EXT}" ]; then
+                note "Updating environment with already installed alternative: $(distinct n "${_alternative}")"
                 export_binaries "${_alternative}"
                 finalize
                 unset _given_name _inname _alternative _aname _def

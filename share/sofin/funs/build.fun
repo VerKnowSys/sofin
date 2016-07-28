@@ -238,7 +238,7 @@ build () {
                 else
                     _already_installed_version="$(${CAT_BIN} ${_installed_indicator} 2>/dev/null)"
                     if [ "${DEF_VERSION}" = "${_already_installed_version}" ]; then
-                        debug "$(distinct d ${_common_lowercase}) bundle is installed with version: $(distinct d ${_already_installed_version})"
+                        debug "$(distinct d ${_common_lowercase}) bundle is installed with version: $(distinct d "${_already_installed_version}")"
                     else
                         warn "$(distinct w "${_common_lowercase}") bundle is installed with version: $(distinct w "${_already_installed_version}"), different from defined: $(distinct w "${DEF_VERSION}")"
                     fi
@@ -263,7 +263,7 @@ build () {
                             note "No additional requirements defined"
                             break
                         else
-                            note "  ${_req} ($(distinct n ${_req_amount}) of $(distinct n ${_req_all}) remaining)"
+                            note "  ${_req} ($(distinct n "${_req_amount}") of $(distinct n "${_req_all}") remaining)"
                             if [ ! -e "${PREFIX}/${_req}${DEFAULT_INST_MARK_EXT}" ]; then
                                 CHANGED=YES
                                 process "${_req}"
@@ -276,7 +276,7 @@ build () {
                 if [ -z "${DONT_BUILD_BUT_DO_EXPORTS}" ]; then
                     if [ -e "${PREFIX}/${_common_lowercase}${DEFAULT_INST_MARK_EXT}" ]; then
                         if [ "${CHANGED}" = "YES" ]; then
-                            note "  ${_common_lowercase} ($(distinct n 1) of $(distinct n ${_req_all}))"
+                            note "  ${_common_lowercase} ($(distinct n 1) of $(distinct n "${_req_all}"))"
                             note "   ${NOTE_CHAR} App dependencies changed. Rebuilding: $(distinct n ${_common_lowercase})"
                             process "${_common_lowercase}"
                             unset CHANGED
@@ -383,11 +383,12 @@ process () {
                 if [ -z "${DEF_GIT_MODE}" ]; then # Standard "fetch source archive" method
                     _base="$(${BASENAME_BIN} "${DEF_SOURCE_PATH}" 2>/dev/null)"
                     debug "DEF_SOURCE_PATH: $(distinct d "${DEF_SOURCE_PATH}") base: $(distinct d "${_base}")"
+                    # TODO: implement auto picking fetch method based on DEF_SOURCE_PATH contents
                     if [ ! -e "${FILE_CACHE_DIR}${_base}" ]; then
-                        note "   ${NOTE_CHAR} Fetching required source: $(distinct n "${_base}")"
                         cd "${FILE_CACHE_DIR}"
                         retry "${FETCH_BIN} ${FETCH_OPTS} ${DEF_SOURCE_PATH}" || \
                             def_error "${DEF_NAME}" "Failed to fetch source: "${DEF_SOURCE_PATH}""
+                        note "   ${NOTE_CHAR} Source fetched for: $(distinct n "${_base}")"
                     fi
                     cd "${BUILD_DIR}"
                     _dest_file="${FILE_CACHE_DIR}${_base}"
