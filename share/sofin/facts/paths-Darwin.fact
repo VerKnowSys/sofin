@@ -1,6 +1,7 @@
 # OSX specific configuration
 
 unset SERVICE_BIN # not necessary
+unset DEFAULT_STRIP_OPTS # strip doesn't accept params under Darwin
 
 # Darwin specific:
 SHA_BIN="/usr/bin/shasum"
