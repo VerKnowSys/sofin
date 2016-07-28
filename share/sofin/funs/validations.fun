@@ -93,14 +93,14 @@ validate_archive_sha1 () {
     _sha1_value="$(${CAT_BIN} ${_current_sha_file} 2>/dev/null)"
     if [ ! -f "${_current_sha_file}" -o \
            -z "${_sha1_value}" ]; then
-        ${RM_BIN} -fv "${_archive_name}" >> ${LOG} 2>> ${LOG}
-        ${RM_BIN} -fv "${_current_sha_file}" >> ${LOG} 2>> ${LOG}
+        try "${RM_BIN} -fv ${_archive_name}"
+        try "${RM_BIN} -fv ${_current_sha_file}"
     fi
     debug "Checking SHA1 match: $(distinct d ${_current_archive_sha1}) vs $(distinct d ${_sha1_value})"
     if [ "${_current_archive_sha1}" != "${_sha1_value}" ]; then
         debug "Bundle archive checksum doesn't match ($(distinct d "${_current_archive_sha1}") vs $(distinct d "${sha1_value}")), removing binary builds and proceeding into build phase"
-        ${RM_BIN} -fv "${_archive_name}" >> ${LOG} 2>> ${LOG}
-        ${RM_BIN} -fv "${_current_sha_file}" >> ${LOG} 2>> ${LOG}
+        try "${RM_BIN} -fv ${_archive_name}"
+        try "${RM_BIN} -fv ${_current_sha_file}"
     else
         note "Found correct prebuilt binary archive: $(distinct n "${_archive_name}")"
     fi
