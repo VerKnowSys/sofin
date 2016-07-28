@@ -631,13 +631,6 @@ process () {
             ${TOUCH_BIN} "${PREFIX}/${_app_param}${DEFAULT_INST_MARK_EXT}"
             debug "Writing version: $(distinct d ${DEF_VERSION}) of software: $(distinct d ${DEF_NAME}) installed in: $(distinct d ${PREFIX})"
             ${PRINTF_BIN} "${DEF_VERSION}" > "${PREFIX}/${_app_param}${DEFAULT_INST_MARK_EXT}"
-
-            if [ -z "${DEVEL}" ]; then # if devel mode not set
-                debug "Cleaning build dir: $(distinct d ${BUILD_DIR}) of bundle: $(distinct d ${DEF_NAME}${DEF_POSTFIX}), after successful build."
-                destroy_builddir "$(${BASENAME_BIN} "${PREFIX}" 2>/dev/null)" "${BUILD_NAMESUM}"
-            else
-                debug "Leaving build dir intact when working in devel mode. Last build dir: $(distinct d ${BUILD_DIR})"
-            fi
             cd "${_cwd}" 2>/dev/null
             unset _cwd
         fi
