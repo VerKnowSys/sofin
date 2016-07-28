@@ -34,7 +34,7 @@ build_bundle () {
 
 
 push_binbuilds () {
-    _push_bundles="$*"
+    _push_bundles="${*}"
     if [ -z "${_push_bundles}" ]; then
         error "At least single argument with $(distinct e "BundleName") to push is required!"
     fi
@@ -62,7 +62,7 @@ push_binbuilds () {
 
 
 deploy_binbuild () {
-    _dbbundles=$*
+    _dbbundles=${*}
     create_dirs
     load_defaults
     note "Software bundles to be built and deployed to remote: $(distinct n ${_dbbundles})"
@@ -165,7 +165,7 @@ fetch_binbuild () {
 
 
 build () {
-    _build_list=$*
+    _build_list=${*}
 
     # Update definitions and perform more checks
     validate_reqs

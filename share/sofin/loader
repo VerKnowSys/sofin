@@ -12,7 +12,7 @@ fi
 
 # loading functions have to know both FACTS and FUNS dirs:
 load_facts () {
-    for _fact in $@; do
+    for _fact in ${@}; do
         # echo "# L: ${DEFAULT_FACTS_DIR}${_fact}"
         . ${DEFAULT_FACTS_DIR}${_fact}
     done
@@ -21,7 +21,7 @@ load_facts () {
 
 
 load_funs () {
-    for _fun in $@; do
+    for _fun in ${@}; do
         # echo "# L: ${DEFAULT_FACTS_DIR}${_fun}"
         . ${DEFAULT_FUNS_DIR}${_fun}
     done

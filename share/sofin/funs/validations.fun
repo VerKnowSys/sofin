@@ -24,7 +24,7 @@ validate_env () {
 
 
 fail_on_bg_job () {
-    _deps=$*
+    _deps=${*}
     debug "deps=$(distinct d $(echo ${_deps} | eval "${NEWLINES_TO_SPACES_GUARD}"))"
     create_dirs
     acquire_lock_for "${_deps}"

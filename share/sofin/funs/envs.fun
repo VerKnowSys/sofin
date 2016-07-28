@@ -2,7 +2,7 @@ compiler_setup () {
     #XXX
     if [ "${1}" = "silent" ]; then
         debug () {
-            ${LOGGER_BIN} "${DEFAULT_NAME}: $@"
+            ${LOGGER_BIN} "${DEFAULT_NAME}: ${@}"
         }
     fi
     debug "---------------- COMPILER FEATURES DUMP -----------------"
@@ -230,7 +230,7 @@ create_lock () {
 
 
 acquire_lock_for () {
-    bundles="$*"
+    bundles="${*}"
     debug "Trying lock acquire for bundles: [$(distinct d ${bundles})]"
     for bundle in ${bundles}; do
         if [ -f "${LOCKS_DIR}${bundle}${DEFAULT_LOCK_EXT}" ]; then

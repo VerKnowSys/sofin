@@ -4,10 +4,10 @@ check_result () {
     fi
     if [ "$1" = "0" ]; then
         shift
-        debug "$(distinct ${ColorGreen} "${SUCCESS_CHAR}") $(distinct d "$*")"
+        debug "$(distinct ${ColorGreen} "${SUCCESS_CHAR}") $(distinct d "${*}")"
     else
         shift
-        error "$(distinct ${ColorRed} "${FAIL_CHAR}") $(distinct e "$*")"
+        error "$(distinct ${ColorRed} "${FAIL_CHAR}") $(distinct e "${*}")"
     fi
 }
 
@@ -71,7 +71,7 @@ file_size () {
 
 
 retry () {
-    _targets="${1}"
+    _targets="${*}"
     _ammo="OOO"
 
     # check for commands that puts something important/intersting on stdout
@@ -112,7 +112,7 @@ retry () {
 
 
 capitalize () {
-    _capi_name="$*"
+    _capi_name="${*}"
     _capi_head="$(${PRINTF_BIN} "${_capi_name}" 2>/dev/null | ${CUT_BIN} -c1 2>/dev/null | ${TR_BIN} '[a-z]' '[A-Z]' 2>/dev/null)"
     _capi_tail="$(${PRINTF_BIN} "${_capi_name}" 2>/dev/null | ${SED_BIN} 's/^[a-zA-Z]//' 2>/dev/null)"
     ${PRINTF_BIN} "${_capi_head}${_capi_tail}"
@@ -121,7 +121,7 @@ capitalize () {
 
 
 lowercase () {
-    ${PRINTF_BIN} "$*" | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null
+    ${PRINTF_BIN} "${*}" | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null
 }
 
 

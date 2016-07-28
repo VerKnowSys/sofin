@@ -62,7 +62,7 @@ log_helper () {
 
 show_logs () {
     create_dirs
-    _logf_pattern="$*"
+    _logf_pattern="${*}"
     _logf_minutes="${LOG_LAST_ACCESS_OR_MOD_MINUTES}"
     debug "show_logs(): _logf_minutes: $(distinct d ${_logf_minutes}), pattern: $(distinct d "${_logf_pattern}")"
     _files_x_min=$(${FIND_BIN} "${LOGS_DIR}" -maxdepth 1 -mindepth 1 -mmin -${_logf_minutes} -amin -${_logf_minutes} -iname "${DEFAULT_NAME}*${_logf_pattern}*" -print 2>/dev/null)
@@ -123,7 +123,7 @@ show_logs () {
 
 
 pretouch_logs () {
-    _params="$*"
+    _params="${*}"
     create_dirs
     debug "Logs pretouch called with params: $(distinct d ${_params})"
     try "${TOUCH_BIN} ${LOGS_DIR}${DEFAULT_NAME}"

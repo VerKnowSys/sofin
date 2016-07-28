@@ -25,7 +25,7 @@ cecho () {
 
 
 debug () {
-    _in="$@"
+    _in="${@}"
     touch_logsdir_and_logfile
     unset _dbfnin
     if [ "${CAP_TERM_BASH}" = "YES" ]; then
@@ -114,7 +114,7 @@ error () {
 distinct () {
     msg_type="${1}"
     shift
-    content="$*"
+    content="${*}"
     if [ -z "${msg_type}" ]; then
         error "No message type given as first param for: ${DISTINCT_COLOUR}distinct()${ColorRed}!"
     fi
