@@ -178,33 +178,38 @@ run () {
 
 
 try () {
-    if [ -n "$1" ]; then
-        _try_params="$@"
+    _try_params="${@}"
+    if [ -n "${_try_params}" ]; then
         touch_logsdir_and_logfile
-        unset _show_prgrss
-        _try_aname="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
         echo "${_try_params}" | eval "${MATCH_PRINT_STDOUT_GUARD}" && _show_prgrss=YES
         _dt="${ColorDarkgray}$(${DATE_BIN} ${DEFAULT_DATE_TRYRUN_OPTS} 2>/dev/null)${ColorReset}"
         debug "${_dt}: ${ColorWhite}(${TRY_CHAR}${ColorWhite}) $(distinct d "${params}${_try_params}") [${_show_prgrss:-NO}]"
+        _try_aname="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
         if [ -z "${_try_aname}" ]; then
             if [ -z "${_show_prgrss}" ]; then
-                eval PATH="${PATH}" "${_try_params}" >> "${LOG}" 2>> "${LOG}"
+                eval "PATH=${PATH} ${_try_params} >> ${LOG} 2>> ${LOG}" && \
+                    return 0
             else
+                # show progress on stderr
                 ${PRINTF_BIN} "${ColorBlue}"
-                eval PATH="${PATH}" "${_try_params}" >> "${LOG}" # show progress on stderr
+                eval "PATH=${PATH} ${_try_params} >> ${LOG}" && \
+                    return 0
             fi
         else
             if [ -z "${_show_prgrss}" ]; then
-                eval PATH="${PATH}" "${_try_params}" >> "${LOG}-${_try_aname}" 2>> "${LOG}-${_try_aname}"
+                eval "PATH=${PATH} ${_try_params} >> ${LOG}-${_try_aname} 2>> ${LOG}-${_try_aname}" && \
+                    return 0
             else
                 ${PRINTF_BIN} "${ColorBlue}"
-                eval PATH="${PATH}" "${_try_params}" >> "${LOG}-${_try_aname}"
+                eval "PATH=${PATH} ${_try_params} >> ${LOG}-${_try_aname}" && \
+                    return 0
             fi
         fi
     else
         error "Specified an empty command to try()!"
     fi
     unset _dt _try_aname _try_params
+    return 1
 }
 
 
