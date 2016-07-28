@@ -385,12 +385,10 @@ process () {
                     debug "DEF_SOURCE_PATH: $(distinct d "${DEF_SOURCE_PATH}") base: $(distinct d "${_base}")"
                     # TODO: implement auto picking fetch method based on DEF_SOURCE_PATH contents
                     if [ ! -e "${FILE_CACHE_DIR}${_base}" ]; then
-                        cd "${FILE_CACHE_DIR}"
-                        retry "${FETCH_BIN} ${FETCH_OPTS} ${DEF_SOURCE_PATH}" || \
-                            def_error "${DEF_NAME}" "Failed to fetch source: "${DEF_SOURCE_PATH}""
+                        retry "${FETCH_BIN} ${FETCH_OPTS} -o ${FILE_CACHE_DIR}${_base} ${DEF_SOURCE_PATH}" || \
+                            def_error "${DEF_NAME}${DEF_POSTFIX}" "Failed source fetch: $(distinct e "${DEF_SOURCE_PATH}${_base}")"
                         note "   ${NOTE_CHAR} Source fetched for: $(distinct n "${_base}")"
                     fi
-                    cd "${BUILD_DIR}"
                     _dest_file="${FILE_CACHE_DIR}${_base}"
                     debug "Build root: $(distinct d ${BUILD_DIR}), file: $(distinct d "${_dest_file}")"
                     if [ -z "${DEF_SHA}" ]; then

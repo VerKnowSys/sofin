@@ -756,7 +756,6 @@ clone_or_fetch_git_bare_repo () {
             ${TAIL_BIN} -n${LOG_LINES_AMOUNT_ON_ERR} ${LOG} 2>/dev/null
             note "$(fill)"
         else
-            _current_dir="$(${PWD_BIN} 2>/dev/null)"
             debug "Trying to update existing bare repository cache in: $(distinct d "${_git_cached}")"
             cd "${_git_cached}"
             try "${GIT_BIN} fetch ${DEFAULT_GIT_OPTS} origin ${_chk_branch}" || \
@@ -767,8 +766,6 @@ clone_or_fetch_git_bare_repo () {
             #     DEF_VERSION="$(${GIT_BIN} rev-parse HEAD 2>/dev/null | ${CUT_BIN} -c -16 2>/dev/null)"
             #     debug "Set DEF_VERSION=$(distinct d "${DEF_VERSION}") - based on most recent commit shasum"
             # fi
-            cd "${_current_dir}"
-            unset _current_dir
         fi
     fi
 
