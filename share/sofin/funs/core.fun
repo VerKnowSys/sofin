@@ -149,30 +149,38 @@ run () {
         echo "${_run_params}" | eval "${MATCH_PRINT_STDOUT_GUARD}" && _run_shw_prgr=YES
         _rnm="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
         _dt="${ColorDarkgray}$(${DATE_BIN} ${DEFAULT_DATE_TRYRUN_OPTS} 2>/dev/null)${ColorReset}"
-        debug "${_dt}: ${ColorWhite}(${RUN_CHAR}${ColorWhite}) $(distinct d "${param}${_run_params}") [${_run_shw_prgr:-NO}]"
+
+        # Since Git is often used in defaunitions, we're allowing definitions to use it's path:
+        if [ -x "${GIT_BIN}" ]; then
+            _git_root="$(${BASENAME_BIN} "$(${BASENAME_BIN} "${GIT_BIN}" 2>/dev/null)" 2>/dev/null)"
+            if [ -n "${_git_root}" ]; then
+                _git_path_addon=":${_git_root}/bin:${_git_root}/libexec/git-core"
+            fi
+        fi
+        debug "${_dt}: ${ColorWhite}(${RUN_CHAR}${ColorWhite}) $(distinct d "${param}${_run_params}") [show-blueout:${_run_shw_prgr:-NO}, git:${_git_root:-NO}]"
         if [ -z "${_rnm}" ]; then
             if [ -z "${_run_shw_prgr}" ]; then
-                eval "PATH=${PATH} ${_run_params} >> ${LOG} 2>> ${LOG}"
+                eval "PATH=${PATH}${_git_path_addon} ${_run_params} >> ${LOG} 2>> ${LOG}"
                 check_result $? "${_run_params}"
             else
                 ${PRINTF_BIN} "${ColorBlue}"
-                eval "PATH=${PATH} ${_run_params} >> ${LOG}"
+                eval "PATH=${PATH}${_git_path_addon} ${_run_params} >> ${LOG}"
                 check_result $? "${_run_params}"
             fi
         else
             if [ -z "${_run_shw_prgr}" ]; then
-                eval "PATH=${PATH} ${_run_params} >> ${LOG}-${_rnm} 2>> ${LOG}-${_rnm}"
+                eval "PATH=${PATH}${_git_path_addon} ${_run_params} >> ${LOG}-${_rnm} 2>> ${LOG}-${_rnm}"
                 check_result $? "${_run_params}"
             else
                 ${PRINTF_BIN} "${ColorBlue}"
-                eval "PATH=${PATH} ${_run_params} >> ${LOG}-${_rnm}"
+                eval "PATH=${PATH}${_git_path_addon} ${_run_params} >> ${LOG}-${_rnm}"
                 check_result $? "${_run_params}"
             fi
         fi
     else
         error "Specified an empty command to run()!"
     fi
-    unset _rnm _run_shw_prgr _run_params _dt
+    unset _rnm _run_shw_prgr _run_params _dt _git_root _git_path_addon
 }
 
 
