@@ -371,25 +371,23 @@ process () {
     fi
     if [ -z "${DEF_DISABLED}" ]; then
         if [ -z "${DEF_HTTP_PATH}" ]; then
-            _definition_no_ext="\
-                $(echo "$(${BASENAME_BIN} ${_req_definition} 2>/dev/null)" | \
-                ${SED_BIN} -e 's/\..*$//g' 2>/dev/null)"
-            note "   ${NOTE_CHAR2} $(distinct n "DEF_HTTP_PATH=\"\"") is undefined for: $(distinct n "${_definition_no_ext}")."
-            note "NOTE: It's only valid for meta bundles. You may consider setting: $(distinct n "DEF_CONFIGURE=\"meta\"") in bundle definition file. Type: $(distinct n "s dev ${_definition_no_ext}"))"
+            _defn_no_ext="$(echo "$(${BASENAME_BIN} "${_req_definition}" 2>/dev/null)" | ${SED_BIN} -e 's/\..*$//g' 2>/dev/null)"
+            note "   ${NOTE_CHAR2} $(distinct n "DEF_HTTP_PATH=\"\"") is undefined for: $(distinct n "${_defn_no_ext}")."
+            note "NOTE: It's only valid for meta bundles. You may consider setting: $(distinct n "DEF_CONFIGURE=\"meta\"") in bundle definition file. Type: $(distinct n "s dev ${_defn_no_ext}"))"
         else
             _cwd="$(${PWD_BIN} 2>/dev/null)"
             if [ -n "${BUILD_DIR}" -a \
                  -n "${BUILD_NAMESUM}" ]; then
                 create_builddir "$(${BASENAME_BIN} "${PREFIX}" 2>/dev/null)" "${BUILD_NAMESUM}"
                 cd "${BUILD_DIR}"
-                if [ -z "${DEF_GIT_MODE}" ]; then # Standard http tarball method:
-                    _base="$(${BASENAME_BIN} ${DEF_HTTP_PATH} 2>/dev/null)"
-                    debug "DEF_HTTP_PATH: $(distinct d ${DEF_HTTP_PATH}) base: $(distinct d "${_base}")"
+                if [ -z "${DEF_GIT_MODE}" ]; then # Standard "fetch source archive" method
+                    _base="$(${BASENAME_BIN} "${DEF_HTTP_PATH}" 2>/dev/null)"
+                    debug "DEF_HTTP_PATH: $(distinct d "${DEF_HTTP_PATH}") base: $(distinct d "${_base}")"
                     if [ ! -e "${FILE_CACHE_DIR}/${_base}" ]; then
-                        note "   ${NOTE_CHAR} Fetching required tarball source: $(distinct n "${_base}")"
+                        note "   ${NOTE_CHAR} Fetching required source: $(distinct n "${_base}")"
                         cd "${FILE_CACHE_DIR}"
                         retry "${FETCH_BIN} ${FETCH_OPTS} ${DEF_HTTP_PATH}" || \
-                            def_error "${DEF_NAME}" "Failed to fetch source: ${DEF_HTTP_PATH}"
+                            def_error "${DEF_NAME}" "Failed to fetch source: "${DEF_HTTP_PATH}""
                     fi
                     cd "${BUILD_DIR}"
                     _dest_file="${FILE_CACHE_DIR}/${_base}"
@@ -399,7 +397,7 @@ process () {
                     else
                         _a_file_checksum="$(file_checksum "${_dest_file}")"
                         if [ "${_a_file_checksum}" = "${DEF_SHA}" ]; then
-                            debug "Source tarball checksum is fine"
+                            debug "Source checksum is fine"
                         else
                             warn "${WARN_CHAR} Source checksum mismatch: $(distinct w "${_a_file_checksum}") vs $(distinct w "${DEF_SHA}")"
                             _bname="$(${BASENAME_BIN} "${_dest_file}" 2>/dev/null)"
@@ -413,8 +411,8 @@ process () {
                         unset _bname _a_file_checksum
                     fi
 
-                    note "   ${NOTE_CHAR} Unpacking source tarball of: $(distinct n "${DEF_NAME}${DEF_POSTFIX}")"
-                    debug "Build dir root: $(distinct d "${BUILD_DIR}")"
+                    note "   ${NOTE_CHAR} Unpacking source of: $(distinct n "${DEF_NAME}${DEF_POSTFIX}")"
+                    debug "Build dir: $(distinct d "${BUILD_DIR}")"
                     try "${TAR_BIN} --directory ${BUILD_DIR} -xf ${_dest_file}" || \
                     try "${TAR_BIN} --directory ${BUILD_DIR} -xfj ${_dest_file}" || \
                     run "${TAR_BIN} --directory ${BUILD_DIR} -xfJ ${_dest_file}"
@@ -423,7 +421,7 @@ process () {
                     # .cache/git-cache => git bare repos
                     ${MKDIR_BIN} -p "${GIT_CACHE_DIR}"
                     _git_cached="${GIT_CACHE_DIR}${DEF_NAME}${DEF_VERSION}${DEFAULT_GIT_DIR_NAME}"
-                    note "   ${NOTE_CHAR} Fetching git repository: $(distinct n ${DEF_HTTP_PATH}${ColorReset})"
+                    note "   ${NOTE_CHAR} Fetching git repository: $(distinct n "${DEF_HTTP_PATH}${ColorReset}")"
                     try "${GIT_BIN} clone ${DEFAULT_GIT_OPTS} --depth 1 --bare ${DEF_HTTP_PATH} ${_git_cached}" || \
                         try "${GIT_BIN} clone ${DEFAULT_GIT_OPTS} --depth 1 --bare ${DEF_HTTP_PATH} ${_git_cached}"
                     if [ "$?" = "0" ]; then
