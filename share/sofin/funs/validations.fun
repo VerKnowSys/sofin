@@ -37,9 +37,11 @@ fail_any_bg_jobs () {
     for _a_lock in $(${FIND_BIN} "${LOCKS_DIR}" -type f -name "*${DEFAULT_LOCK_EXT}" -print 2>/dev/null); do
         _bundle_name="$(${BASENAME_BIN} ${_a_lock} 2>/dev/null)"
         _lock_pid="$(${CAT_BIN} "${_a_lock}" 2>/dev/null)"
-        ${KILL_BIN} -0 ${_lock_pid} 2>/dev/null >/dev/null
-        if [ "$?" = "0" ]; then
-            error "Detected running instance of Sofin, locked on bundle: $(distinct e "${_bundle_name}") pid: $(distinct e "${_lock_pid}")"
+        if [ -n "${_lock_pid}" ]; then
+            ${KILL_BIN} -0 "${_lock_pid}" 2>/dev/null >/dev/null
+            if [ "$?" = "0" ]; then
+                error "Detected running instance of Sofin, locked on bundle: $(distinct e "${_bundle_name}") pid: $(distinct e "${_lock_pid}")"
+            fi
         fi
     done
     unset _bundle_name _lock_pid _a_lock
