@@ -582,12 +582,14 @@ process () {
             unset _cwd
         fi
     else
-        warn "   ${WARN_CHAR} Requirement: $(distinct w "${DEF_NAME}${DEF_POSTFIX}") disabled on: $(distinct w ${SYSTEM_NAME})"
+        note "   ${WARN_CHAR} Requirement: $(distinct n "${_req_definition}") skipped for: $(distinct n "${SYSTEM_NAME}")"
         if [ -n "${PREFIX}" -a \
              ! -d "${PREFIX}" ]; then # case when disabled requirement is first on list of dependencies
             create_software_dir "$(${BASENAME_BIN} "${PREFIX}" 2>/dev/null)"
         fi
-        run "${TOUCH_BIN} ${PREFIX}/${_req}${DEFAULT_INST_MARK_EXT} && ${PRINTF_BIN} \"${DEFAULT_REQ_OS_PROVIDED}\" > ${PREFIX}/${_req}${DEFAULT_INST_MARK_EXT}"
+        _dis_def="${PREFIX}/${_req_definition}${DEFAULT_INST_MARK_EXT}"
+        debug "Disabled requirement: $(distinct d "${_req_definition}"), writing ${DEFAULT_REQ_OS_PROVIDED} to: $(distinct d "${_dis_def}")"
+        run "${PRINTF_BIN} \"${DEFAULT_REQ_OS_PROVIDED}\" > ${_dis_def}"
     fi
-    unset _req _current_branch
+    unset _current_branch _dis_def
 }
