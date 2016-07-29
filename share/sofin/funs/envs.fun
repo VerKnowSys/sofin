@@ -314,12 +314,11 @@ reload_zsh_shells () {
 
 
 update_env_files () {
-    update_shell_vars
     _default_envs="/etc/profile /etc/zshenv /etc/bashrc"
     for _env_file in ${_default_envs}; do
         if [ -f "${_env_file}" ]; then
             debug "Processing existing env file: $(distinct d "${_env_file}")"
-            ${GREP_BIN} -R "SHELL_PID=" "${_env_file}" >/dev/null 2>&1
+            ${EGREP_BIN} "SHELL_PID=" "${_env_file}" >/dev/null 2>&1
             if [ "$?" = "0" ]; then
                 continue
             else
@@ -332,5 +331,6 @@ update_env_files () {
                 debug "Environment block written to file: $(distinct d "${_env_file}")"
         fi
     done
+    update_shell_vars
     unset _default_envs _env_file
 }
