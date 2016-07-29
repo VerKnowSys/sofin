@@ -135,7 +135,7 @@ if [ -n "${SOFIN_COMMAND_ARG}" ]; then
         b|build)
             create_dirs
             _to_be_built="${SOFIN_ARGS}"
-            note "Software bundles to be built: $(distinct n ${_to_be_built})"
+            note "Requested build of: $(distinct n "${_to_be_built}")"
             fail_on_bg_job ${_to_be_built}
             USE_UPDATE=NO
             USE_BINBUILD=NO

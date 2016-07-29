@@ -314,6 +314,7 @@ build () {
         debug "No-Op - not yet implemented"
     fi
     update_shell_vars
+    debug "Build successfull: $(distinct d "${_build_list}")"
     unset _build_list _common_lowercase _req_all _req
 }
 
