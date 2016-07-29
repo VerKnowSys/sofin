@@ -71,6 +71,12 @@ finalize () {
     debug "finalize()"
     destroy_locks
     restore_security_state
+
+    finalize_afterbuild
+}
+
+
+finalize_afterbuild () {
     update_shell_vars
     reload_zsh_shells
 }
