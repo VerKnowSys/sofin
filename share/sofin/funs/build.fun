@@ -437,10 +437,10 @@ process () {
                 _prm_no_undrlne_and_minus="$(echo "${_app_param}" | ${SED_BIN} 's/[-_].*$//' 2>/dev/null)"
                 debug "_app_param: ${_app_param} short: ${_prm_nolib}, nafter-: ${_prm_no_undrlne_and_minus}, DEF_NAME: ${DEF_NAME}, BUILD_DIR: ${BUILD_DIR}"
                 # NOTE: patterns sorted by safety
-                for _pati in    "*${_app_param}*${DEF_VERSION}*" \
-                                "*${_prm_no_undrlne_and_minus}*${DEF_VERSION}*" \
-                                "*${_prm_nolib}*${DEF_VERSION}*" \
-                                "*${DEF_NAME}*${DEF_VERSION}*" \
+                for _pati in    "*${_app_param}*${DEF_VERSION}" \
+                                "*${_prm_no_undrlne_and_minus}*${DEF_VERSION}" \
+                                "*${_prm_nolib}*${DEF_VERSION}" \
+                                "*${DEF_NAME}*${DEF_VERSION}" \
                                 "*${_app_param}*" \
                                 "*${_prm_no_undrlne_and_minus}*" \
                                 "*${_prm_nolib}*" \
