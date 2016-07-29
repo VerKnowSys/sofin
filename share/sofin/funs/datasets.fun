@@ -344,7 +344,8 @@ create_software_bundle_archive () {
     if [ -z "${_csversion}" ]; then
         error "Third argument with $(distinct e "version-string") is required!"
     fi
-    _cddestfile="${FILE_CACHE_DIR}${_csbelem}-${_csversion}${DEFAULT_ARCHIVE_EXT}"
+    _cddestfile="${FILE_CACHE_DIR}${_csbelem}"
+    debug "Creating destfile: $(distinct d "${_cddestfile}")"
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
         _csbd_dataset="${DEFAULT_ZPOOL}${SOFTWARE_DIR}${USER}/${_csbname}"
         debug "Creating archive from dataset: $(distinct d "${_csbd_dataset}") to file: $(distinct d "${_cddestfile}")"
