@@ -417,10 +417,6 @@ process () {
                         unset _bname _a_file_checksum
                     fi
 
-                    _might_be_dir="${BUILD_DIR}/${DEF_NAME}${DEF_POSTFIX}"
-                    try "${MV_BIN} ${_might_be_dir} ${_might_be_dir}-${TIMESTAMP}.old" && \
-                        debug "Moved previous build dir to: $(distinct d "${_might_be_dir}-${TIMESTAMP}.old")"
-
                     note "   ${NOTE_CHAR} Unpacking source of: $(distinct n "${DEF_NAME}${DEF_POSTFIX}")"
                     debug "Build dir: $(distinct d "${BUILD_DIR}")"
                     try "${TAR_BIN} --directory ${BUILD_DIR} -xf ${_dest_file}" || \
@@ -432,7 +428,7 @@ process () {
                     clone_or_fetch_git_bare_repo "${DEF_SOURCE_PATH}" "${DEF_NAME}-${DEF_VERSION}" "${DEF_GIT_CHECKOUT}" "${BUILD_DIR}"
                 fi
 
-                unset _fd _might_be_dir
+                unset _fd
                 _prm_nolib="$(echo "${_app_param}" | ${SED_BIN} 's/lib//' 2>/dev/null)"
                 _prm_no_undrlne_and_minus="$(echo "${_app_param}" | ${SED_BIN} 's/[-_].*$//' 2>/dev/null)"
                 debug "_app_param: ${_app_param} short: ${_prm_nolib}, nafter-: ${_prm_no_undrlne_and_minus}, DEF_NAME: ${DEF_NAME}, BUILD_DIR: ${BUILD_DIR}"
