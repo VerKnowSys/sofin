@@ -570,7 +570,7 @@ process () {
 
             debug "Cleaning man dir from previous dependencies, we want to install man pages that belong to LAST requirement which is app bundle itself"
             for place in man share/man share/info share/doc share/docs; do
-                ${FIND_BIN} "${PREFIX}/${place}" -delete 2>/dev/null
+                try "${FIND_BIN} ${PREFIX}/${place} -delete"
             done
 
             note "   ${NOTE_CHAR} Installing requirement: $(distinct n "${_app_param}")"
