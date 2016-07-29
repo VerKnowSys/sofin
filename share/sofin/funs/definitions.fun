@@ -464,9 +464,9 @@ strip_bundle () {
                     for _file in ${_tbstripfiles}; do
                         _bundlower="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
                         if [ -n "${_bundlower}" ]; then
-                            try "${STRIP_BIN} ${DEFAULT_STRIP_OPTS} ${_file} >> ${LOG}.${_bundlower}.strip 2>> ${LOG}.${_bundlower}.strip"
+                            ${STRIP_BIN} ${DEFAULT_STRIP_OPTS} ${_file} > "${LOG}.${_bundlower}.strip" 2>> "${LOG}.${_bundlower}"
                         else
-                            try "${STRIP_BIN} ${DEFAULT_STRIP_OPTS} ${_file} >> ${LOG}.strip 2>> ${LOG}.strip"
+                            ${STRIP_BIN} ${DEFAULT_STRIP_OPTS} ${_file} > "${LOG}.strip" 2>> "${LOG}"
                         fi
                         if [ "$?" = "0" ]; then
                             _counter="${_counter} + 1"
