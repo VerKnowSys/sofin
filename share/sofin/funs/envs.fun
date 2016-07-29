@@ -273,7 +273,12 @@ destroy_locks () {
 
 
 update_shell_vars () {
-    get_shell_vars > ${SOFIN_PROFILE}
+    if [ -n "${SOFIN_PROFILE}" ]; then
+        debug "Generating shell environment and writing to ${SOFIN_PROFILE}"
+        get_shell_vars > ${SOFIN_PROFILE}
+    else
+        warn "Empty SOFIN_PROFILE! update_shell_vars() is No-Op!"
+    fi
 }
 
 
