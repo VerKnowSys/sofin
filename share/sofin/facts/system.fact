@@ -23,7 +23,8 @@ else
 fi
 
 # Since Git is often used in defaunitions, we're allowing definitions to use it's path:
-if [ -x "${GIT_BIN}" ]; then
+if [ -x "${GIT_BIN}" -a \
+     -z "${GIT_ROOT_DIR}" ]; then
     GIT_ROOT_DIR="$(${BASENAME_BIN} "$(${BASENAME_BIN} "${GIT_BIN}" 2>/dev/null)" 2>/dev/null)"
 else
     unset GIT_ROOT_DIR
