@@ -22,6 +22,13 @@ else
     unset SYSTEM_VERSION OS_TRIPPLE SYS_SPECIFIC_BINARY_REMOTE
 fi
 
+# Since Git is often used in defaunitions, we're allowing definitions to use it's path:
+if [ -x "${GIT_BIN}" ]; then
+    GIT_ROOT_DIR="$(${BASENAME_BIN} "$(${BASENAME_BIN} "${GIT_BIN}" 2>/dev/null)" 2>/dev/null)"
+else
+    unset GIT_ROOT_DIR
+fi
+
 
 SOFIN_SHELL_BLOCK=$(${CAT_BIN} <<EOF
 #------Sofin-Environment-Block------#
