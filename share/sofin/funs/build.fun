@@ -105,10 +105,10 @@ rebuild_bundle () {
         fi
         remove_bundles "${_reb_ap_bundle}"
         USE_BINBUILD=NO
-        build "${_reb_ap_bundle}" || def_error "${_reb_ap_bundle}" "Bundle build failed."
+        build "${_reb_ap_bundle}"
         USE_FORCE=YES
-        wipe_remote_archives ${_reb_ap_bundle} || def_error "${_reb_ap_bundle}" "Wipe failed"
-        push_binbuilds ${_reb_ap_bundle} || def_error "${_reb_ap_bundle}" "Push failure"
+        wipe_remote_archives ${_reb_ap_bundle}
+        push_binbuilds ${_reb_ap_bundle}
     done
     unset _reb_ap_bundle _those_to_rebuild _a_dependency _dep _alldefs_avail _idep _irawname _an_def_nam
 }
