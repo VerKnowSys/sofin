@@ -65,15 +65,13 @@ deploy_binbuild () {
     _dbbundles=${*}
     create_dirs
     load_defaults
-    note "Software bundles to be built and deployed to remote: $(distinct n ${_dbbundles})"
+    note "Requested to build and deploy bundle(s): $(distinct n "${_dbbundles}")"
     for _dbbundle in ${_dbbundles}; do
         USE_BINBUILD=NO
-        build "${_dbbundle}" || \
-            def_error "${_dbbundle}" "Bundle build failed."
+        build "${_dbbundle}"
     done
-    push_binbuilds ${_dbbundles} || \
-        def_error "${_dbbundle}" "Push failure"
-    note "Software bundle deployed successfully: $(distinct n ${_dbbundle})"
+    push_binbuilds ${_dbbundles}
+    note "Deployed successfully: $(distinct n "${_dbbundles}")"
     note "$(fill)"
     unset _dbbundles _dbbundle
 }
