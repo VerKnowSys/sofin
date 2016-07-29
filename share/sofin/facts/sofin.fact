@@ -29,8 +29,6 @@ MAIN_USER="${MAIN_USER:-sofin}"
 
 SERVICES_DIR="${SERVICES_DIR:-/Services/}"
 SOFTWARE_DIR="${SOFTWARE_DIR:-/Software/}"
-SOFIN_PROFILE="${HOME}/.profile"
-SOFIN_ENV_DISABLED_INDICATOR_FILE="${HOME}/.${DEFAULT_NAME}-disabled"
 
 DEFINITIONS_DEFAULT_FILE_NAME="defaults" # NOTE: Base "def" file, loaded before each software definition
 DEFINITIONS_LISTS_FILE_NAME="lists" # NOTE: It's name of lists directory from "Sofin-definitions" repository
