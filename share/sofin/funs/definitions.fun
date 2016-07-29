@@ -302,14 +302,14 @@ available_definitions () {
 
 
 make_exports () {
-    if [ -z "${1}" ]; then
-        error "Missing second argument with export app is required!"
-    fi
-    if [ -z "${2}" ]; then
-        error "Missing third argument with source app is required!"
-    fi
     _export_bin="${1}"
     _bundle_name="$(capitalize "${2}")"
+    if [ -z "${_export_bin}" ]; then
+        error "First argument with $(distinct e "exported-bin") is required!"
+    fi
+    if [ -z "${_bundle_name}" ]; then
+        error "Second argument with $(distinct e "BundleName") is required!"
+    fi
     for _bindir in "/bin/" "/sbin/" "/libexec/"; do
         debug "Looking into bundle binary dir: $(distinct d "${SOFTWARE_DIR}${_bundle_name}${_bindir}")"
         if [ -e "${SOFTWARE_DIR}${_bundle_name}${_bindir}${_export_bin}" ]; then
