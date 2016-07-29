@@ -223,17 +223,34 @@ reset_defs () {
 
 
 remove_bundles () {
-    _bundle_nam="${@}"
-    if [ -z "${_bundle_nam}" ]; then
+    _bundle_name="${@}"
+    if [ -z "${_bundle_name}" ]; then
         error "Second argument with at least one bundle name is required!"
     fi
+    # replace + with *
+    _bundle_nam="$(${PRINTF_BIN} "${_bundle_name}" | ${SED_BIN} -e 's#+#*#' 2>/dev/null)"
+
     # first look for a list with that name:
-    if [ -e "${DEFINITIONS_LISTS_DIR}$(lowercase "${_bundle_nam}")" ]; then
+    if [ -e "${DEFINITIONS_LISTS_DIR}${_bundle_nam}" ]; then
         _picked_bundles="$(${CAT_BIN} ${DEFINITIONS_LISTS_DIR}${_bundle_nam} 2>/dev/null | eval "${NEWLINES_TO_SPACES_GUARD}")"
-        debug "Removing list of bundles: $(distinct d ${_picked_bundles})"
+        debug "Removing list of bundles: $(distinct d "${_picked_bundles}")"
     else
         _picked_bundles="${_bundle_nam}"
-        debug "Removing bundles: $(distinct d ${_picked_bundles})"
+        debug "Removing bundles: $(distinct d "${_picked_bundles}")"
+    fi
+    if [ "${_bundle_nam}" != "${_bundle_name}" ]; then
+        # Specified + - a wildcard
+        _picked_bundles="" # to remove first entry with *
+        _found="$(${FIND_BIN} ${SOFTWARE_DIR} -mindepth 1 -maxdepth 1 -iname "${_bundle_nam}" -type d 2>/dev/null)"
+        for _bund in ${_found}; do
+            _bname="$(${BASENAME_BIN} "${_bund}" 2>/dev/null)"
+            _picked_bundles="${_picked_bundles} ${_bname}"
+        done
+        if [ -z "${_picked_bundles}" ]; then
+            debug "No bundles picked? Maybe there's a '+' in definition name? Let's try: $(distinct d "${_bundle_name}")"
+            _picked_bundles="${_bundle_name}" # original name, with + in it
+        fi
+        unset _found _bund _bname
     fi
 
     load_defaults
@@ -264,13 +281,11 @@ remove_bundles () {
                 return 0 # Just pick first available alternative bundle
 
             elif [ -z "${_alternative}" ]; then
-                debug "No alternative: $(distinct d ${_alternative}) != $(distinct d ${_given_name})"
+                debug "No alternative: $(distinct d "${_alternative}") != $(distinct d "${_given_name}")"
             fi
-        else
-            warn "Bundle: $(distinct w ${_given_name}) not installed."
         fi
     done
-    unset _given_name _inname _alternative _aname _def _picked_bundles
+    unset _given_name _inname _alternative _aname _def _picked_bundles _bundle_name _bundle_nam
 }
 
 
