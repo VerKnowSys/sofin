@@ -240,7 +240,7 @@ develop () {
     create_dirs
     _defname_input="${1}"
     _defname_no_ext="$(echo "${_defname_input}" | ${SED_BIN} -e "s#\.${DEFAULT_DEF_EXT}##" 2>/dev/null)"
-    _devname="$(lowercase "$(${BASENAME_BIN} ${_defname_no_ext} 2>/dev/null)")"
+    _devname="$(lowercase "$(${BASENAME_BIN} "${_defname_no_ext}" 2>/dev/null)")"
     if [ -z "${_devname}" ]; then
         error "No definition file name specified as first param!"
     fi

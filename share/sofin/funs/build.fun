@@ -361,7 +361,7 @@ process () {
     fi
     _req_definition="${DEFINITIONS_DIR}$(lowercase "${_app_param}")${DEFAULT_DEF_EXT}"
     if [ ! -e "${_req_definition}" ]; then
-        error "Cannot fetch definition: $(distinct e ${_req_definition})! Aborting!"
+        error "Cannot fetch definition: $(distinct e "${_req_definition}")! Aborting!"
     fi
     _req_defname="$(echo "$(${BASENAME_BIN} "${_req_definition}" 2>/dev/null)" | ${SED_BIN} -e 's/\..*$//g' 2>/dev/null)"
     debug "Requirement: $(distinct d "${_app_param}") file: $(distinct d "${_req_definition}"), req-name: $(distinct d "${_req_defname}")"

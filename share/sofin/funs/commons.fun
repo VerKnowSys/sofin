@@ -97,7 +97,7 @@ fill () {
         _times="${MAX_COLS}"
     fi
     _buf=""
-    for i in $(${SEQ_BIN} 1 ${_times} 2>/dev/null); do
+    for i in $(${SEQ_BIN} 1 "${_times}" 2>/dev/null); do
         _buf="${_buf}${_char}"
     done
     ${PRINTF_BIN} "${_buf}"
