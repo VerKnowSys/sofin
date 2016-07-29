@@ -295,9 +295,9 @@ build () {
                 fi
 
                 export_binaries "${_common_lowercase}"
+                after_export_callback
             done
 
-            after_export_callback
 
             clean_useless
             strip_bundle "${_common_lowercase}"
