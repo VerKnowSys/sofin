@@ -237,7 +237,7 @@ show_diff () {
 
 
 develop () {
-    create_dirs
+    ${TEST_BIN} -d "${DEFINITIONS_DIR}" || create_dirs # only definiions dir is requires, so skip dir traverse
     _defname_input="${1}"
     _defname_no_ext="$(echo "${_defname_input}" | ${SED_BIN} -e "s#\.${DEFAULT_DEF_EXT}##" 2>/dev/null)"
     _devname="$(lowercase "$(${BASENAME_BIN} "${_defname_no_ext}" 2>/dev/null)")"
