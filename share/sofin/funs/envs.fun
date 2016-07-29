@@ -236,13 +236,13 @@ acquire_lock_for () {
         if [ -f "${LOCKS_DIR}${bundle}${DEFAULT_LOCK_EXT}" ]; then
             lock_pid="$(${CAT_BIN} ${LOCKS_DIR}${bundle}${DEFAULT_LOCK_EXT} 2>/dev/null)"
             lock_parent_pid="$(${PGREP_BIN} -P${lock_pid} 2>/dev/null)"
-            debug "Lock pid: $(distinct d ${lock_pid}), Sofin pid: $(distinct d ${SOFIN_PID}), lock_parent_pid: $(distinct d ${lock_parent_pid})"
+            debug "Lock pid: $(distinct d ${lock_pid}), Sofin pid: $(distinct d ${SOFIN_PID:-$$}), lock_parent_pid: $(distinct d ${lock_parent_pid})"
             ${KILL_BIN} -0 "${lock_pid}" >/dev/null 2>/dev/null
             if [ "$?" = "0" ]; then # NOTE: process is alive
-                if [ "${lock_pid}" = "${SOFIN_PID}" -o \
-                     "${lock_parent_pid}" = "${SOFIN_PID}" ]; then
+                if [ "${lock_pid}" = "${SOFIN_PID:-$$}" -o \
+                     "${lock_parent_pid}" = "${SOFIN_PID:-$$}" ]; then
                     debug "Dealing with own process or it's fork, process may continue.."
-                elif [ "${lock_pid}" = "${SOFIN_PID}" -a \
+                elif [ "${lock_pid}" = "${SOFIN_PID:-$$}" -a \
                        -z "${lock_parent_pid}" ]; then
                     debug "Dealing with no fork, process may continue.."
                 else
@@ -261,10 +261,7 @@ acquire_lock_for () {
 
 
 destroy_locks () {
-    _pid="${SOFIN_PID}"
-    if [ -n "${SOFIN_PID}" ]; then
-        _pid="$$"
-    fi
+    _pid="${SOFIN_PID:-$$}"
     debug "Cleaning file locks that belong to pid: $(distinct d "${_pid}").."
     for _dlf in $(${FIND_BIN} ${LOCKS_DIR} -mindepth 1 -maxdepth 1 -name "*${DEFAULT_LOCK_EXT}" -print 2>/dev/null); do
         try "${GREP_BIN} ${_pid} ${_dlf}" && \
