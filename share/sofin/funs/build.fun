@@ -181,7 +181,7 @@ build () {
         if [ "${DEF_DISABLED}" = "YES" ]; then
             _anm="$(capitalize "${_bund_name}")"
             warn "Bundle: $(distinct w "${_anm}") is disabled on: $(distinct w "${OS_TRIPPLE}")"
-            try "${RM_BIN} -rf ${PREFIX}"
+            destroy_software_dir "${_anm}"
             unset _pref_base
         else
             unset _pref_base
