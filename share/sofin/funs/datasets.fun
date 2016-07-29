@@ -357,10 +357,9 @@ create_software_bundle_archive () {
         debug "No ZFS-binbuilds feature. Falling back to tarballs.."
         _cdir="$(${PWD_BIN} 2>/dev/null)"
         cd "${SOFTWARE_DIR}"
-        try "${TAR_BIN} --use-compress-program='${XZ_BIN} ${DEFAULT_XZ_OPTS}' \
-            --totals -cJf ${_csbname} ${_cddestfile}" || \
-                try "${TAR_BIN} --totals -cJf ${_csbname} ${_cddestfile}" || \
-                    error "Failed to create archive file: $(distinct e "${_cddestfile}")"
+        try "${TAR_BIN} --use-compress-program='${XZ_BIN} ${DEFAULT_XZ_OPTS}' --totals -cJf ${_cddestfile} ${_csbname}" || \
+            try "${TAR_BIN} --totals -cJf ${_cddestfile} ${_csbname}" || \
+                error "Failed to create archive file: $(distinct e "${_cddestfile}")"
         cd "${_cdir}"
     fi
     unset _csbname _csbelem _cddestfile _cdir _csversion _csbd_dataset
