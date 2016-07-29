@@ -85,20 +85,25 @@ DUP_ERR_TO_OUT_GUARD="${TEE_BIN} /dev/stdout"
 if [ -n "${SOFIN_TRACE}" ]; then
     # NOTE: may be useful later:
     #
-    # if [ "YES" = "${CAP_TERM_ZSH}" ]; then
-    #     setopt sourcetrace
-    #     setopt xtrace
-    # elif [ "YES" = "${CAP_TERM_BASH}" ]; then
-    #     set -o sourcetrace
-    #     set -o xtrace
-    # else
-    #     set -o xtrace
-    # fi
+    if [ "YES" = "${CAP_TERM_ZSH}" ]; then
+        setopt sourcetrace
+        setopt xtrace
+    elif [ "YES" = "${CAP_TERM_BASH}" ]; then
+        set -o sourcetrace
+        set -o xtrace
+    else
+        set -o xtrace
+    fi
     set -x
     echo "Enabled trace mode"
 fi
 
 if [ -n "${SOFIN_VERBOSE}" ]; then
-    set -v
+    if [ "YES" = "${CAP_TERM_ZSH}" -o \
+         "YES" = "${CAP_TERM_BASH}" ]; then
+        set -o verbose
+    else
+        set -v
+    fi
     echo "Enabled verbose mode"
 fi
