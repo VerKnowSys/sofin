@@ -294,15 +294,13 @@ build () {
                     fi
                 fi
 
+                strip_bundle "${_common_lowercase}"
                 export_binaries "${_common_lowercase}"
                 after_export_callback
             done
 
-
             clean_useless
-            strip_bundle "${_common_lowercase}"
             create_apple_bundle_if_necessary
-
         fi
     done
 
