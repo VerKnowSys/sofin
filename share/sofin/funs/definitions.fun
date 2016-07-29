@@ -441,14 +441,18 @@ strip_bundle () {
             ;;
     esac
     if [ "${DEF_STRIP}" != "no" ]; then
-        _bundlower="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
         if [ -z "${DEBUGBUILD}" ]; then
             _counter="0"
             for _stripdir in ${_dirs_to_strip}; do
                 if [ -d "${_stripdir}" ]; then
                     _tbstripfiles=$(${FIND_BIN} ${_stripdir} -maxdepth 1 -type f 2>/dev/null)
                     for _file in ${_tbstripfiles}; do
-                        try "${STRIP_BIN} ${DEFAULT_STRIP_OPTS} ${_file}"
+                        _bundlower="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
+                        if [ -n "${_bundlower}" ]; then
+                            try "${STRIP_BIN} ${DEFAULT_STRIP_OPTS} ${_file} >> ${LOG}.${_bundlower}.strip 2>> ${LOG}.${_bundlower}.strip"
+                        else
+                            try "${STRIP_BIN} ${DEFAULT_STRIP_OPTS} ${_file} >> ${LOG}.strip 2>> ${LOG}.strip"
+                        fi
                         if [ "$?" = "0" ]; then
                             _counter="${_counter} + 1"
                         else
