@@ -2,29 +2,41 @@
 
 . /usr/share/sofin/loader
 
-${CHMOD_BIN} 600 ~/.ssh/id_rsa
-. /var/ServeD-OS/setup-buildhost
-setup_buildhost
+if [ "FreeBSD" = "${SYSTEM_NAME}" ]; then
+    try "${CHMOD_BIN} 600 ~/.ssh/id_rsa"
+    . /var/ServeD-OS/setup-buildhost
+    setup_buildhost
+fi
 
 ${TEST_BIN} ! -x /Software/Ccache/bin/ccache || ${SOFIN_BIN} i Ccache
 
 note "Checking remote machine connection (shouldn't take more than a second).."
-${SSH_BIN} sofin@verknowsys.com "uname -a"
+run "${SSH_BIN} sofin@verknowsys.com uname -a"
 
 set +e
 
-for software in $(${CAT_BIN} software.list); do
+_working_state_file="/tmp/processing-software.list"
+if [ ! -f "${_working_state_file}" ]; then
+    note "Creating new file: $(distinct n "${_working_state_file}")"
+    run "${CP_BIN} -v software.list ${_working_state_file}"
+fi
+
+for software in $(${CAT_BIN} ${_working_state_file} 2>/dev/null); do
     if [ "${software}" = "------" ]; then
         note "Finished task."
         exit
     fi
     note "________________________________"
-    note "Resetting Sofin definitions"
-    ${SOFIN_BIN} reset
-    note "Processing software: ${software}"
+
+    if [ "FreeBSD" = "${SYSTEM_NAME}" ]; then
+        ${SOFIN_BIN} reset && \
+            note "Sofin definitions reset for production host type"
+    fi
+
+    note "Processing software: $(distinct n "${software}")"
     ${SOFIN_BIN} rm ${software}
     ${SOFIN_BIN} deploy ${software} && \
     ${SOFIN_BIN} rm ${software} && \
-    ${SED_BIN} -i '' -e "/${software}/d" software.list
+    ${SED_BIN} -i '' -e "/${software}/d" ${_working_state_file}
     note "--------------------------------"
 done
