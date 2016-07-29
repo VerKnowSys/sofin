@@ -147,7 +147,7 @@ get_shell_vars () {
 
     # MANPATH
     manpath="${DEFAULT_MANPATH}"
-    process () {
+    proc_soft () {
         for app in ${1}*; do
             exp="${app}/man"
             if [ -e "${exp}" ]; then
@@ -159,10 +159,7 @@ get_shell_vars () {
             fi
         done
     }
-    process ${SOFTWARE_DIR}
-    if [ "${USER}" != "root" ]; then
-        process ${SOFTWARE_DIR}
-    fi
+    proc_soft ${SOFTWARE_DIR}
 
     ${PRINTF_BIN} "# PATH:\nexport PATH=\"$(echo "${result}" | eval ${CUT_TRAILING_SPACES_GUARD})\"\n\n"
 
