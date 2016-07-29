@@ -1,9 +1,6 @@
 # Security specific configuration
 
 DEFAULT_HARDEN_KEYS="hardening.procfs_harden \
-hardening.log.ulog \
-hardening.log.log \
-hardening.version \
 hardening.pax.segvguard.max_crashes \
 hardening.pax.segvguard.suspend_timeout \
 hardening.pax.segvguard.expiry_timeout \
