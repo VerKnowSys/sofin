@@ -291,6 +291,7 @@ reload_zsh_shells () {
         _shellshort="$(${BASENAME_BIN} "${SHELL}" 2>/dev/null)"
         _wishlist=""
         _pids=$(processes_all | ${EGREP_BIN} "${_shell_pattern}" 2>/dev/null | eval "${FIRST_ARG_GUARD}")
+        debug "Shell inspect: $(distinct d "${_shellshort}"), PIDS: ${_pids}"
         for _pid in ${_pids}; do
             if [ -z "${_wishlist}" ]; then
                 _wishlist="${_pid}"
