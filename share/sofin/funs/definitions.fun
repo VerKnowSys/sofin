@@ -392,7 +392,8 @@ wipe_remote_archives () {
 
 
 create_apple_bundle_if_necessary () { # XXXXXX
-    if [ -n "${DEF_APPLE_BUNDLE}" ]; then
+    if [ -n "${DEF_APPLE_BUNDLE}" -a \
+         "Darwin" = "${SYSTEM_NAME}" ]; then
         _aname="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
         DEF_NAME="$(${PRINTF_BIN} "${DEF_NAME}" | ${CUT_BIN} -c1 2>/dev/null | ${TR_BIN} '[a-z]' '[A-Z]' 2>/dev/null)$(${PRINTF_BIN} "${DEF_NAME}" | ${SED_BIN} 's/^[a-zA-Z]//' 2>/dev/null)"
         DEF_BUNDLE_NAME="${PREFIX}.app"
