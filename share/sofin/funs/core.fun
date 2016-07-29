@@ -194,21 +194,21 @@ try () {
         _try_aname="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
         if [ -z "${_try_aname}" ]; then
             if [ -z "${_show_prgrss}" ]; then
-                eval "PATH=${PATH} ${_try_params} >> ${LOG} 2>> ${LOG}" && \
+                eval "PATH=${PATH} ${_try_params}" >> "${LOG}" 2>> "${LOG}" && \
                     return 0
             else
                 # show progress on stderr
                 ${PRINTF_BIN} "${ColorBlue}"
-                eval "PATH=${PATH} ${_try_params} >> ${LOG}" && \
+                eval "PATH=${PATH} ${_try_params}" >> "${LOG}" && \
                     return 0
             fi
         else
             if [ -z "${_show_prgrss}" ]; then
-                eval "PATH=${PATH} ${_try_params} >> ${LOG}-${_try_aname} 2>> ${LOG}-${_try_aname}" && \
+                eval "PATH=${PATH} ${_try_params}" >> "${LOG}-${_try_aname}" 2>> "${LOG}-${_try_aname}" && \
                     return 0
             else
                 ${PRINTF_BIN} "${ColorBlue}"
-                eval "PATH=${PATH} ${_try_params} >> ${LOG}-${_try_aname}" && \
+                eval "PATH=${PATH} ${_try_params}" >> "${LOG}-${_try_aname}" && \
                     return 0
             fi
         fi
