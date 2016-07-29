@@ -280,14 +280,14 @@ cleanup_handler () {
 
 
 interrupt_handler () {
-    warn "Interrupted: $(distinct w "${SOFIN_PID:-??}")"
+    warn "Interrupted: $(distinct w "${SOFIN_PID:-$$}")"
     finalize
     exit ${ERRORCODE_USER_INTERRUPT}
 }
 
 
 terminate_handler () {
-    warn "Terminated: $(distinct w "${SOFIN_PID:-??}")"
+    warn "Terminated: $(distinct w "${SOFIN_PID:-$$}")"
     finalize
     exit ${ERRORCODE_TERMINATED}
 }
