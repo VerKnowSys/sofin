@@ -87,7 +87,6 @@ note () {
 
 
 error () {
-    restore_security_state
     cecho
     cecho "$(fill)" ${ColorRed}
     cecho "${FAIL_CHAR} Error: ${@}" ${ColorRed}
@@ -108,6 +107,7 @@ error () {
     warn "\tBitbucket: $(distinct w "${DEFAULT_ISSUE_REPORT_SITE}")"
     warn "\tGithub: $(distinct w "${DEFAULT_ISSUE_REPORT_SITE_ALT}")"
     warn "\n$(fill "${SEPARATOR_CHAR}" 46)$(distinct w "  Daniel (dmilith) Dettlaff  ")$(fill "${SEPARATOR_CHAR}" 5)\n"
+    restore_security_state
     exit ${ERRORCODE_TASK_FAILURE}
 }
 
