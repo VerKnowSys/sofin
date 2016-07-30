@@ -89,7 +89,6 @@ if [ -n "${SOFIN_TRACE}" ]; then
         setopt sourcetrace
         setopt xtrace
     elif [ "YES" = "${CAP_TERM_BASH}" ]; then
-        set -o sourcetrace
         set -o xtrace
     else
         set -o xtrace
