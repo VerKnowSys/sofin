@@ -5,7 +5,7 @@
 
 # NOTE: this function must be running on mirror side:
 gather-source () {
-    if [ "$1" = "" ]; then
+    if [ "${1}" = "" ]; then
         printf "Missing archive URL!\n"
         exit 1
     fi
@@ -14,11 +14,11 @@ gather-source () {
     readonly user_name="sofin"
     readonly default_source_path="/Mirror/software/source"
     readonly default_host="software.verknowsys.com"
-    readonly archive_name="$(basename "$1")"
+    readonly archive_name="$(basename "${1}")"
 
     for mirror in $(host ${default_host} | awk '{print $3}'); do
         printf "Synchronizing ${archive_name} with ${mirror}\n"
-        ssh -p ${default_port} "${user_name}@${mirror}" "cd ${default_source_path} && ${fetch_bin} '$1'"
+        ssh -p ${default_port} "${user_name}@${mirror}" "cd ${default_source_path} && ${fetch_bin} '${1}'"
     done
 
     case "$(uname)" in
