@@ -23,7 +23,7 @@ create_dirs () {
 
 
 log_helper () {
-    _log_h_pattern="$1"
+    _log_h_pattern="${1}"
     create_dirs
     if [ -z "${_log_h_pattern}" ]; then
         _log_files="$(find_all "${LOGS_DIR}" "${DEFAULT_NAME}*")"
@@ -44,12 +44,12 @@ log_helper () {
                 ;;
 
             1)
-                note "Found $(distinct n ${_lognum_f}) log file, that matches _log_h_pattern: $(distinct n ${_log_h_pattern}). Attaching tail.."
+                note "Found $(distinct n "${_lognum_f}) log file, that matches _log_h_pattern: $(distinct n ${_log_h_pattern}"). Attaching tail.."
                 ${TAIL_BIN} -n ${LOG_LINES_AMOUNT} -F $(echo "${_log_files}" | eval ${NEWLINES_TO_SPACES_GUARD})
                 ;;
 
             *)
-                note "Found $(distinct n ${_lognum_f}) log files, that match pattern: $(distinct n ${_log_h_pattern}). Attaching to all available files.."
+                note "Found $(distinct n "${_lognum_f}) log files, that match pattern: $(distinct n ${_log_h_pattern}"). Attaching to all available files.."
                 ${TAIL_BIN} -F $(echo "${_log_files}" | eval "${NEWLINES_TO_SPACES_GUARD}")
                 ;;
         esac
@@ -62,7 +62,7 @@ show_logs () {
     create_dirs
     _logf_pattern="${*}"
     _logf_minutes="${LOG_LAST_ACCESS_OR_MOD_MINUTES}"
-    debug "show_logs(): _logf_minutes: $(distinct d ${_logf_minutes}), pattern: $(distinct d "${_logf_pattern}")"
+    debug "show_logs(): _logf_minutes: $(distinct d "${_logf_minutes}"), pattern: $(distinct d "${_logf_pattern}")"
     _files_x_min=$(${FIND_BIN} "${LOGS_DIR}" -maxdepth 1 -mindepth 1 -mmin -${_logf_minutes} -amin -${_logf_minutes} -iname "${DEFAULT_NAME}*${_logf_pattern}*" -print 2>/dev/null)
     touch_logsdir_and_logfile
     if [ "-" = "${_logf_pattern}" -o \
@@ -71,7 +71,7 @@ show_logs () {
 
     elif [ "+" = "${_logf_pattern}" ]; then
         if [ -d "${LOGS_DIR}" ]; then
-            debug "LOGS_DIR: $(distinct d ${LOGS_DIR})"
+            debug "LOGS_DIR: $(distinct d "${LOGS_DIR}")"
             if [ "${SYSTEM_NAME}" = "Linux" ]; then
                 _files_list="$(find_all "${LOGS_DIR}" "${DEFAULT_NAME}*")"
             else
@@ -98,16 +98,16 @@ show_logs () {
             else
                 note "Attaching tail to $(distinct n "${_files_count}") most recently modified log files (exact order): [$(distinct n "${_files_blist}")]"
             fi
-            debug "_files_abspaths: $(distinct d ${_files_abspaths})"
+            debug "_files_abspaths: $(distinct d "${_files_abspaths}")"
             ${TAIL_BIN} -n0 -F ${_files_abspaths} 2>/dev/null
         else
             note "No logs to attach to. LOGS_DIR=($(distinct n "${LOGS_DIR}")) contain no log files?"
         fi
 
     elif [ -z "${_logf_pattern}" ]; then
-        note "No pattern specified, setting tail on all logs accessed or modified in last ${_logf_minutes} minutes.."
+        note "No pattern specified, setting tail on all logs accessed or modified in last $(distinct n "${_logf_minutes}") minutes.."
         if [ -z "${_files_x_min}" ]; then
-            note "No log files updated or accessed in last ${_logf_minutes} minutes to show. Specify '+' as param, to attach a tail to all logs."
+            note "No log files updated or accessed in last $(distinct n "${_logf_minutes}") minutes to show. Specify '$(distinct n "+")' as param, to attach a tail to all logs."
         else
             debug "show_logs(), files: $(distinct d "$(echo "${_files_x_min}" | eval ${FILES_COUNT_GUARD})")"
             ${TAIL_BIN} -n ${LOG_LINES_AMOUNT} $(echo "${_files_x_min}" | eval ${NEWLINES_TO_SPACES_GUARD})
@@ -123,7 +123,7 @@ show_logs () {
 pretouch_logs () {
     _params="${*}"
     create_dirs
-    debug "Logs pretouch called with params: $(distinct d ${_params})"
+    debug "Logs pretouch called with params: $(distinct d "${_params}")"
     try "${TOUCH_BIN} ${LOGS_DIR}${DEFAULT_NAME}"
     _pret_list=""
     for _app in ${_params}; do

@@ -2,7 +2,7 @@ check_version () { # $1 => installed version, $2 => available version
     if [ ! "${1}" = "" ]; then
         if [ ! "${2}" = "" ]; then
             if [ ! "${1}" = "${2}" ]; then
-                warn "Bundle: $(distinct w $(capitalize ${3})), version: $(distinct w ${2}) is definied, but installed version is: $(distinct w ${1})"
+                warn "Bundle: $(distinct w $(capitalize "${3}")), version: $(distinct w "${2}") is definied, but installed version is: $(distinct w "${1}")"
                 FOUND_OUTDATED=YES
             fi
         fi
@@ -16,7 +16,7 @@ validate_env () {
     do
         _var_value="$(${PRINTF_BIN} "${_envvar}" | ${AWK_BIN} '{sub(/^[A-Z_]*=/, ""); print $1;}' 2>/dev/null)"
         if [ ! -x "${_var_value}" ]; then
-            error "Required binary is unavailable: $(distinct e ${_envvar})"
+            error "Required binary is unavailable: $(distinct e "${_envvar}")"
         fi
     done || exit ${ERRORCODE_VALIDATE_ENV_FAILURE}
     unset _var_value _envvar
@@ -25,7 +25,7 @@ validate_env () {
 
 fail_on_bg_job () {
     _deps=${*}
-    debug "deps=$(distinct d $(echo ${_deps} | eval "${NEWLINES_TO_SPACES_GUARD}"))"
+    debug "deps=$(distinct d "$(echo "${_deps}" | eval "${NEWLINES_TO_SPACES_GUARD}")")"
     create_dirs
     acquire_lock_for "${_deps}"
     unset _deps
@@ -35,10 +35,10 @@ fail_on_bg_job () {
 fail_any_bg_jobs () {
     # Traverse through locks, make sure that every pid from lock is dead before cleaning can continue
     for _a_lock in $(${FIND_BIN} "${LOCKS_DIR}" -type f -name "*${DEFAULT_LOCK_EXT}" -print 2>/dev/null); do
-        _bundle_name="$(${BASENAME_BIN} ${_a_lock} 2>/dev/null)"
+        _bundle_name="$(${BASENAME_BIN} "${_a_lock}" 2>/dev/null)"
         _lock_pid="$(${CAT_BIN} "${_a_lock}" 2>/dev/null)"
         if [ -n "${_lock_pid}" ]; then
-            ${KILL_BIN} -0 "${_lock_pid}" 2>/dev/null >/dev/null
+            try "${KILL_BIN} -0 ${_lock_pid}"
             if [ "$?" = "0" ]; then
                 error "Detected running instance of Sofin, locked on bundle: $(distinct e "${_bundle_name}") pid: $(distinct e "${_lock_pid}")"
             fi
@@ -56,7 +56,7 @@ validate_reqs () {
                 if [ "${_a_files}" != "1" ]; then
                     _pstfix="s"
                 fi
-                warn "/usr/local has been found, and contains: $(distinct w ${_a_files}+) file${_pstfix}"
+                warn "$(distinct w "/usr/local") has been found, which contains: $(distinct w "${_a_files}+") file${_pstfix}."
             fi
         fi
         unset _a_files _pstfix
@@ -77,26 +77,25 @@ check_defs_dir () {
 
 
 validate_archive_sha1 () {
-    _archive_name="$1"
+    _archive_name="${1}"
     if [ ! -f "${_archive_name}" -o \
            -z "${_archive_name}" ]; then
-         error "validate_archive_sha1(): Specified empty $(distinct e archive_name), or file doesn't exists: $(distinct e ${_archive_name})"
+         error "Specified empty $(distinct e archive_name), or file doesn't exists: $(distinct e "${_archive_name}")"
     fi
     # checking archive sha1 checksum
     if [ -e "${_archive_name}" ]; then
         _current_archive_sha1="$(file_checksum "${_archive_name}")"
-        debug "current_archive_sha1: $(distinct d ${_current_archive_sha1})"
+        debug "current_archive_sha1: $(distinct d "${_current_archive_sha1}")"
     else
         error "No bundle archive found?"
     fi
     _current_sha_file="${_archive_name}${DEFAULT_CHKSUM_EXT}"
-    _sha1_value="$(${CAT_BIN} ${_current_sha_file} 2>/dev/null)"
+    _sha1_value="$(${CAT_BIN} "${_current_sha_file}" 2>/dev/null)"
     if [ ! -f "${_current_sha_file}" -o \
            -z "${_sha1_value}" ]; then
         try "${RM_BIN} -fv ${_archive_name}"
         try "${RM_BIN} -fv ${_current_sha_file}"
     fi
-    debug "Checking SHA1 match: $(distinct d ${_current_archive_sha1}) vs $(distinct d ${_sha1_value})"
     if [ "${_current_archive_sha1}" != "${_sha1_value}" ]; then
         debug "Bundle archive checksum doesn't match ($(distinct d "${_current_archive_sha1}") vs $(distinct d "${sha1_value}")), removing binary builds and proceeding into build phase"
         try "${RM_BIN} -fv ${_archive_name}"

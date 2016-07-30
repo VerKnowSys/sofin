@@ -76,12 +76,12 @@ debug () {
 
 
 warn () {
-    cecho "$1" ${ColorYellow}
+    cecho "${1}" ${ColorYellow}
 }
 
 
 note () {
-    cecho "$1" ${ColorGreen}
+    cecho "${1}" ${ColorGreen}
 }
 
 
@@ -89,7 +89,7 @@ error () {
     restore_security_state
     cecho
     cecho "$(fill)" ${ColorRed}
-    cecho "${FAIL_CHAR} Error: $1" ${ColorRed}
+    cecho "${FAIL_CHAR} Error: ${1}" ${ColorRed}
     cecho "$(fill)" ${ColorRed}
     warn "\n$(fill)"
     warn "${NOTE_CHAR2} Since I'm very serious about software code quality overall,"
@@ -217,25 +217,24 @@ try () {
 retry () {
     _targets="${*}"
     _ammo="OOO"
-
+    unset _git_path
     touch_logsdir_and_logfile
-
     # check for commands that puts something important/intersting on stdout
-    echo "${_targets}" | eval "${MATCH_PRINT_STDOUT_GUARD}" && _rtry_show_blueout=YES
-
-    debug "Show stdout progress _rtry_show_blueout=$(distinct d "${_rtry_show_blueout}")"
+    echo "${_targets}" | eval "${MATCH_PRINT_STDOUT_GUARD}" && _rtry_blue=YES
+    if [ -n "${GIT_ROOT_DIR}" ]; then
+        _git_path=":${GIT_ROOT_DIR}/bin:${GIT_ROOT_DIR}/libexec/git-core"
+    fi
     while [ -n "${_ammo}" ]; do
         if [ -n "${_targets}" ]; then
-            debug "Invoking: retry($(distinct ${ColorParams} "${_targets}")) [$(distinct d "${_ammo}")]"
-            _rgit_root="$(${BASENAME_BIN} $(${BASENAME_BIN} "${GIT_BIN}" 2>/dev/null) 2>/dev/null)"
-            if [ -z "${_rtry_show_blueout}" ]; then
-                eval "PATH=${_rgit_root}/bin:${_rgit_root}/libexec/git-core:${DEFAULT_PATH} ${_targets}" >> ${LOG} 2>> ${LOG} && \
-                    unset _rgit_root _ammo _targets && \
+            debug "retry($(distinct ${ColorParams} "${_targets}")) [$(distinct d "${_ammo}")]"
+            if [ -z "${_rtry_blue}" ]; then
+                eval "PATH=${DEFAULT_PATH}${_git_path} ${_targets}" >> "${LOG}" 2>> "${LOG}" && \
+                    unset _ammo _targets && \
                         return 0
             else
                 ${PRINTF_BIN} "${ColorBlue}"
-                eval "PATH=${_rgit_root}/bin:${_rgit_root}/libexec/git-core:${DEFAULT_PATH} ${_targets}" >> ${LOG} && \
-                    unset _rgit_root _ammo _targets && \
+                eval "PATH=${DEFAULT_PATH}${_git_path} ${_targets}" >> "${LOG}" && \
+                    unset _ammo _targets && \
                         return 0
             fi
         else
@@ -244,8 +243,8 @@ retry () {
         _ammo="$(echo "${_ammo}" | ${SED_BIN} 's/O//' 2>/dev/null)"
         debug "Remaining attempts: $(distinct d "${_ammo}")"
     done
-    debug "All _ammo exhausted to invoke a command: $(distinct e "${_targets}")"
-    unset _ammo _targets _rgit_root _rtry_show_blueout
+    debug "All available ammo exhausted to invoke a command: $(distinct d "${_targets}")"
+    unset _ammo _targets _rtry_blue
     return 1
 }
 
@@ -319,9 +318,9 @@ restore_security_state () {
     if [ "YES" = "${CAP_SYS_HARDENED}" ]; then
         if [ -f "${DEFAULT_SECURITY_STATE_FILE}" ]; then
             note "Restoring pre-build security state"
-            . ${DEFAULT_SECURITY_STATE_FILE} 2>> ${LOG}
+            . ${DEFAULT_SECURITY_STATE_FILE} >> "${LOG}" 2>> "${LOG}"
         else
-            debug "No security state file found: ${DEFAULT_SECURITY_STATE_FILE}"
+            debug "No security state file found: $(distinct d "${DEFAULT_SECURITY_STATE_FILE}")"
         fi
     else
         debug "No hardening capabilities in system"

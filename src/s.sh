@@ -100,7 +100,7 @@ if [ -n "${SOFIN_COMMAND_ARG}" ]; then
             else
                 _pickd_bundls="${SOFIN_ARGS}"
             fi
-            debug "Processing software: $(distinct d "${_pickd_bundls}") for: $(distinct d ${OS_TRIPPLE})"
+            debug "Processing software: $(distinct d "${_pickd_bundls}") for: $(distinct d "${OS_TRIPPLE}")"
             build "${_pickd_bundls}"
             unset _pickd_bundls
             finalize

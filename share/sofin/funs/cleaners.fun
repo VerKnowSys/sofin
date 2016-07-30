@@ -39,7 +39,7 @@ clean_failbuilds () {
                 try "${RM_BIN} -rf ${i}"
             done
             _cf_result="$(echo "${_cf_number}" | ${BC_BIN} 2>/dev/null)"
-            note "$(distinct n ${_cf_result}) directories cleaned."
+            note "$(distinct n "${_cf_result}") directories cleaned."
         fi
     fi
     unset _cf_number _cf_files _cf_result
@@ -48,7 +48,7 @@ clean_failbuilds () {
 
 perform_clean () {
     fail_any_bg_jobs
-    case "$1" in
+    case "${1}" in
         purge) # purge
             clean_purge
             ;;

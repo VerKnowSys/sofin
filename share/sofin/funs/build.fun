@@ -98,7 +98,7 @@ rebuild_bundle () {
         fi
     done
 
-    note "Will rebuild, wipe and push these bundles: $(distinct n ${_those_to_rebuild})"
+    note "Will rebuild, wipe and push these bundles: $(distinct n "${_those_to_rebuild}")"
     for _reb_ap_bundle in ${_those_to_rebuild}; do
         if [ "${_reb_ap_bundle}" = "Git" -o "${_reb_ap_bundle}" = "Zsh" ]; then
             continue
@@ -107,8 +107,8 @@ rebuild_bundle () {
         USE_BINBUILD=NO
         build "${_reb_ap_bundle}"
         USE_FORCE=YES
-        wipe_remote_archives ${_reb_ap_bundle}
-        push_binbuilds ${_reb_ap_bundle}
+        wipe_remote_archives "${_reb_ap_bundle}"
+        push_binbuilds "${_reb_ap_bundle}"
     done
     unset _reb_ap_bundle _those_to_rebuild _a_dependency _dep _alldefs_avail _idep _irawname _an_def_nam
 }
@@ -155,7 +155,7 @@ fetch_binbuild () {
         if [ -e "${FILE_CACHE_DIR}${_bb_archive}" ]; then
             install_software_from_binbuild "${_bb_archive}" "${_bbfull_name}" "${_bb_ver}"
         else
-            debug "Binary build checksum doesn't match for: $(distinct d "${_bbfull_name}")"
+            debug "Binary build unavailable for bundle: $(distinct d "${_bbfull_name}")"
         fi
     fi
     unset _bbfull_name _bbaname _bb_archive
@@ -187,31 +187,33 @@ build () {
             unset _pref_base
             for _req_name in ${DEFINITIONS_DIR}${_bund_name}${DEFAULT_DEF_EXT}; do
                 unset DONT_BUILD_BUT_DO_EXPORTS
-                debug "Reading definition: $(distinct d ${_req_name})"
+                debug "Reading definition: $(distinct d "${_req_name}")"
                 load_defaults
                 load_defs "${_req_name}"
                 if [ -z "${DEF_REQUIREMENTS}" ]; then
                     debug "No app requirements"
                 else
-                    pretouch_logs ${DEF_REQUIREMENTS}
+                    pretouch_logs "${DEF_REQUIREMENTS}"
                 fi
 
                 # Note: this acutally may break definitions like ImageMagick..
-                #_common_lowercase="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
-                _common_lowercase="${DEF_NAME}${DEF_POSTFIX}"
-                DEF_NAME="$(capitalize "${_common_lowercase}")"
+                #_bund_lcase="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
+                _bund_lcase="${DEF_NAME}${DEF_POSTFIX}"
+                _bundl_name="$(capitalize "${_bund_lcase}")"
+                DEF_NAME="${_bundl_name}"
 
                 # if definition requires root privileges, throw an "exception":
                 if [ -n "${DEF_REQUIRE_ROOT_ACCESS}" ]; then
                     if [ "${USER}" != "root" ]; then
-                        error "Definition requires superuser priviledges: $(distinct e ${_common_lowercase}). Installation aborted."
+                        error "Definition requires superuser priviledges: $(distinct e "${_bund_lcase}"). Installation aborted."
                     fi
                 fi
 
-                _bundl_name="$(capitalize "${_common_lowercase}")"
                 PREFIX="${SOFTWARE_DIR}${_bundl_name}"
                 SERVICE_DIR="${SERVICES_DIR}${_bundl_name}"
-                BUILD_NAMESUM="$(text_checksum "${DEF_NAME}${DEF_POSTFIX}-${DEF_VERSION}")"
+                SOFTWARE_DIR="${SERVICES_DIR}${_bundl_name}"
+
+                BUILD_NAMESUM="$(text_checksum "${_bund_lcase}-${DEF_VERSION}")"
                 BUILD_DIR="${PREFIX}/${DEFAULT_SRC_EXT}${BUILD_NAMESUM}"
                 create_builddir "${_bundl_name}" "${BUILD_NAMESUM}"
 
@@ -226,19 +228,19 @@ build () {
                 fi
 
                 # binary build of whole software bundle
-                _full_bund_name="${_common_lowercase}-${DEF_VERSION}"
+                _full_bund_name="${_bund_lcase}-${DEF_VERSION}"
                 try "${MKDIR_BIN} -p ${FILE_CACHE_DIR}"
 
-                _an_archive="$(capitalize "${_common_lowercase}")-${DEF_VERSION}${DEFAULT_ARCHIVE_EXT}"
-                _installed_indicator="${PREFIX}/${_common_lowercase}${DEFAULT_INST_MARK_EXT}"
+                _an_archive="${_bundl_name}-${DEF_VERSION}${DEFAULT_ARCHIVE_EXT}"
+                _installed_indicator="${PREFIX}/${_bund_lcase}${DEFAULT_INST_MARK_EXT}"
                 if [ ! -e "${_installed_indicator}" ]; then
-                    fetch_binbuild "${_full_bund_name}" "${_common_lowercase}" "${_an_archive}" "${DEF_VERSION}"
+                    fetch_binbuild "${_full_bund_name}" "${_bund_lcase}" "${_an_archive}" "${DEF_VERSION}"
                 else
                     _already_installed_version="$(${CAT_BIN} ${_installed_indicator} 2>/dev/null)"
                     if [ "${DEF_VERSION}" = "${_already_installed_version}" ]; then
-                        debug "$(distinct d ${_common_lowercase}) bundle is installed with version: $(distinct d "${_already_installed_version}")"
+                        debug "$(distinct d "${_bund_lcase}") bundle is installed with version: $(distinct d "${_already_installed_version}")"
                     else
-                        warn "$(distinct w "${_common_lowercase}") bundle is installed with version: $(distinct w "${_already_installed_version}"), different from defined: $(distinct w "${DEF_VERSION}")"
+                        warn "$(distinct w "${_bund_lcase}") bundle is installed with version: $(distinct w "${_already_installed_version}"), different from defined: $(distinct w "${DEF_VERSION}")"
                     fi
                     DONT_BUILD_BUT_DO_EXPORTS=YES
                     unset _already_installed_version
@@ -250,7 +252,7 @@ build () {
                     else
                         note "Installing: $(distinct n "${DEF_FULL_NAME}"), version: $(distinct n "${DEF_VERSION}"), with requirements: $(distinct n "${DEF_REQUIREMENTS}")"
                     fi
-                    _req_amount="$(${PRINTF_BIN} "${DEF_REQUIREMENTS}" | ${WC_BIN} -w 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)"
+                    _req_amount="$(${PRINTF_BIN} "${DEF_REQUIREMENTS}\n" | ${WC_BIN} -w 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)"
                     _req_amount="$(${PRINTF_BIN} "${_req_amount} + 1\n" | ${BC_BIN} 2>/dev/null)"
                     _req_all="${_req_amount}"
                     for _req in ${DEF_REQUIREMENTS}; do
@@ -262,7 +264,7 @@ build () {
                             break
                         else
                             note "  ${_req} ($(distinct n "${_req_amount}") of $(distinct n "${_req_all}") remaining)"
-                            if [ ! -e "${PREFIX}/${_req}${DEFAULT_INST_MARK_EXT}" ]; then
+                            if [ ! -f "${PREFIX}/${_req}${DEFAULT_INST_MARK_EXT}" ]; then
                                 CHANGED=YES
                                 process "${_req}"
                             fi
@@ -272,30 +274,30 @@ build () {
                 fi
 
                 if [ -z "${DONT_BUILD_BUT_DO_EXPORTS}" ]; then
-                    if [ -e "${PREFIX}/${_common_lowercase}${DEFAULT_INST_MARK_EXT}" ]; then
+                    if [ -e "${PREFIX}/${_bund_lcase}${DEFAULT_INST_MARK_EXT}" ]; then
                         if [ "${CHANGED}" = "YES" ]; then
-                            note "  ${_common_lowercase} ($(distinct n 1) of $(distinct n "${_req_all}"))"
-                            note "   ${NOTE_CHAR} App dependencies changed. Rebuilding: $(distinct n ${_common_lowercase})"
-                            process "${_common_lowercase}"
+                            note "  ${_bund_lcase} ($(distinct n 1) of $(distinct n "${_req_all}"))"
+                            note "   ${NOTE_CHAR} App dependencies changed. Rebuilding: $(distinct n "${_bund_lcase}")"
+                            process "${_bund_lcase}"
                             unset CHANGED
                             mark_installed "${DEF_NAME}${DEF_POSTFIX}" "${DEF_VERSION}"
                             show_done "${DEF_NAME}${DEF_POSTFIX}"
                         else
-                            note "  ${_common_lowercase} ($(distinct n 1) of $(distinct n ${_req_all}))"
+                            note "  ${_bund_lcase} ($(distinct n 1) of $(distinct n "${_req_all}"))"
                             show_done "${DEF_NAME}${DEF_POSTFIX}"
-                            debug "${SUCCESS_CHAR} $(distinct d ${_common_lowercase}) current: $(distinct d ${_version_element}), definition: [$(distinct d ${DEF_VERSION})] Ok."
+                            debug "${SUCCESS_CHAR} $(distinct d "${_bund_lcase}") current: $(distinct d "${_version_element}"), definition: [$(distinct d "${DEF_VERSION}")] Ok."
                         fi
                     else
-                        note "  ${_common_lowercase} ($(distinct n 1) of $(distinct n ${_req_all}))"
-                        debug "Right before process call: ${_common_lowercase}"
-                        process "${_common_lowercase}"
+                        note "  ${_bund_lcase} ($(distinct n 1) of $(distinct n "${_req_all}"))"
+                        debug "Right before process call: ${_bund_lcase}"
+                        process "${_bund_lcase}"
                         mark_installed "${DEF_NAME}${DEF_POSTFIX}" "${DEF_VERSION}"
-                        note "${SUCCESS_CHAR} ${_common_lowercase} [$(distinct n ${DEF_VERSION})]\n"
+                        note "${SUCCESS_CHAR} ${_bund_lcase} [$(distinct n "${DEF_VERSION}")]\n"
                     fi
                 fi
 
-                strip_bundle "${_common_lowercase}"
-                export_binaries "${_common_lowercase}"
+                strip_bundle "${_bund_lcase}"
+                export_binaries "${_bund_lcase}"
                 after_export_callback
             done
 
@@ -323,39 +325,39 @@ build () {
     fi
     finalize_afterbuild && \
         debug "Build successfull: $(distinct d "${_build_list}")"
-    unset _build_list _common_lowercase _req_all _req
+    unset _build_list _bund_lcase _req_all _req
 }
 
 
 dump_debug_info () {
     debug "-------------- PRE CONFIGURE SETTINGS DUMP --------------"
-    debug "CPUS (used): $(distinct d ${CPUS})"
-    debug "ALL_CPUS: $(distinct d ${ALL_CPUS})"
-    debug "MAKE_OPTS: $(distinct d ${MAKE_OPTS})"
-    debug "FETCH_OPTS: $(distinct d ${FETCH_OPTS})"
-    debug "PREFIX: $(distinct d ${PREFIX})"
-    debug "SERVICE_DIR: $(distinct d ${SERVICE_DIR})"
+    debug "CPUS (used): $(distinct d "${CPUS}")"
+    debug "ALL_CPUS: $(distinct d "${ALL_CPUS}")"
+    debug "MAKE_OPTS: $(distinct d "${MAKE_OPTS}")"
+    debug "FETCH_OPTS: $(distinct d "${FETCH_OPTS}")"
+    debug "PREFIX: $(distinct d "${PREFIX}")"
+    debug "SERVICE_DIR: $(distinct d "${SERVICE_DIR}")"
     debug "CURRENT_DIR: $(distinct d $(${PWD_BIN} 2>/dev/null))"
-    debug "BUILD_NAMESUM: $(distinct d ${BUILD_NAMESUM})"
-    debug "BUILD_DIR: $(distinct d ${BUILD_DIR})"
-    debug "PATH: $(distinct d ${PATH})"
-    debug "CC: $(distinct d ${CC})"
-    debug "CXX: $(distinct d ${CXX})"
-    debug "CPP: $(distinct d ${CPP})"
-    debug "CXXFLAGS: $(distinct d ${CXXFLAGS})"
-    debug "CFLAGS: $(distinct d ${CFLAGS})"
-    debug "LDFLAGS: $(distinct d ${LDFLAGS})"
+    debug "BUILD_NAMESUM: $(distinct d "${BUILD_NAMESUM}")"
+    debug "BUILD_DIR: $(distinct d "${BUILD_DIR}")"
+    debug "PATH: $(distinct d "${PATH}")"
+    debug "CC: $(distinct d "${CC}")"
+    debug "CXX: $(distinct d "${CXX}")"
+    debug "CPP: $(distinct d "${CPP}")"
+    debug "CXXFLAGS: $(distinct d "${CXXFLAGS}")"
+    debug "CFLAGS: $(distinct d "${CFLAGS}")"
+    debug "LDFLAGS: $(distinct d "${LDFLAGS}")"
     if [ "Darwin" = "${SYSTEM_NAME}" ]; then
-        debug "DYLD_LIBRARY_PATH: $(distinct d ${DYLD_LIBRARY_PATH})"
+        debug "DYLD_LIBRARY_PATH: $(distinct d "${DYLD_LIBRARY_PATH}")"
     else
-        debug "LD_LIBRARY_PATH: $(distinct d ${LD_LIBRARY_PATH})"
+        debug "LD_LIBRARY_PATH: $(distinct d "${LD_LIBRARY_PATH}")"
     fi
     debug "-------------- PRE CONFIGURE SETTINGS DUMP ENDS ---------"
 }
 
 
 process () {
-    _app_param="$1"
+    _app_param="${1}"
     if [ -z "${_app_param}" ]; then
         error "No param given for process()!"
     fi
@@ -397,7 +399,7 @@ process () {
                             def_error "${DEF_NAME}${DEF_POSTFIX}" "Failed source fetch: $(distinct e "${DEF_SOURCE_PATH}${_base}")"
                         note "   ${NOTE_CHAR} Source fetched for: $(distinct n "${_base}")"
                     fi
-                    debug "Build root: $(distinct d ${BUILD_DIR}), file: $(distinct d "${_dest_file}")"
+                    debug "Build root: $(distinct d "${BUILD_DIR}"), file: $(distinct d "${_dest_file}")"
                     if [ -z "${DEF_SHA}" ]; then
                         error "Missing SHA sum for source: $(distinct e "${_dest_file}")!"
                     else
@@ -497,7 +499,7 @@ process () {
                         ;;
 
                     posix)
-                        run "./configure -prefix ${PREFIX} -cc $(${BASENAME_BIN} ${CC} 2>/dev/null) ${DEF_CONFIGURE_ARGS}"
+                        run "./configure -prefix ${PREFIX} -cc $(${BASENAME_BIN} "${CC}" 2>/dev/null) ${DEF_CONFIGURE_ARGS}"
                         ;;
 
                     cmake)
@@ -577,8 +579,8 @@ process () {
             run "${DEF_INSTALL_METHOD}"
             after_install_callback
 
-            debug "Marking $(distinct d "${_app_param}") as installed in: $(distinct d "${PREFIX}")"
-            ${TOUCH_BIN} "${PREFIX}/${_app_param}${DEFAULT_INST_MARK_EXT}"
+            run "${TOUCH_BIN} ${PREFIX}/${_app_param}${DEFAULT_INST_MARK_EXT}" && \
+                debug "$(distinct d "${_app_param}") marked as installed in: $(distinct d "${PREFIX}")"
             debug "Writing version: $(distinct d "${DEF_VERSION}") of software: $(distinct d "${DEF_NAME}") installed in: $(distinct d "${PREFIX}")"
             ${PRINTF_BIN} "${DEF_VERSION}" > "${PREFIX}/${_app_param}${DEFAULT_INST_MARK_EXT}"
             cd "${_cwd}" 2>/dev/null

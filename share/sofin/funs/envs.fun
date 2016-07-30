@@ -216,12 +216,7 @@ create_lock () {
     else
         debug "Acquring bundle lock for: $(distinct d "${_bundle_name}")"
     fi
-    if [ -z "${SOFIN_PID}" ]; then
-        SOFIN_PID="$$"
-        debug "\$SOFIN_PID is empty! Assigned as current process pid: $(distinct d "${SOFIN_PID}")"
-    else
-        debug "create_lock(): Pid of current Sofin session is: $(distinct d "${SOFIN_PID}")"
-    fi
+    debug "Pid of current Sofin session: $(distinct d "${SOFIN_PID}")"
     _bundle="$(capitalize "${_bundle_name}")"
     ${MKDIR_BIN} -p ${LOCKS_DIR} 2>/dev/null
     ${PRINTF_BIN} "${SOFIN_PID}" > "${LOCKS_DIR}${_bundle}${DEFAULT_LOCK_EXT}"
@@ -274,8 +269,8 @@ destroy_locks () {
 
 update_shell_vars () {
     if [ -n "${SOFIN_PROFILE}" ]; then
-        debug "Generating shell environment and writing to ${SOFIN_PROFILE}"
-        get_shell_vars > ${SOFIN_PROFILE}
+        debug "Generating shell environment and writing to: $(distinct d "${SOFIN_PROFILE}")"
+        get_shell_vars > "${SOFIN_PROFILE}"
     else
         warn "Empty SOFIN_PROFILE! update_shell_vars() is No-Op!"
     fi

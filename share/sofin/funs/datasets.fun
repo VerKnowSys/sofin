@@ -4,7 +4,7 @@ push_to_all_mirrors () {
     _pversion_element="${2}"
     _ptelement_name="${_pbto_bundle_name}-${_pversion_element}${DEFAULT_ARCHIVE_EXT}"
     _def_dig_query="$(${HOST_BIN} A ${MAIN_SOFTWARE_ADDRESS} 2>/dev/null | ${GREP_BIN} 'Address:' 2>/dev/null | eval "${HOST_ADDRESS_GUARD}")"
-    debug "Address: $(distinct d "${_def_dig_query}"), bundle: $(distinct d "${_pbto_bundle_name}"), name: $(distinct d ${_ptelement_name})"
+    debug "Address: $(distinct d "${_def_dig_query}"), bundle: $(distinct d "${_pbto_bundle_name}"), name: $(distinct d "${_ptelement_name}")"
     if [ -z "${_pbto_bundle_name}" ]; then
         error "First argument with a $(distinct e "BundleName") is required!"
     fi
@@ -25,7 +25,7 @@ push_to_all_mirrors () {
         checksum_filecache_element "${_ptelement_name}"
 
         try "${CHMOD_BIN} -v o+r ${FILE_CACHE_DIR}${_ptelement_name} ${FILE_CACHE_DIR}${_ptelement_name}${DEFAULT_CHKSUM_EXT}" && \
-            debug "Set read access for archives: $(distinct d ${_ptelement_name}), $(distinct d ${_ptelement_name}${DEFAULT_CHKSUM_EXT}) before we send them to public remote"
+            debug "Set read access for archives: $(distinct d "${_ptelement_name}"), $(distinct d "${_ptelement_name}${DEFAULT_CHKSUM_EXT}") before we send them to public remote"
 
         debug "Deploying bin-bundle: $(distinct d "${_ptelement_name}") to mirror: $(distinct d "${_ptmirror}")"
         push_binary_archive "${_ptelement_name}" "${_ptmirror}" "${_ptaddress}"
@@ -64,7 +64,7 @@ push_dset_zfs_stream () {
 
             debug "Setting common access to archive files before we send it: $(distinct d "${_ffile}")"
             try "${CHMOD_BIN} -v a+r ${FILE_CACHE_DIR}${_ffile}"
-            debug "Sending initial service stream to $(distinct d ${MAIN_COMMON_NAME}) repository: $(distinct d ${MAIN_COMMON_REPOSITORY}/${_ffile})"
+            debug "Sending initial service stream to $(distinct d "${MAIN_COMMON_NAME}") repository: $(distinct d "${MAIN_COMMON_REPOSITORY}/${_ffile}")"
 
             retry "${SCP_BIN} ${DEFAULT_SSH_OPTS} ${DEFAULT_SCP_OPTS} -P ${MAIN_PORT} ${FILE_CACHE_DIR}${_ffile} ${MAIN_USER}@${_psmirror}:${COMMON_BINARY_REMOTE}/${_ffile}.partial"
             if [ "$?" = "0" ]; then

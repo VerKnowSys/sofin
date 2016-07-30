@@ -1,5 +1,5 @@
 check_result () {
-    if [ "$1" = "0" ]; then
+    if [ "${1}" = "0" ]; then
         shift
         debug "$(distinct ${ColorGreen} "${SUCCESS_CHAR}") $(distinct d "${*}")"
     else
@@ -155,7 +155,7 @@ find_most_recent () {
             debug "Empty matcher given in find_most_recent(), using wildcard."
             _frmatcher="*"
         else
-            debug "Specified matcher: $(distinct d ${_frmatcher})"
+            debug "Specified matcher: $(distinct d "${_frmatcher}")"
         fi
         if [ -d "${_frpath}" ]; then
             debug "Find _frpath: $(distinct d "${_frpath}")"
@@ -193,7 +193,7 @@ difftext () {
 
 
 text_checksum () {
-    _fcsmname="$1"
+    _fcsmname="${1}"
     if [ -z "${_fcsmname}" ]; then
         error "Empty content string given for function: $(distinct e "text_checksum()")"
     fi
@@ -211,7 +211,7 @@ text_checksum () {
 
 
 file_checksum () {
-    _fcsmname="$1"
+    _fcsmname="${1}"
     if [ -z "${_fcsmname}" ]; then
         error "Empty file name given for function: $(distinct e "file_checksum()")"
     fi

@@ -123,11 +123,11 @@ update_defs () {
     try "${MKDIR_BIN} -p ${LOGS_DIR}"
     _cwd="$(${PWD_BIN} 2>/dev/null)"
     if [ ! -x "${GIT_BIN}" ]; then
-        note "Installing initial definition list from tarball to cache dir: $(distinct n ${CACHE_DIR})"
+        note "Installing initial definition list from tarball to cache dir: $(distinct n "${CACHE_DIR}")"
         try "${RM_BIN} -rf ${CACHE_DIR}${DEFINITIONS_BASE}"
         try "${MKDIR_BIN} -p ${LOGS_DIR} ${CACHE_DIR}${DEFINITIONS_BASE}"
         _initial_defs="${MAIN_SOURCE_REPOSITORY}${DEFINITIONS_INITIAL_FILE_NAME}${DEFAULT_ARCHIVE_TARBALL_EXT}"
-        debug "Fetching latest tarball with initial definitions from: $(distinct d ${_initial_defs})"
+        debug "Fetching latest tarball with initial definitions from: $(distinct d "${_initial_defs}")"
         _out_file="${FILE_CACHE_DIR}${DEFINITIONS_INITIAL_FILE_NAME}${DEFAULT_ARCHIVE_TARBALL_EXT}"
         retry "${FETCH_BIN} -o ${_out_file} ${FETCH_OPTS} '${_initial_defs}'" && \
             try "${TAR_BIN} -xJf ${_out_file} --directory ${CACHE_DIR}${DEFINITIONS_BASE}" && \
@@ -144,13 +144,13 @@ update_defs () {
         fi
         debug "State of definitions repository was re-set to: $(distinct d "${_def_head}")"
         if [ "${_def_cur_branch}" != "${BRANCH}" ]; then # use _def_cur_branch value if branch isn't matching default branch
-            debug "Checking out branch: $(distinct d ${_def_cur_branch})"
+            debug "Checking out branch: $(distinct d "${_def_cur_branch}")"
             try "${GIT_BIN} checkout ${DEFAULT_GIT_OPTS} -b ${_def_cur_branch}" || \
                 try "${GIT_BIN} checkout ${DEFAULT_GIT_OPTS} ${_def_cur_branch}" || \
-                    warn "Can't checkout branch: $(distinct w ${_def_cur_branch})"
+                    warn "Can't checkout branch: $(distinct w "${_def_cur_branch}")"
 
             try "${GIT_BIN} pull ${DEFAULT_GIT_OPTS} origin ${_def_cur_branch}" && \
-                note "Branch: $(distinct n ${_def_cur_branch}) is at: $(distinct n ${_def_head})" && \
+                note "Branch: $(distinct n "${_def_cur_branch}") is now at: $(distinct n "${_def_head}")" && \
                 return
 
             note "${ColorRed}Error occured: Update from branch: $(distinct e "${BRANCH}") of repository: $(distinct e "${REPOSITORY}") wasn't possible. Log below:${ColorReset}"
@@ -158,14 +158,14 @@ update_defs () {
             return
 
         else # else use default branch
-            debug "Using default branch: $(distinct d ${BRANCH})"
+            debug "Using default branch: $(distinct d "${BRANCH}")"
             if [ "${_def_cur_branch}" != "${BRANCH}" ]; then
                 try "${GIT_BIN} checkout ${DEFAULT_GIT_OPTS} -b ${BRANCH}" || \
                     try "${GIT_BIN} checkout ${DEFAULT_GIT_OPTS} ${BRANCH}" || \
-                        warn "Can't checkout branch: $(distinct w ${BRANCH})"
+                        warn "Can't checkout branch: $(distinct w "${BRANCH}")"
             fi
             try "${GIT_BIN} pull ${DEFAULT_GIT_OPTS} origin ${BRANCH}" && \
-                note "Branch: $(distinct n "${BRANCH}") is at: $(distinct n ${_def_head})" && \
+                note "Branch: $(distinct n "${BRANCH}") is at: $(distinct n "${_def_head}")" && \
                     return
 
             note "${ColorRed}Error occured: Update from branch: $(distinct e "${BRANCH}") of repository: $(distinct e "${REPOSITORY}") wasn't possible. Log's below:${ColorReset}"
@@ -175,7 +175,7 @@ update_defs () {
     else
         # create cache; clone definitions repository:
         cd "${CACHE_DIR}"
-        debug "Cloning repository: $(distinct d "${REPOSITORY}") from branch: $(distinct d "${BRANCH}"); LOGS_DIR: $(distinct d ${LOGS_DIR}), CACHE_DIR: $(distinct d ${CACHE_DIR})"
+        debug "Cloning repository: $(distinct d "${REPOSITORY}") from branch: $(distinct d "${BRANCH}"); LOGS_DIR: $(distinct d "${LOGS_DIR}"), CACHE_DIR: $(distinct d "${CACHE_DIR}")"
         try "${RM_BIN} -vrf ${DEFINITIONS_BASE}"
         try "${GIT_BIN} clone ${DEFAULT_GIT_OPTS} ${REPOSITORY} ${DEFINITIONS_BASE}" || \
             error "Error cloning branch: $(distinct e "${BRANCH}") of repository: $(distinct e "${REPOSITORY}"). Please make sure that given repository and branch are valid!"
@@ -184,7 +184,7 @@ update_defs () {
         if [ "${BRANCH}" != "${_def_cur_branch}" ]; then
             try "${GIT_BIN} checkout ${DEFAULT_GIT_OPTS} -b ${BRANCH}" || \
                 try "${GIT_BIN} checkout ${DEFAULT_GIT_OPTS} ${BRANCH}" || \
-                    warn "Can't checkout branch: $(distinct w ${BRANCH})"
+                    warn "Can't checkout branch: $(distinct w "${BRANCH}")"
         fi
         _def_head="$(${CAT_BIN} "${CACHE_DIR}${DEFINITIONS_BASE}/${DEFAULT_GIT_DIR_NAME}/refs/heads/${_def_cur_branch}" 2>/dev/null)"
         if [ -z "${_def_head}" ]; then
@@ -267,7 +267,7 @@ remove_bundles () {
             # if removing a single bundle, then look for alternatives. Otherwise, just remove bundle..
             debug "_picked_bundles: ${_picked_bundles}, _given_name: ${_given_name}"
             if [ "${_picked_bundles}" = "${_given_name}" ]; then
-                debug "Looking for other installed versions of: $(distinct d ${_aname}), that might be exported automatically.."
+                debug "Looking for other installed versions of: $(distinct d "${_aname}"), that might be exported automatically.."
                 _inname="$(echo "$(lowercase "${_given_name}")" | ${SED_BIN} 's/[0-9]*//g' 2>/dev/null)"
                 _alternative="$(${FIND_BIN} ${SOFTWARE_DIR} -mindepth 1 -maxdepth 1 -type d -iname "${_inname}*" -not -name "${_given_name}" 2>/dev/null | ${SED_BIN} 's/^.*\///g' 2>/dev/null | ${HEAD_BIN} -n1 2>/dev/null)"
             fi
@@ -338,12 +338,12 @@ show_outdated () {
             debug "Bundle name: ${_bundle}, Prefix: ${_prefix}"
 
             if [ ! -f "${_prefix}/${_bundle}${DEFAULT_INST_MARK_EXT}" ]; then
-                warn "Bundle: $(distinct w ${_bundle}) is not yet installed or damaged."
+                warn "Bundle: $(distinct w "${_bundle}") is not yet installed or damaged."
                 continue
             fi
             _bund_vers="$(${CAT_BIN} "${_prefix}/${_bundle}${DEFAULT_INST_MARK_EXT}" 2>/dev/null)"
             if [ ! -f "${DEFINITIONS_DIR}${_bundle}${DEFAULT_DEF_EXT}" ]; then
-                warn "No such bundle found: $(distinct w ${_bundle})"
+                warn "No such bundle found: $(distinct w "${_bundle}")"
                 continue
             fi
             load_defs "${_bundle}"
@@ -364,7 +364,7 @@ wipe_remote_archives () {
     _bund_names="${@}"
     _ans="YES"
     if [ -z "${USE_FORCE}" ]; then
-        warn "Are you sure you want to wipe binary bundles: $(distinct w ${_bund_names}) from binary repository: $(distinct w ${MAIN_BINARY_REPOSITORY})? (Type $(distinct w YES) to confirm)"
+        warn "Are you sure you want to wipe binary bundles: $(distinct w "${_bund_names}") from binary repository: $(distinct w "${MAIN_BINARY_REPOSITORY}")? (Type $(distinct w YES) to confirm)"
         read _ans
     fi
     if [ "${_ans}" = "YES" ]; then
@@ -374,11 +374,11 @@ wipe_remote_archives () {
             _remote_ar_name="${_wr_element}-"
             _wr_dig="$(${HOST_BIN} A ${MAIN_SOFTWARE_ADDRESS} 2>/dev/null | ${GREP_BIN} 'Address:' 2>/dev/null | eval "${HOST_ADDRESS_GUARD}")"
             if [ -z "${_wr_dig}" ]; then
-                error "No mirrors found in address: $(distinct e ${MAIN_SOFTWARE_ADDRESS})"
+                error "No mirrors found in address: $(distinct e "${MAIN_SOFTWARE_ADDRESS}")"
             fi
             debug "Using defined mirror(s): $(distinct d "${_wr_dig}")"
             for _wr_mirr in ${_wr_dig}; do
-                note "Wiping out remote: $(distinct n ${_wr_mirr}) binary archives: $(distinct n "${_remote_ar_name}")"
+                note "Wiping out remote: $(distinct n "${_wr_mirr}") binary archives: $(distinct n "${_remote_ar_name}")"
                 ${PRINTF_BIN} "${ColorBlue}"
                 ${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} "${MAIN_USER}@${_wr_mirr}" \
                     "${FIND_BIN} ${MAIN_BINARY_PREFIX}/${SYS_SPECIFIC_BINARY_REMOTE} -iname '${_remote_ar_name}' -print -delete"
@@ -397,7 +397,7 @@ create_apple_bundle_if_necessary () { # XXXXXX
         _aname="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
         DEF_NAME="$(${PRINTF_BIN} "${DEF_NAME}" | ${CUT_BIN} -c1 2>/dev/null | ${TR_BIN} '[a-z]' '[A-Z]' 2>/dev/null)$(${PRINTF_BIN} "${DEF_NAME}" | ${SED_BIN} 's/^[a-zA-Z]//' 2>/dev/null)"
         DEF_BUNDLE_NAME="${PREFIX}.app"
-        note "Creating Apple bundle: $(distinct n ${DEF_NAME} )in: $(distinct n ${DEF_BUNDLE_NAME})"
+        note "Creating Apple bundle: $(distinct n "${DEF_NAME}") in: $(distinct n "${DEF_BUNDLE_NAME}")"
         ${MKDIR_BIN} -p "${DEF_BUNDLE_NAME}/libs" "${DEF_BUNDLE_NAME}/Contents" "${DEF_BUNDLE_NAME}/Contents/Resources/${_aname}" "${DEF_BUNDLE_NAME}/exports" "${DEF_BUNDLE_NAME}/share"
         try "${CP_BIN} -R ${PREFIX}/${DEF_NAME}.app/Contents/* ${DEF_BUNDLE_NAME}/Contents/"
         try "${CP_BIN} -R ${PREFIX}/bin/${_aname} ${DEF_BUNDLE_NAME}/exports/"
@@ -432,7 +432,7 @@ strip_bundle () {
     load_defs "${_sbfdefinition_name}"
     if [ -z "${PREFIX}" ]; then
         PREFIX="${SOFTWARE_DIR}$(capitalize "${DEF_NAME}${DEF_POSTFIX}")"
-        debug "An empty prefix for: $(distinct d ${_sbfdefinition_name}). Resetting to: $(distinct d "${PREFIX}")"
+        debug "An empty prefix for: $(distinct d "${_sbfdefinition_name}"). Resetting to: $(distinct d "${PREFIX}")"
     fi
 
     _dirs_to_strip=""
@@ -500,7 +500,7 @@ clean_useless () {
                 for _cu_pattern in ${DEF_DEFAULT_USELESS}; do
                     if [ -n "${PREFIX}" -a \
                            -z "${DEF_USEFUL}" ]; then # TODO: implement ignoring DEF_USEFUL entries here!
-                        debug "Pattern of DEF_DEFAULT_USELESS: $(distinct d ${_cu_pattern})"
+                        debug "Pattern of DEF_DEFAULT_USELESS: $(distinct d "${_cu_pattern}")"
                         try "${RM_BIN} -vrf ${PREFIX}/${_cu_pattern}"
                     fi
                 done
@@ -511,7 +511,7 @@ clean_useless () {
                 for _cu_pattern in ${DEF_USELESS}; do
                     if [ -n "${PREFIX}" -a \
                          -n "${_cu_pattern}" ]; then
-                        debug "Pattern of DEF_USELESS: $(distinct d ${PREFIX}/${_cu_pattern})"
+                        debug "Pattern of DEF_USELESS: $(distinct d "${PREFIX}/${_cu_pattern}")"
                         try "${RM_BIN} -vrf ${PREFIX}/${_cu_pattern}"
                     fi
                 done
@@ -543,7 +543,7 @@ clean_useless () {
                                 _tobermlist="${_cufile} ${_tobermlist}"
                             fi
                         else
-                            debug "Useful _cufile left intact: $(distinct d ${_cufile})"
+                            debug "Useful _cufile left intact: $(distinct d "${_cufile}")"
                         fi
                     fi
                 done
@@ -562,7 +562,7 @@ clean_useless () {
 conflict_resolve () {
     debug "Resolving conflicts for: $(distinct d "${DEF_CONFLICTS_WITH}")"
     if [ -n "${DEF_CONFLICTS_WITH}" ]; then
-        debug "Resolving possible conflicts with: $(distinct d ${DEF_CONFLICTS_WITH})"
+        debug "Resolving possible conflicts with: $(distinct d "${DEF_CONFLICTS_WITH}")"
         for _cr_app in ${DEF_CONFLICTS_WITH}; do
             _crfind_s="$(${FIND_BIN} ${SOFTWARE_DIR} -maxdepth 1 -type d -iname "${_cr_app}*" 2>/dev/null)"
             for _cr_name in ${_crfind_s}; do
@@ -572,7 +572,7 @@ conflict_resolve () {
                      -a "${_crn}" != "${DEF_NAME}${DEF_POSTFIX}" \
                 ]; then
                     ${MV_BIN} "${_cr_name}/exports" "${_cr_name}/exports-disabled" && \
-                        debug "Resolved conflict with: $(distinct n ${_crn})"
+                        debug "Resolved conflict with: $(distinct n "${_crn}")"
                 fi
             done
         done
@@ -582,7 +582,7 @@ conflict_resolve () {
 
 
 export_binaries () {
-    _ebdef_name="$1"
+    _ebdef_name="${1}"
     if [ -z "${_ebdef_name}" ]; then
         error "No definition name specified as first param for export_binaries()!"
     fi
@@ -602,7 +602,7 @@ export_binaries () {
     else
         _a_name="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
         _an_amount="$(echo "${DEF_EXPORTS}" | ${WC_BIN} -w 2>/dev/null | ${TR_BIN} -d '\t|\r|\ ' 2>/dev/null)"
-        debug "Exporting $(distinct d ${_an_amount}) binaries of prefix: $(distinct d ${PREFIX})"
+        debug "Exporting $(distinct d "${_an_amount}") binaries of prefix: $(distinct d "${PREFIX}")"
         try "${MKDIR_BIN} -p ${PREFIX}/exports"
         _expolist=""
         for exp in ${DEF_EXPORTS}; do
@@ -614,7 +614,7 @@ export_binaries () {
                         cd "${PREFIX}${dir}"
                         try "${LN_BIN} -vfs ..${dir}${exp} ../exports/${exp}"
                         cd "${_acurrdir}"
-                        _expo_elem="$(${BASENAME_BIN} ${_afile_to_exp} 2>/dev/null)"
+                        _expo_elem="$(${BASENAME_BIN} "${_afile_to_exp}" 2>/dev/null)"
                         _expolist="${_expolist} ${_expo_elem}"
                     fi
                 fi
@@ -633,13 +633,13 @@ hack_def () {
     fi
     _hack_pattern="${1}"
     _abeauty_pat="$(distinct n "*${_hack_pattern}*")"
-    _all_hackdirs=$(${FIND_BIN} ${CACHE_DIR}cache -type d -mindepth 2 -maxdepth 2 -iname "*${_hack_pattern}*" 2>/dev/null)
+    _all_hackdirs=$(${FIND_BIN} ${FILE_CACHE_DIR} -type d -mindepth 2 -maxdepth 2 -iname "*${_hack_pattern}*" 2>/dev/null)
     _all_am="$(echo "${_all_hackdirs}" | ${WC_BIN} -l 2>/dev/null | ${TR_BIN} -d '\t|\r|\ ' 2>/dev/null)"
     ${TEST_BIN} -z "${_all_am}" && _all_am="0"
     if [ -z "${_all_hackdirs}" ]; then
-        warn "No matching build dirs found for pattern: $(distinct e ${_abeauty_pat})"
+        warn "No matching build dirs found for pattern: $(distinct e "${_abeauty_pat}")"
     else
-        note "Sofin will now walk through: $(distinct n ${_all_am}) build dirs in: $(distinct n ${CACHE_DIR}cache), that matches pattern: $(distinct n ${_abeauty_pat})"
+        note "Sofin will now walk through: $(distinct n "${_all_am}") build dirs in: $(distinct n "${FILE_CACHE_DIR}"), that matches pattern: $(distinct n "${_abeauty_pat}")"
     fi
     for _a_dir in ${_all_hackdirs}; do
         note
@@ -720,7 +720,7 @@ traverse_patchlevels () {
     _trav_patches=${*}
     for _patch in ${_trav_patches}; do
         for _level in 0 1 2 3 4 5; do # Up to: -p5
-            debug "Applying patch: $(distinct d "${_patch}"), level: $(distinct d ${_level})"
+            debug "Applying patch: $(distinct d "${_patch}"), level: $(distinct d "${_level}")"
             try "${PATCH_BIN} -p${_level} -N -f -i ${_patch}"
             if [ "$?" = "0" ]; then # skip applying single patch if it already passed
                 debug "Patch: $(distinct d "${_patch}") applied successfully!"
@@ -772,7 +772,7 @@ clone_or_fetch_git_bare_repo () {
         debug "Fetched bare repository: $(distinct d "${_bare_name}")"
     else
         if [ ! -d "${_git_cached}/branches" -a ! -f "${_git_cached}/config" ]; then
-            note "\n${ColorRed}Definitions were not updated. Showing $(distinct n ${LOG_LINES_AMOUNT_ON_ERR}) lines of internal log:${ColorReset}"
+            note "\n${ColorRed}Definitions were not updated. Showing $(distinct n "${LOG_LINES_AMOUNT_ON_ERR}") lines of internal log:${ColorReset}"
             ${TAIL_BIN} -n${LOG_LINES_AMOUNT_ON_ERR} ${LOG} 2>/dev/null
             note "$(fill)"
         else

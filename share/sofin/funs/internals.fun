@@ -1,7 +1,7 @@
 usage_howto () {
     note "Built in tasks:"
     note "  $(distinct n "install | get | pick | choose | use  ") installs software from list or from definition and switches exports for it (example: ${SOFIN_BIN_SHORT} install Rubinius)"
-    note "  $(distinct n "dependencies | deps | local          ") installs software from list defined in '$(distinct n ${DEFAULT_PROJECT_DEPS_LIST_FILE})' file in current directory"
+    note "  $(distinct n "dependencies | deps | local          ") installs software from list defined in '$(distinct n "${DEFAULT_PROJECT_DEPS_LIST_FILE}")' file in current directory"
     note "  $(distinct n "uninstall | remove | delete          ") removes an application or list (example: ${SOFIN_BIN_SHORT} uninstall Rubinius)"
     note "  $(distinct n "list | installed                     ") gives short list of installed software"
     note "  $(distinct n "full | fulllist | fullinstalled      ") gives detailed list with installed software including requirements"
@@ -44,7 +44,7 @@ write_info_about_shell_configuration () {
 
 
 sofin_header () {
-    ${PRINTF_BIN} "$(distinct n 'Sof')tware $(distinct n 'In')staller v$(distinct n ${SOFIN_VERSION}) -- (c) 2o11-2o16 -- Daniel ($(distinct n dmilith)) Dettlaff\n\
+    ${PRINTF_BIN} "$(distinct n 'Sof')tware $(distinct n 'In')staller v$(distinct n "${SOFIN_VERSION}") -- (c) 2o11-2o16 -- Daniel ($(distinct n dmilith)) Dettlaff\n\
 "
 }
 
@@ -60,7 +60,7 @@ processes_all_sofin () {
 
 
 # processes_installing () {
-#     filter="$1"
+#     filter="${1}"
 #     if [ -z "${filter}" ]; then # general case
 #         general_matcher="[A-Z0-9]+[a-z0-9]*"
 #         matcher=""
@@ -294,19 +294,19 @@ list_bundles_alphabetic () {
 
 mark_installed () {
     _softname="${1}"
-    _ver_to_write="${2}"
+    _verfile="${2}"
     if [ -z "${_softname}" ]; then
-        error "mark(): Failed with an empty _softname!"
+        error "Failed with an empty _softname!"
     fi
-    if [ -z "${_ver_to_write}" ]; then
-        error "mark(): Failed with an empty _ver_to_write!"
+    if [ -z "${_verfile}" ]; then
+        error "Failed with an empty _verfile!"
     fi
     _softfile="$(lowercase "${_softname}")"
-    debug "Marking definition: $(distinct d ${_softfile}) as installed"
     ${TOUCH_BIN} "${PREFIX}/${_softfile}${DEFAULT_INST_MARK_EXT}"
-    debug "Writing version: $(distinct d ${_ver_to_write}) of software: $(distinct d ${_softfile}) installed in: $(distinct d ${PREFIX})"
     ${PRINTF_BIN} "${_ver_to_write}" > "${PREFIX}/${_softfile}${DEFAULT_INST_MARK_EXT}"
-    unset _softname _ver_to_write _softfile
+    debug "Marking definition: $(distinct d "${_softfile}") as installed"
+        debug "Stored version: $(distinct d "${_verfile}") of software: $(distinct d "${_softfile}") installed in: $(distinct d "${PREFIX}")"
+    unset _softname _verfile _softfile
 }
 
 
@@ -316,13 +316,13 @@ show_done () {
     if [ -z "${_sdver}" ]; then
         _sdver="0"
     fi
-    note "${SUCCESS_CHAR} ${_sd_low_name} [$(distinct n ${_sdver})]"
+    note "${SUCCESS_CHAR} ${_sd_low_name} [$(distinct n "${_sdver}")]"
     unset _sdver _sd_low_name
 }
 
 
 show_alt_definitions_and_exit () {
-    _an_app="$1"
+    _an_app="${1}"
     if [ ! -f "${DEFINITIONS_DIR}${_an_app}${DEFAULT_DEF_EXT}" ]; then
         _contents=""
         _maybe_version="$(${FIND_BIN} ${DEFINITIONS_DIR} -maxdepth 1 -name "${_an_app}*${DEFAULT_DEF_EXT}" 2>/dev/null)"
