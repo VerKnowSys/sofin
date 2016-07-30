@@ -77,12 +77,12 @@ debug () {
 
 
 warn () {
-    cecho "${1}" ${ColorYellow}
+    cecho "${@}" ${ColorYellow}
 }
 
 
 note () {
-    cecho "${1}" ${ColorGreen}
+    cecho "${@}" ${ColorGreen}
 }
 
 
