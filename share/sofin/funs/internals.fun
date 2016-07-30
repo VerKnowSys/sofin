@@ -302,9 +302,8 @@ mark_installed () {
         error "Failed with an empty _verfile!"
     fi
     _softfile="$(lowercase "${_softname}")"
-    ${TOUCH_BIN} "${PREFIX}/${_softfile}${DEFAULT_INST_MARK_EXT}"
-    ${PRINTF_BIN} "${_ver_to_write}" > "${PREFIX}/${_softfile}${DEFAULT_INST_MARK_EXT}"
     debug "Marking definition: $(distinct d "${_softfile}") as installed"
+    run "${PRINTF_BIN} \"${_verfile}\" > ${PREFIX}/${_softfile}${DEFAULT_INST_MARK_EXT}" && \
         debug "Stored version: $(distinct d "${_verfile}") of software: $(distinct d "${_softfile}") installed in: $(distinct d "${PREFIX}")"
     unset _softname _verfile _softfile
 }
