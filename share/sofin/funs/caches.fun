@@ -30,7 +30,7 @@ log_helper () {
     else
         _log_files="$(find_all "${LOGS_DIR}" "${DEFAULT_NAME}*${_log_h_pattern}*")"
     fi
-    _lognum_f="$(echo "${_log_files}" | eval ${FILES_COUNT_GUARD})"
+    _lognum_f="$(${PRINTF_BIN} "${_log_files}\n" | eval "${FILES_COUNT_GUARD}")"
     if [ -z "${_lognum_f}" ]; then
         _lognum_f="0"
     fi
@@ -45,12 +45,12 @@ log_helper () {
 
             1)
                 note "Found $(distinct n "${_lognum_f}") log file, that matches _log_h_pattern: $(distinct n "${_log_h_pattern}"). Attaching tail.."
-                ${TAIL_BIN} -n "${LOG_LINES_AMOUNT}" -F $(echo "${_log_files}" | eval "${NEWLINES_TO_SPACES_GUARD}")
+                ${TAIL_BIN} -n ${LOG_LINES_AMOUNT} -F $(${PRINTF_BIN} "${_log_files}\n" | eval "${NEWLINES_TO_SPACES_GUARD}")
                 ;;
 
             *)
                 note "Found $(distinct n "${_lognum_f}") log files, that match pattern: $(distinct n "${_log_h_pattern}"). Attaching to all available files.."
-                ${TAIL_BIN} -F $(echo "${_log_files}" | eval "${NEWLINES_TO_SPACES_GUARD}")
+                ${TAIL_BIN} -F $(${PRINTF_BIN} "${_log_files}\n" | eval "${NEWLINES_TO_SPACES_GUARD}")
                 ;;
         esac
     fi
@@ -62,7 +62,7 @@ show_logs () {
     create_dirs
     _logf_pattern=${*}
     _logf_minutes="${LOG_LAST_ACCESS_OR_MOD_MINUTES}"
-    debug "show_logs(): _logf_minutes: $(distinct d "${_logf_minutes}"), pattern: $(distinct d "${_logf_pattern}")"
+    debug "_logf_minutes: $(distinct d "${_logf_minutes}"), pattern: $(distinct d "${_logf_pattern}")"
     _files_x_min=$(${FIND_BIN} "${LOGS_DIR}" -maxdepth 1 -mindepth 1 -mmin -${_logf_minutes} -amin -${_logf_minutes} -iname "${DEFAULT_NAME}*${_logf_pattern}*" -print 2>/dev/null)
     touch_logsdir_and_logfile
     if [ "-" = "${_logf_pattern}" -o \
@@ -97,7 +97,7 @@ show_logs () {
                 note "Attaching tail to $(distinct n "${_files_count}") most recently modified log files (exact order): [$(distinct n "${_files_blist}")]"
             fi
             debug "_files_abspaths: $(distinct d "${_files_abspaths}")"
-            ${TAIL_BIN} -n0 -F "${_files_abspaths}" 2>/dev/null
+            ${TAIL_BIN} -n0 -F ${_files_abspaths} 2>/dev/null
         else
             note "No logs to attach to. LOGS_DIR=($(distinct n "${LOGS_DIR}")) contain no log files?"
         fi
@@ -107,8 +107,8 @@ show_logs () {
         if [ -z "${_files_x_min}" ]; then
             note "No log files updated or accessed in last $(distinct n "${_logf_minutes}") minutes to show. Specify '$(distinct n "+")' as param, to attach a tail to all logs."
         else
-            debug "show_logs(), files: $(distinct d "$(echo "${_files_x_min}" | eval "${FILES_COUNT_GUARD}")")"
-            ${TAIL_BIN} -n "${LOG_LINES_AMOUNT}" $(echo "${_files_x_min}" | eval "${NEWLINES_TO_SPACES_GUARD}")
+            debug "show_log files: $(distinct d "$(${PRINTF_BIN} "${_files_x_min}\n" | eval "${FILES_COUNT_GUARD}")")"
+            ${TAIL_BIN} -n ${LOG_LINES_AMOUNT} $(${PRINTF_BIN} "${_files_x_min}\n" | eval "${NEWLINES_TO_SPACES_GUARD}")
         fi
     else
         note "Seeking for log files.."
@@ -144,7 +144,7 @@ pretouch_logs () {
 
 show_log_if_available () {
     if [ -f "${LOG}" ]; then
-        note $(fill)
+        note "$(fill)"
         ${TAIL_BIN} -n${LOG_LINES_AMOUNT_ON_ERR} "${LOG}" 2>/dev/null
     else
         debug "No log available to attach tail to.."

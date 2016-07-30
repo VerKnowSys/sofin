@@ -30,7 +30,7 @@ clean_failbuilds () {
         if [ -z "${_cf_files}" ]; then
             debug "No cache dirs. Skipped"
         else
-            num="$(echo "${_cf_files}" | eval ${FILES_COUNT_GUARD})"
+            num="$(${PRINTF_BIN} "${_cf_files}\n" | eval "${FILES_COUNT_GUARD}")"
             if [ -n "${num}" ]; then
                 _cf_number="${_cf_number} + ${num} - 1"
             fi
@@ -38,7 +38,7 @@ clean_failbuilds () {
                 debug "Removing cache directory: ${i}"
                 try "${RM_BIN} -rf ${i}"
             done
-            _cf_result="$(echo "${_cf_number}" | ${BC_BIN} 2>/dev/null)"
+            _cf_result="$(${PRINTF_BIN} "${_cf_number}\n" | ${BC_BIN} 2>/dev/null)"
             note "$(distinct n "${_cf_result}") directories cleaned."
         fi
     fi

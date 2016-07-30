@@ -39,9 +39,9 @@ compiler_setup () {
         DEFAULT_COMPILER_FLAGS="${DEFAULT_COMPILER_FLAGS} -O2"
     fi
 
-    CFLAGS="$(echo "-I${PREFIX}/include ${DEF_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}" | eval ${CUT_TRAILING_SPACES_GUARD})"
-    CXXFLAGS="$(echo "-I${PREFIX}/include ${DEF_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}" | eval ${CUT_TRAILING_SPACES_GUARD})"
-    LDFLAGS="$(echo "-L${PREFIX}/lib ${DEF_LINKER_ARGS} ${DEFAULT_LDFLAGS}" | eval ${CUT_TRAILING_SPACES_GUARD})"
+    CFLAGS="$(${PRINTF_BIN} "-I${PREFIX}/include ${DEF_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}\n" | eval "${CUT_TRAILING_SPACES_GUARD}")"
+    CXXFLAGS="$(${PRINTF_BIN} "-I${PREFIX}/include ${DEF_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}\n" | eval "${CUT_TRAILING_SPACES_GUARD}")"
+    LDFLAGS="$(${PRINTF_BIN} "-L${PREFIX}/lib ${DEF_LINKER_ARGS} ${DEFAULT_LDFLAGS}\n" | eval "${CUT_TRAILING_SPACES_GUARD}")"
 
     # pick compiler in order:
     # 1. /usr/bin/clang
@@ -75,17 +75,17 @@ compiler_setup () {
         fi
     fi
 
-    CC="$(echo "${BASE_COMPILER}/bin/${default_c} ${DEF_COMPILER_ARGS}" | eval ${CUT_TRAILING_SPACES_GUARD})"
+    CC="$(${PRINTF_BIN} "${BASE_COMPILER}/bin/${default_c} ${DEF_COMPILER_ARGS}\n" | eval "${CUT_TRAILING_SPACES_GUARD}")"
     if [ ! -x "${BASE_COMPILER}/bin/${default_c}" ]; then # fallback for systems with clang without standalone preprocessor binary:
         error "Base C compiler: $(distinct e "${CC}") should be an executable!"
     fi
 
-    CXX="$(echo "${BASE_COMPILER}/bin/${default_cxx} ${DEF_COMPILER_ARGS}" | eval ${CUT_TRAILING_SPACES_GUARD})"
+    CXX="$(${PRINTF_BIN} "${BASE_COMPILER}/bin/${default_cxx} ${DEF_COMPILER_ARGS}\n" | eval "${CUT_TRAILING_SPACES_GUARD}")"
     if [ ! -x "${BASE_COMPILER}/bin/${default_cxx}" ]; then # fallback for systems with clang without standalone preprocessor binary:
         error "Base C++ compiler: $(distinct e "${CXX}") should be an executable!"
     fi
 
-    CPP="$(echo "${BASE_COMPILER}/bin/${default_cpp}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
+    CPP="$(${PRINTF_BIN} "${BASE_COMPILER}/bin/${default_cpp}\n" | eval "${CUT_TRAILING_SPACES_GUARD}")"
     if [ ! -x "${BASE_COMPILER}/bin/${default_cpp}" ]; then # fallback for systems with clang without standalone preprocessor binary:
         CPP="${BASE_COMPILER}/bin/${default_c} -E"
     fi

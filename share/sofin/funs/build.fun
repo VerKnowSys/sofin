@@ -365,7 +365,7 @@ process () {
     if [ ! -e "${_req_definition}" ]; then
         error "Cannot fetch definition: $(distinct e "${_req_definition}")! Aborting!"
     fi
-    _req_defname="$(echo "$(${BASENAME_BIN} "${_req_definition}" 2>/dev/null)" | ${SED_BIN} -e 's/\..*$//g' 2>/dev/null)"
+    _req_defname="$(${PRINTF_BIN} "$(${BASENAME_BIN} "${_req_definition}" 2>/dev/null)\n" | ${SED_BIN} -e 's/\..*$//g' 2>/dev/null)"
     debug "Requirement: $(distinct d "${_app_param}") file: $(distinct d "${_req_definition}"), req-name: $(distinct d "${_req_defname}")"
 
     load_defaults
@@ -431,8 +431,8 @@ process () {
                 fi
 
                 unset _fd
-                _prm_nolib="$(echo "${_app_param}" | ${SED_BIN} 's/lib//' 2>/dev/null)"
-                _prm_no_undrlne_and_minus="$(echo "${_app_param}" | ${SED_BIN} 's/[-_].*$//' 2>/dev/null)"
+                _prm_nolib="$(${PRINTF_BIN} "${_app_param}\n" | ${SED_BIN} 's/lib//' 2>/dev/null)"
+                _prm_no_undrlne_and_minus="$(${PRINTF_BIN} "${_app_param}\n" | ${SED_BIN} 's/[-_].*$//' 2>/dev/null)"
                 debug "_app_param: ${_app_param} short: ${_prm_nolib}, nafter-: ${_prm_no_undrlne_and_minus}, DEF_NAME: ${DEF_NAME}, BUILD_DIR: ${BUILD_DIR}"
                 # NOTE: patterns sorted by safety
                 for _pati in    "*${_app_param}*${DEF_VERSION}" \

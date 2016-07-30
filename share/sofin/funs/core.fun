@@ -90,7 +90,7 @@ error () {
     restore_security_state
     cecho
     cecho "$(fill)" ${ColorRed}
-    cecho "${FAIL_CHAR} Error: ${1}" ${ColorRed}
+    cecho "${FAIL_CHAR} Error: ${@}" ${ColorRed}
     cecho "$(fill)" ${ColorRed}
     warn "\n$(fill)"
     warn "${NOTE_CHAR2} Since I'm very serious about software code quality overall,"
@@ -242,7 +242,7 @@ retry () {
         else
             error "Given an empty command to evaluate!"
         fi
-        _ammo="$(echo "${_ammo}" | ${SED_BIN} 's/O//' 2>/dev/null)"
+        _ammo="$(${PRINTF_BIN} "${_ammo}\n" | ${SED_BIN} 's/O//' 2>/dev/null)"
         debug "Remaining attempts: $(distinct d "${_ammo}")"
     done
     debug "All available ammo exhausted to invoke a command: $(distinct d "${_targets}")"

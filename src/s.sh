@@ -8,7 +8,7 @@ unset COMPLIANCE_CHECK
 
 SOFIN_ARGS_FULL=${*}
 SOFIN_COMMAND_ARG="${1}"
-SOFIN_ARGS="$(echo "${SOFIN_ARGS_FULL}" | ${CUT_BIN} -d' ' -f2- 2>/dev/null)"
+SOFIN_ARGS="$(${PRINTF_BIN} "${SOFIN_ARGS_FULL}\n" | ${CUT_BIN} -d' ' -f2- 2>/dev/null)"
 SOFIN_PID="${SOFIN_PID:-$$}"
 
 
@@ -97,7 +97,7 @@ if [ -n "${SOFIN_COMMAND_ARG}" ]; then
             fail_on_bg_job ${SOFIN_ARGS}
             # NOTE: trying a list first - it will have priority if file exists:
             if [ -f "${DEFINITIONS_LISTS_DIR}${_list_maybe}" ]; then
-                _pickd_bundls="$(${CAT_BIN} "${DEFINITIONS_LISTS_DIR}${_list_maybe}" 2>/dev/null | eval ${NEWLINES_TO_SPACES_GUARD})"
+                _pickd_bundls="$(${CAT_BIN} "${DEFINITIONS_LISTS_DIR}${_list_maybe}" 2>/dev/null | eval "${NEWLINES_TO_SPACES_GUARD}")"
             else
                 _pickd_bundls="${SOFIN_ARGS}"
             fi
@@ -117,8 +117,8 @@ if [ -n "${SOFIN_COMMAND_ARG}" ]; then
             if [ ! -f "${DEFAULT_PROJECT_DEPS_LIST_FILE}" ]; then
                 error "Dependencies file not found! Expected file: $(distinct e "${DEFAULT_PROJECT_DEPS_LIST_FILE}") in current directory!"
             fi
-            _pickd_bundls="$(${CAT_BIN} "${DEFAULT_PROJECT_DEPS_LIST_FILE}" 2>/dev/null | eval ${NEWLINES_TO_SPACES_GUARD})"
-            _bundls_amount="$(echo "${_pickd_bundls}" | eval ${WORDS_COUNT_GUARD})"
+            _pickd_bundls="$(${CAT_BIN} "${DEFAULT_PROJECT_DEPS_LIST_FILE}" 2>/dev/null | eval "${NEWLINES_TO_SPACES_GUARD}")"
+            _bundls_amount="$(${PRINTF_BIN} "${_pickd_bundls}\n" | eval "${WORDS_COUNT_GUARD}")"
             note "Dependencies list file found with $(distinct n "${_bundls_amount}") elements in order: $(distinct n "${_pickd_bundls}")"
             build "${_pickd_bundls}"
             unset _pickd_bundls _bundls_amount

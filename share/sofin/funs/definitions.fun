@@ -268,7 +268,7 @@ remove_bundles () {
             debug "_picked_bundles: ${_picked_bundles}, _given_name: ${_given_name}"
             if [ "${_picked_bundles}" = "${_given_name}" ]; then
                 debug "Looking for other installed versions of: $(distinct d "${_aname}"), that might be exported automatically.."
-                _inname="$(echo "$(lowercase "${_given_name}")" | ${SED_BIN} 's/[0-9]*//g' 2>/dev/null)"
+                _inname="$(${PRINTF_BIN} "$(lowercase "${_given_name}")\n" | ${SED_BIN} 's/[0-9]*//g' 2>/dev/null)"
                 _alternative="$(${FIND_BIN} ${SOFTWARE_DIR} -mindepth 1 -maxdepth 1 -type d -iname "${_inname}*" -not -name "${_given_name}" 2>/dev/null | ${SED_BIN} 's/^.*\///g' 2>/dev/null | ${HEAD_BIN} -n1 2>/dev/null)"
             fi
 
@@ -477,7 +477,7 @@ strip_bundle () {
                     done
                 fi
             done
-            _sbresult="$(echo "${_counter}" | ${BC_BIN} 2>/dev/null)"
+            _sbresult="$(${PRINTF_BIN} "${_counter}\n" | ${BC_BIN} 2>/dev/null)"
             if [ "${_sbresult}" -lt "0" -o \
                  -z "${_sbresult}" ]; then
                 _sbresult="0"
@@ -531,7 +531,7 @@ clean_useless () {
                         # traverse through DEF_USEFUL for _cufile patterns required by software but not exported
                         _cu_commit_removal=""
                         for is_useful in ${DEF_USEFUL}; do
-                            echo "${_cufile}" | ${GREP_BIN} "${is_useful}" >/dev/null 2>&1
+                            ${PRINTF_BIN} "${_cufile}\n" | ${GREP_BIN} "${is_useful}" >/dev/null 2>&1
                             if [ "$?" = "0" ]; then
                                 _cu_commit_removal="no"
                             fi
@@ -601,7 +601,7 @@ export_binaries () {
         note "Defined no exports of prefix: $(distinct n "${PREFIX}")"
     else
         _a_name="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
-        _an_amount="$(echo "${DEF_EXPORTS}" | ${WC_BIN} -w 2>/dev/null | ${TR_BIN} -d '\t|\r|\ ' 2>/dev/null)"
+        _an_amount="$(${PRINTF_BIN} "${DEF_EXPORTS}\n" | ${WC_BIN} -w 2>/dev/null | ${TR_BIN} -d '\t|\r|\ ' 2>/dev/null)"
         debug "Exporting $(distinct d "${_an_amount}") binaries of prefix: $(distinct d "${PREFIX}")"
         try "${MKDIR_BIN} -p ${PREFIX}/exports"
         _expolist=""
@@ -634,7 +634,7 @@ hack_def () {
     _hack_pattern="${1}"
     _abeauty_pat="$(distinct n "*${_hack_pattern}*")"
     _all_hackdirs=$(${FIND_BIN} ${FILE_CACHE_DIR} -type d -mindepth 2 -maxdepth 2 -iname "*${_hack_pattern}*" 2>/dev/null)
-    _all_am="$(echo "${_all_hackdirs}" | ${WC_BIN} -l 2>/dev/null | ${TR_BIN} -d '\t|\r|\ ' 2>/dev/null)"
+    _all_am="$(${PRINTF_BIN} "${_all_hackdirs}\n" | ${WC_BIN} -l 2>/dev/null | ${TR_BIN} -d '\t|\r|\ ' 2>/dev/null)"
     ${TEST_BIN} -z "${_all_am}" && _all_am="0"
     if [ -z "${_all_hackdirs}" ]; then
         warn "No matching build dirs found for pattern: $(distinct e "${_abeauty_pat}")"

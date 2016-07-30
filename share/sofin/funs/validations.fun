@@ -108,8 +108,8 @@ validate_archive_sha1 () {
 
 
 validate_def_postfix () {
-    _cigiven_name="$(${BASENAME_BIN} "$(echo "$(lowercase "${1}")" | eval "${CUTOFF_DEF_EXT_GUARD}")")"
-    _cidefinition_name="$(${BASENAME_BIN} "$(echo "$(lowercase "${2}")" | eval "${CUTOFF_DEF_EXT_GUARD}")")"
+    _cigiven_name="$(${BASENAME_BIN} "$(${PRINTF_BIN} "$(lowercase "${1}")" | eval "${CUTOFF_DEF_EXT_GUARD}")")"
+    _cidefinition_name="$(${BASENAME_BIN} "$(${PRINTF_BIN} "$(lowercase "${2}")" | eval "${CUTOFF_DEF_EXT_GUARD}")")"
     # case when DEF_POSTFIX was ommited => use definition file name difference as POSTFIX:
     _l1="$(${PRINTF_BIN} "${_cidefinition_name}" | ${WC_BIN} -c 2>/dev/null)"
     _l2="$(${PRINTF_BIN} "${_cigiven_name}" | ${WC_BIN} -c 2>/dev/null)"

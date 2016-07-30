@@ -94,13 +94,13 @@ fill () {
     fi
     _times=${2}
     if [ -z "${_times}" ]; then
-        _times="${MAX_COLS}"
+        _times=${MAX_COLS}
     fi
-    _buf=""
+    unset _buf
     for i in $(${SEQ_BIN} 1 "${_times}" 2>/dev/null); do
         _buf="${_buf}${_char}"
     done
-    ${PRINTF_BIN} "${_buf}"
+    ${PRINTF_BIN} "${_buf}" 2>/dev/null
     unset _times _buf _char
 }
 
@@ -170,7 +170,7 @@ find_most_recent () {
                 ${SORT_BIN} -nr 2>/dev/null | \
                 ${HEAD_BIN} -n${MAX_OPEN_TAIL_LOGS} 2>/dev/null | \
                 ${CUT_BIN} -d' ' -f2 2>/dev/null)"
-            _frres_singleline="$(echo "${_frfind_results}" | eval "${NEWLINES_TO_SPACES_GUARD}")"
+            _frres_singleline="$(${PRINTF_BIN} "${_frfind_results}\n" | eval "${NEWLINES_TO_SPACES_GUARD}")"
             debug "Find results: $(distinct d "${_frres_singleline}")"
             if [ -z "${_frfind_results}" ]; then
                 ${PRINTF_BIN} "" 2>/dev/null
