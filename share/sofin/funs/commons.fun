@@ -79,7 +79,7 @@ capitalize () {
 
 
 lowercase () {
-    ${PRINTF_BIN} ${*} | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null
+    ${PRINTF_BIN} "${@}" 2>> "${LOG}" | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null
 }
 
 
