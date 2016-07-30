@@ -300,7 +300,9 @@ handle_error () {
 
 trap_signals () {
     trap 'cleanup_handler' EXIT
-    trap 'handle_error $LINENO' ERR
+    if [ "YES" = "${CAP_TERM_BASH}" ]; then
+        trap 'handle_error $LINENO' ERR
+    fi
     trap 'interrupt_handler' INT
     trap 'terminate_handler' TERM
     trap 'noop_handler' USR2 # This signal is used to "reload shell"-feature. Sofin should ignore it
@@ -309,7 +311,9 @@ trap_signals () {
 
 untrap_signals () {
     trap - EXIT
-    trap - ERR
+    if [ "YES" = "${CAP_TERM_BASH}" ]; then
+        trap - ERR
+    fi
     trap - INT
     trap - TERM
     trap - USR2 # This signal is used to "reload shell"-feature. Sofin should ignore it
