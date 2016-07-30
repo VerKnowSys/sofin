@@ -370,9 +370,9 @@ wipe_remote_archives () {
     if [ "${_ans}" = "YES" ]; then
         cd "${SOFTWARE_DIR}"
         for _wr_element in ${_bund_names}; do
-            _lowercase_element="$(lowercase ${_wr_element})"
+            _lowercase_element="$(lowercase "${_wr_element}")"
             _remote_ar_name="${_wr_element}-"
-            _wr_dig="$(${HOST_BIN} A ${MAIN_SOFTWARE_ADDRESS} 2>/dev/null | ${GREP_BIN} 'Address:' 2>/dev/null | eval "${HOST_ADDRESS_GUARD}")"
+            _wr_dig="$(${HOST_BIN} A "${MAIN_SOFTWARE_ADDRESS}" 2>/dev/null | ${GREP_BIN} 'Address:' 2>/dev/null | eval "${HOST_ADDRESS_GUARD}")"
             if [ -z "${_wr_dig}" ]; then
                 error "No mirrors found in address: $(distinct e "${MAIN_SOFTWARE_ADDRESS}")"
             fi
