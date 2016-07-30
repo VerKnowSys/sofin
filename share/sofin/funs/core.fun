@@ -40,7 +40,7 @@ debug () {
                         if [ -z "${_dbfnin}" ]; then
                             _dbfnin="${_cee}(): "
                         else
-                            _dbfnin="${_cee}->${_dbfnin}"
+                            _dbfnin="${_cee}->${_dbfnin}(): "
                         fi
                         ;;
                 esac
@@ -50,7 +50,7 @@ debug () {
         setopt debugbeforecmd
         setopt notify
     else
-        _dbfnin="():"
+        _dbfnin="(): "
     fi
 
     _dbfn="# ${ColorFunction}${_dbfnin}${ColorViolet}" # NOTE: "#" is required for debug mode to work properly
@@ -59,11 +59,11 @@ debug () {
         if [ -n "${_dbgnme}" -a \
              -d "${LOGS_DIR}" ]; then
             # Definition log
-            cecho "${_dbfn}${_in}" ${ColorViolet} >> "${LOG}-${_dbgnme}" 2>> "${LOG}-${_dbgnme}"
+            cecho "${_dbfn}${_in}" "${ColorViolet}" >> "${LOG}-${_dbgnme}" 2>> "${LOG}-${_dbgnme}"
         elif [ -z "${_dbgnme}" -a \
                -d "${LOGS_DIR}" ]; then
             # Main log
-            cecho "${_dbfn}${_in}" ${ColorViolet} >> "${LOG}" 2>> "${LOG}"
+            cecho "${_dbfn}${_in}" "${ColorViolet}" >> "${LOG}" 2>> "${LOG}"
         elif [ ! -d "${LOGS_DIR}" ]; then
             # System logger fallback
             ${LOGGER_BIN} "${ColorReset}${DEFAULT_NAME}: ${ColorViolet}${_dbfn}${_in}${ColorReset}"
