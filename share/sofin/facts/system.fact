@@ -52,7 +52,12 @@ determine_system_capabilites () {
             unset CAP_SYS_ZFS
         else
             # Zfs: set DEFAULT_ZPOOL to first available zpool
-            DEFAULT_ZPOOL="$(${ZPOOL_BIN} list -H 2>/dev/null | eval "${FIRST_ARG_GUARD}")"
+            _zpool="$(${ZPOOL_BIN} list -H 2>/dev/null | eval "${FIRST_ARG_GUARD}")"
+            if [ -n "${_zpool}" ]; then
+                DEFAULT_ZPOOL="${DEFAULT_ZPOOL:-${_zpool}}"
+            else
+                DEFAULT_ZPOOL="${DEFAULT_ZPOOL:-zroot}"
+            fi
             ORIGIN_ZFS_SNAP_NAME="origin"
 
             # For ZFS we don't use tarballs anymore:
