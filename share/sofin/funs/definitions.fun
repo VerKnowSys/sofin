@@ -653,7 +653,12 @@ hack_def () {
         for _logfile in config.log build.log CMakeFiles/CMakeError.log CMakeFiles/CMakeOutput.log; do
             if [ -f "${_logfile}" ]; then
                 _found_any="yes"
-                eval "cd ${_a_dir} && ${ZSH_BIN} --login -c '${_log_viewer} ${_logfile}'"
+                if [ -n "${DEVEL}" ]; then
+                    eval "cd ${_a_dir} && ${ZSH_BIN} --login -c '${_log_viewer} ${_logfile}'"
+                else
+                    debug "No DEVEL set - only entering BUILD_DIR"
+                    eval "cd ${_a_dir} && ${ZSH_BIN} --login"
+                fi
             fi
         done
         if [ -z "${_found_any}" ]; then
