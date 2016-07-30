@@ -226,33 +226,34 @@ create_lock () {
 
 
 acquire_lock_for () {
-    bundles="${*}"
-    debug "Trying lock acquire for bundles: [$(distinct d ${bundles})]"
-    for bundle in ${bundles}; do
-        if [ -f "${LOCKS_DIR}${bundle}${DEFAULT_LOCK_EXT}" ]; then
-            lock_pid="$(${CAT_BIN} ${LOCKS_DIR}${bundle}${DEFAULT_LOCK_EXT} 2>/dev/null)"
-            lock_parent_pid="$(${PGREP_BIN} -P${lock_pid} 2>/dev/null)"
-            debug "Lock pid: $(distinct d ${lock_pid}), Sofin pid: $(distinct d ${SOFIN_PID:-$$}), lock_parent_pid: $(distinct d ${lock_parent_pid})"
-            ${KILL_BIN} -0 "${lock_pid}" >/dev/null 2>/dev/null
+    _bundles="${*}"
+    debug "Trying lock acquire for bundles: [$(distinct d "${_bundles}")]"
+    for _bundle in ${_bundles}; do
+        if [ -f "${LOCKS_DIR}${_bundle}${DEFAULT_LOCK_EXT}" ]; then
+            _lock_pid="$(${CAT_BIN} ${LOCKS_DIR}${_bundle}${DEFAULT_LOCK_EXT} 2>/dev/null)"
+            _lock_ppid="$(${PGREP_BIN} -P${_lock_pid} 2>/dev/null)"
+            debug "Lock pid: $(distinct d "${_lock_pid}"), Sofin pid: $(distinct d "${SOFIN_PID}"), _lock_ppid: $(distinct d "${_lock_ppid}")"
+            try "${KILL_BIN} -0 ${_lock_pid}"
             if [ "$?" = "0" ]; then # NOTE: process is alive
-                if [ "${lock_pid}" = "${SOFIN_PID:-$$}" -o \
-                     "${lock_parent_pid}" = "${SOFIN_PID:-$$}" ]; then
+                if [ "${_lock_pid}" = "${SOFIN_PID}" -o \
+                     "${_lock_ppid}" = "${SOFIN_PID}" ]; then
                     debug "Dealing with own process or it's fork, process may continue.."
-                elif [ "${lock_pid}" = "${SOFIN_PID:-$$}" -a \
-                       -z "${lock_parent_pid}" ]; then
+                elif [ "${_lock_pid}" = "${SOFIN_PID}" -a \
+                       -z "${_lock_ppid}" ]; then
                     debug "Dealing with no fork, process may continue.."
                 else
-                    error "Bundle: $(distinct e ${bundle}) is locked due to background job pid: $(distinct e "${lock_pid}")"
+                    error "Bundle: $(distinct e "${_bundle}") is locked due to background job pid: $(distinct e "${_lock_pid}")"
                 fi
             else # NOTE: process is dead
                 debug "Found lock file acquired by dead process. Acquring a new lock.."
-                create_lock "${bundle}"
+                create_lock "${_bundle}"
             fi
         else
-            debug "No file lock for bundle: $(distinct d ${bundle})"
-            create_lock "${bundle}"
+            debug "No file lock for _bundle: $(distinct d "${_bundle}")"
+            create_lock "${_bundle}"
         fi
     done
+    unset _bundle _bundles _lock_pid _lock_ppid
 }
 
 
