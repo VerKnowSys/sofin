@@ -16,9 +16,9 @@ cecho () {
     _cein="${1}" # content
     _cecol="${2}" # color
     if [ "${TTY}" = "YES" ]; then # if it's terminal then use colors
-        ${PRINTF_BIN} '%s\n' "${_cecol}${_cein}${ColorReset}"
+        ${PRINTF_BIN} "${_cecol}%s${ColorReset}\n" "${_cein}"
     else
-        ${PRINTF_BIN} '%s\n' "${_cein}"
+        ${PRINTF_BIN} "%s\n" "${_cein}"
     fi
     unset _cein _cecol
 }
