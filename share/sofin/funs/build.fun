@@ -419,9 +419,9 @@ process () {
 
                     note "   ${NOTE_CHAR} Unpacking source of: $(distinct n "${DEF_NAME}${DEF_POSTFIX}")"
                     debug "Build dir: $(distinct d "${BUILD_DIR}")"
-                    try "${TAR_BIN} --directory ${BUILD_DIR} -xf ${_dest_file}" || \
-                        try "${TAR_BIN} --directory ${BUILD_DIR} -xfj ${_dest_file}" || \
-                            run "${TAR_BIN} --directory ${BUILD_DIR} -xfJ ${_dest_file}"
+                    try "${TAR_BIN} -xf ${_dest_file} --directory ${BUILD_DIR}" || \
+                        try "${TAR_BIN} -xjf ${_dest_file} --directory ${BUILD_DIR}" || \
+                            run "${TAR_BIN} -xJf ${_dest_file} --directory ${BUILD_DIR}"
                 else
                     # git method:
                     # .cache/git-cache => git bare repos
