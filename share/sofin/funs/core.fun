@@ -288,21 +288,30 @@ terminate_handler () {
 
 
 noop_handler () {
-    warn "Got signal: USR2 (NO-OP)"
+    debug "Handled signal USR2 with noop()"
 }
 
 
 handle_error () {
-    echo "HE: ${*}"
+    debug "ErrorLine: ${ColorViolet}${1}"
 }
 
 
 trap_signals () {
-    trap cleanup_handler EXIT
-    # trap handle_error ERR
-    trap interrupt_handler INT
-    trap terminate_handler TERM
-    trap noop_handler USR2 # This signal is used to "reload shell"-feature. Sofin should ignore it
+    trap 'cleanup_handler' EXIT
+    trap 'handle_error $LINENO' ERR
+    trap 'interrupt_handler' INT
+    trap 'terminate_handler' TERM
+    trap 'noop_handler' USR2 # This signal is used to "reload shell"-feature. Sofin should ignore it
+}
+
+
+untrap_signals () {
+    trap - EXIT
+    trap - ERR
+    trap - INT
+    trap - TERM
+    trap - USR2 # This signal is used to "reload shell"-feature. Sofin should ignore it
 }
 
 
