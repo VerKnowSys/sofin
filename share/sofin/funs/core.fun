@@ -115,7 +115,7 @@ error () {
 distinct () {
     _msg_type="${1}"
     shift
-    _contents=${@}
+    _contents="${@}"
     if [ -z "${_msg_type}" ]; then
         error "No message type given as first param for: ${DISTINCT_COLOUR}distinct()${ColorRed}!"
     fi
@@ -145,7 +145,7 @@ distinct () {
 
 
 run () {
-    _run_params=${@}
+    _run_params="${@}"
     if [ -n "${_run_params}" ]; then
         touch_logsdir_and_logfile
         echo "${_run_params}" | eval "${MATCH_PRINT_STDOUT_GUARD}" && _run_shw_prgr=YES
@@ -181,7 +181,7 @@ run () {
 
 
 try () {
-    _try_params=${@}
+    _try_params="${@}"
     if [ -n "${_try_params}" ]; then
         touch_logsdir_and_logfile
         echo "${_try_params}" | eval "${MATCH_PRINT_STDOUT_GUARD}" && _show_prgrss=YES

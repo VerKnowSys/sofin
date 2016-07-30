@@ -1,10 +1,10 @@
 check_result () {
     if [ "${1}" = "0" ]; then
         shift
-        debug "$(distinct ${ColorGreen} "${SUCCESS_CHAR}") $(distinct d "${*}")"
+        debug "$(distinct ${ColorGreen} "${SUCCESS_CHAR}") $(distinct d "${@}")"
     else
         shift
-        error "$(distinct ${ColorRed} "${FAIL_CHAR}") $(distinct e "${*}")"
+        error "$(distinct ${ColorRed} "${FAIL_CHAR}") $(distinct e "${@}")"
     fi
 }
 
