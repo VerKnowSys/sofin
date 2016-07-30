@@ -76,8 +76,8 @@ show_logs () {
             else
                 _files_list="$(find_most_recent "${LOGS_DIR}" "${DEFAULT_NAME}*")"
             fi
-            _files_abspaths="$(${PRINTF_BIN} "${_files_list}" | eval "${NEWLINES_TO_SPACES_GUARD}")"
-            _files_count="$(${PRINTF_BIN} "${_files_list}" | eval "${FILES_COUNT_GUARD}")"
+            _files_abspaths="$(${PRINTF_BIN} "${_files_list}\n" | eval "${NEWLINES_TO_SPACES_GUARD}")"
+            _files_count="$(${PRINTF_BIN} "${_files_list}\n" | eval "${FILES_COUNT_GUARD}")"
             _files_blist="" # build file list without full path to each one
             for _fl in ${_files_list}; do
                 _base_fl="$(${BASENAME_BIN} "${_fl}" 2>/dev/null)"
