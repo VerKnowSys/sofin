@@ -280,34 +280,30 @@ update_shell_vars () {
 
 
 reload_zsh_shells () {
-    if [ -n "${SHELL_PID}" ]; then
-        _shell_pattern="zsh"
-        if [ "Darwin" = "${SYSTEM_NAME}" ]; then
-            _shell_pattern="\d ${ZSH_BIN}" # NOTE: this fixes issue with SIGUSR2 signal sent to iTerm
-        fi
-        _shellshort="$(${BASENAME_BIN} "${SHELL}" 2>/dev/null)"
-        _wishlist=""
-        _pids=$(processes_all | ${EGREP_BIN} "${_shell_pattern}" 2>/dev/null | eval "${FIRST_ARG_GUARD}")
-        debug "Shell inspect: $(distinct d "${_shellshort}"), PIDS: ${_pids}"
-        for _pid in ${_pids}; do
-            if [ -z "${_wishlist}" ]; then
-                _wishlist="${_pid}"
-            else
-                ${KILL_BIN} -0 "${_pid}" >/dev/null 2>&1
-                if [ "$?" = "0" ]; then
-                    debug "Found alive pid: $(distinct d ${_pid}) in background."
-                    _wishlist="${_wishlist} ${_pid}"
-                fi
-            fi
-        done
-        if [ -n "${_wishlist}" ]; then
-            ${KILL_BIN} -SIGUSR2 "${_wishlist}" >> ${LOG} 2>> ${LOG} && \
-                note "Reload signal sent to $(distinct n "${_shellshort}") pids: $(distinct n "${_wishlist}")"
-        fi
-    else
-        write_info_about_shell_configuration
+    _shell_pattern="zsh"
+    if [ "Darwin" = "${SYSTEM_NAME}" ]; then
+        _shell_pattern="\d ${ZSH_BIN}" # NOTE: this fixes issue with SIGUSR2 signal sent to iTerm
     fi
-    unset _wishlist _pids _shell_pattern _pid _shellshort
+    unset _wishlist
+    _shellshort="$(${BASENAME_BIN} "${SHELL}" 2>/dev/null)"
+    _pids=$(processes_all | ${EGREP_BIN} "${_shell_pattern}" 2>/dev/null | eval "${FIRST_ARG_GUARD}")
+    debug "Shell inspect: $(distinct d "${_shellshort}"), pattern: $(distinct d "${_shell_pattern}"), PIDS: $(distinct d "${_pids}")"
+    for _pid in ${_pids}; do
+        if [ -z "${_wishlist}" ]; then
+            _wishlist="${_pid}"
+        else
+            try "${KILL_BIN} -0 ${_pid}"
+            if [ "$?" = "0" ]; then
+                debug "Found alive pid: $(distinct d "${_pid}") in background."
+                _wishlist="${_wishlist} ${_pid}"
+            fi
+        fi
+    done
+    if [ -n "${_wishlist}" ]; then
+        try "${KILL_BIN} -SIGUSR2 ${_wishlist}" && \
+            note "Reload signal sent to $(distinct n "${_shellshort}") pids: $(distinct n "${_wishlist}")"
+    fi
+    unset _wishlist _pid _pids _shell_pattern _shellshort
 }
 
 
