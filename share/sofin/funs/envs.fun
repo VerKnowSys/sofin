@@ -216,6 +216,7 @@ create_lock () {
     else
         debug "Acquring bundle lock for: $(distinct d "${_bundle_name}")"
     fi
+    SOFIN_PID="${SOFIN_PID:-$$}"
     debug "Pid of current Sofin session: $(distinct d "${SOFIN_PID}")"
     _bundle="$(capitalize "${_bundle_name}")"
     ${MKDIR_BIN} -p ${LOCKS_DIR} 2>/dev/null
