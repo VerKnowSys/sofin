@@ -216,6 +216,7 @@ build () {
                 # has to be able to reach these values to find dependencies and utilities
                 export PATH="${PREFIX}/bin:${PREFIX}/sbin:${DEFAULT_PATH}"
                 export PKG_CONFIG_PATH="${PREFIX}/lib/pkgconfig"
+                export PREFIX
 
                 # NOTE: standalone definition has own SERVICES_DIR/Bundlename/ prefix
                 if [ -n "${DEF_STANDALONE}" ]; then
