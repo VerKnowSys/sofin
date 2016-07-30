@@ -177,14 +177,11 @@ build () {
         _bund_name="$(lowercase "${_bund_name}")"
         load_defaults
         load_defs "${_bund_name}"
-        _pref_base="$(${BASENAME_BIN} "${PREFIX}" 2>/dev/null)"
         if [ "${DEF_DISABLED}" = "YES" ]; then
             _anm="$(capitalize "${_bund_name}")"
             warn "Bundle: $(distinct w "${_anm}") is disabled on: $(distinct w "${OS_TRIPPLE}")"
             destroy_software_dir "${_anm}"
-            unset _pref_base
         else
-            unset _pref_base
             for _req_name in ${DEFINITIONS_DIR}${_bund_name}${DEFAULT_DEF_EXT}; do
                 unset DONT_BUILD_BUT_DO_EXPORTS
                 debug "Reading definition: $(distinct d "${_req_name}")"
@@ -211,8 +208,6 @@ build () {
 
                 PREFIX="${SOFTWARE_DIR}${_bundl_name}"
                 SERVICE_DIR="${SERVICES_DIR}${_bundl_name}"
-                SOFTWARE_DIR="${SERVICES_DIR}${_bundl_name}"
-
                 BUILD_NAMESUM="$(text_checksum "${_bund_lcase}-${DEF_VERSION}")"
                 BUILD_DIR="${PREFIX}/${DEFAULT_SRC_EXT}${BUILD_NAMESUM}"
                 create_builddir "${_bundl_name}" "${BUILD_NAMESUM}"
