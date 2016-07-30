@@ -74,7 +74,7 @@ file_size () {
 
 
 capitalize () {
-    _capi_name="${*}"
+    _capi_name=${*}
     _capi_head="$(${PRINTF_BIN} "${_capi_name}" 2>/dev/null | ${CUT_BIN} -c1 2>/dev/null | ${TR_BIN} '[a-z]' '[A-Z]' 2>/dev/null)"
     _capi_tail="$(${PRINTF_BIN} "${_capi_name}" 2>/dev/null | ${SED_BIN} 's/^[a-zA-Z]//' 2>/dev/null)"
     ${PRINTF_BIN} "${_capi_head}${_capi_tail}"
@@ -83,7 +83,7 @@ capitalize () {
 
 
 lowercase () {
-    ${PRINTF_BIN} "${*}" | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null
+    ${PRINTF_BIN} ${*} | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null
 }
 
 

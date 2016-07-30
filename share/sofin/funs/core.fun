@@ -25,7 +25,7 @@ cecho () {
 
 
 debug () {
-    _in="${@}"
+    _in=${@}
     touch_logsdir_and_logfile
     unset _dbfnin
     if [ "${CAP_TERM_BASH}" = "YES" ]; then
@@ -114,7 +114,7 @@ error () {
 distinct () {
     msg_type="${1}"
     shift
-    content="${*}"
+    content=${*}
     if [ -z "${msg_type}" ]; then
         error "No message type given as first param for: ${DISTINCT_COLOUR}distinct()${ColorRed}!"
     fi
@@ -143,7 +143,7 @@ distinct () {
 
 
 run () {
-    _run_params="${@}"
+    _run_params=${@}
     if [ -n "${_run_params}" ]; then
         touch_logsdir_and_logfile
         echo "${_run_params}" | eval "${MATCH_PRINT_STDOUT_GUARD}" && _run_shw_prgr=YES
@@ -179,7 +179,7 @@ run () {
 
 
 try () {
-    _try_params="${@}"
+    _try_params=${@}
     if [ -n "${_try_params}" ]; then
         touch_logsdir_and_logfile
         echo "${_try_params}" | eval "${MATCH_PRINT_STDOUT_GUARD}" && _show_prgrss=YES
@@ -215,7 +215,7 @@ try () {
 
 
 retry () {
-    _targets="${*}"
+    _targets=${*}
     _ammo="OOO"
     unset _git_path
     touch_logsdir_and_logfile

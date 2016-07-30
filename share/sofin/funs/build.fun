@@ -34,7 +34,7 @@ build_bundle () {
 
 
 push_binbuilds () {
-    _push_bundles="${*}"
+    _push_bundles=${*}
     if [ -z "${_push_bundles}" ]; then
         error "At least single argument with $(distinct e "BundleName") to push is required!"
     fi

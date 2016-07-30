@@ -226,11 +226,11 @@ create_lock () {
 
 
 acquire_lock_for () {
-    _bundles="${*}"
+    _bundles=${*}
     debug "Trying lock acquire for bundles: [$(distinct d "${_bundles}")]"
     for _bundle in ${_bundles}; do
         if [ -f "${LOCKS_DIR}${_bundle}${DEFAULT_LOCK_EXT}" ]; then
-            _lock_pid="$(${CAT_BIN} ${LOCKS_DIR}${_bundle}${DEFAULT_LOCK_EXT} 2>/dev/null)"
+            _lock_pid="$(${CAT_BIN} "${LOCKS_DIR}${_bundle}${DEFAULT_LOCK_EXT}" 2>/dev/null)"
             _lock_ppid="$(${PGREP_BIN} -P${_lock_pid} 2>/dev/null)"
             debug "Lock pid: $(distinct d "${_lock_pid}"), Sofin pid: $(distinct d "${SOFIN_PID}"), _lock_ppid: $(distinct d "${_lock_ppid}")"
             try "${KILL_BIN} -0 ${_lock_pid}"
