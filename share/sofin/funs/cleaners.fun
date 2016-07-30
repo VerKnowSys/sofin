@@ -68,10 +68,9 @@ perform_clean () {
 
 
 finalize () {
-    debug "finalize()"
+    untrap_signals
     destroy_locks
     restore_security_state
-
     finalize_afterbuild
 }
 
