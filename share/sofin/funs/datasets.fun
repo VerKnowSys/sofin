@@ -59,18 +59,15 @@ push_dset_zfs_stream () {
         debug "push_dset_zfs_stream file: ${_psfin_snapfile}, ${_ffile}"
         if [ -f "${FILE_CACHE_DIR}${_ffile}" ]; then
             ${PRINTF_BIN} "${ColorBlue}"
-            ${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} "${MAIN_USER}@${_psmirror}" \
-                "mkdir -p '${COMMON_BINARY_REMOTE}'; chmod 0755 '${COMMON_BINARY_REMOTE}'"
+            try "${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} ${MAIN_USER}@${_psmirror} \"mkdir -p '${COMMON_BINARY_REMOTE}'; chmod 0755 '${COMMON_BINARY_REMOTE}'\""
 
             debug "Setting common access to archive files before we send it: $(distinct d "${_ffile}")"
-            try "${CHMOD_BIN} -v a+r ${FILE_CACHE_DIR}${_ffile}"
             debug "Sending initial service stream to $(distinct d "${MAIN_COMMON_NAME}") repository: $(distinct d "${MAIN_COMMON_REPOSITORY}/${_ffile}")"
+            try "${CHMOD_BIN} -v a+r ${FILE_CACHE_DIR}${_psfin_snapfile}"
 
-            retry "${SCP_BIN} ${DEFAULT_SSH_OPTS} ${DEFAULT_SCP_OPTS} -P ${MAIN_PORT} ${FILE_CACHE_DIR}${_ffile} ${MAIN_USER}@${_psmirror}:${COMMON_BINARY_REMOTE}/${_ffile}.partial"
+            retry "${SCP_BIN} ${DEFAULT_SSH_OPTS} ${DEFAULT_SCP_OPTS} -P ${MAIN_PORT} ${FILE_CACHE_DIR}${_psfin_snapfile} ${MAIN_USER}@${_psmirror}:${COMMON_BINARY_REMOTE}/${_psfin_snapfile}.partial"
             if [ "$?" = "0" ]; then
-                ${PRINTF_BIN} "${ColorBlue}"
-                ${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} "${MAIN_USER}@${_psmirror}" \
-                    "cd ${COMMON_BINARY_REMOTE} && mv ${_ffile}.partial ${_ffile}"
+                retry "${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} ${MAIN_USER}@${_psmirror} \"cd ${COMMON_BINARY_REMOTE} && mv ${_psfin_snapfile}.partial ${_psfin_snapfile}\""
             else
                 error "Failed to send snapshot of $(distinct e "${_pselement}") archive file: $(distinct e "${_ffile}") to remote host: $(distinct e "${MAIN_USER}@${_psmirror}")!"
             fi
@@ -156,10 +153,8 @@ fetch_dset_zfs_stream () {
         if [ "$?" = "0" ]; then
             _dataset_name="${DEFAULT_ZPOOL}${SERVICES_DIR}${USER}/${_fdz_bund_name}"
             debug "Creating service dataset: $(distinct d "${_dataset_name}"), from file stream: $(distinct d "${_fdz_out_file}")."
-            ${PRINTF_BIN} "${ColorBlue}"
-            ${XZCAT_BIN} ${FILE_CACHE_DIR}${_fdz_out_file} | ${ZFS_BIN} receive -F -v ${_dataset_name} && \
-                ${ZFS_BIN} rename "${_dataset_name}@${DEFAULT_GIT_SNAPSHOT_HEAD}" "${ORIGIN_ZFS_SNAP_NAME}" && \
-                    note "Received service dataset for: $(distinct n "${_dataset_name}")"
+            retry "${XZCAT_BIN} ${FILE_CACHE_DIR}${_fdz_out_file} | ${ZFS_BIN} receive -F -v ${_dataset_name} && ${ZFS_BIN} rename \"${_dataset_name}@${DEFAULT_GIT_SNAPSHOT_HEAD}\" ${ORIGIN_ZFS_SNAP_NAME}" && \
+                    note "Received service dataset: $(distinct n "${_dataset_name}")"
             unset _dataset_name
         else
             debug "Initial service dataset unavailable for: $(distinct d "${_fdz_bund_name}"). Assuming it's not necessary.."
@@ -350,9 +345,8 @@ create_software_bundle_archive () {
         _csbd_dataset="${DEFAULT_ZPOOL}${SOFTWARE_DIR}${USER}/${_csbname}"
         debug "Creating archive from dataset: $(distinct d "${_csbd_dataset}") to file: $(distinct d "${_cddestfile}")"
         try "${ZFS_BIN} umount -f ${_csbd_dataset}"
-        ${PRINTF_BIN} "${ColorBlue}"
-        ${ZFS_BIN} send ${_csbd_dataset} | ${XZ_BIN} ${DEFAULT_XZ_OPTS} > ${_cddestfile} && \
-            debug "Created ZFS binbundle from dataset: $(distinct d "${_csbd_dataset}")"
+        retry "${ZFS_BIN} send ${_csbd_dataset} | ${XZ_BIN} ${DEFAULT_XZ_OPTS} > ${_cddestfile}" && \
+            note "Created ZFS binbundle from dataset: $(distinct d "${_csbd_dataset}")"
         try "${ZFS_BIN} mount ${_csbd_dataset}"
     else
         debug "No ZFS-binbuilds feature. Falling back to tarballs.."
@@ -423,8 +417,7 @@ push_binary_archive () {
         def_error "${_bpbundle_file}" "Unable to push file: $(distinct e "${_bpfn_chksum_file}") to: $(distinct e "${_bpaddress}/${_bpbundle_file}")"
     if [ "$?" = "0" ]; then
         ${PRINTF_BIN} "${ColorBlue}"
-        ${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} "${MAIN_USER}@${_bpamirror}" \
-            "cd ${MAIN_BINARY_PREFIX}/${SYS_SPECIFIC_BINARY_REMOTE} && mv ${_bpbundle_file}.partial ${_bpbundle_file}"
+        retry "${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} ${MAIN_USER}@${_bpamirror} \"cd ${MAIN_BINARY_PREFIX}/${SYS_SPECIFIC_BINARY_REMOTE} && mv ${_bpbundle_file}.partial ${_bpbundle_file}\""
         retry "${SCP_BIN} ${DEFAULT_SSH_OPTS} ${DEFAULT_SCP_OPTS} -P ${MAIN_PORT} ${_bpfn_chksum_file} ${_bpaddress}/${_bpbundle_file}${DEFAULT_CHKSUM_EXT}" || \
             def_error "${_bpfn_chksum_file}" "Error sending: $(distinct e "${_bpfn_chksum_file}") file to: $(distinct e "${_bpaddress}/${_bpbundle_file}${DEFAULT_CHKSUM_EXT}")"
     else
