@@ -38,13 +38,14 @@ debug () {
 
                     *)
                         if [ -z "${_dbfnin}" ]; then
-                            _dbfnin="${_cee}(): "
+                            _dbfnin="${_cee}"
                         else
-                            _dbfnin="${_cee}->${_dbfnin}(): "
+                            _dbfnin="${_cee}->${_dbfnin}"
                         fi
                         ;;
                 esac
             done
+            _dbfnin="${_dbfnin}(): "
         fi
     elif [ "${CAP_TERM_ZSH}" = "YES" ]; then
         setopt debugbeforecmd
