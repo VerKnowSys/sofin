@@ -39,9 +39,9 @@ compiler_setup () {
         DEFAULT_COMPILER_FLAGS="${DEFAULT_COMPILER_FLAGS} -O2"
     fi
 
-    CFLAGS="$(${PRINTF_BIN} "-I${PREFIX}/include ${DEF_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}\n" | eval "${CUT_TRAILING_SPACES_GUARD}")"
-    CXXFLAGS="$(${PRINTF_BIN} "-I${PREFIX}/include ${DEF_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}\n" | eval "${CUT_TRAILING_SPACES_GUARD}")"
-    LDFLAGS="$(${PRINTF_BIN} "-L${PREFIX}/lib ${DEF_LINKER_ARGS} ${DEFAULT_LDFLAGS}\n" | eval "${CUT_TRAILING_SPACES_GUARD}")"
+    CFLAGS="$(${PRINTF_BIN} '%s\n' "-I${PREFIX}/include ${DEF_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
+    CXXFLAGS="$(${PRINTF_BIN} '%s\n' "-I${PREFIX}/include ${DEF_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
+    LDFLAGS="$(${PRINTF_BIN} '%s\n' "-L${PREFIX}/lib ${DEF_LINKER_ARGS} ${DEFAULT_LDFLAGS}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
 
     # pick compiler in order:
     # 1. /usr/bin/clang
@@ -75,17 +75,17 @@ compiler_setup () {
         fi
     fi
 
-    CC="$(${PRINTF_BIN} "${BASE_COMPILER}/bin/${default_c} ${DEF_COMPILER_ARGS}\n" | eval "${CUT_TRAILING_SPACES_GUARD}")"
+    CC="$(${PRINTF_BIN} '%s\n' "${BASE_COMPILER}/bin/${default_c} ${DEF_COMPILER_ARGS}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
     if [ ! -x "${BASE_COMPILER}/bin/${default_c}" ]; then # fallback for systems with clang without standalone preprocessor binary:
         error "Base C compiler: $(distinct e "${CC}") should be an executable!"
     fi
 
-    CXX="$(${PRINTF_BIN} "${BASE_COMPILER}/bin/${default_cxx} ${DEF_COMPILER_ARGS}\n" | eval "${CUT_TRAILING_SPACES_GUARD}")"
+    CXX="$(${PRINTF_BIN} '%s\n' "${BASE_COMPILER}/bin/${default_cxx} ${DEF_COMPILER_ARGS}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
     if [ ! -x "${BASE_COMPILER}/bin/${default_cxx}" ]; then # fallback for systems with clang without standalone preprocessor binary:
         error "Base C++ compiler: $(distinct e "${CXX}") should be an executable!"
     fi
 
-    CPP="$(${PRINTF_BIN} "${BASE_COMPILER}/bin/${default_cpp}\n" | eval "${CUT_TRAILING_SPACES_GUARD}")"
+    CPP="$(${PRINTF_BIN} '%s\n' "${BASE_COMPILER}/bin/${default_cpp}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
     if [ ! -x "${BASE_COMPILER}/bin/${default_cpp}" ]; then # fallback for systems with clang without standalone preprocessor binary:
         CPP="${BASE_COMPILER}/bin/${default_c} -E"
     fi
@@ -220,7 +220,7 @@ create_lock () {
     debug "Pid of current Sofin session: $(distinct d "${SOFIN_PID}")"
     _bundle="$(capitalize "${_bundle_name}")"
     ${MKDIR_BIN} -p ${LOCKS_DIR} 2>/dev/null
-    ${PRINTF_BIN} "${SOFIN_PID}" > "${LOCKS_DIR}${_bundle}${DEFAULT_LOCK_EXT}"
+    ${PRINTF_BIN} '%s\n' "${SOFIN_PID}" > "${LOCKS_DIR}${_bundle}${DEFAULT_LOCK_EXT}"
     unset _bundle _bundle_name
 }
 
@@ -316,12 +316,12 @@ update_env_files () {
             if [ "$?" = "0" ]; then
                 continue
             else
-                ${PRINTF_BIN} "${SOFIN_SHELL_BLOCK}" >> "${_env_file}" && \
+                ${PRINTF_BIN} '%s\n' "${SOFIN_SHELL_BLOCK}" >> "${_env_file}" && \
                     debug "Environment block appended to file: $(distinct d "${_env_file}")"
 
             fi
         else
-            ${PRINTF_BIN} "${SOFIN_SHELL_BLOCK}" >> "${_env_file}" && \
+            ${PRINTF_BIN} '%s\n' "${SOFIN_SHELL_BLOCK}" >> "${_env_file}" && \
                 debug "Environment block written to file: $(distinct d "${_env_file}")"
         fi
     done

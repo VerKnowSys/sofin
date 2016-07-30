@@ -153,7 +153,7 @@ get_shell_vars () {
     gsv_int_manpath "${SOFTWARE_DIR}"
 
     ${PRINTF_BIN} "# ${ColorParams}PATH${ColorReset}:\n"
-    ${PRINTF_BIN} "export PATH=\"$(${PRINTF_BIN} "${_path}\n" | eval "${CUT_TRAILING_SPACES_GUARD}")\"\n"
+    ${PRINTF_BIN} "export PATH=\"$(${PRINTF_BIN} '%s\n' "${_path}" | eval "${CUT_TRAILING_SPACES_GUARD}")\"\n"
     ${PRINTF_BIN} "# ${ColorParams}CC${ColorReset}:\n"
     ${PRINTF_BIN} "export CC=\"${CC}\"\n"
     ${PRINTF_BIN} "# ${ColorParams}CXX${ColorReset}:\n"
@@ -170,18 +170,18 @@ get_shell_vars () {
         ${PRINTF_BIN} "export LDFLAGS=\"\"\n"
     else # sofin environment override enabled, Default behavior:
         ${PRINTF_BIN} "# ${ColorParams}CFLAGS${ColorReset}:\n"
-        ${PRINTF_BIN} "export CFLAGS=\"$(${PRINTF_BIN} "${_cflags}\n" | eval "${CUT_TRAILING_SPACES_GUARD}")\"\n"
+        ${PRINTF_BIN} "export CFLAGS=\"$(${PRINTF_BIN} '%s\n' "${_cflags}" | eval "${CUT_TRAILING_SPACES_GUARD}")\"\n"
         ${PRINTF_BIN} "# ${ColorParams}CXXFLAGS${ColorReset}:\n"
-        ${PRINTF_BIN} "export CXXFLAGS=\"$(${PRINTF_BIN} "${_cxxflags}\n" | eval "${CUT_TRAILING_SPACES_GUARD}")\"${ColorReset}\n"
+        ${PRINTF_BIN} "export CXXFLAGS=\"$(${PRINTF_BIN} '%s\n' "${_cxxflags}" | eval "${CUT_TRAILING_SPACES_GUARD}")\"${ColorReset}\n"
         ${PRINTF_BIN} "# ${ColorParams}LDFLAGS${ColorReset}:\n"
-        ${PRINTF_BIN} "export LDFLAGS=\"$(${PRINTF_BIN} "${_ldflags}\n" | eval "${CUT_TRAILING_SPACES_GUARD}")\"\n"
+        ${PRINTF_BIN} "export LDFLAGS=\"$(${PRINTF_BIN} '%s\n' "${_ldflags}" | eval "${CUT_TRAILING_SPACES_GUARD}")\"\n"
     fi
 
     # common
     ${PRINTF_BIN} "# ${ColorParams}PKG_CONFIG_PATH${ColorReset}:\n"
-    ${PRINTF_BIN} "export PKG_CONFIG_PATH=\"$(${PRINTF_BIN} "${_pkg_config_path}\n" | eval "${CUT_TRAILING_SPACES_GUARD}")\"\n"
+    ${PRINTF_BIN} "export PKG_CONFIG_PATH=\"$(${PRINTF_BIN} '%s\n' "${_pkg_config_path}" | eval "${CUT_TRAILING_SPACES_GUARD}")\"\n"
     ${PRINTF_BIN} "# ${ColorParams}MANPATH${ColorReset}:\n"
-    ${PRINTF_BIN} "export MANPATH=\"$(${PRINTF_BIN} "${_manpath}\n" | eval "${CUT_TRAILING_SPACES_GUARD}")\"\n"
+    ${PRINTF_BIN} "export MANPATH=\"$(${PRINTF_BIN} '%s\n' "${_manpath}" | eval "${CUT_TRAILING_SPACES_GUARD}")\"\n"
 
     unset _cflags _cxxflags _ldflags _pkg_config_path _manpath _app _exp
 }
@@ -200,7 +200,7 @@ list_bundles_full () {
                 note "${ColorRed}${FAIL_CHAR} ${_lbfapp_name} ${ColorReset}[${ColorRed}!${ColorReset}]"
             fi
             for _lbfreq in $(${FIND_BIN} ${_lbfapp} -maxdepth 1 -name *${DEFAULT_INST_MARK_EXT} 2>/dev/null | ${SORT_BIN} 2>/dev/null); do
-                _lbpp="$(${PRINTF_BIN} "$(${BASENAME_BIN} "${_lbfreq}" 2>/dev/null)" | ${SED_BIN} "s/${DEFAULT_INST_MARK_EXT}//" 2>/dev/null)"
+                _lbpp="$(${PRINTF_BIN} '%s' "$(${BASENAME_BIN} "${_lbfreq}" 2>/dev/null)" | ${SED_BIN} "s/${DEFAULT_INST_MARK_EXT}//" 2>/dev/null)"
                 note "   ${NOTE_CHAR} ${_lbpp} $(distinct "${ColorGray}" "[")$(distinct n $(${CAT_BIN} "${_lbfreq}" 2>/dev/null))$(distinct "${ColorGray}" "]")"
             done
         done
@@ -238,7 +238,7 @@ show_diff () {
 develop () {
     ${TEST_BIN} -d "${DEFINITIONS_DIR}" || create_dirs # only definiions dir is requires, so skip dir traverse
     _defname_input="${1}"
-    _defname_no_ext="$(${PRINTF_BIN} "${_defname_input}\n" | ${SED_BIN} -e "s#\.${DEFAULT_DEF_EXT}##" 2>/dev/null)"
+    _defname_no_ext="$(${PRINTF_BIN} '%s\n' "${_defname_input}" | ${SED_BIN} -e "s#\.${DEFAULT_DEF_EXT}##" 2>/dev/null)"
     _devname="$(lowercase "$(${BASENAME_BIN} "${_defname_no_ext}" 2>/dev/null)")"
     if [ -z "${_devname}" ]; then
         error "No definition file name specified as first param!"
@@ -326,7 +326,7 @@ show_alt_definitions_and_exit () {
         for _maybe in ${_maybe_version}; do
             _elem="$(${BASENAME_BIN} "${_maybe}" 2>/dev/null)"
             _cap_elem="$(capitalize "${_elem}")"
-            _contents="${_contents}$(${PRINTF_BIN} "${_cap_elem}\n" | ${SED_BIN} 's/\..*//' 2>/dev/null) "
+            _contents="${_contents}$(${PRINTF_BIN} '%s\n' "${_cap_elem}" | ${SED_BIN} 's/\..*//' 2>/dev/null) "
         done
         if [ -z "${_contents}" ]; then
             warn "No such definition found: $(distinct w "${_an_app}"). No alternatives found."
