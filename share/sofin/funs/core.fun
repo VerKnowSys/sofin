@@ -147,35 +147,34 @@ run () {
     if [ -n "${_run_params}" ]; then
         touch_logsdir_and_logfile
         echo "${_run_params}" | eval "${MATCH_PRINT_STDOUT_GUARD}" && _run_shw_prgr=YES
-        _rnm="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
-        _dt="${ColorDarkgray}$(${DATE_BIN} ${DEFAULT_DATE_TRYRUN_OPTS} 2>/dev/null)${ColorReset}"
         if [ -n "${GIT_ROOT_DIR}" ]; then
-            _git_path_addon=":${GIT_ROOT_DIR}/bin:${GIT_ROOT_DIR}/libexec/git-core"
+            _git_path=":${GIT_ROOT_DIR}/bin:${GIT_ROOT_DIR}/libexec/git-core"
         fi
-        debug "${_dt}: ${ColorWhite}${RUN_CHAR}: $(distinct d "${param}${_run_params}") [show-blueout:${_run_shw_prgr:-NO}, git:${GIT_ROOT_DIR:-NO}]"
-        if [ -z "${_rnm}" ]; then
+        debug "${ColorDarkgray}$(${DATE_BIN} ${DEFAULT_DATE_TRYRUN_OPTS} 2>/dev/null)${ColorReset}: ${ColorWhite}${RUN_CHAR}: $(distinct d "${ColorParams}${_run_params}") [show-blueout:$(distinct d "${_run_shw_prgr:-NO}")]"
+        if [ -z "${DEF_NAME}${DEF_POSTFIX}" ]; then
             if [ -z "${_run_shw_prgr}" ]; then
-                eval "PATH=${PATH}${_git_path_addon} ${_run_params}" >> ${LOG} 2>> ${LOG}
+                eval "PATH=${PATH}${_git_path} ${_run_params}" >> "${LOG}" 2>> "${LOG}"
                 check_result $? "${_run_params}"
             else
                 ${PRINTF_BIN} "${ColorBlue}"
-                eval "PATH=${PATH}${_git_path_addon} ${_run_params}" >> ${LOG}
+                eval "PATH=${PATH}${_git_path} ${_run_params}" >> "${LOG}"
                 check_result $? "${_run_params}"
             fi
         else
+            _rnm="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
             if [ -z "${_run_shw_prgr}" ]; then
-                eval "PATH=${PATH}${_git_path_addon} ${_run_params}" >> ${LOG}-${_rnm} 2>> ${LOG}-${_rnm}
+                eval "PATH=${PATH}${_git_path} ${_run_params}" >> "${LOG}-${_rnm}" 2>> "${LOG}-${_rnm}"
                 check_result $? "${_run_params}"
             else
                 ${PRINTF_BIN} "${ColorBlue}"
-                eval "PATH=${PATH}${_git_path_addon} ${_run_params}" >> ${LOG}-${_rnm}
+                eval "PATH=${PATH}${_git_path} ${_run_params}" >> "${LOG}-${_rnm}"
                 check_result $? "${_run_params}"
             fi
         fi
     else
         error "Specified an empty command to run()!"
     fi
-    unset _rnm _run_shw_prgr _run_params _dt _git_root _git_path_addon
+    unset _rnm _run_shw_prgr _run_params _dt _git_root _git_path
 }
 
 
