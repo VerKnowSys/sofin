@@ -3,13 +3,13 @@
 
 if [ "${1}" = "trace" -o \
      -n "${SOFIN_TRACE}" ]; then
-    echo "Enabling trace mode"
+    ${PRINTF_BIN} "Enabling trace mode\n"
     set -x
 fi
 
 if [ "${1}" = "verbose" -o \
      -n "${SOFIN_TRACE}" ]; then
-    echo "Enabling verbose mode"
+    ${PRINTF_BIN} "Enabling verbose mode\n"
     set -v
 fi
 

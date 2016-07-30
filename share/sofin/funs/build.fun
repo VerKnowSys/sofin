@@ -89,7 +89,7 @@ rebuild_bundle () {
     for _dep in ${_alldefs_avail}; do
         load_defaults
         . "${_dep}"
-        echo "${DEF_REQUIREMENTS}" | ${GREP_BIN} "${_a_dependency}" >/dev/null 2>&1
+        ${PRINTF_BIN} "${DEF_REQUIREMENTS}\n" | ${GREP_BIN} "${_a_dependency}" >/dev/null 2>&1
         if [ "$?" = "0" ]; then
             _idep="$(${BASENAME_BIN} "${_dep}" 2>/dev/null)"
             _irawname="$(${PRINTF_BIN} "${_idep}" | ${SED_BIN} "s/${DEFAULT_DEF_EXT}//g" 2>/dev/null)"
@@ -521,7 +521,7 @@ process () {
                         fi
                         if [ "${SYSTEM_NAME}" = "Linux" ]; then
                             # NOTE: No /Services feature implemented for Linux.
-                            echo "${DEF_CONFIGURE}" | ${GREP_BIN} "configure" >/dev/null 2>&1
+                            ${PRINTF_BIN} "${DEF_CONFIGURE}\n" | ${GREP_BIN} "configure" >/dev/null 2>&1
                             if [ "$?" = "0" ]; then
                                 try "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${PREFIX} ${_pic_optional}" || \
                                 run "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${PREFIX}" # fallback
@@ -532,7 +532,7 @@ process () {
                         else
                             # do a simple check for "configure" in DEF_CONFIGURE definition
                             # this way we can tell if we want to put configure options as params
-                            echo "${DEF_CONFIGURE}" | ${GREP_BIN} "configure" >/dev/null 2>&1
+                            ${PRINTF_BIN} "${DEF_CONFIGURE}\n" | ${GREP_BIN} "configure" >/dev/null 2>&1
                             if [ "$?" = "0" ]; then
                                 # TODO: add --docdir=${PREFIX}/docs
                                 # NOTE: By default try to configure software with these options:

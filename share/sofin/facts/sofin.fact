@@ -95,7 +95,7 @@ if [ -n "${SOFIN_TRACE}" ]; then
         set -o xtrace
     fi
     set -x
-    echo "Enabled trace mode"
+    ${PRINTF_BIN} "Enabled trace mode\n"
 fi
 
 if [ -n "${SOFIN_VERBOSE}" ]; then
@@ -105,5 +105,5 @@ if [ -n "${SOFIN_VERBOSE}" ]; then
     else
         set -v
     fi
-    echo "Enabled verbose mode"
+    ${PRINTF_BIN} "Enabled verbose mode\n"
 fi
