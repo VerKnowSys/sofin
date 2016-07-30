@@ -74,11 +74,7 @@ file_size () {
 
 
 capitalize () {
-    _capi_name=${*}
-    _capi_head="$(${PRINTF_BIN} "${_capi_name}" 2>/dev/null | ${CUT_BIN} -c1 2>/dev/null | ${TR_BIN} '[a-z]' '[A-Z]' 2>/dev/null)"
-    _capi_tail="$(${PRINTF_BIN} "${_capi_name}" 2>/dev/null | ${SED_BIN} 's/^[a-zA-Z]//' 2>/dev/null)"
-    ${PRINTF_BIN} "${_capi_head}${_capi_tail}"
-    unset _capi_head _capi_tail _capi_name
+    ${PRINTF_BIN} "${@}" 2>> "${LOG}" | ${AWK_BIN} '{for(i=1;i<=NF;i++){ $i=toupper(substr($i,1,1)) substr($i,2) }}1' 2>/dev/null
 }
 
 
