@@ -55,21 +55,20 @@ push_dset_zfs_stream () {
         if [ -z "${_psversion_element}" ]; then
             error "Fourth argument with a $(distinct e "version-string") is required!"
         fi
-        _ffile="${_psfin_snapfile}${DEFAULT_SERVICE_SNAPSHOT_EXT}"
-        debug "push_dset_zfs_stream file: ${_psfin_snapfile}, ${_ffile}"
-        if [ -f "${FILE_CACHE_DIR}${_ffile}" ]; then
+        debug "push_dset_zfs_stream file: $(distinct d "${_psfin_snapfile}")"
+        if [ -f "${FILE_CACHE_DIR}${_psfin_snapfile}" ]; then
             ${PRINTF_BIN} "${ColorBlue}"
             try "${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} ${MAIN_USER}@${_psmirror} \"mkdir -p '${COMMON_BINARY_REMOTE}'; chmod 0755 '${COMMON_BINARY_REMOTE}'\""
 
-            debug "Setting common access to archive files before we send it: $(distinct d "${_ffile}")"
-            debug "Sending initial service stream to $(distinct d "${MAIN_COMMON_NAME}") repository: $(distinct d "${MAIN_COMMON_REPOSITORY}/${_ffile}")"
+            debug "Setting common access to archive files before we send it: $(distinct d "${_psfin_snapfile}")"
             try "${CHMOD_BIN} -v a+r ${FILE_CACHE_DIR}${_psfin_snapfile}"
+            debug "Sending initial service stream to $(distinct d "${MAIN_COMMON_NAME}") repository: $(distinct d "${MAIN_COMMON_REPOSITORY}/${_psfin_snapfile}")"
 
             retry "${SCP_BIN} ${DEFAULT_SSH_OPTS} ${DEFAULT_SCP_OPTS} -P ${MAIN_PORT} ${FILE_CACHE_DIR}${_psfin_snapfile} ${MAIN_USER}@${_psmirror}:${COMMON_BINARY_REMOTE}/${_psfin_snapfile}.partial"
             if [ "$?" = "0" ]; then
                 retry "${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} ${MAIN_USER}@${_psmirror} \"cd ${COMMON_BINARY_REMOTE} && mv ${_psfin_snapfile}.partial ${_psfin_snapfile}\""
             else
-                error "Failed to send snapshot of $(distinct e "${_pselement}") archive file: $(distinct e "${_ffile}") to remote host: $(distinct e "${MAIN_USER}@${_psmirror}")!"
+                error "Failed to send snapshot of $(distinct e "${_pselement}") archive file: $(distinct e "${_psfin_snapfile}") to remote host: $(distinct e "${MAIN_USER}@${_psmirror}")!"
             fi
         else
             warn "No service stream available for bundle: $(distinct w "${_pselement}")"
@@ -77,7 +76,7 @@ push_dset_zfs_stream () {
     else
         debug "No ZFS support"
     fi
-    unset _psmirror _pselement _ffile _psfin_snapfile _psversion_element
+    unset _psmirror _pselement _psfin_snapfile _psfin_snapfile _psversion_element
 }
 
 
