@@ -112,33 +112,34 @@ error () {
 
 
 distinct () {
-    msg_type="${1}"
+    _msg_type="${1}"
     shift
-    content=${*}
-    if [ -z "${msg_type}" ]; then
+    _contents=${@}
+    if [ -z "${_msg_type}" ]; then
         error "No message type given as first param for: ${DISTINCT_COLOUR}distinct()${ColorRed}!"
     fi
-    case ${msg_type} in
+    case ${_msg_type} in
         n|note)
-            ${PRINTF_BIN} "${DISTINCT_COLOUR}${content}${ColorGreen}"
+            ${PRINTF_BIN} "${DISTINCT_COLOUR}${_contents}${ColorGreen}"
             ;;
 
         d|debug)
-            ${PRINTF_BIN} "${DISTINCT_COLOUR}${content}${ColorViolet}"
+            ${PRINTF_BIN} "${DISTINCT_COLOUR}${_contents}${ColorViolet}"
             ;;
 
         w|warn)
-            ${PRINTF_BIN} "${DISTINCT_COLOUR}${content}${ColorYellow}"
+            ${PRINTF_BIN} "${DISTINCT_COLOUR}${_contents}${ColorYellow}"
             ;;
 
         e|error)
-            ${PRINTF_BIN} "${DISTINCT_COLOUR}${content}${ColorRed}"
+            ${PRINTF_BIN} "${DISTINCT_COLOUR}${_contents}${ColorRed}"
             ;;
 
         *)
-            ${PRINTF_BIN} "${msg_type}${content}${ColorReset}"
+            ${PRINTF_BIN} "${_msg_type}${_contents}${ColorReset}"
             ;;
     esac
+    unset _msg_type _contents
 }
 
 
@@ -330,7 +331,7 @@ restore_security_state () {
 
 store_security_state () {
     if [ "YES" = "${CAP_SYS_HARDENED}" ]; then
-        ${RM_BIN} -f "${DEFAULT_SECURITY_STATE_FILE}" 2>/dev/null
+        try "${RM_BIN} -f ${DEFAULT_SECURITY_STATE_FILE}"
         debug "Storing current security state to file: $(distinct d "${DEFAULT_SECURITY_STATE_FILE}")"
         for _key in ${DEFAULT_HARDEN_KEYS}; do
             _sss_value="$(${SYSCTL_BIN} -n "${_key}" 2>/dev/null)"
@@ -346,8 +347,8 @@ store_security_state () {
 
 disable_security_features () {
     if [ "YES" = "${CAP_SYS_HARDENED}" ]; then
-        ${RM_BIN} -f "${DEFAULT_SECURITY_STATE_FILE}" 2>/dev/null
         debug "Disabling all security features.."
+        try "${RM_BIN} -f ${DEFAULT_SECURITY_STATE_FILE}"
         for _key in ${DEFAULT_HARDEN_KEYS}; do
             try "${SYSCTL_BIN} ${_key}=0"
         done
