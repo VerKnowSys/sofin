@@ -119,25 +119,25 @@ distinct () {
     if [ -z "${_msg_type}" ]; then
         error "No message type given as first param for: ${DISTINCT_COLOUR}distinct()${ColorRed}!"
     fi
-    case ${_msg_type} in
+    case "${_msg_type}" in
         n|note)
-            ${PRINTF_BIN} "${DISTINCT_COLOUR}${_contents}${ColorGreen}"
+            ${PRINTF_BIN} "${DISTINCT_COLOUR}${_contents}${ColorGreen}" 2>/dev/null
             ;;
 
         d|debug)
-            ${PRINTF_BIN} "${DISTINCT_COLOUR}${_contents}${ColorViolet}"
+            ${PRINTF_BIN} "${DISTINCT_COLOUR}${_contents}${ColorViolet}" 2>/dev/null
             ;;
 
         w|warn)
-            ${PRINTF_BIN} "${DISTINCT_COLOUR}${_contents}${ColorYellow}"
+            ${PRINTF_BIN} "${DISTINCT_COLOUR}${_contents}${ColorYellow}" 2>/dev/null
             ;;
 
         e|error)
-            ${PRINTF_BIN} "${DISTINCT_COLOUR}${_contents}${ColorRed}"
+            ${PRINTF_BIN} "${DISTINCT_COLOUR}${_contents}${ColorRed}" 2>/dev/null
             ;;
 
         *)
-            ${PRINTF_BIN} "${_msg_type}${_contents}${ColorReset}"
+            ${PRINTF_BIN} "${_msg_type}${_contents}${ColorReset}" 2>/dev/null
             ;;
     esac
     unset _msg_type _contents
