@@ -92,7 +92,7 @@ rebuild_bundle () {
         ${PRINTF_BIN} "${DEF_REQUIREMENTS}\n" | ${GREP_BIN} "${_a_dependency}" >/dev/null 2>&1
         if [ "$?" = "0" ]; then
             _idep="$(${BASENAME_BIN} "${_dep}" 2>/dev/null)"
-            _irawname="$(${PRINTF_BIN} "${_idep}" | ${SED_BIN} "s/${DEFAULT_DEF_EXT}//g" 2>/dev/null)"
+            _irawname="$(${PRINTF_BIN} '%s' "${_idep}" | ${SED_BIN} "s/${DEFAULT_DEF_EXT}//g" 2>/dev/null)"
             _an_def_nam="$(capitalize "${_irawname}")"
             _those_to_rebuild="${_an_def_nam} ${_those_to_rebuild}"
         fi
@@ -252,8 +252,8 @@ build () {
                     else
                         note "Installing: $(distinct n "${DEF_FULL_NAME}"), version: $(distinct n "${DEF_VERSION}"), with requirements: $(distinct n "${DEF_REQUIREMENTS}")"
                     fi
-                    _req_amount="$(${PRINTF_BIN} "${DEF_REQUIREMENTS}\n" | ${WC_BIN} -w 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)"
-                    _req_amount="$(${PRINTF_BIN} "${_req_amount} + 1\n" | ${BC_BIN} 2>/dev/null)"
+                    _req_amount="$(${PRINTF_BIN} '%s\n' "${DEF_REQUIREMENTS}" | ${WC_BIN} -w 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)"
+                    _req_amount="$(${PRINTF_BIN} '%s\n' "${_req_amount} + 1" | ${BC_BIN} 2>/dev/null)"
                     _req_all="${_req_amount}"
                     for _req in ${DEF_REQUIREMENTS}; do
                         if [ -n "${DEF_USER_INFO}" ]; then
@@ -269,7 +269,7 @@ build () {
                                 process "${_req}"
                             fi
                         fi
-                        _req_amount="$(${PRINTF_BIN} "${_req_amount} - 1\n" | ${BC_BIN} 2>/dev/null)"
+                        _req_amount="$(${PRINTF_BIN} '%s\n' "${_req_amount} - 1" | ${BC_BIN} 2>/dev/null)"
                     done
                 fi
 
@@ -365,7 +365,7 @@ process () {
     if [ ! -e "${_req_definition}" ]; then
         error "Cannot fetch definition: $(distinct e "${_req_definition}")! Aborting!"
     fi
-    _req_defname="$(${PRINTF_BIN} "$(${BASENAME_BIN} "${_req_definition}" 2>/dev/null)\n" | ${SED_BIN} -e 's/\..*$//g' 2>/dev/null)"
+    _req_defname="$(${PRINTF_BIN} '%s\n' "$(${BASENAME_BIN} "${_req_definition}" 2>/dev/null)" | ${SED_BIN} -e 's/\..*$//g' 2>/dev/null)"
     debug "Requirement: $(distinct d "${_app_param}") file: $(distinct d "${_req_definition}"), req-name: $(distinct d "${_req_defname}")"
 
     load_defaults
@@ -433,8 +433,8 @@ process () {
                 fi
 
                 unset _fd
-                _prm_nolib="$(${PRINTF_BIN} "${_app_param}\n" | ${SED_BIN} 's/lib//' 2>/dev/null)"
-                _prm_no_undrlne_and_minus="$(${PRINTF_BIN} "${_app_param}\n" | ${SED_BIN} 's/[-_].*$//' 2>/dev/null)"
+                _prm_nolib="$(${PRINTF_BIN} '%s\n' "${_app_param}" | ${SED_BIN} 's/lib//' 2>/dev/null)"
+                _prm_no_undrlne_and_minus="$(${PRINTF_BIN} '%s\n' "${_app_param}" | ${SED_BIN} 's/[-_].*$//' 2>/dev/null)"
                 debug "_app_param: ${_app_param} short: ${_prm_nolib}, nafter-: ${_prm_no_undrlne_and_minus}, DEF_NAME: ${DEF_NAME}, BUILD_DIR: ${BUILD_DIR}"
                 # NOTE: patterns sorted by safety
                 for _pati in    "*${_app_param}*${DEF_VERSION}" \

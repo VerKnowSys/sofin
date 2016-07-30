@@ -242,7 +242,7 @@ retry () {
         else
             error "Given an empty command to evaluate!"
         fi
-        _ammo="$(${PRINTF_BIN} "${_ammo}\n" | ${SED_BIN} 's/O//' 2>/dev/null)"
+        _ammo="$(${PRINTF_BIN} '%s\n' "${_ammo}" | ${SED_BIN} 's/O//' 2>/dev/null)"
         debug "Remaining attempts: $(distinct d "${_ammo}")"
     done
     debug "All available ammo exhausted to invoke a command: $(distinct d "${_targets}")"

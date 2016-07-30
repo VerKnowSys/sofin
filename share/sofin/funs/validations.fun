@@ -14,7 +14,7 @@ check_version () { # $1 => installed version, $2 => available version
 validate_env () {
     ${ENV_BIN} 2>/dev/null | ${GREP_BIN} '_BIN=/' 2>/dev/null | while IFS= read -r _envvar
     do
-        _var_value="$(${PRINTF_BIN} "${_envvar}" | ${AWK_BIN} '{sub(/^[A-Z_]*=/, ""); print $1;}' 2>/dev/null)"
+        _var_value="$(${PRINTF_BIN} '%s' "${_envvar}" | ${AWK_BIN} '{sub(/^[A-Z_]*=/, ""); print $1;}' 2>/dev/null)"
         if [ ! -x "${_var_value}" ]; then
             error "Required binary is unavailable: $(distinct e "${_envvar}")"
         fi
@@ -25,7 +25,7 @@ validate_env () {
 
 fail_on_bg_job () {
     _deps=${*}
-    debug "deps=$(distinct d "$(${PRINTF_BIN} "${_deps}\n" | eval "${NEWLINES_TO_SPACES_GUARD}")")"
+    debug "deps=$(distinct d "$(${PRINTF_BIN} '%s\n' "${_deps}" | eval "${NEWLINES_TO_SPACES_GUARD}")")"
     create_dirs
     acquire_lock_for "${_deps}"
     unset _deps
@@ -108,11 +108,11 @@ validate_archive_sha1 () {
 
 
 validate_def_postfix () {
-    _cigiven_name="$(${BASENAME_BIN} "$(${PRINTF_BIN} "$(lowercase "${1}")" | eval "${CUTOFF_DEF_EXT_GUARD}")")"
-    _cidefinition_name="$(${BASENAME_BIN} "$(${PRINTF_BIN} "$(lowercase "${2}")" | eval "${CUTOFF_DEF_EXT_GUARD}")")"
+    _cigiven_name="$(${BASENAME_BIN} "$(${PRINTF_BIN} '%s' "$(lowercase "${1}")" | eval "${CUTOFF_DEF_EXT_GUARD}")")"
+    _cidefinition_name="$(${BASENAME_BIN} "$(${PRINTF_BIN} '%s' "$(lowercase "${2}")" | eval "${CUTOFF_DEF_EXT_GUARD}")")"
     # case when DEF_POSTFIX was ommited => use definition file name difference as POSTFIX:
-    _l1="$(${PRINTF_BIN} "${_cidefinition_name}" | ${WC_BIN} -c 2>/dev/null)"
-    _l2="$(${PRINTF_BIN} "${_cigiven_name}" | ${WC_BIN} -c 2>/dev/null)"
+    _l1="$(${PRINTF_BIN} '%s' "${_cidefinition_name}" | ${WC_BIN} -c 2>/dev/null)"
+    _l2="$(${PRINTF_BIN} '%s' "${_cigiven_name}" | ${WC_BIN} -c 2>/dev/null)"
     if [ "${_l1}" -gt "${_l2}" ]; then
         _cispc_nme_diff="$(difftext "${_cidefinition_name}" "${_cigiven_name}")"
     elif [ "${_l2}" -gt "${_l1}" ]; then

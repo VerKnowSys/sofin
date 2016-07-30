@@ -166,7 +166,7 @@ find_most_recent () {
                 ${SORT_BIN} -nr 2>/dev/null | \
                 ${HEAD_BIN} -n${MAX_OPEN_TAIL_LOGS} 2>/dev/null | \
                 ${CUT_BIN} -d' ' -f2 2>/dev/null)"
-            _frres_singleline="$(${PRINTF_BIN} "${_frfind_results}\n" | eval "${NEWLINES_TO_SPACES_GUARD}")"
+            _frres_singleline="$(${PRINTF_BIN} '%s\n' "${_frfind_results}" | eval "${NEWLINES_TO_SPACES_GUARD}")"
             debug "Find results: $(distinct d "${_frres_singleline}")"
             if [ -z "${_frfind_results}" ]; then
                 ${PRINTF_BIN} "" 2>/dev/null
@@ -184,7 +184,7 @@ find_most_recent () {
 difftext () {
     _text_input="${1}"
     _text_match="${2}"
-    ${PRINTF_BIN} "$(${PRINTF_BIN} "${_text_input}" | ${SED_BIN} -e "s#${_text_match}##" 2>/dev/null)"
+    ${PRINTF_BIN} '%s' "$(${PRINTF_BIN} '%s' "${_text_input}" | ${SED_BIN} -e "s#${_text_match}##" 2>/dev/null)"
 }
 
 

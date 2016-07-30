@@ -14,7 +14,7 @@ load_defs () {
             elif [ -e "${DEFINITIONS_DIR}${_def}" ]; then
                 debug "< $(distinct d "${DEFINITIONS_DIR}${_def}")"
                 . ${DEFINITIONS_DIR}${_def}
-                _given_def="$(${PRINTF_BIN} "${_def}" | eval "${CUTOFF_DEF_EXT_GUARD}")"
+                _given_def="$(${PRINTF_BIN} '%s' "${_def}" | eval "${CUTOFF_DEF_EXT_GUARD}")"
 
             else
                 # validate available alternatives and quit no matter the result
@@ -90,7 +90,7 @@ load_defaults () {
 
 
 inherit () {
-    _inhnm="$(${PRINTF_BIN} "${1}" | eval "${CUTOFF_DEF_EXT_GUARD}")"
+    _inhnm="$(${PRINTF_BIN} '%s' "${1}" | eval "${CUTOFF_DEF_EXT_GUARD}")"
     debug "Loading parent definition: $(distinct d "${_inhnm}")"
     . ${DEFINITIONS_DIR}${_inhnm}${DEFAULT_DEF_EXT}
 }
@@ -228,7 +228,7 @@ remove_bundles () {
         error "Second argument with at least one bundle name is required!"
     fi
     # replace + with *
-    _bundle_nam="$(${PRINTF_BIN} "${_bundle_name}" | ${SED_BIN} -e 's#+#*#' 2>/dev/null)"
+    _bundle_nam="$(${PRINTF_BIN} '%s' "${_bundle_name}" | ${SED_BIN} -e 's#+#*#' 2>/dev/null)"
 
     # first look for a list with that name:
     if [ -e "${DEFINITIONS_LISTS_DIR}${_bundle_nam}" ]; then
@@ -268,7 +268,7 @@ remove_bundles () {
             debug "_picked_bundles: ${_picked_bundles}, _given_name: ${_given_name}"
             if [ "${_picked_bundles}" = "${_given_name}" ]; then
                 debug "Looking for other installed versions of: $(distinct d "${_aname}"), that might be exported automatically.."
-                _inname="$(${PRINTF_BIN} "$(lowercase "${_given_name}")\n" | ${SED_BIN} 's/[0-9]*//g' 2>/dev/null)"
+                _inname="$(${PRINTF_BIN} '%s\n' "$(lowercase "${_given_name}")" | ${SED_BIN} 's/[0-9]*//g' 2>/dev/null)"
                 _alternative="$(${FIND_BIN} ${SOFTWARE_DIR} -mindepth 1 -maxdepth 1 -type d -iname "${_inname}*" -not -name "${_given_name}" 2>/dev/null | ${SED_BIN} 's/^.*\///g' 2>/dev/null | ${HEAD_BIN} -n1 2>/dev/null)"
             fi
 
@@ -395,7 +395,7 @@ create_apple_bundle_if_necessary () { # XXXXXX
     if [ -n "${DEF_APPLE_BUNDLE}" -a \
          "Darwin" = "${SYSTEM_NAME}" ]; then
         _aname="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
-        DEF_NAME="$(${PRINTF_BIN} "${DEF_NAME}" | ${CUT_BIN} -c1 2>/dev/null | ${TR_BIN} '[a-z]' '[A-Z]' 2>/dev/null)$(${PRINTF_BIN} "${DEF_NAME}" | ${SED_BIN} 's/^[a-zA-Z]//' 2>/dev/null)"
+        DEF_NAME="$(${PRINTF_BIN} '%s' "${DEF_NAME}" | ${CUT_BIN} -c1 2>/dev/null | ${TR_BIN} '[a-z]' '[A-Z]' 2>/dev/null)$(${PRINTF_BIN} '%s' "${DEF_NAME}" | ${SED_BIN} 's/^[a-zA-Z]//' 2>/dev/null)"
         DEF_BUNDLE_NAME="${PREFIX}.app"
         note "Creating Apple bundle: $(distinct n "${DEF_NAME}") in: $(distinct n "${DEF_BUNDLE_NAME}")"
         ${MKDIR_BIN} -p "${DEF_BUNDLE_NAME}/libs" "${DEF_BUNDLE_NAME}/Contents" "${DEF_BUNDLE_NAME}/Contents/Resources/${_aname}" "${DEF_BUNDLE_NAME}/exports" "${DEF_BUNDLE_NAME}/share"
@@ -477,7 +477,7 @@ strip_bundle () {
                     done
                 fi
             done
-            _sbresult="$(${PRINTF_BIN} "${_counter}\n" | ${BC_BIN} 2>/dev/null)"
+            _sbresult="$(${PRINTF_BIN} '%s\n' "${_counter}" | ${BC_BIN} 2>/dev/null)"
             if [ "${_sbresult}" -lt "0" -o \
                  -z "${_sbresult}" ]; then
                 _sbresult="0"
@@ -601,7 +601,7 @@ export_binaries () {
         note "Defined no exports of prefix: $(distinct n "${PREFIX}")"
     else
         _a_name="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
-        _an_amount="$(${PRINTF_BIN} "${DEF_EXPORTS}\n" | ${WC_BIN} -w 2>/dev/null | ${TR_BIN} -d '\t|\r|\ ' 2>/dev/null)"
+        _an_amount="$(${PRINTF_BIN} '%s\n' "${DEF_EXPORTS}" | ${WC_BIN} -w 2>/dev/null | ${TR_BIN} -d '\t|\r|\ ' 2>/dev/null)"
         debug "Exporting $(distinct d "${_an_amount}") binaries of prefix: $(distinct d "${PREFIX}")"
         try "${MKDIR_BIN} -p ${PREFIX}/exports"
         _expolist=""
@@ -634,7 +634,7 @@ hack_def () {
     _hack_pattern="${1}"
     _abeauty_pat="$(distinct n "*${_hack_pattern}*")"
     _all_hackdirs=$(${FIND_BIN} ${FILE_CACHE_DIR} -type d -mindepth 2 -maxdepth 2 -iname "*${_hack_pattern}*" 2>/dev/null)
-    _all_am="$(${PRINTF_BIN} "${_all_hackdirs}\n" | ${WC_BIN} -l 2>/dev/null | ${TR_BIN} -d '\t|\r|\ ' 2>/dev/null)"
+    _all_am="$(${PRINTF_BIN} '%s\n' "${_all_hackdirs}" | ${WC_BIN} -l 2>/dev/null | ${TR_BIN} -d '\t|\r|\ ' 2>/dev/null)"
     ${TEST_BIN} -z "${_all_am}" && _all_am="0"
     if [ -z "${_all_hackdirs}" ]; then
         warn "No matching build dirs found for pattern: $(distinct e "${_abeauty_pat}")"
