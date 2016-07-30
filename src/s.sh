@@ -7,9 +7,10 @@
 unset COMPLIANCE_CHECK
 
 SOFIN_ARGS_FULL="${*}"
-SOFIN_ARGS="$(echo ${SOFIN_ARGS_FULL} | ${CUT_BIN} -d' ' -f2- 2>/dev/null)"
 SOFIN_COMMAND_ARG="${1}"
-SOFIN_PID="$$"
+SOFIN_ARGS="$(echo "${SOFIN_ARGS_FULL}" | ${CUT_BIN} -d' ' -f2- 2>/dev/null)"
+SOFIN_PID="${SOFIN_PID:-$$}"
+
 
 env_reset
 if [ -n "${SOFIN_COMMAND_ARG}" ]; then
