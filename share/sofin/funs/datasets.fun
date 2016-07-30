@@ -283,7 +283,7 @@ create_builddir () {
             error "Second argument with $(distinct e "dataset-checksum") is required!"
         fi
         _dset="${DEFAULT_ZPOOL}${SOFTWARE_DIR}${USER}/${_cb_bundle_name}/${DEFAULT_SRC_EXT}${_dset_namesum}"
-        debug "Creating ZFS build-dataset with checksum: $(distinct d "${_dset_namesum}") of $(distinct d "${_dset}")"
+        debug "Creating ZFS build-dataset: $(distinct d "${_dset}")"
         try "${ZFS_BIN} create -p -o mountpoint=${SOFTWARE_DIR}${_cb_bundle_name}/${DEFAULT_SRC_EXT}${_dset_namesum} ${_dset}"
         try "${ZFS_BIN} mount ${_dset}"
         unset _dset _dset_namesum
