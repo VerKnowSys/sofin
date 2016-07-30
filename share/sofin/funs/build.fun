@@ -374,20 +374,22 @@ process () {
     compiler_setup
     dump_debug_info
 
+    _bundlnm="$(capitalize "${_app_param}")"
     if [ -z "${PREFIX}" ]; then
-        PATH="${DEFAULT_PATH}"
+        PREFIX="${SOFTWARE_DIR}${_bundlnm}"
+        PATH="${PREFIX}/bin:${PREFIX}/sbin:${DEFAULT_PATH}"
     else
         PATH="${PREFIX}/bin:${PREFIX}/sbin:${DEFAULT_PATH}"
     fi
     if [ -z "${DEF_DISABLED}" ]; then
         if [ -z "${DEF_SOURCE_PATH}" ]; then
-            note "   ${NOTE_CHAR2} $(distinct n "DEF_SOURCE_PATH=\"\"") is undefined for: $(distinct n "${_req_defname}")."
-            note "NOTE: It's only valid for meta bundles. You may consider setting: $(distinct n "DEF_CONFIGURE=\"meta\"") in bundle definition file. Type: $(distinct n "s dev ${_req_defname}"))"
+            note "   ${NOTE_CHAR2} $(distinct n "DEF_SOURCE_PATH") is undefined for: $(distinct n "${_req_defname}")."
+            note "NOTE: It's only valid for meta bundles. You may consider setting: $(distinct n "DEF_CONFIGURE=\"meta\"") in definition file of bundle."
         else
             _cwd="$(${PWD_BIN} 2>/dev/null)"
             if [ -n "${BUILD_DIR}" -a \
                  -n "${BUILD_NAMESUM}" ]; then
-                create_builddir "$(${BASENAME_BIN} "${PREFIX}" 2>/dev/null)" "${BUILD_NAMESUM}"
+                create_builddir "${_bundlnm}" "${BUILD_NAMESUM}"
                 cd "${BUILD_DIR}"
                 if [ -z "${DEF_GIT_MODE}" ]; then # Standard "fetch source archive" method
                     _base="$(${BASENAME_BIN} "${DEF_SOURCE_PATH}" 2>/dev/null)"
@@ -580,9 +582,8 @@ process () {
             after_install_callback
 
             run "${TOUCH_BIN} ${PREFIX}/${_app_param}${DEFAULT_INST_MARK_EXT}" && \
-                debug "$(distinct d "${_app_param}") marked as installed in: $(distinct d "${PREFIX}")"
-            debug "Writing version: $(distinct d "${DEF_VERSION}") of software: $(distinct d "${DEF_NAME}") installed in: $(distinct d "${PREFIX}")"
             ${PRINTF_BIN} "${DEF_VERSION}" > "${PREFIX}/${_app_param}${DEFAULT_INST_MARK_EXT}"
+                debug "Stored version: $(distinct d "${DEF_VERSION}") of software: $(distinct d "${DEF_NAME}") installed in: $(distinct d "${PREFIX}")"
             cd "${_cwd}" 2>/dev/null
             unset _cwd
         fi
@@ -596,5 +597,5 @@ process () {
         debug "Disabled requirement: $(distinct d "${_req_defname}"), writing '${DEFAULT_REQ_OS_PROVIDED}' to: $(distinct d "${_dis_def}")"
         run "${PRINTF_BIN} \"${DEFAULT_REQ_OS_PROVIDED}\" > ${_dis_def}"
     fi
-    unset _current_branch _dis_def _req_defname
+    unset _current_branch _dis_def _req_defname _bundlnm
 }
