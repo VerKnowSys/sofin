@@ -94,28 +94,36 @@ prepare_service_dataset () {
         fi
         _full_dataset_name="${DEFAULT_ZPOOL}${SERVICES_DIR}${USER}/${_ps_elem}"
         _ps_snap_file="${_ps_elem}-${_ps_ver_elem}${DEFAULT_SERVICE_SNAPSHOT_EXT}"
-        debug "Dataset name: $(distinct d "${_full_dataset_name}"), snapshot file: $(distinct d "${_ps_snap_file}")"
-        fetch_dset_zfs_stream "${_ps_elem}" "${_ps_snap_file}"
-
-        debug "Grepping for dataset: $(distinct d "${DEFAULT_ZPOOL}${SERVICES_DIR}${USER}/${_ps_elem}")"
-        ${ZFS_BIN} list -H 2>/dev/null | eval "${FIRST_ARG_GUARD}" | ${EGREP_BIN} "${DEFAULT_ZPOOL}${SERVICES_DIR}${USER}/${_ps_elem}" >/dev/null 2>&1
-        if [ "$?" = "0" ]; then
-            note "Preparing to send service dataset: $(distinct n "${_full_dataset_name}"), for bundle: $(distinct n "${_ps_elem}")"
-            try "${ZFS_BIN} umount -f ${_full_dataset_name}"
-            run "${ZFS_BIN} send ${_full_dataset_name} | ${XZ_BIN} ${DEFAULT_XZ_OPTS} > ${FILE_CACHE_DIR}${_ps_snap_file}"
-            try "${ZFS_BIN} mount ${_full_dataset_name}"
+        debug "Dataset name: $(distinct d "${_full_dataset_name}"), snapshot-file: $(distinct d "${_ps_snap_file}")"
+        if [ ! -f "${FILE_CACHE_DIR}${_ps_snap_file}" ]; then
+            fetch_dset_zfs_stream "${_ps_elem}" "${_ps_snap_file}"
+            if [ -f "${FILE_CACHE_DIR}${_ps_snap_file}" ]; then
+                debug "Service origin available!"
+            else
+                debug "Service origin unavailable! Creating new one."
+                debug "Grepping for dataset: $(distinct d "${_full_dataset_name}")"
+                ${ZFS_BIN} list -H 2>/dev/null | eval "${FIRST_ARG_GUARD}" | ${EGREP_BIN} "${_full_dataset_name}" >/dev/null 2>&1
+                if [ "$?" = "0" ]; then
+                    note "Preparing to send service dataset: $(distinct n "${_full_dataset_name}"), for bundle: $(distinct n "${_ps_elem}")"
+                    try "${ZFS_BIN} umount -f ${_full_dataset_name}"
+                    run "${ZFS_BIN} send ${_full_dataset_name} | ${XZ_BIN} ${DEFAULT_XZ_OPTS} > ${FILE_CACHE_DIR}${_ps_snap_file}"
+                    try "${ZFS_BIN} mount ${_full_dataset_name}"
+                else
+                    run "${ZFS_BIN} create -p -o mountpoint=${SERVICES_DIR}${_ps_elem} ${_full_dataset_name}"
+                    try "${ZFS_BIN} umount -f ${_full_dataset_name}"
+                    run "${ZFS_BIN} send ${_full_dataset_name} | ${XZ_BIN} ${DEFAULT_XZ_OPTS} > ${FILE_CACHE_DIR}${_ps_snap_file}"
+                    try "${ZFS_BIN} mount ${_full_dataset_name}"
+                fi
+                _snap_size="$(file_size "${FILE_CACHE_DIR}${_ps_snap_file}")"
+                if [ "${_snap_size}" = "0" ]; then
+                    try "${RM_BIN} -vf ${FILE_CACHE_DIR}${_ps_snap_file}"
+                    debug "Service dataset dump is empty for bundle: $(distinct d "${_ps_elem}-${_ps_ver_elem}")"
+                else
+                    debug "Snapshot of size: $(distinct d "${_snap_size}") is ready for bundle: $(distinct d "${_ps_elem}")"
+                fi
+            fi
         else
-            run "${ZFS_BIN} create -p -o mountpoint=${SERVICES_DIR}${_ps_elem} ${_full_dataset_name}"
-            try "${ZFS_BIN} umount -f ${_full_dataset_name}"
-            run "${ZFS_BIN} send ${_full_dataset_name} | ${XZ_BIN} ${DEFAULT_XZ_OPTS} > ${FILE_CACHE_DIR}${_ps_snap_file}"
-            try "${ZFS_BIN} mount ${_full_dataset_name}"
-        fi
-        _snap_size="$(file_size "${FILE_CACHE_DIR}${_ps_snap_file}")"
-        if [ "${_snap_size}" = "0" ]; then
-            try "${RM_BIN} -vf ${FILE_CACHE_DIR}${_ps_snap_file}"
-            debug "Service dataset dump is empty for bundle: $(distinct d "${_ps_elem}-${_ps_ver_elem}")"
-        else
-            debug "Snapshot of size: $(distinct d "${_snap_size}") is ready for bundle: $(distinct d "${_ps_elem}")"
+            debug "Service ${ORIGIN_ZFS_SNAP_NAME} snapshot file exists: $(distinct d "${FILE_CACHE_DIR}${_ps_snap_file}")"
         fi
         unset _snap_size _ps_ver_elem _full_dataset_name _ps_snap_file _ps_elem
     fi
@@ -394,7 +402,7 @@ install_software_from_binbuild () {
 }
 
 
-push_binary_archive () {
+push_software_archive () {
     _bpbundle_file="${1}"
     _bpamirror="${2}"
     _bpaddress="${3}"
@@ -407,21 +415,25 @@ push_binary_archive () {
     if [ -z "${_bpaddress}" ]; then
         error "Fourth argument: $(distinct e "mirror-address") is empty!"
     fi
+    _bpfn_file="${FILE_CACHE_DIR}${_bpbundle_file}"
+    _bpfn_file_dest="${_bpaddress}/${_bpbundle_file}"
     _bpfn_chksum_file="${FILE_CACHE_DIR}${_bpbundle_file}${DEFAULT_CHKSUM_EXT}"
+    _bpfn_chksum_file_dest="${_bpaddress}/${_bpbundle_file}${DEFAULT_CHKSUM_EXT}"
     _bpshortsha="$(${CAT_BIN} "${_bpfn_chksum_file}" 2>/dev/null | ${CUT_BIN} -c -16 2>/dev/null)"
+    _bp_remotfs_file="${MAIN_BINARY_PREFIX}/${SYS_SPECIFIC_BINARY_REMOTE}/${_bpbundle_file}"
     if [ -z "${_bpshortsha}" ]; then
         error "No sha checksum in file: $(distinct e "${_bpfn_chksum_file}")"
     fi
     debug "BundleName: $(distinct d "${_bpbundle_file}"), bundle_file: $(distinct d "${_bpbundle_file}"), repository address: $(distinct d "${_bpaddress}")"
-    retry "${SCP_BIN} ${DEFAULT_SSH_OPTS} ${DEFAULT_SCP_OPTS} -P ${MAIN_PORT} ${_bpfn_chksum_file} ${_bpaddress}/${_bpbundle_file}.partial" || \
-        def_error "${_bpbundle_file}" "Unable to push file: $(distinct e "${_bpfn_chksum_file}") to: $(distinct e "${_bpaddress}/${_bpbundle_file}")"
+    retry "${SCP_BIN} ${DEFAULT_SSH_OPTS} ${DEFAULT_SCP_OPTS} -P ${MAIN_PORT} ${_bpfn_file} ${_bpfn_file_dest}${DEFAULT_PARTIAL_FILE_EXT}"
     if [ "$?" = "0" ]; then
-        ${PRINTF_BIN} "${ColorBlue}"
-        retry "${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} ${MAIN_USER}@${_bpamirror} \"cd ${MAIN_BINARY_PREFIX}/${SYS_SPECIFIC_BINARY_REMOTE} && mv ${_bpbundle_file}.partial ${_bpbundle_file}\""
-        retry "${SCP_BIN} ${DEFAULT_SSH_OPTS} ${DEFAULT_SCP_OPTS} -P ${MAIN_PORT} ${_bpfn_chksum_file} ${_bpaddress}/${_bpbundle_file}${DEFAULT_CHKSUM_EXT}" || \
-            def_error "${_bpfn_chksum_file}" "Error sending: $(distinct e "${_bpfn_chksum_file}") file to: $(distinct e "${_bpaddress}/${_bpbundle_file}${DEFAULT_CHKSUM_EXT}")"
+        retry "${SCP_BIN} ${DEFAULT_SSH_OPTS} ${DEFAULT_SCP_OPTS} -P ${MAIN_PORT} ${_bpfn_chksum_file} ${_bpfn_chksum_file_dest}" || \
+            def_error "${_bpbundle_file}" "Error sending checksum file: $(distinct e "${_bpfn_chksum_file}") to: $(distinct e "${_bpfn_chksum_file_dest}")"
+        retry "${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} ${MAIN_USER}@${_bpamirror} \"${MV_BIN} -v ${_bp_remotfs_file}${DEFAULT_PARTIAL_FILE_EXT} ${_bp_remotfs_file}\"" && \
+            note "Bundle deployed successfully!" && \
+            debug "Partial file renamed to destination name: $(distinct d "${_bp_remotfs_file}")"
     else
-        error "Failed to push binary build of: $(distinct e "${_bpbundle_file}") to remote: $(distinct e "${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bpbundle_file}")"
+        error "Failed to push binary build of: $(distinct e "${_bpbundle_file}") to remote: $(distinct e "${_bp_remotfs_file}")"
     fi
-    unset _bpbundle_file _bpbundle_file _bpamirror _bpaddress _bpshortsha _bpfn_chksum_file
+    unset _bpbundle_file _bpbundle_file _bpamirror _bpaddress _bpshortsha _bpfn_chksum_file _bp_remotfs_file _bpfn_chksum_file _bpfn_chksum_file_dest
 }
