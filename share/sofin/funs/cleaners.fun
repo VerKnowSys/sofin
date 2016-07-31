@@ -68,9 +68,6 @@ perform_clean () {
 
 
 finalize () {
-    if [ -z "${DEVEL}" ]; then
-        try_destroy_binbuild
-    fi
     untrap_signals
     restore_security_state
     finalize_afterbuild
