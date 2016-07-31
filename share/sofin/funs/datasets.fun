@@ -428,7 +428,6 @@ push_software_archive () {
         retry "${SCP_BIN} ${DEFAULT_SSH_OPTS} ${DEFAULT_SCP_OPTS} -P ${MAIN_PORT} ${_bpfn_chksum_file} ${_bpfn_chksum_file_dest}" || \
             def_error "${_bpbundle_file}" "Error sending checksum file: $(distinct e "${_bpfn_chksum_file}") to: $(distinct e "${_bpfn_chksum_file_dest}")"
         retry "${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} ${MAIN_USER}@${_bpamirror} \"${MV_BIN} -v ${_bp_remotfs_file}${DEFAULT_PARTIAL_FILE_EXT} ${_bp_remotfs_file}\"" && \
-            note "Bundle deployed successfully!" && \
             debug "Partial file renamed to destination name: $(distinct d "${_bp_remotfs_file}")"
     else
         error "Failed to push binary build of: $(distinct e "${_bpbundle_file}") to remote: $(distinct e "${_bp_remotfs_file}")"
