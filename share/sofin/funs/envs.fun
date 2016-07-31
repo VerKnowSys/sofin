@@ -258,9 +258,10 @@ acquire_lock_for () {
 
 
 destroy_locks () {
+    _pattern="${1}"
     _pid="${SOFIN_PID:-$$}"
-    debug "Cleaning file locks that belong to pid: $(distinct d "${_pid}").."
-    for _dlf in $(${FIND_BIN} ${LOCKS_DIR} -mindepth 1 -maxdepth 1 -name "*${DEFAULT_LOCK_EXT}" -print 2>/dev/null); do
+    debug "Cleaning file locks matching pattern: $(distinct d "${_pattern}") that belong to pid: $(distinct d "${_pid}").."
+    for _dlf in $(${FIND_BIN} ${LOCKS_DIR} -mindepth 1 -maxdepth 1 -name "*${_pattern}*${DEFAULT_LOCK_EXT}" -print 2>/dev/null); do
         try "${GREP_BIN} ${_pid} ${_dlf}" && \
             try "${RM_BIN} -f ${_dlf}" && \
                 debug "Lock file removed: $(distinct d "${_dlf}")"
