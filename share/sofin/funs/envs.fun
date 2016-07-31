@@ -30,12 +30,12 @@ compiler_setup () {
     esac
 
     if [ "YES" = "${DEBUGBUILD}" ]; then
-        debug " $(distinct d "${ColorGreen}${SUCCESS_CHAR}") $(distinct d "${ColorGreen}debug-build")"
-        debug " $(distinct d "${ColorYellow}${FAIL_CHAR}") $(distinct d "${ColorGray}production-build")"
+        debug " $(distinct ${ColorGreen} "${SUCCESS_CHAR}") $(distinct ${ColorGreen} "debug-build")"
+        debug " $(distinct ${ColorYellow} "${FAIL_CHAR}") $(distinct ${ColorGray} "production-build")"
         DEFAULT_COMPILER_FLAGS="${DEFAULT_COMPILER_FLAGS} -O0 -ggdb"
     else
-        debug " $(distinct d "${ColorGreen}${SUCCESS_CHAR}") $(distinct d "${ColorGreen}production-build")"
-        debug " $(distinct d "${ColorYellow}${FAIL_CHAR}") $(distinct d "${ColorGray}debug-build")"
+        debug " $(distinct ${ColorGreen} "${SUCCESS_CHAR}") $(distinct ${ColorGreen} "production-build")"
+        debug " $(distinct ${ColorYellow} "${FAIL_CHAR}") $(distinct ${ColorGray} "debug-build")"
         DEFAULT_COMPILER_FLAGS="${DEFAULT_COMPILER_FLAGS} -O2"
     fi
 

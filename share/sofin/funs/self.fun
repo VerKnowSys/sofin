@@ -68,7 +68,7 @@ install_sofin_files () {
 
     run "${INSTALL_BIN} -v src/s.sh ${PREFIX}usr/bin/s" && \
         note "  ${_okch} sofin launcher" && \
-            note "Sofin installed with version: $(distinct n "${SOFIN_VERSION}")\n"
+            note "Sofin installed with version: $(distinct n "${SOFIN_VERSION}")"
 
     note "Type: $(distinct n "s usage") for help."
     note "Read: $(distinct n "https://bitbucket.org/verknowsys/sofin") for more details."

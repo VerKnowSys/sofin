@@ -44,8 +44,7 @@ write_info_about_shell_configuration () {
 
 
 sofin_header () {
-    ${PRINTF_BIN} "$(distinct n 'Sof')tware $(distinct n 'In')staller v$(distinct n "${SOFIN_VERSION}") -- (c) 2o11-2o16 -- Daniel ($(distinct n dmilith)) Dettlaff\n\
-"
+    ${PRINTF_BIN} '%s\n\n' "$(distinct n 'Sof')tware $(distinct n 'In')staller v$(distinct n "${SOFIN_VERSION}") -- (c) 2o11-2o16 -- Daniel ($(distinct n dmilith)) Dettlaff"
 }
 
 
@@ -153,35 +152,35 @@ get_shell_vars () {
     gsv_int_manpath "${SOFTWARE_DIR}"
 
     ${PRINTF_BIN} "# ${ColorParams}PATH${ColorReset}:\n"
-    ${PRINTF_BIN} "export PATH=\"$(${PRINTF_BIN} '%s\n' "${_path}" | eval "${CUT_TRAILING_SPACES_GUARD}")\"\n"
+    ${PRINTF_BIN} '%s\n' "export PATH=\"$(${PRINTF_BIN} '%s\n' "${_path}" 2>/dev/null | eval "${CUT_TRAILING_SPACES_GUARD}")\""
     ${PRINTF_BIN} "# ${ColorParams}CC${ColorReset}:\n"
-    ${PRINTF_BIN} "export CC=\"${CC}\"\n"
+    ${PRINTF_BIN} '%s\n' "export CC=\"${CC}\""
     ${PRINTF_BIN} "# ${ColorParams}CXX${ColorReset}:\n"
-    ${PRINTF_BIN} "export CXX=\"${CXX}\"\n"
+    ${PRINTF_BIN} '%s\n' "export CXX=\"${CXX}\""
     ${PRINTF_BIN} "# ${ColorParams}CPP${ColorReset}:\n"
-    ${PRINTF_BIN} "export CPP=\"${CPP}\"\n"
+    ${PRINTF_BIN} '%s\n' "export CPP=\"${CPP}\""
 
     if [ -f "${SOFIN_ENV_DISABLED_INDICATOR_FILE}" ]; then # sofin disabled. Default system environment
         ${PRINTF_BIN} "# ${ColorParams}CFLAGS${ColorReset}:\n"
-        ${PRINTF_BIN} "export CFLAGS=\"\"\n"
+        ${PRINTF_BIN} '%s\n' "export CFLAGS=\"\""
         ${PRINTF_BIN} "# ${ColorParams}CXXFLAGS${ColorReset}:\n"
-        ${PRINTF_BIN} "export CXXFLAGS=\"\"\n"
+        ${PRINTF_BIN} '%s\n' "export CXXFLAGS=\"\""
         ${PRINTF_BIN} "# ${ColorParams}LDFLAGS${ColorReset}:\n"
-        ${PRINTF_BIN} "export LDFLAGS=\"\"\n"
+        ${PRINTF_BIN} '%s\n' "export LDFLAGS=\"\""
     else # sofin environment override enabled, Default behavior:
         ${PRINTF_BIN} "# ${ColorParams}CFLAGS${ColorReset}:\n"
-        ${PRINTF_BIN} "export CFLAGS=\"$(${PRINTF_BIN} '%s\n' "${_cflags}" | eval "${CUT_TRAILING_SPACES_GUARD}")\"\n"
+        ${PRINTF_BIN} '%s\n' "export CFLAGS=\"$(${PRINTF_BIN} '%s\n' "${_cflags}" 2>/dev/null | eval "${CUT_TRAILING_SPACES_GUARD}")\""
         ${PRINTF_BIN} "# ${ColorParams}CXXFLAGS${ColorReset}:\n"
-        ${PRINTF_BIN} "export CXXFLAGS=\"$(${PRINTF_BIN} '%s\n' "${_cxxflags}" | eval "${CUT_TRAILING_SPACES_GUARD}")\"${ColorReset}\n"
+        ${PRINTF_BIN} '%s\n' "export CXXFLAGS=\"$(${PRINTF_BIN} '%s\n' "${_cxxflags}" 2>/dev/null | eval "${CUT_TRAILING_SPACES_GUARD}")\"${ColorReset}"
         ${PRINTF_BIN} "# ${ColorParams}LDFLAGS${ColorReset}:\n"
-        ${PRINTF_BIN} "export LDFLAGS=\"$(${PRINTF_BIN} '%s\n' "${_ldflags}" | eval "${CUT_TRAILING_SPACES_GUARD}")\"\n"
+        ${PRINTF_BIN} '%s\n' "export LDFLAGS=\"$(${PRINTF_BIN} '%s\n' "${_ldflags}" 2>/dev/null | eval "${CUT_TRAILING_SPACES_GUARD}")\""
     fi
 
     # common
     ${PRINTF_BIN} "# ${ColorParams}PKG_CONFIG_PATH${ColorReset}:\n"
-    ${PRINTF_BIN} "export PKG_CONFIG_PATH=\"$(${PRINTF_BIN} '%s\n' "${_pkg_config_path}" | eval "${CUT_TRAILING_SPACES_GUARD}")\"\n"
+    ${PRINTF_BIN} '%s\n' "export PKG_CONFIG_PATH=\"$(${PRINTF_BIN} '%s\n' "${_pkg_config_path}" 2>/dev/null | eval "${CUT_TRAILING_SPACES_GUARD}")\""
     ${PRINTF_BIN} "# ${ColorParams}MANPATH${ColorReset}:\n"
-    ${PRINTF_BIN} "export MANPATH=\"$(${PRINTF_BIN} '%s\n' "${_manpath}" | eval "${CUT_TRAILING_SPACES_GUARD}")\"\n"
+    ${PRINTF_BIN} '%s\n' "export MANPATH=\"$(${PRINTF_BIN} '%s\n' "${_manpath}" 2>/dev/null | eval "${CUT_TRAILING_SPACES_GUARD}")\""
 
     unset _cflags _cxxflags _ldflags _pkg_config_path _manpath _app _exp
 }
@@ -197,11 +196,11 @@ list_bundles_full () {
             if [ -e "${_lbinstald_file}" ]; then
                 note "${SUCCESS_CHAR} ${_lbfapp_name}"
             else
-                note "${ColorRed}${FAIL_CHAR} ${_lbfapp_name} ${ColorReset}[${ColorRed}!${ColorReset}]"
+                note "$(distinct ${ColorRed} "${FAIL_CHAR}") ${_lbfapp_name} $(distinct ${ColorRed} "[!]")"
             fi
-            for _lbfreq in $(${FIND_BIN} ${_lbfapp} -maxdepth 1 -name *${DEFAULT_INST_MARK_EXT} 2>/dev/null | ${SORT_BIN} 2>/dev/null); do
+            for _lbfreq in $(${FIND_BIN} ${_lbfapp} -mindepth 1 -maxdepth 1 -iname "*${DEFAULT_INST_MARK_EXT}" 2>/dev/null | ${SORT_BIN} 2>/dev/null); do
                 _lbpp="$(${PRINTF_BIN} '%s' "$(${BASENAME_BIN} "${_lbfreq}" 2>/dev/null)" | ${SED_BIN} "s/${DEFAULT_INST_MARK_EXT}//" 2>/dev/null)"
-                note "   ${NOTE_CHAR} ${_lbpp} $(distinct "${ColorGray}" "[")$(distinct n $(${CAT_BIN} "${_lbfreq}" 2>/dev/null))$(distinct "${ColorGray}" "]")"
+                note "   ${NOTE_CHAR} ${_lbpp} $(distinct ${ColorGray} "[")$(distinct n $(${CAT_BIN} "${_lbfreq}" 2>/dev/null))$(distinct ${ColorGray} "]")"
             done
         done
         unset _lbfreq _lbfapp _lbflowercase _lbfapp_name _lbinstald_file _lbpp
