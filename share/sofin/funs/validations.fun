@@ -93,11 +93,12 @@ validate_archive_sha1 () {
     _sha1_value="$(${CAT_BIN} "${_current_sha_file}" 2>/dev/null)"
     if [ ! -f "${_current_sha_file}" -o \
            -z "${_sha1_value}" ]; then
+        debug "No sha1 file available for archive, or sha1 value is empty! Removing local bin-builds of: $(distinct d "${_archive_name}")"
         try "${RM_BIN} -fv ${_archive_name}"
         try "${RM_BIN} -fv ${_current_sha_file}"
     fi
     if [ "${_current_archive_sha1}" != "${_sha1_value}" ]; then
-        debug "Bundle archive checksum doesn't match ($(distinct d "${_current_archive_sha1}") vs $(distinct d "${sha1_value}")), removing binary builds and proceeding into build phase"
+        debug "Bundle archive checksum doesn't match ($(distinct d "${_current_archive_sha1}") vs $(distinct d "${_sha1_value}")), removing binary builds and proceeding into build phase"
         try "${RM_BIN} -fv ${_archive_name}"
         try "${RM_BIN} -fv ${_current_sha_file}"
     else
