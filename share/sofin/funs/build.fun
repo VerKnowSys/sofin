@@ -147,7 +147,7 @@ fetch_binbuild () {
         debug "BB-archive: $(distinct d "${_bb_archive}"). Expecting binbuild to be available in: $(distinct d "${FILE_CACHE_DIR}${_bb_archive}")"
         if [ -e "${FILE_CACHE_DIR}${_bb_archive}" ]; then
             validate_archive_sha1 "${FILE_CACHE_DIR}${_bb_archive}"
-            install_software_from_binbuild "${_bb_archive}" "${_bbfull_name}" "${_bb_ver}"
+            install_software_from_binbuild "${_bb_archive}" "${_bbfull_name}"
         else
             debug "Binary build unavailable for bundle: $(distinct d "${_bbfull_name}")"
         fi
