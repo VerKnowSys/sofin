@@ -235,16 +235,16 @@ show_diff () {
 
 
 develop () {
-    ${TEST_BIN} -d "${DEFINITIONS_DIR}" || create_dirs # only definiions dir is requires, so skip dir traverse
-    _defname_input="${1}"
+    _defname_input="${@}"
+    ${TEST_BIN} -d "${DEFINITIONS_DIR}" 2>/dev/null || create_dirs # only definiions dir is requires, so skip dir traverse
     _defname_no_ext="$(${PRINTF_BIN} '%s\n' "${_defname_input}" | ${SED_BIN} -e "s#\.${DEFAULT_DEF_EXT}##" 2>/dev/null)"
     _devname="$(lowercase "$(${BASENAME_BIN} "${_defname_no_ext}" 2>/dev/null)")"
-    if [ -z "${_devname}" ]; then
+    if [ -z "${_defname_input}" ]; then
         error "No definition file name specified as first param!"
     fi
-    note "Paste your definition below. Hit ctrl-d (after a newline) to commit. ctrl-c breaks."
-    ${CAT_BIN} > "${DEFINITIONS_DIR}/${_devname}${DEFAULT_DEF_EXT}" 2>/dev/null
-    unset _devname _defname_no_ext _defname_input
+    note "Paste your definition below. Hit $(distinct n "[Enter]"), $(distinct n "Ctrl-D") to update definitions file: $(distinct n "${DEFINITIONS_DIR}${_devname}${DEFAULT_DEF_EXT}")"
+    ${CAT_BIN} > "${DEFINITIONS_DIR}${_devname}${DEFAULT_DEF_EXT}" 2>/dev/null
+    unset _defname_input  _devname _defname_no_ext
 }
 
 

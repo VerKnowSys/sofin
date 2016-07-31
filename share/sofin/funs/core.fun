@@ -208,7 +208,7 @@ retry () {
     unset _git_path
     touch_logsdir_and_logfile
     # check for commands that puts something important/intersting on stdout
-    ${PRINTF_BIN} '%s\n' "${_targets}" 2>dev/null | eval "${MATCH_PRINT_STDOUT_GUARD}" && _rtry_blue=YES
+    ${PRINTF_BIN} '%s\n' "${_targets}" 2>/dev/null | eval "${MATCH_PRINT_STDOUT_GUARD}" && _rtry_blue=YES
     if [ -n "${GIT_ROOT_DIR}" ]; then
         _git_path=":${GIT_ROOT_DIR}/bin:${GIT_ROOT_DIR}/libexec/git-core"
     fi

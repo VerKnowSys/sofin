@@ -72,7 +72,6 @@ deploy_binbuild () {
     done
     push_binbuilds ${_dbbundles}
     note "Deployed successfully: $(distinct n "${_dbbundles}")"
-    note "$(fill)"
     unset _dbbundles _dbbundle
 }
 
@@ -288,7 +287,7 @@ build () {
                         debug "Right before process call: ${_bund_lcase}"
                         process "${_bund_lcase}"
                         mark_installed "${DEF_NAME}${DEF_POSTFIX}" "${DEF_VERSION}"
-                        note "${SUCCESS_CHAR} ${_bund_lcase} [$(distinct n "${DEF_VERSION}")]\n"
+                        note "${SUCCESS_CHAR} ${_bund_lcase} [$(distinct n "${DEF_VERSION}")]"
                     fi
                 fi
 
