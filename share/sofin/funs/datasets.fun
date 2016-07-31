@@ -104,7 +104,7 @@ build_service_dataset () {
                 debug "Service origin unavailable! Creating new one."
                 debug "Grepping for dataset: $(distinct d "${_full_dataset_name}")"
                 ${ZFS_BIN} list -H 2>/dev/null | eval "${FIRST_ARG_GUARD}" | ${EGREP_BIN} "${_full_dataset_name}" >/dev/null 2>&1
-                if [ "$?" = "0" ]; then
+                if [ "${?}" = "0" ]; then
                     note "Preparing to send service dataset: $(distinct n "${_full_dataset_name}"), for bundle: $(distinct n "${_ps_elem}")"
                     try "${ZFS_BIN} umount -f ${_full_dataset_name}"
                     run "${ZFS_BIN} send ${_full_dataset_name} | ${XZ_BIN} ${DEFAULT_XZ_OPTS} > ${FILE_CACHE_DIR}${_ps_snap_file}"
@@ -158,7 +158,7 @@ fetch_dset_zfs_stream () {
         _commons_path="${MAIN_COMMON_REPOSITORY}/${_fdz_out_file}"
         debug "Fetch service stream-dataset: $(distinct d "${FILE_CACHE_DIR}${_fdz_out_file}")"
         retry "${FETCH_BIN} -o ${FILE_CACHE_DIR}${_fdz_out_file} ${FETCH_OPTS} '${_commons_path}'"
-        if [ "$?" = "0" ]; then
+        if [ "${?}" = "0" ]; then
             _dataset_name="${DEFAULT_ZPOOL}${SERVICES_DIR}${USER}/${_fdz_bund_name}"
             debug "Creating service dataset: $(distinct d "${_dataset_name}"), from file stream: $(distinct d "${_fdz_out_file}")."
             retry "${XZCAT_BIN} ${FILE_CACHE_DIR}${_fdz_out_file} | ${ZFS_BIN} receive -F -v ${_dataset_name} && ${ZFS_BIN} rename \"${_dataset_name}@${DEFAULT_GIT_SNAPSHOT_HEAD}\" ${ORIGIN_ZFS_SNAP_NAME}" && \
@@ -377,7 +377,7 @@ install_software_from_binbuild () {
         # On systems with ZFS capability, we use zfs receive instead of tarballing:
         _isfb_dataset="${DEFAULT_ZPOOL}${SOFTWARE_DIR}${USER}/${_isfb_fullname}"
         ${ZFS_BIN} list -H 2>/dev/null | eval "${FIRST_ARG_GUARD}" | ${EGREP_BIN} "${_isfb_dataset}" >/dev/null 2>&1
-        if [ "$?" != "0" ]; then
+        if [ "${?}" != "0" ]; then
             debug "Installing ZFS based binary build to dataset: $(distinct d "${_isfb_dataset}")"
             run "${XZCAT_BIN} ${FILE_CACHE_DIR}${_isfb_archive} | ${ZFS_BIN} receive -F -v ${_isfb_dataset} &&
                 ${ZFS_BIN} rename ${_isfb_dataset}@${DEFAULT_GIT_SNAPSHOT_HEAD} ${ORIGIN_ZFS_SNAP_NAME}" && \
@@ -389,7 +389,7 @@ install_software_from_binbuild () {
         fi
     else
         try "${TAR_BIN} -xJf ${FILE_CACHE_DIR}${_isfb_archive} --directory ${SOFTWARE_DIR}"
-        if [ "$?" = "0" ]; then
+        if [ "${?}" = "0" ]; then
             note "Installed bin-build: $(distinct n "${_isfb_fullname}")"
             DONT_BUILD_BUT_DO_EXPORTS=YES
         else
@@ -424,7 +424,7 @@ push_software_archive () {
     fi
     debug "BundleName: $(distinct d "${_bpbundle_file}"), bundle_file: $(distinct d "${_bpbundle_file}"), repository address: $(distinct d "${_bpaddress}")"
     retry "${SCP_BIN} ${DEFAULT_SSH_OPTS} ${DEFAULT_SCP_OPTS} -P ${MAIN_PORT} ${_bpfn_file} ${_bpfn_file_dest}${DEFAULT_PARTIAL_FILE_EXT}"
-    if [ "$?" = "0" ]; then
+    if [ "${?}" = "0" ]; then
         retry "${SCP_BIN} ${DEFAULT_SSH_OPTS} ${DEFAULT_SCP_OPTS} -P ${MAIN_PORT} ${_bpfn_chksum_file} ${_bpfn_chksum_file_dest}" || \
             def_error "${_bpbundle_file}" "Error sending checksum file: $(distinct e "${_bpfn_chksum_file}") to: $(distinct e "${_bpfn_chksum_file_dest}")"
         retry "${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} ${MAIN_USER}@${_bpamirror} \"${MV_BIN} -v ${_bp_remotfs_file}${DEFAULT_PARTIAL_FILE_EXT} ${_bp_remotfs_file}\"" && \

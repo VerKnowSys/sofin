@@ -142,21 +142,21 @@ run () {
         if [ -z "${DEF_NAME}${DEF_POSTFIX}" ]; then
             if [ -z "${_run_shw_prgr}" ]; then
                 eval "PATH=${PATH}${_git_path} ${_run_params}" >> "${LOG}" 2>> "${LOG}"
-                check_result $? "${_run_params}"
+                check_result ${?} "${_run_params}"
             else
                 ${PRINTF_BIN} "${ColorBlue}"
                 eval "PATH=${PATH}${_git_path} ${_run_params}" >> "${LOG}"
-                check_result $? "${_run_params}"
+                check_result ${?} "${_run_params}"
             fi
         else
             _rnm="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
             if [ -z "${_run_shw_prgr}" ]; then
                 eval "PATH=${PATH}${_git_path} ${_run_params}" >> "${LOG}-${_rnm}" 2>> "${LOG}-${_rnm}"
-                check_result $? "${_run_params}"
+                check_result ${?} "${_run_params}"
             else
                 ${PRINTF_BIN} "${ColorBlue}"
                 eval "PATH=${PATH}${_git_path} ${_run_params}" >> "${LOG}-${_rnm}"
-                check_result $? "${_run_params}"
+                check_result ${?} "${_run_params}"
             fi
         fi
     else

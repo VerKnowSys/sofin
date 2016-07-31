@@ -31,13 +31,13 @@ fi
 # determine TERM capabilities:
 determine_term_capabilites () {
     setopt >/dev/null 2>/dev/null # zsh only command
-    if [ "$?" = "0" ]; then
+    if [ "${?}" = "0" ]; then
         CAP_TERM_ZSH=YES
         unset CAP_TERM_BASH
     else
         # Check bash specific command (but also available in zsh):
         declare -f >/dev/null 2>/dev/null
-        if [ "$?" = "0" ]; then
+        if [ "${?}" = "0" ]; then
             # let's assume that if shell has support for "declare -f"
             # then it also supports bashismed "arrays[*]":
             CAP_TERM_BASH=YES
@@ -49,7 +49,7 @@ determine_term_capabilites () {
     fi
 
     ${TPUT_BIN} setaf 0 >/dev/null 2>/dev/null
-    if [ "$?" != "0" ]; then # broken with tput under FreeBSD, related bug: https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=210858
+    if [ "${?}" != "0" ]; then # broken with tput under FreeBSD, related bug: https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=210858
         unset CAP_TERM_TPUT
 
         # Use legacy ANSI definitions:

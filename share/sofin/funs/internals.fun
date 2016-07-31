@@ -221,7 +221,7 @@ show_diff () {
     if [ -f "./${_sddefname}" ]; then
         debug "Checking status for untracked files.."
         ${GIT_BIN} status --short "${_sddefname}" 2>/dev/null | ${EGREP_BIN} '\?\?' >/dev/null 2>&1
-        if [ "$?" = "0" ]; then # found "??" which means file is untracked..
+        if [ "${?}" = "0" ]; then # found "??" which means file is untracked..
             note "No diff available for definition: ${_beauty_defn} (currently untracked)"
         else
             note "Showing detailed modifications of defintion: ${_beauty_defn}"

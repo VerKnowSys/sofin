@@ -85,7 +85,7 @@ rebuild_bundle () {
         load_defaults
         . "${_dep}"
         ${PRINTF_BIN} '%s\n' "${DEF_REQUIREMENTS}" 2>/dev/null | ${GREP_BIN} "${_a_dependency}" >/dev/null 2>&1
-        if [ "$?" = "0" ]; then
+        if [ "${?}" = "0" ]; then
             _idep="$(${BASENAME_BIN} "${_dep}" 2>/dev/null)"
             _irawname="$(${PRINTF_BIN} '%s' "${_idep}" | ${SED_BIN} "s/${DEFAULT_DEF_EXT}//g" 2>/dev/null)"
             _an_def_nam="$(capitalize "${_irawname}")"
@@ -130,7 +130,7 @@ fetch_binbuild () {
         if [ ! -e "${FILE_CACHE_DIR}${_bb_archive}${DEFAULT_CHKSUM_EXT}" ]; then
             try "${FETCH_BIN} -o ${FILE_CACHE_DIR}${_bb_archive}${DEFAULT_CHKSUM_EXT} ${FETCH_OPTS} '${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}${DEFAULT_CHKSUM_EXT}'" || \
                 try "${FETCH_BIN} -o ${FILE_CACHE_DIR}${_bb_archive}${DEFAULT_CHKSUM_EXT} ${FETCH_OPTS} '${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}${DEFAULT_CHKSUM_EXT}'"
-            if [ "$?" = "0" ]; then
+            if [ "${?}" = "0" ]; then
                 try "${FETCH_BIN} -o ${FILE_CACHE_DIR}${_bb_archive} ${FETCH_OPTS} '${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}'" || \
                     try "${FETCH_BIN} -o ${FILE_CACHE_DIR}${_bb_archive} ${FETCH_OPTS} '${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}'" || \
                         try "${FETCH_BIN} -o ${FILE_CACHE_DIR}${_bb_archive} ${FETCH_OPTS} '${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}'" || \
@@ -491,7 +491,7 @@ process_flat () {
                         if [ "${SYSTEM_NAME}" = "Linux" ]; then
                             # NOTE: No /Services feature implemented for Linux.
                             ${PRINTF_BIN} '%s\n' "${DEF_CONFIGURE}" | ${GREP_BIN} "configure" >/dev/null 2>&1
-                            if [ "$?" = "0" ]; then
+                            if [ "${?}" = "0" ]; then
                                 try "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} ${_pic_optional}" || \
                                 run "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix}" # fallback
                             else
@@ -502,7 +502,7 @@ process_flat () {
                             # do a simple check for "configure" in DEF_CONFIGURE definition
                             # this way we can tell if we want to put configure options as params
                             ${PRINTF_BIN} '%s\n' "${DEF_CONFIGURE}" | ${GREP_BIN} "configure" >/dev/null 2>&1
-                            if [ "$?" = "0" ]; then
+                            if [ "${?}" = "0" ]; then
                                 # TODO: add --docdir=${_prefix}/docs
                                 # NOTE: By default try to configure software with these options:
                                 #   --sysconfdir=${SERVICE_DIR}/etc

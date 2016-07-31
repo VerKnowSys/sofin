@@ -45,7 +45,7 @@ EOF
 determine_system_capabilites () {
     # TODO: add ability to run on systems without present C_COMPILER_NAME
     ${ZPOOL_BIN} list >/dev/null 2>/dev/null
-    if [ "$?" = "0" ]; then
+    if [ "${?}" = "0" ]; then
         CAP_SYS_ZFS=YES
         if [ "${SYSTEM_NAME}" = "Darwin" ]; then
             # NOTE: Even if ZFS is present on OSX, by now we want it disabled for now..
@@ -68,14 +68,14 @@ determine_system_capabilites () {
     fi
 
     ${SYSCTL_BIN} -a 2>/dev/null | ${GREP_BIN} 'hardening.pax' >/dev/null 2>&1
-    if [ "$?" = "0" ]; then
+    if [ "${?}" = "0" ]; then
         CAP_SYS_HARDENED=YES
     else
         unset CAP_SYS_HARDENED
     fi
 
     ${SYSCTL_BIN} -a 2>/dev/null | ${GREP_BIN} 'kern.dtrace' >/dev/null 2>&1
-    if [ "$?" = "0" ]; then
+    if [ "${?}" = "0" ]; then
         CAP_SYS_DTRACE=YES
         ${KLDLOAD_BIN} dtrace >/dev/null 2>&1 || true
         ${KLDLOAD_BIN} dtraceall >/dev/null 2>&1 || true
@@ -84,7 +84,7 @@ determine_system_capabilites () {
     fi
 
     ${SYSCTL_BIN} -a 2>/dev/null | ${GREP_BIN} 'kern.features.linux64' >/dev/null 2>&1
-    if [ "$?" = "0" ]; then
+    if [ "${?}" = "0" ]; then
         CAP_SYS_LINUX64_ABI=YES
         ${KLDLOAD_BIN} linux64 >/dev/null 2>&1|| true
     else

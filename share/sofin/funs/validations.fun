@@ -39,7 +39,7 @@ fail_any_bg_jobs () {
         _lock_pid="$(${CAT_BIN} "${_a_lock}" 2>/dev/null)"
         if [ -n "${_lock_pid}" ]; then
             try "${KILL_BIN} -0 ${_lock_pid}"
-            if [ "$?" = "0" ]; then
+            if [ "${?}" = "0" ]; then
                 error "Detected running instance of Sofin, locked on bundle: $(distinct e "${_bundle_name}") pid: $(distinct e "${_lock_pid}")"
             fi
         fi

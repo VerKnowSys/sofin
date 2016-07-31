@@ -79,7 +79,7 @@ load_defaults () {
         # check definition/defaults compliance version
         debug "Version compliance test $(distinct d "${DEF_COMPLIANCE}") vs $(distinct d "${SOFIN_VERSION}")"
         ${PRINTF_BIN} "${SOFIN_VERSION}" | eval "${EGREP_BIN} '${DEF_COMPLIANCE}'" >/dev/null 2>&1
-        if [ "$?" = "0" ]; then
+        if [ "${?}" = "0" ]; then
             debug "Compliance check passed."
             COMPLIANCE_CHECK="passed"
         else
@@ -467,7 +467,7 @@ strip_bundle () {
                         else
                             ${STRIP_BIN} ${DEFAULT_STRIP_OPTS} ${_file} > "${LOG}.strip" 2>> "${LOG}"
                         fi
-                        if [ "$?" = "0" ]; then
+                        if [ "${?}" = "0" ]; then
                             _counter="${_counter} + 1"
                         else
                             _counter="${_counter} - 1"
@@ -530,7 +530,7 @@ clean_useless () {
                         _cu_commit_removal=""
                         for is_useful in ${DEF_USEFUL}; do
                             ${PRINTF_BIN} "${_cufile}\n" | ${GREP_BIN} "${is_useful}" >/dev/null 2>&1
-                            if [ "$?" = "0" ]; then
+                            if [ "${?}" = "0" ]; then
                                 _cu_commit_removal="no"
                             fi
                         done
@@ -725,7 +725,7 @@ traverse_patchlevels () {
         for _level in 0 1 2 3 4 5; do # Up to: -p5
             debug "Applying patch: $(distinct d "${_patch}"), level: $(distinct d "${_level}")"
             try "${PATCH_BIN} -p${_level} -N -f -i ${_patch}"
-            if [ "$?" = "0" ]; then # skip applying single patch if it already passed
+            if [ "${?}" = "0" ]; then # skip applying single patch if it already passed
                 debug "Patch: $(distinct d "${_patch}") applied successfully!"
                 break;
             fi
@@ -771,7 +771,7 @@ clone_or_fetch_git_bare_repo () {
     note "   ${NOTE_CHAR} Fetching git repository: $(distinct n "${_source_path}")"
     try "${GIT_BIN} clone ${DEFAULT_GIT_OPTS} --depth 1 --bare ${_source_path} ${_git_cached}" || \
         try "${GIT_BIN} clone ${DEFAULT_GIT_OPTS} --depth 1 --bare ${_source_path} ${_git_cached}"
-    if [ "$?" = "0" ]; then
+    if [ "${?}" = "0" ]; then
         debug "Fetched bare repository: $(distinct d "${_bare_name}")"
     else
         if [ ! -d "${_git_cached}/branches" -a ! -f "${_git_cached}/config" ]; then

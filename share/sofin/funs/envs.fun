@@ -165,7 +165,7 @@ compiler_setup () {
                 # Golden linker support without LLVM plugin:
                 if [ -x "${GOLD_BIN}" ]; then
                     ${GREP_BIN} '7\.' /etc/debian_version >/dev/null 2>&1
-                    if [ "$?" != "0" ]; then
+                    if [ "${?}" != "0" ]; then
                         DEFAULT_COMPILER_FLAGS="${DEFAULT_COMPILER_FLAGS} -Wl,-fuse-ld=gold"
                         DEFAULT_LDFLAGS="${DEFAULT_LDFLAGS} -fuse-ld=gold"
                     else
@@ -234,7 +234,7 @@ acquire_lock_for () {
             _lock_ppid="$(${PGREP_BIN} -P${_lock_pid} 2>/dev/null)"
             debug "Lock pid: $(distinct d "${_lock_pid}"), Sofin pid: $(distinct d "${SOFIN_PID}"), _lock_ppid: $(distinct d "${_lock_ppid}")"
             try "${KILL_BIN} -0 ${_lock_pid}"
-            if [ "$?" = "0" ]; then # NOTE: process is alive
+            if [ "${?}" = "0" ]; then # NOTE: process is alive
                 if [ "${_lock_pid}" = "${SOFIN_PID}" -o \
                      "${_lock_ppid}" = "${SOFIN_PID}" ]; then
                     debug "Dealing with own process or it's fork, process may continue.."
@@ -294,7 +294,7 @@ reload_zsh_shells () {
             _wishlist="${_pid}"
         else
             try "${KILL_BIN} -0 ${_pid}"
-            if [ "$?" = "0" ]; then
+            if [ "${?}" = "0" ]; then
                 debug "Found alive pid: $(distinct d "${_pid}") in background."
                 _wishlist="${_wishlist} ${_pid}"
             fi
@@ -314,7 +314,7 @@ update_env_files () {
         if [ -f "${_env_file}" ]; then
             debug "Processing existing env file: $(distinct d "${_env_file}")"
             ${EGREP_BIN} "SHELL_PID=" "${_env_file}" >/dev/null 2>&1
-            if [ "$?" = "0" ]; then
+            if [ "${?}" = "0" ]; then
                 continue
             else
                 ${PRINTF_BIN} '%s\n' "${SOFIN_SHELL_BLOCK}" >> "${_env_file}" && \
