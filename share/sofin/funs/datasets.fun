@@ -145,10 +145,11 @@ fetch_dset_zfs_stream () {
     _fdz_out_file="${2}"
     if [ -z "${_fdz_bund_name}" -o \
          -z "${_fdz_out_file}" ]; then
-        error "Expected two arguments: $(distinct e "bundle-name") and $(distinct e "abs-out-file")."
+        error "Expected two arguments: $(distinct e "bundle-name") and $(distinct e "name-out-file")."
     fi
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
         _commons_path="${MAIN_COMMON_REPOSITORY}/${_fdz_out_file}"
+        debug "Fetch service stream-dataset: $(distinct d "${FILE_CACHE_DIR}${_fdz_out_file}")"
         retry "${FETCH_BIN} -o ${FILE_CACHE_DIR}${_fdz_out_file} ${FETCH_OPTS} '${_commons_path}'"
         if [ "$?" = "0" ]; then
             _dataset_name="${DEFAULT_ZPOOL}${SERVICES_DIR}${USER}/${_fdz_bund_name}"
@@ -157,7 +158,8 @@ fetch_dset_zfs_stream () {
                     note "Received service dataset: $(distinct n "${_dataset_name}")"
             unset _dataset_name
         else
-            debug "Initial service dataset unavailable for: $(distinct d "${_fdz_bund_name}"). Assuming it's not necessary.."
+            debug "Origin service dataset unavailable for: $(distinct d "${_fdz_bund_name}")."
+            return 1
         fi
     else
         debug "ZFS feature disabled"
