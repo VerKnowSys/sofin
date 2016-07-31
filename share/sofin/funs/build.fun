@@ -129,29 +129,24 @@ fetch_binbuild () {
             error "Cannot fetch binbuild! An empty archive name given!"
         fi
         _bbfull_name="$(capitalize "${_bbfull_name}")"
-        if [ ! -e "${FILE_CACHE_DIR}${_bb_archive}" ]; then
-            try "${MKDIR_BIN} -p ${FILE_CACHE_DIR}"
-            try "${FETCH_BIN} -o ${FILE_CACHE_DIR}${_bb_archive} ${FETCH_OPTS} '${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}${DEFAULT_CHKSUM_EXT}'" || \
-                try "${FETCH_BIN} -o ${FILE_CACHE_DIR}${_bb_archive} ${FETCH_OPTS} '${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}${DEFAULT_CHKSUM_EXT}'"
+        try "${MKDIR_BIN} -p ${FILE_CACHE_DIR}"
+        # If sha1 of bundle file exists locally..
+        if [ ! -e "${FILE_CACHE_DIR}${_bb_archive}${DEFAULT_CHKSUM_EXT}" ]; then
+            try "${FETCH_BIN} -o ${FILE_CACHE_DIR}${_bb_archive}${DEFAULT_CHKSUM_EXT} ${FETCH_OPTS} '${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}${DEFAULT_CHKSUM_EXT}'" || \
+                try "${FETCH_BIN} -o ${FILE_CACHE_DIR}${_bb_archive}${DEFAULT_CHKSUM_EXT} ${FETCH_OPTS} '${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}${DEFAULT_CHKSUM_EXT}'"
             if [ "$?" = "0" ]; then
                 try "${FETCH_BIN} -o ${FILE_CACHE_DIR}${_bb_archive} ${FETCH_OPTS} '${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}'" || \
                     try "${FETCH_BIN} -o ${FILE_CACHE_DIR}${_bb_archive} ${FETCH_OPTS} '${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}'" || \
-                    try "${FETCH_BIN} -o ${FILE_CACHE_DIR}${_bb_archive} ${FETCH_OPTS} '${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}'" || \
-                    error "Failure fetching available binary build for: $(distinct e "${_bb_archive}"). Please check your DNS / Network setup!"
+                        try "${FETCH_BIN} -o ${FILE_CACHE_DIR}${_bb_archive} ${FETCH_OPTS} '${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}'" || \
+                            error "Failure fetching available binary build for: $(distinct e "${_bb_archive}"). Please check your network setup!"
             else
-                note "No binary build file: $(distinct n "${_bb_archive}")"
+                note "No binary build file available: $(distinct n "${_bb_archive}")"
             fi
         fi
 
-        debug "_bb_archive: $(distinct d "${_bb_archive}"). Expecting binbuild to be available in: $(distinct d "${FILE_CACHE_DIR}${_bb_archive}")"
-
-        # validate binary build:
+        debug "BB-archive: $(distinct d "${_bb_archive}"). Expecting binbuild to be available in: $(distinct d "${FILE_CACHE_DIR}${_bb_archive}")"
         if [ -e "${FILE_CACHE_DIR}${_bb_archive}" ]; then
             validate_archive_sha1 "${FILE_CACHE_DIR}${_bb_archive}"
-        fi
-
-        # after sha1 validation we may continue with binary build if file still exists
-        if [ -e "${FILE_CACHE_DIR}${_bb_archive}" ]; then
             install_software_from_binbuild "${_bb_archive}" "${_bbfull_name}" "${_bb_ver}"
         else
             debug "Binary build unavailable for bundle: $(distinct d "${_bbfull_name}")"
