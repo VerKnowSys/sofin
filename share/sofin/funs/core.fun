@@ -76,22 +76,17 @@ note () {
 
 
 error () {
-    ${PRINTF_BIN} "\n${ColorRed}%s\n\n  ${FAIL_CHAR} Error:\n          %s\n\n%s${ColorReset}\n\n" \
-        "$(fill)" "${@}" "$(fill)$(fill)"
-    warn "${NOTE_CHAR2} If you think this error is a bug in definition,"
-    warn "  please report an info about encountered problem. Core scenarios:"
-    warn "\t$(distinct w "*encountered-design-problem*"),"
-    warn "\t$(distinct w "*found-feature-bug*"),"
-    warn "\t$(distinct w "*stucked-in-some-undefined-behaviour*"),"
-    warn "\t$(distinct w "*caused-data-loss*"),"
-    warn "${NOTE_CHAR2} Sofin resources:"
-    warn "\t$(distinct w "https://github.com/VerKnowSys/sofin"),"
-    warn "\t$(distinct w "https://github.com/VerKnowSys/sofin/wiki/Sofin,-the-software-installer")"
-    warn "${NOTE_CHAR2} Sofin issue trackers:"
-    warn "\tBitbucket: $(distinct w "${DEFAULT_ISSUE_REPORT_SITE}")"
-    warn "\tGithub: $(distinct w "${DEFAULT_ISSUE_REPORT_SITE_ALT}")"
-    warn "\n$(fill "${SEPARATOR_CHAR}" 46)$(distinct w "  Daniel (dmilith) Dettlaff  ")$(fill "${SEPARATOR_CHAR}" 5)\n"
+    ${PRINTF_BIN} "\n\n${ColorRed}%s\n\n  ${FAIL_CHAR} Error!\n\n    %s\n\n%s\n\n\n" \
+        "$(fill "${SEPARATOR_CHAR2}")" "${@}" "$(fill "${SEPARATOR_CHAR2}")"
+    warn "  ${NOTE_CHAR2} If you think this error is a bug in definition, please report an info about"
+    warn "    encountered problem on one of issue trackers:"
+    ${PRINTF_BIN} "\n"
+    warn "  ${NOTE_CHAR}  Bitbucket: $(distinct w "${DEFAULT_ISSUE_REPORT_SITE}")"
+    warn "  ${NOTE_CHAR}  Github: $(distinct w "${DEFAULT_ISSUE_REPORT_SITE_ALT}")"
+    ${PRINTF_BIN} "\n"
+    warn "$(fill "${SEPARATOR_CHAR}" 46)$(distinct w "  Daniel (dmilith) Dettlaff  ")$(fill "${SEPARATOR_CHAR}" 5)"
     restore_security_state
+    ${PRINTF_BIN} "\n"
     exit ${ERRORCODE_TASK_FAILURE}
 }
 
