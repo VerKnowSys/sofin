@@ -59,16 +59,24 @@ push_dset_zfs_stream () {
         fi
         debug "push_dset_zfs_stream file: $(distinct d "${_psfin_snapfile}")"
         if [ -f "${FILE_CACHE_DIR}${_psfin_snapfile}" ]; then
+            # create required dirs and stuff:
             try "${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} ${MAIN_USER}@${_psmirror} \"${MKDIR_BIN} -vp '${COMMON_BINARY_REMOTE}'; ${CHMOD_BIN} -v 0755 '${COMMON_BINARY_REMOTE}'\""
-            try "${CHMOD_BIN} -v a+r ${FILE_CACHE_DIR}${_psfin_snapfile}" && \
-                debug "Archive access a+r for: $(distinct d "${_psfin_snapfile}")"
-            retry "${SCP_BIN} ${DEFAULT_SSH_OPTS} ${DEFAULT_SCP_OPTS} -P ${MAIN_PORT} ${FILE_CACHE_DIR}${_psfin_snapfile} ${MAIN_USER}@${_psmirror}:${COMMON_BINARY_REMOTE}/${_psfin_snapfile}${DEFAULT_PARTIAL_FILE_EXT}"
-            if [ "$?" = "0" ]; then
-                debug "Service origin stream was sent to: $(distinct d "${MAIN_COMMON_NAME}") repository: $(distinct d "${MAIN_COMMON_REPOSITORY}/${_psfin_snapfile}")"
-                retry "${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} ${MAIN_USER}@${_psmirror} \"cd ${COMMON_BINARY_REMOTE} && ${MV_BIN} -v ${_psfin_snapfile}${DEFAULT_PARTIAL_FILE_EXT} ${_psfin_snapfile}\"" && \
-                    debug "Partial file renamed successfully"
+
+            # NOTE: check if service dataset bundle isn't already pushed. ZFS streams cannot be overwritten!
+            try "${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} ${MAIN_USER}@${_psmirror} \"${FILE_BIN} ${COMMON_BINARY_REMOTE}/${_psfin_snapfile}\""
+            if [ "${?}" = "0" ]; then
+                debug "Service dataset file found existing on remote mirror: $(distinct d "${_psmirror}"). Service dataset origins can be stored only once (future ZFS-related features will rely on this!)"
             else
-                error "Failed to send service stream of bundle: $(distinct e "${_pselement}") file: $(distinct e "${_psfin_snapfile}") to remote host: $(distinct e "${MAIN_USER}@${_psmirror}")!"
+                try "${CHMOD_BIN} -v a+r ${FILE_CACHE_DIR}${_psfin_snapfile}" && \
+                    debug "Archive access a+r for: $(distinct d "${_psfin_snapfile}")"
+                retry "${SCP_BIN} ${DEFAULT_SSH_OPTS} ${DEFAULT_SCP_OPTS} -P ${MAIN_PORT} ${FILE_CACHE_DIR}${_psfin_snapfile} ${MAIN_USER}@${_psmirror}:${COMMON_BINARY_REMOTE}/${_psfin_snapfile}${DEFAULT_PARTIAL_FILE_EXT}"
+                if [ "${?}" = "0" ]; then
+                    debug "Service origin stream was sent to: $(distinct d "${MAIN_COMMON_NAME}") repository: $(distinct d "${MAIN_COMMON_REPOSITORY}/${_psfin_snapfile}")"
+                    retry "${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} ${MAIN_USER}@${_psmirror} \"cd ${COMMON_BINARY_REMOTE} && ${MV_BIN} -v ${_psfin_snapfile}${DEFAULT_PARTIAL_FILE_EXT} ${_psfin_snapfile}\"" && \
+                        debug "Partial file renamed successfully"
+                else
+                    error "Failed to send service stream of bundle: $(distinct e "${_pselement}") file: $(distinct e "${_psfin_snapfile}") to remote host: $(distinct e "${MAIN_USER}@${_psmirror}")!"
+                fi
             fi
         else
             warn "No service stream available for bundle: $(distinct w "${_pselement}")"
