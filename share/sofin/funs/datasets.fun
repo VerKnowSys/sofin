@@ -443,7 +443,7 @@ try_destroy_binbuild () {
             destroy_builddir "$(${BASENAME_BIN} "${PREFIX}" 2>/dev/null)" "${BUILD_NAMESUM}"
         else
             # shouldn't happen..
-            warn "No BUILD_NAMESUM set! Can't identift build-dir!"
+            debug "No BUILD_NAMESUM set! Can't identify build-dir!"
         fi
     else
         debug "Empty prefix. No build-dir to destroy"
