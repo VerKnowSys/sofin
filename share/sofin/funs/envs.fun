@@ -275,7 +275,7 @@ update_shell_vars () {
         debug "Generating shell environment and writing to: $(distinct d "${SOFIN_PROFILE}")"
         get_shell_vars > "${SOFIN_PROFILE}"
     else
-        warn "Empty SOFIN_PROFILE! update_shell_vars() is No-Op!"
+        debug "Empty profile file: $(distinct d "${SOFIN_PROFILE}")! No-Op!"
     fi
 }
 
@@ -302,7 +302,7 @@ reload_zsh_shells () {
     done
     if [ -n "${_wishlist}" ]; then
         try "${KILL_BIN} -SIGUSR2 ${_wishlist}" && \
-            note "Reload signal sent to $(distinct n "${_shellshort}") pids: $(distinct n "${_wishlist}")"
+            debug "Reload signal sent to $(distinct d "${_shellshort}") pids: $(distinct d "${_wishlist}")"
     fi
     unset _wishlist _pid _pids _shell_pattern _shellshort
 }
