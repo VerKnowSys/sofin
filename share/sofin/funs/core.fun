@@ -54,52 +54,48 @@ debug () {
         _dbfnin="(): "
     fi
 
-    _dbfn="# ${ColorFunction}${_dbfnin}${ColorViolet}" # NOTE: "#" is required for debug mode to work properly
+    # NOTE: "#" is required for debug mode to work properly
+    _dbfn="# ${ColorFunction}${_dbfnin}${ColorViolet}"
     if [ -z "${DEBUG}" ]; then
         _dbgnme="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
         if [ -n "${_dbgnme}" -a \
              -d "${LOGS_DIR}" ]; then
             # Definition log
-            cecho "${_dbfn}${_in}" "${ColorViolet}" >> "${LOG}-${_dbgnme}" 2>> "${LOG}-${_dbgnme}"
+            ${PRINTF_BIN} "${_dbfn}%s${ColorReset}\n" "${_in}" 2>> "${LOG}-${_dbgnme}" >> "${LOG}-${_dbgnme}"
         elif [ -z "${_dbgnme}" -a \
                -d "${LOGS_DIR}" ]; then
             # Main log
-            cecho "${_dbfn}${_in}" "${ColorViolet}" >> "${LOG}" 2>> "${LOG}"
+            ${PRINTF_BIN} "${_dbfn}%s${ColorReset}\n" "${_in}" 2>> "${LOG}" >> "${LOG}"
         elif [ ! -d "${LOGS_DIR}" ]; then
             # System logger fallback
-            ${LOGGER_BIN} "${ColorReset}${DEFAULT_NAME}: ${ColorViolet}${_dbfn}${_in}${ColorReset}"
+            ${LOGGER_BIN} "${DEFAULT_NAME}: ${_dbfn}${_in}${ColorReset}" 2>> "${LOG}"
         fi
-    else # DEBUG is set.
-        cecho "${_dbfn}${_in}" ${ColorViolet}
+    else # DEBUG is set. Print to stdout
+        ${PRINTF_BIN} "${_dbfn}%s${ColorReset}\n" "${_in}"
     fi
-    unset _dbgnme _in _dbfn _cee _dbfnin _elmz
+    unset _dbgnme _in _dbfn _dbfnin _elmz _cee
 }
 
 
 warn () {
-    cecho "${@}" ${ColorYellow}
+    ${PRINTF_BIN} "${ColorYellow}%s${ColorReset}\n" "${@}"
 }
 
 
 note () {
-    cecho "${@}" ${ColorGreen}
+    ${PRINTF_BIN} "${ColorGreen}%s${ColorReset}\n" "${@}"
 }
 
 
 error () {
-    cecho
-    cecho "$(fill)" ${ColorRed}
-    cecho "${FAIL_CHAR} Error: ${@}" ${ColorRed}
-    cecho "$(fill)" ${ColorRed}
-    warn "\n$(fill)"
-    warn "${NOTE_CHAR2} Since I'm very serious about software code quality overall,"
-    warn "  please don't hesitate to report an issue(s) if you encounter a problem,"
-    warn "  or for instance experience one of scenarios:"
-    warn "\t$(distinct w "*found-design-problem*"),"
-    warn "\t$(distinct w "*feature-bug*"),"
+    ${PRINTF_BIN} "\n${ColorRed}%s\n\n  ${FAIL_CHAR} Error:\n          %s\n\n%s${ColorReset}\n\n" \
+        "$(fill)" "${@}" "$(fill)$(fill)"
+    warn "${NOTE_CHAR2} If you think this error is a bug in definition,"
+    warn "  please report an info about encountered problem. Core scenarios:"
+    warn "\t$(distinct w "*encountered-design-problem*"),"
+    warn "\t$(distinct w "*found-feature-bug*"),"
     warn "\t$(distinct w "*stucked-in-some-undefined-behaviour*"),"
     warn "\t$(distinct w "*caused-data-loss*"),"
-    warn "\t$(distinct w "*found-regressions*"),"
     warn "${NOTE_CHAR2} Sofin resources:"
     warn "\t$(distinct w "https://github.com/VerKnowSys/sofin"),"
     warn "\t$(distinct w "https://github.com/VerKnowSys/sofin/wiki/Sofin,-the-software-installer")"
@@ -121,23 +117,23 @@ distinct () {
     fi
     case "${_msg_type}" in
         n|note)
-            ${PRINTF_BIN} "${DISTINCT_COLOUR}${_contents}${ColorGreen}" 2>/dev/null
+            ${PRINTF_BIN} "${DISTINCT_COLOUR}%s${ColorGreen}" "${_contents}" 2>/dev/null
             ;;
 
         d|debug)
-            ${PRINTF_BIN} "${DISTINCT_COLOUR}${_contents}${ColorViolet}" 2>/dev/null
+            ${PRINTF_BIN} "${DISTINCT_COLOUR}%s${ColorViolet}" "${_contents}" 2>/dev/null
             ;;
 
         w|warn)
-            ${PRINTF_BIN} "${DISTINCT_COLOUR}${_contents}${ColorYellow}" 2>/dev/null
+            ${PRINTF_BIN} "${DISTINCT_COLOUR}%s${ColorYellow}" "${_contents}" 2>/dev/null
             ;;
 
         e|error)
-            ${PRINTF_BIN} "${DISTINCT_COLOUR}${_contents}${ColorRed}" 2>/dev/null
+            ${PRINTF_BIN} "${DISTINCT_COLOUR}%s${ColorRed}" "${_contents}" 2>/dev/null
             ;;
 
         *)
-            ${PRINTF_BIN} "${_msg_type}${_contents}${ColorReset}" 2>/dev/null
+            ${PRINTF_BIN} "${_msg_type}%s${ColorReset}" "${_contents}" 2>/dev/null
             ;;
     esac
     unset _msg_type _contents
@@ -148,11 +144,13 @@ run () {
     _run_params="${@}"
     if [ -n "${_run_params}" ]; then
         touch_logsdir_and_logfile
-        echo "${_run_params}" | eval "${MATCH_PRINT_STDOUT_GUARD}" && _run_shw_prgr=YES
+        ${PRINTF_BIN} '%s\n' "${_run_params}" | eval "${MATCH_PRINT_STDOUT_GUARD}" && _run_shw_prgr=YES
         if [ -n "${GIT_ROOT_DIR}" ]; then
             _git_path=":${GIT_ROOT_DIR}/bin:${GIT_ROOT_DIR}/libexec/git-core"
+        else
+            unset _git_path
         fi
-        debug "${ColorDarkgray}$(${DATE_BIN} ${DEFAULT_DATE_TRYRUN_OPTS} 2>/dev/null)${ColorReset}: ${ColorWhite}${RUN_CHAR}: $(distinct d "${ColorParams}${_run_params}") [show-blueout:$(distinct d "${_run_shw_prgr:-NO}")]"
+        debug "$(distinct ${ColorDarkgray} "$(${DATE_BIN} ${DEFAULT_DATE_TRYRUN_OPTS} 2>/dev/null)"): $(distinct ${ColorWhite} ${RUN_CHAR}): $(distinct ${ColorParams} "${_run_params}") $(distinct ${ColorBlue} "[show-blueout:${_run_shw_prgr:-NO}]")"
         if [ -z "${DEF_NAME}${DEF_POSTFIX}" ]; then
             if [ -z "${_run_shw_prgr}" ]; then
                 eval "PATH=${PATH}${_git_path} ${_run_params}" >> "${LOG}" 2>> "${LOG}"
@@ -184,9 +182,9 @@ try () {
     _try_params="${@}"
     if [ -n "${_try_params}" ]; then
         touch_logsdir_and_logfile
-        echo "${_try_params}" | eval "${MATCH_PRINT_STDOUT_GUARD}" && _show_prgrss=YES
-        _dt="${ColorDarkgray}$(${DATE_BIN} ${DEFAULT_DATE_TRYRUN_OPTS} 2>/dev/null)${ColorReset}"
-        debug "${_dt}: ${ColorWhite}${TRY_CHAR}: $(distinct d "${ColorParams}${_try_params}") [${_show_prgrss:-NO}]"
+        ${PRINTF_BIN} "${_try_params}\n" | eval "${MATCH_PRINT_STDOUT_GUARD}" && _show_prgrss=YES
+        _dt="$(distinct ${ColorDarkgray} "$(${DATE_BIN} ${DEFAULT_DATE_TRYRUN_OPTS} 2>/dev/null)")"
+        debug "${_dt}: $(distinct ${ColorWhite} "${TRY_CHAR}") $(distinct ${ColorParams} "${_try_params}") $(distinct ${ColorBlue} "[${_show_prgrss:-NO}]")"
         _try_aname="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
         if [ -z "${_try_aname}" ]; then
             if [ -z "${_show_prgrss}" ]; then
@@ -222,13 +220,14 @@ retry () {
     unset _git_path
     touch_logsdir_and_logfile
     # check for commands that puts something important/intersting on stdout
-    echo "${_targets}" | eval "${MATCH_PRINT_STDOUT_GUARD}" && _rtry_blue=YES
+    ${PRINTF_BIN} '%s\n' "${_targets}" 2>dev/null | eval "${MATCH_PRINT_STDOUT_GUARD}" && _rtry_blue=YES
     if [ -n "${GIT_ROOT_DIR}" ]; then
         _git_path=":${GIT_ROOT_DIR}/bin:${GIT_ROOT_DIR}/libexec/git-core"
     fi
     while [ -n "${_ammo}" ]; do
         if [ -n "${_targets}" ]; then
-            debug "retry($(distinct ${ColorParams} "${_targets}")) [$(distinct d "${_ammo}")]"
+            _dt="$(distinct ${ColorDarkgray} "$(${DATE_BIN} ${DEFAULT_DATE_TRYRUN_OPTS} 2>/dev/null)")"
+            debug "${_dt}: $(distinct ${ColorWhite} "${TRY_CHAR}${NOTE_CHAR}${RUN_CHAR}") $(distinct ${ColorParams} "${_targets}") $(distinct ${ColorBlue} "[${_show_prgrss:-NO}]")"
             if [ -z "${_rtry_blue}" ]; then
                 eval "PATH=${DEFAULT_PATH}${_git_path} ${_targets}" >> "${LOG}" 2>> "${LOG}" && \
                     unset _ammo _targets && \
@@ -242,7 +241,7 @@ retry () {
         else
             error "Given an empty command to evaluate!"
         fi
-        _ammo="$(${PRINTF_BIN} '%s\n' "${_ammo}" | ${SED_BIN} 's/O//' 2>/dev/null)"
+        _ammo="$(${PRINTF_BIN} '%s\n' "${_ammo}" 2>/dev/null | ${SED_BIN} 's/O//' 2>/dev/null)"
         debug "Remaining attempts: $(distinct d "${_ammo}")"
     done
     debug "All available ammo exhausted to invoke a command: $(distinct d "${_targets}")"
