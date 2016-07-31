@@ -294,17 +294,10 @@ build () {
             clean_useless
             create_apple_bundle_if_necessary
         fi
+
+        finalize_afterbuild "${_bund_name}"
     done
 
-    # Cleanup build dirs..
-    if [ -z "${DEVEL}" ]; then
-        try_destroy_binbuild
-    else
-        # TODO: dump srcdir? here?
-        debug "No-Op - not yet implemented"
-    fi
-    finalize_afterbuild && \
-        debug "Build successfull: $(distinct d "${_build_list}")"
     unset _build_list _bund_lcase _req_all _req
 }
 

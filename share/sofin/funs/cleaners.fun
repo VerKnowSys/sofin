@@ -72,13 +72,25 @@ finalize () {
         try_destroy_binbuild
     fi
     untrap_signals
-    destroy_locks
     restore_security_state
     finalize_afterbuild
+    destroy_locks
+    update_shell_vars
+    reload_zsh_shells
 }
 
 
 finalize_afterbuild () {
-    update_shell_vars
-    reload_zsh_shells
+    _bund_name="${1}"
+    # Cleanup build dir if DEVEL unset:
+    if [ -z "${DEVEL}" ]; then
+        try_destroy_binbuild
+    else
+        # TODO: dump srcdir? here?
+        debug "No-Op - not yet implemented"
+    fi
+    # Destroy lock of just built bundle:
+    if [ -n "${_bund_name}" ]; then
+        destroy_locks "${_bund_name}"
+    fi
 }
