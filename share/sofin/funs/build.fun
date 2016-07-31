@@ -252,7 +252,7 @@ build () {
                             note "  ${_req} ($(distinct n "${_req_amount}") of $(distinct n "${_req_all}") remaining)"
                             if [ ! -f "${PREFIX}/${_req}${DEFAULT_INST_MARK_EXT}" ]; then
                                 CHANGED=YES
-                                process_flat "${_req}" "${PREFIX}"
+                                process_flat "${_req}" "${PREFIX}" "${_bund_name}"
                             fi
                         fi
                         _req_amount="$(${PRINTF_BIN} '%s\n' "${_req_amount} - 1" | ${BC_BIN} 2>/dev/null)"
@@ -264,7 +264,7 @@ build () {
                         if [ "${CHANGED}" = "YES" ]; then
                             note "  ${_bund_lcase} ($(distinct n 1) of $(distinct n "${_req_all}"))"
                             note "   ${NOTE_CHAR} App dependencies changed. Rebuilding: $(distinct n "${_bund_lcase}")"
-                            process_flat "${_bund_lcase}" "${PREFIX}"
+                            process_flat "${_bund_lcase}" "${PREFIX}" "${_bund_name}"
                             unset CHANGED
                             mark_installed "${DEF_NAME}${DEF_POSTFIX}" "${DEF_VERSION}"
                             show_done "${DEF_NAME}${DEF_POSTFIX}"
@@ -276,7 +276,7 @@ build () {
                     else
                         note "  ${_bund_lcase} ($(distinct n 1) of $(distinct n "${_req_all}"))"
                         debug "Right before process call: ${_bund_lcase}"
-                        process_flat "${_bund_lcase}" "${PREFIX}"
+                        process_flat "${_bund_lcase}" "${PREFIX}" "${_bund_name}"
                         mark_installed "${DEF_NAME}${DEF_POSTFIX}" "${DEF_VERSION}"
                         note "$(distinct n "${SUCCESS_CHAR}") ${_bund_lcase} [$(distinct n "${DEF_VERSION}")]"
                     fi
@@ -330,18 +330,22 @@ dump_debug_info () {
 process_flat () {
     _app_param="${1}"
     _prefix="${2}"
+    _bundlnm="${3}"
     if [ -z "${_app_param}" ]; then
-        error "First argument with $(distinct e "BundleName") is required!"
+        error "First argument with $(distinct e "requirement-name") is required!"
     fi
     if [ -z "${_prefix}" ]; then
         error "Second argument with $(distinct e "/Software/PrefixDir") is required!"
     fi
+    if [ -z "${_bundlnm}" ]; then
+        error "Third argument with $(distinct e "BundleName") is required!"
+    fi
     _req_definition="${DEFINITIONS_DIR}$(lowercase "${_app_param}")${DEFAULT_DEF_EXT}"
     if [ ! -e "${_req_definition}" ]; then
-        error "Cannot fetch definition: $(distinct e "${_req_definition}")! Aborting!"
+        error "Cannot read definition file: $(distinct e "${_req_definition}")!"
     fi
     _req_defname="$(${PRINTF_BIN} '%s\n' "$(${BASENAME_BIN} "${_req_definition}" 2>/dev/null)" | ${SED_BIN} -e 's/\..*$//g' 2>/dev/null)"
-    debug "Requirement: $(distinct d "${_app_param}"), PREFIX: $(distinct d "${_prefix}") file: $(distinct d "${_req_definition}"), req-name: $(distinct d "${_req_defname}")"
+    debug "Bundle: $(distinct d "${_bundlnm}"), requirement: $(distinct d "${_app_param}"), PREFIX: $(distinct d "${_prefix}") file: $(distinct d "${_req_definition}"), req-name: $(distinct d "${_req_defname}")"
 
     load_defaults
     load_defs "${_req_definition}"
@@ -358,7 +362,7 @@ process_flat () {
             _cwd="$(${PWD_BIN} 2>/dev/null)"
             if [ -n "${BUILD_DIR}" -a \
                  -n "${BUILD_NAMESUM}" ]; then
-                create_builddir "${_app_param}" "${BUILD_NAMESUM}"
+                create_builddir "${_bundlnm}" "${BUILD_NAMESUM}"
                 cd "${BUILD_DIR}"
                 if [ -z "${DEF_GIT_MODE}" ]; then # Standard "fetch source archive" method
                     _base="$(${BASENAME_BIN} "${DEF_SOURCE_PATH}" 2>/dev/null)"
@@ -382,7 +386,7 @@ process_flat () {
                             _bname="$(${BASENAME_BIN} "${_dest_file}" 2>/dev/null)"
                             try "${RM_BIN} -vf ${_dest_file}" && \
                                 warn "${WARN_CHAR} Removed corrupted cache file: $(distinct w "${_bname}") and retrying.."
-                            process_flat "${_app_param}" "${_prefix}"
+                            process_flat "${_app_param}" "${_prefix}" "${_bundlnm}"
                         fi
                         unset _bname _a_file_checksum
                     fi
@@ -401,7 +405,7 @@ process_flat () {
                 unset _fd
                 _prm_nolib="$(${PRINTF_BIN} '%s\n' "${_app_param}" | ${SED_BIN} 's/lib//' 2>/dev/null)"
                 _prm_no_undrlne_and_minus="$(${PRINTF_BIN} '%s\n' "${_app_param}" | ${SED_BIN} 's/[-_].*$//' 2>/dev/null)"
-                debug "_app_param: ${_app_param} short: ${_prm_nolib}, nafter-: ${_prm_no_undrlne_and_minus}, DEF_NAME: ${DEF_NAME}, BUILD_DIR: ${BUILD_DIR}"
+                debug "Requirement: ${_app_param} short: ${_prm_nolib}, nafter-: ${_prm_no_undrlne_and_minus}, DEF_NAME: ${DEF_NAME}, BUILD_DIR: ${BUILD_DIR}"
                 # NOTE: patterns sorted by safety
                 for _pati in    "*${_app_param}*${DEF_VERSION}" \
                                 "*${_prm_no_undrlne_and_minus}*${DEF_VERSION}" \
@@ -561,5 +565,5 @@ process_flat () {
         debug "Disabled requirement: $(distinct d "${_req_defname}"), writing '${DEFAULT_REQ_OS_PROVIDED}' to: $(distinct d "${_dis_def}")"
         run "${PRINTF_BIN} '%s' \"${DEFAULT_REQ_OS_PROVIDED}\" > ${_dis_def}"
     fi
-    unset _current_branch _dis_def _req_defname _app_param _prefix
+    unset _current_branch _dis_def _req_defname _app_param _prefix _bundlnm
 }
