@@ -16,7 +16,7 @@ build_bundle () {
     if [ ! -d "${SOFTWARE_DIR}${_bsbname}" ]; then
         create_software_dir "${_bsbname}"
         create_software_bundle_archive "${_bsbname}" "${_bsbelement}" "${_bsversion}" && \
-            note "Archived bundle: $(distinct n "${_bsbelement}") ready to deploy" && \
+            note "Archived bundle: $(distinct n "${_bsbelement}") is ready to deploy" && \
                 return
         error "Failed to create bundle archives for: $(distinct e "${_bsbelement}")"
     else
@@ -139,7 +139,7 @@ fetch_binbuild () {
                     try "${FETCH_BIN} -o ${FILE_CACHE_DIR}${_bb_archive} ${FETCH_OPTS} '${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}'" || \
                     error "Failure fetching available binary build for: $(distinct e "${_bb_archive}"). Please check your DNS / Network setup!"
             else
-                note "No binary build available for: $(distinct n "${OS_TRIPPLE}/${_full_name}-${_bb_ver}")"
+                note "No binary build file: $(distinct n "${_bb_archive}")"
             fi
         fi
 
