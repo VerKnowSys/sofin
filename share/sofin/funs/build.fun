@@ -252,7 +252,7 @@ build () {
                             note "  ${_req} ($(distinct n "${_req_amount}") of $(distinct n "${_req_all}") remaining)"
                             if [ ! -f "${PREFIX}/${_req}${DEFAULT_INST_MARK_EXT}" ]; then
                                 CHANGED=YES
-                                process "${_req}"
+                                process_flat "${_req}" "${PREFIX}"
                             fi
                         fi
                         _req_amount="$(${PRINTF_BIN} '%s\n' "${_req_amount} - 1" | ${BC_BIN} 2>/dev/null)"
@@ -264,7 +264,7 @@ build () {
                         if [ "${CHANGED}" = "YES" ]; then
                             note "  ${_bund_lcase} ($(distinct n 1) of $(distinct n "${_req_all}"))"
                             note "   ${NOTE_CHAR} App dependencies changed. Rebuilding: $(distinct n "${_bund_lcase}")"
-                            process "${_bund_lcase}"
+                            process_flat "${_bund_lcase}" "${PREFIX}"
                             unset CHANGED
                             mark_installed "${DEF_NAME}${DEF_POSTFIX}" "${DEF_VERSION}"
                             show_done "${DEF_NAME}${DEF_POSTFIX}"
@@ -276,7 +276,7 @@ build () {
                     else
                         note "  ${_bund_lcase} ($(distinct n 1) of $(distinct n "${_req_all}"))"
                         debug "Right before process call: ${_bund_lcase}"
-                        process "${_bund_lcase}"
+                        process_flat "${_bund_lcase}" "${PREFIX}"
                         mark_installed "${DEF_NAME}${DEF_POSTFIX}" "${DEF_VERSION}"
                         note "$(distinct n "${SUCCESS_CHAR}") ${_bund_lcase} [$(distinct n "${DEF_VERSION}")]"
                     fi
@@ -326,17 +326,21 @@ dump_debug_info () {
 }
 
 
-process () {
+process_flat () {
     _app_param="${1}"
+    _prefix="${2}"
     if [ -z "${_app_param}" ]; then
-        error "No param given for process()!"
+        error "First argument with $(distinct e "BundleName") is required!"
+    fi
+    if [ -z "${_prefix}" ]; then
+        error "Second argument with $(distinct e "/Software/PrefixDir") is required!"
     fi
     _req_definition="${DEFINITIONS_DIR}$(lowercase "${_app_param}")${DEFAULT_DEF_EXT}"
     if [ ! -e "${_req_definition}" ]; then
         error "Cannot fetch definition: $(distinct e "${_req_definition}")! Aborting!"
     fi
     _req_defname="$(${PRINTF_BIN} '%s\n' "$(${BASENAME_BIN} "${_req_definition}" 2>/dev/null)" | ${SED_BIN} -e 's/\..*$//g' 2>/dev/null)"
-    debug "Requirement: $(distinct d "${_app_param}") file: $(distinct d "${_req_definition}"), req-name: $(distinct d "${_req_defname}")"
+    debug "Requirement: $(distinct d "${_app_param}"), PREFIX: $(distinct d "${_prefix}") file: $(distinct d "${_req_definition}"), req-name: $(distinct d "${_req_defname}")"
 
     load_defaults
     load_defs "${_req_definition}"
@@ -344,13 +348,7 @@ process () {
     compiler_setup
     dump_debug_info
 
-    _bundlnm="$(capitalize "${_app_param}")"
-    if [ -z "${PREFIX}" ]; then
-        PREFIX="${SOFTWARE_DIR}${_bundlnm}"
-        PATH="${PREFIX}/bin:${PREFIX}/sbin:${DEFAULT_PATH}"
-    else
-        PATH="${PREFIX}/bin:${PREFIX}/sbin:${DEFAULT_PATH}"
-    fi
+    PATH="${_prefix}/bin:${_prefix}/sbin:${DEFAULT_PATH}"
     if [ -z "${DEF_DISABLED_ON}" ]; then
         if [ -z "${DEF_SOURCE_PATH}" ]; then
             note "   ${NOTE_CHAR2} $(distinct n "DEF_SOURCE_PATH") is undefined for: $(distinct n "${_req_defname}")."
@@ -359,7 +357,7 @@ process () {
             _cwd="$(${PWD_BIN} 2>/dev/null)"
             if [ -n "${BUILD_DIR}" -a \
                  -n "${BUILD_NAMESUM}" ]; then
-                create_builddir "${_bundlnm}" "${BUILD_NAMESUM}"
+                create_builddir "${_app_param}" "${BUILD_NAMESUM}"
                 cd "${BUILD_DIR}"
                 if [ -z "${DEF_GIT_MODE}" ]; then # Standard "fetch source archive" method
                     _base="$(${BASENAME_BIN} "${DEF_SOURCE_PATH}" 2>/dev/null)"
@@ -381,12 +379,9 @@ process () {
                         else
                             warn "${WARN_CHAR} Source checksum mismatch: $(distinct w "${_a_file_checksum}") vs $(distinct w "${DEF_SHA}")"
                             _bname="$(${BASENAME_BIN} "${_dest_file}" 2>/dev/null)"
-                            warn "${WARN_CHAR} Removing file from cache: $(distinct w "${_bname}") and retrying.."
-                            # remove corrupted file
-                            try "${RM_BIN} -vf ${_dest_file}"
-                            # and restart script with same arguments:
-                            debug "Evaluating again: $(distinct d "process(${_app_param})")"
-                            process "${_app_param}"
+                            try "${RM_BIN} -vf ${_dest_file}" && \
+                                warn "${WARN_CHAR} Removed corrupted cache file: $(distinct w "${_bname}") and retrying.."
+                            process_flat "${_app_param}" "${_prefix}"
                         fi
                         unset _bname _a_file_checksum
                     fi
@@ -460,8 +455,8 @@ process () {
 
                     no-conf)
                         note "   ${NOTE_CHAR} No configuration for definition: $(distinct n "${_app_param}")"
-                        DEF_MAKE_METHOD="${DEF_MAKE_METHOD} PREFIX=${PREFIX}"
-                        DEF_INSTALL_METHOD="${DEF_INSTALL_METHOD} PREFIX=${PREFIX}"
+                        DEF_MAKE_METHOD="${DEF_MAKE_METHOD} PREFIX=${_prefix}"
+                        DEF_INSTALL_METHOD="${DEF_INSTALL_METHOD} PREFIX=${_prefix}"
                         ;;
 
                     binary)
@@ -471,12 +466,12 @@ process () {
                         ;;
 
                     posix)
-                        run "./configure -prefix ${PREFIX} -cc $(${BASENAME_BIN} "${CC}" 2>/dev/null) ${DEF_CONFIGURE_ARGS}"
+                        run "./configure -prefix ${_prefix} -cc $(${BASENAME_BIN} "${CC}" 2>/dev/null) ${DEF_CONFIGURE_ARGS}"
                         ;;
 
                     cmake)
                         ${TEST_BIN} -z "${DEF_CMAKE_BUILD_DIR}" && DEF_CMAKE_BUILD_DIR="." # default - cwd
-                        run "${DEF_CONFIGURE} ${DEF_CMAKE_BUILD_DIR} -LH -DCMAKE_INSTALL_RPATH=\"${PREFIX}/lib;${PREFIX}/libexec\" -DCMAKE_INSTALL_PREFIX=${PREFIX} -DCMAKE_BUILD_TYPE=Release -DSYSCONFDIR=${SERVICE_DIR}/etc -DDOCDIR=${SERVICE_DIR}/share/doc -DJOB_POOL_COMPILE=${CPUS} -DJOB_POOL_LINK=${CPUS} -DCMAKE_C_FLAGS=\"${CFLAGS}\" -DCMAKE_CXX_FLAGS=\"${CXXFLAGS}\" ${DEF_CONFIGURE_ARGS}"
+                        run "${DEF_CONFIGURE} ${DEF_CMAKE_BUILD_DIR} -LH -DCMAKE_INSTALL_RPATH=\"${_prefix}/lib;${_prefix}/libexec\" -DCMAKE_INSTALL_PREFIX=${_prefix} -DCMAKE_BUILD_TYPE=Release -DSYSCONFDIR=${SERVICE_DIR}/etc -DDOCDIR=${SERVICE_DIR}/share/doc -DJOB_POOL_COMPILE=${CPUS} -DJOB_POOL_LINK=${CPUS} -DCMAKE_C_FLAGS=\"${CFLAGS}\" -DCMAKE_CXX_FLAGS=\"${CXXFLAGS}\" ${DEF_CONFIGURE_ARGS}"
                         ;;
 
                     void|meta|empty|none)
@@ -493,10 +488,10 @@ process () {
                             # NOTE: No /Services feature implemented for Linux.
                             ${PRINTF_BIN} '%s\n' "${DEF_CONFIGURE}" | ${GREP_BIN} "configure" >/dev/null 2>&1
                             if [ "$?" = "0" ]; then
-                                try "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${PREFIX} ${_pic_optional}" || \
-                                run "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${PREFIX}" # fallback
+                                try "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} ${_pic_optional}" || \
+                                run "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix}" # fallback
                             else
-                                try "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${PREFIX}" || \
+                                try "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix}" || \
                                 run "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS}" # Trust definition
                             fi
                         else
@@ -504,7 +499,7 @@ process () {
                             # this way we can tell if we want to put configure options as params
                             ${PRINTF_BIN} '%s\n' "${DEF_CONFIGURE}" | ${GREP_BIN} "configure" >/dev/null 2>&1
                             if [ "$?" = "0" ]; then
-                                # TODO: add --docdir=${PREFIX}/docs
+                                # TODO: add --docdir=${_prefix}/docs
                                 # NOTE: By default try to configure software with these options:
                                 #   --sysconfdir=${SERVICE_DIR}/etc
                                 #   --localstatedir=${SERVICE_DIR}/var
@@ -512,18 +507,18 @@ process () {
                                 #   --with-pic
                                 # OPTIMIZE: TODO: XXX: use ./configure --help | grep option to
                                 #      build configure options quickly
-                                try "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${PREFIX} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var --runstatedir=${SERVICE_DIR}/run ${_pic_optional}" || \
-                                try "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${PREFIX} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var ${_pic_optional}" || \
-                                try "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${PREFIX} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var" || \
-                                try "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${PREFIX} --sysconfdir=${SERVICE_DIR}/etc ${_pic_optional}" || \
-                                try "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${PREFIX} --sysconfdir=${SERVICE_DIR}/etc" || \
-                                try "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${PREFIX} ${_pic_optional}" || \
-                                run "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${PREFIX}" # last two - only as a fallback
+                                try "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var --runstatedir=${SERVICE_DIR}/run ${_pic_optional}" || \
+                                try "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var ${_pic_optional}" || \
+                                try "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var" || \
+                                try "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc ${_pic_optional}" || \
+                                try "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc" || \
+                                try "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} ${_pic_optional}" || \
+                                run "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix}" # last two - only as a fallback
 
                             else # fallback again:
                                 # NOTE: First - try to specify GNU prefix,
                                 # then trust prefix given in software definition.
-                                try "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${PREFIX}" || \
+                                try "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix}" || \
                                 run "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS}"
                             fi
                         fi
@@ -544,27 +539,26 @@ process () {
 
             debug "Cleaning man dir from previous dependencies, we want to install man pages that belong to LAST requirement which is app bundle itself"
             for place in man share/man share/info share/doc share/docs; do
-                try "${FIND_BIN} ${PREFIX}/${place} -delete"
+                try "${FIND_BIN} ${_prefix}/${place} -delete"
             done
 
             note "   ${NOTE_CHAR} Installing requirement: $(distinct n "${_app_param}")"
             run "${DEF_INSTALL_METHOD}"
             after_install_callback
 
-            run "${PRINTF_BIN} '%s' \"${DEF_VERSION}\" > ${PREFIX}/${_app_param}${DEFAULT_INST_MARK_EXT}" && \
-                debug "Stored version: $(distinct d "${DEF_VERSION}") of software: $(distinct d "${DEF_NAME}") installed in: $(distinct d "${PREFIX}")"
+            run "${PRINTF_BIN} '%s' \"${DEF_VERSION}\" > ${_prefix}/${_app_param}${DEFAULT_INST_MARK_EXT}" && \
+                debug "Stored version: $(distinct d "${DEF_VERSION}") of software: $(distinct d "${DEF_NAME}") installed in: $(distinct d "${_prefix}")"
             cd "${_cwd}" 2>/dev/null
             unset _cwd
         fi
     else
-        note "   ${WARN_CHAR} Requirement: $(distinct n "${_req_defname}") skipped for: $(distinct n "${SYSTEM_NAME}")"
-        if [ -n "${PREFIX}" -a \
-             ! -d "${PREFIX}" ]; then # case when disabled requirement is first on list of dependencies
-            create_software_dir "$(${BASENAME_BIN} "${PREFIX}" 2>/dev/null)"
+        note "   ${WARN_CHAR} Requirement: $(distinct n "${_req_defname}") is provided by base system."
+        if [ ! -d "${_prefix}" ]; then # case when disabled requirement is first on list of dependencies
+            create_software_dir "$(${BASENAME_BIN} "${_prefix}" 2>/dev/null)"
         fi
-        _dis_def="${PREFIX}/${_req_defname}${DEFAULT_INST_MARK_EXT}"
+        _dis_def="${_prefix}/${_req_defname}${DEFAULT_INST_MARK_EXT}"
         debug "Disabled requirement: $(distinct d "${_req_defname}"), writing '${DEFAULT_REQ_OS_PROVIDED}' to: $(distinct d "${_dis_def}")"
         run "${PRINTF_BIN} '%s' \"${DEFAULT_REQ_OS_PROVIDED}\" > ${_dis_def}"
     fi
-    unset _current_branch _dis_def _req_defname _bundlnm
+    unset _current_branch _dis_def _req_defname _app_param _prefix
 }
