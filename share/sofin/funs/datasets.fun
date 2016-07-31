@@ -31,7 +31,7 @@ push_to_all_mirrors () {
         debug "Deploying bin-bundle: $(distinct d "${_ptelm_file_name}") to mirror: $(distinct d "${_ptmirror}")"
         push_software_archive "${_ptelm_file_name}" "${_ptmirror}" "${_ptaddress}"
 
-        prepare_service_dataset "${_pbto_bundle_name}" "${_pversion_element}"
+        build_service_dataset "${_pbto_bundle_name}" "${_pversion_element}"
         push_dset_zfs_stream "${_ptelm_service_name}" "${_pbto_bundle_name}" "${_ptmirror}" "${_pversion_element}"
     done
     unset _ptaddress _ptmirror _pversion_element _ptelm_file_name _pt_query
@@ -79,7 +79,7 @@ push_dset_zfs_stream () {
 }
 
 
-prepare_service_dataset () {
+build_service_dataset () {
     _ps_elem="${1}"
     _ps_ver_elem="${2}"
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
