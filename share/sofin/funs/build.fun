@@ -362,7 +362,6 @@ process_flat () {
             _cwd="$(${PWD_BIN} 2>/dev/null)"
             if [ -n "${BUILD_DIR}" -a \
                  -n "${BUILD_NAMESUM}" ]; then
-                create_builddir "${_bundlnm}" "${BUILD_NAMESUM}"
                 cd "${BUILD_DIR}"
                 if [ -z "${DEF_GIT_MODE}" ]; then # Standard "fetch source archive" method
                     _base="$(${BASENAME_BIN} "${DEF_SOURCE_PATH}" 2>/dev/null)"
