@@ -43,12 +43,12 @@ push_binbuilds () {
         _pbinstall_indicator_file="${SOFTWARE_DIR}${_pbelement}/${_pblowercase_element}${DEFAULT_INST_MARK_EXT}"
         _pbbversion_element="$(${CAT_BIN} "${_pbinstall_indicator_file}" 2>/dev/null)"
         if [ ! -f "${_pbinstall_indicator_file}" ]; then
-            error "Missing install indicator: $(distinct e "${_pbinstall_indicator_file}"). You can't push a binary build of uncomplete build!"
+            error "Bundle install indicator: $(distinct e "${_pbinstall_indicator_file}") doesn't exist!"
         fi
-        debug "About to push: $(distinct d "${_pbelement}"), install-indicator: $(distinct d "${_pbinstall_indicator_file}"), soft-version: $(distinct d "${_pbbversion_element}")"
         if [ -n "${_pbelement}" -a \
              -d "${SOFTWARE_DIR}${_pbelement}" -a \
              -n "${_pbbversion_element}" ]; then
+            debug "About to push: $(distinct d "${_pbelement}"), install-indicator: $(distinct d "${_pbinstall_indicator_file}"), soft-version: $(distinct d "${_pbbversion_element}")"
             push_to_all_mirrors "${_pbelement}" "${_pbbversion_element}"
         else
             error "Push validations failed for bundle: $(distinct e "${_pbelement}")! It might not be fully installed or broken."
