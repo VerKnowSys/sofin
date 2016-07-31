@@ -126,7 +126,7 @@ find_all () {
                 ${PRINTF_BIN} '%s\n' "${_fafind_results}" 2>/dev/null
             fi
         else
-            error "Directory $(distinct e "${_fapath}") doesn't exists!"
+            error "Directory $(distinct e "${_fapath}") doesn't exist!"
         fi
     fi
     unset _fapath _famatcher _fatype _fafind_results
@@ -170,7 +170,7 @@ find_most_recent () {
                 ${PRINTF_BIN} '%s' "${_frfind_results}" 2>/dev/null
             fi
         else
-            error "Directory $(distinct e "${_frpath}") doesn't exists!"
+            error "Directory $(distinct e "${_frpath}") doesn't exist!"
         fi
     fi
     unset _frpath _frmatcher _frtype _frfind_results _frres_singleline

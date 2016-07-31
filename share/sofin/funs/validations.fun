@@ -80,7 +80,7 @@ validate_archive_sha1 () {
     _archive_name="${1}"
     if [ ! -f "${_archive_name}" -o \
            -z "${_archive_name}" ]; then
-         error "Specified empty $(distinct e archive_name), or file doesn't exists: $(distinct e "${_archive_name}")"
+         error "Specified empty $(distinct e archive_name), or file doesn't exist: $(distinct e "${_archive_name}")"
     fi
     # checking archive sha1 checksum
     if [ -e "${_archive_name}" ]; then
