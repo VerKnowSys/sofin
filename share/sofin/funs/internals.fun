@@ -30,7 +30,8 @@ usage_howto () {
     note "  $(distinct n "rebuild                              ") rebuilds and pushes each software bundle that depends on definition given as a param. (example: ${SOFIN_BIN_SHORT} rebuild openssl - will rebuild all bundles that have 'openssl' dependency)"
     note "  $(distinct n "reset                               ") resets local definitions repository"
     note "  $(distinct n "diff                                ") displays changes in current definitions cache. Accepts any part of definition name"
-    note "  $(distinct n "hack                                ") hack through build dirs matching pattern given as param"
+    # TODO: fix-hack
+    # note "  $(distinct n "hack                                ") hack through build dirs matching pattern given as param"
 }
 
 

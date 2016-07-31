@@ -21,9 +21,10 @@ if [ -n "${SOFIN_COMMAND_ARG}" ]; then
             ;;
 
 
-        hack|h)
-            hack_def ${SOFIN_ARGS}
-            ;;
+        # TODO: re-enable this feature
+        # hack|h)
+        #     hack_def "${SOFIN_ARGS}"
+        #     ;;
 
 
         diffs|diff)

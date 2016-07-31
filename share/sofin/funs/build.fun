@@ -300,6 +300,7 @@ build () {
 
 
 dump_debug_info () {
+    # TODO: add DEF_ insight
     debug "-------------- PRE CONFIGURE SETTINGS DUMP --------------"
     debug "CPUS (used): $(distinct d "${CPUS}")"
     debug "ALL_CPUS: $(distinct d "${ALL_CPUS}")"

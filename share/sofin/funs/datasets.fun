@@ -34,7 +34,7 @@ push_to_all_mirrors () {
         build_service_dataset "${_pbto_bundle_name}" "${_pversion_element}"
         push_dset_zfs_stream "${_ptelm_service_name}" "${_pbto_bundle_name}" "${_ptmirror}" "${_pversion_element}"
     done
-    note "Push to: $(distinct n "${_pt_query}") was successfull!"
+    note "Push successfull!"
     unset _ptaddress _ptmirror _pversion_element _ptelm_file_name _pt_query
 }
 
