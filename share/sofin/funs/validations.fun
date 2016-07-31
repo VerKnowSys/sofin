@@ -136,13 +136,13 @@ validate_def_postfix () {
 
 validate_definition_disabled () {
     _ch_dis_name="${1}"
-    unset DEF_DISABLED
+    unset DEF_DISABLED_ON
     # check requirement for disabled state:
     if [ -n "${_ch_dis_name}" ]; then
         for _def_disabled in ${_ch_dis_name}; do
             if [ "${SYSTEM_NAME}" = "${_def_disabled}" ]; then
                 debug "Disabled: $(distinct d "${_def_disabled}") on $(distinct d "${SYSTEM_NAME}")"
-                DEF_DISABLED=YES
+                DEF_DISABLED_ON=YES
             fi
         done
     fi

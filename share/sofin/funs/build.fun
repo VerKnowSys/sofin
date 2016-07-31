@@ -171,7 +171,7 @@ build () {
         _bund_name="$(lowercase "${_bund_name}")"
         load_defaults
         load_defs "${_bund_name}"
-        if [ "${DEF_DISABLED}" = "YES" ]; then
+        if [ "${DEF_DISABLED_ON}" = "YES" ]; then
             _anm="$(capitalize "${_bund_name}")"
             warn "Bundle: $(distinct w "${_anm}") is disabled on: $(distinct w "${OS_TRIPPLE}")"
             destroy_software_dir "${_anm}"
@@ -354,7 +354,7 @@ process () {
     else
         PATH="${PREFIX}/bin:${PREFIX}/sbin:${DEFAULT_PATH}"
     fi
-    if [ -z "${DEF_DISABLED}" ]; then
+    if [ -z "${DEF_DISABLED_ON}" ]; then
         if [ -z "${DEF_SOURCE_PATH}" ]; then
             note "   ${NOTE_CHAR2} $(distinct n "DEF_SOURCE_PATH") is undefined for: $(distinct n "${_req_defname}")."
             note "NOTE: It's only valid for meta bundles. You may consider setting: $(distinct n "DEF_CONFIGURE=\"meta\"") in definition file of bundle."
