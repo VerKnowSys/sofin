@@ -298,6 +298,7 @@ build () {
         finalize_afterbuild "${_bund_name}"
     done
 
+    note "Build successfull: $(distinct n "${_build_list}")"
     unset _build_list _bund_lcase _req_all _req
 }
 
