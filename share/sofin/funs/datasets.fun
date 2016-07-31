@@ -3,7 +3,7 @@ push_to_all_mirrors () {
     _pbto_bundle_name="${1}"
     _pversion_element="${2}"
     _ptelm_file_name="${_pbto_bundle_name}-${_pversion_element}-${OS_TRIPPLE}${DEFAULT_ARCHIVE_EXT}"
-    _ptelm_service_name="${_pbto_bundle_name}-${_pversion_element}-${OS_TRIPPLE}${DEFAULT_SERVICE_SNAPSHOT_EXT}"
+    _ptelm_service_name="${_pbto_bundle_name}-${_pversion_element}${DEFAULT_SERVICE_SNAPSHOT_EXT}"
     _pt_query="$(${HOST_BIN} A "${MAIN_SOFTWARE_ADDRESS}" 2>/dev/null | ${GREP_BIN} 'Address:' 2>/dev/null | eval "${HOST_ADDRESS_GUARD}")"
     debug "Address: $(distinct d "${_pt_query}"), bundle: $(distinct d "${_pbto_bundle_name}"), name: $(distinct d "${_ptelm_file_name}")"
     if [ -z "${_pbto_bundle_name}" ]; then
