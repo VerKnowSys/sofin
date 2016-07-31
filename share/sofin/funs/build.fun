@@ -15,18 +15,14 @@ build_bundle () {
     debug "build_bundle: $(distinct d "${_bsbname}"), should be in: $(distinct d "${SOFTWARE_DIR}${_bsbname}"), full-name: $(distinct d "${_bsbelement}")"
     if [ ! -d "${SOFTWARE_DIR}${_bsbname}" ]; then
         create_software_dir "${_bsbname}"
-        create_software_bundle_archive "${_bsbname}" "${_bsbelement}" "${_bsversion}" && \
-            note "Archived bundle: $(distinct n "${_bsbelement}") is ready to deploy" && \
-                return
-        error "Failed to create bundle archives for: $(distinct e "${_bsbelement}")"
+        create_software_bundle_archive "${_bsbname}" "${_bsbelement}" "${_bsversion}"
     else
         if [ ! -f "${FILE_CACHE_DIR}${_bsbelement}" ]; then
             debug "Found incomplete or damaged bundle file. Rebuilding: $(distinct d "${_bsbelement}")"
             try "${RM_BIN} -vf ${FILE_CACHE_DIR}${_bsbelement}"
-            create_software_bundle_archive "${_bsbname}" "${_bsbelement}" "${_bsversion}" && \
-                note "Archived bundle: $(distinct n "${_bsbelement}") ready to deploy"
+            create_software_bundle_archive "${_bsbname}" "${_bsbelement}" "${_bsversion}"
         else
-            note "Archived bundle: $(distinct n "${_bsbelement}") already exists, and will be reused to deploy"
+            debug "Already existing bundle: $(distinct d "${_bsbelement}") will be reused to deploy"
         fi
     fi
     unset _bsbname _bsbelement
@@ -282,7 +278,7 @@ build () {
                         debug "Right before process call: ${_bund_lcase}"
                         process "${_bund_lcase}"
                         mark_installed "${DEF_NAME}${DEF_POSTFIX}" "${DEF_VERSION}"
-                        note "${SUCCESS_CHAR} ${_bund_lcase} [$(distinct n "${DEF_VERSION}")]"
+                        note "$(distinct n "${SUCCESS_CHAR}") ${_bund_lcase} [$(distinct n "${DEF_VERSION}")]"
                     fi
                 fi
 
