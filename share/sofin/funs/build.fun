@@ -298,17 +298,7 @@ build () {
 
     # Cleanup build dirs..
     if [ -z "${DEVEL}" ]; then
-        if [ -n "${PREFIX}" -a \
-             -d "${PREFIX}" ]; then
-            if [ -n "${BUILD_NAMESUM}" ]; then
-                destroy_builddir "$(${BASENAME_BIN} "${PREFIX}" 2>/dev/null)" "${BUILD_NAMESUM}"
-            else
-                # shouldn't happen..
-                warn "No BUILD_NAMESUM set! Can't identift build-dir!"
-            fi
-        else
-            debug "Empty prefix. No build-dir to destroy"
-        fi
+        try_destroy_binbuild
     else
         # TODO: dump srcdir? here?
         debug "No-Op - not yet implemented"
