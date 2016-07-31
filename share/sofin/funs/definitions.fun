@@ -153,7 +153,7 @@ update_defs () {
                 note "Branch: $(distinct n "${_def_cur_branch}") is now at: $(distinct n "${_def_head}")" && \
                 return
 
-            note "${ColorRed}Error occured: Update from branch: $(distinct e "${BRANCH}") of repository: $(distinct e "${REPOSITORY}") wasn't possible. Log below:${ColorReset}"
+            ${PRINTF_BIN} "${ColorRed}%s${ColorReset}" "Error occured: Update from branch: $(distinct e "${BRANCH}") of repository: $(distinct e "${REPOSITORY}") wasn't possible. Log's below:\n\n"
             show_log_if_available
             return
 
@@ -168,7 +168,7 @@ update_defs () {
                 note "Branch: $(distinct n "${BRANCH}") is at: $(distinct n "${_def_head}")" && \
                     return
 
-            note "${ColorRed}Error occured: Update from branch: $(distinct e "${BRANCH}") of repository: $(distinct e "${REPOSITORY}") wasn't possible. Log's below:${ColorReset}"
+            ${PRINTF_BIN} "${ColorRed}%s${ColorReset}" "Error occured: Update from branch: $(distinct e "${BRANCH}") of repository: $(distinct e "${REPOSITORY}") wasn't possible. Log's below:\n\n"
             show_log_if_available
             return
         fi
