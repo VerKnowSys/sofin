@@ -375,15 +375,14 @@ install_software_from_binbuild () {
     _isfb_version="${3}"
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
         # On systems with ZFS capability, we use zfs receive instead of tarballing:
-        _isfb_dataset="${DEFAULT_ZPOOL}${SOFTWARE_DIR}${USER}/${_isfb_archive}"
+        _isfb_dataset="${DEFAULT_ZPOOL}${SOFTWARE_DIR}${USER}/${_isfb_fullname}"
         debug "dataset check: ${_isfb_dataset}"
         ${ZFS_BIN} list -H 2>/dev/null | eval "${FIRST_ARG_GUARD}" | ${EGREP_BIN} "${_isfb_dataset}" >/dev/null 2>&1
         if [ "$?" != "0" ]; then
             debug "Installing ZFS based binary build to dataset: $(distinct d "${_isfb_dataset}")"
-            ${PRINTF_BIN} "${ColorBlue}"
-            ${XZCAT_BIN} ${FILE_CACHE_DIR}${_isfb_archive} | ${ZFS_BIN} receive -F -v ${_isfb_dataset} && \
-                ${ZFS_BIN} rename "${_isfb_dataset}@${DEFAULT_GIT_SNAPSHOT_HEAD}" "${ORIGIN_ZFS_SNAP_NAME}" && \
-                    note "Bundle: $(distinct n "${_isfb_fullname}") installed, with version: $(distinct n "${_isfb_version}")" && \
+            run "${XZCAT_BIN} ${FILE_CACHE_DIR}${_isfb_archive} | ${ZFS_BIN} receive -F -v ${_isfb_dataset} &&
+                ${ZFS_BIN} rename ${_isfb_dataset}@${DEFAULT_GIT_SNAPSHOT_HEAD} ${ORIGIN_ZFS_SNAP_NAME}" && \
+                    note "Installed: $(distinct n "${_isfb_fullname}"), with version: $(distinct n "${_isfb_version}")" && \
                         DONT_BUILD_BUT_DO_EXPORTS=YES
         else
             note "Bundle dataset exists. Skipped binary build installation for: $(distinct n "${_isfb_fullname}")"
