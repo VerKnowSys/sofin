@@ -2,39 +2,39 @@
 push_to_all_mirrors () {
     _pbto_bundle_name="${1}"
     _pversion_element="${2}"
-    _ptelement_name="${_pbto_bundle_name}-${_pversion_element}${DEFAULT_ARCHIVE_EXT}"
-    _def_dig_query="$(${HOST_BIN} A ${MAIN_SOFTWARE_ADDRESS} 2>/dev/null | ${GREP_BIN} 'Address:' 2>/dev/null | eval "${HOST_ADDRESS_GUARD}")"
-    debug "Address: $(distinct d "${_def_dig_query}"), bundle: $(distinct d "${_pbto_bundle_name}"), name: $(distinct d "${_ptelement_name}")"
+    _ptelm_file_name="${_pbto_bundle_name}-${_pversion_element}-${OS_TRIPPLE}${DEFAULT_ARCHIVE_EXT}"
     _ptelm_service_name="${_pbto_bundle_name}-${_pversion_element}-${OS_TRIPPLE}${DEFAULT_SERVICE_SNAPSHOT_EXT}"
+    _pt_query="$(${HOST_BIN} A "${MAIN_SOFTWARE_ADDRESS}" 2>/dev/null | ${GREP_BIN} 'Address:' 2>/dev/null | eval "${HOST_ADDRESS_GUARD}")"
+    debug "Address: $(distinct d "${_pt_query}"), bundle: $(distinct d "${_pbto_bundle_name}"), name: $(distinct d "${_ptelm_file_name}")"
     if [ -z "${_pbto_bundle_name}" ]; then
         error "First argument with a $(distinct e "BundleName") is required!"
     fi
     if [ -z "${_pversion_element}" ]; then
         error "Second argument with a $(distinct e "version-string") is required!"
     fi
-    if [ -z "${_def_dig_query}" ]; then
+    if [ -z "${_pt_query}" ]; then
         error "Unable to determine IP address of: $(distinct e "${MAIN_SOFTWARE_ADDRESS}")"
     else
-        debug "Processing mirror(s): $(distinct d "${_def_dig_query}")"
+        debug "Processing mirror(s): $(distinct d "${_pt_query}")"
     fi
-    for _ptmirror in ${_def_dig_query}; do
+    for _ptmirror in ${_pt_query}; do
         _ptaddress="${MAIN_USER}@${_ptmirror}:${MAIN_BINARY_PREFIX}/${SYS_SPECIFIC_BINARY_REMOTE}"
         debug "Remote address inspect: $(distinct d "${_ptaddress}")"
-        try "${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} ${MAIN_USER}@${_ptmirror} 'mkdir -p ${MAIN_BINARY_PREFIX}/${SYS_SPECIFIC_BINARY_REMOTE}'"
+        try "${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} ${MAIN_USER}@${_ptmirror} '${MKDIR_BIN} -vp ${MAIN_BINARY_PREFIX}/${SYS_SPECIFIC_BINARY_REMOTE}'"
 
-        build_bundle "${_pbto_bundle_name}" "${_ptelement_name}" "${_pversion_element}"
-        checksum_filecache_element "${_ptelement_name}"
+        build_bundle "${_pbto_bundle_name}" "${_ptelm_file_name}" "${_pversion_element}"
+        checksum_filecache_element "${_ptelm_file_name}"
 
-        try "${CHMOD_BIN} -v o+r ${FILE_CACHE_DIR}${_ptelement_name} ${FILE_CACHE_DIR}${_ptelement_name}${DEFAULT_CHKSUM_EXT}" && \
-            debug "Set read access for archives: $(distinct d "${_ptelement_name}"), $(distinct d "${_ptelement_name}${DEFAULT_CHKSUM_EXT}") before we send them to public remote"
+        try "${CHMOD_BIN} -v o+r ${FILE_CACHE_DIR}${_ptelm_file_name} ${FILE_CACHE_DIR}${_ptelm_file_name}${DEFAULT_CHKSUM_EXT}" && \
+            debug "Set read access for archives: $(distinct d "${_ptelm_file_name}"), $(distinct d "${_ptelm_file_name}${DEFAULT_CHKSUM_EXT}") before we send them to public remote"
 
-        debug "Deploying bin-bundle: $(distinct d "${_ptelement_name}") to mirror: $(distinct d "${_ptmirror}")"
-        push_binary_archive "${_ptelement_name}" "${_ptmirror}" "${_ptaddress}"
+        debug "Deploying bin-bundle: $(distinct d "${_ptelm_file_name}") to mirror: $(distinct d "${_ptmirror}")"
+        push_software_archive "${_ptelm_file_name}" "${_ptmirror}" "${_ptaddress}"
 
         prepare_service_dataset "${_pbto_bundle_name}" "${_pversion_element}"
-        push_dset_zfs_stream "${_ptelement_name}" "${_pbto_bundle_name}" "${_ptmirror}" "${_pversion_element}"
+        push_dset_zfs_stream "${_ptelm_service_name}" "${_pbto_bundle_name}" "${_ptmirror}" "${_pversion_element}"
     done
-    unset _ptaddress _ptmirror _pversion_element _ptelement_name _def_dig_query
+    unset _ptaddress _ptmirror _pversion_element _ptelm_file_name _pt_query
 }
 
 
