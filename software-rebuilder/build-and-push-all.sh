@@ -35,7 +35,7 @@ for software in $(${CAT_BIN} ${_working_state_file} 2>/dev/null); do
 
     note "Processing software: $(distinct n "${software}")"
     ${SOFIN_BIN} rm ${software}
-    ${SOFIN_BIN} deploy ${software} && \
+    DEVEL=YES ${SOFIN_BIN} deploy ${software} && \
     ${SOFIN_BIN} rm ${software} && \
     ${SED_BIN} -i '' -e "/${software}/d" ${_working_state_file}
     note "--------------------------------"
