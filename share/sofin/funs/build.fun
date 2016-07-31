@@ -226,7 +226,7 @@ build () {
                 _full_bund_name="${_bund_lcase}-${DEF_VERSION}"
                 try "${MKDIR_BIN} -p ${FILE_CACHE_DIR}"
 
-                _an_archive="${_bundl_name}-${DEF_VERSION}${DEFAULT_ARCHIVE_EXT}"
+                _an_archive="${_bundl_name}-${DEF_VERSION}-${OS_TRIPPLE}${DEFAULT_ARCHIVE_EXT}"
                 _installed_indicator="${PREFIX}/${_bund_lcase}${DEFAULT_INST_MARK_EXT}"
                 if [ ! -e "${_installed_indicator}" ]; then
                     fetch_binbuild "${_full_bund_name}" "${_bund_lcase}" "${_an_archive}" "${DEF_VERSION}"
