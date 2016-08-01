@@ -38,6 +38,7 @@ determine_term_capabilites () {
         zmodload zsh/parameter
 
         setopt debugbeforecmd
+        setopt appendhistory
         setopt extendedhistory
 
         # NOTE: don't send HUP on shell exit:
