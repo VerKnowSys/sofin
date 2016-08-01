@@ -14,41 +14,48 @@ env_reset () {
 
 debug () {
     _in=${@}
-    _sep="${_sep:-$(distd "λ" ${ColorDarkgray})}"
-    touch_logsdir_and_logfile
-    if [ "${CAP_TERM_BASH}" = "YES" ]; then
-        _dbfile="$(distd "${BASH_SOURCE#/usr/share/sofin/}:${BASH_LINENO[0]}" ${ColorBlue})"
-        _fun="$(distd "${FUNCNAME[2]}()" ${ColorBlue})"
-
-    elif [ "${CAP_TERM_ZSH}" = "YES" ]; then
-        # NOTE: $funcstack[2]; ${funcfiletrace[@]} ${funcsourcetrace[@]} ${funcstack[@]} ${functrace[@]}
-        _dbfile="$(distd "${funcfiletrace[2]#/usr/share/sofin/}" ${ColorBlue})"
-        _fun="$(distd " ${funcstack[2]}()" ${ColorBlue})"
-
-    else
-        _dbfile=""
-        _fun=""
-    fi
-
-    _dbfn=" (${SHLVL}) [${_sep}${_fun} @ ${_dbfile}] "
-    if [ -z "${DEBUG}" ]; then
-        _dbgnme="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
-        if [ -n "${_dbgnme}" -a \
-             -d "${LOGS_DIR}" ]; then
-            # Definition log
-            ${PRINTF_BIN} "#${ColorDebug}%s%s${ColorReset}\n" "${_dbfn}" "${_in}" 2>> "${LOG}-${_dbgnme}" >> "${LOG}-${_dbgnme}"
-        elif [ -z "${_dbgnme}" -a \
-               -d "${LOGS_DIR}" ]; then
-            # Main log
-            ${PRINTF_BIN} "#${ColorDebug}%s%s${ColorReset}\n" "${_dbfn}" "${_in}" 2>> "${LOG}" >> "${LOG}"
-        elif [ ! -d "${LOGS_DIR}" ]; then
-            # System logger fallback
-            ${LOGGER_BIN} "# λ ${ColorDebug}${_dbfn}${_in}${ColorReset}" 2>> "${LOG}"
+    if [ -n "${CAP_SYS_PRODUCTION}" ]; then
+        if [ -n "${DEBUG}" ]; then
+            ${PRINTF_BIN} "# (%s) λ ${ColorDebug}%s${ColorReset}\n" "${SHLVL}" "${@}"
+        else
+            ${PRINTF_BIN} "# (%s) λ ${ColorDebug}%s${ColorReset}\n" "${SHLVL}" "${@}" >/dev/null
         fi
-    else # DEBUG is set. Print to stdout
-        ${PRINTF_BIN} "#${ColorDebug}%s%s${ColorReset}\n" "${_dbfn}" "${_in}"
+    else
+        _sep="${_sep:-$(distd "λ " ${ColorDarkgray})}"
+        if [ "${CAP_TERM_BASH}" = "YES" ]; then
+            _dbfile="$(distd "${BASH_SOURCE#/usr/share/sofin/}:${BASH_LINENO[0]}" ${ColorBlue})"
+            _fun="$(distd "${FUNCNAME[2]}()" ${ColorBlue})"
+
+        elif [ "${CAP_TERM_ZSH}" = "YES" ]; then
+            # NOTE: $funcstack[2]; ${funcfiletrace[@]} ${funcsourcetrace[@]} ${funcstack[@]} ${functrace[@]}
+            _dbfile="$(distd "${funcfiletrace[2]#/usr/share/sofin/}" ${ColorBlue})"
+            _fun="$(distd " ${funcstack[2]}()" ${ColorBlue})"
+
+        else
+            _dbfile=""
+            _fun=""
+        fi
+
+        _dbfn=" (${SHLVL}) [${_sep}${_fun} @ ${_dbfile}] "
+        if [ -z "${DEBUG}" ]; then
+            _dbgnme="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
+            if [ -n "${_dbgnme}" -a \
+                 -d "${LOGS_DIR}" ]; then
+                # Definition log
+                ${PRINTF_BIN} "#${ColorDebug}%s%s${ColorReset}\n" "${_dbfn}" "${_in}" 2>> "${LOG}-${_dbgnme}" >> "${LOG}-${_dbgnme}"
+            elif [ -z "${_dbgnme}" -a \
+                   -d "${LOGS_DIR}" ]; then
+                # Main log
+                ${PRINTF_BIN} "#${ColorDebug}%s%s${ColorReset}\n" "${_dbfn}" "${_in}" 2>> "${LOG}" >> "${LOG}"
+            elif [ ! -d "${LOGS_DIR}" ]; then
+                # System logger fallback
+                ${LOGGER_BIN} "# λ ${ColorDebug}${_dbfn}${_in}${ColorReset}" 2>> "${LOG}"
+            fi
+        else # DEBUG is set. Print to stdout
+            ${PRINTF_BIN} "#${ColorDebug}%s%s${ColorReset}\n" "${_dbfn}" "${_in}"
+        fi
+        unset _dbgnme _in _dbfn _dbfnin _elmz _cee
     fi
-    unset _dbgnme _in _dbfn _dbfnin _elmz _cee
 }
 
 
