@@ -68,12 +68,12 @@ perform_clean () {
 
 
 finalize () {
-    untrap_signals
     restore_security_state
     finalize_afterbuild
     destroy_locks
     update_shell_vars
     reload_zsh_shells
+    untrap_signals
 }
 
 
