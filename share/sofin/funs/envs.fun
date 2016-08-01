@@ -1,10 +1,4 @@
 compiler_setup () {
-    #XXX
-    if [ "${1}" = "silent" ]; then
-        debug () {
-            ${LOGGER_BIN} "${DEFAULT_NAME}: ${@}"
-        }
-    fi
     debug "---------------- COMPILER FEATURES DUMP -----------------"
     debug "Listing compiler features for platform: $(distd "${SYSTEM_NAME}")"
     case "${SYSTEM_NAME}" in
