@@ -288,20 +288,16 @@ reload_zsh_shells () {
     unset _wishlist
     _shellshort="$(${BASENAME_BIN} "${SHELL}" 2>/dev/null)"
     _pids=$(processes_all | ${EGREP_BIN} "${_shell_pattern}" 2>/dev/null | eval "${FIRST_ARG_GUARD}")
-    debug "Shell inspect: $(distd "${_shellshort}"), pattern: $(distd "${_shell_pattern}"), PIDS: $(distd "$(${PRINTF_BIN} "${_pids}" | eval "${NEWLINES_TO_SPACES_GUARD}")")"
+    # debug "Shell inspect: $(distd "${_shellshort}"), pattern: $(distd "${_shell_pattern}"), PIDS: $(distd "$(${PRINTF_BIN} "${_pids}" | eval "${NEWLINES_TO_SPACES_GUARD}")")"
     for _pid in ${_pids}; do
         if [ -z "${_wishlist}" ]; then
             _wishlist="${_pid}"
         else
-            try "${KILL_BIN} -0 ${_pid}"
-            if [ "${?}" = "0" ]; then
-                debug "Found alive pid: $(distd "${_pid}") in background."
-                _wishlist="${_wishlist} ${_pid}"
-            fi
+            _wishlist="${_wishlist} ${_pid}"
         fi
     done
     if [ -n "${_wishlist}" ]; then
-        try "${KILL_BIN} -SIGUSR2 ${_wishlist}" && \
+        try "${KILL_BIN} -SIGUSR2 ${_wishlist} 2>/dev/null" && \
             debug "Reload signal sent to $(distd "${_shellshort}") pids: $(distd "${_wishlist}")"
     fi
     unset _wishlist _pid _pids _shell_pattern _shellshort
