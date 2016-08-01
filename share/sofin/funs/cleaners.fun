@@ -74,6 +74,12 @@ finalize () {
     update_shell_vars
     reload_zsh_shells
     untrap_signals
+    summary
+}
+
+
+summary () {
+    times >> "${LOG:-/var/log/sofin}"
 }
 
 
