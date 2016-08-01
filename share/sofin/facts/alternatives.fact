@@ -98,8 +98,8 @@ else
 fi
 
 # Default shell - sh/zsh
-if [ -x "/Software/Zsh/bin/zsh" ]; then
-    ZSH_BIN="/Software/Zsh/bin/zsh"
+if [ -x "/Software/Zsh/exports/zsh" ]; then
+    ZSH_BIN="/Software/Zsh/exports/zsh"
 elif [ -x "/usr/bin/zsh" ]; then
     ZSH_BIN="/usr/bin/zsh"
 elif [ -x "/usr/pkg/bin/zsh" ]; then
