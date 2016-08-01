@@ -200,7 +200,6 @@ build () {
                 SERVICE_DIR="${SERVICES_DIR}${_bundl_name}"
                 BUILD_NAMESUM="$(text_checksum "${_bund_lcase}-${DEF_VERSION}")"
                 BUILD_DIR="${PREFIX}/${DEFAULT_SRC_EXT}${BUILD_NAMESUM}"
-                create_builddir "${_bundl_name}" "${BUILD_NAMESUM}"
 
                 # These values has to be exported because external build mechanisms
                 # has to be able to reach these values to find dependencies and utilities
@@ -231,6 +230,9 @@ build () {
                     DONT_BUILD_BUT_DO_EXPORTS=YES
                     unset _already_installed_version
                 fi
+
+                # NOTE: It's necessary to create build dir *after* binbuild check (which may create dataset itself)
+                create_builddir "${_bundl_name}" "${BUILD_NAMESUM}"
 
                 if [ -z "${DONT_BUILD_BUT_DO_EXPORTS}" ]; then
                     if [ -z "${DEF_REQUIREMENTS}" ]; then
