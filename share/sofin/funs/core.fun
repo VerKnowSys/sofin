@@ -91,35 +91,27 @@ error () {
 }
 
 
-distinct () {
-    _msg_type="${1}"
-    shift
-    _contents="${@}"
-    if [ -z "${_msg_type}" ]; then
-        error "No message type given as first param for: ${DISTINCT_COLOUR}distinct()${ColorRed}!"
-    fi
-    case "${_msg_type}" in
-        n|note)
-            ${PRINTF_BIN} "${DISTINCT_COLOUR}%s${ColorGreen}" "${_contents}" 2>/dev/null
-            ;;
+# distdebug
+distd () {
+    ${PRINTF_BIN} "${2:-${ColorDistinct}}%s${3:-${ColorDebug}}" "${1}" 2>/dev/null
+}
 
-        d|debug)
-            ${PRINTF_BIN} "${DISTINCT_COLOUR}%s${ColorViolet}" "${_contents}" 2>/dev/null
-            ;;
 
-        w|warn)
-            ${PRINTF_BIN} "${DISTINCT_COLOUR}%s${ColorYellow}" "${_contents}" 2>/dev/null
-            ;;
+# distnote
+distn () {
+    ${PRINTF_BIN} "${2:-${ColorDistinct}}%s${3:-${ColorNote}}" "${1}" 2>/dev/null
+}
 
-        e|error)
-            ${PRINTF_BIN} "${DISTINCT_COLOUR}%s${ColorRed}" "${_contents}" 2>/dev/null
-            ;;
 
-        *)
-            ${PRINTF_BIN} "${_msg_type}%s${ColorReset}" "${_contents}" 2>/dev/null
-            ;;
-    esac
-    unset _msg_type _contents
+# distwarn
+distw () {
+    ${PRINTF_BIN} "${2:-${ColorDistinct}}%s${3:-${ColorWarning}}" "${1}" 2>/dev/null
+}
+
+
+# disterror
+diste () {
+    ${PRINTF_BIN} "${2:-${ColorDistinct}}%s${3:-${ColorError}}" "${1}" 2>/dev/null
 }
 
 
