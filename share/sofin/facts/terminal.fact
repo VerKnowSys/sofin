@@ -64,9 +64,11 @@ determine_term_capabilites () {
         ColorBlue="\033[34m"
         ColorMagenta="\033[35m"
         ColorCyan="\033[36m"
+        ColorDistinct="${ColorCyan}"
         ColorWhite="\033[97m"
         ColorParams="\033[38;5;12m"
         ColorViolet="\033[38;5;97m"
+        ColorDebug="${ColorViolet}"
         ColorFunction="\033[38;5;163m"
     else
         CAP_TERM_TPUT=YES
@@ -83,9 +85,11 @@ determine_term_capabilites () {
         ColorBlue="$(${TPUT_BIN} setaf 4)"
         ColorMagenta="$(${TPUT_BIN} setaf 5)"
         ColorCyan="$(${TPUT_BIN} setaf 6)"
+        ColorDistinct="${ColorCyan}"
         ColorWhite="$(${TPUT_BIN} setaf 15)"
         ColorParams="$(${TPUT_BIN} setaf 12)"
         ColorViolet="$(${TPUT_BIN} setaf 97)"
+        ColorDebug="${ColorViolet}"
         ColorFunction="$(${TPUT_BIN} setaf 163)"
     fi
 }

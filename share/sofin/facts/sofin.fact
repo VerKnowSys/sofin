@@ -42,7 +42,6 @@ DEFINITIONS_LISTS_DIR="${CACHE_DIR}${DEFINITIONS_BASE}/${DEFINITIONS_LISTS_FILE_
 CCACHE_BIN_OPTIONAL="${SOFTWARE_DIR}Ccache/exports/ccache"
 DEFAULT_PATH="${DEFAULT_PATH:-/bin:/usr/bin:/sbin:/usr/sbin:/usr/pkg/bin:/usr/pkg/sbin}"
 SOFIN_BIN_SHORT="$(${BASENAME_BIN} "${SOFIN_BIN}" 2>/dev/null)"
-DISTINCT_COLOUR="${ColorCyan}"
 
 # Build timestamp in seconds since 1970
 TIMESTAMP="${TIMESTAMP:-$(${DATE_BIN} ${DEFAULT_DATE_TS_OPTS} 2>/dev/null)}"
