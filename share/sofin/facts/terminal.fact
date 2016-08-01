@@ -34,6 +34,9 @@ fi
 determine_term_capabilites () {
     setopt >/dev/null 2>/dev/null # zsh only command
     if [ "${?}" = "0" ]; then
+        # Zsh is still running as sh, so we want to load Zsh fancy features:
+        zmodload zsh/parameter
+
         setopt debugbeforecmd
         setopt extendedhistory
 
