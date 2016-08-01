@@ -35,31 +35,37 @@ debug () {
             done
             _dbfnin="${_dbfnin}(): "
         fi
+        _dname="$(${BASENAME_BIN} "${BASH_SOURCE}" 2>/dev/null)"
+        _dbfile="$(distd "${_dname}:${BASH_LINENO[0]}" ${ColorParams})"
+        _dbfnin="[${_dbfile}]"
+
     elif [ "${CAP_TERM_ZSH}" = "YES" ]; then
         setopt debugbeforecmd
-        setopt notify
+        setopt extendedhistory
+        _dbfnin="[]"
     else
-        _dbfnin="(): "
+        _dbfnin=""
     fi
+    _sep="${_sep:-$(distd "λ" ${ColorDarkgray})}"
 
     # NOTE: "#" is required for debug mode to work properly
-    _dbfn="# ${ColorFunction}${_dbfnin}${ColorViolet}"
+    _dbfn=" ${_dbfnin} ${_sep} "
     if [ -z "${DEBUG}" ]; then
         _dbgnme="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
         if [ -n "${_dbgnme}" -a \
              -d "${LOGS_DIR}" ]; then
             # Definition log
-            ${PRINTF_BIN} "${_dbfn}%s${ColorReset}\n" "${_in}" 2>> "${LOG}-${_dbgnme}" >> "${LOG}-${_dbgnme}"
+            ${PRINTF_BIN} "#${ColorDebug}${_dbfn}%s${ColorReset}\n" "${_in}" 2>> "${LOG}-${_dbgnme}" >> "${LOG}-${_dbgnme}"
         elif [ -z "${_dbgnme}" -a \
                -d "${LOGS_DIR}" ]; then
             # Main log
-            ${PRINTF_BIN} "${_dbfn}%s${ColorReset}\n" "${_in}" 2>> "${LOG}" >> "${LOG}"
+            ${PRINTF_BIN} "#${ColorDebug}${_dbfn}%s${ColorReset}\n" "${_in}" 2>> "${LOG}" >> "${LOG}"
         elif [ ! -d "${LOGS_DIR}" ]; then
             # System logger fallback
-            ${LOGGER_BIN} "${DEFAULT_NAME}: ${_dbfn}${_in}${ColorReset}" 2>> "${LOG}"
+            ${LOGGER_BIN} "# λ ${ColorDebug}${_dbfn}${_in}${ColorReset}" 2>> "${LOG}"
         fi
     else # DEBUG is set. Print to stdout
-        ${PRINTF_BIN} "${_dbfn}%s${ColorReset}\n" "${_in}"
+        ${PRINTF_BIN} "#${ColorDebug}${_dbfn}%s${ColorReset}\n" "${_in}"
     fi
     unset _dbgnme _in _dbfn _dbfnin _elmz _cee
 }
