@@ -36,6 +36,13 @@ determine_term_capabilites () {
     if [ "${?}" = "0" ]; then
         setopt debugbeforecmd
         setopt extendedhistory
+
+        # NOTE: don't send HUP on shell exit:
+        setopt nohup
+
+        # NOTE: required for funcstack to work:
+        setopt evallineno
+
         CAP_TERM_ZSH=YES
         unset CAP_TERM_BASH
     else
