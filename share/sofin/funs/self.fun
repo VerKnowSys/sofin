@@ -20,6 +20,7 @@ load_requirements () {
 
 
 install_sofin () {
+    CAP_SYS_PRODUCTION=YES
     compiler_setup
     build_sofin_natives
     install_sofin_files
