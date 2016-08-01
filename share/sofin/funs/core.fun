@@ -40,8 +40,6 @@ debug () {
         _dbfnin="[${_dbfile}]"
 
     elif [ "${CAP_TERM_ZSH}" = "YES" ]; then
-        setopt debugbeforecmd
-        setopt extendedhistory
         _dbfnin="[]"
     else
         _dbfnin=""
