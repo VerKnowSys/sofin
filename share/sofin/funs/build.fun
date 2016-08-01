@@ -364,7 +364,7 @@ process_flat () {
                     # TODO: implement auto picking fetch method based on DEF_SOURCE_PATH contents
                     if [ ! -e "${_dest_file}" ]; then
                         retry "${FETCH_BIN} -o ${_dest_file} ${FETCH_OPTS} '${DEF_SOURCE_PATH}'" || \
-                            def_error "${DEF_NAME}${DEF_POSTFIX}" "Failed source fetch: $(diste "${DEF_SOURCE_PATH}${_base}")"
+                            error "Failed to fetch source: $(diste "${DEF_SOURCE_PATH}")"
                         note "   ${NOTE_CHAR} Source fetched: $(distn "${_base}")"
                     fi
                     debug "Build root: $(distd "${BUILD_DIR}"), file: $(distd "${_dest_file}")"

@@ -9,15 +9,6 @@ check_result () {
 }
 
 
-def_error () {
-    if [ -z "${2}" ]; then
-        error "$(diste "${FAIL_CHAR}" ${ColorRed}) $(diste "${1}")"
-    else
-        error "$(diste "${SUCCESS_CHAR}" ${ColorGreen}) $(diste "${2}")"
-    fi
-}
-
-
 check_os () {
     case "${SYSTEM_NAME}" in
         FreeBSD)
