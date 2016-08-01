@@ -1,6 +1,6 @@
 clean_purge () {
     if [ -d "${CACHE_DIR}" ]; then
-        debug "Purging all caches from: $(distinct n "${CACHE_DIR}")"
+        debug "Purging all caches from: $(distn "${CACHE_DIR}")"
         try "${RM_BIN} -rf ${CACHE_DIR}"
     fi
 }
@@ -8,7 +8,7 @@ clean_purge () {
 
 clean_logs () {
     if [ -d "${LOGS_DIR}" ]; then
-        debug "Removing build logs from: $(distinct n "${LOGS_DIR}")"
+        debug "Removing build logs from: $(distn "${LOGS_DIR}")"
         try "${RM_BIN} -rf ${LOGS_DIR}"
     fi
 }
@@ -16,7 +16,7 @@ clean_logs () {
 
 clean_filecache () {
     if [ -d "${FILE_CACHE_DIR}" ]; then
-        debug "Removing file-caches from: $(distinct n "${FILE_CACHE_DIR}")"
+        debug "Removing file-caches from: $(distn "${FILE_CACHE_DIR}")"
         try "${RM_BIN} -rf ${FILE_CACHE_DIR}"
     fi
 }
@@ -39,7 +39,7 @@ clean_failbuilds () {
                 try "${RM_BIN} -rf ${i}"
             done
             _cf_result="$(${PRINTF_BIN} '%s\n' "${_cf_number}" | ${BC_BIN} 2>/dev/null)"
-            note "$(distinct n "${_cf_result}") directories cleaned."
+            note "$(distn "${_cf_result}") directories cleaned."
         fi
     fi
     unset _cf_number _cf_files _cf_result

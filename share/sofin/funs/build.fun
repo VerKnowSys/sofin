@@ -4,25 +4,25 @@ build_bundle () {
     _bsbelement="${2}"
     _bsversion="${3}"
     if [ -z "${_bsbname}" ]; then
-        error "First argument with $(distinct e "BundleName") is required!"
+        error "First argument with $(diste "BundleName") is required!"
     fi
     if [ -z "${_bsbelement}" ]; then
-        error "Second argument with $(distinct e "element-name") is required!"
+        error "Second argument with $(diste "element-name") is required!"
     fi
     if [ -z "${_bsversion}" ]; then
-        error "Third argument with $(distinct e "version-string") is required!"
+        error "Third argument with $(diste "version-string") is required!"
     fi
-    debug "build_bundle: $(distinct d "${_bsbname}"), should be in: $(distinct d "${SOFTWARE_DIR}${_bsbname}"), full-name: $(distinct d "${_bsbelement}")"
+    debug "build_bundle: $(distd "${_bsbname}"), should be in: $(distd "${SOFTWARE_DIR}${_bsbname}"), full-name: $(distd "${_bsbelement}")"
     if [ ! -d "${SOFTWARE_DIR}${_bsbname}" ]; then
         create_software_dir "${_bsbname}"
         create_software_bundle_archive "${_bsbname}" "${_bsbelement}" "${_bsversion}"
     else
         if [ ! -f "${FILE_CACHE_DIR}${_bsbelement}" ]; then
-            debug "Found incomplete or damaged bundle file. Rebuilding: $(distinct d "${_bsbelement}")"
+            debug "Found incomplete or damaged bundle file. Rebuilding: $(distd "${_bsbelement}")"
             try "${RM_BIN} -vf ${FILE_CACHE_DIR}${_bsbelement}"
             create_software_bundle_archive "${_bsbname}" "${_bsbelement}" "${_bsversion}"
         else
-            debug "Already existing bundle: $(distinct d "${_bsbelement}") will be reused to deploy"
+            debug "Already existing bundle: $(distd "${_bsbelement}") will be reused to deploy"
         fi
     fi
     unset _bsbname _bsbelement
@@ -32,7 +32,7 @@ build_bundle () {
 push_binbuilds () {
     _push_bundles=${*}
     if [ -z "${_push_bundles}" ]; then
-        error "At least single argument with $(distinct e "BundleName") to push is required!"
+        error "At least single argument with $(diste "BundleName") to push is required!"
     fi
     create_dirs
     for _pbelement in ${_push_bundles}; do
@@ -43,15 +43,15 @@ push_binbuilds () {
         _pbinstall_indicator_file="${SOFTWARE_DIR}${_pbelement}/${_pblowercase_element}${DEFAULT_INST_MARK_EXT}"
         _pbbversion_element="$(${CAT_BIN} "${_pbinstall_indicator_file}" 2>/dev/null)"
         if [ ! -f "${_pbinstall_indicator_file}" ]; then
-            error "Bundle install indicator: $(distinct e "${_pbinstall_indicator_file}") doesn't exist!"
+            error "Bundle install indicator: $(diste "${_pbinstall_indicator_file}") doesn't exist!"
         fi
         if [ -n "${_pbelement}" -a \
              -d "${SOFTWARE_DIR}${_pbelement}" -a \
              -n "${_pbbversion_element}" ]; then
-            debug "About to push: $(distinct d "${_pbelement}"), install-indicator: $(distinct d "${_pbinstall_indicator_file}"), soft-version: $(distinct d "${_pbbversion_element}")"
+            debug "About to push: $(distd "${_pbelement}"), install-indicator: $(distd "${_pbinstall_indicator_file}"), soft-version: $(distd "${_pbbversion_element}")"
             push_to_all_mirrors "${_pbelement}" "${_pbbversion_element}"
         else
-            error "Push validations failed for bundle: $(distinct e "${_pbelement}")! It might not be fully installed or broken."
+            error "Push validations failed for bundle: $(diste "${_pbelement}")! It might not be fully installed or broken."
         fi
     done
 }
@@ -61,13 +61,13 @@ deploy_binbuild () {
     _dbbundles=${*}
     create_dirs
     load_defaults
-    note "Requested to build and deploy bundle(s): $(distinct n "${_dbbundles}")"
+    note "Requested to build and deploy bundle(s): $(distn "${_dbbundles}")"
     for _dbbundle in ${_dbbundles}; do
         USE_BINBUILD=NO
         build "${_dbbundle}"
     done
     push_binbuilds ${_dbbundles}
-    note "Deployed successfully: $(distinct n "${_dbbundles}")"
+    note "Deployed successfully: $(distn "${_dbbundles}")"
     unset _dbbundles _dbbundle
 }
 
@@ -93,7 +93,7 @@ rebuild_bundle () {
         fi
     done
 
-    note "Will rebuild, wipe and push these bundles: $(distinct n "${_those_to_rebuild}")"
+    note "Will rebuild, wipe and push these bundles: $(distn "${_those_to_rebuild}")"
     for _reb_ap_bundle in ${_those_to_rebuild}; do
         if [ "${_reb_ap_bundle}" = "Git" -o "${_reb_ap_bundle}" = "Zsh" ]; then
             continue
@@ -134,18 +134,18 @@ fetch_binbuild () {
                 try "${FETCH_BIN} -o ${FILE_CACHE_DIR}${_bb_archive} ${FETCH_OPTS} '${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}'" || \
                     try "${FETCH_BIN} -o ${FILE_CACHE_DIR}${_bb_archive} ${FETCH_OPTS} '${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}'" || \
                         try "${FETCH_BIN} -o ${FILE_CACHE_DIR}${_bb_archive} ${FETCH_OPTS} '${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}'" || \
-                            error "Failure fetching available binary build for: $(distinct e "${_bb_archive}"). Please check your network setup!"
+                            error "Failure fetching available binary build for: $(diste "${_bb_archive}"). Please check your network setup!"
             else
-                note "No binary build file available: $(distinct n "${_bb_archive}")"
+                note "No binary build file available: $(distn "${_bb_archive}")"
             fi
         fi
 
-        debug "BB-archive: $(distinct d "${_bb_archive}"). Expecting binbuild to be available in: $(distinct d "${FILE_CACHE_DIR}${_bb_archive}")"
+        debug "BB-archive: $(distd "${_bb_archive}"). Expecting binbuild to be available in: $(distd "${FILE_CACHE_DIR}${_bb_archive}")"
         if [ -e "${FILE_CACHE_DIR}${_bb_archive}" ]; then
             validate_archive_sha1 "${FILE_CACHE_DIR}${_bb_archive}"
             install_software_from_binbuild "${_bb_archive}" "${_bbfull_name}"
         else
-            debug "Binary build unavailable for bundle: $(distinct d "${_bbfull_name}")"
+            debug "Binary build unavailable for bundle: $(distd "${_bbfull_name}")"
         fi
     fi
     unset _bbfull_name _bbaname _bb_archive
@@ -169,12 +169,12 @@ build () {
         load_defs "${_bund_name}"
         if [ "${DEF_DISABLED_ON}" = "YES" ]; then
             _anm="$(capitalize "${_bund_name}")"
-            warn "Bundle: $(distinct w "${_anm}") is disabled on: $(distinct w "${OS_TRIPPLE}")"
+            warn "Bundle: $(distw "${_anm}") is disabled on: $(distw "${OS_TRIPPLE}")"
             destroy_software_dir "${_anm}"
         else
             for _req_name in ${DEFINITIONS_DIR}${_bund_name}${DEFAULT_DEF_EXT}; do
                 unset DONT_BUILD_BUT_DO_EXPORTS
-                debug "Reading definition: $(distinct d "${_req_name}")"
+                debug "Reading definition: $(distd "${_req_name}")"
                 load_defaults
                 load_defs "${_req_name}"
                 if [ -z "${DEF_REQUIREMENTS}" ]; then
@@ -192,7 +192,7 @@ build () {
                 # if definition requires root privileges, throw an "exception":
                 if [ -n "${DEF_REQUIRE_ROOT_ACCESS}" ]; then
                     if [ "${USER}" != "root" ]; then
-                        error "Definition requires superuser priviledges: $(distinct e "${_bund_lcase}"). Installation aborted."
+                        error "Definition requires superuser priviledges: $(diste "${_bund_lcase}"). Installation aborted."
                     fi
                 fi
 
@@ -224,9 +224,9 @@ build () {
                 else
                     _already_installed_version="$(${CAT_BIN} ${_installed_indicator} 2>/dev/null)"
                     if [ "${DEF_VERSION}" = "${_already_installed_version}" ]; then
-                        debug "$(distinct d "${_bund_lcase}") bundle is installed with version: $(distinct d "${_already_installed_version}")"
+                        debug "$(distd "${_bund_lcase}") bundle is installed with version: $(distd "${_already_installed_version}")"
                     else
-                        warn "$(distinct w "${_bund_lcase}") bundle is installed with version: $(distinct w "${_already_installed_version}"), different from defined: $(distinct w "${DEF_VERSION}")"
+                        warn "$(distw "${_bund_lcase}") bundle is installed with version: $(distw "${_already_installed_version}"), different from defined: $(distw "${DEF_VERSION}")"
                     fi
                     DONT_BUILD_BUT_DO_EXPORTS=YES
                     unset _already_installed_version
@@ -234,9 +234,9 @@ build () {
 
                 if [ -z "${DONT_BUILD_BUT_DO_EXPORTS}" ]; then
                     if [ -z "${DEF_REQUIREMENTS}" ]; then
-                        note "Installing: $(distinct n "${DEF_FULL_NAME}"), version: $(distinct n "${DEF_VERSION}")"
+                        note "Installing: $(distn "${DEF_FULL_NAME}"), version: $(distn "${DEF_VERSION}")"
                     else
-                        note "Installing: $(distinct n "${DEF_FULL_NAME}"), version: $(distinct n "${DEF_VERSION}"), with requirements: $(distinct n "${DEF_REQUIREMENTS}")"
+                        note "Installing: $(distn "${DEF_FULL_NAME}"), version: $(distn "${DEF_VERSION}"), with requirements: $(distn "${DEF_REQUIREMENTS}")"
                     fi
                     _req_amount="$(${PRINTF_BIN} '%s\n' "${DEF_REQUIREMENTS}" | ${WC_BIN} -w 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)"
                     _req_amount="$(${PRINTF_BIN} '%s\n' "${_req_amount} + 1" | ${BC_BIN} 2>/dev/null)"
@@ -249,7 +249,7 @@ build () {
                             note "No additional requirements defined"
                             break
                         else
-                            note "  ${_req} ($(distinct n "${_req_amount}") of $(distinct n "${_req_all}") remaining)"
+                            note "  $(distn "${_req}") ($(distn "${_req_amount}") of $(distn "${_req_all}") remaining)"
                             if [ ! -f "${PREFIX}/${_req}${DEFAULT_INST_MARK_EXT}" ]; then
                                 CHANGED=YES
                                 process_flat "${_req}" "${PREFIX}" "${_bund_name}"
@@ -262,23 +262,22 @@ build () {
                 if [ -z "${DONT_BUILD_BUT_DO_EXPORTS}" ]; then
                     if [ -e "${PREFIX}/${_bund_lcase}${DEFAULT_INST_MARK_EXT}" ]; then
                         if [ "${CHANGED}" = "YES" ]; then
-                            note "  ${_bund_lcase} ($(distinct n 1) of $(distinct n "${_req_all}"))"
-                            note "   ${NOTE_CHAR} App dependencies changed. Rebuilding: $(distinct n "${_bund_lcase}")"
+                            note "  $(distn "${_bund_lcase}") ($(distn 1) of $(distn "${_req_all}"))"
+                            note "   ${NOTE_CHAR} Definition dependencies has changed. Rebuilding: $(distn "${_bund_lcase}")"
                             process_flat "${_bund_lcase}" "${PREFIX}" "${_bund_name}"
                             unset CHANGED
                             mark_installed "${DEF_NAME}${DEF_POSTFIX}" "${DEF_VERSION}"
                             show_done "${DEF_NAME}${DEF_POSTFIX}"
                         else
-                            note "  ${_bund_lcase} ($(distinct n 1) of $(distinct n "${_req_all}"))"
+                            note "  $(distn "${_bund_lcase}") ($(distn 1) of $(distn "${_req_all}"))"
                             show_done "${DEF_NAME}${DEF_POSTFIX}"
-                            debug "${SUCCESS_CHAR} $(distinct d "${_bund_lcase}") current: $(distinct d "${_version_element}"), definition: [$(distinct d "${DEF_VERSION}")] Ok."
+                            debug "${SUCCESS_CHAR} $(distd "${_bund_lcase}") current: $(distd "${_version_element}"), definition: [$(distd "${DEF_VERSION}")] Ok."
                         fi
                     else
-                        note "  ${_bund_lcase} ($(distinct n 1) of $(distinct n "${_req_all}"))"
-                        debug "Right before process call: ${_bund_lcase}"
+                        note "  $(distn "${_bund_lcase}") ($(distn 1) of $(distn "${_req_all}"))"
                         process_flat "${_bund_lcase}" "${PREFIX}" "${_bund_name}"
                         mark_installed "${DEF_NAME}${DEF_POSTFIX}" "${DEF_VERSION}"
-                        note "$(distinct n "${SUCCESS_CHAR}") ${_bund_lcase} [$(distinct n "${DEF_VERSION}")]"
+                        note "$(distn "${SUCCESS_CHAR}") $(distn "${_bund_lcase}") [$(distn "${DEF_VERSION}")]"
                     fi
                 fi
 
@@ -294,7 +293,7 @@ build () {
         finalize_afterbuild "${_bund_name}"
     done
 
-    note "Build successfull: $(distinct n "${_build_list}")"
+    note "Build successfull: $(distn "${_build_list}")"
     unset _build_list _bund_lcase _req_all _req
 }
 
@@ -302,26 +301,26 @@ build () {
 dump_debug_info () {
     # TODO: add DEF_ insight
     debug "-------------- PRE CONFIGURE SETTINGS DUMP --------------"
-    debug "CPUS (used): $(distinct d "${CPUS}")"
-    debug "ALL_CPUS: $(distinct d "${ALL_CPUS}")"
-    debug "MAKE_OPTS: $(distinct d "${MAKE_OPTS}")"
-    debug "FETCH_OPTS: $(distinct d "${FETCH_OPTS}")"
-    debug "PREFIX: $(distinct d "${PREFIX}")"
-    debug "SERVICE_DIR: $(distinct d "${SERVICE_DIR}")"
-    debug "CURRENT_DIR: $(distinct d $(${PWD_BIN} 2>/dev/null))"
-    debug "BUILD_NAMESUM: $(distinct d "${BUILD_NAMESUM}")"
-    debug "BUILD_DIR: $(distinct d "${BUILD_DIR}")"
-    debug "PATH: $(distinct d "${PATH}")"
-    debug "CC: $(distinct d "${CC}")"
-    debug "CXX: $(distinct d "${CXX}")"
-    debug "CPP: $(distinct d "${CPP}")"
-    debug "CXXFLAGS: $(distinct d "${CXXFLAGS}")"
-    debug "CFLAGS: $(distinct d "${CFLAGS}")"
-    debug "LDFLAGS: $(distinct d "${LDFLAGS}")"
+    debug "CPUS (used): $(distd "${CPUS}")"
+    debug "ALL_CPUS: $(distd "${ALL_CPUS}")"
+    debug "MAKE_OPTS: $(distd "${MAKE_OPTS}")"
+    debug "FETCH_OPTS: $(distd "${FETCH_OPTS}")"
+    debug "PREFIX: $(distd "${PREFIX}")"
+    debug "SERVICE_DIR: $(distd "${SERVICE_DIR}")"
+    debug "CURRENT_DIR: $(distd $(${PWD_BIN} 2>/dev/null))"
+    debug "BUILD_NAMESUM: $(distd "${BUILD_NAMESUM}")"
+    debug "BUILD_DIR: $(distd "${BUILD_DIR}")"
+    debug "PATH: $(distd "${PATH}")"
+    debug "CC: $(distd "${CC}")"
+    debug "CXX: $(distd "${CXX}")"
+    debug "CPP: $(distd "${CPP}")"
+    debug "CXXFLAGS: $(distd "${CXXFLAGS}")"
+    debug "CFLAGS: $(distd "${CFLAGS}")"
+    debug "LDFLAGS: $(distd "${LDFLAGS}")"
     if [ "Darwin" = "${SYSTEM_NAME}" ]; then
-        debug "DYLD_LIBRARY_PATH: $(distinct d "${DYLD_LIBRARY_PATH}")"
+        debug "DYLD_LIBRARY_PATH: $(distd "${DYLD_LIBRARY_PATH}")"
     else
-        debug "LD_LIBRARY_PATH: $(distinct d "${LD_LIBRARY_PATH}")"
+        debug "LD_LIBRARY_PATH: $(distd "${LD_LIBRARY_PATH}")"
     fi
     debug "-------------- PRE CONFIGURE SETTINGS DUMP ENDS ---------"
 }
@@ -332,20 +331,20 @@ process_flat () {
     _prefix="${2}"
     _bundlnm="${3}"
     if [ -z "${_app_param}" ]; then
-        error "First argument with $(distinct e "requirement-name") is required!"
+        error "First argument with $(diste "requirement-name") is required!"
     fi
     if [ -z "${_prefix}" ]; then
-        error "Second argument with $(distinct e "/Software/PrefixDir") is required!"
+        error "Second argument with $(diste "/Software/PrefixDir") is required!"
     fi
     if [ -z "${_bundlnm}" ]; then
-        error "Third argument with $(distinct e "BundleName") is required!"
+        error "Third argument with $(diste "BundleName") is required!"
     fi
     _req_definition="${DEFINITIONS_DIR}$(lowercase "${_app_param}")${DEFAULT_DEF_EXT}"
     if [ ! -e "${_req_definition}" ]; then
-        error "Cannot read definition file: $(distinct e "${_req_definition}")!"
+        error "Cannot read definition file: $(diste "${_req_definition}")!"
     fi
     _req_defname="$(${PRINTF_BIN} '%s\n' "$(${BASENAME_BIN} "${_req_definition}" 2>/dev/null)" | ${SED_BIN} -e 's/\..*$//g' 2>/dev/null)"
-    debug "Bundle: $(distinct d "${_bundlnm}"), requirement: $(distinct d "${_app_param}"), PREFIX: $(distinct d "${_prefix}") file: $(distinct d "${_req_definition}"), req-name: $(distinct d "${_req_defname}")"
+    debug "Bundle: $(distd "${_bundlnm}"), requirement: $(distd "${_app_param}"), PREFIX: $(distd "${_prefix}") file: $(distd "${_req_definition}"), req-name: $(distd "${_req_defname}")"
 
     load_defaults
     load_defs "${_req_definition}"
@@ -356,8 +355,8 @@ process_flat () {
     PATH="${_prefix}/bin:${_prefix}/sbin:${DEFAULT_PATH}"
     if [ -z "${DEF_DISABLED_ON}" ]; then
         if [ -z "${DEF_SOURCE_PATH}" ]; then
-            note "   ${NOTE_CHAR2} $(distinct n "DEF_SOURCE_PATH") is undefined for: $(distinct n "${_req_defname}")."
-            note "NOTE: It's only valid for meta bundles. You may consider setting: $(distinct n "DEF_CONFIGURE=\"meta\"") in definition file of bundle."
+            note "   ${NOTE_CHAR2} $(distn "DEF_SOURCE_PATH") is undefined for: $(distn "${_req_defname}")."
+            note "NOTE: It's only valid for meta bundles. You may consider setting: $(distn "DEF_CONFIGURE=\"meta\"") in definition file of bundle."
         else
             _cwd="$(${PWD_BIN} 2>/dev/null)"
             if [ -n "${BUILD_DIR}" -a \
@@ -365,33 +364,33 @@ process_flat () {
                 cd "${BUILD_DIR}"
                 if [ -z "${DEF_GIT_MODE}" ]; then # Standard "fetch source archive" method
                     _base="$(${BASENAME_BIN} "${DEF_SOURCE_PATH}" 2>/dev/null)"
-                    debug "DEF_SOURCE_PATH: $(distinct d "${DEF_SOURCE_PATH}") base: $(distinct d "${_base}")"
+                    debug "DEF_SOURCE_PATH: $(distd "${DEF_SOURCE_PATH}") base: $(distd "${_base}")"
                     _dest_file="${FILE_CACHE_DIR}${_base}"
                     # TODO: implement auto picking fetch method based on DEF_SOURCE_PATH contents
                     if [ ! -e "${_dest_file}" ]; then
                         retry "${FETCH_BIN} -o ${_dest_file} ${FETCH_OPTS} '${DEF_SOURCE_PATH}'" || \
-                            def_error "${DEF_NAME}${DEF_POSTFIX}" "Failed source fetch: $(distinct e "${DEF_SOURCE_PATH}${_base}")"
-                        note "   ${NOTE_CHAR} Source fetched for: $(distinct n "${_base}")"
+                            def_error "${DEF_NAME}${DEF_POSTFIX}" "Failed source fetch: $(diste "${DEF_SOURCE_PATH}${_base}")"
+                        note "   ${NOTE_CHAR} Source fetched: $(distn "${_base}")"
                     fi
-                    debug "Build root: $(distinct d "${BUILD_DIR}"), file: $(distinct d "${_dest_file}")"
+                    debug "Build root: $(distd "${BUILD_DIR}"), file: $(distd "${_dest_file}")"
                     if [ -z "${DEF_SHA}" ]; then
-                        error "Missing SHA sum for source: $(distinct e "${_dest_file}")!"
+                        error "Missing SHA sum for source: $(diste "${_dest_file}")!"
                     else
                         _a_file_checksum="$(file_checksum "${_dest_file}")"
                         if [ "${_a_file_checksum}" = "${DEF_SHA}" ]; then
                             debug "Source checksum is fine"
                         else
-                            warn "${WARN_CHAR} Source checksum mismatch: $(distinct w "${_a_file_checksum}") vs $(distinct w "${DEF_SHA}")"
+                            warn "${WARN_CHAR} Source checksum mismatch: $(distw "${_a_file_checksum}") vs $(distw "${DEF_SHA}")"
                             _bname="$(${BASENAME_BIN} "${_dest_file}" 2>/dev/null)"
                             try "${RM_BIN} -vf ${_dest_file}" && \
-                                warn "${WARN_CHAR} Removed corrupted cache file: $(distinct w "${_bname}") and retrying.."
+                                warn "${WARN_CHAR} Removed corrupted cache file: $(distw "${_bname}") and retrying.."
                             process_flat "${_app_param}" "${_prefix}" "${_bundlnm}"
                         fi
                         unset _bname _a_file_checksum
                     fi
 
-                    note "   ${NOTE_CHAR} Unpacking source of: $(distinct n "${DEF_NAME}${DEF_POSTFIX}")"
-                    debug "Build dir: $(distinct d "${BUILD_DIR}")"
+                    note "   ${NOTE_CHAR} Unpacking source of: $(distn "${DEF_NAME}${DEF_POSTFIX}")"
+                    debug "Build dir: $(distd "${BUILD_DIR}")"
                     try "${TAR_BIN} -xf ${_dest_file} --directory ${BUILD_DIR}" || \
                         try "${TAR_BIN} -xjf ${_dest_file} --directory ${BUILD_DIR}" || \
                             run "${TAR_BIN} -xJf ${_dest_file} --directory ${BUILD_DIR}"
@@ -417,12 +416,12 @@ process_flat () {
                 do
                     _fd="$(${FIND_BIN} "${BUILD_DIR}" -maxdepth 1 -mindepth 1 -type d -iname "${_pati}" 2>/dev/null | ${HEAD_BIN} -n1 2>/dev/null)"
                     if [ -n "${_fd}" ]; then
-                        debug "Found build dir: $(distinct d "${_fd}"), for definition: $(distinct d "${DEF_NAME}")"
+                        debug "Found build dir: $(distd "${_fd}"), for definition: $(distd "${DEF_NAME}")"
                         break
                     fi
                 done
                 if [ -z "${_fd}" ]; then
-                    error "No source dir found for definition: $(distinct e "${_app_param}")?"
+                    error "No source dir found for definition: $(diste "${_app_param}")?"
                 fi
                 cd "${_fd}"
 
@@ -432,11 +431,11 @@ process_flat () {
                     cd "${_fd}/${DEF_BUILD_DIR_POSTFIX}"
                 fi
                 _pwd="$(${PWD_BIN} 2>/dev/null)"
-                debug "Switched to build dir root: $(distinct d "${_pwd}")"
+                debug "Switched to build dir root: $(distd "${_pwd}")"
 
                 if [ -n "${DEF_GIT_CHECKOUT}" -a \
                      "master" != "${DEF_GIT_CHECKOUT}" ]; then
-                    debug "   ${NOTE_CHAR} Definition branch: $(distinct n "${DEF_GIT_CHECKOUT}")"
+                    debug "   ${NOTE_CHAR} Definition branch: $(distn "${DEF_GIT_CHECKOUT}")"
                     _current_branch="$(${GIT_BIN} rev-parse --abbrev-ref HEAD 2>/dev/null)"
                     if [ "${_current_branch}" != "${DEF_GIT_CHECKOUT}" ]; then
                         try "${GIT_BIN} checkout ${DEFAULT_GIT_OPTS} -b ${DEF_GIT_CHECKOUT}"
@@ -450,21 +449,21 @@ process_flat () {
                 apply_definition_patches "${DEF_NAME}${DEF_POSTFIX}"
                 after_patch_callback
 
-                note "   ${NOTE_CHAR} Configuring: $(distinct n "${_app_param}"), version: $(distinct n "${DEF_VERSION}")"
+                note "   ${NOTE_CHAR} Configuring: $(distn "${_app_param}"), version: $(distn "${DEF_VERSION}")"
                 case "${DEF_CONFIGURE}" in
 
                     ignore)
-                        note "   ${NOTE_CHAR} Configuration skipped for definition: $(distinct n "${_app_param}")"
+                        note "   ${NOTE_CHAR} Configuration skipped for definition: $(distn "${_app_param}")"
                         ;;
 
                     no-conf)
-                        note "   ${NOTE_CHAR} No configuration for definition: $(distinct n "${_app_param}")"
+                        note "   ${NOTE_CHAR} No configuration for definition: $(distn "${_app_param}")"
                         DEF_MAKE_METHOD="${DEF_MAKE_METHOD} PREFIX=${_prefix}"
                         DEF_INSTALL_METHOD="${DEF_INSTALL_METHOD} PREFIX=${_prefix}"
                         ;;
 
                     binary)
-                        note "   ${NOTE_CHAR} Prebuilt definition of: $(distinct n "${_app_param}")"
+                        note "   ${NOTE_CHAR} Prebuilt definition of: $(distn "${_app_param}")"
                         DEF_MAKE_METHOD="true"
                         DEF_INSTALL_METHOD="true"
                         ;;
@@ -536,7 +535,7 @@ process_flat () {
             fi
 
             # and common part between normal and continue modes:
-            note "   ${NOTE_CHAR} Building requirement: $(distinct n "${_app_param}")"
+            note "   ${NOTE_CHAR} Building requirement: $(distn "${_app_param}")"
             try "${DEF_MAKE_METHOD}" || \
             run "${DEF_MAKE_METHOD}"
             after_make_callback
@@ -546,22 +545,22 @@ process_flat () {
                 try "${FIND_BIN} ${_prefix}/${place} -delete"
             done
 
-            note "   ${NOTE_CHAR} Installing requirement: $(distinct n "${_app_param}")"
+            note "   ${NOTE_CHAR} Installing requirement: $(distn "${_app_param}")"
             run "${DEF_INSTALL_METHOD}"
             after_install_callback
 
             run "${PRINTF_BIN} '%s' \"${DEF_VERSION}\" > ${_prefix}/${_app_param}${DEFAULT_INST_MARK_EXT}" && \
-                debug "Stored version: $(distinct d "${DEF_VERSION}") of software: $(distinct d "${DEF_NAME}") installed in: $(distinct d "${_prefix}")"
+                debug "Stored version: $(distd "${DEF_VERSION}") of software: $(distd "${DEF_NAME}") installed in: $(distd "${_prefix}")"
             cd "${_cwd}" 2>/dev/null
             unset _cwd
         fi
     else
-        note "   ${WARN_CHAR} Requirement: $(distinct n "${_req_defname}") is provided by base system."
+        note "   ${WARN_CHAR} Requirement: $(distn "${_req_defname}") is provided by base system."
         if [ ! -d "${_prefix}" ]; then # case when disabled requirement is first on list of dependencies
             create_software_dir "$(${BASENAME_BIN} "${_prefix}" 2>/dev/null)"
         fi
         _dis_def="${_prefix}/${_req_defname}${DEFAULT_INST_MARK_EXT}"
-        debug "Disabled requirement: $(distinct d "${_req_defname}"), writing '${DEFAULT_REQ_OS_PROVIDED}' to: $(distinct d "${_dis_def}")"
+        debug "Disabled requirement: $(distd "${_req_defname}"), writing '${DEFAULT_REQ_OS_PROVIDED}' to: $(distd "${_dis_def}")"
         run "${PRINTF_BIN} '%s' \"${DEFAULT_REQ_OS_PROVIDED}\" > ${_dis_def}"
     fi
     unset _current_branch _dis_def _req_defname _app_param _prefix _bundlnm

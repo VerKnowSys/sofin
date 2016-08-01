@@ -6,7 +6,7 @@ compiler_setup () {
         }
     fi
     debug "---------------- COMPILER FEATURES DUMP -----------------"
-    debug "Listing compiler features for platform: $(distinct d "${SYSTEM_NAME}")"
+    debug "Listing compiler features for platform: $(distd "${SYSTEM_NAME}")"
     case "${SYSTEM_NAME}" in
         Minix)
             DEFAULT_COMPILER_FLAGS="${COMMON_COMPILER_FLAGS} -I/usr/pkg/include -fPIE"
@@ -30,12 +30,12 @@ compiler_setup () {
     esac
 
     if [ "YES" = "${DEBUGBUILD}" ]; then
-        debug " $(distinct ${ColorGreen} "${SUCCESS_CHAR}") $(distinct ${ColorGreen} "debug-build")"
-        debug " $(distinct ${ColorYellow} "${FAIL_CHAR}") $(distinct ${ColorGray} "production-build")"
+        debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "debug-build" ${ColorGreen})"
+        debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "production-build" ${ColorGray})"
         DEFAULT_COMPILER_FLAGS="${DEFAULT_COMPILER_FLAGS} -O0 -ggdb"
     else
-        debug " $(distinct ${ColorGreen} "${SUCCESS_CHAR}") $(distinct ${ColorGreen} "production-build")"
-        debug " $(distinct ${ColorYellow} "${FAIL_CHAR}") $(distinct ${ColorGray} "debug-build")"
+        debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "production-build" ${ColorGreen})"
+        debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "debug-build" ${ColorGray})"
         DEFAULT_COMPILER_FLAGS="${DEFAULT_COMPILER_FLAGS} -O2"
     fi
 
@@ -52,7 +52,7 @@ compiler_setup () {
     BASE_COMPILER="${SOFTWARE_DIR}$(capitalize ${C_COMPILER_NAME})" # /Software/Clang
     if [ -x "${BASE_COMPILER}/bin/${default_c}" -a \
          -x "${BASE_COMPILER}/bin/${default_cxx}" ]; then
-        debug " $(distinct ${ColorGreen} "${SUCCESS_CHAR}") $(distinct ${ColorGreen} "base-compiler: ${default_c}")"
+        debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "base-compiler: ${default_c}" ${ColorGreen})"
     else # /usr/bin/clang
         BASE_COMPILER="/usr"
         if [ "${SYSTEM_NAME}" = "Minix" ]; then
@@ -60,7 +60,7 @@ compiler_setup () {
         fi
         if [ -x "${BASE_COMPILER}/bin/${default_c}" -a \
              -x "${BASE_COMPILER}/bin/${default_cxx}" ]; then
-            debug " $(distinct ${ColorGreen} "${SUCCESS_CHAR}") $(distinct ${ColorGreen} "base-compiler: ${default_c}")"
+            debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "base-compiler: ${default_c}" ${ColorGreen})"
         else
             if [ -x "${BASE_COMPILER}/bin/${C_COMPILER_NAME_ALT}" -a \
                  -x "${BASE_COMPILER}/bin/${CXX_COMPILER_NAME_ALT}" -a \
@@ -68,21 +68,21 @@ compiler_setup () {
                 default_c="${C_COMPILER_NAME_ALT}"
                 default_cxx="${CXX_COMPILER_NAME_ALT}"
                 default_cpp="${CPP_PREPROCESSOR_NAME_ALT}"
-                debug " $(distinct ${ColorGreen} "${SUCCESS_CHAR}") $(distinct ${ColorGreen} "base-compiler: ${default_c}")"
+                debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "base-compiler: ${default_c}" ${ColorGreen})"
             else
-                debug " $(distinct ${ColorYellow} "${FAIL_CHAR}") $(distinct ${ColorGray} "base-compiler: ${default_c}")"
+                debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "base-compiler: ${default_c}" ${ColorGray})"
             fi
         fi
     fi
 
     CC="$(${PRINTF_BIN} '%s\n' "${BASE_COMPILER}/bin/${default_c} ${DEF_COMPILER_ARGS}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
     if [ ! -x "${BASE_COMPILER}/bin/${default_c}" ]; then # fallback for systems with clang without standalone preprocessor binary:
-        error "Base C compiler: $(distinct e "${CC}") should be an executable!"
+        error "Base C compiler: $(diste "${CC}") should be an executable!"
     fi
 
     CXX="$(${PRINTF_BIN} '%s\n' "${BASE_COMPILER}/bin/${default_cxx} ${DEF_COMPILER_ARGS}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
     if [ ! -x "${BASE_COMPILER}/bin/${default_cxx}" ]; then # fallback for systems with clang without standalone preprocessor binary:
-        error "Base C++ compiler: $(distinct e "${CXX}") should be an executable!"
+        error "Base C++ compiler: $(diste "${CXX}") should be an executable!"
     fi
 
     CPP="$(${PRINTF_BIN} '%s\n' "${BASE_COMPILER}/bin/${default_cpp}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
@@ -92,46 +92,46 @@ compiler_setup () {
 
     # -fPIC check:
     echo "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'f[Pp][Ii][Cc]' >/dev/null 2>/dev/null && \
-        debug " $(distinct ${ColorGreen} "${SUCCESS_CHAR}") $(distinct ${ColorGreen} "position-independent-code")" || \
-        debug " $(distinct ${ColorYellow} "${FAIL_CHAR}") $(distinct ${ColorGray} "position-independent-code")"
+        debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "position-independent-code" ${ColorGreen})" || \
+        debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "position-independent-code" ${ColorGray})"
 
     # -fPIE check:
     echo "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'f[Pp][Ii][Ee]' >/dev/null 2>/dev/null && \
-        debug " $(distinct ${ColorGreen} "${SUCCESS_CHAR}") $(distinct ${ColorGreen} "position-independent-executable")" || \
-        debug " $(distinct ${ColorYellow} "${FAIL_CHAR}") $(distinct ${ColorGray} "position-independent-executable")"
+        debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "position-independent-executable" ${ColorGreen})" || \
+        debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "position-independent-executable" ${ColorGray})"
 
     # -fstack-protector-all check:
     echo "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'fstack-protector-all' >/dev/null 2>/dev/null && \
-        debug " $(distinct ${ColorGreen} "${SUCCESS_CHAR}") $(distinct ${ColorGreen} "stack-protector-all")" || \
-        debug " $(distinct ${ColorYellow} "${FAIL_CHAR}") $(distinct ${ColorGray} "stack-protector-all")"
+        debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "stack-protector-all" ${ColorGreen})" || \
+        debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "stack-protector-all" ${ColorGray})"
 
     # -fno-strict-overflow check:
     echo "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'fno-strict-overflow' >/dev/null 2>/dev/null && \
-        debug " $(distinct ${ColorGreen} "${SUCCESS_CHAR}") $(distinct ${ColorGreen} "no-strict-overflow")" || \
-        debug " $(distinct ${ColorYellow} "${FAIL_CHAR}") $(distinct ${ColorGray} "no-strict-overflow")"
+        debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "no-strict-overflow" ${ColorGreen})" || \
+        debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "no-strict-overflow" ${ColorGray})"
 
     if [ "${default_c}" = "${C_COMPILER_NAME}" ]; then
-        debug " $(distinct ${ColorGreen} "${SUCCESS_CHAR}") $(distinct ${ColorGreen} "clang-compiler")"
-        debug " $(distinct ${ColorYellow} "${FAIL_CHAR}") $(distinct ${ColorGray} "gnu-c-compiler")"
+        debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "clang-compiler" ${ColorGreen})"
+        debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "gnu-c-compiler" ${ColorGray})"
     elif [ "${default_c}" = "${C_COMPILER_NAME_ALT}" ]; then
-        debug " $(distinct ${ColorGreen} "${SUCCESS_CHAR}") $(distinct ${ColorGreen} "gnu-c-compiler")"
-        debug " $(distinct ${ColorYellow} "${FAIL_CHAR}") $(distinct ${ColorGray} "clang-compiler")"
+        debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "gnu-c-compiler" ${ColorGreen})"
+        debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "clang-compiler" ${ColorGray})"
     fi
 
     # Support for other definition options
     if [ -n "${FORCE_GNU_COMPILER}" ]; then # force GNU compiler usage on definition side:
-        warn "Support for GNU compiler was recently dropped, and is ignored since Sofin 1.0. Try using $(distinct e Gcc) instead?"
+        warn "Support for GNU compiler was recently dropped, and is ignored since Sofin 1.0. Try using $(diste Gcc) instead?"
     fi
 
     # TODO: make a alternatives / or capability
     if [ -z "${DEF_NO_CCACHE}" ]; then # ccache is supported by default but it's optional
         if [ -x "${CCACHE_BIN_OPTIONAL}" ]; then # check for CCACHE availability
-            debug " $(distinct ${ColorGreen} "${SUCCESS_CHAR}") $(distinct ${ColorGreen} "ccache")"
+            debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "ccache" ${ColorGreen})"
             CC="${CCACHE_BIN_OPTIONAL} ${CC}"
             CXX="${CCACHE_BIN_OPTIONAL} ${CXX}"
             CPP="${CCACHE_BIN_OPTIONAL} ${CPP}"
         else
-            debug " $(distinct ${ColorYellow} "${FAIL_CHAR}") $(distinct ${ColorGray} "ccache")"
+            debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "ccache" ${ColorGray})"
         fi
     fi
 
@@ -178,10 +178,10 @@ compiler_setup () {
                 fi
                 ;;
         esac
-        debug " $(distinct ${ColorGreen} "${SUCCESS_CHAR}") $(distinct ${ColorGreen} "gold-linker")"
+        debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "gold-linker" ${ColorGreen})"
     else # Golden linker causes troubles with some build systems like Qt, so we give option to disable it
         unset NM LD
-        debug " $(distinct ${ColorYellow} "${FAIL_CHAR}") $(distinct ${ColorGray} "gold-linker")"
+        debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "gold-linker" ${ColorGray})"
     fi
 
     if [ -z "${DEF_LINKER_NO_DTAGS}" ]; then
@@ -189,17 +189,17 @@ compiler_setup () {
             CFLAGS="${CFLAGS} -Wl,-rpath=${PREFIX}/lib,--enable-new-dtags"
             CXXFLAGS="${CXXFLAGS} -Wl,-rpath=${PREFIX}/lib,--enable-new-dtags"
             LDFLAGS="${LDFLAGS} -Wl,-rpath=${PREFIX}/lib,--enable-new-dtags"
-            debug " $(distinct ${ColorGreen} "${SUCCESS_CHAR}") $(distinct ${ColorGreen} "enable-new-dtags")"
+            debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "enable-new-dtags" ${ColorGreen})"
         else
-            debug " $(distinct ${ColorYellow} "${FAIL_CHAR}") $(distinct ${ColorGray} "enable-new-dtags")"
+            debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "enable-new-dtags" ${ColorGray})"
         fi
     fi
     if [ -z "${DEF_NO_FAST_MATH}" ]; then
-        debug " $(distinct ${ColorGreen} "${SUCCESS_CHAR}") $(distinct ${ColorGreen} "fast-math")"
+        debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "fast-math" ${ColorGreen})"
         CFLAGS="${CFLAGS} -ffast-math"
         CXXFLAGS="${CXXFLAGS} -ffast-math"
     else
-        debug " $(distinct ${ColorYellow} "${FAIL_CHAR}") $(distinct ${ColorGray} "fast-math")"
+        debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "fast-math" ${ColorGray})"
     fi
     debug "-------------- COMPILER FEATURES DUMP ENDS --------------"
 
@@ -214,10 +214,10 @@ create_lock () {
     if [ -z "${_bundle_name}" ]; then
         error "No bundle name specified to lock!"
     else
-        debug "Acquring bundle lock for: $(distinct d "${_bundle_name}")"
+        debug "Acquring bundle lock for: $(distd "${_bundle_name}")"
     fi
     SOFIN_PID="${SOFIN_PID:-$$}"
-    debug "Pid of current Sofin session: $(distinct d "${SOFIN_PID}")"
+    debug "Pid of current Sofin session: $(distd "${SOFIN_PID}")"
     _bundle="$(capitalize "${_bundle_name}")"
     ${MKDIR_BIN} -p ${LOCKS_DIR} 2>/dev/null
     ${PRINTF_BIN} '%s\n' "${SOFIN_PID}" > "${LOCKS_DIR}${_bundle}${DEFAULT_LOCK_EXT}"
@@ -227,12 +227,12 @@ create_lock () {
 
 acquire_lock_for () {
     _bundles=${*}
-    debug "Trying lock acquire for bundles: [$(distinct d "${_bundles}")]"
+    debug "Trying lock acquire for bundles: [$(distd "${_bundles}")]"
     for _bundle in ${_bundles}; do
         if [ -f "${LOCKS_DIR}${_bundle}${DEFAULT_LOCK_EXT}" ]; then
             _lock_pid="$(${CAT_BIN} "${LOCKS_DIR}${_bundle}${DEFAULT_LOCK_EXT}" 2>/dev/null)"
             _lock_ppid="$(${PGREP_BIN} -P${_lock_pid} 2>/dev/null)"
-            debug "Lock pid: $(distinct d "${_lock_pid}"), Sofin pid: $(distinct d "${SOFIN_PID}"), _lock_ppid: $(distinct d "${_lock_ppid}")"
+            debug "Lock pid: $(distd "${_lock_pid}"), Sofin pid: $(distd "${SOFIN_PID}"), _lock_ppid: $(distd "${_lock_ppid}")"
             try "${KILL_BIN} -0 ${_lock_pid}"
             if [ "${?}" = "0" ]; then # NOTE: process is alive
                 if [ "${_lock_pid}" = "${SOFIN_PID}" -o \
@@ -242,14 +242,14 @@ acquire_lock_for () {
                        -z "${_lock_ppid}" ]; then
                     debug "Dealing with no fork, process may continue.."
                 else
-                    error "Bundle: $(distinct e "${_bundle}") is locked due to background job pid: $(distinct e "${_lock_pid}")"
+                    error "Bundle: $(diste "${_bundle}") is locked due to background job pid: $(diste "${_lock_pid}")"
                 fi
             else # NOTE: process is dead
                 debug "Found lock file acquired by dead process. Acquring a new lock.."
                 create_lock "${_bundle}"
             fi
         else
-            debug "No file lock for _bundle: $(distinct d "${_bundle}")"
+            debug "No file lock for _bundle: $(distd "${_bundle}")"
             create_lock "${_bundle}"
         fi
     done
@@ -260,11 +260,11 @@ acquire_lock_for () {
 destroy_locks () {
     _pattern="${1}"
     _pid="${SOFIN_PID:-$$}"
-    debug "Cleaning file locks matching pattern: $(distinct d "${_pattern}") that belong to pid: $(distinct d "${_pid}").."
+    debug "Cleaning file locks matching pattern: $(distd "${_pattern}") that belong to pid: $(distd "${_pid}").."
     for _dlf in $(${FIND_BIN} ${LOCKS_DIR} -mindepth 1 -maxdepth 1 -name "*${_pattern}*${DEFAULT_LOCK_EXT}" -print 2>/dev/null); do
         try "${GREP_BIN} ${_pid} ${_dlf}" && \
             try "${RM_BIN} -f ${_dlf}" && \
-                debug "Lock file removed: $(distinct d "${_dlf}")"
+                debug "Lock file removed: $(distd "${_dlf}")"
     done
     unset _dlf _pid
 }
@@ -272,10 +272,10 @@ destroy_locks () {
 
 update_shell_vars () {
     if [ -n "${SOFIN_PROFILE}" ]; then
-        debug "Generating shell environment and writing to: $(distinct d "${SOFIN_PROFILE}")"
+        debug "Generating shell environment and writing to: $(distd "${SOFIN_PROFILE}")"
         get_shell_vars > "${SOFIN_PROFILE}"
     else
-        debug "Empty profile file: $(distinct d "${SOFIN_PROFILE}")! No-Op!"
+        debug "Empty profile file: $(distd "${SOFIN_PROFILE}")! No-Op!"
     fi
 }
 
@@ -288,21 +288,21 @@ reload_zsh_shells () {
     unset _wishlist
     _shellshort="$(${BASENAME_BIN} "${SHELL}" 2>/dev/null)"
     _pids=$(processes_all | ${EGREP_BIN} "${_shell_pattern}" 2>/dev/null | eval "${FIRST_ARG_GUARD}")
-    debug "Shell inspect: $(distinct d "${_shellshort}"), pattern: $(distinct d "${_shell_pattern}"), PIDS: $(distinct d "${_pids}")"
+    debug "Shell inspect: $(distd "${_shellshort}"), pattern: $(distd "${_shell_pattern}"), PIDS: $(distd "${_pids}")"
     for _pid in ${_pids}; do
         if [ -z "${_wishlist}" ]; then
             _wishlist="${_pid}"
         else
             try "${KILL_BIN} -0 ${_pid}"
             if [ "${?}" = "0" ]; then
-                debug "Found alive pid: $(distinct d "${_pid}") in background."
+                debug "Found alive pid: $(distd "${_pid}") in background."
                 _wishlist="${_wishlist} ${_pid}"
             fi
         fi
     done
     if [ -n "${_wishlist}" ]; then
         try "${KILL_BIN} -SIGUSR2 ${_wishlist}" && \
-            debug "Reload signal sent to $(distinct d "${_shellshort}") pids: $(distinct d "${_wishlist}")"
+            debug "Reload signal sent to $(distd "${_shellshort}") pids: $(distd "${_wishlist}")"
     fi
     unset _wishlist _pid _pids _shell_pattern _shellshort
 }
@@ -312,18 +312,18 @@ update_env_files () {
     _default_envs="/etc/profile /etc/zshenv /etc/bashrc"
     for _env_file in ${_default_envs}; do
         if [ -f "${_env_file}" ]; then
-            debug "Processing existing env file: $(distinct d "${_env_file}")"
+            debug "Processing existing env file: $(distd "${_env_file}")"
             ${EGREP_BIN} "SHELL_PID=" "${_env_file}" >/dev/null 2>&1
             if [ "${?}" = "0" ]; then
                 continue
             else
                 ${PRINTF_BIN} '%s\n' "${SOFIN_SHELL_BLOCK}" >> "${_env_file}" && \
-                    debug "Environment block appended to file: $(distinct d "${_env_file}")"
+                    debug "Environment block appended to file: $(distd "${_env_file}")"
 
             fi
         else
             ${PRINTF_BIN} '%s\n' "${SOFIN_SHELL_BLOCK}" >> "${_env_file}" && \
-                debug "Environment block written to file: $(distinct d "${_env_file}")"
+                debug "Environment block written to file: $(distd "${_env_file}")"
         fi
     done
     update_shell_vars

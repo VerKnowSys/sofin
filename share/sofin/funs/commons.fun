@@ -1,19 +1,19 @@
 check_result () {
     if [ "${1}" = "0" ]; then
         shift
-        debug "$(distinct ${ColorGreen} "${SUCCESS_CHAR}") $(distinct d "${@}")"
+        debug "$(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "${@}")"
     else
         shift
-        error "$(distinct ${ColorRed} "${FAIL_CHAR}") $(distinct e "${@}")"
+        error "$(diste "${FAIL_CHAR}" ${ColorRed}) $(diste "${@}")"
     fi
 }
 
 
 def_error () {
     if [ -z "${2}" ]; then
-        error "$(distinct ${ColorRed} "${FAIL_CHAR}") $(distinct e "${1}")"
+        error "$(diste "${FAIL_CHAR}" ${ColorRed}) $(diste "${1}")"
     else
-        error "$(distinct ${ColorGreen} "${SUCCESS_CHAR}") $(distinct e "${2}")"
+        error "$(diste "${SUCCESS_CHAR}" ${ColorGreen}) $(diste "${2}")"
     fi
 }
 
@@ -126,7 +126,7 @@ find_all () {
                 ${PRINTF_BIN} '%s\n' "${_fafind_results}" 2>/dev/null
             fi
         else
-            error "Directory $(distinct e "${_fapath}") doesn't exist!"
+            error "Directory $(diste "${_fapath}") doesn't exist!"
         fi
     fi
     unset _fapath _famatcher _fatype _fafind_results
@@ -149,10 +149,10 @@ find_most_recent () {
             debug "Empty matcher given in find_most_recent(), using wildcard."
             _frmatcher="*"
         else
-            debug "Specified matcher: $(distinct d "${_frmatcher}")"
+            debug "Specified matcher: $(distd "${_frmatcher}")"
         fi
         if [ -d "${_frpath}" ]; then
-            debug "Find _frpath: $(distinct d "${_frpath}")"
+            debug "Find _frpath: $(distd "${_frpath}")"
             _frfind_results="$(${FIND_BIN} "${_frpath}" \
                 -maxdepth 2 \
                 -mindepth 1 \
@@ -165,12 +165,12 @@ find_most_recent () {
                 ${HEAD_BIN} -n${MAX_OPEN_TAIL_LOGS} 2>/dev/null | \
                 ${CUT_BIN} -d' ' -f2 2>/dev/null)"
             _frres_singleline="$(${PRINTF_BIN} '%s\n' "${_frfind_results}" | eval "${NEWLINES_TO_SPACES_GUARD}")"
-            debug "Find results: $(distinct d "${_frres_singleline}")"
+            debug "Find results: $(distd "${_frres_singleline}")"
             if [ -n "${_frfind_results}" ]; then
                 ${PRINTF_BIN} '%s' "${_frfind_results}" 2>/dev/null
             fi
         else
-            error "Directory $(distinct e "${_frpath}") doesn't exist!"
+            error "Directory $(diste "${_frpath}") doesn't exist!"
         fi
     fi
     unset _frpath _frmatcher _frtype _frfind_results _frres_singleline
@@ -187,7 +187,7 @@ difftext () {
 text_checksum () {
     _fcsmname="${1}"
     if [ -z "${_fcsmname}" ]; then
-        error "Empty content string given for function: $(distinct e "text_checksum()")"
+        error "Empty content string given for function: $(diste "text_checksum()")"
     fi
     case ${SYSTEM_NAME} in
         Minix|Darwin|Linux)
@@ -205,7 +205,7 @@ text_checksum () {
 file_checksum () {
     _fcsmname="${1}"
     if [ -z "${_fcsmname}" ]; then
-        error "Empty file name given for function: $(distinct e "file_checksum()")"
+        error "Empty file name given for function: $(diste "file_checksum()")"
     fi
     case ${SYSTEM_NAME} in
         Minix|Darwin|Linux)

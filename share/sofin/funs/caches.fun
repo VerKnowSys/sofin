@@ -1,7 +1,7 @@
 create_dirs () {
     # special threatment for LOGS_DIR
     if [ ! -d "${LOGS_DIR}" ]; then
-        debug "LOGS_DIR: $(distinct d "${LOGS_DIR}")"
+        debug "LOGS_DIR: $(distd "${LOGS_DIR}")"
         try "${MKDIR_BIN} -p ${LOGS_DIR}"
     fi
 
@@ -15,7 +15,7 @@ create_dirs () {
     fi
     if [ ! -d "${DEFINITIONS_DIR}" -o \
          ! -f "${DEFINITIONS_DEFAULTS}" ]; then
-        debug "No valid definitions cache found in: $(distinct d "${DEFINITIONS_DIR}"). Creating one."
+        debug "No valid definitions cache found in: $(distd "${DEFINITIONS_DIR}"). Creating one."
         clean_purge
         update_defs
     fi
@@ -34,7 +34,7 @@ log_helper () {
     if [ -z "${_lognum_f}" ]; then
         _lognum_f="0"
     fi
-    debug "Log helper, files found: $(distinct d "${_lognum_f}")"
+    debug "Log helper, files found: $(distd "${_lognum_f}")"
     if [ -z "${_log_files}" ]; then
         log_helper ${_log_h_pattern}
     else
@@ -44,12 +44,12 @@ log_helper () {
                 ;;
 
             1)
-                note "Found $(distinct n "${_lognum_f}") log file, that matches _log_h_pattern: $(distinct n "${_log_h_pattern}"). Attaching tail.."
+                note "Found $(distn "${_lognum_f}") log file, that matches _log_h_pattern: $(distn "${_log_h_pattern}"). Attaching tail.."
                 ${TAIL_BIN} -n ${LOG_LINES_AMOUNT} -F $(${PRINTF_BIN} '%s\n' "${_log_files}" | eval "${NEWLINES_TO_SPACES_GUARD}")
                 ;;
 
             *)
-                note "Found $(distinct n "${_lognum_f}") log files, that match pattern: $(distinct n "${_log_h_pattern}"). Attaching to all available files.."
+                note "Found $(distn "${_lognum_f}") log files, that match pattern: $(distn "${_log_h_pattern}"). Attaching to all available files.."
                 ${TAIL_BIN} -F $(${PRINTF_BIN} '%s\n' "${_log_files}" | eval "${NEWLINES_TO_SPACES_GUARD}")
                 ;;
         esac
@@ -62,7 +62,7 @@ show_logs () {
     create_dirs
     _logf_pattern=${*}
     _logf_minutes="${LOG_LAST_ACCESS_OR_MOD_MINUTES}"
-    debug "_logf_minutes: $(distinct d "${_logf_minutes}"), pattern: $(distinct d "${_logf_pattern}")"
+    debug "_logf_minutes: $(distd "${_logf_minutes}"), pattern: $(distd "${_logf_pattern}")"
     _files_x_min=$(${FIND_BIN} "${LOGS_DIR}" -maxdepth 1 -mindepth 1 -mmin -${_logf_minutes} -amin -${_logf_minutes} -iname "${DEFAULT_NAME}*${_logf_pattern}*" -print 2>/dev/null)
     touch_logsdir_and_logfile
     if [ "-" = "${_logf_pattern}" -o \
@@ -82,7 +82,7 @@ show_logs () {
             for _fl in ${_files_list}; do
                 _base_fl="$(${BASENAME_BIN} "${_fl}" 2>/dev/null)"
                 if [ -z "${_base_fl}" ]; then
-                    debug "Got an empty element basename: _base_fl=$(distinct d "${_base_fl}") of _fl=$(distinct d "${_fl}")"
+                    debug "Got an empty element basename: _base_fl=$(distd "${_base_fl}") of _fl=$(distd "${_fl}")"
                 else
                     if [ -z "${_files_blist}" ]; then
                         _files_blist="${_base_fl}"
@@ -92,22 +92,22 @@ show_logs () {
                 fi
             done
             if [ "0" = "${_files_count}" ]; then
-                note "Attaching tail only to internal log: [$(distinct n "${_files_blist}")]"
+                note "Attaching tail only to internal log: [$(distn "${_files_blist}")]"
             else
-                note "Attaching tail to $(distinct n "${_files_count}") most recently modified log files (exact order): [$(distinct n "${_files_blist}")]"
+                note "Attaching tail to $(distn "${_files_count}") most recently modified log files (exact order): [$(distn "${_files_blist}")]"
             fi
-            debug "_files_abspaths: $(distinct d "${_files_abspaths}")"
+            debug "_files_abspaths: $(distd "${_files_abspaths}")"
             ${TAIL_BIN} -n0 -F ${_files_abspaths} 2>/dev/null
         else
-            note "No logs to attach to. LOGS_DIR=($(distinct n "${LOGS_DIR}")) contain no log files?"
+            note "No logs to attach to. LOGS_DIR=($(distn "${LOGS_DIR}")) contain no log files?"
         fi
 
     elif [ -z "${_logf_pattern}" ]; then
-        note "No pattern specified, setting tail on all logs accessed or modified in last $(distinct n "${_logf_minutes}") minutes.."
+        note "No pattern specified, setting tail on all logs accessed or modified in last $(distn "${_logf_minutes}") minutes.."
         if [ -z "${_files_x_min}" ]; then
-            note "No log files updated or accessed in last $(distinct n "${_logf_minutes}") minutes to show. Specify '$(distinct n "+")' as param, to attach a tail to all logs."
+            note "No log files updated or accessed in last $(distn "${_logf_minutes}") minutes to show. Specify '$(distn "+")' as param, to attach a tail to all logs."
         else
-            debug "show_log files: $(distinct d "$(${PRINTF_BIN} '%s\n' "${_files_x_min}" | eval "${FILES_COUNT_GUARD}")")"
+            debug "show_log files: $(distd "$(${PRINTF_BIN} '%s\n' "${_files_x_min}" | eval "${FILES_COUNT_GUARD}")")"
             ${TAIL_BIN} -n ${LOG_LINES_AMOUNT} $(${PRINTF_BIN} '%s\n' "${_files_x_min}" | eval "${NEWLINES_TO_SPACES_GUARD}")
         fi
     else
@@ -121,12 +121,12 @@ show_logs () {
 pretouch_logs () {
     _params=${*}
     create_dirs
-    debug "Logs pretouch called with params: $(distinct d "${_params}")"
+    debug "Logs pretouch called with params: $(distd "${_params}")"
     try "${TOUCH_BIN} ${LOGS_DIR}${DEFAULT_NAME}"
     _pret_list=""
     for _app in ${_params}; do
         if [ -z "${_app}" ]; then
-            debug "Empty app given out of params: $(distinct d "${_params}")?"
+            debug "Empty app given out of params: $(distd "${_params}")?"
         else
             _lapp="$(lowercase ${_app})"
             if [ -z "${_pret_list}" ]; then
@@ -136,7 +136,7 @@ pretouch_logs () {
             fi
         fi
     done
-    debug "pretouch_logs(): $(distinct d "${_pret_list}")"
+    debug "pretouch_logs(): $(distd "${_pret_list}")"
     try "${TOUCH_BIN} ${_pret_list}"
     unset _app _params _lapp _pret_list
 }

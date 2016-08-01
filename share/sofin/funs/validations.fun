@@ -2,7 +2,7 @@ check_version () { # $1 => installed version, $2 => available version
     if [ ! "${1}" = "" ]; then
         if [ ! "${2}" = "" ]; then
             if [ ! "${1}" = "${2}" ]; then
-                warn "Bundle: $(distinct w $(capitalize "${3}")), version: $(distinct w "${2}") is definied, but installed version is: $(distinct w "${1}")"
+                warn "Bundle: $(distw $(capitalize "${3}")), version: $(distw "${2}") is definied, but installed version is: $(distw "${1}")"
                 FOUND_OUTDATED=YES
             fi
         fi
@@ -16,7 +16,7 @@ validate_env () {
     do
         _var_value="$(${PRINTF_BIN} '%s' "${_envvar}" | ${AWK_BIN} '{sub(/^[A-Z_]*=/, ""); print $1;}' 2>/dev/null)"
         if [ ! -x "${_var_value}" ]; then
-            error "Required binary is unavailable: $(distinct e "${_envvar}")"
+            error "Required binary is unavailable: $(diste "${_envvar}")"
         fi
     done || exit ${ERRORCODE_VALIDATE_ENV_FAILURE}
     unset _var_value _envvar
@@ -25,7 +25,7 @@ validate_env () {
 
 fail_on_bg_job () {
     _deps=${*}
-    debug "deps=$(distinct d "$(${PRINTF_BIN} '%s\n' "${_deps}" | eval "${NEWLINES_TO_SPACES_GUARD}")")"
+    debug "deps=$(distd "$(${PRINTF_BIN} '%s\n' "${_deps}" | eval "${NEWLINES_TO_SPACES_GUARD}")")"
     create_dirs
     acquire_lock_for "${_deps}"
     unset _deps
@@ -40,7 +40,7 @@ fail_any_bg_jobs () {
         if [ -n "${_lock_pid}" ]; then
             try "${KILL_BIN} -0 ${_lock_pid}"
             if [ "${?}" = "0" ]; then
-                error "Detected running instance of Sofin, locked on bundle: $(distinct e "${_bundle_name}") pid: $(distinct e "${_lock_pid}")"
+                error "Detected running instance of Sofin, locked on bundle: $(diste "${_bundle_name}") pid: $(diste "${_lock_pid}")"
             fi
         fi
     done
@@ -56,7 +56,7 @@ validate_reqs () {
                 if [ "${_a_files}" != "1" ]; then
                     _pstfix="s"
                 fi
-                warn "$(distinct w "/usr/local") has been found, which contains: $(distinct w "${_a_files}+") file${_pstfix}."
+                warn "$(distw "/usr/local") has been found, which contains: $(distw "${_a_files}+") file${_pstfix}."
             fi
         fi
         unset _a_files _pstfix
@@ -70,7 +70,7 @@ validate_reqs () {
 check_defs_dir () {
     create_base_datasets
     if [ ! -d "${CACHE_DIR}" ]; then
-        debug "No cache directory found. Creating one at: $(distinct d "${CACHE_DIR}")"
+        debug "No cache directory found. Creating one at: $(distd "${CACHE_DIR}")"
         "${MKDIR_BIN}" -p "${CACHE_DIR}" >/dev/null 2>&1
     fi
 }
@@ -80,12 +80,12 @@ validate_archive_sha1 () {
     _archive_name="${1}"
     if [ ! -f "${_archive_name}" -o \
            -z "${_archive_name}" ]; then
-         error "Specified empty $(distinct e archive_name), or file doesn't exist: $(distinct e "${_archive_name}")"
+         error "Specified empty $(diste archive_name), or file doesn't exist: $(diste "${_archive_name}")"
     fi
     # checking archive sha1 checksum
     if [ -e "${_archive_name}" ]; then
         _current_archive_sha1="$(file_checksum "${_archive_name}")"
-        debug "current_archive_sha1: $(distinct d "${_current_archive_sha1}")"
+        debug "current_archive_sha1: $(distd "${_current_archive_sha1}")"
     else
         error "No bundle archive found?"
     fi
@@ -93,16 +93,16 @@ validate_archive_sha1 () {
     _sha1_value="$(${CAT_BIN} "${_current_sha_file}" 2>/dev/null)"
     if [ ! -f "${_current_sha_file}" -o \
            -z "${_sha1_value}" ]; then
-        debug "No sha1 file available for archive, or sha1 value is empty! Removing local bin-builds of: $(distinct d "${_archive_name}")"
+        debug "No sha1 file available for archive, or sha1 value is empty! Removing local bin-builds of: $(distd "${_archive_name}")"
         try "${RM_BIN} -fv ${_archive_name}"
         try "${RM_BIN} -fv ${_current_sha_file}"
     fi
     if [ "${_current_archive_sha1}" != "${_sha1_value}" ]; then
-        debug "Bundle archive checksum doesn't match ($(distinct d "${_current_archive_sha1}") vs $(distinct d "${_sha1_value}")), removing binary builds and proceeding into build phase"
+        debug "Bundle archive checksum doesn't match ($(distd "${_current_archive_sha1}") vs $(distd "${_sha1_value}")), removing binary builds and proceeding into build phase"
         try "${RM_BIN} -fv ${_archive_name}"
         try "${RM_BIN} -fv ${_current_sha_file}"
     else
-        note "Found correct prebuilt binary archive: $(distinct n "${_archive_name}")"
+        note "Found correct prebuilt binary archive: $(distn "${_archive_name}")"
     fi
     unset _sha1_value _current_sha_file _current_archive_sha1 _archive_name
 }
@@ -123,10 +123,10 @@ validate_def_postfix () {
     fi
     if [ -z "${DEF_POSTFIX}" -a \
          -n "${_cispc_nme_diff}" ]; then
-        debug "Inferred DEF_POSTFIX=$(distinct d "${_cispc_nme_diff}") from definition: $(distinct d "${DEF_NAME}")"
+        debug "Inferred DEF_POSTFIX=$(distd "${_cispc_nme_diff}") from definition: $(distd "${DEF_NAME}")"
         DEF_POSTFIX="${_cispc_nme_diff}"
     elif [ -n "${_cispc_nme_diff}" ]; then
-        debug "Given-name and definition-name difference: $(distinct d "${_cispc_nme_diff}")"
+        debug "Given-name and definition-name difference: $(distd "${_cispc_nme_diff}")"
     else
         debug "No difference between given-name and definition-name."
     fi
@@ -141,7 +141,7 @@ validate_definition_disabled () {
     if [ -n "${_ch_dis_name}" ]; then
         for _def_disabled in ${_ch_dis_name}; do
             if [ "${SYSTEM_NAME}" = "${_def_disabled}" ]; then
-                debug "Disabled: $(distinct d "${_def_disabled}") on $(distinct d "${SYSTEM_NAME}")"
+                debug "Disabled: $(distd "${_def_disabled}") on $(distd "${SYSTEM_NAME}")"
                 DEF_DISABLED_ON=YES
             fi
         done

@@ -102,7 +102,7 @@ if [ -n "${SOFIN_COMMAND_ARG}" ]; then
             else
                 _pickd_bundls="${SOFIN_ARGS}"
             fi
-            debug "Processing software: $(distinct d "${_pickd_bundls}") for: $(distinct d "${OS_TRIPPLE}")"
+            debug "Processing software: $(distd "${_pickd_bundls}") for: $(distd "${OS_TRIPPLE}")"
             build "${_pickd_bundls}"
             unset _pickd_bundls
             finalize
@@ -116,11 +116,11 @@ if [ -n "${SOFIN_COMMAND_ARG}" ]; then
             fi
             fail_on_bg_job "${SOFIN_ARGS}"
             if [ ! -f "${DEFAULT_PROJECT_DEPS_LIST_FILE}" ]; then
-                error "Dependencies file not found! Expected file: $(distinct e "${DEFAULT_PROJECT_DEPS_LIST_FILE}") in current directory!"
+                error "Dependencies file not found! Expected file: $(diste "${DEFAULT_PROJECT_DEPS_LIST_FILE}") in current directory!"
             fi
             _pickd_bundls="$(${CAT_BIN} "${DEFAULT_PROJECT_DEPS_LIST_FILE}" 2>/dev/null | eval "${NEWLINES_TO_SPACES_GUARD}")"
             _bundls_amount="$(${PRINTF_BIN} '%s\n' "${_pickd_bundls}" | eval "${WORDS_COUNT_GUARD}")"
-            note "Dependencies list file found with $(distinct n "${_bundls_amount}") elements in order: $(distinct n "${_pickd_bundls}")"
+            note "Dependencies list file found with $(distn "${_bundls_amount}") elements in order: $(distn "${_pickd_bundls}")"
             build "${_pickd_bundls}"
             unset _pickd_bundls _bundls_amount
             finalize
@@ -137,7 +137,7 @@ if [ -n "${SOFIN_COMMAND_ARG}" ]; then
         b|build)
             create_dirs
             _to_be_built="${SOFIN_ARGS}"
-            note "Requested build of: $(distinct n "${_to_be_built}")"
+            note "Requested build of: $(distn "${_to_be_built}")"
             fail_on_bg_job "${_to_be_built}"
             USE_UPDATE=NO
             USE_BINBUILD=NO

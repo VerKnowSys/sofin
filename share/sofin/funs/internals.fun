@@ -1,51 +1,51 @@
 usage_howto () {
     note "Built in tasks:"
-    note "  $(distinct n "install | get | pick | choose | use  ") installs software from list or from definition and switches exports for it (example: ${SOFIN_BIN_SHORT} install Rubinius)"
-    note "  $(distinct n "dependencies | deps | local          ") installs software from list defined in '$(distinct n "${DEFAULT_PROJECT_DEPS_LIST_FILE}")' file in current directory"
-    note "  $(distinct n "uninstall | remove | delete          ") removes an application or list (example: ${SOFIN_BIN_SHORT} uninstall Rubinius)"
-    note "  $(distinct n "list | installed                     ") gives short list of installed software"
-    note "  $(distinct n "full | fulllist | fullinstalled      ") gives detailed list with installed software including requirements"
-    note "  $(distinct n "available | avail                    ") lists available software"
-    note "  $(distinct n "export | exp | exportapp             ") adds given command to application exports (example: ${SOFIN_BIN_SHORT} export rails Rubinius)"
-    note "  $(distinct n "getshellvars | shellvars | vars      ") returns shell variables for installed software"
-    note "  $(distinct n "log                                  ") shows tail of all logs (for debug messages and verbose info)"
-    note "  $(distinct n "log -                                ") shows tail of Sofin internal log only"
-    note "  $(distinct n "log +                                ") shows and watches all recently modified files"
-    note "  $(distinct n "log any-part-of-def-name             ") shows and watches log(s) which name matches pattern"
-    note "  $(distinct n "reload | rehash                      ") recreates shell vars and reloads current shell"
-    note "  $(distinct n "up | update                          ") only update definitions from remote repository and exit"
-    note "  $(distinct n "ver | version                        ") shows ${SOFIN_BIN_SHORT} script version"
-    note "  $(distinct n "clean                                ") cleans binbuilds cache, unpacked source content and logs"
-    note "  $(distinct n "distclean                            ") cleans binbuilds cache, unpacked source content, logs and definitions"
-    note "  $(distinct n "purge                                ") cleans binbuilds cache, unpacked source content, logs, definitions, source cache and possible states"
-    note "  $(distinct n "out | outdated                       ") lists outdated software"
-    note "  $(distinct n "build                                ") does binary build from source for software specified as params"
-    note "  $(distinct n "deploy                               ") build + push"
-    note "  $(distinct n "push | binpush | send                ") creates binary build from prebuilt software bundles name given as params (example: ${SOFIN_BIN_SHORT} push Rubinius Vifm Curl)"
-    note "  $(distinct n "wipe                                 ") wipes binary builds (matching given name) from binary respositories (example: ${SOFIN_BIN_SHORT} wipe Rubinius Vifm)"
-    note "  $(distinct n "enable                               ") enables Sofin developer environment (full environment stored in ~/.profile). It's the default"
-    note "  $(distinct n "disable                              ") disables Sofin developer environment (only PATH, PKG_CONFIG_PATH and MANPATH written to ~/.profile)"
-    note "  $(distinct n "status                               ") shows Sofin status"
-    note "  $(distinct n "dev                                  ") puts definition content on the fly. Second argument is (lowercase) definition name (no extension). (example: ${SOFIN_BIN_SHORT} dev rubinius)"
-    note "  $(distinct n "rebuild                              ") rebuilds and pushes each software bundle that depends on definition given as a param. (example: ${SOFIN_BIN_SHORT} rebuild openssl - will rebuild all bundles that have 'openssl' dependency)"
-    note "  $(distinct n "reset                               ") resets local definitions repository"
-    note "  $(distinct n "diff                                ") displays changes in current definitions cache. Accepts any part of definition name"
+    note "  $(distn "install | get | pick | choose | use  ") installs software from list or from definition and switches exports for it ($(distn "example: ${SOFIN_BIN_SHORT} install Rubinius" ${ColorExample}))"
+    note "  $(distn "dependencies | deps | local          ") installs software from list defined in '$(distn "${DEFAULT_PROJECT_DEPS_LIST_FILE}")' file in current directory"
+    note "  $(distn "uninstall | remove | delete          ") removes an application or list ($(distn "example: ${SOFIN_BIN_SHORT} uninstall Rubinius" ${ColorExample}))"
+    note "  $(distn "list | installed                     ") gives short list of installed software"
+    note "  $(distn "full | fulllist | fullinstalled      ") gives detailed list with installed software including requirements"
+    note "  $(distn "available | avail                    ") lists available software"
+    note "  $(distn "export | exp | exportapp             ") adds given command to application exports ($(distn "example: ${SOFIN_BIN_SHORT} export rails Rubinius" ${ColorExample}))"
+    note "  $(distn "getshellvars | shellvars | vars      ") returns shell variables for installed software"
+    note "  $(distn "log                                  ") shows tail of all logs (for debug messages and verbose info)"
+    note "  $(distn "log -                                ") shows tail of Sofin internal log only"
+    note "  $(distn "log +                                ") shows and watches all recently modified files"
+    note "  $(distn "log any-part-of-def-name             ") shows and watches log(s) which name matches pattern"
+    note "  $(distn "reload | rehash                      ") recreates shell vars and reloads current shell"
+    note "  $(distn "up | update                          ") only update definitions from remote repository and exit"
+    note "  $(distn "ver | version                        ") shows ${SOFIN_BIN_SHORT} script version"
+    note "  $(distn "clean                                ") cleans binbuilds cache, unpacked source content and logs"
+    note "  $(distn "distclean                            ") cleans binbuilds cache, unpacked source content, logs and definitions"
+    note "  $(distn "purge                                ") cleans binbuilds cache, unpacked source content, logs, definitions, source cache and possible states"
+    note "  $(distn "out | outdated                       ") lists outdated software"
+    note "  $(distn "build                                ") does binary build from source for software specified as params"
+    note "  $(distn "deploy                               ") build + push"
+    note "  $(distn "push | binpush | send                ") creates binary build from prebuilt software bundles name given as params ($(distn "example: ${SOFIN_BIN_SHORT} push Rubinius Vifm Curl" ${ColorExample}))"
+    note "  $(distn "wipe                                 ") wipes binary builds (matching given name) from binary respositories ($(distn "example: ${SOFIN_BIN_SHORT} wipe Rubinius Vifm" ${ColorExample}))"
+    note "  $(distn "enable                               ") enables Sofin developer environment (full environment stored in ~/.profile). It's the default"
+    note "  $(distn "disable                              ") disables Sofin developer environment (only PATH, PKG_CONFIG_PATH and MANPATH written to ~/.profile)"
+    note "  $(distn "status                               ") shows Sofin status"
+    note "  $(distn "dev                                  ") puts definition content on the fly. Second argument is (lowercase) definition name (no extension). ($(distn "example: ${SOFIN_BIN_SHORT} dev rubinius" ${ColorExample}))"
+    note "  $(distn "rebuild                              ") rebuilds and pushes each software bundle that depends on definition given as a param. ($(distn "example: ${SOFIN_BIN_SHORT} rebuild openssl - will rebuild all bundles that have 'openssl' dependency" ${ColorExample}))"
+    note "  $(distn "reset                               ") resets local definitions repository"
+    note "  $(distn "diff                                ") displays changes in current definitions cache. Accepts any part of definition name"
     # TODO: fix-hack
-    # note "  $(distinct n "hack                                ") hack through build dirs matching pattern given as param"
+    # note "  $(distn "hack                                ") hack through build dirs matching pattern given as param"
 }
 
 
 write_info_about_shell_configuration () {
     if [ "YES" = "${TTY}" ]; then
-        warn "$(distinct w SHELL_PID) has no value (normally contains pid of current shell)\nShell auto reload function is disabled for this session"
+        warn "$(distw SHELL_PID) has no value (normally contains pid of current shell)\nShell auto reload function is disabled for this session"
     else
-        debug "$(distinct d SHELL_PID) has no value (normally contains pid of current shell)\nShell auto reload function is disabled for this session"
+        debug "$(distd SHELL_PID) has no value (normally contains pid of current shell)\nShell auto reload function is disabled for this session"
     fi
 }
 
 
 sofin_header () {
-    ${PRINTF_BIN} '%s\n\n' "$(distinct n 'Sof')tware $(distinct n 'In')staller v$(distinct n "${SOFIN_VERSION}") -- (c) 2o11-2o16 -- Daniel ($(distinct n dmilith)) Dettlaff"
+    ${PRINTF_BIN} '%s\n\n' "$(distn 'Sof')tware $(distn 'In')staller v$(distn "${SOFIN_VERSION}") -- (c) 2o11-2o16 -- Daniel ($(distn dmilith)) Dettlaff"
 }
 
 
@@ -197,11 +197,11 @@ list_bundles_full () {
             if [ -e "${_lbinstald_file}" ]; then
                 note "${SUCCESS_CHAR} ${_lbfapp_name}"
             else
-                note "$(distinct ${ColorRed} "${FAIL_CHAR}") ${_lbfapp_name} $(distinct ${ColorRed} "[!]")"
+                note "$(distn "${FAIL_CHAR}" ${ColorRed}) ${_lbfapp_name} $(distn "[!]" ${ColorRed})"
             fi
             for _lbfreq in $(${FIND_BIN} ${_lbfapp} -mindepth 1 -maxdepth 1 -iname "*${DEFAULT_INST_MARK_EXT}" 2>/dev/null | ${SORT_BIN} 2>/dev/null); do
                 _lbpp="$(${PRINTF_BIN} '%s' "$(${BASENAME_BIN} "${_lbfreq}" 2>/dev/null)" | ${SED_BIN} "s/${DEFAULT_INST_MARK_EXT}//" 2>/dev/null)"
-                note "   ${NOTE_CHAR} ${_lbpp} $(distinct ${ColorGray} "[")$(distinct n $(${CAT_BIN} "${_lbfreq}" 2>/dev/null))$(distinct ${ColorGray} "]")"
+                note "   ${NOTE_CHAR} ${_lbpp} $(distn "[" ${ColorGray})$(distn $(${CAT_BIN} "${_lbfreq}" 2>/dev/null))$(distn "]" ${ColorGray})"
             done
         done
         unset _lbfreq _lbfapp _lbflowercase _lbfapp_name _lbinstald_file _lbpp
@@ -215,7 +215,7 @@ show_diff () {
     # if specified a file name, make sure it's named properly:
     ${EGREP_BIN} "${DEFAULT_DEF_EXT}$" "${_sddefname}" >/dev/null 2>&1 || \
         _sddefname="${_sddefname}${DEFAULT_DEF_EXT}"
-    _beauty_defn="$(distinct n "${_sddefname}")"
+    _beauty_defn="$(distn "${_sddefname}")"
 
     cd ${DEFINITIONS_DIR}
     if [ -f "./${_sddefname}" ]; then
@@ -243,7 +243,7 @@ develop () {
     if [ -z "${_defname_input}" ]; then
         error "No definition file name specified as first param!"
     fi
-    note "Paste your definition below. Hit $(distinct n "[Enter]"), $(distinct n "Ctrl-D") to update definitions file: $(distinct n "${DEFINITIONS_DIR}${_devname}${DEFAULT_DEF_EXT}")"
+    note "Paste your definition below. Hit $(distn "[Enter]"), $(distn "Ctrl-D") to update definitions file: $(distn "${DEFINITIONS_DIR}${_devname}${DEFAULT_DEF_EXT}")"
     ${CAT_BIN} > "${DEFINITIONS_DIR}${_devname}${DEFAULT_DEF_EXT}" 2>/dev/null
     unset _defname_input  _devname _defname_no_ext
 }
@@ -277,7 +277,7 @@ sofin_status () {
     if [ -f ${SOFIN_ENV_DISABLED_INDICATOR_FILE} ]; then
         note "Sofin shell environment is: ${ColorRed}disabled${ColorReset}"
     else
-        note "Sofin shell environment is: $(distinct n enabled${ColorReset})"
+        note "Sofin shell environment is: $(distn enabled${ColorReset})"
     fi
 }
 
@@ -302,7 +302,7 @@ mark_installed () {
     fi
     _softfile="$(lowercase "${_softname}")"
     run "${PRINTF_BIN} \"${_verfile}\" > ${PREFIX}/${_softfile}${DEFAULT_INST_MARK_EXT}" && \
-        debug "Stored version: $(distinct d "${_verfile}") of software: $(distinct d "${_softfile}") installed in: $(distinct d "${PREFIX}")"
+        debug "Stored version: $(distd "${_verfile}") of software: $(distd "${_softfile}") installed in: $(distd "${PREFIX}")"
     unset _softname _verfile _softfile
 }
 
@@ -313,7 +313,7 @@ show_done () {
     if [ -z "${_sdver}" ]; then
         _sdver="0"
     fi
-    note "${SUCCESS_CHAR} ${_sd_low_name} [$(distinct n "${_sdver}")]"
+    note "${SUCCESS_CHAR} ${_sd_low_name} [$(distn "${_sdver}")]"
     unset _sdver _sd_low_name
 }
 
@@ -329,9 +329,9 @@ show_alt_definitions_and_exit () {
             _contents="${_contents}$(${PRINTF_BIN} '%s\n' "${_cap_elem}" | ${SED_BIN} 's/\..*//' 2>/dev/null) "
         done
         if [ -z "${_contents}" ]; then
-            warn "No such definition found: $(distinct w "${_an_app}"). No alternatives found."
+            warn "No such definition found: $(distw "${_an_app}"). No alternatives found."
         else
-            warn "No such definition found: $(distinct w "${_an_app}"). Alternatives found: $(distinct w "${_contents}")"
+            warn "No such definition found: $(distw "${_an_app}"). Alternatives found: $(distw "${_contents}")"
         fi
         unset _an_app _elem _cap_elem _contents _maybe_version _maybe_version _maybe
         exit

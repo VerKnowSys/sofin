@@ -81,10 +81,10 @@ error () {
     warn "  ${NOTE_CHAR2} If you think this error is a bug in definition, please report an info about"
     warn "    encountered problem on one of issue trackers:"
     ${PRINTF_BIN} "\n"
-    warn "  ${NOTE_CHAR}  Bitbucket: $(distinct w "${DEFAULT_ISSUE_REPORT_SITE}")"
-    warn "  ${NOTE_CHAR}  Github: $(distinct w "${DEFAULT_ISSUE_REPORT_SITE_ALT}")"
+    warn "  ${NOTE_CHAR}  Bitbucket: $(distw "${DEFAULT_ISSUE_REPORT_SITE}")"
+    warn "  ${NOTE_CHAR}  Github: $(distw "${DEFAULT_ISSUE_REPORT_SITE_ALT}")"
     ${PRINTF_BIN} "\n"
-    warn "$(fill "${SEPARATOR_CHAR}" 46)$(distinct w "  Daniel (dmilith) Dettlaff  ")$(fill "${SEPARATOR_CHAR}" 5)"
+    warn "$(fill "${SEPARATOR_CHAR}" 46)$(distw "  Daniel (dmilith) Dettlaff  ")$(fill "${SEPARATOR_CHAR}" 5)"
     restore_security_state
     ${PRINTF_BIN} "\n"
     exit ${ERRORCODE_TASK_FAILURE}
@@ -125,7 +125,7 @@ run () {
         else
             unset _git_path
         fi
-        debug "$(distinct ${ColorDarkgray} "$(${DATE_BIN} ${DEFAULT_DATE_TRYRUN_OPTS} 2>/dev/null)"): $(distinct ${ColorWhite} ${RUN_CHAR}): $(distinct ${ColorParams} "${_run_params}") $(distinct ${ColorBlue} "[show-blueout:${_run_shw_prgr:-NO}]")"
+        debug "$(distd "$(${DATE_BIN} ${DEFAULT_DATE_TRYRUN_OPTS} 2>/dev/null)" ${ColorDarkgray}): $(distd "${RUN_CHAR}" ${ColorWhite}): $(distd "${_run_params}" ${ColorParams}) $(distd "[show-blueout:${_run_shw_prgr:-NO}]" ${ColorBlue})"
         if [ -z "${DEF_NAME}${DEF_POSTFIX}" ]; then
             if [ -z "${_run_shw_prgr}" ]; then
                 eval "PATH=${PATH}${_git_path} ${_run_params}" >> "${LOG}" 2>> "${LOG}"
@@ -158,8 +158,8 @@ try () {
     if [ -n "${_try_params}" ]; then
         touch_logsdir_and_logfile
         ${PRINTF_BIN} "${_try_params}\n" | eval "${MATCH_PRINT_STDOUT_GUARD}" && _show_prgrss=YES
-        _dt="$(distinct ${ColorDarkgray} "$(${DATE_BIN} ${DEFAULT_DATE_TRYRUN_OPTS} 2>/dev/null)")"
-        debug "${_dt}: $(distinct ${ColorWhite} "${TRY_CHAR}") $(distinct ${ColorParams} "${_try_params}") $(distinct ${ColorBlue} "[${_show_prgrss:-NO}]")"
+        _dt="$(distd "$(${DATE_BIN} ${DEFAULT_DATE_TRYRUN_OPTS} 2>/dev/null)" ${ColorDarkgray})"
+        debug "${_dt}: $(distd "${TRY_CHAR}" ${ColorWhite}) $(distd "${_try_params}" ${ColorParams}) $(distd "[${_show_prgrss:-NO}]" ${ColorBlue})"
         _try_aname="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
         if [ -z "${_try_aname}" ]; then
             if [ -z "${_show_prgrss}" ]; then
@@ -201,8 +201,8 @@ retry () {
     fi
     while [ -n "${_ammo}" ]; do
         if [ -n "${_targets}" ]; then
-            _dt="$(distinct ${ColorDarkgray} "$(${DATE_BIN} ${DEFAULT_DATE_TRYRUN_OPTS} 2>/dev/null)")"
-            debug "${_dt}: $(distinct ${ColorWhite} "${TRY_CHAR}${NOTE_CHAR}${RUN_CHAR}") $(distinct ${ColorParams} "${_targets}") $(distinct ${ColorBlue} "[${_show_prgrss:-NO}]")"
+            _dt="$(distd "$(${DATE_BIN} ${DEFAULT_DATE_TRYRUN_OPTS} 2>/dev/null)" ${ColorDarkgray})"
+            debug "${_dt}: $(distd "${TRY_CHAR}${NOTE_CHAR}${RUN_CHAR}" ${ColorWhite}) $(distd "${_targets}" ${ColorParams}) $(distd "[${_show_prgrss:-NO}]" ${ColorBlue})"
             if [ -z "${_rtry_blue}" ]; then
                 eval "PATH=${DEFAULT_PATH}${_git_path} ${_targets}" >> "${LOG}" 2>> "${LOG}" && \
                     unset _ammo _targets && \
@@ -217,9 +217,9 @@ retry () {
             error "Given an empty command to evaluate!"
         fi
         _ammo="$(${PRINTF_BIN} '%s\n' "${_ammo}" 2>/dev/null | ${SED_BIN} 's/O//' 2>/dev/null)"
-        debug "Remaining attempts: $(distinct d "${_ammo}")"
+        debug "Remaining attempts: $(distd "${_ammo}")"
     done
-    debug "All available ammo exhausted to invoke a command: $(distinct d "${_targets}")"
+    debug "All available ammo exhausted to invoke a command: $(distd "${_targets}")"
     unset _ammo _targets _rtry_blue
     return 1
 }
@@ -249,14 +249,14 @@ cleanup_handler () {
 
 
 interrupt_handler () {
-    warn "Interrupted: $(distinct w "${SOFIN_PID:-$$}")"
+    warn "Interrupted: $(distw "${SOFIN_PID:-$$}")"
     finalize
     exit ${ERRORCODE_USER_INTERRUPT}
 }
 
 
 terminate_handler () {
-    warn "Terminated: $(distinct w "${SOFIN_PID:-$$}")"
+    warn "Terminated: $(distw "${SOFIN_PID:-$$}")"
     finalize
     exit ${ERRORCODE_TERMINATED}
 }
@@ -300,7 +300,7 @@ restore_security_state () {
             note "Restoring pre-build security state"
             . ${DEFAULT_SECURITY_STATE_FILE} >> "${LOG}" 2>> "${LOG}"
         else
-            debug "No security state file found: $(distinct d "${DEFAULT_SECURITY_STATE_FILE}")"
+            debug "No security state file found: $(distd "${DEFAULT_SECURITY_STATE_FILE}")"
         fi
     else
         debug "No hardening capabilities in system"
@@ -311,7 +311,7 @@ restore_security_state () {
 store_security_state () {
     if [ "YES" = "${CAP_SYS_HARDENED}" ]; then
         try "${RM_BIN} -f ${DEFAULT_SECURITY_STATE_FILE}"
-        debug "Storing current security state to file: $(distinct d "${DEFAULT_SECURITY_STATE_FILE}")"
+        debug "Storing current security state to file: $(distd "${DEFAULT_SECURITY_STATE_FILE}")"
         for _key in ${DEFAULT_HARDEN_KEYS}; do
             _sss_value="$(${SYSCTL_BIN} -n "${_key}" 2>/dev/null)"
             _sss_cntnt="${SYSCTL_BIN} ${_key}=${_sss_value}"

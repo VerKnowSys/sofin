@@ -57,5 +57,5 @@ else
     ${SSH_BIN} ${DEFAULT_NAME}@${DEFAULT_RELEASE_HOST} "rm /Mirror/software/source/${DEFINITIONS_INITIAL_FILE_NAME}${DEFAULT_ARCHIVE_TARBALL_EXT} ; source ~/.functions.sh && gather-source ${DEFAULT_RELEASE_PATH}/${DEFINITIONS_INITIAL_FILE_NAME}${DEFAULT_ARCHIVE_TARBALL_EXT}" >/dev/null
     ${RM_BIN} -rf ./${DEFAULT_SOFIN_DEFINITIONS_NAME} ${DEFINITIONS_INITIAL_FILE_NAME}${DEFAULT_ARCHIVE_TARBALL_EXT}
 
-    note "Sofin v$(distinct n "${SOFIN_VERSION}") deployed to: $(distinct n "${DEFAULT_RELEASE_PATH}")"
+    note "Sofin v$(distn "${SOFIN_VERSION}") deployed to: $(distn "${DEFAULT_RELEASE_PATH}")"
 fi

@@ -17,7 +17,7 @@ set +e
 
 _working_state_file="/tmp/processing-software.list"
 if [ ! -f "${_working_state_file}" ]; then
-    note "Creating new file: $(distinct n "${_working_state_file}")"
+    note "Creating new file: $(distn "${_working_state_file}")"
     run "${CP_BIN} -v software.list ${_working_state_file}"
 fi
 
@@ -33,7 +33,7 @@ for software in $(${CAT_BIN} ${_working_state_file} 2>/dev/null); do
             note "Sofin definitions reset for production host type"
     fi
 
-    note "Processing software: $(distinct n "${software}")"
+    note "Processing software: $(distn "${software}")"
     ${SOFIN_BIN} rm ${software}
     DEVEL=YES ${SOFIN_BIN} deploy ${software} && \
     ${SOFIN_BIN} rm ${software} && \
