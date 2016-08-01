@@ -14,56 +14,39 @@ env_reset () {
 
 debug () {
     _in=${@}
+    _sep="${_sep:-$(distd "λ" ${ColorDarkgray})}"
     touch_logsdir_and_logfile
-    unset _dbfnin
     if [ "${CAP_TERM_BASH}" = "YES" ]; then
-        if [ -n "${FUNCNAME[*]}" ]; then # bash based:
-            _elmz="${FUNCNAME[*]}"
-            for _cee in ${_elmz}; do
-                case "${_cee}" in
-                    debug|note|warn|error|distinct)
-                        ;;
-
-                    *)
-                        if [ -z "${_dbfnin}" ]; then
-                            _dbfnin="${_cee}"
-                        else
-                            _dbfnin="${_cee}->${_dbfnin}"
-                        fi
-                        ;;
-                esac
-            done
-            _dbfnin="${_dbfnin}(): "
-        fi
-        _dname="$(${BASENAME_BIN} "${BASH_SOURCE}" 2>/dev/null)"
-        _dbfile="$(distd "${_dname}:${BASH_LINENO[0]}" ${ColorParams})"
-        _dbfnin="[${_dbfile}]"
+        _dbfile="$(distd "${BASH_SOURCE#/usr/share/sofin/}:${BASH_LINENO[0]}" ${ColorBlue})"
+        _fun="$(distd "${FUNCNAME[2]}()" ${ColorBlue})"
 
     elif [ "${CAP_TERM_ZSH}" = "YES" ]; then
-        _dbfnin="[]"
-    else
-        _dbfnin=""
-    fi
-    _sep="${_sep:-$(distd "λ" ${ColorDarkgray})}"
+        # NOTE: $funcstack[2]; ${funcfiletrace[@]} ${funcsourcetrace[@]} ${funcstack[@]} ${functrace[@]}
+        _dbfile="$(distd "${funcfiletrace[2]#/usr/share/sofin/}" ${ColorBlue})"
+        _fun="$(distd " ${funcstack[2]}()" ${ColorBlue})"
 
-    # NOTE: "#" is required for debug mode to work properly
-    _dbfn=" ${_dbfnin} ${_sep} "
+    else
+        _dbfile=""
+        _fun=""
+    fi
+
+    _dbfn=" (${SHLVL}) [${_sep}${_fun} @ ${_dbfile}] "
     if [ -z "${DEBUG}" ]; then
         _dbgnme="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
         if [ -n "${_dbgnme}" -a \
              -d "${LOGS_DIR}" ]; then
             # Definition log
-            ${PRINTF_BIN} "#${ColorDebug}${_dbfn}%s${ColorReset}\n" "${_in}" 2>> "${LOG}-${_dbgnme}" >> "${LOG}-${_dbgnme}"
+            ${PRINTF_BIN} "#${ColorDebug}%s%s${ColorReset}\n" "${_dbfn}" "${_in}" 2>> "${LOG}-${_dbgnme}" >> "${LOG}-${_dbgnme}"
         elif [ -z "${_dbgnme}" -a \
                -d "${LOGS_DIR}" ]; then
             # Main log
-            ${PRINTF_BIN} "#${ColorDebug}${_dbfn}%s${ColorReset}\n" "${_in}" 2>> "${LOG}" >> "${LOG}"
+            ${PRINTF_BIN} "#${ColorDebug}%s%s${ColorReset}\n" "${_dbfn}" "${_in}" 2>> "${LOG}" >> "${LOG}"
         elif [ ! -d "${LOGS_DIR}" ]; then
             # System logger fallback
             ${LOGGER_BIN} "# λ ${ColorDebug}${_dbfn}${_in}${ColorReset}" 2>> "${LOG}"
         fi
     else # DEBUG is set. Print to stdout
-        ${PRINTF_BIN} "#${ColorDebug}${_dbfn}%s${ColorReset}\n" "${_in}"
+        ${PRINTF_BIN} "#${ColorDebug}%s%s${ColorReset}\n" "${_dbfn}" "${_in}"
     fi
     unset _dbgnme _in _dbfn _dbfnin _elmz _cee
 }
@@ -91,6 +74,7 @@ error () {
     warn "$(fill "${SEPARATOR_CHAR}" 46)$(distw "  Daniel (dmilith) Dettlaff  ")$(fill "${SEPARATOR_CHAR}" 5)"
     restore_security_state
     ${PRINTF_BIN} "\n"
+    # TODO: add "history backtrace". Play with: fc -lnd -5, but separate sh/zsh history file should solve the problem
     exit ${ERRORCODE_TASK_FAILURE}
 }
 
