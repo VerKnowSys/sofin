@@ -91,6 +91,27 @@ determine_system_capabilites () {
         unset CAP_SYS_LINUX64_ABI
     fi
 
+    # Production mode is default mode
+    CAP_SYS_PRODUCTION=YES
+
+    if [ -f "${SERVED_BUILDHOST_INDICATOR_FILE}" -o \
+         -f "${SERVED_BUILDHOST_INDICATOR_FILE_ALT}" ]; then
+        CAP_SYS_BUILDHOST=YES
+        unset CAP_SYS_PRODUCTION
+    else
+        unset CAP_SYS_BUILDHOST
+    fi
+
+    # core functions will use production mode by default for performance
+    if [ -z "${CAP_SYS_PRODUCTION}" ]; then
+        if [ -d "share/sofin/facts/" -a \
+             -f "share/sofin/facts/core.fact" ]; then
+            . share/sofin/facts/core.fact
+        elif [ -d "/usr/share/sofin/facts/" -a \
+             -f "/usr/share/sofin/facts/core.fact" ]; then
+            . /usr/share/sofin/facts/core.fact
+        fi
+    fi
 }
 
 determine_system_capabilites
