@@ -110,21 +110,17 @@ rebuild_bundle () {
 
 
 fetch_binbuild () {
-    _bbfull_name="${1}"
-    _bbaname="${2}"
-    _bb_archive="${3}"
-    _bb_ver="${4}"
+    _fbb_bundname="${1}"
+    _bb_archive="${2}"
     if [ -n "${USE_BINBUILD}" ]; then
-        debug "Binary build check was skipped"
+        debug "Binary build check was skipped since USE_BINBUILD has a value: $(distd ${USE_BINBUILD})"
     else
-        _bbaname="$(lowercase "${_bbaname}")"
-        if [ -z "${_bbaname}" ]; then
-            error "Cannot fetch binbuild! An empty definition name given!"
+        if [ -z "${_fbb_bundname}" ]; then
+            error "Cannot fetch binbuild! An empty $(diste "BunndleName") given!"
         fi
         if [ -z "${_bb_archive}" ]; then
-            error "Cannot fetch binbuild! An empty archive name given!"
+            error "Cannot fetch binbuild! An empty $(diste "file-archive-name") given!"
         fi
-        _bbfull_name="$(capitalize "${_bbfull_name}")"
         try "${MKDIR_BIN} -p ${FILE_CACHE_DIR}"
         # If sha1 of bundle file exists locally..
         if [ ! -e "${FILE_CACHE_DIR}${_bb_archive}${DEFAULT_CHKSUM_EXT}" ]; then
@@ -143,12 +139,12 @@ fetch_binbuild () {
         debug "BB-archive: $(distd "${_bb_archive}"). Expecting binbuild to be available in: $(distd "${FILE_CACHE_DIR}${_bb_archive}")"
         if [ -e "${FILE_CACHE_DIR}${_bb_archive}" ]; then
             validate_archive_sha1 "${FILE_CACHE_DIR}${_bb_archive}"
-            install_software_from_binbuild "${_bb_archive}" "${_bbfull_name}"
+            install_software_from_binbuild "${_bb_archive}" "${_fbb_bundname}"
         else
-            debug "Binary build unavailable for bundle: $(distd "${_bbfull_name}")"
+            debug "Binary build unavailable for bundle: $(distd "${_fbb_bundname}")"
         fi
     fi
-    unset _bbfull_name _bbaname _bb_archive
+    unset _fbb_bundname _fbb_bundname _bb_archive
 }
 
 
@@ -212,14 +208,11 @@ build () {
                     create_service_dir "${_bundl_name}"
                 fi
 
-                # binary build of whole software bundle
-                _full_bund_name="${_bund_lcase}-${DEF_VERSION}"
                 try "${MKDIR_BIN} -p ${FILE_CACHE_DIR}"
-
                 _an_archive="${_bundl_name}-${DEF_VERSION}-${OS_TRIPPLE}${DEFAULT_ARCHIVE_EXT}"
                 _installed_indicator="${PREFIX}/${_bund_lcase}${DEFAULT_INST_MARK_EXT}"
                 if [ ! -e "${_installed_indicator}" ]; then
-                    fetch_binbuild "${_full_bund_name}" "${_bund_lcase}" "${_an_archive}" "${DEF_VERSION}"
+                    fetch_binbuild "${_bundl_name}" "${_an_archive}"
                 else
                     _already_installed_version="$(${CAT_BIN} ${_installed_indicator} 2>/dev/null)"
                     if [ "${DEF_VERSION}" = "${_already_installed_version}" ]; then
