@@ -157,6 +157,7 @@ build () {
     store_security_state
     disable_security_features
 
+    debug "Sofin v$(distd ${SOFIN_VERSION}): New build started for bundles: $(distd ${_build_list})"
     PATH="${DEFAULT_PATH}"
     for _bund_name in ${_build_list}; do
         _specified="${_bund_name}" # store original value of user input
