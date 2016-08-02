@@ -417,7 +417,25 @@ process_flat () {
                     fi
                 done
                 if [ -z "${_fd}" ]; then
-                    error "No source dir found for definition: $(diste "${_app_param}")?"
+                    # NOTE: Handle one more case - inherited definitions, and there might be several of these..
+                    # XXX: hardcoded name of function inherit() - which might be used in any definition file:
+                    _inherited="$(${GREP_BIN} 'inherit' "${_req_definition}" 2>/dev/null | ${SED_BIN} 's/inherit[ ]*//g' 2>/dev/null)"
+                    if [ -z "${_inherited}" ]; then
+                        error "No source dir found for definition: $(diste "${_app_param}")?"
+                    else
+                        for _inh in ${_inherited}; do
+                            debug "Trying inherited value: $(distd "${_inh}")"
+                            _fd="$(${FIND_BIN} "${BUILD_DIR}" -maxdepth 1 -mindepth 1 -type d -iname "*${_inh}*${DEF_VERSION}*" 2>/dev/null | ${HEAD_BIN} -n1 2>/dev/null)"
+                            if [ -n "${_fd}" ]; then
+                                debug "Found inherited build dir: $(distd "${_fd}"), for definition: $(distd "${DEF_NAME}")"
+                                break
+                            fi
+                        done
+                        # If nothing helps..
+                        if [ -z "${_fd}" ]; then
+                            error "No inherited source dir found for definition: $(diste "${_app_param}")?"
+                        fi
+                    fi
                 fi
                 cd "${_fd}"
 
