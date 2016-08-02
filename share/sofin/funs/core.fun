@@ -326,10 +326,10 @@ summary () {
     SOFIN_RUNTIME="$(calculate_bc "(${SOFIN_END} - ${SOFIN_START:-${SOFIN_END}}) / 1000")"
 
     ${PRINTF_BIN} "${ColorExample}%s${ColorReset}\n" "$(fill ${SEPARATOR_CHAR2})" >> "${LOG:-/var/log/sofin}"
-    ${PRINTF_BIN} "${ColorExample}args.head: ${ColorYellow}%s\n" "${SOFIN_COMMAND_ARG}" >> "${LOG:-/var/log/sofin}"
-    ${PRINTF_BIN} "${ColorExample}args.tail: ${ColorYellow}%s\n" "${SOFIN_ARGS}" >> "${LOG:-/var/log/sofin}"
-    ${PRINTF_BIN} "${ColorExample}pid: ${ColorYellow}%d${ColorExample}\n" "${SOFIN_PID}" >> "${LOG:-/var/log/sofin}"
-    ${PRINTF_BIN} "${ColorExample}runtime: ${ColorYellow}%d${ColorExample} ms.\n" "${SOFIN_RUNTIME}" >> "${LOG:-/var/log/sofin}"
+    ${PRINTF_BIN} "${ColorExample}args.head: ${ColorYellow}%s\n" "${SOFIN_COMMAND_ARG:-''}" >> "${LOG:-/var/log/sofin}"
+    ${PRINTF_BIN} "${ColorExample}args.tail: ${ColorYellow}%s\n" "${SOFIN_ARGS:-''}" >> "${LOG:-/var/log/sofin}"
+    ${PRINTF_BIN} "${ColorExample}pid: ${ColorYellow}%d${ColorExample}\n" "${SOFIN_PID:--1}" >> "${LOG:-/var/log/sofin}"
+    ${PRINTF_BIN} "${ColorExample}runtime: ${ColorYellow}%d${ColorExample} ms.\n" "${SOFIN_RUNTIME:--1}" >> "${LOG:-/var/log/sofin}"
 
     # Show "times" stats from shell:
     ${PRINTF_BIN} "${ColorExample}shell times: ${ColorReset}\n" >> "${LOG:-/var/log/sofin}"
