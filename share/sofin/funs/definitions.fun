@@ -194,8 +194,11 @@ reset_defs () {
     fi
     note "Definitions repository reset to: $(distn "${_rdefs_branch}")"
     for line in $(${GIT_BIN} status --short 2>/dev/null | ${CUT_BIN} -f2 -d' ' 2>/dev/null); do
-        try "${RM_BIN} -fv '${line}'" && \
-            debug "Removed untracked file from definition repository: $(distd "${line}")"
+        unset _add_opt
+        try "${PRINTF_BIN} '%s' \"${line}\" 2>/dev/null | ${EGREP_BIN} \"patches/\"" && \
+            _add_opt="r"
+        try "${RM_BIN} -fv${_add_opt} '${line}'" && \
+            debug "Removed untracked file${_add_opt:-/dir} from definition repository: $(distd "${line}")"
     done
     update_defs
     cd "${_cwd}"
