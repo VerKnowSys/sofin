@@ -134,7 +134,7 @@ update_defs () {
                 note "Branch: $(distn "${_def_cur_branch}") is now at: $(distn "${_def_head}")" && \
                 return
 
-            ${PRINTF_BIN} "${ColorRed}%s${ColorReset}" "Error occured: Update from branch: $(diste "${BRANCH}") of repository: $(diste "${REPOSITORY}") wasn't possible. Log's below:\n\n"
+            ${PRINTF_BIN} "${ColorRed}%s${ColorReset}\n$(fill)\n" "Error occured: Update from branch: $(diste "${BRANCH}") of repository: $(diste "${REPOSITORY}") wasn't possible. Log's below:"
             show_log_if_available
             return
 
@@ -149,7 +149,7 @@ update_defs () {
                 note "Branch: $(distn "${BRANCH}") is at: $(distn "${_def_head}")" && \
                     return
 
-            ${PRINTF_BIN} "${ColorRed}%s${ColorReset}" "Error occured: Update from branch: $(diste "${BRANCH}") of repository: $(diste "${REPOSITORY}") wasn't possible. Log's below:\n\n"
+            ${PRINTF_BIN} "${ColorRed}%s${ColorReset}\n$(fill)\n" "Error occured: Update from branch: $(diste "${BRANCH}") of repository: $(diste "${REPOSITORY}") wasn't possible. Log's below:"
             show_log_if_available
             return
         fi
