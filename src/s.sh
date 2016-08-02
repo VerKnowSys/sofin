@@ -6,6 +6,9 @@
 # this is internal version check for defaults.def
 unset COMPLIANCE_CHECK
 
+# performance counts:
+SOFIN_START="${SOFIN_START:-$(${SOFIN_MICROSECONDS_UTILITY_BIN})}"
+
 SOFIN_ARGS_FULL=${*}
 SOFIN_COMMAND_ARG="${1}"
 SOFIN_ARGS="$(${PRINTF_BIN} '%s\n' "${SOFIN_ARGS_FULL}" | ${CUT_BIN} -d' ' -f2- 2>/dev/null)"
