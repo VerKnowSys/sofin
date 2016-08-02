@@ -249,30 +249,6 @@ develop () {
 }
 
 
-enable_sofin_env () {
-    ${RM_BIN} -f ${SOFIN_ENV_DISABLED_INDICATOR_FILE}
-    update_shell_vars
-    if [ -z "${SHELL_PID}" ]; then
-        note "Enabled Sofin environment, yet no SHELL_PID defined. Autoreload skipped."
-    else
-        note "Enabled Sofin environment. Reloading shell"
-        ${KILL_BIN} -SIGUSR2 "${SHELL_PID}" >/dev/null 2>&1
-    fi
-}
-
-
-disable_sofin_env () {
-    ${TOUCH_BIN} ${SOFIN_ENV_DISABLED_INDICATOR_FILE}
-    update_shell_vars
-    if [ -z "${SHELL_PID}" ]; then
-        note "Disabled Sofin environment, yet no SHELL_PID defined. Autoreload skipped."
-    else
-        note "Disabled Sofin environment. Reloading shell"
-        ${KILL_BIN} -SIGUSR2 "${SHELL_PID}" 2>/dev/null 2>&1
-    fi
-}
-
-
 sofin_status () {
     if [ -f ${SOFIN_ENV_DISABLED_INDICATOR_FILE} ]; then
         note "Sofin shell environment is: ${ColorRed}disabled${ColorReset}"

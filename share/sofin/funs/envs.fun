@@ -1,3 +1,41 @@
+env_reset () {
+    # unset conflicting environment variables
+    unset LDFLAGS
+    unset CFLAGS
+    unset CXXFLAGS
+    unset CPPFLAGS
+    unset PATH
+    unset LD_LIBRARY_PATH
+    unset LD_PRELOAD
+    unset DYLD_LIBRARY_PATH
+    unset PKG_CONFIG_PATH
+}
+
+
+enable_sofin_env () {
+    try "${RM_BIN} -f ${SOFIN_ENV_DISABLED_INDICATOR_FILE}" && \
+        update_shell_vars
+    if [ -z "${SHELL_PID}" ]; then
+        note "Enabled Sofin environment, yet no SHELL_PID defined. Autoreload skipped."
+    else
+        note "Enabled Sofin environment. Reloading shell"
+        ${KILL_BIN} -SIGUSR2 "${SHELL_PID}" >/dev/null 2>&1
+    fi
+}
+
+
+disable_sofin_env () {
+    try "${TOUCH_BIN} ${SOFIN_ENV_DISABLED_INDICATOR_FILE}" && \
+        update_shell_vars
+    if [ -z "${SHELL_PID}" ]; then
+        note "Disabled Sofin environment, yet no SHELL_PID defined. Autoreload skipped."
+    else
+        note "Disabled Sofin environment. Reloading shell"
+        ${KILL_BIN} -SIGUSR2 "${SHELL_PID}" 2>/dev/null 2>&1
+    fi
+}
+
+
 compiler_setup () {
     debug "---------------- COMPILER FEATURES DUMP -----------------"
     debug "Listing compiler features for platform: $(distd "${SYSTEM_NAME}")"

@@ -156,3 +156,23 @@ touch_logsdir_and_logfile () {
     ${MKDIR_BIN} -p "${LOGS_DIR}" >/dev/null 2>&1
     ${TOUCH_BIN} "${LOG}" >/dev/null 2>&1
 }
+
+
+checksum_filecache_element () {
+    _file_to_checksum="${1}"
+    if [ -z "${_file_to_checksum}" ]; then
+        error "First argument with $(diste "file-name-to-chksum") is required!"
+    fi
+    _file_chksum="$(file_checksum "${FILE_CACHE_DIR}${_file_to_checksum}")"
+    if [ -z "${_file_chksum}" ]; then
+        error "Empty checksum of file: $(diste "${FILE_CACHE_DIR}${_file_to_checksum}")"
+    elif [ ! -f "${FILE_CACHE_DIR}${_file_to_checksum}" ]; then
+        error "No such file found in file-cache: $(diste "${FILE_CACHE_DIR}${_file_to_checksum}")"
+    else
+        _chksum_file="${FILE_CACHE_DIR}${_file_to_checksum}${DEFAULT_CHKSUM_EXT}"
+        ${PRINTF_BIN} '%s' "${_file_chksum}" > "${_chksum_file}" && \
+            debug "Stored chksum: $(distd "${_file_chksum}") of file: $(distd "${_file_to_checksum}") in path: $(distd "${FILE_CACHE_DIR}${_file_to_checksum}")"
+    fi
+    unset _file_chksum _file_to_checksum _chksum_file
+}
+

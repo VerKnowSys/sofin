@@ -1,16 +1,3 @@
-env_reset () {
-    # unset conflicting environment variables
-    unset LDFLAGS
-    unset CFLAGS
-    unset CXXFLAGS
-    unset CPPFLAGS
-    unset PATH
-    unset LD_LIBRARY_PATH
-    unset LD_PRELOAD
-    unset DYLD_LIBRARY_PATH
-    unset PKG_CONFIG_PATH
-}
-
 
 debug () {
     _in=${@}
@@ -330,4 +317,8 @@ disable_security_features () {
     else
         debug "No hardening capabilities in system"
     fi
+}
+
+
+summary () {
 }

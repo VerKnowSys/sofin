@@ -78,11 +78,6 @@ finalize () {
 }
 
 
-summary () {
-    times >> "${LOG:-/var/log/sofin}"
-}
-
-
 finalize_afterbuild () {
     _bund_name="${1}"
     # Cleanup build dir if DEVEL unset:
