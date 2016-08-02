@@ -211,6 +211,12 @@ file_checksum () {
 }
 
 
+# give any input to pass it through bc:
+calculate_bc () {
+    ${PRINTF_BIN} '%s\n' "${@}" 2>/dev/null | ${BC_BIN} 2>/dev/null
+}
+
+
 print_rainbow () {
     ${PRINTF_BIN} "${ColorReset}ColorReset${ColorRed}ColorRed${ColorGreen}ColorGreen${ColorYellow}ColorYellow${ColorBlue}ColorBlue${ColorMagenta}ColorMagenta${ColorCyan}ColorCyan${ColorGray}ColorGray${ColorWhite}ColorWhite"
 
