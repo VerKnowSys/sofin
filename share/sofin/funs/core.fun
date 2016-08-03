@@ -102,36 +102,31 @@ run () {
     if [ -n "${_run_params}" ]; then
         touch_logsdir_and_logfile
         ${PRINTF_BIN} '%s\n' "${_run_params}" | eval "${MATCH_PRINT_STDOUT_GUARD}" && _run_shw_prgr=YES
-        if [ -n "${GIT_ROOT_DIR}" ]; then
-            _git_path=":${GIT_ROOT_DIR}/bin:${GIT_ROOT_DIR}/libexec/git-core"
-        else
-            unset _git_path
-        fi
         debug "$(distd "$(${DATE_BIN} ${DEFAULT_DATE_TRYRUN_OPTS} 2>/dev/null)" ${ColorDarkgray}): $(distd "${RUN_CHAR}" ${ColorWhite}): $(distd "${_run_params}" ${ColorParams}) $(distd "[show-blueout:${_run_shw_prgr:-NO}]" ${ColorBlue})"
         if [ -z "${DEF_NAME}${DEF_POSTFIX}" ]; then
             if [ -z "${_run_shw_prgr}" ]; then
-                eval "PATH=${PATH}${_git_path} ${_run_params}" >> "${LOG}" 2>> "${LOG}"
+                eval "PATH=${PATH}${GIT_EXPORTS} ${_run_params}" >> "${LOG}" 2>> "${LOG}"
                 check_result ${?} "${_run_params}"
             else
                 ${PRINTF_BIN} "${ColorBlue}"
-                eval "PATH=${PATH}${_git_path} ${_run_params}" >> "${LOG}"
+                eval "PATH=${PATH}${GIT_EXPORTS} ${_run_params}" >> "${LOG}"
                 check_result ${?} "${_run_params}"
             fi
         else
             _rnm="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
             if [ -z "${_run_shw_prgr}" ]; then
-                eval "PATH=${PATH}${_git_path} ${_run_params}" >> "${LOG}-${_rnm}" 2>> "${LOG}-${_rnm}"
+                eval "PATH=${PATH}${GIT_EXPORTS} ${_run_params}" >> "${LOG}-${_rnm}" 2>> "${LOG}-${_rnm}"
                 check_result ${?} "${_run_params}"
             else
                 ${PRINTF_BIN} "${ColorBlue}"
-                eval "PATH=${PATH}${_git_path} ${_run_params}" >> "${LOG}-${_rnm}"
+                eval "PATH=${PATH}${GIT_EXPORTS} ${_run_params}" >> "${LOG}-${_rnm}"
                 check_result ${?} "${_run_params}"
             fi
         fi
     else
         error "Specified an empty command to run()!"
     fi
-    unset _rnm _run_shw_prgr _run_params _dt _git_root _git_path
+    unset _rnm _run_shw_prgr _run_params _dt
 }
 
 
@@ -145,21 +140,21 @@ try () {
         _try_aname="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
         if [ -z "${_try_aname}" ]; then
             if [ -z "${_show_prgrss}" ]; then
-                eval "PATH=${PATH} ${_try_params}" >> "${LOG}" 2>> "${LOG}" && \
+                eval "PATH=${PATH}${GIT_EXPORTS} ${_try_params}" >> "${LOG}" 2>> "${LOG}" && \
                     return 0
             else
                 # show progress on stderr
                 ${PRINTF_BIN} "${ColorBlue}"
-                eval "PATH=${PATH} ${_try_params}" >> "${LOG}" && \
+                eval "PATH=${PATH}${GIT_EXPORTS} ${_try_params}" >> "${LOG}" && \
                     return 0
             fi
         else
             if [ -z "${_show_prgrss}" ]; then
-                eval "PATH=${PATH} ${_try_params}" >> "${LOG}-${_try_aname}" 2>> "${LOG}-${_try_aname}" && \
+                eval "PATH=${PATH}${GIT_EXPORTS} ${_try_params}" >> "${LOG}-${_try_aname}" 2>> "${LOG}-${_try_aname}" && \
                     return 0
             else
                 ${PRINTF_BIN} "${ColorBlue}"
-                eval "PATH=${PATH} ${_try_params}" >> "${LOG}-${_try_aname}" && \
+                eval "PATH=${PATH}${GIT_EXPORTS} ${_try_params}" >> "${LOG}-${_try_aname}" && \
                     return 0
             fi
         fi
@@ -174,24 +169,20 @@ try () {
 retry () {
     _targets=${*}
     _ammo="OOO"
-    unset _git_path
     touch_logsdir_and_logfile
     # check for commands that puts something important/intersting on stdout
     ${PRINTF_BIN} '%s\n' "${_targets}" 2>/dev/null | eval "${MATCH_PRINT_STDOUT_GUARD}" && _rtry_blue=YES
-    if [ -n "${GIT_ROOT_DIR}" ]; then
-        _git_path=":${GIT_ROOT_DIR}/bin:${GIT_ROOT_DIR}/libexec/git-core"
-    fi
     while [ -n "${_ammo}" ]; do
         if [ -n "${_targets}" ]; then
             _dt="$(distd "$(${DATE_BIN} ${DEFAULT_DATE_TRYRUN_OPTS} 2>/dev/null)" ${ColorDarkgray})"
             debug "${_dt}: $(distd "${TRY_CHAR}${NOTE_CHAR}${RUN_CHAR}" ${ColorWhite}) $(distd "${_targets}" ${ColorParams}) $(distd "[${_show_prgrss:-NO}]" ${ColorBlue})"
             if [ -z "${_rtry_blue}" ]; then
-                eval "PATH=${DEFAULT_PATH}${_git_path} ${_targets}" >> "${LOG}" 2>> "${LOG}" && \
+                eval "PATH=${DEFAULT_PATH}${GIT_EXPORTS} ${_targets}" >> "${LOG}" 2>> "${LOG}" && \
                     unset _ammo _targets && \
                         return 0
             else
                 ${PRINTF_BIN} "${ColorBlue}"
-                eval "PATH=${DEFAULT_PATH}${_git_path} ${_targets}" >> "${LOG}" && \
+                eval "PATH=${DEFAULT_PATH}${GIT_EXPORTS} ${_targets}" >> "${LOG}" && \
                     unset _ammo _targets && \
                         return 0
             fi
