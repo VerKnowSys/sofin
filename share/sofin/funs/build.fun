@@ -418,6 +418,7 @@ process_flat () {
                 done
                 if [ -z "${_fd}" ]; then
                     # NOTE: Handle one more case - inherited definitions, and there might be several of these..
+                    # TODO: add support for recursive check through inherited definitions
                     # XXX: hardcoded name of function inherit() - which might be used in any definition file:
                     _inherited="$(${GREP_BIN} 'inherit' "${_req_definition}" 2>/dev/null | ${SED_BIN} 's/inherit[ ]*//g' 2>/dev/null)"
                     if [ -z "${_inherited}" ]; then

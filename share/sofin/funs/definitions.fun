@@ -419,23 +419,23 @@ strip_bundle () {
 
     _dirs_to_strip=""
     case "${DEF_STRIP}" in
-        all)
+        all|ALL)
             debug "$(distd "${_sbfdefinition_name}"): Strip both binaries and libraries."
             _dirs_to_strip="${PREFIX}/bin ${PREFIX}/sbin ${PREFIX}/lib ${PREFIX}/libexec"
             ;;
 
-        exports|export|bins|binaries|bin)
+        exports|export|bins|binaries|bin|BIN|BINS)
             debug "$(distd "${_sbfdefinition_name}"): Strip exported binaries only"
             _dirs_to_strip="${PREFIX}/bin ${PREFIX}/sbin ${PREFIX}/libexec"
             ;;
 
-        libs|lib|libexec)
+        libs|lib|libexec|LIB|LIBS)
             debug "$(distd "${_sbfdefinition_name}"): Strip libraries only"
             _dirs_to_strip="${PREFIX}/lib"
             ;;
 
         *)
-            debug "$(distd "${_sbfdefinition_name}"): Strip nothing"
+            warn "$(distd "${_sbfdefinition_name}"): Strip nothing? Valid options: ALL | BIN | LIB"
             ;;
     esac
     if [ "${DEF_STRIP}" != "no" ]; then
