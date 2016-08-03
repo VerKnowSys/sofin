@@ -51,12 +51,14 @@ if [ -n "${SOFIN_COMMAND_ARG}" ]; then
 
 
         distclean)
+            initialize
             perform_clean dist
             update_defs
             ;;
 
 
         purge)
+            initialize
             perform_clean purge
             update_defs
             ;;
@@ -93,6 +95,7 @@ if [ -n "${SOFIN_COMMAND_ARG}" ]; then
 
 
         i|install|get|pick|choose|use|switch)
+            initialize
             create_dirs
             _list_maybe="$(lowercase "${2}")"
             if [ -z "${_list_maybe}" ]; then
@@ -113,6 +116,7 @@ if [ -n "${SOFIN_COMMAND_ARG}" ]; then
 
 
         deps|dependencies|local)
+            initialize
             create_dirs
             if [ "${USER}" = "root" ]; then
                 warn "Installation of project dependencies as root is immoral"
@@ -131,6 +135,7 @@ if [ -n "${SOFIN_COMMAND_ARG}" ]; then
 
 
         p|push|binpush|send)
+            initialize
             fail_on_bg_job "${SOFIN_ARGS}"
             push_binbuilds "${SOFIN_ARGS}"
             finalize
@@ -138,6 +143,7 @@ if [ -n "${SOFIN_COMMAND_ARG}" ]; then
 
 
         b|build)
+            initialize
             create_dirs
             _to_be_built="${SOFIN_ARGS}"
             note "Requested build of: $(distn "${_to_be_built}")"
@@ -151,6 +157,7 @@ if [ -n "${SOFIN_COMMAND_ARG}" ]; then
 
 
         d|deploy)
+            initialize
             fail_on_bg_job "${SOFIN_ARGS}"
             deploy_binbuild "${SOFIN_ARGS}"
             finalize
@@ -165,6 +172,7 @@ if [ -n "${SOFIN_COMMAND_ARG}" ]; then
 
 
         rebuild)
+            initialize
             fail_on_bg_job "${SOFIN_ARGS}"
             rebuild_bundle "${SOFIN_ARGS}"
             finalize
@@ -177,6 +185,7 @@ if [ -n "${SOFIN_COMMAND_ARG}" ]; then
 
 
         delete|remove|uninstall|rm)
+            initialize
             fail_on_bg_job "${SOFIN_ARGS}"
             remove_bundles "${SOFIN_ARGS}"
             finalize
@@ -199,6 +208,7 @@ if [ -n "${SOFIN_COMMAND_ARG}" ]; then
 
 
         exportapp|export|exp)
+            initialize
             fail_on_bg_job "${SOFIN_ARGS}"
             make_exports "${SOFIN_ARGS}"
             finalize

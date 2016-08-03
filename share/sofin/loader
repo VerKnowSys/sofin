@@ -51,12 +51,6 @@ load_sofin () {
         definitions.fun \
         datasets.fun \
         build.fun
-
-    setup_defs_branch
-    setup_defs_repo
-    check_os
-    check_defs_dir
-    trap_signals
 }
 
 load_sofin

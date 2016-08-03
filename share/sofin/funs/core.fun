@@ -337,3 +337,12 @@ summary () {
 
     ${PRINTF_BIN} "${ColorExample}%s${ColorReset}\n" "$(fill ${SEPARATOR_CHAR2})" >> "${LOG:-/var/log/sofin}"
 }
+
+
+initialize () {
+    setup_defs_branch
+    setup_defs_repo
+    check_defs_dir
+    check_os
+    trap_signals
+}
