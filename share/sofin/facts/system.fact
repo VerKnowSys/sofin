@@ -24,10 +24,21 @@ fi
 
 # Since Git is often used in defaunitions, we're allowing definitions to use it's path:
 if [ -x "${GIT_BIN}" -a \
-     -z "${GIT_ROOT_DIR}" ]; then
-    GIT_ROOT_DIR="$(${BASENAME_BIN} "$(${BASENAME_BIN} "${GIT_BIN}" 2>/dev/null)" 2>/dev/null)"
+     -z "${GIT_EXPORTS}" ]; then
+    # by default try exported git from default Git bundle:
+    GIT_EXPORTS="$(${DIRNAME_BIN} "${GIT_BIN}" 2>/dev/null)/exports"
+    if [ -x "${GIT_EXPORTS}/git" ]; then
+        GIT_EXPORTS=":${GIT_EXPORTS}"
+    else
+        GIT_EXPORTS="$(${DIRNAME_BIN} "${GIT_BIN}" 2>/dev/null)/bin"
+        if [ -x "${GIT_EXPORTS}/git" ]; then
+            GIT_EXPORTS=":${GIT_EXPORTS}"
+        else
+            unset GIT_EXPORTS
+        fi
+    fi
 else
-    unset GIT_ROOT_DIR
+    unset GIT_EXPORTS
 fi
 
 
