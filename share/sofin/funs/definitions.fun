@@ -757,6 +757,8 @@ clone_or_fetch_git_bare_repo () {
         try "${GIT_BIN} clone ${DEFAULT_GIT_OPTS} --depth 1 --bare ${_source_path} ${_git_cached}"
     if [ "${?}" = "0" ]; then
         debug "Fetched bare repository: $(distd "${_bare_name}")"
+    elif [ -d "${_git_cached}" ]; then
+        debug "Bare repository already fetched: $(distd "${_git_cached}")"
     else
         if [ ! -d "${_git_cached}/branches" -a ! -f "${_git_cached}/config" ]; then
             note "\n${ColorRed}Definitions were not updated. Showing $(distn "${LOG_LINES_AMOUNT_ON_ERR}") lines of internal log:${ColorReset}"
