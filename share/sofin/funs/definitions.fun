@@ -759,23 +759,14 @@ clone_or_fetch_git_bare_repo () {
         debug "Fetched bare repository: $(distd "${_bare_name}")"
     elif [ -d "${_git_cached}" ]; then
         debug "Bare repository already fetched: $(distd "${_git_cached}")"
-    else
-        if [ ! -d "${_git_cached}/branches" -a ! -f "${_git_cached}/config" ]; then
-            note "\n${ColorRed}Definitions were not updated. Showing $(distn "${LOG_LINES_AMOUNT_ON_ERR}") lines of internal log:${ColorReset}"
-            ${TAIL_BIN} -n${LOG_LINES_AMOUNT_ON_ERR} ${LOG} 2>/dev/null
-            note "$(fill)"
-        else
-            debug "Trying to update existing bare repository cache in: $(distd "${_git_cached}")"
-            cd "${_git_cached}"
-            try "${GIT_BIN} fetch ${DEFAULT_GIT_OPTS} origin ${_chk_branch}" || \
-                try "${GIT_BIN} fetch ${DEFAULT_GIT_OPTS} origin" || \
-                    warn "   ${WARN_CHAR} Failed to fetch an update from bare repository: $(distw "${_git_cached}")"
-            # for empty DEF_VERSION, it will fill it with first 16 chars of repository HEAD SHA1:
-            # if [ -z "${DEF_VERSION}" ]; then
-            #     DEF_VERSION="$(${GIT_BIN} rev-parse HEAD 2>/dev/null | ${CUT_BIN} -c -16 2>/dev/null)"
-            #     debug "Set DEF_VERSION=$(distd "${DEF_VERSION}") - based on most recent commit shasum"
-            # fi
-        fi
+        debug "Trying to update existing bare repository cache in: $(distd "${_git_cached}")"
+        cd "${_git_cached}"
+        try "${GIT_BIN} fetch ${DEFAULT_GIT_OPTS} origin ${_chk_branch}" || \
+            try "${GIT_BIN} fetch ${DEFAULT_GIT_OPTS} origin" || \
+                warn "   ${WARN_CHAR} Failed to fetch an update from bare repository: $(distw "${_git_cached}")"
+    elif [ ! -d "${_git_cached}/branches" -a \
+           ! -f "${_git_cached}/config" ]; then
+        error "Unable to fetch from git repository: $(diste "${_source_path}")"
     fi
 
     # bare repository is already cloned, so we just clone from it now..
