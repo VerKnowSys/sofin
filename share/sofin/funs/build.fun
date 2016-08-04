@@ -459,7 +459,7 @@ process_flat () {
                     unset _current_branch
                 fi
 
-                after_update_callback
+                after_unpack_callback
 
                 apply_definition_patches "${DEF_NAME}${DEF_POSTFIX}"
                 after_patch_callback

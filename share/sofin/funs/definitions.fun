@@ -655,7 +655,7 @@ hack_def () {
 }
 
 
-after_update_callback () {
+after_unpack_callback () {
     if [ -n "${DEF_AFTER_UNPACK_METHOD}" ]; then
         debug "Evaluating callback: $(distd "${DEF_AFTER_UNPACK_METHOD}")"
         run "${DEF_AFTER_UNPACK_METHOD}"
