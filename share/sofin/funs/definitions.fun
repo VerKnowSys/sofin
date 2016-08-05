@@ -158,7 +158,7 @@ update_defs () {
         cd "${CACHE_DIR}"
         debug "Cloning repository: $(distd "${REPOSITORY}") from branch: $(distd "${BRANCH}"); LOGS_DIR: $(distd "${LOGS_DIR}"), CACHE_DIR: $(distd "${CACHE_DIR}")"
         try "${RM_BIN} -vrf ${DEFINITIONS_BASE}"
-        try "${GIT_BIN} clone ${DEFAULT_GIT_OPTS} ${REPOSITORY} ${DEFINITIONS_BASE}" || \
+        try "${GIT_BIN} clone ${DEFAULT_GIT_CLONE_OPTS} ${REPOSITORY} ${DEFINITIONS_BASE}" || \
             error "Error cloning branch: $(diste "${BRANCH}") of repository: $(diste "${REPOSITORY}"). Please make sure that given repository and branch are valid!"
         cd "${CACHE_DIR}${DEFINITIONS_BASE}"
         _def_cur_branch="$(${GIT_BIN} rev-parse --abbrev-ref HEAD 2>/dev/null)"
@@ -753,8 +753,8 @@ clone_or_fetch_git_bare_repo () {
     _git_cached="${GIT_CACHE_DIR}${_bare_name}${DEFAULT_GIT_DIR_NAME}"
     try "${MKDIR_BIN} -p ${GIT_CACHE_DIR}"
     note "   ${NOTE_CHAR} Fetching git repository: $(distn "${_source_path}")"
-    try "${GIT_BIN} clone ${DEFAULT_GIT_OPTS} --depth 1 --bare ${_source_path} ${_git_cached}" || \
-        try "${GIT_BIN} clone ${DEFAULT_GIT_OPTS} --depth 1 --bare ${_source_path} ${_git_cached}"
+    try "${GIT_BIN} clone ${DEFAULT_GIT_CLONE_OPTS} --depth 1 --bare ${_source_path} ${_git_cached}" || \
+        try "${GIT_BIN} clone ${DEFAULT_GIT_CLONE_OPTS} --depth 1 --bare ${_source_path} ${_git_cached}"
     if [ "${?}" = "0" ]; then
         debug "Fetched bare repository: $(distd "${_bare_name}")"
     elif [ -d "${_git_cached}" ]; then
@@ -773,7 +773,7 @@ clone_or_fetch_git_bare_repo () {
     _dest_repo="${_build_dir}/${_bare_name}"
     try "${MV_BIN} -f ${_dest_repo} ${_dest_repo}-${TIMESTAMP}.old" && \
         debug "Renamed already existing build directory: $(distd "${_dest_repo}") to: $(distd "${_bare_name}-${TIMESTAMP}.old")"
-    run "${GIT_BIN} clone ${DEFAULT_GIT_OPTS} ${_git_cached} ${_dest_repo}" && \
+    run "${GIT_BIN} clone ${DEFAULT_GIT_CLONE_OPTS} ${_git_cached} ${_dest_repo}" && \
         debug "Cloned git respository from cached git bare: $(distd "${_git_cached}")"
     unset _git_cached _bare_name _chk_branch _build_dir _dest_repo
 }
