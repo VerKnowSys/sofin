@@ -105,21 +105,21 @@ run () {
         debug "$(distd "$(${DATE_BIN} ${DEFAULT_DATE_TRYRUN_OPTS} 2>/dev/null)" ${ColorDarkgray}): $(distd "${RUN_CHAR}" ${ColorWhite}): $(distd "${_run_params}" ${ColorParams}) $(distd "[show-blueout:${_run_shw_prgr:-NO}]" ${ColorBlue})"
         if [ -z "${DEF_NAME}${DEF_POSTFIX}" ]; then
             if [ -z "${_run_shw_prgr}" ]; then
-                eval "PATH=${PATH}${GIT_EXPORTS} ${_run_params}" >> "${LOG}" 2>> "${LOG}"
+                eval "export PATH=${PATH}${GIT_EXPORTS} && ${_run_params}" >> "${LOG}" 2>> "${LOG}"
                 check_result ${?} "${_run_params}"
             else
                 ${PRINTF_BIN} "${ColorBlue}"
-                eval "PATH=${PATH}${GIT_EXPORTS} ${_run_params}" >> "${LOG}"
+                eval "export PATH=${PATH}${GIT_EXPORTS} && ${_run_params}" >> "${LOG}"
                 check_result ${?} "${_run_params}"
             fi
         else
             _rnm="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
             if [ -z "${_run_shw_prgr}" ]; then
-                eval "PATH=${PATH}${GIT_EXPORTS} ${_run_params}" >> "${LOG}-${_rnm}" 2>> "${LOG}-${_rnm}"
+                eval "export PATH=${PATH}${GIT_EXPORTS} && ${_run_params}" >> "${LOG}-${_rnm}" 2>> "${LOG}-${_rnm}"
                 check_result ${?} "${_run_params}"
             else
                 ${PRINTF_BIN} "${ColorBlue}"
-                eval "PATH=${PATH}${GIT_EXPORTS} ${_run_params}" >> "${LOG}-${_rnm}"
+                eval "export PATH=${PATH}${GIT_EXPORTS} && ${_run_params}" >> "${LOG}-${_rnm}"
                 check_result ${?} "${_run_params}"
             fi
         fi
@@ -140,21 +140,21 @@ try () {
         _try_aname="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
         if [ -z "${_try_aname}" ]; then
             if [ -z "${_show_prgrss}" ]; then
-                eval "PATH=${PATH}${GIT_EXPORTS} ${_try_params}" >> "${LOG}" 2>> "${LOG}" && \
+                eval "export PATH=${PATH}${GIT_EXPORTS} && ${_try_params}" >> "${LOG}" 2>> "${LOG}" && \
                     return 0
             else
                 # show progress on stderr
                 ${PRINTF_BIN} "${ColorBlue}"
-                eval "PATH=${PATH}${GIT_EXPORTS} ${_try_params}" >> "${LOG}" && \
+                eval "export PATH=${PATH}${GIT_EXPORTS} && ${_try_params}" >> "${LOG}" && \
                     return 0
             fi
         else
             if [ -z "${_show_prgrss}" ]; then
-                eval "PATH=${PATH}${GIT_EXPORTS} ${_try_params}" >> "${LOG}-${_try_aname}" 2>> "${LOG}-${_try_aname}" && \
+                eval "export PATH=${PATH}${GIT_EXPORTS} && ${_try_params}" >> "${LOG}-${_try_aname}" 2>> "${LOG}-${_try_aname}" && \
                     return 0
             else
                 ${PRINTF_BIN} "${ColorBlue}"
-                eval "PATH=${PATH}${GIT_EXPORTS} ${_try_params}" >> "${LOG}-${_try_aname}" && \
+                eval "export PATH=${PATH}${GIT_EXPORTS} && ${_try_params}" >> "${LOG}-${_try_aname}" && \
                     return 0
             fi
         fi
