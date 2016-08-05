@@ -41,8 +41,8 @@ compiler_setup () {
     debug "Listing compiler features for platform: $(distd "${SYSTEM_NAME}")"
     case "${SYSTEM_NAME}" in
         Minix)
-            DEFAULT_COMPILER_FLAGS="${COMMON_COMPILER_FLAGS} -I/usr/pkg/include -fPIE"
-            DEFAULT_LDFLAGS="${COMMON_LDFLAGS} -L/usr/pkg/lib -fPIE"
+            DEFAULT_COMPILER_FLAGS="${COMMON_COMPILER_FLAGS} -I/usr/pkg/include"
+            DEFAULT_LDFLAGS="${COMMON_LDFLAGS} -L/usr/pkg/lib"
             ;;
 
         FreeBSD)
