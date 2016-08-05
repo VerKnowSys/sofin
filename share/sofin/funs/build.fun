@@ -491,11 +491,6 @@ process_flat () {
                         run "${DEF_CONFIGURE} ${DEF_CMAKE_BUILD_DIR} -LH -DCMAKE_INSTALL_RPATH=\"${_prefix}/lib;${_prefix}/libexec\" -DCMAKE_INSTALL_PREFIX=${_prefix} -DCMAKE_BUILD_TYPE=Release -DSYSCONFDIR=${SERVICE_DIR}/etc -DDOCDIR=${SERVICE_DIR}/share/doc -DJOB_POOL_COMPILE=${CPUS} -DJOB_POOL_LINK=${CPUS} -DCMAKE_C_FLAGS=\"${CFLAGS}\" -DCMAKE_CXX_FLAGS=\"${CXXFLAGS}\" ${DEF_CONFIGURE_ARGS}"
                         ;;
 
-                    void|meta|empty|none)
-                        DEF_MAKE_METHOD="true"
-                        DEF_INSTALL_METHOD="true"
-                        ;;
-
                     *)
                         unset _pic_optional
                         if [ "${SYSTEM_NAME}" != "Darwin" ]; then
