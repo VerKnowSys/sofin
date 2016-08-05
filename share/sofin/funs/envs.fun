@@ -47,7 +47,7 @@ compiler_setup () {
 
         FreeBSD)
             DEFAULT_COMPILER_FLAGS="${COMMON_COMPILER_FLAGS} -fPIE"
-            DEFAULT_LDFLAGS="${COMMON_LDFLAGS} -fPIE"
+            DEFAULT_LDFLAGS="${COMMON_LDFLAGS} -pie"
             ;;
 
         Darwin)
