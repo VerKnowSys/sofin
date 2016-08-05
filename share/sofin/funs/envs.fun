@@ -337,8 +337,7 @@ reload_zsh_shells () {
 
 
 update_env_files () {
-    _default_envs="/etc/profile /etc/zshenv /etc/bashrc"
-    for _env_file in ${_default_envs}; do
+    for _env_file in /etc/profile /etc/zshenv /etc/bashrc; do
         if [ -f "${_env_file}" ]; then
             debug "Processing existing env file: $(distd "${_env_file}")"
             ${EGREP_BIN} "SHELL_PID=" "${_env_file}" >/dev/null 2>&1
