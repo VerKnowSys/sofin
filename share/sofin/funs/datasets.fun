@@ -273,7 +273,7 @@ destroy_software_dir () {
         _dsname="${DEFAULT_ZPOOL}${SOFTWARE_DIR}${USER}/${_dset_destroy}"
         debug "Destroying software-dataset: $(distd "${_dsname}")"
         try "${ZFS_BIN} umount -f ${_dsname}"
-        try "${ZFS_BIN} destroy -r ${_dsname}"
+        try "${ZFS_BIN} destroy -fr ${_dsname}"
         try "${RM_BIN} -rf ${SOFTWARE_DIR}${_dset_destroy}"
         unset _dsname
     else
@@ -322,7 +322,7 @@ destroy_builddir () {
         if [ -z "${DEVEL}" ]; then
             debug "Destroying ZFS build-dataset: $(distd "${_dsname}")"
             try "${ZFS_BIN} umount -f ${_dsname}"
-            try "${ZFS_BIN} destroy -r ${_dsname}"
+            try "${ZFS_BIN} destroy -fr ${_dsname}"
             try "${RM_BIN} -fr ${SOFTWARE_DIR}${_deste_bund_name}/${DEFAULT_SRC_EXT}${_dset_sum}"
         else
             debug "DEVEL mode enabled, skipped dataset destroy: $(distd "${_dsname}")"
