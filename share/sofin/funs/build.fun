@@ -350,9 +350,8 @@ process_flat () {
 
     PATH="${_prefix}/bin:${_prefix}/sbin:${DEFAULT_PATH}"
     if [ -z "${DEF_DISABLED_ON}" ]; then
-        if [ -z "${DEF_SOURCE_PATH}" ]; then
-            note "   ${NOTE_CHAR2} $(distn "DEF_SOURCE_PATH") is undefined for: $(distn "${_req_defname}")."
-            note "NOTE: It's only valid for meta bundles. You may consider setting: $(distn "DEF_CONFIGURE=\"meta\"") in definition file of bundle."
+        if [ "${DEF_TYPE}" = "meta" ]; then
+            note "   ${NOTE_CHAR2} Meta bundle detected."
         else
             _cwd="$(${PWD_BIN} 2>/dev/null)"
             if [ -n "${BUILD_DIR}" -a \
