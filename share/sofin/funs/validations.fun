@@ -147,3 +147,26 @@ validate_definition_disabled () {
         done
     fi
 }
+
+
+validate_pie_on_exports () {
+    _bundz=${@}
+    if [ -z "${_bundz}" ]; then
+        error "At least single bundle name has to be specified for pie validation."
+    fi
+    if [ "YES" = "${CAP_SYS_HARDENED}" ]; then
+        # Make sure PIE is applied on binaries:
+        debug "Checking PIE on exports: $(distd "${_bundz}")"
+        for _bun in ${_bundz}; do
+            if [ -d "${SOFTWARE_DIR}${_bun}/exports" ]; then
+                for _bin in $(${FIND_BIN} ${SOFTWARE_DIR}${_bun}/exports -mindepth 1 -maxdepth 1 -type l 2>/dev/null | ${XARGS_BIN} ${READLINK_BIN} -f 2>/dev/null); do
+                    try "${FILE_BIN} '${_bin}' 2>/dev/null | ${EGREP_BIN} '${PIE_TYPE_ENTRY}'" || \
+                        warn "Exported binary: $(distw "${_bin}"), is not a $(distw "${PIE_TYPE_ENTRY}") (not-PIE)!"
+                done
+            fi
+        done
+        debug "PIE exports check finished."
+    else
+        debug "Nothing required."
+    fi
+}

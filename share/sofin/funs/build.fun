@@ -289,6 +289,8 @@ build () {
         finalize_afterbuild "${_bund_name}"
     done
 
+    validate_pie_on_exports "${_build_list}"
+
     note "Build successfull: $(distn "${_build_list}")"
     unset _build_list _bund_lcase _req_all _req
 }
