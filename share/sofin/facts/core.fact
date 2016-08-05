@@ -53,6 +53,9 @@ DEFAULT_DATE_TS_OPTS="+%s"
 DEFAULT_DATE_TRYRUN_OPTS="+%F-%H%M%S"
 DEFAULT_STRIP_OPTS="--strip-debug --strip-unneeded --preserve-dates"
 
+# Security related values:
+PIE_TYPE_ENTRY="LSB shared object"
+
 # Shell error code meanings:
 ERRORCODE_TASK_FAILURE=1
 ERRORCODE_USER_INTERRUPT=2
