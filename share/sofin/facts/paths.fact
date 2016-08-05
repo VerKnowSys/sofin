@@ -71,6 +71,7 @@ DD_BIN="/bin/dd"
 TPUT_BIN="/usr/bin/tput"
 TEE_BIN="/usr/bin/tee"
 FILE_BIN="/usr/bin/file"
+READLINK_BIN="/usr/bin/readlink"
 
 # Pick best utilities available:
 if [ -f "${DEFAULT_FACTS_DIR}alternatives.fact" ]; then
