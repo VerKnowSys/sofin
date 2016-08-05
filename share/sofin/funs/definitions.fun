@@ -31,6 +31,11 @@ load_defs () {
         done
     fi
 
+    if [ "${DEF_TYPE}" = "meta" ]; then
+        # Skip validations for "not real definition":
+        return 0
+    fi
+
     # Perform several sanity checks here..
     for _required_field in  "DEF_NAME=${DEF_NAME}" \
                             "DEF_NAME_DEF_POSTFIX=${DEF_NAME}${DEF_POSTFIX}" \
