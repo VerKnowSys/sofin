@@ -178,6 +178,7 @@ compiler_setup () {
                     LDFLAGS="-L${PREFIX}/lib ${DEF_LINKER_ARGS} ${DEFAULT_LDFLAGS}"
                     LD="/usr/bin/ld --plugin /usr/lib/LLVMgold.so"
                     NM="/usr/bin/nm --plugin /usr/lib/LLVMgold.so"
+                    RANLIB=":" # shouldn't be necessary
                 fi
                 ;;
 
@@ -194,6 +195,7 @@ compiler_setup () {
                     CFLAGS="-I${PREFIX}/include ${DEF_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
                     CXXFLAGS="-I${PREFIX}/include ${DEF_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
                     LDFLAGS="-L${PREFIX}/lib ${DEF_LINKER_ARGS} ${DEFAULT_LDFLAGS}"
+                    RANLIB="${RANLIB_BIN}"
                     unset NM LD
                 fi
                 ;;
@@ -225,7 +227,7 @@ compiler_setup () {
 
     unset default_c default_cxx default_cpp
 
-    export CFLAGS CXXFLAGS LDFLAGS LD NM CC CXX CPP
+    export CFLAGS CXXFLAGS LDFLAGS LD NM CC CXX CPP RANLIB
 }
 
 
