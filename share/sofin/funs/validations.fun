@@ -175,8 +175,14 @@ validate_pie_on_exports () {
         for _bun in ${_bundz}; do
             if [ -d "${SOFTWARE_DIR}${_bun}/exports" ]; then
                 for _bin in $(${FIND_BIN} ${SOFTWARE_DIR}${_bun}/exports -mindepth 1 -maxdepth 1 -type l 2>/dev/null | ${XARGS_BIN} ${READLINK_BIN} -f 2>/dev/null); do
-                    try "${FILE_BIN} '${_bin}' 2>/dev/null | ${GREP_BIN} 'ELF' | ${EGREP_BIN} '${PIE_TYPE_ENTRY}'" || \
-                        warn "Exported binary: $(distw "${_bin}"), is not a $(distw "${PIE_TYPE_ENTRY}") (not-PIE)!"
+                    try "${FILE_BIN} '${_bin}' 2>/dev/null | ${GREP_BIN} 'ELF'"
+                    if [ "$?" = "0" ]; then
+                        # it's ELF binary/library:
+                        try "${FILE_BIN} '${_bin}' 2>/dev/null | ${GREP_BIN} 'ELF' | ${EGREP_BIN} '${PIE_TYPE_ENTRY}'" || \
+                            warn "Exported ELF binary: $(distw "${_bin}"), is not a $(distw "${PIE_TYPE_ENTRY}") (not-PIE)!"
+                    else
+                        debug "Executable, but not an ELF: $(distd "${_bin}")"
+                    fi
                 done
             fi
         done
