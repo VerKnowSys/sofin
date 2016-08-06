@@ -171,7 +171,7 @@ compiler_setup () {
         case "${SYSTEM_NAME}" in
             FreeBSD|Minix)
                 if [ -x "${GOLD_BIN}" -a -f "/usr/lib/LLVMgold.so" ]; then
-                    _addon="/usr/lib/libLTO.so"
+                    _addon="/usr/lib/libLTO.so-DISABLED" # XXX: it's useless anyway at current stage
                     if [ -f "${_addon}" ]; then
                         _compiler_addon="-Wl,-flto"
                         _linker_addon="-Wl,-flto"
