@@ -1,4 +1,5 @@
-#/bin/sh
+#!/usr/bin/env zsh
+
 
 . /usr/share/sofin/loader
 
