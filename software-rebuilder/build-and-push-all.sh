@@ -8,6 +8,7 @@ if [ "FreeBSD" = "${SYSTEM_NAME}" ]; then
     setup_buildhost
 fi
 
+${TEST_BIN} -f /.build-host && export DEVEL=YES
 ${TEST_BIN} ! -x /Software/Ccache/bin/ccache || ${SOFIN_BIN} i Ccache
 
 note "Checking remote machine connection (shouldn't take more than a second).."
