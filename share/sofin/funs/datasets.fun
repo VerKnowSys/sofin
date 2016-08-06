@@ -111,7 +111,7 @@ build_service_dataset () {
             else
                 debug "Service origin unavailable! Creating new one."
                 debug "Grepping for dataset: $(distd "${_full_dataset_name}")"
-                try "${ZFS_BIN} list '${_full_dataset_name}'"
+                try "${ZFS_BIN} list -H -t filesystem '${_full_dataset_name}'"
                 if [ "${?}" = "0" ]; then
                     note "Preparing to send service dataset: $(distn "${_full_dataset_name}"), for bundle: $(distn "${_ps_elem}")"
                     try "${ZFS_BIN} umount -f ${_full_dataset_name}"
@@ -191,7 +191,7 @@ create_service_dir () {
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
         _dsname="${DEFAULT_ZPOOL}${SERVICES_DIR}${USER}/${_dset_create}"
         debug "Creating ZFS service-dataset: $(distd "${_dsname}")"
-        try "${ZFS_BIN} list '${_dsname}'" || \
+        try "${ZFS_BIN} list -H -t filesystem '${_dsname}'" || \
             try "${ZFS_BIN} create -p -o mountpoint=${SERVICES_DIR}${_dset_create} ${_dsname}"
         try "${ZFS_BIN} mount ${_dsname}"
         unset _dsname
@@ -228,14 +228,14 @@ create_base_datasets () {
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
         debug "Creating base software-dataset: $(distd "${DEFAULT_ZPOOL}${SOFTWARE_DIR}")"
         _dsname="${DEFAULT_ZPOOL}${SOFTWARE_DIR}${USER}"
-        try "${ZFS_BIN} list '${_dsname}'" || \
+        try "${ZFS_BIN} list -H -t filesystem '${_dsname}'" || \
             try "${ZFS_BIN} create -p -o mountpoint=${SOFTWARE_DIR} ${_dsname}"
         try "${ZFS_BIN} mount ${_dsname}"
         unset _dsname
 
         debug "Creating base services-dataset: $(distd "${DEFAULT_ZPOOL}${SERVICES_DIR}")"
         _dsname="${DEFAULT_ZPOOL}${SERVICES_DIR}${USER}"
-        try "${ZFS_BIN} list '${_dsname}'" || \
+        try "${ZFS_BIN} list -H -t filesystem '${_dsname}'" || \
             try "${ZFS_BIN} create -p -o mountpoint=${SERVICES_DIR} ${_dsname}"
         try "${ZFS_BIN} mount ${_dsname}"
         unset _dsname
@@ -251,7 +251,7 @@ create_software_dir () {
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
         _dsname="${DEFAULT_ZPOOL}${SOFTWARE_DIR}${USER}/${_dset_create}"
         debug "Creating ZFS software-dataset: $(distd "${_dsname}")"
-        try "${ZFS_BIN} list '${_dsname}'" || \
+        try "${ZFS_BIN} list -H -t filesystem '${_dsname}'" || \
             try "${ZFS_BIN} create -p -o mountpoint=${SOFTWARE_DIR}${_dset_create} ${_dsname}"
         try "${ZFS_BIN} mount ${_dsname}"
         unset _dsname
@@ -385,11 +385,11 @@ install_software_from_binbuild () {
         # On systems with ZFS capability, we use zfs receive instead of tarballing:
         _isfb_dataset="${DEFAULT_ZPOOL}${SOFTWARE_DIR}${USER}/${_isfb_fullname}"
         debug "isfb: $(distd ${_isfb_archive}), isff: $(distd ${_isfb_fullname}), isfbdset: $(distd ${_isfb_dataset})"
-        try "${ZFS_BIN} list '${_isfb_dataset}'"
+        try "${ZFS_BIN} list -H -t filesystem '${_isfb_dataset}'"
         if [ "${?}" != "0" ]; then
             debug "Installing ZFS based binary build to dataset: $(distd "${_isfb_dataset}")"
             run "${XZCAT_BIN} ${FILE_CACHE_DIR}${_isfb_archive} | ${ZFS_BIN} receive -F -v ${_isfb_dataset} &&
-                ${ZFS_BIN} rename ${_isfb_dataset}@${DEFAULT_GIT_SNAPSHOT_HEAD} ${ORIGIN_ZFS_SNAP_NAME}" && \
+                ${ZFS_BIN} rename '${_isfb_dataset}@${DEFAULT_GIT_SNAPSHOT_HEAD}' '${ORIGIN_ZFS_SNAP_NAME}'" && \
                     note "Installed: $(distn "${_isfb_fullname}")" && \
                         DONT_BUILD_BUT_DO_EXPORTS=YES
         else
