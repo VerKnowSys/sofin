@@ -119,12 +119,27 @@ validate_def_postfix () {
     elif [ "${_l2}" -gt "${_l1}" ]; then
         _cispc_nme_diff="$(difftext "${_cigiven_name}" "${_cidefinition_name}")"
     else # equal
+        # if difference is the name itself..
         _cispc_nme_diff="$(difftext "${_cigiven_name}" "$(lowercase "${DEF_NAME}")")"
     fi
+    debug "validate_def_postfix: DEF_NAME: ${DEF_NAME}, 1: ${_cigiven_name}, 2: ${_cidefinition_name}, DIFF: ${_cispc_nme_diff}"
     if [ -z "${DEF_POSTFIX}" -a \
-         -n "${_cispc_nme_diff}" ]; then
+         "${_cispc_nme_diff}" != "${DEF_NAME}" -a \
+         "${_cispc_nme_diff}" != "${DEF_NAME}${DEF_POSTFIX}" ]; then
         debug "Inferred DEF_POSTFIX=$(distd "${_cispc_nme_diff}") from definition: $(distd "${DEF_NAME}")"
         DEF_POSTFIX="${_cispc_nme_diff}"
+        # TODO: detect if postfix isn't already applied here
+
+    elif [ "${_cispc_nme_diff}" = "${DEF_NAME}" -a \
+           "${_cispc_nme_diff}" = "${DEF_NAME}${DEF_POSTFIX}" ]; then
+        # NOTE: This is case when dealing with definition file name,
+        # that has nothing in common with DEF_NAME (usually it's a postfix).
+        # In that case, we should pick specified name, *NOT* DEF_NAME:
+        DEF_NAME="${_cigiven_name}"
+        unset DEF_POSTFIX
+
+        debug "Inferred DEF_NAME: $(distd "${_cigiven_name}"), no DEF_POSTFIX, since definition file name, has nothing in common with DEF_NAME - which is allowed."
+
     elif [ -n "${_cispc_nme_diff}" ]; then
         debug "Given-name and definition-name difference: $(distd "${_cispc_nme_diff}")"
     else
