@@ -182,6 +182,10 @@ compiler_setup () {
                 fi
                 ;;
 
+            Darwin)
+                RANLIB="${RANLIB_BIN}"
+                ;;
+
             Linux)
                 # Golden linker support without LLVM plugin:
                 if [ -x "${GOLD_BIN}" ]; then
