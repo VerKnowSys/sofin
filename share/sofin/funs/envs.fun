@@ -171,14 +171,22 @@ compiler_setup () {
         case "${SYSTEM_NAME}" in
             FreeBSD|Minix)
                 if [ -x "${GOLD_BIN}" -a -f "/usr/lib/LLVMgold.so" ]; then
-                    DEFAULT_COMPILER_FLAGS="${DEFAULT_COMPILER_FLAGS} -Wl,-fuse-ld=gold -Wl,-flto"
-                    DEFAULT_LDFLAGS="${DEFAULT_LDFLAGS} -Wl,-fuse-ld=gold -Wl,-flto"
+                    _addon="/usr/lib/libLTO.so"
+                    if [ -f "${_addon}" ]; then
+                        _compiler_addon="-Wl,-flto"
+                        _linker_addon="-Wl,-flto"
+                        _plugin_addon="--plugin ${_addon}"
+                    fi
+
+                    DEFAULT_COMPILER_FLAGS="${DEFAULT_COMPILER_FLAGS} -Wl,-fuse-ld=gold ${_compiler_addon}"
+                    DEFAULT_LDFLAGS="${DEFAULT_LDFLAGS} -Wl,-fuse-ld=gold ${_linker_addon}"
                     CFLAGS="-I${PREFIX}/include ${DEF_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
                     CXXFLAGS="-I${PREFIX}/include ${DEF_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
                     LDFLAGS="-L${PREFIX}/lib ${DEF_LINKER_ARGS} ${DEFAULT_LDFLAGS}"
-                    LD="/usr/bin/ld --plugin /usr/lib/libLTO.so --plugin /usr/lib/LLVMgold.so"
-                    NM="/usr/bin/nm --plugin /usr/lib/libLTO.so --plugin /usr/lib/LLVMgold.so"
+                    LD="/usr/bin/ld ${_plugin_addon} --plugin /usr/lib/LLVMgold.so"
+                    NM="/usr/bin/nm ${_plugin_addon} --plugin /usr/lib/LLVMgold.so"
                     RANLIB=":" # shouldn't be necessary
+                    unset _addon _compiler_addon _linker_addon _plugin_addon
                 fi
                 ;;
 
