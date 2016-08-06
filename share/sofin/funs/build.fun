@@ -293,6 +293,8 @@ build () {
 
     note "Build successfull: $(distn "${_build_list}")"
     unset _build_list _bund_lcase _req_all _req
+
+    env_reset
 }
 
 
