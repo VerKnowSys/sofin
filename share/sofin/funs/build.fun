@@ -485,7 +485,9 @@ process_flat () {
                         ;;
 
                     posix)
-                        run "./configure -prefix ${_prefix} -cc $(${BASENAME_BIN} "${CC}" 2>/dev/null) ${DEF_CONFIGURE_ARGS}"
+                        try "./configure -prefix ${_prefix} -cc '${C_COMPILER_NAME} ${CFLAGS}' -libs '-L${PREFIX}/lib ${LDFLAGS}' -mandir ${PREFIX}/share/man -libdir ${PREFIX}/lib -aspp '${C_COMPILER_NAME} ${CFLAGS} -c' ${DEF_CONFIGURE_ARGS}" || \
+                        try "./configure -prefix ${_prefix} -cc '${C_COMPILER_NAME} ${CFLAGS}' -libs '-L${PREFIX}/lib ${LDFLAGS}' -libdir ${PREFIX}/lib -aspp '${C_COMPILER_NAME} ${CFLAGS} -c' ${DEF_CONFIGURE_ARGS}" || \
+                        run "./configure -prefix ${_prefix} -cc '${C_COMPILER_NAME} ${CFLAGS}' -libs '-L${PREFIX}/lib ${LDFLAGS}' -aspp '${C_COMPILER_NAME} ${CFLAGS} -c' ${DEF_CONFIGURE_ARGS}"
                         ;;
 
                     cmake)
