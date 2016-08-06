@@ -112,8 +112,8 @@ validate_def_postfix () {
     _cigiven_name="$(${BASENAME_BIN} "$(${PRINTF_BIN} '%s' "$(lowercase "${1}")" | eval "${CUTOFF_DEF_EXT_GUARD}")")"
     _cidefinition_name="$(${BASENAME_BIN} "$(${PRINTF_BIN} '%s' "$(lowercase "${2}")" | eval "${CUTOFF_DEF_EXT_GUARD}")")"
     # case when DEF_POSTFIX was ommited => use definition file name difference as POSTFIX:
-    _l1="$(${PRINTF_BIN} '%s' "${_cidefinition_name}" | ${WC_BIN} -c 2>/dev/null)"
-    _l2="$(${PRINTF_BIN} '%s' "${_cigiven_name}" | ${WC_BIN} -c 2>/dev/null)"
+    _l1="${#_cidefinition_name}"
+    _l2="${#_cigiven_name}"
     if [ "${_l1}" -gt "${_l2}" ]; then
         _cispc_nme_diff="$(difftext "${_cidefinition_name}" "${_cigiven_name}")"
     elif [ "${_l2}" -gt "${_l1}" ]; then
