@@ -70,9 +70,6 @@ determine_system_capabilites () {
                 DEFAULT_ZPOOL="${DEFAULT_ZPOOL:-zroot}"
             fi
             ORIGIN_ZFS_SNAP_NAME="origin"
-
-            # For ZFS we don't use tarballs anymore:
-            DEFAULT_ARCHIVE_EXT="${DEFAULT_SOFTWARE_SNAPSHOT_EXT}"
         fi
     else
         unset CAP_SYS_ZFS DEFAULT_ZPOOL ORIGIN_ZFS_SNAP_NAME
