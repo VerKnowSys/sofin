@@ -298,12 +298,18 @@ destroy_locks () {
         try "${EGREP_BIN} '^${_pid}$' ${_dlf}" && \
             try "${RM_BIN} -f ${_dlf}" && \
                 debug "Removed currently owned pid lock: $(distd "${_dlf}")"
-        try "${KILL_BIN} -0 $(${CAT_BIN} "${_dlf}" 2>/dev/null)"
-        if [ "${?}" != "0" ]; then
-            try "${RM_BIN} -f ${_dlf}" && \
-                debug "Pid: $(distd "${_pid}") appears to be already dead. Removed lock file: $(distd "${_dlf}")"
+
+        _possiblepid="$(${CAT_BIN} "${_dlf}" 2>/dev/null)"
+        if [ -n "${_possiblepid}" ]; then
+            try "${KILL_BIN} -0 ${_possiblepid}"
+            if [ "${?}" != "0" ]; then
+                try "${RM_BIN} -f ${_dlf}" && \
+                    debug "Pid: $(distd "${_pid}") appears to be already dead. Removed lock file: $(distd "${_dlf}")"
+            else
+                debug "Pid: $(distd "${_pid}") is alive. Leaving lock untouched."
+            fi
         else
-            debug "Pid: $(distd "${_pid}") is alive. Leaving lock untouched."
+            debug "Empty pid?"
         fi
     done && \
         debug "Finished locks cleanup using pattern: $(distd "${_pattern:-''}") that belong to pid: $(distd "${_pid}")"
