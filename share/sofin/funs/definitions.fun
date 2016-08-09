@@ -478,58 +478,52 @@ strip_bundle () {
 }
 
 
-clean_useless () {
+track_useful_and_useless_files () {
     if [ "${DEF_CLEAN_USELESS}" = "YES" ]; then
+        unset _fordel
         # we shall clean the bundle, from useless files..
         if [ -n "${PREFIX}" ]; then
             # step 0: clean defaults side DEF_DEFAULT_USELESS entries only if DEF_USEFUL is empty
-            unset _fordel
             if [ -n "${DEF_DEFAULT_USELESS}" -a \
                  -z "${DEF_USEFUL}" ]; then
                 for _cu_pattern in ${DEF_DEFAULT_USELESS}; do
                     if [ -e "${PREFIX}/${_cu_pattern}" ]; then
                         if [ -z "${_fordel}" ]; then
-                            _fordel="${PREFIX}/${_cu_pattern}"
+                            _fordel="'${PREFIX}/${_cu_pattern}'"
                         else
-                            _fordel="${_fordel} ${PREFIX}/${_cu_pattern}"
+                            _fordel="'${_fordel}' '${PREFIX}/${_cu_pattern}'"
                         fi
                     # else
                     # debug "Not existent pattern.."
                     fi
                 done
             fi
-            try "${RM_BIN} -rf ${_fordel}" && \
-                debug "Removed useless files matching patterns: DEF_DEFAULT_USELESS=$(distd "${DEF_DEFAULT_USELESS}")"
 
             # step 1: clean definition side DEF_USELESS entries only if DEF_USEFUL is empty
             if [ -n "${DEF_USELESS}" ]; then
-                unset _fordel
                 for _cu_pattern in ${DEF_USELESS}; do
                     if [ -n "${_cu_pattern}" ]; then
                         if [ -z "${_fordel}" ]; then
-                            _fordel="${PREFIX}/${_cu_pattern}"
+                            _fordel="'${PREFIX}/${_cu_pattern}'"
                         else
-                            _fordel="${_fordel} ${PREFIX}/${_cu_pattern}"
+                            _fordel="'${_fordel}' '${PREFIX}/${_cu_pattern}'"
                         fi
                     fi
                 done
-                try "${RM_BIN} -rf ${_fordel}" && \
-                    debug "Removed useless files of prefix: $(distd "${PREFIX}") defined by DEF_USELESS"
             fi
         else
-            warn "No $(distw "PREFIX") defined in clean_useless()!"
+            error "No $(distw "PREFIX") defined! Something went wrong (at least)!"
         fi
 
         unset _dbg_exp_lst
         for _cu_dir in bin sbin libexec; do
             if [ -d "${PREFIX}/${_cu_dir}" ]; then
                 _cuall_binaries=$(${FIND_BIN} ${PREFIX}/${_cu_dir} -mindepth 1 -maxdepth 1 -type f -or -type l 2>/dev/null)
-                unset _fordel
                 for _cufile in ${_cuall_binaries}; do
                     unset _cu_commit_removal
                     _cubase="${_cufile##*/}" # NOTE: faster "basename"
                     if [ -e "${PREFIX}/exports/${_cubase}" ]; then
-                        _dbg_exp_lst="${_dbg_exp_lst} ${_cubase}"
+                        _dbg_exp_lst="'${_dbg_exp_lst}' '${_cubase}'"
                     else
                         # traverse through DEF_USEFUL for _cufile patterns required by software but not exported
                         for _is_useful in ${DEF_USEFUL}; do
@@ -553,9 +547,9 @@ clean_useless () {
                         done
                         if [ -z "${_cu_commit_removal}" ]; then
                             if [ -z "${_fordel}" ]; then
-                                _fordel="${_cufile}"
+                                _fordel="'${_cufile}'"
                             else
-                                _fordel="${_cufile} ${_fordel}"
+                                _fordel="'${_cufile}' '${_fordel}'"
                             fi
                         else
                             debug "Useful file left intact: $(distd "${_cufile}")"
@@ -564,11 +558,17 @@ clean_useless () {
                 done
             fi
         done
-        debug "Found exports: $(distd "${_dbg_exp_lst}")"
-        try "${RM_BIN} -rf ${_fordel}" && \
-            debug "Useless files removed"
+
+        if [ -n "${_dbg_exp_lst}" ]; then
+            debug "Found exports: $(distd "${_dbg_exp_lst}")"
+        else
+            debug "Empty exports list?"
+        fi
+
+        remove_useless ${_fordel} && \
+            debug "Useless files were wiped."
     else
-        debug "Useless files cleanup skipped"
+        debug "Useless files cleanup skipped since DEF_CLEAN_USELESS=$(distd "${DEF_CLEAN_USELESS:-''}")!"
     fi
     unset _cu_pattern _cufile _cuall_binaries _cu_commit_removal _cubase _fordel _dbg_exp_lst
 }

@@ -299,7 +299,7 @@ build () {
                 after_export_callback
             done
 
-            clean_useless
+            track_useful_and_useless_files
             create_apple_bundle_if_necessary
         fi
 
