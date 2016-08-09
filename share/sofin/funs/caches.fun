@@ -136,8 +136,8 @@ pretouch_logs () {
             fi
         fi
     done
-    debug "pretouch_logs(): $(distd "${_pret_list}")"
-    try "${TOUCH_BIN} ${_pret_list}"
+    try "${TOUCH_BIN} ${_pret_list}" && \
+        debug "Logs pre-touch-ed!"
     unset _app _params _lapp _pret_list
 }
 
