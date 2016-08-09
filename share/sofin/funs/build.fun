@@ -578,7 +578,9 @@ process_flat () {
 
             debug "Cleaning man dir from previous dependencies, we want to install man pages that belong to LAST requirement which is app bundle itself"
             for place in man share/man share/info share/doc share/docs; do
-                try "${FIND_BIN} ${_prefix}/${place} -delete"
+                if [ -e "${_prefix}/${place}" ]; then
+                    try "${FIND_BIN} ${_prefix}/${place} -delete"
+                fi
             done
 
             note "   ${NOTE_CHAR} Installing requirement: $(distn "${_app_param}")"
