@@ -92,3 +92,14 @@ finalize_afterbuild () {
         destroy_locks "${_bund_name}"
     fi
 }
+
+
+remove_useless () {
+    _rufiles=${@}
+    if [ -n "${_rufiles}" ]; then
+        try "${RM_BIN} -rf '${_rufiles}'" && \
+            return 0
+        debug "Failed to remove useless files: '$(distd "${_rufiles}")'"
+    fi
+    return 1
+}
