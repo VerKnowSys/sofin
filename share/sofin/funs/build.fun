@@ -22,7 +22,24 @@ build_bundle () {
             try "${RM_BIN} -vf ${FILE_CACHE_DIR}${_bsbelement}"
             create_software_bundle_archive "${_bsbname}" "${_bsbelement}" "${_bsversion}"
         else
-            warn "Already existing bundle found in cache: $(distw "${FILE_CACHE_DIR}${_bsbelement}") will be reused to deploy."
+            debug "Found already existing bundle stream in file-cache: $(distd "${FILE_CACHE_DIR}${_bsbelement}")"
+
+            # NOTE: Let's move old one, make a shasum difference, if different => overwrite
+            try "${MV_BIN} -v ${FILE_CACHE_DIR}${_bsbelement} ${FILE_CACHE_DIR}${_bsbelement}.old ; ${MV_BIN} -v ${FILE_CACHE_DIR}${_bsbelement}${DEFAULT_CHKSUM_EXT} ${FILE_CACHE_DIR}${_bsbelement}${DEFAULT_CHKSUM_EXT}.old" && \
+                debug "Old bundle stream, was temporarely moved."
+            create_software_bundle_archive "${_bsbname}" "${_bsbelement}" "${_bsversion}"
+            if [ -f "${FILE_CACHE_DIR}${_bsbelement}" ]; then
+                _newsum="$(file_checksum "${FILE_CACHE_DIR}${_bsbelement}")"
+                _oldsum="$(${CAT_BIN} "${FILE_CACHE_DIR}${_bsbelement}${DEFAULT_CHKSUM_EXT}.old" 2>/dev/null)"
+                debug "Comparing shasum of most recent stream and one from previous stream. Old-sum: $(distd "${_oldsum}"), new-sum: $(distd "${_newsum}")"
+                if [ "${_oldsum}" = "${_newsum}" ]; then
+                    try "${MV_BIN} -fv ${FILE_CACHE_DIR}${_bsbelement}.old ${FILE_CACHE_DIR}${_bsbelement}.old ; ${MV_BIN} -fv ${FILE_CACHE_DIR}${_bsbelement}${DEFAULT_CHKSUM_EXT}.old ${FILE_CACHE_DIR}${_bsbelement}${DEFAULT_CHKSUM_EXT}" && \
+                        debug "Checksums match! Upload unnecessary! Previous cache stream file was restored."
+                else
+                    try "${RM_BIN} -fv ${FILE_CACHE_DIR}${_bsbelement}.old ${FILE_CACHE_DIR}${_bsbelement}${DEFAULT_CHKSUM_EXT}.old" && \
+                        debug "Checksum didn't match. New stream will be used to upload bundle stream. Previous cache stream file was removed."
+                fi
+            fi
         fi
     fi
     unset _bsbname _bsbelement
@@ -607,4 +624,6 @@ process_flat () {
         run "${PRINTF_BIN} '%s' \"${DEFAULT_REQ_OS_PROVIDED}\" > ${_dis_def}"
     fi
     unset _current_branch _dis_def _req_defname _app_param _prefix _bundlnm
+
+    # TODO: reset env here?
 }
