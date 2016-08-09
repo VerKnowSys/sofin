@@ -22,7 +22,7 @@ build_bundle () {
             try "${RM_BIN} -vf ${FILE_CACHE_DIR}${_bsbelement}"
             create_software_bundle_archive "${_bsbname}" "${_bsbelement}" "${_bsversion}"
         else
-            debug "Already existing bundle: $(distd "${_bsbelement}") will be reused to deploy"
+            warn "Already existing bundle found in cache: $(distw "${FILE_CACHE_DIR}${_bsbelement}") will be reused to deploy."
         fi
     fi
     unset _bsbname _bsbelement
