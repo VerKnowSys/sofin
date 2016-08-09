@@ -728,6 +728,14 @@ after_make_callback () {
 }
 
 
+after_test_callback () {
+    if [ -n "${DEF_AFTER_TEST_METHOD}" ]; then
+        debug "Evaluating callback DEF_AFTER_TEST_METHOD: $(distd "${DEF_AFTER_TEST_METHOD}")"
+        run "${DEF_AFTER_TEST_METHOD}"
+    fi
+}
+
+
 after_install_callback () {
     if [ -n "${DEF_AFTER_INSTALL_METHOD}" ]; then
         debug "Evaluating callback DEF_AFTER_INSTALL_METHOD: $(distd "${DEF_AFTER_INSTALL_METHOD}")"
