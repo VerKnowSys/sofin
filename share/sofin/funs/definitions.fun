@@ -440,7 +440,7 @@ strip_bundle () {
             ;;
 
         *)
-            warn "$(distd "${_sbfdefinition_name}"): Strip nothing? Valid options: ALL | BIN | LIB"
+            warn "$(distw "${_sbfdefinition_name}"): Strip nothing? Valid options are: ALL | BIN | LIB | NO"
             ;;
     esac
     if [ "${DEF_STRIP}" != "no" ]; then
