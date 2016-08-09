@@ -251,9 +251,9 @@ develop () {
 
 sofin_status () {
     if [ -f ${SOFIN_ENV_DISABLED_INDICATOR_FILE} ]; then
-        note "Sofin shell environment is: ${ColorRed}disabled${ColorReset}"
+        note "Sofin shell environment is: $(distn "disabled" ${ColorRed})"
     else
-        note "Sofin shell environment is: $(distn enabled${ColorReset})"
+        note "Sofin shell environment is: $(distn "enabled" ${ColorParams})"
     fi
 }
 
