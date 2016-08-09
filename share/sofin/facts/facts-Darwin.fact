@@ -14,4 +14,4 @@ DTRACE_BIN="/usr/sbin/dtrace"
 # set core parameters:
 ALL_CPUS="$(${SYSCTL_BIN} -e machdep.cpu.thread_count 2>/dev/null | ${CUT_BIN} -d'=' -f2 2>/dev/null)"
 CPUS="$(${PRINTF_BIN} '%s\n' "${ALL_CPUS:-${DEFAULT_CPUS}} - 3" | ${BC_BIN} 2>/dev/null)" # decrease threads by 3 on workstation OS
-MAKE_OPTS="-j${CPUS:-${DEFAULT_CPUS}}"
+MAKE_OPTS="-s -j${CPUS:-${DEFAULT_CPUS}}"

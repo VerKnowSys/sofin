@@ -12,4 +12,4 @@ SCP_BIN="/usr/pkg/bin/scp"
 # set core parameters:
 CPUS="${CPUS:-${DEFAULT_CPUS}}" # XXX: hardcoded
 ALL_CPUS="${CPUS:-${DEFAULT_CPUS}}"
-MAKE_OPTS="-j${CPUS:-${DEFAULT_CPUS}}"
+MAKE_OPTS="-s -j${CPUS:-${DEFAULT_CPUS}}"
