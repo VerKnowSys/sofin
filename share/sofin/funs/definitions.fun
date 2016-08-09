@@ -701,7 +701,7 @@ after_make_callback () {
 
 
 after_install_callback () {
-    if [ ! "${DEF_AFTER_INSTALL_METHOD}" = "" ]; then
+    if [ -n "${DEF_AFTER_INSTALL_METHOD}" ]; then
         debug "Evaluating callback: $(distd "${DEF_AFTER_INSTALL_METHOD}")"
         run "${DEF_AFTER_INSTALL_METHOD}"
     fi
