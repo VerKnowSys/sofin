@@ -40,7 +40,7 @@ build_sofin_natives () {
     compiler_setup
     for _prov in ${SOFIN_PROVIDES}; do
         if [ -f "src/${_prov}.cc" ]; then
-            run "${CXX_COMPILER_NAME} ${CXXFLAGS} -o bin/${_prov} src/${_prov}.cc" && \
+            run "${CXX_COMPILER_NAME} ${CXXFLAGS} ${LDFLAGS} -o bin/${_prov} src/${_prov}.cc" && \
                 note "  ${_okch} src/${_prov}.cc"
         fi
     done
