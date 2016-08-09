@@ -37,9 +37,10 @@ update_defs () {
 build_sofin_natives () {
     _okch="$(distn "${SUCCESS_CHAR}" ${ColorParams})"
     note "Building.."
+    compiler_setup
     for _prov in ${SOFIN_PROVIDES}; do
         if [ -f "src/${_prov}.cc" ]; then
-            run "${CXX_COMPILER_NAME} ${DEFAULT_COMPILER_FLAGS} -o bin/${_prov} src/${_prov}.cc" && \
+            run "${CXX_COMPILER_NAME} ${CXXFLAGS} -o bin/${_prov} src/${_prov}.cc" && \
                 note "  ${_okch} src/${_prov}.cc"
         fi
     done
