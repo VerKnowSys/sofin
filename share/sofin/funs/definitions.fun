@@ -498,8 +498,8 @@ clean_useless () {
                     fi
                 done
             fi
-            debug "Pattern of DEF_DEFAULT_USELESS: $(distd "${_cu_pattern}")"
-            try "${RM_BIN} -rf ${_fordel}"
+            try "${RM_BIN} -rf ${_fordel}" && \
+                debug "Removed useless files matching patterns: DEF_DEFAULT_USELESS=$(distd "${DEF_DEFAULT_USELESS}")"
 
             # step 1: clean definition side DEF_USELESS entries only if DEF_USEFUL is empty
             if [ -n "${DEF_USELESS}" ]; then
@@ -545,7 +545,7 @@ clean_useless () {
                             if [ "${_cu_dir}" = "${_subdir}" ]; then
                                 ${PRINTF_BIN} '%s\n' "${_cufile}" 2>/dev/null | ${EGREP_BIN} ".*(.${_pattern}).*" >/dev/null 2>&1
                                 if [ "${?}" = "0" ]; then
-                                    debug "got: '$(distd "${_cufile}")' match with: $(distd "${_subdir}") + / + '$(distd ".*(.${_pattern}).*")'"
+                                    debug "got: '$(distd "${_cufile}")' match with: $(distd "${_subdir}") ~= '$(distd ".*(.${_pattern}).*")'"
                                     _cu_commit_removal=NO
                                     break; # we got match - one confirmation is enough!
                                 fi
