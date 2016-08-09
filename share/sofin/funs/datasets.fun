@@ -114,14 +114,14 @@ build_service_dataset () {
                 try "${ZFS_BIN} list -H -t filesystem '${_full_dataset_name}'"
                 if [ "${?}" = "0" ]; then
                     note "Preparing to send service dataset: $(distn "${_full_dataset_name}"), for bundle: $(distn "${_ps_elem}")"
-                    try "${ZFS_BIN} umount -f ${_full_dataset_name}"
-                    run "${ZFS_BIN} send ${_full_dataset_name} | ${XZ_BIN} ${DEFAULT_XZ_OPTS} > ${FILE_CACHE_DIR}${_ps_snap_file}"
-                    try "${ZFS_BIN} mount ${_full_dataset_name}"
+                    try "${ZFS_BIN} umount -f '${_full_dataset_name}'"
+                    run "${ZFS_BIN} send '${_full_dataset_name}' | ${XZ_BIN} ${DEFAULT_XZ_OPTS} > ${FILE_CACHE_DIR}${_ps_snap_file}"
+                    try "${ZFS_BIN} mount '${_full_dataset_name}'"
                 else
-                    run "${ZFS_BIN} create -p -o mountpoint=${SERVICES_DIR}${_ps_elem} ${_full_dataset_name}"
-                    try "${ZFS_BIN} umount -f ${_full_dataset_name}"
-                    run "${ZFS_BIN} send ${_full_dataset_name} | ${XZ_BIN} ${DEFAULT_XZ_OPTS} > ${FILE_CACHE_DIR}${_ps_snap_file}"
-                    try "${ZFS_BIN} mount ${_full_dataset_name}"
+                    run "${ZFS_BIN} create -p -o mountpoint=${SERVICES_DIR}${_ps_elem} '${_full_dataset_name}'"
+                    try "${ZFS_BIN} umount -f '${_full_dataset_name}'"
+                    run "${ZFS_BIN} send '${_full_dataset_name}' | ${XZ_BIN} ${DEFAULT_XZ_OPTS} > ${FILE_CACHE_DIR}${_ps_snap_file}"
+                    try "${ZFS_BIN} mount '${_full_dataset_name}'"
                 fi
                 _snap_size="$(file_size "${FILE_CACHE_DIR}${_ps_snap_file}")"
                 if [ "${_snap_size}" = "0" ]; then
@@ -169,7 +169,7 @@ fetch_dset_zfs_stream () {
         if [ "${?}" = "0" ]; then
             _dataset_name="${DEFAULT_ZPOOL}${SERVICES_DIR}${USER}/${_fdz_bund_name}"
             debug "Creating service dataset: $(distd "${_dataset_name}"), from file stream: $(distd "${_fdz_out_file}")."
-            retry "${XZCAT_BIN} ${FILE_CACHE_DIR}${_fdz_out_file} | ${ZFS_BIN} receive -F -v ${_dataset_name} && ${ZFS_BIN} rename \"${_dataset_name}@${DEFAULT_GIT_SNAPSHOT_HEAD}\" ${ORIGIN_ZFS_SNAP_NAME}" && \
+            retry "${XZCAT_BIN} '${FILE_CACHE_DIR}${_fdz_out_file}' | ${ZFS_BIN} receive -F -v '${_dataset_name}' && ${ZFS_BIN} rename '${_dataset_name}@${DEFAULT_GIT_SNAPSHOT_HEAD}' ${ORIGIN_ZFS_SNAP_NAME}" && \
                     note "Received service dataset: $(distn "${_dataset_name}")"
             unset _dataset_name
         else
@@ -192,14 +192,14 @@ create_service_dir () {
         _dsname="${DEFAULT_ZPOOL}${SERVICES_DIR}${USER}/${_dset_create}"
         debug "Creating ZFS service-dataset: $(distd "${_dsname}")"
         try "${ZFS_BIN} list -H -t filesystem '${_dsname}'" || \
-            try "${ZFS_BIN} create -p -o mountpoint=${SERVICES_DIR}${_dset_create} ${_dsname}"
-        try "${ZFS_BIN} mount ${_dsname}"
+            try "${ZFS_BIN} create -p -o mountpoint=${SERVICES_DIR}${_dset_create} '${_dsname}'"
+        try "${ZFS_BIN} mount '${_dsname}'"
         unset _dsname
     else
         debug "Creating regular service-directory: $(distd "${SERVICES_DIR}${_dset_create}")"
-        try "${MKDIR_BIN} -p ${SERVICES_DIR}${_dset_create}"
+        try "${MKDIR_BIN} -p '${SERVICES_DIR}${_dset_create}'"
     fi
-    try "${CHMOD_BIN} 0710 ${SERVICES_DIR}${_dset_create}"
+    try "${CHMOD_BIN} -v 0710 '${SERVICES_DIR}${_dset_create}'"
     unset _dset_create
 }
 
@@ -211,14 +211,15 @@ destroy_service_dir () {
     fi
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
         _dsname="${DEFAULT_ZPOOL}${SERVICES_DIR}${USER}/${_dset_destroy}"
-        debug "Destroying dataset: $(distd "${_dsname}")"
-        try "${ZFS_BIN} umount -f ${_dsname}"
-        try "${ZFS_BIN} destroy -r ${_dsname}"
-        try "${RM_BIN} -rf ${SERVICES_DIR}${_dset_destroy}"
+        try "${ZFS_BIN} umount -f '${_dsname}'"
+        try "${ZFS_BIN} destroy -r '${_dsname}'" && \
+            try "${RM_BIN} -rf '${SERVICES_DIR}${_dset_destroy}'" && \
+                debug "Service dataset destroyed: $(distd "${_dsname}")"
+
         unset _dsname
     else
-        debug "Removing regular software-directory: $(distd "${SERVICES_DIR}${_dset_destroy}")"
-        try "${RM_BIN} -rf ${SERVICES_DIR}${_dset_destroy}"
+        try "${RM_BIN} -rf '${SERVICES_DIR}${_dset_destroy}'" && \
+            debug "Removed regular software-directory: $(distd "${SERVICES_DIR}${_dset_destroy}")"
     fi
     unset _dset_destroy
 }
@@ -229,15 +230,15 @@ create_base_datasets () {
         debug "Creating base software-dataset: $(distd "${DEFAULT_ZPOOL}${SOFTWARE_DIR}")"
         _dsname="${DEFAULT_ZPOOL}${SOFTWARE_DIR}${USER}"
         try "${ZFS_BIN} list -H -t filesystem '${_dsname}'" || \
-            try "${ZFS_BIN} create -p -o mountpoint=${SOFTWARE_DIR} ${_dsname}"
-        try "${ZFS_BIN} mount ${_dsname}"
+            try "${ZFS_BIN} create -p -o mountpoint=${SOFTWARE_DIR} '${_dsname}'"
+        try "${ZFS_BIN} mount '${_dsname}'"
         unset _dsname
 
         debug "Creating base services-dataset: $(distd "${DEFAULT_ZPOOL}${SERVICES_DIR}")"
         _dsname="${DEFAULT_ZPOOL}${SERVICES_DIR}${USER}"
         try "${ZFS_BIN} list -H -t filesystem '${_dsname}'" || \
-            try "${ZFS_BIN} create -p -o mountpoint=${SERVICES_DIR} ${_dsname}"
-        try "${ZFS_BIN} mount ${_dsname}"
+            try "${ZFS_BIN} create -p -o mountpoint=${SERVICES_DIR} '${_dsname}'"
+        try "${ZFS_BIN} mount '${_dsname}'"
         unset _dsname
     fi
 }
@@ -252,14 +253,14 @@ create_software_dir () {
         _dsname="${DEFAULT_ZPOOL}${SOFTWARE_DIR}${USER}/${_dset_create}"
         debug "Creating ZFS software-dataset: $(distd "${_dsname}")"
         try "${ZFS_BIN} list -H -t filesystem '${_dsname}'" || \
-            try "${ZFS_BIN} create -p -o mountpoint=${SOFTWARE_DIR}${_dset_create} ${_dsname}"
-        try "${ZFS_BIN} mount ${_dsname}"
+            try "${ZFS_BIN} create -p -o mountpoint=${SOFTWARE_DIR}${_dset_create} '${_dsname}'"
+        try "${ZFS_BIN} mount '${_dsname}'"
         unset _dsname
     else
         debug "Creating regular software-directory: $(distd "${SOFTWARE_DIR}${_dset_create}")"
-        try "${MKDIR_BIN} -p ${SOFTWARE_DIR}${_dset_create}"
+        try "${MKDIR_BIN} -p '${SOFTWARE_DIR}${_dset_create}'"
     fi
-    try "${CHMOD_BIN} 0710 ${SOFTWARE_DIR}${_dset_create}"
+    try "${CHMOD_BIN} 0710 '${SOFTWARE_DIR}${_dset_create}'"
     unset _dset_create
 }
 
@@ -272,13 +273,13 @@ destroy_software_dir () {
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
         _dsname="${DEFAULT_ZPOOL}${SOFTWARE_DIR}${USER}/${_dset_destroy}"
         debug "Destroying software-dataset: $(distd "${_dsname}")"
-        try "${ZFS_BIN} umount -f ${_dsname}"
-        try "${ZFS_BIN} destroy -fr ${_dsname}"
-        try "${RM_BIN} -rf ${SOFTWARE_DIR}${_dset_destroy}"
+        try "${ZFS_BIN} umount -f '${_dsname}'"
+        try "${ZFS_BIN} destroy -fr '${_dsname}'"
+        try "${RM_BIN} -rf '${SOFTWARE_DIR}${_dset_destroy}'"
         unset _dsname
     else
         debug "Removing regular software-directory: $(distd "${SOFTWARE_DIR}${_dset_destroy}")"
-        try "${RM_BIN} -rf ${SOFTWARE_DIR}${_dset_destroy}"
+        try "${RM_BIN} -rf '${SOFTWARE_DIR}${_dset_destroy}'"
     fi
     unset _dset_destroy
 }
@@ -296,13 +297,13 @@ create_builddir () {
         fi
         _dset="${DEFAULT_ZPOOL}${SOFTWARE_DIR}${USER}/${_cb_bundle_name}/${DEFAULT_SRC_EXT}${_dset_namesum}"
         debug "Creating ZFS build-dataset: $(distd "${_dset}")"
-        try "${ZFS_BIN} create -p -o mountpoint=${SOFTWARE_DIR}${_cb_bundle_name}/${DEFAULT_SRC_EXT}${_dset_namesum} ${_dset}"
-        try "${ZFS_BIN} mount ${_dset}"
+        try "${ZFS_BIN} create -p -o mountpoint=${SOFTWARE_DIR}${_cb_bundle_name}/${DEFAULT_SRC_EXT}${_dset_namesum} '${_dset}'"
+        try "${ZFS_BIN} mount '${_dset}'"
         unset _dset _dset_namesum
     else
         _bdir="${SOFTWARE_DIR}${_cb_bundle_name}/${DEFAULT_SRC_EXT}${_dset_namesum}"
         debug "Creating regular build-directory: $(distd "${_bdir}")"
-        try "${MKDIR_BIN} -p ${_bdir}"
+        try "${MKDIR_BIN} -p '${_bdir}'"
     fi
     unset _bdir _cb_bundle_name _dset_namesum
 }
@@ -321,9 +322,9 @@ destroy_builddir () {
         _dsname="${DEFAULT_ZPOOL}${SOFTWARE_DIR}${USER}/${_deste_bund_name}/${DEFAULT_SRC_EXT}${_dset_sum}"
         if [ -z "${DEVEL}" ]; then
             debug "Destroying ZFS build-dataset: $(distd "${_dsname}")"
-            try "${ZFS_BIN} umount -f ${_dsname}"
-            try "${ZFS_BIN} destroy -fr ${_dsname}"
-            try "${RM_BIN} -fr ${SOFTWARE_DIR}${_deste_bund_name}/${DEFAULT_SRC_EXT}${_dset_sum}"
+            try "${ZFS_BIN} umount -f '${_dsname}'"
+            try "${ZFS_BIN} destroy -fr '${_dsname}'"
+            try "${RM_BIN} -fr '${SOFTWARE_DIR}${_deste_bund_name}/${DEFAULT_SRC_EXT}${_dset_sum}'"
         else
             debug "DEVEL mode enabled, skipped dataset destroy: $(distd "${_dsname}")"
         fi
@@ -331,7 +332,7 @@ destroy_builddir () {
     else
         _bdir="${SOFTWARE_DIR}${_deste_bund_name}/${DEFAULT_SRC_EXT}${_dset_sum}"
         debug "Removing regular build-directory: $(distd "${_bdir}")"
-        try "${RM_BIN} -fr ${_bdir}"
+        try "${RM_BIN} -fr '${_bdir}'"
     fi
     unset _deste_bund_name _bdir _deste_bund_name _dset_sum _dsname
 }
@@ -361,10 +362,10 @@ create_software_bundle_archive () {
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
         _csbd_dataset="${DEFAULT_ZPOOL}${SOFTWARE_DIR}${USER}/${_csbname}"
         debug "Creating archive from dataset: $(distd "${_csbd_dataset}") to file: $(distd "${_cddestfile}")"
-        try "${ZFS_BIN} umount -f ${_csbd_dataset}"
-        retry "${ZFS_BIN} send ${_csbd_dataset} | ${XZ_BIN} ${DEFAULT_XZ_OPTS} > ${_cddestfile}" && \
+        try "${ZFS_BIN} umount -f '${_csbd_dataset}'"
+        retry "${ZFS_BIN} send '${_csbd_dataset}' | ${XZ_BIN} ${DEFAULT_XZ_OPTS} > ${_cddestfile}" && \
             note "Created bin-bundle from dataset: $(distd "${_csbd_dataset}")"
-        try "${ZFS_BIN} mount ${_csbd_dataset}"
+        try "${ZFS_BIN} mount '${_csbd_dataset}'"
     else
         debug "No ZFS-binbuilds feature. Falling back to tarballs.."
         _cdir="$(${PWD_BIN} 2>/dev/null)"
@@ -388,8 +389,8 @@ install_software_from_binbuild () {
         try "${ZFS_BIN} list -H -t filesystem '${_isfb_dataset}'"
         if [ "${?}" != "0" ]; then
             debug "Installing ZFS based binary build to dataset: $(distd "${_isfb_dataset}")"
-            run "${XZCAT_BIN} ${FILE_CACHE_DIR}${_isfb_archive} | ${ZFS_BIN} receive -F -v ${_isfb_dataset} &&
-                ${ZFS_BIN} rename '${_isfb_dataset}@${DEFAULT_GIT_SNAPSHOT_HEAD}' '${ORIGIN_ZFS_SNAP_NAME}'" && \
+            run "${XZCAT_BIN} '${FILE_CACHE_DIR}${_isfb_archive}' | ${ZFS_BIN} receive -F -v '${_isfb_dataset}' &&
+                ${ZFS_BIN} rename '${_isfb_dataset}@${DEFAULT_GIT_SNAPSHOT_HEAD}' ${ORIGIN_ZFS_SNAP_NAME}" && \
                     note "Installed: $(distn "${_isfb_fullname}")" && \
                         DONT_BUILD_BUT_DO_EXPORTS=YES
         else
