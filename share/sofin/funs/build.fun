@@ -401,7 +401,8 @@ process_flat () {
                 else
                     # git method:
                     # .cache/git-cache => git bare repos
-                    clone_or_fetch_git_bare_repo "${DEF_SOURCE_PATH}" "${DEF_NAME}-${DEF_VERSION}" "${DEF_GIT_CHECKOUT}" "${BUILD_DIR}"
+                    # NOTE: if DEF_GIT_CHECKOUT is unset, use DEF_VERSION:
+                    clone_or_fetch_git_bare_repo "${DEF_SOURCE_PATH}" "${DEF_NAME}${DEF_POSTFIX}-master" "${DEF_GIT_CHECKOUT:-${DEF_VERSION}}" "${BUILD_DIR}"
                 fi
 
                 unset _fd
@@ -456,16 +457,16 @@ process_flat () {
                 _pwd="$(${PWD_BIN} 2>/dev/null)"
                 debug "Switched to build dir root: $(distd "${_pwd}")"
 
-                if [ -n "${DEF_GIT_CHECKOUT}" -a \
-                     "master" != "${DEF_GIT_CHECKOUT}" ]; then
-                    debug "   ${NOTE_CHAR} Definition branch: $(distn "${DEF_GIT_CHECKOUT}")"
-                    _current_branch="$(${GIT_BIN} rev-parse --abbrev-ref HEAD 2>/dev/null)"
-                    if [ "${_current_branch}" != "${DEF_GIT_CHECKOUT}" ]; then
-                        try "${GIT_BIN} checkout ${DEFAULT_GIT_OPTS} -b ${DEF_GIT_CHECKOUT}"
-                    fi
-                    try "${GIT_BIN} checkout ${DEFAULT_GIT_OPTS} ${DEF_GIT_CHECKOUT}"
-                    unset _current_branch
-                fi
+                # if [ -n "${DEF_GIT_CHECKOUT}" -a \
+                #      "master" != "${DEF_GIT_CHECKOUT}" ]; then
+                #     debug "   ${NOTE_CHAR} Definition branch: $(distn "${DEF_GIT_CHECKOUT}")"
+                #     _current_branch="$(${GIT_BIN} rev-parse --abbrev-ref HEAD 2>/dev/null)"
+                #     if [ "${_current_branch}" != "${DEF_GIT_CHECKOUT}" ]; then
+                #         try "${GIT_BIN} checkout ${DEFAULT_GIT_OPTS} -b ${DEF_GIT_CHECKOUT}"
+                #     fi
+                #     try "${GIT_BIN} checkout ${DEFAULT_GIT_OPTS} ${DEF_GIT_CHECKOUT}"
+                #     unset _current_branch
+                # fi
 
                 after_unpack_callback
 

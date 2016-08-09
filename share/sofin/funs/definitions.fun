@@ -757,28 +757,28 @@ clone_or_fetch_git_bare_repo () {
     _build_dir="${4}"
     _git_cached="${GIT_CACHE_DIR}${_bare_name}${DEFAULT_GIT_DIR_NAME}"
     try "${MKDIR_BIN} -p ${GIT_CACHE_DIR}"
-    note "   ${NOTE_CHAR} Fetching git repository: $(distn "${_source_path}")"
-    try "${GIT_BIN} clone ${DEFAULT_GIT_CLONE_OPTS} --depth 1 --bare ${_source_path} ${_git_cached}" || \
-        try "${GIT_BIN} clone ${DEFAULT_GIT_CLONE_OPTS} --depth 1 --bare ${_source_path} ${_git_cached}"
+    note "   ${NOTE_CHAR} Fetching source repository: $(distn "${_source_path}")"
+    try "${GIT_BIN} clone ${DEFAULT_GIT_CLONE_OPTS} --depth 50 --bare ${_source_path} ${_git_cached}" || \
+        try "${GIT_BIN} clone ${DEFAULT_GIT_CLONE_OPTS} --depth 50 --bare ${_source_path} ${_git_cached}"
     if [ "${?}" = "0" ]; then
-        debug "Fetched bare repository: $(distd "${_bare_name}")"
+        debug "Cloned bare repository: $(distd "${_bare_name}")"
     elif [ -d "${_git_cached}" ]; then
-        debug "Bare repository already fetched: $(distd "${_git_cached}")"
-        debug "Trying to update existing bare repository cache in: $(distd "${_git_cached}")"
+        _cwddd="$(${PWD_BIN} 2>/dev/null)"
+        debug "Trying to update  existing bare repository cache in: $(distd "${_git_cached}")"
         cd "${_git_cached}"
         try "${GIT_BIN} fetch ${DEFAULT_GIT_OPTS} origin ${_chk_branch}" || \
-            try "${GIT_BIN} fetch ${DEFAULT_GIT_OPTS} origin" || \
-                warn "   ${WARN_CHAR} Failed to fetch an update from bare repository: $(distw "${_git_cached}")"
+            warn "   ${WARN_CHAR} Failed to fetch an update from bare repository: $(distw "${_git_cached}") [branch: $(distw "${_chk_branch}")]"
+        cd "${_cwddd}"
     elif [ ! -d "${_git_cached}/branches" -a \
            ! -f "${_git_cached}/config" ]; then
-        error "Unable to fetch from git repository: $(diste "${_source_path}")"
+        error "Failed to fetch source repository: $(diste "${_source_path}") [branch: $(diste "${_chk_branch}")]"
     fi
 
     # bare repository is already cloned, so we just clone from it now..
-    _dest_repo="${_build_dir}/${_bare_name}"
-    try "${MV_BIN} -f ${_dest_repo} ${_dest_repo}-${TIMESTAMP}.old" && \
-        debug "Renamed already existing build directory: $(distd "${_dest_repo}") to: $(distd "${_bare_name}-${TIMESTAMP}.old")"
-    run "${GIT_BIN} clone ${DEFAULT_GIT_CLONE_OPTS} ${_git_cached} ${_dest_repo}" && \
-        debug "Cloned git respository from cached git bare: $(distd "${_git_cached}")"
+    _dest_repo="${_build_dir}/${_bare_name}-${_chk_branch}"
+    try "${RM_BIN} -rf '${_dest_repo}'"
+    debug "Attempting to clone from cached repository: $(distd "${_git_cached}").."
+    run "${GIT_BIN} clone ${DEFAULT_GIT_CLONE_OPTS} -b ${_chk_branch} ${_git_cached} ${_dest_repo}" && \
+        debug "Cloned branch: $(distd "${_chk_branch}") from cached repository: $(distd "${_git_cached}")"
     unset _git_cached _bare_name _chk_branch _build_dir _dest_repo
 }
