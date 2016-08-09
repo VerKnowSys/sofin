@@ -294,12 +294,19 @@ acquire_lock_for () {
 destroy_locks () {
     _pattern="${1}"
     _pid="${SOFIN_PID:-$$}"
-    debug "Cleaning file locks matching pattern: $(distd "${_pattern}") that belong to pid: $(distd "${_pid}").."
     for _dlf in $(${FIND_BIN} ${LOCKS_DIR} -mindepth 1 -maxdepth 1 -name "*${_pattern}*${DEFAULT_LOCK_EXT}" -print 2>/dev/null); do
-        try "${GREP_BIN} ${_pid} ${_dlf}" && \
+        try "${EGREP_BIN} '^${_pid}$' ${_dlf}" && \
             try "${RM_BIN} -f ${_dlf}" && \
-                debug "Lock file removed: $(distd "${_dlf}")"
-    done
+                debug "Removed currently owned pid lock: $(distd "${_dlf}")"
+        try "${KILL_BIN} -0 $(${CAT_BIN} "${_dlf}" 2>/dev/null)"
+        if [ "${?}" != "0" ]; then
+            try "${RM_BIN} -f ${_dlf}" && \
+                debug "Pid: $(distd "${_pid}") appears to be already dead. Removed lock file: $(distd "${_dlf}")"
+        else
+            debug "Pid: $(distd "${_pid}") is alive. Leaving lock untouched."
+        fi
+    done && \
+        debug "Finished locks cleanup using pattern: $(distd "${_pattern:-''}") that belong to pid: $(distd "${_pid}")"
     unset _dlf _pid
 }
 
