@@ -587,7 +587,7 @@ process_flat () {
             fi
 
             # and common part between normal and continue modes:
-            cd "${_fd}"
+            cd "${_pwd}"
             note "   ${NOTE_CHAR} Building requirement: $(distn "${_app_param}")"
             try "${DEF_MAKE_METHOD}" || \
             run "${DEF_MAKE_METHOD}"
@@ -595,7 +595,8 @@ process_flat () {
 
             # OTE: after successful make, invoke "make test" by default:
             note "   ${NOTE_CHAR} Testing requirement: $(distn "${_app_param}")"
-            cd "${_fd}"
+            cd "${_pwd}"
+            # NOTE: Test environment might be different:
             run "${DEF_TEST_METHOD}"
             after_test_callback
 
@@ -606,12 +607,12 @@ process_flat () {
                 fi
             done
 
-            cd "${_fd}"
+            cd "${_pwd}"
             note "   ${NOTE_CHAR} Installing requirement: $(distn "${_app_param}")"
             run "${DEF_INSTALL_METHOD}"
             after_install_callback
 
-            cd "${_fd}"
+            cd "${_pwd}"
             run "${PRINTF_BIN} '%s' \"${DEF_VERSION}\" > ${_prefix}/${_app_param}${DEFAULT_INST_MARK_EXT}" && \
                 debug "Stored version: $(distd "${DEF_VERSION}") of software: $(distd "${DEF_NAME}") installed in: $(distd "${_prefix}")"
 
