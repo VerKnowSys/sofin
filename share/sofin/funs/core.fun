@@ -336,4 +336,7 @@ initialize () {
     check_defs_dir
     check_os
     trap_signals
+
+    # turn echo off
+    ${STTY_BIN} -echo
 }

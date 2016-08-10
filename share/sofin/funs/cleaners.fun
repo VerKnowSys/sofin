@@ -75,6 +75,9 @@ finalize () {
     reload_zsh_shells
     untrap_signals
     summary
+
+    # Bring back echo
+    ${STTY_BIN} echo
 }
 
 
