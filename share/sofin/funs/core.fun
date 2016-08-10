@@ -263,7 +263,7 @@ untrap_signals () {
     fi
     trap - INT
     trap - TERM
-    trap - USR2 # This signal is used to "reload shell"-feature. Sofin should ignore it
+    trap 'noop_handler' USR2 # This signal is used to "reload shell"-feature. Sofin should ignore it
 }
 
 
