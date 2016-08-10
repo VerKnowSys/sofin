@@ -596,8 +596,13 @@ process_flat () {
             # OTE: after successful make, invoke "make test" by default:
             note "   ${NOTE_CHAR} Testing requirement: $(distn "${_app_param}")"
             cd "${_pwd}"
-            # NOTE: Test environment might be different:
-            run "${DEF_TEST_METHOD}"
+
+            if [ "YES" = "${CAP_SYS_PRODUCTION}" ]; then
+                # NOTE: mandatory on production machines:
+                run "${DEF_TEST_METHOD}"
+            else
+                try "${DEF_TEST_METHOD}"
+            fi
             after_test_callback
 
             debug "Cleaning man dir from previous dependencies, we want to install man pages that belong to LAST requirement which is app bundle itself"
