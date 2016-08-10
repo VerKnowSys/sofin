@@ -283,6 +283,18 @@ mark_installed () {
 }
 
 
+mark_dependency_test_passed () {
+    _softname="${1}"
+    if [ -z "${_softname}" ]; then
+        error "To mark dependency '$(diste "passed")' - you must provide it's name first!"
+    fi
+    _softfile="$(lowercase "${_softname}")"
+    run "${TOUCH_BIN} ${PREFIX}/${_softfile}${DEFAULT_TEST_PASSED_EXT}" && \
+        debug "Test suite passed for dependency: $(distd "${_softfile}")"
+    unset _softname _verfile _softfile
+}
+
+
 show_done () {
     _sd_low_name="$(lowercase "${1}")"
     _sdver="$(${CAT_BIN} "${PREFIX}/${_sd_low_name}${DEFAULT_INST_MARK_EXT}" 2>/dev/null)"
