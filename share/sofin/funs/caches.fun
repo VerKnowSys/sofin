@@ -96,7 +96,7 @@ show_logs () {
             else
                 note "Attaching tail to $(distn "${_files_count}") most recently modified log files (exact order): [$(distn "${_files_blist}")]"
             fi
-            debug "_files_abspaths: $(distd "${_files_abspaths}")"
+            # debug "_files_abspaths: $(distd "${_files_abspaths}")"
             ${TAIL_BIN} -n0 -F ${_files_abspaths} 2>/dev/null
         else
             note "No logs to attach to. LOGS_DIR=($(distn "${LOGS_DIR}")) contain no log files?"
