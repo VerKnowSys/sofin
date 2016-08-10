@@ -577,7 +577,6 @@ process_flat () {
                                 run "${_addon} ${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS}"
                             fi
                         fi
-                        unset _addon
                         ;;
 
                 esac
@@ -588,6 +587,7 @@ process_flat () {
             fi
 
             # and common part between normal and continue modes:
+            cd "${_fd}"
             note "   ${NOTE_CHAR} Building requirement: $(distn "${_app_param}")"
             try "${DEF_MAKE_METHOD}" || \
             run "${DEF_MAKE_METHOD}"
@@ -595,6 +595,7 @@ process_flat () {
 
             # OTE: after successful make, invoke "make test" by default:
             note "   ${NOTE_CHAR} Testing requirement: $(distn "${_app_param}")"
+            cd "${_fd}"
             run "${DEF_TEST_METHOD}"
             after_test_callback
 
@@ -605,14 +606,17 @@ process_flat () {
                 fi
             done
 
+            cd "${_fd}"
             note "   ${NOTE_CHAR} Installing requirement: $(distn "${_app_param}")"
             run "${DEF_INSTALL_METHOD}"
             after_install_callback
 
+            cd "${_fd}"
             run "${PRINTF_BIN} '%s' \"${DEF_VERSION}\" > ${_prefix}/${_app_param}${DEFAULT_INST_MARK_EXT}" && \
                 debug "Stored version: $(distd "${DEF_VERSION}") of software: $(distd "${DEF_NAME}") installed in: $(distd "${_prefix}")"
+
             cd "${_cwd}" 2>/dev/null
-            unset _cwd
+            unset _cwd _addon
         fi
     else
         note "   ${WARN_CHAR} Requirement: $(distn "${_req_defname}") is provided by base system."
