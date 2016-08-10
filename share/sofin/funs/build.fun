@@ -600,8 +600,10 @@ process_flat () {
             if [ "YES" = "${CAP_SYS_PRODUCTION}" ]; then
                 # NOTE: mandatory on production machines:
                 run "${DEF_TEST_METHOD}"
-            else
-                try "${DEF_TEST_METHOD}"
+                mark_dependency_test_passed "${_app_param}"
+            else # Build host:
+                try "${DEF_TEST_METHOD}" && \
+                    mark_dependency_test_passed "${_app_param}"
             fi
             after_test_callback
 
