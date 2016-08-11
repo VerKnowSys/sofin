@@ -468,12 +468,20 @@ require_prefix_set () {
 }
 
 
+require_namesum_set () {
+    if [ -z "${BUILD_NAMESUM}"]; then
+        error "BUILD_NAMESUM can't be empty!"
+    fi
+}
+
+
 do_prefix_snapshot () {
     _snap_name="${1}"
     if [ -z "${_snap_name}" ]; then
         error "Snapshot name can't be empty!"
     fi
     require_prefix_set
+    require_namesum_set
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
         _pr_snp="${DEFAULT_ZPOOL}${SOFTWARE_DIR}${USER}/${PREFIX##*/}"
         try "${ZFS_BIN} rename ${_pr_snp}@${_snap_name} ${_snap_name}_${TIMESTAMP}" # if snapshot exists, rename it
