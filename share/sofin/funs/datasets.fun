@@ -170,7 +170,7 @@ fetch_dset_zfs_stream () {
         retry "${FETCH_BIN} -o ${FILE_CACHE_DIR}${_fdz_out_file} ${FETCH_OPTS} '${_commons_path}'"
         if [ "${?}" = "0" ]; then
             _dataset_name="${DEFAULT_ZPOOL}${SERVICES_DIR}${USER}/${_fdz_bund_name}"
-            try "${XZCAT_BIN} '${FILE_CACHE_DIR}${_fdz_out_file}' | ${ZFS_BIN} receive ${ZFS_RECEIVE_OPTS} '${_dataset_name}'" && \
+            try "${XZCAT_BIN} '${FILE_CACHE_DIR}${_fdz_out_file}' | ${ZFS_BIN} receive ${ZFS_RECEIVE_OPTS} '${_dataset_name}' | ${TAIL_BIN} -n1 2>/dev/null" && \
                     note "Received service dataset: $(distn "${_dataset_name}")"
             unset _dataset_name
         else
@@ -268,7 +268,7 @@ receive_origin () {
     fi
     if [ -f "${_origin_file}" ]; then
         # NOTE: each user dataset is made of same origin, hence you can apply snapshots amongst them..
-        run "${XZCAT_BIN} "${_origin_file}" | ${ZFS_BIN} receive ${ZFS_RECEIVE_OPTS} '${ZFS_DEF_POOL_NAME}/${_dorigin_base}${_dname}'" && \
+        run "${XZCAT_BIN} "${_origin_file}" | ${ZFS_BIN} receive ${ZFS_RECEIVE_OPTS} '${ZFS_DEF_POOL_NAME}/${_dorigin_base}${_dname}' | ${TAIL_BIN} -n1 2>/dev/null" && \
             debug "Origin received successfully: $(distd "${_origin_name}")"
     else
         error "No origin file available! That's mandatory to have this file: $(diste "${_origin_file}")"
@@ -423,7 +423,7 @@ install_software_from_binbuild () {
         try "${ZFS_BIN} list -H -t filesystem '${_isfb_dataset}'"
         if [ "${?}" != "0" ]; then
             debug "Installing ZFS based binary build to dataset: $(distd "${_isfb_dataset}")"
-            run "${XZCAT_BIN} '${FILE_CACHE_DIR}${_isfb_archive}' | ${ZFS_BIN} receive -F ${ZFS_RECEIVE_OPTS} '${_isfb_dataset}'" && \
+            run "${XZCAT_BIN} '${FILE_CACHE_DIR}${_isfb_archive}' | ${ZFS_BIN} receive ${ZFS_RECEIVE_OPTS} '${_isfb_dataset}' | ${TAIL_BIN} -n1 2>/dev/null" && \
                     note "Installed: $(distn "${_isfb_fullname}")" && \
                         DONT_BUILD_BUT_DO_EXPORTS=YES
         else
