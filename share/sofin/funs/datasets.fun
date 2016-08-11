@@ -244,6 +244,26 @@ create_base_datasets () {
 }
 
 
+receive_base_software_origin () {
+    _dname="${1}"
+    if [ -z "${_dname}" ]; then
+        error "No dataset name given!"
+    fi
+    _origin_name="Software-user-${ORIGIN_ZFS_SNAP_NAME}${DEFAULT_SOFTWARE_SNAPSHOT_EXT}"
+    _origin_file="${FILE_CACHE_DIR}/${_origin_name}"
+    if [ ! -f "${_origin_file}" ]; then
+        run "${FETCH_BIN} ${FETCH_OPTS} ${MAIN_COMMON_REPOSITORY}${_origin_name} -o ${_origin_file}"
+    fi
+    if [ -f "${_origin_file}" ]; then
+        # NOTE: each user dataset is made of same origin, hence you can apply snapshots amongst them..
+        run "${XZCAT_BIN} "${_origin_file}" | ${ZFS_BIN} receive -v '${ZFS_DEF_POOL_NAME}/Software/${_dname}'"
+    else
+        error "No origin file available! That's mandatory to have this file: $(diste "${_origin_file}")"
+    fi
+    unset _dname _origin_file
+}
+
+
 create_software_dir () {
     _dset_create="${1}"
     if [ -z "${_dset_create}" ]; then
@@ -253,7 +273,7 @@ create_software_dir () {
         _dsname="${DEFAULT_ZPOOL}${SOFTWARE_DIR}${USER}/${_dset_create}"
         debug "Creating ZFS software-dataset: $(distd "${_dsname}")"
         try "${ZFS_BIN} list -H -t filesystem '${_dsname}'" || \
-            try "${ZFS_BIN} create -p -o mountpoint=${SOFTWARE_DIR}${_dset_create} '${_dsname}'"
+            receive_base_software_origin "${_dsname}"
         try "${ZFS_BIN} mount '${_dsname}'"
         unset _dsname
     else
