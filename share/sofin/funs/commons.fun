@@ -65,12 +65,12 @@ file_size () {
 
 
 capitalize () {
-    ${PRINTF_BIN} '%s' "${@}" 2>> "${LOG}" | ${AWK_BIN} '{for(i=1;i<=NF;i++){ $i=toupper(substr($i,1,1)) substr($i,2) }}1' 2>/dev/null
+    ${PRINTF_BIN} '%s' "${@}" 2>/dev/null | ${AWK_BIN} '{for(i=1;i<=NF;i++){ $i=toupper(substr($i,1,1)) substr($i,2) }}1' 2>/dev/null
 }
 
 
 lowercase () {
-    ${PRINTF_BIN} '%s' "${@}" 2>> "${LOG}" | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null
+    ${PRINTF_BIN} '%s' "${@}" 2>/dev/null | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null
 }
 
 
