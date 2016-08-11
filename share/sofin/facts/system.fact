@@ -70,6 +70,8 @@ determine_system_capabilites () {
                 DEFAULT_ZPOOL="${DEFAULT_ZPOOL:-zroot}"
             fi
             ORIGIN_ZFS_SNAP_NAME="origin"
+            ZFS_SEND_OPTS="-D -L -e -p -v" # dedup, large-blocks, write-embed, include-properties, verbose
+            ZFS_RECEIVE_OPTS="-s -v" # save-interrupted-state verbose
         fi
     else
         unset CAP_SYS_ZFS DEFAULT_ZPOOL ORIGIN_ZFS_SNAP_NAME
