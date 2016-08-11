@@ -459,3 +459,62 @@ try_destroy_binbuild () {
         debug "Empty prefix. No build-dir to destroy"
     fi
 }
+
+
+require_prefix_set () {
+    if [ -z "${PREFIX}"]; then
+        error "PREFIX can't be empty!"
+    fi
+}
+
+
+do_prefix_snapshot () {
+    _snap_name="${1}"
+    if [ -z "${_snap_name}" ]; then
+        error "Snapshot name can't be empty!"
+    fi
+    require_prefix_set
+    if [ "YES" = "${CAP_SYS_ZFS}" ]; then
+        _pr_snp="${DEFAULT_ZPOOL}${SOFTWARE_DIR}${USER}/${PREFIX##*/}"
+        try "${ZFS_BIN} rename ${_pr_snp}@${_snap_name} ${_snap_name}_${TIMESTAMP}" # if snapshot exists, rename it
+        try "${ZFS_BIN} snapshot ${_pr_snp}@${_snap_name}" && \
+            debug "Done @${_snap_name} snapshot of PREFIX: $(distd "${PREFIX}") of dataset: $(distd "${_pr_snp}")" && \
+                return 0
+        return 1
+    fi
+}
+
+
+after_unpack_snapshot () {
+    do_prefix_snapshot "after_unpack"
+}
+
+
+after_patch_snapshot () {
+    do_prefix_snapshot "after_patch"
+}
+
+
+after_configure_snapshot () {
+    do_prefix_snapshot "after_configure"
+}
+
+
+after_make_snapshot () {
+    do_prefix_snapshot "after_make"
+}
+
+
+after_test_snapshot () {
+    do_prefix_snapshot "after_test"
+}
+
+
+after_install_snapshot () {
+    do_prefix_snapshot "after_install"
+}
+
+
+after_export_snapshot () {
+    do_prefix_snapshot "after_export"
+}

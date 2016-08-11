@@ -297,6 +297,7 @@ build () {
                 strip_bundle "${_bund_lcase}"
                 export_binaries "${_bund_lcase}"
                 after_export_callback
+                after_export_snapshot
             done
 
             track_useful_and_useless_files
@@ -486,9 +487,11 @@ process_flat () {
                 # fi
 
                 after_unpack_callback
+                after_unpack_snapshot
 
                 apply_definition_patches "${DEF_NAME}${DEF_POSTFIX}"
                 after_patch_callback
+                after_patch_snapshot
 
                 note "   ${NOTE_CHAR} Configuring: $(distn "${_app_param}"), version: $(distn "${DEF_VERSION}")"
                 case "${DEF_CONFIGURE}" in
@@ -582,6 +585,7 @@ process_flat () {
                 esac
 
                 after_configure_callback
+                after_configure_snapshot
             else
                 error "These values cannot be empty: BUILD_DIR, BUILD_NAMESUM"
             fi
@@ -592,6 +596,7 @@ process_flat () {
             try "${DEF_MAKE_METHOD}" || \
             run "${DEF_MAKE_METHOD}"
             after_make_callback
+            after_make_snapshot
 
             # OTE: after successful make, invoke "make test" by default:
             note "   ${NOTE_CHAR} Testing requirement: $(distn "${_app_param}")"
@@ -610,6 +615,7 @@ process_flat () {
                 warn "$(distw "${USE_NO_TEST}") is defined. Skipping tests for: $(distw "${_app_param}")"
             fi
             after_test_callback
+            after_test_snapshot
 
             debug "Cleaning man dir from previous dependencies, we want to install man pages that belong to LAST requirement which is app bundle itself"
             for place in man share/man share/info share/doc share/docs; do
@@ -622,6 +628,7 @@ process_flat () {
             note "   ${NOTE_CHAR} Installing requirement: $(distn "${_app_param}")"
             run "${DEF_INSTALL_METHOD}"
             after_install_callback
+            after_install_snapshot
 
             cd "${_pwd}"
             run "${PRINTF_BIN} '%s' \"${DEF_VERSION}\" > ${_prefix}/${_app_param}${DEFAULT_INST_MARK_EXT}" && \
