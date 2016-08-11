@@ -5,7 +5,7 @@ load_defs () {
     else
         debug "Seeking: $(distd "${_definitions}")"
         for _given_def in ${_definitions}; do
-            _name_base="$(${BASENAME_BIN} "${_given_def}" 2>/dev/null)"
+            _name_base="${_given_def##*/}"
             _def="$(lowercase "${_name_base}")"
             if [ -e "${DEFINITIONS_DIR}${_def}${DEFAULT_DEF_EXT}" ]; then
                 debug "< $(distd "${DEFINITIONS_DIR}${_def}${DEFAULT_DEF_EXT}")"
@@ -232,7 +232,7 @@ remove_bundles () {
         _picked_bundles="" # to remove first entry with *
         _found="$(${FIND_BIN} ${SOFTWARE_DIR} -mindepth 1 -maxdepth 1 -iname "${_bundle_nam}" -type d 2>/dev/null)"
         for _bund in ${_found}; do
-            _bname="$(${BASENAME_BIN} "${_bund}" 2>/dev/null)"
+            _bname="${_bund##*/}"
             _picked_bundles="${_picked_bundles} ${_bname}"
         done
         if [ -z "${_picked_bundles}" ]; then
@@ -323,7 +323,7 @@ show_outdated () {
     load_defaults
     if [ -d "${SOFTWARE_DIR}" ]; then
         for _prefix in $(${FIND_BIN} ${SOFTWARE_DIR} -mindepth 1 -maxdepth 1 -type d -not -name ".*" 2>/dev/null); do
-            _bundle="$(${BASENAME_BIN} "${_prefix}" 2>/dev/null | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null)" # lowercase for case sensitive fs
+            _bundle="$(lowercase "${_prefix##*/}")"
             debug "Bundle name: ${_bundle}, Prefix: ${_prefix}"
 
             if [ ! -f "${_prefix}/${_bundle}${DEFAULT_INST_MARK_EXT}" ]; then
@@ -585,7 +585,7 @@ conflict_resolve () {
         for _cr_app in ${DEF_CONFLICTS_WITH}; do
             _crfind_s="$(${FIND_BIN} ${SOFTWARE_DIR} -maxdepth 1 -type d -iname "${_cr_app}*" 2>/dev/null)"
             for _cr_name in ${_crfind_s}; do
-                _crn="$(${BASENAME_BIN} "${_cr_name}" 2>/dev/null)"
+                _crn="${_cr_name##*/}"
                 if [ -e "${_cr_name}/exports" \
                      -a "${_crn}" != "${DEF_NAME}" \
                      -a "${_crn}" != "${DEF_NAME}${DEF_POSTFIX}" \
@@ -633,7 +633,7 @@ export_binaries () {
                         cd "${PREFIX}${dir}"
                         try "${LN_BIN} -vfs ..${dir}${exp} ../exports/${exp}"
                         cd "${_acurrdir}"
-                        _expo_elem="$(${BASENAME_BIN} "${_afile_to_exp}" 2>/dev/null)"
+                        _expo_elem="${_afile_to_exp##*/}"
                         _expolist="${_expolist} ${_expo_elem}"
                     fi
                 fi

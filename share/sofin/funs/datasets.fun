@@ -483,7 +483,7 @@ try_destroy_binbuild () {
     if [ -n "${PREFIX}" -a \
          -d "${PREFIX}" ]; then
         if [ -n "${BUILD_NAMESUM}" ]; then
-            destroy_builddir "$(${BASENAME_BIN} "${PREFIX}" 2>/dev/null)" "${BUILD_NAMESUM}"
+            destroy_builddir "${PREFIX##*/}" "${BUILD_NAMESUM}"
         else
             # shouldn't happen..
             debug "No BUILD_NAMESUM set! Can't identify build-dir!"

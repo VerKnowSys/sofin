@@ -80,7 +80,7 @@ show_logs () {
             _files_count="$(${PRINTF_BIN} '%s\n' "${_files_list}" | eval "${FILES_COUNT_GUARD}")"
             _files_blist="" # build file list without full path to each one
             for _fl in ${_files_list}; do
-                _base_fl="$(${BASENAME_BIN} "${_fl}" 2>/dev/null)"
+                _base_fl="${_fl##*/}"
                 if [ -z "${_base_fl}" ]; then
                     debug "Got an empty element basename: _base_fl=$(distd "${_base_fl}") of _fl=$(distd "${_fl}")"
                 else

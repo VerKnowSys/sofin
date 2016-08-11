@@ -103,7 +103,7 @@ rebuild_bundle () {
         . "${_dep}"
         ${PRINTF_BIN} '%s\n' "${DEF_REQUIREMENTS}" 2>/dev/null | ${GREP_BIN} "${_a_dependency}" >/dev/null 2>&1
         if [ "${?}" = "0" ]; then
-            _idep="$(${BASENAME_BIN} "${_dep}" 2>/dev/null)"
+            _idep="${_dep##*/}"
             _irawname="$(${PRINTF_BIN} '%s' "${_idep}" | ${SED_BIN} "s/${DEFAULT_DEF_EXT}//g" 2>/dev/null)"
             _an_def_nam="$(capitalize "${_irawname}")"
             _those_to_rebuild="${_an_def_nam} ${_those_to_rebuild}"
@@ -366,7 +366,7 @@ process_flat () {
     if [ ! -e "${_req_definition}" ]; then
         error "Cannot read definition file: $(diste "${_req_definition}")!"
     fi
-    _req_defname="$(${PRINTF_BIN} '%s\n' "$(${BASENAME_BIN} "${_req_definition}" 2>/dev/null)" | ${SED_BIN} -e 's/\..*$//g' 2>/dev/null)"
+    _req_defname="$(${PRINTF_BIN} '%s\n' "${_req_definition##*/}" | ${SED_BIN} -e 's/\..*$//g' 2>/dev/null)"
     debug "Bundle: $(distd "${_bundlnm}"), requirement: $(distd "${_app_param}"), PREFIX: $(distd "${_prefix}") file: $(distd "${_req_definition}"), req-name: $(distd "${_req_defname}")"
 
     load_defaults
@@ -385,7 +385,7 @@ process_flat () {
                  -n "${BUILD_NAMESUM}" ]; then
                 cd "${BUILD_DIR}"
                 if [ -z "${DEF_GIT_MODE}" ]; then # Standard "fetch source archive" method
-                    _base="$(${BASENAME_BIN} "${DEF_SOURCE_PATH}" 2>/dev/null)"
+                    _base="${DEF_SOURCE_PATH##*/}"
                     debug "DEF_SOURCE_PATH: $(distd "${DEF_SOURCE_PATH}") base: $(distd "${_base}")"
                     _dest_file="${FILE_CACHE_DIR}${_base}"
                     # TODO: implement auto picking fetch method based on DEF_SOURCE_PATH contents
@@ -403,7 +403,7 @@ process_flat () {
                             debug "Source checksum is fine"
                         else
                             warn "${WARN_CHAR} Source checksum mismatch: $(distw "${_a_file_checksum}") vs $(distw "${DEF_SHA}")"
-                            _bname="$(${BASENAME_BIN} "${_dest_file}" 2>/dev/null)"
+                            _bname="${_dest_file##*/}"
                             try "${RM_BIN} -vf ${_dest_file}" && \
                                 warn "${WARN_CHAR} Removed corrupted cache file: $(distw "${_bname}") and retrying.."
                             process_flat "${_app_param}" "${_prefix}" "${_bundlnm}"
@@ -640,7 +640,7 @@ process_flat () {
     else
         note "   ${WARN_CHAR} Requirement: $(distn "${_req_defname}") is provided by base system."
         if [ ! -d "${_prefix}" ]; then # case when disabled requirement is first on list of dependencies
-            create_software_dir "$(${BASENAME_BIN} "${_prefix}" 2>/dev/null)"
+            create_software_dir "${_prefix##*/}"
         fi
         _dis_def="${_prefix}/${_req_defname}${DEFAULT_INST_MARK_EXT}"
         debug "Disabled requirement: $(distd "${_req_defname}"), writing '${DEFAULT_REQ_OS_PROVIDED}' to: $(distd "${_dis_def}")"

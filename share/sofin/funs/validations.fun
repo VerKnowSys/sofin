@@ -35,7 +35,7 @@ fail_on_bg_job () {
 fail_any_bg_jobs () {
     # Traverse through locks, make sure that every pid from lock is dead before cleaning can continue
     for _a_lock in $(${FIND_BIN} "${LOCKS_DIR}" -type f -name "*${DEFAULT_LOCK_EXT}" -print 2>/dev/null); do
-        _bundle_name="$(${BASENAME_BIN} "${_a_lock}" 2>/dev/null)"
+        _bundle_name="${_a_lock##*/}"
         _lock_pid="$(${CAT_BIN} "${_a_lock}" 2>/dev/null)"
         if [ -n "${_lock_pid}" ]; then
             try "${KILL_BIN} -0 ${_lock_pid}"
@@ -109,8 +109,10 @@ validate_archive_sha1 () {
 
 
 validate_def_postfix () {
-    _cigiven_name="$(${BASENAME_BIN} "$(${PRINTF_BIN} '%s' "$(lowercase "${1}")" | eval "${CUTOFF_DEF_EXT_GUARD}")")"
-    _cidefinition_name="$(${BASENAME_BIN} "$(${PRINTF_BIN} '%s' "$(lowercase "${2}")" | eval "${CUTOFF_DEF_EXT_GUARD}")")"
+    _arg1="$(${PRINTF_BIN} '%s' "$(lowercase "${1}")" | eval "${CUTOFF_DEF_EXT_GUARD}")"
+    _arg2="$(${PRINTF_BIN} '%s' "$(lowercase "${2}")" | eval "${CUTOFF_DEF_EXT_GUARD}")"
+    _cigiven_name="${_arg1##*/}" # basename
+    _cidefinition_name="${_arg2##*/}"
     # case when DEF_POSTFIX was ommited => use definition file name difference as POSTFIX:
     _l1="${#_cidefinition_name}"
     _l2="${#_cigiven_name}"

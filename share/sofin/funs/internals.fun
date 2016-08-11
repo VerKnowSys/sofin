@@ -191,7 +191,7 @@ list_bundles_full () {
     note "Installed software bundles (with dependencies):"
     if [ -d "${SOFTWARE_DIR}" ]; then
         for _lbfapp in ${SOFTWARE_DIR}*; do
-            _lbfapp_name="$(${BASENAME_BIN} "${_lbfapp}" 2>/dev/null)"
+            _lbfapp_name="${_lbfapp##*/}"
             _lbflowercase="$(lowercase "${_lbfapp_name}")"
             _lbinstald_file="${SOFTWARE_DIR}/${_lbfapp_name}/${_lbflowercase}${DEFAULT_INST_MARK_EXT}"
             if [ -e "${_lbinstald_file}" ]; then
@@ -200,7 +200,7 @@ list_bundles_full () {
                 note "$(distn "${FAIL_CHAR}" ${ColorRed}) ${_lbfapp_name} $(distn "[!]" ${ColorRed})"
             fi
             for _lbfreq in $(${FIND_BIN} ${_lbfapp} -mindepth 1 -maxdepth 1 -iname "*${DEFAULT_INST_MARK_EXT}" 2>/dev/null | ${SORT_BIN} 2>/dev/null); do
-                _lbpp="$(${PRINTF_BIN} '%s' "$(${BASENAME_BIN} "${_lbfreq}" 2>/dev/null)" | ${SED_BIN} "s/${DEFAULT_INST_MARK_EXT}//" 2>/dev/null)"
+                _lbpp="$(${PRINTF_BIN} '%s' "${_lbfreq##*/}" | ${SED_BIN} "s/${DEFAULT_INST_MARK_EXT}//" 2>/dev/null)"
                 note "   ${NOTE_CHAR} ${_lbpp} $(distn "[" ${ColorGray})$(distn $(${CAT_BIN} "${_lbfreq}" 2>/dev/null))$(distn "]" ${ColorGray})"
             done
         done
@@ -239,7 +239,7 @@ develop () {
     _defname_input="${@}"
     ${TEST_BIN} -d "${DEFINITIONS_DIR}" 2>/dev/null || create_dirs # only definiions dir is requires, so skip dir traverse
     _defname_no_ext="$(${PRINTF_BIN} '%s\n' "${_defname_input}" | ${SED_BIN} -e "s#\.${DEFAULT_DEF_EXT}##" 2>/dev/null)"
-    _devname="$(lowercase "$(${BASENAME_BIN} "${_defname_no_ext}" 2>/dev/null)")"
+    _devname="$(lowercase "${_defname_no_ext##*/}")"
     if [ -z "${_defname_input}" ]; then
         error "No definition file name specified as first param!"
     fi
@@ -312,7 +312,7 @@ show_alt_definitions_and_exit () {
         _contents=""
         _maybe_version="$(${FIND_BIN} ${DEFINITIONS_DIR} -maxdepth 1 -name "${_an_app}*${DEFAULT_DEF_EXT}" 2>/dev/null)"
         for _maybe in ${_maybe_version}; do
-            _elem="$(${BASENAME_BIN} "${_maybe}" 2>/dev/null)"
+            _elem="${_maybe##*/}"
             _cap_elem="$(capitalize "${_elem}")"
             _contents="${_contents}$(${PRINTF_BIN} '%s\n' "${_cap_elem}" | ${SED_BIN} 's/\..*//' 2>/dev/null) "
         done
