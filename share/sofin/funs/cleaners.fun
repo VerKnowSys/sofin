@@ -100,7 +100,7 @@ finalize_afterbuild () {
 remove_useless () {
     _rufiles=${@}
     if [ -n "${_rufiles}" ]; then
-        try "${RM_BIN} -rf '${_rufiles}'" && \
+        try "${RM_BIN} -rf ${_rufiles}" && \
             return 0
         debug "Failed to remove useless files: '$(distd "${_rufiles}")'"
     fi
