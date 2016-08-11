@@ -228,13 +228,13 @@ destroy_service_dir () {
 
 create_base_datasets () {
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
-        _soft_origin="${DEFAULT_ZPOOL}${SOFTWARE_DIR}"
+        _soft_origin="${DEFAULT_ZPOOL}${SOFTWARE_DIR%/}" # NOTE: cut last "/"
         try "${ZFS_BIN} list -H -t filesystem '${_soft_origin}'" || \
             receive_origin "${_soft_origin}" "Software"
         try "${ZFS_BIN} mount '${_soft_origin}'"
         unset _soft_origin
 
-        _serv_origin="${DEFAULT_ZPOOL}${SERVICES_DIR}"
+        _serv_origin="${DEFAULT_ZPOOL}${SERVICES_DIR%/}"
         try "${ZFS_BIN} list -H -t filesystem '${_serv_origin}'" || \
             receive_origin "${_serv_origin}" "Services"
         try "${ZFS_BIN} mount '${_serv_origin}'"
