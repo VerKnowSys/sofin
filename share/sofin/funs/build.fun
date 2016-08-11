@@ -612,7 +612,7 @@ process_flat () {
                         mark_dependency_test_passed "${_app_param}"
                 fi
             else
-                warn "$(distw "USE_NO_TEST") is defined. Skipping tests for: $(distw "${_app_param}")"
+                warn "   ${WARN_CHAR} $(distw "USE_NO_TEST") is defined. Skipping tests for: $(distw "${_app_param}")"
             fi
             after_test_callback
             after_test_snapshot
