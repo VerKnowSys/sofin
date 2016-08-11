@@ -597,13 +597,17 @@ process_flat () {
             note "   ${NOTE_CHAR} Testing requirement: $(distn "${_app_param}")"
             cd "${_pwd}"
 
-            if [ "YES" = "${CAP_SYS_PRODUCTION}" ]; then
-                # NOTE: mandatory on production machines:
-                run "${DEF_TEST_METHOD}"
-                mark_dependency_test_passed "${_app_param}"
-            else # Build host:
-                try "${DEF_TEST_METHOD}" && \
+            if [ -z "${USE_NO_TEST}" ]; then
+                if [ "YES" = "${CAP_SYS_PRODUCTION}" ]; then
+                    # NOTE: mandatory on production machines:
+                    run "${DEF_TEST_METHOD}"
                     mark_dependency_test_passed "${_app_param}"
+                else # Build host:
+                    try "${DEF_TEST_METHOD}" && \
+                        mark_dependency_test_passed "${_app_param}"
+                fi
+            else
+                warn "$(distw "${USE_NO_TEST}") is defined. Skipping tests for: $(distw "${_app_param}")"
             fi
             after_test_callback
 
