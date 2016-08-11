@@ -523,7 +523,11 @@ track_useful_and_useless_files () {
                     unset _cu_commit_removal
                     _cubase="${_cufile##*/}" # NOTE: faster "basename"
                     if [ -e "${PREFIX}/exports/${_cubase}" ]; then
-                        _dbg_exp_lst="'${_dbg_exp_lst}' '${_cubase}'"
+                        if [ -z "${_dbg_exp_lst}" ]; then
+                            _dbg_exp_lst="${_cubase}"
+                        else
+                            _dbg_exp_lst="${_dbg_exp_lst} ${_cubase}"
+                        fi
                     else
                         # traverse through DEF_USEFUL for _cufile patterns required by software but not exported
                         for _is_useful in ${DEF_USEFUL}; do
