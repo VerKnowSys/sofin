@@ -489,9 +489,9 @@ track_useful_and_useless_files () {
                 for _cu_pattern in ${DEF_DEFAULT_USELESS}; do
                     if [ -e "${PREFIX}/${_cu_pattern}" ]; then
                         if [ -z "${_fordel}" ]; then
-                            _fordel="'${PREFIX}/${_cu_pattern}'"
+                            _fordel="${PREFIX}/${_cu_pattern}"
                         else
-                            _fordel="'${_fordel}' '${PREFIX}/${_cu_pattern}'"
+                            _fordel="${_fordel} ${PREFIX}/${_cu_pattern}"
                         fi
                     # else
                     # debug "Not existent pattern.."
@@ -504,9 +504,9 @@ track_useful_and_useless_files () {
                 for _cu_pattern in ${DEF_USELESS}; do
                     if [ -n "${_cu_pattern}" ]; then
                         if [ -z "${_fordel}" ]; then
-                            _fordel="'${PREFIX}/${_cu_pattern}'"
+                            _fordel="${PREFIX}/${_cu_pattern}"
                         else
-                            _fordel="'${_fordel}' '${PREFIX}/${_cu_pattern}'"
+                            _fordel="${_fordel} ${PREFIX}/${_cu_pattern}"
                         fi
                     fi
                 done
@@ -551,9 +551,9 @@ track_useful_and_useless_files () {
                         done
                         if [ -z "${_cu_commit_removal}" ]; then
                             if [ -z "${_fordel}" ]; then
-                                _fordel="'${_cufile}'"
+                                _fordel="${_cufile}"
                             else
-                                _fordel="'${_cufile}' '${_fordel}'"
+                                _fordel="${_cufile} ${_fordel}"
                             fi
                         else
                             debug "Useful file left intact: $(distd "${_cufile}")"
@@ -569,7 +569,7 @@ track_useful_and_useless_files () {
             debug "Empty exports list?"
         fi
 
-        remove_useless ${_fordel} && \
+        remove_useless "${_fordel}" && \
             debug "Useless files were wiped."
     else
         debug "Useless files cleanup skipped since DEF_CLEAN_USELESS=$(distd "${DEF_CLEAN_USELESS:-''}")!"
