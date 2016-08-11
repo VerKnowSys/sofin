@@ -115,12 +115,14 @@ build_service_dataset () {
                 if [ "${?}" = "0" ]; then
                     note "Preparing to send service dataset: $(distn "${_full_dataset_name}"), for bundle: $(distn "${_ps_elem}")"
                     try "${ZFS_BIN} umount -f '${_full_dataset_name}'"
-                    run "${ZFS_BIN} send '${_full_dataset_name}' | ${XZ_BIN} ${DEFAULT_XZ_OPTS} > ${FILE_CACHE_DIR}${_ps_snap_file}"
+                    try "${ZFS_BIN} snapshot '${_full_dataset_name}@${ORIGIN_ZFS_SNAP_NAME}'"
+                    run "${ZFS_BIN} send ${ZFS_SEND_OPTS} '${_full_dataset_name}@${ORIGIN_ZFS_SNAP_NAME}' | ${XZ_BIN} ${DEFAULT_XZ_OPTS} > ${FILE_CACHE_DIR}${_ps_snap_file}"
                     try "${ZFS_BIN} mount '${_full_dataset_name}'"
                 else
                     run "${ZFS_BIN} create -p -o mountpoint=${SERVICES_DIR}${_ps_elem} '${_full_dataset_name}'"
                     try "${ZFS_BIN} umount -f '${_full_dataset_name}'"
-                    run "${ZFS_BIN} send '${_full_dataset_name}' | ${XZ_BIN} ${DEFAULT_XZ_OPTS} > ${FILE_CACHE_DIR}${_ps_snap_file}"
+                    try "${ZFS_BIN} snapshot '${_full_dataset_name}@${ORIGIN_ZFS_SNAP_NAME}'"
+                    run "${ZFS_BIN} send ${ZFS_SEND_OPTS} '${_full_dataset_name}@${ORIGIN_ZFS_SNAP_NAME}' | ${XZ_BIN} ${DEFAULT_XZ_OPTS} > ${FILE_CACHE_DIR}${_ps_snap_file}"
                     try "${ZFS_BIN} mount '${_full_dataset_name}'"
                 fi
                 _snap_size="$(file_size "${FILE_CACHE_DIR}${_ps_snap_file}")"
@@ -168,8 +170,7 @@ fetch_dset_zfs_stream () {
         retry "${FETCH_BIN} -o ${FILE_CACHE_DIR}${_fdz_out_file} ${FETCH_OPTS} '${_commons_path}'"
         if [ "${?}" = "0" ]; then
             _dataset_name="${DEFAULT_ZPOOL}${SERVICES_DIR}${USER}/${_fdz_bund_name}"
-            debug "Creating service dataset: $(distd "${_dataset_name}"), from file stream: $(distd "${_fdz_out_file}")."
-            retry "${XZCAT_BIN} '${FILE_CACHE_DIR}${_fdz_out_file}' | ${ZFS_BIN} receive -F -v '${_dataset_name}' && ${ZFS_BIN} rename '${_dataset_name}@${DEFAULT_GIT_SNAPSHOT_HEAD}' ${ORIGIN_ZFS_SNAP_NAME}" && \
+            try "${XZCAT_BIN} '${FILE_CACHE_DIR}${_fdz_out_file}' | ${ZFS_BIN} receive ${ZFS_RECEIVE_OPTS} '${_dataset_name}'" && \
                     note "Received service dataset: $(distn "${_dataset_name}")"
             unset _dataset_name
         else
@@ -227,36 +228,48 @@ destroy_service_dir () {
 
 create_base_datasets () {
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
-        debug "Creating base software-dataset: $(distd "${DEFAULT_ZPOOL}${SOFTWARE_DIR}")"
-        _dsname="${DEFAULT_ZPOOL}${SOFTWARE_DIR}${USER}"
-        try "${ZFS_BIN} list -H -t filesystem '${_dsname}'" || \
-            try "${ZFS_BIN} create -p -o mountpoint=${SOFTWARE_DIR} '${_dsname}'"
-        try "${ZFS_BIN} mount '${_dsname}'"
-        unset _dsname
+        _soft_origin="${DEFAULT_ZPOOL}${SOFTWARE_DIR}"
+        try "${ZFS_BIN} list -H -t filesystem '${_soft_origin}'" || \
+            receive_origin "${_soft_origin}" "Software"
+        try "${ZFS_BIN} mount '${_soft_origin}'"
+        unset _soft_origin
 
-        debug "Creating base services-dataset: $(distd "${DEFAULT_ZPOOL}${SERVICES_DIR}")"
-        _dsname="${DEFAULT_ZPOOL}${SERVICES_DIR}${USER}"
-        try "${ZFS_BIN} list -H -t filesystem '${_dsname}'" || \
-            try "${ZFS_BIN} create -p -o mountpoint=${SERVICES_DIR} '${_dsname}'"
-        try "${ZFS_BIN} mount '${_dsname}'"
-        unset _dsname
+        _serv_origin="${DEFAULT_ZPOOL}${SERVICES_DIR}"
+        try "${ZFS_BIN} list -H -t filesystem '${_serv_origin}'" || \
+            receive_origin "${_serv_origin}" "Services"
+        try "${ZFS_BIN} mount '${_serv_origin}'"
+        unset _serv_origin
     fi
 }
 
 
-receive_base_software_origin () {
+receive_origin () {
     _dname="${1}"
+    _dorigin_base="${2}"
+    _dtype="${3}"
     if [ -z "${_dname}" ]; then
         error "No dataset name given!"
     fi
-    _origin_name="Software-user-${ORIGIN_ZFS_SNAP_NAME}${DEFAULT_SOFTWARE_SNAPSHOT_EXT}"
+    if [ -z "${_dorigin_base}" ]; then
+        error "No dataset bae given! Should be one of 'Services' or 'Software'"
+    fi
+    if [ -n "${_dtype}" ]; then
+        _dname="/${USER}/${_dname}"
+        _head="${_dorigin_base}-user"
+    else
+        unset _dname
+        _head="${_dorigin_base}" # not-mountable base dataset
+    fi
+    _origin_name="${_head}-${ORIGIN_ZFS_SNAP_NAME}${DEFAULT_SOFTWARE_SNAPSHOT_EXT}"
     _origin_file="${FILE_CACHE_DIR}/${_origin_name}"
     if [ ! -f "${_origin_file}" ]; then
-        run "${FETCH_BIN} ${FETCH_OPTS} ${MAIN_COMMON_REPOSITORY}${_origin_name} -o ${_origin_file}"
+        run "${FETCH_BIN} ${FETCH_OPTS} -o ${_origin_file} ${MAIN_COMMON_REPOSITORY}${_origin_name}" && \
+            debug "Origin fetched successfully: $(distd "${_origin_name}")"
     fi
     if [ -f "${_origin_file}" ]; then
         # NOTE: each user dataset is made of same origin, hence you can apply snapshots amongst them..
-        run "${XZCAT_BIN} "${_origin_file}" | ${ZFS_BIN} receive -v '${ZFS_DEF_POOL_NAME}/Software/${_dname}'"
+        run "${XZCAT_BIN} "${_origin_file}" | ${ZFS_BIN} receive ${ZFS_RECEIVE_OPTS} '${ZFS_DEF_POOL_NAME}/${_dorigin_base}${_dname}'" && \
+            debug "Origin received successfully: $(distd "${_origin_name}")"
     else
         error "No origin file available! That's mandatory to have this file: $(diste "${_origin_file}")"
     fi
@@ -273,7 +286,7 @@ create_software_dir () {
         _dsname="${DEFAULT_ZPOOL}${SOFTWARE_DIR}${USER}/${_dset_create}"
         debug "Creating ZFS software-dataset: $(distd "${_dsname}")"
         try "${ZFS_BIN} list -H -t filesystem '${_dsname}'" || \
-            receive_base_software_origin "${_dsname}"
+            receive_origin "${_dsname}" "Software" "user"
         try "${ZFS_BIN} mount '${_dsname}'"
         unset _dsname
     else
@@ -383,7 +396,8 @@ create_software_bundle_archive () {
         _csbd_dataset="${DEFAULT_ZPOOL}${SOFTWARE_DIR}${USER}/${_csbname}"
         debug "Creating archive from dataset: $(distd "${_csbd_dataset}") to file: $(distd "${_cddestfile}")"
         try "${ZFS_BIN} umount -f '${_csbd_dataset}'"
-        retry "${ZFS_BIN} send '${_csbd_dataset}' | ${XZ_BIN} ${DEFAULT_XZ_OPTS} > ${_cddestfile}" && \
+        try "${ZFS_BIN} snapshot '${_csbd_dataset}@${ORIGIN_ZFS_SNAP_NAME}'"
+        try "${ZFS_BIN} send ${ZFS_SEND_OPTS} '${_csbd_dataset}@${ORIGIN_ZFS_SNAP_NAME}' | ${XZ_BIN} ${DEFAULT_XZ_OPTS} > ${_cddestfile}" && \
             note "Created bin-bundle from dataset: $(distd "${_csbd_dataset}")"
         try "${ZFS_BIN} mount '${_csbd_dataset}'"
     else
@@ -409,8 +423,7 @@ install_software_from_binbuild () {
         try "${ZFS_BIN} list -H -t filesystem '${_isfb_dataset}'"
         if [ "${?}" != "0" ]; then
             debug "Installing ZFS based binary build to dataset: $(distd "${_isfb_dataset}")"
-            run "${XZCAT_BIN} '${FILE_CACHE_DIR}${_isfb_archive}' | ${ZFS_BIN} receive -F -v '${_isfb_dataset}' &&
-                ${ZFS_BIN} rename '${_isfb_dataset}@${DEFAULT_GIT_SNAPSHOT_HEAD}' ${ORIGIN_ZFS_SNAP_NAME}" && \
+            run "${XZCAT_BIN} '${FILE_CACHE_DIR}${_isfb_archive}' | ${ZFS_BIN} receive -F ${ZFS_RECEIVE_OPTS} '${_isfb_dataset}'" && \
                     note "Installed: $(distn "${_isfb_fullname}")" && \
                         DONT_BUILD_BUT_DO_EXPORTS=YES
         else
