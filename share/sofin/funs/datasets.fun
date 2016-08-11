@@ -462,14 +462,14 @@ try_destroy_binbuild () {
 
 
 require_prefix_set () {
-    if [ -z "${PREFIX}"]; then
+    if [ -z "${PREFIX}" ]; then
         error "PREFIX can't be empty!"
     fi
 }
 
 
 require_namesum_set () {
-    if [ -z "${BUILD_NAMESUM}"]; then
+    if [ -z "${BUILD_NAMESUM}" ]; then
         error "BUILD_NAMESUM can't be empty!"
     fi
 }
@@ -483,12 +483,33 @@ do_prefix_snapshot () {
     require_prefix_set
     require_namesum_set
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
-        _pr_snp="${DEFAULT_ZPOOL}${SOFTWARE_DIR}${USER}/${PREFIX##*/}"
-        try "${ZFS_BIN} rename ${_pr_snp}@${_snap_name} ${_snap_name}_${TIMESTAMP}" # if snapshot exists, rename it
+        _pr_name="${PREFIX##*/}"
+        # Software main dir:
+        _pr_snp="${DEFAULT_ZPOOL}${SOFTWARE_DIR}${USER}/${_pr_name}"
+        # Build dir:
+        _pr_bdir_snp="${DEFAULT_ZPOOL}${SOFTWARE_DIR}${USER}/${_pr_name}/${DEFAULT_SRC_EXT}${BUILD_NAMESUM}"
+        debug "_pr_name: $(distd "${_pr_name}"), _pr_snp: $(distd "${_pr_snp}"), _pr_bdir_snp: $(distd "${_pr_bdir_snp}")"
+
+        # Try renaming existing snaps:
+        try "${ZFS_BIN} rename ${_pr_snp}@${_snap_name} ${_snap_name}_${TIMESTAMP}" && \
+            debug "Renamed snapshot to: $(distd "${_pr_snp}@${_snap_name} ${_snap_name}_${TIMESTAMP}")"
+        try "${ZFS_BIN} rename ${_pr_bdir_snp}@${_snap_name} ${_snap_name}_${TIMESTAMP}" && \
+            debug "Renamed snapshot to: $(distd "${_pr_bdir_snp}@${_snap_name} ${_snap_name}_${TIMESTAMP}")"
+
+        # Do snapshots:
         try "${ZFS_BIN} snapshot ${_pr_snp}@${_snap_name}" && \
             debug "Done @${_snap_name} snapshot of PREFIX: $(distd "${PREFIX}") of dataset: $(distd "${_pr_snp}")" && \
-                return 0
-        return 1
+                _p1=0
+        try "${ZFS_BIN} snapshot ${_pr_bdir_snp}@${_snap_name}" && \
+            debug "Done @${_snap_name} snapshot of PREFIX: $(distd "${PREFIX}") of dataset: $(distd "${_pr_bdir_snp}")" && \
+                _p2=0
+
+        if [ "${_p1}" = "0" -a \
+             "${_p2}" = "0" ]; then
+            return 0
+        else
+            return 1
+        fi
     fi
 }
 
