@@ -22,6 +22,7 @@ KLDLOAD_BIN="/sbin/kldload"
 MDMFS_BIN="/sbin/mdmfs"
 LIMITS_BIN="/usr/bin/limits"
 DTRACE_BIN="/usr/sbin/dtrace"
+PWD_MKDB_BIN="/usr/sbin/pwd_mkdb"
 
 # ServeD governor, FreeBSD specific:
 GVR_BIN="/usr/bin/gvr"
