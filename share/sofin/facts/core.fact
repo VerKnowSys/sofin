@@ -29,12 +29,6 @@ DEFAULT_PARTIAL_FILE_EXT=".partial"
 DEFAULT_DEF_EXT=".def"
 DEFAULT_LOCK_EXT=".lock"
 
-# For ZFS we don't use tarballs anymore:
-if [ "YES" = "${CAP_SYS_ZFS}" ]; then
-    DEFAULT_ARCHIVE_EXT="${DEFAULT_SOFTWARE_SNAPSHOT_EXT}"
-else
-    DEFAULT_ARCHIVE_EXT=".txz" # gets value of DEFAULT_SOFTWARE_SNAPSHOT_EXT under systems with ZFS support
-fi
 DEFAULT_ARCHIVE_TARBALL_EXT=".txz" # can be used for files that have to be delivered in tarball format
 DEFAULT_CHKSUM_EXT=".sha1"
 DEFAULT_REQ_OS_PROVIDED="os-provided"
@@ -42,7 +36,12 @@ DEFAULT_INST_MARK_EXT=".installed"
 DEFAULT_TEST_PASSED_EXT=".passed"
 DEFAULT_SOFTWARE_SNAPSHOT_EXT=".zfsx"
 DEFAULT_SERVICE_SNAPSHOT_EXT=".zfsp"
-DEFAULT_GIT_SNAPSHOT_HEAD="--head--"
+# For ZFS we don't use tarballs anymore:
+if [ "YES" = "${CAP_SYS_ZFS}" ]; then
+    DEFAULT_ARCHIVE_EXT="${DEFAULT_SOFTWARE_SNAPSHOT_EXT}"
+else
+    DEFAULT_ARCHIVE_EXT=".txz" # gets value of DEFAULT_SOFTWARE_SNAPSHOT_EXT under systems with ZFS support
+fi
 DEFAULT_SRC_EXT=".src_"
 DEFAULT_GIT_DIR_NAME=".git"
 DEFAULT_PROJECT_DEPS_LIST_FILE=".dependencies"
