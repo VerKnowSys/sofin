@@ -134,7 +134,7 @@ get_shell_vars () {
         done
     }
     gsv_int_cflags "${SOFTWARE_DIR}"
-    _cxxflags="${_cflags}"
+    _cxxflags="-std=c++11 ${_cflags}"
 
     # MANPATH
     _manpath="${DEFAULT_MANPATH}"
