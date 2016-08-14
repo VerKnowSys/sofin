@@ -344,8 +344,8 @@ reload_zsh_shells () {
         fi
     done
     if [ -n "${_wishlist}" ]; then
-        try "${KILL_BIN} -SIGUSR2 $$ ${_wishlist}" && \
-            debug "Reload signal sent to $(distd "${_shellshort}") pids: $(distd "${_wishlist}")"
+        try "${KILL_BIN} -SIGUSR2 ${SOFIN_PID} ${_wishlist}" && \
+            debug "Reload signal sent to $(distd "${_shellshort}") pids: $(distd "${SOFIN_PID} + ${_wishlist}")"
     fi
     unset _wishlist _pid _pids _shell_pattern _shellshort
 }
