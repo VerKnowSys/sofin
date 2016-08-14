@@ -73,11 +73,22 @@ finalize () {
     destroy_locks
     update_shell_vars
     reload_zsh_shells
+    finalize_onquit
+}
+
+
+finalize_onquit () {
     untrap_signals
     summary
-
     # Bring back echo
     ${STTY_BIN} echo
+}
+
+
+# NOTE: C-c is handled differently, not full finalize is running. f.e. build dir isn't wiped out
+finalize_interrupt () {
+    destroy_locks
+    finalize_onquit
 }
 
 

@@ -225,7 +225,7 @@ cleanup_handler () {
 
 interrupt_handler () {
     warn "Interrupted: $(distw "${SOFIN_PID:-$$}")"
-    finalize
+    finalize_interrupt
     exit ${ERRORCODE_USER_INTERRUPT}
 }
 
