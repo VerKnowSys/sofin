@@ -43,12 +43,13 @@ fi
 
 
 SOFIN_SHELL_BLOCK=$(${CAT_BIN} <<EOF
-#------Sofin-Environment-Block------#
-trap 'source "\$HOME/.profile"' USR2
-if [ -e "\$HOME/.profile" ]; then
-    source "\$HOME/.profile"
+#--------Sofin-Environment-Block------#
+trap '. "~/.profile"' USR2
+if [ -e "~/.profile" ]; then
+    . "~/.profile"
 fi
-export SHELL_PID="\$\$"
+export readonly SHELL_PID="\$\$"
+
 EOF
 )
 
