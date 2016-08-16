@@ -336,6 +336,8 @@ reload_zsh_shells () {
     _shell_pattern="zsh"
     if [ "Darwin" = "${SYSTEM_NAME}" ]; then
         _shell_pattern="\d ${ZSH_BIN}" # NOTE: this fixes issue with SIGUSR2 signal sent to iTerm
+    elif [ "FreeBSD" = "${SYSTEM_NAME}" ]; then
+        _shell_pattern="\ -zsh \(zsh\)"
     fi
     unset _wishlist
     _shellshort="${SHELL##*/}" # basename
