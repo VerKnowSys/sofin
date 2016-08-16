@@ -1,14 +1,19 @@
 env_reset () {
     # unset conflicting environment variables
-    unset LDFLAGS
-    unset CFLAGS
-    unset CXXFLAGS
-    unset CPPFLAGS
-    unset PATH
-    unset LD_LIBRARY_PATH
-    unset LD_PRELOAD
-    unset DYLD_LIBRARY_PATH
-    unset PKG_CONFIG_PATH
+    # dynamic linker:
+    unset LD_PRELOAD LD_LIBRARY_PATH DYLD_LIBRARY_PATH
+
+    # utils
+    unset CC CXX LD AR RANLIB NM AS
+
+    # flags
+    unset CFLAGS CXXFLAGS CPPFLAGS LDFLAGS
+
+    # NOTE: By default environment should treat non-ASCII characters as literals.
+    #       It's often required for test suites:
+    LANG=C
+    LC_ALL=C
+    LC_CTYPE=C
 }
 
 
