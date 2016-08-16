@@ -486,11 +486,17 @@ process_flat () {
                 #     unset _current_branch
                 # fi
 
+                cd "${_pwd}"
                 after_unpack_callback
+                cd "${_pwd}"
                 after_unpack_snapshot
 
+                cd "${_pwd}"
                 apply_definition_patches "${DEF_NAME}${DEF_POSTFIX}"
+
+                cd "${_pwd}"
                 after_patch_callback
+                cd "${_pwd}"
                 after_patch_snapshot
 
                 note "   ${NOTE_CHAR} Configuring: $(distn "${_app_param}"), version: $(distn "${DEF_VERSION}")"
@@ -584,7 +590,9 @@ process_flat () {
 
                 esac
 
+                cd "${_pwd}"
                 after_configure_callback
+                cd "${_pwd}"
                 after_configure_snapshot
             else
                 error "These values cannot be empty: BUILD_DIR, BUILD_NAMESUM"
@@ -595,7 +603,9 @@ process_flat () {
             note "   ${NOTE_CHAR} Building requirement: $(distn "${_app_param}")"
             try "${DEF_MAKE_METHOD}" || \
             run "${DEF_MAKE_METHOD}"
+            cd "${_pwd}"
             after_make_callback
+            cd "${_pwd}"
             after_make_snapshot
 
             # OTE: after successful make, invoke "make test" by default:
@@ -614,7 +624,9 @@ process_flat () {
             else
                 warn "   ${WARN_CHAR} $(distw "USE_NO_TEST") is defined. Skipping tests for: $(distw "${_app_param}")"
             fi
+            cd "${_pwd}"
             after_test_callback
+            cd "${_pwd}"
             after_test_snapshot
 
             debug "Cleaning man dir from previous dependencies, we want to install man pages that belong to LAST requirement which is app bundle itself"
@@ -627,7 +639,9 @@ process_flat () {
             cd "${_pwd}"
             note "   ${NOTE_CHAR} Installing requirement: $(distn "${_app_param}")"
             run "${DEF_INSTALL_METHOD}"
+            cd "${_pwd}"
             after_install_callback
+            cd "${_pwd}"
             after_install_snapshot
 
             cd "${_pwd}"
