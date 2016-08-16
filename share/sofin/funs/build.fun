@@ -609,7 +609,7 @@ process_flat () {
                 fi
                 # NOTE: mandatory on production machines:
                 # XXX: in future it should throw an error here..
-                try "TEST_ENV=${DEF_TEST_ENV} TEST_JOBS=${CPUS} ${_anadd}LD_LIBRARY_PATH=${_pwd} ${DEF_TEST_METHOD}" && \
+                try "TEST_ENV=${DEF_TEST_ENV} TEST_JOBS=${CPUS} ${_anadd}LD_LIBRARY_PATH=${PREFIX}/lib:${_pwd}:/usr/lib ${DEF_TEST_METHOD}" && \
                     mark_dependency_test_passed "${_app_param}"
             else
                 warn "   ${WARN_CHAR} $(distw "USE_NO_TEST") is defined. Skipping tests for: $(distw "${_app_param}")"
