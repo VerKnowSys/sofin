@@ -468,7 +468,7 @@ process_flat () {
                 cd "${_fd}"
 
                 # Handle DEF_BUILD_DIR_POSTFIX here
-                if [ -n "${_fd}/${DEF_BUILD_DIR_POSTFIX}" ]; then
+                if [ -n "${DEF_BUILD_DIR_POSTFIX}" ]; then
                     try "${MKDIR_BIN} -p ${_fd}/${DEF_BUILD_DIR_POSTFIX}"
                     cd "${_fd}/${DEF_BUILD_DIR_POSTFIX}"
                 fi
