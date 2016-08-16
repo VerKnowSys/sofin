@@ -79,7 +79,7 @@ determine_system_capabilites () {
         unset CAP_SYS_ZFS DEFAULT_ZPOOL ORIGIN_ZFS_SNAP_NAME
     fi
 
-    ${SYSCTL_BIN} -a 2>/dev/null | ${GREP_BIN} 'hardening.pax' >/dev/null 2>&1
+    ${SYSCTL_BIN} hardening.pax >/dev/null 2>&1
     if [ "${?}" = "0" ]; then
         CAP_SYS_HARDENED=YES
         # NOTE: This implies: we request/expect PIC and PIE on every binary and library built by Sofin
@@ -87,7 +87,7 @@ determine_system_capabilites () {
         unset CAP_SYS_HARDENED
     fi
 
-    ${SYSCTL_BIN} -a 2>/dev/null | ${GREP_BIN} 'kern.dtrace' >/dev/null 2>&1
+    ${SYSCTL_BIN} kern.dtrace >/dev/null 2>&1
     if [ "${?}" = "0" ]; then
         CAP_SYS_DTRACE=YES
         ${KLDLOAD_BIN} dtrace >/dev/null 2>&1 || true
@@ -96,7 +96,7 @@ determine_system_capabilites () {
         unset CAP_SYS_DTRACE
     fi
 
-    ${SYSCTL_BIN} -a 2>/dev/null | ${GREP_BIN} 'kern.features.linux64' >/dev/null 2>&1
+    ${SYSCTL_BIN} kern.features.linux64 >/dev/null 2>&1
     if [ "${?}" = "0" ]; then
         CAP_SYS_LINUX64_ABI=YES
         ${KLDLOAD_BIN} linux64 >/dev/null 2>&1|| true
