@@ -601,8 +601,7 @@ process_flat () {
             # and common part between normal and continue modes:
             cd "${_pwd}"
             note "   ${NOTE_CHAR} Building requirement: $(distn "${_app_param}")"
-            try "${DEF_MAKE_METHOD}" || \
-            run "${DEF_MAKE_METHOD}"
+            try "${DEF_MAKE_METHOD}"
             cd "${_pwd}"
             after_make_callback
             cd "${_pwd}"
