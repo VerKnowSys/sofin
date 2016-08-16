@@ -190,7 +190,7 @@ compiler_setup () {
                     LDFLAGS="-L${PREFIX}/lib ${DEF_LINKER_ARGS} ${DEFAULT_LDFLAGS}"
                     LD="/usr/bin/ld ${_plugin_addon} --plugin /usr/lib/LLVMgold.so"
                     NM="/usr/bin/nm ${_plugin_addon} --plugin /usr/lib/LLVMgold.so"
-                    RANLIB=":" # shouldn't be necessary
+                    # RANLIB=":" # shouldn't be necessary
                     unset _addon _compiler_addon _linker_addon _plugin_addon
                 fi
                 ;;
