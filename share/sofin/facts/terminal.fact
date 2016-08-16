@@ -42,10 +42,13 @@ determine_term_capabilites () {
         setopt extendedhistory
 
         # NOTE: don't send HUP on shell exit:
-        setopt nohup
+        unsetopt hup
 
         # NOTE: required for funcstack to work:
         setopt evallineno
+
+        # NOTE: don't do notification on signal handling:
+        unsetopt monitor
 
         CAP_TERM_ZSH=YES
         unset CAP_TERM_BASH
