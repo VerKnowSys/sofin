@@ -604,8 +604,13 @@ process_flat () {
 
             if [ -z "${USE_NO_TEST}" ]; then
                 if [ "YES" = "${CAP_SYS_PRODUCTION}" ]; then
+                    unset _anadd
+                    if [ "Darwin" = "${SYSTEM_NAME}" ]; then
+                        _anadd="DY"
+                    fi
                     # NOTE: mandatory on production machines:
-                    run "${DEF_TEST_METHOD}"
+                    run "TEST_ENV=${DEF_TEST_ENV} TEST_JOBS=${CPUS} ${_anadd}LD_LIBRARY_PATH=${_pwd} ${DEF_TEST_METHOD}"
+                    # XXX: in future it should throw an error here..
                     mark_dependency_test_passed "${_app_param}"
                 else # Build host:
                     try "${DEF_TEST_METHOD}" && \
