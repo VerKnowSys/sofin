@@ -61,7 +61,9 @@ CPP_PREPROCESSOR_NAME_ALT="cpp"
 
 # Compiler cross platform defaults:
 COMMON_FLAGS="-fPIC"
-COMMON_COMPILER_FLAGS="${COMMON_FLAGS} -fno-strict-overflow -w -Wformat -Wformat-security -Werror=format-security -fstack-protector-strong --param ssp-buffer-size=4 -D_FORTIFY_SOURCE=2" # NOTE: comment out "-fno-strict-overflow -fstack-protector-all" on Centos 5
+# NOTE: XXX: To add -Werror=format-security as a default, we have to get rid of GNU software ;)
+COMMON_COMPILER_FLAGS="${COMMON_FLAGS} -fno-strict-overflow -w -Wformat -Wformat-security -fstack-protector-strong --param ssp-buffer-size=4 -D_FORTIFY_SOURCE=2" # NOTE: comment out "-fno-strict-overflow -fstack-protector-all" on Centos 5
+
 COMMON_LDFLAGS="${COMMON_FLAGS}"
 DEFAULT_LDFLAGS="${COMMON_FLAGS}"
 DEFAULT_COMPILER_FLAGS="${COMMON_COMPILER_FLAGS}"
