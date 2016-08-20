@@ -466,14 +466,14 @@ process_flat () {
                     fi
                 fi
                 cd "${_fd}"
+                _pwd="${_fd}"
 
                 # Handle DEF_BUILD_DIR_POSTFIX here
                 if [ -n "${DEF_BUILD_DIR_POSTFIX}" ]; then
-                    try "${MKDIR_BIN} -p ${_fd}/${DEF_BUILD_DIR_POSTFIX}"
-                    cd "${_fd}/${DEF_BUILD_DIR_POSTFIX}"
+                    ${MKDIR_BIN} -p "${_fd}/${DEF_BUILD_DIR_POSTFIX}"
+                    _pwd="${_fd}/${DEF_BUILD_DIR_POSTFIX}"
                 fi
-                _pwd="$(${PWD_BIN} 2>/dev/null)"
-                debug "Switched to build dir root: $(distd "${_pwd}")"
+                debug "Definition-build-dir: $(distd "${_pwd}")"
 
                 cd "${_pwd}"
                 after_unpack_callback
@@ -487,6 +487,7 @@ process_flat () {
                 after_patch_callback
                 cd "${_pwd}"
                 after_patch_snapshot
+                cd "${_pwd}"
 
                 note "   ${NOTE_CHAR} Configuring: $(distn "${_app_param}"), version: $(distn "${DEF_VERSION}")"
                 case "${DEF_CONFIGURE}" in
