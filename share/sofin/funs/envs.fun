@@ -142,6 +142,11 @@ compiler_setup () {
         debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "stack-protector-all" ${ColorGreen})" || \
         debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "stack-protector-all" ${ColorGray})"
 
+    # -fstack-protector-strong check:
+    echo "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'fstack-protector-strong' >/dev/null 2>/dev/null && \
+        debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "stack-protector-strong" ${ColorGreen})" || \
+        debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "stack-protector-strong" ${ColorGray})"
+
     # -fno-strict-overflow check:
     echo "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'fno-strict-overflow' >/dev/null 2>/dev/null && \
         debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "no-strict-overflow" ${ColorGreen})" || \
