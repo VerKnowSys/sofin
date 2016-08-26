@@ -9,7 +9,7 @@ if [ "FreeBSD" = "${SYSTEM_NAME}" ]; then
     setup_buildhost
 fi
 
-${TEST_BIN} -f /.build-host && export DEVEL=YES
+# ${TEST_BIN} -f /.build-host && export DEVEL=YES
 ${TEST_BIN} ! -x /Software/Ccache/bin/ccache || ${SOFIN_BIN} i Ccache
 
 note "Checking remote machine connection (shouldn't take more than a second).."
@@ -30,11 +30,11 @@ for software in $(${CAT_BIN} ${_working_state_file} 2>/dev/null); do
     fi
     note "________________________________"
 
-    if [ "FreeBSD" = "${SYSTEM_NAME}" -a \
-         -z "${DEVEL}" ]; then
-        ${SOFIN_BIN} reset && \
-            note "Sofin definitions reset for production host type with undefined $(distn "DEVEL")"
-    fi
+    # if [ "FreeBSD" = "${SYSTEM_NAME}" -a \
+    #      -z "${DEVEL}" ]; then
+    #     ${SOFIN_BIN} reset && \
+    #         note "Sofin definitions reset for production host type with undefined $(distn "DEVEL")"
+    # fi
 
     _indicator="/Software/${software}/$(lowercase "${software}")${DEFAULT_INST_MARK_EXT}"
     if [ -d "/Software/${software}" -a \
@@ -44,7 +44,7 @@ for software in $(${CAT_BIN} ${_working_state_file} 2>/dev/null); do
     else
         note "Processing software: $(distn "${software}")"
         ${SOFIN_BIN} rm ${software}
-        DEVEL=YES ${SOFIN_BIN} deploy ${software} && \
+        USE_NO_TEST=1 ${SOFIN_BIN} deploy ${software} && \
         ${SED_BIN} -i '' -e "/${software}/d" ${_working_state_file}
     fi
     note "--------------------------------"
