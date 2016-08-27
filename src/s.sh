@@ -41,12 +41,12 @@ if [ -n "${SOFIN_COMMAND_ARG}" ]; then
 
 
         log)
-            show_logs ${SOFIN_ARGS%log}
+            show_logs ${SOFIN_ARGS%${SOFIN_COMMAND_ARG}}
             ;;
 
 
         less|les|show)
-            less_logs ${SOFIN_ARGS}
+            less_logs ${SOFIN_ARGS%${SOFIN_COMMAND_ARG}}
             ;;
 
 
