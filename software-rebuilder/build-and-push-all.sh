@@ -17,6 +17,8 @@ run "${SSH_BIN} sofin@verknowsys.com uname -a"
 
 set +e
 
+unset USE_NO_TEST
+
 _working_state_file="/var/software.list.processing"
 if [ ! -f "${_working_state_file}" ]; then
     note "Creating new file: $(distn "${_working_state_file}")"
@@ -44,7 +46,7 @@ for software in $(${CAT_BIN} ${_working_state_file} 2>/dev/null); do
     else
         note "Processing software: $(distn "${software}")"
         ${SOFIN_BIN} rm ${software}
-        USE_NO_TEST=1 ${SOFIN_BIN} deploy ${software} && \
+        ${SOFIN_BIN} deploy ${software} && \
         ${SED_BIN} -i '' -e "/${software}/d" ${_working_state_file}
     fi
     note "--------------------------------"
