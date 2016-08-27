@@ -605,6 +605,13 @@ process_flat () {
             note "   ${NOTE_CHAR} Testing requirement: $(distn "${_app_param}")"
             cd "${_pwd}"
 
+            if [ -n "${DEF_SKIPPED_DEFINITION_TEST}" ]; then
+                debug "Defined DEF_SKIPPED_DEFINITION_TEST: $(distd "${DEF_SKIPPED_DEFINITION_TEST}")"
+                ${PRINTF_BIN} '%s\n' "${DEF_SKIPPED_DEFINITION_TEST}" 2>/dev/null | ${EGREP_BIN} "${_app_param}" 2>/dev/null && \
+                    debug "Disabling tests for: $(distd "${_app_param}")" && \
+                        USE_NO_TEST=1
+            fi
+
             if [ -z "${USE_NO_TEST}" ]; then
                 unset _anadd
                 if [ "Darwin" = "${SYSTEM_NAME}" ]; then
