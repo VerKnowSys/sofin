@@ -225,7 +225,8 @@ compiler_setup () {
         debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "gold-linker" ${ColorGreen})"
 
     elif [ -z "${DEF_NO_LLVM_LINKER}" -a \
-           -x "/usr/bin/ld.lld" ]; then
+           -x "/usr/bin/ld.lld" -a \
+           "${SYSTEM_NAME}" != "Darwin" ]; then
         # LLVM linker support:
         DEFAULT_COMPILER_FLAGS="${DEFAULT_COMPILER_FLAGS} -fuse-ld=lld ${_compiler_addon}"
         DEFAULT_LDFLAGS="${DEFAULT_LDFLAGS} ${_linker_addon}"
