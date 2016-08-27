@@ -45,6 +45,11 @@ if [ -n "${SOFIN_COMMAND_ARG}" ]; then
             ;;
 
 
+        less|les|show)
+            less_logs ${SOFIN_ARGS}
+            ;;
+
+
         clean)
             perform_clean
             ;;

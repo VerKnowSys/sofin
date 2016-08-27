@@ -58,6 +58,12 @@ log_helper () {
 }
 
 
+less_logs () {
+    # XXX: show only single log
+    ${LESS_BIN} ${DEFAULT_LESS_OPTIONS} ${LOGS_DIR}/sofin*${1}*
+}
+
+
 show_logs () {
     create_dirs
     _logf_pattern="${1:-+}"
