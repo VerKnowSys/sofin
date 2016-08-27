@@ -624,7 +624,7 @@ process_flat () {
                 try "TEST_ENV=${DEF_TEST_ENV} TEST_JOBS=${CPUS} ${_anadd}LD_LIBRARY_PATH=${PREFIX}/lib:${_pwd}:/usr/lib ${DEF_TEST_METHOD}" && \
                     mark_dependency_test_passed "${_app_param}"
             else
-                warn "   ${WARN_CHAR} $(distw "USE_NO_TEST") is defined. Skipping tests for: $(distw "${_app_param}")"
+                warn "   ${WARN_CHAR} Tests for definition: $(distw "${_app_param}") skipped on demand"
             fi
             cd "${_pwd}"
             after_test_callback
