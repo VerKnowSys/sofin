@@ -41,7 +41,7 @@ if [ -n "${SOFIN_COMMAND_ARG}" ]; then
 
 
         log)
-            show_logs ${SOFIN_ARGS}
+            show_logs ${SOFIN_ARGS%log}
             ;;
 
 
