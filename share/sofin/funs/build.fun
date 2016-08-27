@@ -602,17 +602,19 @@ process_flat () {
             after_make_snapshot
 
             # OTE: after successful make, invoke "make test" by default:
-            note "   ${NOTE_CHAR} Testing requirement: $(distn "${_app_param}")"
-            cd "${_pwd}"
-
+            unset _this_test_skipped
             if [ -n "${DEF_SKIPPED_DEFINITION_TEST}" ]; then
                 debug "Defined DEF_SKIPPED_DEFINITION_TEST: $(distd "${DEF_SKIPPED_DEFINITION_TEST}")"
-                ${PRINTF_BIN} '%s\n' "${DEF_SKIPPED_DEFINITION_TEST}" 2>/dev/null | ${EGREP_BIN} "${_app_param}" 2>/dev/null && \
-                    debug "Disabling tests for: $(distd "${_app_param}")" && \
-                        USE_NO_TEST=1
+                ${PRINTF_BIN} '%s\n' "${DEF_SKIPPED_DEFINITION_TEST}" 2>/dev/null | ${EGREP_BIN} "${_app_param}" >/dev/null 2>/dev/null && \
+                    note "Skipped tests for definition of: $(distn "${_app_param}")" && \
+                        _this_test_skipped=1
             fi
 
-            if [ -z "${USE_NO_TEST}" ]; then
+            if [ -z "${USE_NO_TEST}" -a \
+                 -z "${_this_test_skipped}" ]; then
+                note "   ${NOTE_CHAR} Testing requirement: $(distn "${_app_param}")"
+                cd "${_pwd}"
+
                 unset _anadd
                 if [ "Darwin" = "${SYSTEM_NAME}" ]; then
                     _anadd="DY"
