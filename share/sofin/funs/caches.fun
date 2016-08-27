@@ -102,14 +102,14 @@ show_logs () {
             note "No logs to attach to. LOGS_DIR=($(distn "${LOGS_DIR}")) contain no log files?"
         fi
 
-    elif [ -z "${_logf_pattern}" ]; then
-        note "No pattern specified, setting tail on all logs accessed or modified in last $(distn "${_logf_minutes}") minutes.."
-        if [ -z "${_files_x_min}" ]; then
-            note "No log files updated or accessed in last $(distn "${_logf_minutes}") minutes to show. Specify '$(distn "+")' as param, to attach a tail to all logs."
-        else
-            debug "show_log files: $(distd "$(${PRINTF_BIN} '%s\n' "${_files_x_min}" | eval "${FILES_COUNT_GUARD}")")"
-            ${TAIL_BIN} -n ${LOG_LINES_AMOUNT} $(${PRINTF_BIN} '%s\n' "${_files_x_min}" | eval "${NEWLINES_TO_SPACES_GUARD}")
-        fi
+    # elif [ -z "${_logf_pattern}" ]; then
+    #     note "No pattern specified, setting tail on all logs accessed or modified in last $(distn "${_logf_minutes}") minutes.."
+    #     if [ -z "${_files_x_min}" ]; then
+    #         note "No log files updated or accessed in last $(distn "${_logf_minutes}") minutes to show. Specify '$(distn "+")' as param, to attach a tail to all logs."
+    #     else
+    #         debug "show_log files: $(distd "$(${PRINTF_BIN} '%s\n' "${_files_x_min}" | eval "${FILES_COUNT_GUARD}")")"
+    #         ${TAIL_BIN} -n ${LOG_LINES_AMOUNT} $(${PRINTF_BIN} '%s\n' "${_files_x_min}" | eval "${NEWLINES_TO_SPACES_GUARD}")
+    #     fi
     else
         note "Seeking for log files.."
         log_helper "${_logf_pattern}"
