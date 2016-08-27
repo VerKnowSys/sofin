@@ -369,10 +369,9 @@ process_flat () {
     _req_defname="$(${PRINTF_BIN} '%s\n' "${_req_definition##*/}" | ${SED_BIN} -e 's/\..*$//g' 2>/dev/null)"
     debug "Bundle: $(distd "${_bundlnm}"), requirement: $(distd "${_app_param}"), PREFIX: $(distd "${_prefix}") file: $(distd "${_req_definition}"), req-name: $(distd "${_req_defname}")"
 
+    compiler_setup
     load_defaults
     load_defs "${_req_definition}"
-
-    compiler_setup
 
     PATH="${_prefix}/bin:${_prefix}/sbin:${DEFAULT_PATH}"
     if [ -z "${DEF_DISABLED_ON}" ]; then
