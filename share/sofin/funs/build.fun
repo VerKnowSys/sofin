@@ -373,7 +373,6 @@ process_flat () {
     load_defs "${_req_definition}"
 
     compiler_setup
-    dump_debug_info
 
     PATH="${_prefix}/bin:${_prefix}/sbin:${DEFAULT_PATH}"
     if [ -z "${DEF_DISABLED_ON}" ]; then
@@ -591,6 +590,8 @@ process_flat () {
             else
                 error "These values cannot be empty: BUILD_DIR, BUILD_NAMESUM"
             fi
+
+            dump_debug_info
 
             # and common part between normal and continue modes:
             cd "${_pwd}"
