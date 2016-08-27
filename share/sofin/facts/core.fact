@@ -52,7 +52,7 @@ DEFAULT_SSH_OPTS="" #-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no
 DEFAULT_SCP_OPTS="-C -B"
 DEFAULT_PS_OPTS="-axS"
 DEFAULT_XZ_OPTS="--verbose --threads=${DEFAULT_CPUS}"
-DEFAULT_LESS_OPTIONS="--hilite-search -K -N -M -R --follow-name -c"
+DEFAULT_LESS_OPTIONS="--hilite-search -K -N -M -f -c -s -r --follow-name"
 DEFAULT_GIT_CLONE_OPTS="--progress --recursive"
 DEFAULT_ID_USER_NAME_OPTS="-un"
 DEFAULT_DATE_TS_OPTS="+%s"
