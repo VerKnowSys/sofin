@@ -179,28 +179,21 @@ compiler_setup () {
 
     # Golden linker support
     if [ -z "${DEF_NO_GOLDEN_LINKER}" -a \
-         -x "${GOLD_BIN}" -a -f "/usr/lib/LLVMgold.so" ]; then
+         -x "${GOLD_BIN}" -a \
+         -f "${GOLD_SO}" ]; then
         case "${SYSTEM_NAME}" in
             FreeBSD|Minix)
-                _addon="/usr/lib/libLTO.so-DISABLED" # XXX: it's useless anyway at current stage
-                if [ -f "${_addon}" ]; then
-                    _compiler_addon="-Wl,-flto"
-                    _linker_addon="-Wl,-flto"
-                    _plugin_addon="--plugin ${_addon}"
-                fi
-
-                DEFAULT_COMPILER_FLAGS="${DEFAULT_COMPILER_FLAGS} -Wl,-fuse-ld=gold ${_compiler_addon}"
-                DEFAULT_LDFLAGS="${DEFAULT_LDFLAGS} -Wl,-fuse-ld=gold ${_linker_addon}"
+                DEFAULT_COMPILER_FLAGS="${DEFAULT_COMPILER_FLAGS} -Wl,-fuse-ld=gold"
+                DEFAULT_LDFLAGS="${DEFAULT_LDFLAGS} -Wl,-fuse-ld=gold"
                 CFLAGS="-I${PREFIX}/include ${DEF_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
                 CXXFLAGS="-I${PREFIX}/include ${DEF_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
                 LDFLAGS="-L${PREFIX}/lib ${DEF_LINKER_ARGS} ${DEFAULT_LDFLAGS}"
-                LD="/usr/bin/ld ${_plugin_addon} --plugin /usr/lib/LLVMgold.so"
-                NM="/usr/bin/nm ${_plugin_addon} --plugin /usr/lib/LLVMgold.so"
-                unset _addon _compiler_addon _linker_addon _plugin_addon
+                LD="/usr/bin/ld --plugin ${GOLD_SO}"
+                NM="/usr/bin/nm --plugin ${GOLD_SO}"
                 ;;
 
             Darwin)
-                RANLIB="${RANLIB_BIN}"
+                unset NM AR AS RANLIB LD
                 ;;
 
             Linux)
@@ -228,12 +221,11 @@ compiler_setup () {
            -x "/usr/bin/ld.lld" -a \
            "${SYSTEM_NAME}" != "Darwin" ]; then
         # LLVM linker support:
-        DEFAULT_COMPILER_FLAGS="${DEFAULT_COMPILER_FLAGS} -fuse-ld=lld ${_compiler_addon}"
-        DEFAULT_LDFLAGS="${DEFAULT_LDFLAGS} ${_linker_addon}"
+        DEFAULT_COMPILER_FLAGS="${DEFAULT_COMPILER_FLAGS} -fuse-ld=lld"
         CFLAGS="-I${PREFIX}/include ${DEF_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
         CXXFLAGS="-I${PREFIX}/include ${DEF_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
         LDFLAGS="-L${PREFIX}/lib ${DEF_LINKER_ARGS} ${DEFAULT_LDFLAGS}"
-        LD="/usr/bin/ld.lld" #  -flavor link
+        LD="/usr/bin/ld.lld"
         NM="/Software/Lld/exports/llvm-nm"
         AR="/Software/Lld/exports/llvm-ar"
         AS="/Software/Lld/exports/llvm-as"
@@ -246,8 +238,6 @@ compiler_setup () {
         unset NM AR AS RANLIB LD
 
         # Legacy (slowest) mode:
-        DEFAULT_LDFLAGS="${COMMON_FLAGS}"
-        DEFAULT_COMPILER_FLAGS="${COMMON_COMPILER_FLAGS}"
         CFLAGS="-I${PREFIX}/include ${DEF_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
         CXXFLAGS="-I${PREFIX}/include ${DEF_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
         LDFLAGS="-L${PREFIX}/lib ${DEF_LINKER_ARGS} ${DEFAULT_LDFLAGS}"
