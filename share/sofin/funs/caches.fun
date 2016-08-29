@@ -117,8 +117,8 @@ show_logs () {
     #         ${TAIL_BIN} -n ${LOG_LINES_AMOUNT} $(${PRINTF_BIN} '%s\n' "${_files_x_min}" | eval "${NEWLINES_TO_SPACES_GUARD}")
     #     fi
     else
-        note "Seeking for log files matching pattern: '$(distn "${_logf_pattern}")' (5s check intervals)"
-        ${SLEEP_BIN} 5 2>/dev/null
+        note "Seeking log files that match pattern: '$(distn "${_logf_pattern}")' (check intervals: $(distn "${LOG_CHECK_INTERVAL:-3}")s)"
+        ${SLEEP_BIN} "${LOG_CHECK_INTERVAL:-3}" 2>/dev/null
         log_helper "${_logf_pattern}"
     fi
     unset _files_x_min _logf_minutes _logf_pattern _files_list _files_count _files_blist _mod_f_names
