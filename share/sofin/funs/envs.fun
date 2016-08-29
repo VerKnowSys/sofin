@@ -241,6 +241,19 @@ compiler_setup () {
 
         debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "llvm-linker" ${ColorGreen})"
         debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "gold-linker" ${ColorGray})"
+    else
+        # NOTE: fallback with reset to system defaults - usually regular linker:
+        unset NM AR AS RANLIB LD
+
+        # Legacy (slowest) mode:
+        DEFAULT_LDFLAGS="${COMMON_FLAGS}"
+        DEFAULT_COMPILER_FLAGS="${COMMON_COMPILER_FLAGS}"
+        CFLAGS="-I${PREFIX}/include ${DEF_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
+        CXXFLAGS="-I${PREFIX}/include ${DEF_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
+        LDFLAGS="-L${PREFIX}/lib ${DEF_LINKER_ARGS} ${DEFAULT_LDFLAGS}"
+
+        debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "llvm-linker" ${ColorGray})"
+        debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "gold-linker" ${ColorGray})"
     fi
 
     if [ -z "${DEF_LINKER_NO_DTAGS}" ]; then
