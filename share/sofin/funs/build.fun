@@ -369,8 +369,17 @@ process_flat () {
     _req_defname="$(${PRINTF_BIN} '%s\n' "${_req_definition##*/}" | ${SED_BIN} -e 's/\..*$//g' 2>/dev/null)"
     debug "Bundle: $(distd "${_bundlnm}"), requirement: $(distd "${_app_param}"), PREFIX: $(distd "${_prefix}") file: $(distd "${_req_definition}"), req-name: $(distd "${_req_defname}")"
 
-    compiler_setup
+    # XXX: FIXME: OPTIMIZE: Each definition read twice... log bloat & shit
+    # NOTE: Because compiler_setup() uses DEF_* from definition file to
+    #       setup correct environment for build process..
     load_defaults
+    load_defs "${_req_definition}"
+
+    # Setup compiler features and options for given definition
+    compiler_setup
+
+    # NOTE: ..load definition again, because each definition can also alter
+    #       it's build environment values (flexibility, KISS)
     load_defs "${_req_definition}"
 
     PATH="${_prefix}/bin:${_prefix}/sbin:${DEFAULT_PATH}"
