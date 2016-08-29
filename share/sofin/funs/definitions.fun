@@ -3,17 +3,14 @@ load_defs () {
     if [ -z "${_definitions}" ]; then
         error "No definition name specified!"
     else
-        debug "Seeking: $(distd "${_definitions}")"
         for _given_def in ${_definitions}; do
             _name_base="${_given_def##*/}"
             _def="$(lowercase "${_name_base}")"
             if [ -e "${DEFINITIONS_DIR}${_def}${DEFAULT_DEF_EXT}" ]; then
-                debug "< $(distd "${DEFINITIONS_DIR}${_def}${DEFAULT_DEF_EXT}")"
-                . ${DEFINITIONS_DIR}${_def}${DEFAULT_DEF_EXT}
+                . "${DEFINITIONS_DIR}${_def}${DEFAULT_DEF_EXT}"
 
             elif [ -e "${DEFINITIONS_DIR}${_def}" ]; then
-                debug "< $(distd "${DEFINITIONS_DIR}${_def}")"
-                . ${DEFINITIONS_DIR}${_def}
+                . "${DEFINITIONS_DIR}${_def}"
                 _given_def="$(${PRINTF_BIN} '%s' "${_def}" | eval "${CUTOFF_DEF_EXT_GUARD}")"
 
             else
@@ -78,14 +75,11 @@ load_defs () {
 
 
 load_defaults () {
-    debug "Loading definition defaults"
     . "${DEFINITIONS_DEFAULTS}"
     if [ -z "${COMPLIANCE_CHECK}" ]; then
         # check definition/defaults compliance version
-        debug "Version compliance test $(distd "${DEF_COMPLIANCE}") vs $(distd "${SOFIN_VERSION}")"
         ${PRINTF_BIN} "${SOFIN_VERSION}" | eval "${EGREP_BIN} '${DEF_COMPLIANCE}'" >/dev/null 2>&1
         if [ "${?}" = "0" ]; then
-            debug "Compliance check passed."
             COMPLIANCE_CHECK="passed"
         else
             error "Versions mismatch!. DEF_COMPILIANCE='$(diste "${DEF_COMPLIANCE}")' and SOFIN_VERSION='$(diste "${SOFIN_VERSION}")' should match.\n  Hint: Update your definitions repository to latest version!"
