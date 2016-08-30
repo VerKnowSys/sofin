@@ -322,6 +322,7 @@ dump_debug_info () {
     debug "CPUS (used): $(distd "${CPUS}")"
     debug "ALL_CPUS: $(distd "${ALL_CPUS}")"
     debug "MAKE_OPTS: $(distd "${MAKE_OPTS}")"
+    debug "FETCH_BIN: $(distd "${FETCH_BIN}")"
     debug "FETCH_OPTS: $(distd "${FETCH_OPTS}")"
     debug "PREFIX: $(distd "${PREFIX}")"
     debug "SERVICE_DIR: $(distd "${SERVICE_DIR}")"
