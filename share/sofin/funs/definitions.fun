@@ -273,14 +273,16 @@ remove_bundles () {
 
 
 available_definitions () {
-    cd "${DEFINITIONS_DIR}"
-    note "Available definitions:"
-    ${LS_BIN} -m *def 2>/dev/null | ${SED_BIN} "s/${DEFAULT_DEF_EXT}//g" 2>/dev/null
-    note "Definitions count:"
-    ${LS_BIN} -a *def 2>/dev/null | ${WC_BIN} -l 2>/dev/null
-    cd "${DEFINITIONS_LISTS_DIR}"
-    note "Available lists:"
-    ${LS_BIN} -m * 2>/dev/null | ${SED_BIN} "s/${DEFAULT_DEF_EXT}//g" 2>/dev/null
+    if [ -d "${DEFINITIONS_DIR}" ]; then
+        cd "${DEFINITIONS_DIR}"
+        _alldefs="$(${FIND_BIN} ${DEFINITIONS_DIR} -mindepth 1 -maxdepth 1 -type f -name "*${DEFAULT_DEF_EXT}" 2>/dev/null)"
+        permnote "All definitions defined in current cache: $(distn "$(${LS_BIN} -m *def 2>/dev/null | eval "${CUT_TRAILING_SPACES_GUARD}")" "${ColorReset}")"
+    fi
+    if [ -d "${DEFINITIONS_LISTS_DIR}" ]; then
+        cd "${DEFINITIONS_LISTS_DIR}"
+        permnote "Available lists: $(distn "$(${LS_BIN} -m * 2>/dev/null | ${SED_BIN} "s/${DEFAULT_DEF_EXT}//g" 2>/dev/null)" "${ColorReset}")"
+    fi
+    note "Definitions count: $(distn "$(${PRINTF_BIN} '%s' "${_alldefs:-0}" | eval "${FILES_COUNT_GUARD}")")"
 }
 
 
