@@ -29,6 +29,9 @@ if [ -t 1 ]; then
     SEPARATOR_CHAR2="─"
 fi
 
+# Line replay ANSI codes:
+REPLAY_CURRENT_LINE="\33[2K\r"
+REPLAY_PREVIOUS_LINE="\033[A\33[2K\r"
 
 # determine TERM capabilities:
 determine_term_capabilites () {
