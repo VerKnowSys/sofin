@@ -78,13 +78,13 @@ deploy_binbuild () {
     _dbbundles=${*}
     create_dirs
     load_defaults
-    note "Requested to build and deploy bundle(s): $(distn "${_dbbundles}")"
+    permnote "Requested to build and deploy bundle(s): $(distn "${_dbbundles}")"
     for _dbbundle in ${_dbbundles}; do
         USE_BINBUILD=NO
         build "${_dbbundle}"
     done
     push_binbuilds ${_dbbundles}
-    note "Deployed successfully: $(distn "${_dbbundles}")"
+    permnote "Deployed successfully: $(distn "${_dbbundles}")"
     unset _dbbundles _dbbundle
 }
 
@@ -247,9 +247,9 @@ build () {
 
                 if [ -z "${DONT_BUILD_BUT_DO_EXPORTS}" ]; then
                     if [ -z "${DEF_REQUIREMENTS}" ]; then
-                        note "Installing: $(distn "${DEF_FULL_NAME}"), version: $(distn "${DEF_VERSION}")"
+                        permnote "Installing: $(distn "${DEF_FULL_NAME}"), version: $(distn "${DEF_VERSION}")"
                     else
-                        note "Installing: $(distn "${DEF_FULL_NAME}"), version: $(distn "${DEF_VERSION}"), with requirements: $(distn "${DEF_REQUIREMENTS}")"
+                        permnote "Installing: $(distn "${DEF_FULL_NAME}"), version: $(distn "${DEF_VERSION}"), with requirements: $(distn "${DEF_REQUIREMENTS}")"
                     fi
                     _req_amount="$(${PRINTF_BIN} '%s\n' "${DEF_REQUIREMENTS}" | ${WC_BIN} -w 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)"
                     _req_amount="$(${PRINTF_BIN} '%s\n' "${_req_amount} + 1" | ${BC_BIN} 2>/dev/null)"
@@ -262,7 +262,7 @@ build () {
                             note "No additional requirements defined"
                             break
                         else
-                            note "  $(distn "${_req}") ($(distn "${_req_amount}") of $(distn "${_req_all}") remaining)"
+                            permnote "  $(distn "${_req}") ($(distn "${_req_amount}") of $(distn "${_req_all}") remaining)"
                             if [ ! -f "${PREFIX}/${_req}${DEFAULT_INST_MARK_EXT}" ]; then
                                 CHANGED=YES
                                 process_flat "${_req}" "${PREFIX}" "${_bund_name}"
@@ -275,22 +275,22 @@ build () {
                 if [ -z "${DONT_BUILD_BUT_DO_EXPORTS}" ]; then
                     if [ -e "${PREFIX}/${_bund_lcase}${DEFAULT_INST_MARK_EXT}" ]; then
                         if [ "${CHANGED}" = "YES" ]; then
-                            note "  $(distn "${_bund_lcase}") ($(distn 1) of $(distn "${_req_all}"))"
+                            permnote "  $(distn "${_bund_lcase}") ($(distn 1) of $(distn "${_req_all}"))"
                             note "   ${NOTE_CHAR} Definition dependencies has changed. Rebuilding: $(distn "${_bund_lcase}")"
                             process_flat "${_bund_lcase}" "${PREFIX}" "${_bund_name}"
                             unset CHANGED
                             mark_installed "${DEF_NAME}${DEF_POSTFIX}" "${DEF_VERSION}"
                             show_done "${DEF_NAME}${DEF_POSTFIX}"
                         else
-                            note "  $(distn "${_bund_lcase}") ($(distn 1) of $(distn "${_req_all}"))"
+                            permnote "  $(distn "${_bund_lcase}") ($(distn 1) of $(distn "${_req_all}"))"
                             show_done "${DEF_NAME}${DEF_POSTFIX}"
                             debug "${SUCCESS_CHAR} $(distd "${_bund_lcase}") current: $(distd "${_version_element}"), definition: [$(distd "${DEF_VERSION}")] Ok."
                         fi
                     else
-                        note "  $(distn "${_bund_lcase}") ($(distn 1) of $(distn "${_req_all}"))"
+                        permnote "  $(distn "${_bund_lcase}") ($(distn 1) of $(distn "${_req_all}"))"
                         process_flat "${_bund_lcase}" "${PREFIX}" "${_bund_name}"
                         mark_installed "${DEF_NAME}${DEF_POSTFIX}" "${DEF_VERSION}"
-                        note "$(distn "${SUCCESS_CHAR}") $(distn "${_bund_lcase}") [$(distn "${DEF_VERSION}")]"
+                        permnote "$(distn "${SUCCESS_CHAR}") $(distn "${_bund_lcase}") [$(distn "${DEF_VERSION}")]"
                     fi
                 fi
 
