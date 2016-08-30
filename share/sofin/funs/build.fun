@@ -333,6 +333,12 @@ dump_debug_info () {
     debug "CXXFLAGS: $(distd "${CXXFLAGS}")"
     debug "CFLAGS: $(distd "${CFLAGS}")"
     debug "LDFLAGS: $(distd "${LDFLAGS}")"
+    debug "LD_PRELOAD: $(distd "${LD_PRELOAD}")"
+    if [ "Darwin" = "${SYSTEM_NAME}" ]; then
+        debug "DYLD_LIBRARY_PATH: $(distd "${DYLD_LIBRARY_PATH}")"
+    else
+        debug "LD_LIBRARY_PATH: $(distd "${LD_LIBRARY_PATH}")"
+    fi
     debug "CC: $(distd "${CC}")"
     debug "CXX: $(distd "${CXX}")"
     debug "CPP: $(distd "${CPP}")"
@@ -341,11 +347,6 @@ dump_debug_info () {
     debug "RANLIB: $(distd "${RANLIB}")"
     debug "AR: $(distd "${AR}")"
     debug "AS: $(distd "${AS}")"
-    if [ "Darwin" = "${SYSTEM_NAME}" ]; then
-        debug "DYLD_LIBRARY_PATH: $(distd "${DYLD_LIBRARY_PATH}")"
-    else
-        debug "LD_LIBRARY_PATH: $(distd "${LD_LIBRARY_PATH}")"
-    fi
     debug "-------------- PRE CONFIGURE SETTINGS DUMP ENDS ---------"
 }
 
