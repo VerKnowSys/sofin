@@ -746,10 +746,10 @@ traverse_patchlevels () {
     _trav_patches=${*}
     for _patch in ${_trav_patches}; do
         for _level in 0 1 2 3 4 5; do # Up to: -p5
-            debug "Applying patch: $(distd "${_patch}"), level: $(distd "${_level}")"
+            debug "Applying patch: $(distd "${_patch##*/}"), level: $(distd "${_level}")"
             try "${PATCH_BIN} -p${_level} -N -f -i ${_patch}"
             if [ "${?}" = "0" ]; then # skip applying single patch if it already passed
-                debug "Patch: $(distd "${_patch}") applied successfully!"
+                debug "Patch: patches$(distd "${_patch##*patches}") applied successfully!"
                 break;
             fi
         done
