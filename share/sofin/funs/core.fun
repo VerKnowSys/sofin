@@ -1,6 +1,9 @@
 
 debug () {
     _in=${@}
+    if [ "${TTY}" = "YES" ]; then
+        _permdbg="\n"
+    fi
     if [ -n "${CAP_SYS_PRODUCTION}" ]; then
         if [ -n "${DEBUG}" ]; then
             ${PRINTF_BIN} "# (%s) λ ${ColorDebug}%s${ColorReset}\n" "${SHLVL}" "${@}"
@@ -29,11 +32,11 @@ debug () {
             if [ -n "${_dbgnme}" -a \
                  -d "${LOGS_DIR}" ]; then
                 # Definition log
-                ${PRINTF_BIN} "#${ColorDebug}%s%s${ColorReset}\n" "${_dbfn}" "${_in}" 2>> "${LOG}-${_dbgnme}" >> "${LOG}-${_dbgnme}"
+                ${PRINTF_BIN} "#${ColorDebug}%s%s${ColorReset}\n${_permdbg}" "${_dbfn}" "${_in}" 2>> "${LOG}-${_dbgnme}" >> "${LOG}-${_dbgnme}"
             elif [ -z "${_dbgnme}" -a \
                    -d "${LOGS_DIR}" ]; then
                 # Main log
-                ${PRINTF_BIN} "#${ColorDebug}%s%s${ColorReset}\n" "${_dbfn}" "${_in}" 2>> "${LOG}" >> "${LOG}"
+                ${PRINTF_BIN} "#${ColorDebug}%s%s${ColorReset}\n${_permdbg}" "${_dbfn}" "${_in}" 2>> "${LOG}" >> "${LOG}"
             elif [ ! -d "${LOGS_DIR}" ]; then
                 # System logger fallback
                 ${LOGGER_BIN} "# λ ${ColorDebug}${_dbfn}${_in}${ColorReset}" 2>> "${LOG}"
@@ -47,12 +50,21 @@ debug () {
 
 
 warn () {
-    ${PRINTF_BIN} "${ColorYellow}%s${ColorReset}\n" "${@}"
+    if [ "${TTY}" = "YES" ]; then
+        ${PRINTF_BIN} "${REPLAY_PREVIOUS_LINE}${ColorYellow}%s${ColorReset}\n\n" "${@}"
+    else
+        ${PRINTF_BIN} "${ColorYellow}%s${ColorReset}\n" "${@}"
+    fi
 }
 
 
 note () {
-    ${PRINTF_BIN} "${ColorGreen}%s${ColorReset}\n" "${@}"
+    if [ "${TTY}" = "YES" ]; then
+        ${PRINTF_BIN} "${REPLAY_PREVIOUS_LINE}${ColorGreen}%s${ColorReset}\n" "${@}"
+    else
+        ${PRINTF_BIN} "${ColorGreen}%s${ColorReset}\n" "${@}"
+    fi
+}
 
 
 permnote () {
