@@ -24,7 +24,7 @@ enable_sofin_env () {
         note "Enabled Sofin environment, yet no SHELL_PID defined. Autoreload skipped."
     else
         note "Enabled Sofin environment. Reloading shell"
-        ${KILL_BIN} -SIGUSR2 "${SHELL_PID}" >/dev/null 2>&1
+        reload_zsh_shells
     fi
 }
 
@@ -36,7 +36,7 @@ disable_sofin_env () {
         note "Disabled Sofin environment, yet no SHELL_PID defined. Autoreload skipped."
     else
         note "Disabled Sofin environment. Reloading shell"
-        ${KILL_BIN} -SIGUSR2 "${SHELL_PID}" 2>/dev/null 2>&1
+        reload_zsh_shells
     fi
 }
 
