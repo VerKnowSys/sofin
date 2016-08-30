@@ -36,20 +36,21 @@ update_defs () {
 
 build_sofin_natives () {
     _okch="$(distn "${SUCCESS_CHAR}" ${ColorParams})"
-    note "Building.."
+    permnote "Building.."
     compiler_setup
     for _prov in ${SOFIN_PROVIDES}; do
         if [ -f "src/${_prov}.cc" ]; then
             run "${CXX_COMPILER_NAME} ${CXXFLAGS} ${LDFLAGS} -o bin/${_prov} src/${_prov}.cc" && \
-                note "  ${_okch} src/${_prov}.cc"
+                permnote "  ${_okch} src/${_prov}.cc"
         fi
     done
 }
 
 
 install_sofin_files () {
+    set -e
     _okch="$(distn "${SUCCESS_CHAR}" ${ColorParams})"
-    note "Installing.."
+    permnote "Installing.."
     if [ -n "${PREFIX}" ]; then
         for _a_destph in "${PREFIX}" "${PREFIX}etc" "${PREFIX}usr/bin"; do
             try "${MKDIR_BIN} -p ${_a_destph}"
@@ -63,15 +64,15 @@ install_sofin_files () {
             run "${RM_BIN} -f bin/${_prov}"
         fi
     done && \
-        note "  ${_okch} native utils"
+        permnote "  ${_okch} native utils"
 
     run "${CP_BIN} -vfR share/sofin ${PREFIX}usr/share/" && \
-        note "  ${_okch} facts and functions"
+        permnote "  ${_okch} facts and functions"
 
     run "${INSTALL_BIN} -v src/s.sh ${PREFIX}usr/bin/s" && \
-        note "  ${_okch} sofin launcher" && \
+        permnote "  ${_okch} sofin launcher" && \
             note "Sofin installed with version: $(distn "${SOFIN_VERSION}")"
 
-    note "Type: $(distn "s usage") for help."
-    note "Read: $(distn "https://bitbucket.org/verknowsys/sofin") for more details."
+    permnote "Type: $(distn "s usage") for help."
+    permnote "Read: $(distn "https://bitbucket.org/verknowsys/sofin") for more details."
 }
