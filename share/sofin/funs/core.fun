@@ -53,6 +53,14 @@ warn () {
 
 note () {
     ${PRINTF_BIN} "${ColorGreen}%s${ColorReset}\n" "${@}"
+
+
+permnote () {
+    if [ "${TTY}" = "YES" ]; then
+        ${PRINTF_BIN} "${REPLAY_PREVIOUS_LINE}${ColorGreen}%s${ColorReset}\n\n" "${@}"
+    else
+        ${PRINTF_BIN} "${ColorGreen}%s${ColorReset}\n" "${@}"
+    fi
 }
 
 
