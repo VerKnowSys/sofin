@@ -36,7 +36,7 @@ if [ -n "${SOFIN_COMMAND_ARG}" ]; then
 
 
         ver|version)
-            note "$(sofin_header)"
+            sofin_header
             ;;
 
 
