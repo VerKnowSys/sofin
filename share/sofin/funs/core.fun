@@ -3,6 +3,8 @@ debug () {
     _in=${@}
     if [ "${TTY}" = "YES" ]; then
         _permdbg="\n"
+    else
+        unset _permdbg
     fi
     if [ -n "${CAP_SYS_PRODUCTION}" ]; then
         if [ -n "${DEBUG}" ]; then
@@ -32,11 +34,11 @@ debug () {
             if [ -n "${_dbgnme}" -a \
                  -d "${LOGS_DIR}" ]; then
                 # Definition log
-                ${PRINTF_BIN} "#${ColorDebug}%s%s${ColorReset}\n${_permdbg}" "${_dbfn}" "${_in}" 2>> "${LOG}-${_dbgnme}" >> "${LOG}-${_dbgnme}"
+                ${PRINTF_BIN} "#${ColorDebug}%s%s${ColorReset}${_permdbg}" "${_dbfn}" "${_in}" 2>> "${LOG}-${_dbgnme}" >> "${LOG}-${_dbgnme}"
             elif [ -z "${_dbgnme}" -a \
                    -d "${LOGS_DIR}" ]; then
                 # Main log
-                ${PRINTF_BIN} "#${ColorDebug}%s%s${ColorReset}\n${_permdbg}" "${_dbfn}" "${_in}" 2>> "${LOG}" >> "${LOG}"
+                ${PRINTF_BIN} "#${ColorDebug}%s%s${ColorReset}${_permdbg}" "${_dbfn}" "${_in}" 2>> "${LOG}" >> "${LOG}"
             elif [ ! -d "${LOGS_DIR}" ]; then
                 # System logger fallback
                 ${LOGGER_BIN} "# λ ${ColorDebug}${_dbfn}${_in}${ColorReset}" 2>> "${LOG}"
