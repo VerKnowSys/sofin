@@ -71,11 +71,13 @@ if [ -n "${SOFIN_COMMAND_ARG}" ]; then
 
         enable)
             enable_sofin_env
+            finalize_shell_reload
             ;;
 
 
         disable)
             disable_sofin_env
+            finalize_shell_reload
             ;;
 
 
@@ -198,7 +200,7 @@ if [ -n "${SOFIN_COMMAND_ARG}" ]; then
 
 
         reload|rehash)
-            finalize
+            finalize_shell_reload
             ;;
 
 
