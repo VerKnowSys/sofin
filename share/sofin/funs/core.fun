@@ -104,7 +104,7 @@ run () {
     if [ -n "${_run_params}" ]; then
         touch_logsdir_and_logfile
         ${PRINTF_BIN} '%s\n' "${_run_params}" | eval "${MATCH_PRINT_STDOUT_GUARD}" && _run_shw_prgr=YES
-        debug "$(distd "$(${DATE_BIN} ${DEFAULT_DATE_TRYRUN_OPTS} 2>/dev/null)" ${ColorDarkgray}): $(distd "${RUN_CHAR}" ${ColorWhite}): $(distd "${_run_params}" ${ColorParams}) $(distd "[show-blueout:${_run_shw_prgr:-NO}]" ${ColorBlue})"
+        # debug "$(distd "$(${DATE_BIN} ${DEFAULT_DATE_TRYRUN_OPTS} 2>/dev/null)" ${ColorDarkgray}): $(distd "${RUN_CHAR}" ${ColorWhite}): $(distd "${_run_params}" ${ColorParams}) $(distd "[show-blueout:${_run_shw_prgr:-NO}]" ${ColorBlue})"
         if [ -z "${DEF_NAME}${DEF_POSTFIX}" ]; then
             if [ -z "${_run_shw_prgr}" ]; then
                 eval "PATH=${PATH}${GIT_EXPORTS} ${_run_params}" >> "${LOG}" 2>> "${LOG}"
@@ -137,8 +137,8 @@ try () {
     if [ -n "${_try_params}" ]; then
         touch_logsdir_and_logfile
         ${PRINTF_BIN} "${_try_params}\n" | eval "${MATCH_PRINT_STDOUT_GUARD}" && _show_prgrss=YES
-        _dt="$(distd "$(${DATE_BIN} ${DEFAULT_DATE_TRYRUN_OPTS} 2>/dev/null)" ${ColorDarkgray})"
-        debug "${_dt}: $(distd "${TRY_CHAR}" ${ColorWhite}) $(distd "${_try_params}" ${ColorParams}) $(distd "[${_show_prgrss:-NO}]" ${ColorBlue})"
+        # _dt="$(distd "$(${DATE_BIN} ${DEFAULT_DATE_TRYRUN_OPTS} 2>/dev/null)" ${ColorDarkgray})"
+        # debug "${_dt}: $(distd "${TRY_CHAR}" ${ColorWhite}) $(distd "${_try_params}" ${ColorParams}) $(distd "[${_show_prgrss:-NO}]" ${ColorBlue})"
         _try_aname="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
         if [ -z "${_try_aname}" ]; then
             if [ -z "${_show_prgrss}" ]; then
@@ -176,8 +176,8 @@ retry () {
     ${PRINTF_BIN} '%s\n' "${_targets}" 2>/dev/null | eval "${MATCH_PRINT_STDOUT_GUARD}" && _rtry_blue=YES
     while [ -n "${_ammo}" ]; do
         if [ -n "${_targets}" ]; then
-            _dt="$(distd "$(${DATE_BIN} ${DEFAULT_DATE_TRYRUN_OPTS} 2>/dev/null)" ${ColorDarkgray})"
-            debug "${_dt}: $(distd "${TRY_CHAR}${NOTE_CHAR}${RUN_CHAR}" ${ColorWhite}) $(distd "${_targets}" ${ColorParams}) $(distd "[${_show_prgrss:-NO}]" ${ColorBlue})"
+            # _dt="$(distd "$(${DATE_BIN} ${DEFAULT_DATE_TRYRUN_OPTS} 2>/dev/null)" ${ColorDarkgray})"
+            # debug "${_dt}: $(distd "${TRY_CHAR}${NOTE_CHAR}${RUN_CHAR}" ${ColorWhite}) $(distd "${_targets}" ${ColorParams}) $(distd "[${_show_prgrss:-NO}]" ${ColorBlue})"
             if [ -z "${_rtry_blue}" ]; then
                 eval "PATH=${DEFAULT_PATH}${GIT_EXPORTS} ${_targets}" >> "${LOG}" 2>> "${LOG}" && \
                     unset _ammo _targets && \
