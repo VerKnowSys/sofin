@@ -71,6 +71,11 @@ finalize () {
     restore_security_state
     finalize_afterbuild
     destroy_locks
+    finalize_shell_reload
+}
+
+
+finalize_shell_reload () {
     update_shell_vars
     reload_zsh_shells
     finalize_onquit
