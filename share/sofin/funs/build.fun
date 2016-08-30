@@ -499,7 +499,7 @@ process_flat () {
                 cd "${_pwd}"
 
                 note "   ${NOTE_CHAR} Configuring: $(distn "${_app_param}"), version: $(distn "${DEF_VERSION}")"
-                case "${DEF_CONFIGURE}" in
+                case "${DEF_CONFIGURE_METHOD}" in
 
                     ignore)
                         note "   ${NOTE_CHAR} Configuration skipped for definition: $(distn "${_app_param}")"
@@ -528,7 +528,7 @@ process_flat () {
                         ${MKDIR_BIN} -p build
                         _pwd="${_pwd}/build"
                         cd "${_pwd}"
-                        run "${DEF_CONFIGURE} ../ -LH -DCMAKE_INSTALL_RPATH=\"${_prefix}/lib;${_prefix}/libexec\" -DCMAKE_INSTALL_PREFIX=${_prefix} -DCMAKE_BUILD_TYPE=Release -DSYSCONFDIR=${SERVICE_DIR}/etc -DMAN_INSTALLDIR=${_prefix}/share/man -DDOCDIR=${_prefix}/share/doc -DJOB_POOL_COMPILE=${CPUS} -DJOB_POOL_LINK=${CPUS} -DCMAKE_C_FLAGS=\"${CFLAGS}\" -DCMAKE_CXX_FLAGS=\"${CXXFLAGS}\" ${DEF_CONFIGURE_ARGS} -G\"Unix Makefiles\""
+                        run "${DEF_CONFIGURE_METHOD} ../ -LH -DCMAKE_INSTALL_RPATH=\"${_prefix}/lib;${_prefix}/libexec\" -DCMAKE_INSTALL_PREFIX=${_prefix} -DCMAKE_BUILD_TYPE=Release -DSYSCONFDIR=${SERVICE_DIR}/etc -DMAN_INSTALLDIR=${_prefix}/share/man -DDOCDIR=${_prefix}/share/doc -DJOB_POOL_COMPILE=${CPUS} -DJOB_POOL_LINK=${CPUS} -DCMAKE_C_FLAGS=\"${CFLAGS}\" -DCMAKE_CXX_FLAGS=\"${CXXFLAGS}\" ${DEF_CONFIGURE_ARGS} -G\"Unix Makefiles\""
                         ;;
 
                     *)
@@ -539,23 +539,23 @@ process_flat () {
                         _addon="CFLAGS='${CFLAGS}' CXXFLAGS='${CXXFLAGS}' LDFLAGS='${LDFLAGS}'"
                         if [ "${SYSTEM_NAME}" = "Linux" ]; then
                             # NOTE: No /Services feature implemented for Linux.
-                            ${PRINTF_BIN} '%s\n' "${DEF_CONFIGURE}" | ${GREP_BIN} "configure" >/dev/null 2>&1
+                            ${PRINTF_BIN} '%s\n' "${DEF_CONFIGURE_METHOD}" | ${GREP_BIN} "configure" >/dev/null 2>&1
                             if [ "${?}" = "0" ]; then
                                 # NOTE: by defaultautoconf configure accepts influencing variables as configure script params
-                                try "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} ${_pic_optional} ${_addon}" || \
-                                try "${_addon} ${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} ${_pic_optional}" || \
-                                try "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} ${_addon}" || \
-                                run "${_addon} ${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix}"
+                                try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} ${_pic_optional} ${_addon}" || \
+                                try "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} ${_pic_optional}" || \
+                                try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} ${_addon}" || \
+                                run "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix}"
                             else
-                                try "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} ${_addon}" || \
-                                try "${_addon} ${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix}" || \
-                                try "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} ${_addon}" || \
-                                run "${_addon} ${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS}" # Trust definition
+                                try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} ${_addon}" || \
+                                try "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix}" || \
+                                try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} ${_addon}" || \
+                                run "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS}" # Trust definition
                             fi
                         else
-                            # do a simple check for "configure" in DEF_CONFIGURE definition
+                            # do a simple check for "configure" in DEF_CONFIGURE_METHOD definition
                             # this way we can tell if we want to put configure options as params
-                            ${PRINTF_BIN} '%s\n' "${DEF_CONFIGURE}" | ${GREP_BIN} "configure" >/dev/null 2>&1
+                            ${PRINTF_BIN} '%s\n' "${DEF_CONFIGURE_METHOD}" | ${GREP_BIN} "configure" >/dev/null 2>&1
                             if [ "${?}" = "0" ]; then
                                 # TODO: add --docdir=${_prefix}/docs
                                 # NOTE: By default try to configure software with these options:
@@ -565,28 +565,28 @@ process_flat () {
                                 #   --with-pic
                                 # OPTIMIZE: TODO: XXX: use ./configure --help | grep option to
                                 #      build configure options quickly
-                                try "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var --runstatedir=${SERVICE_DIR}/run ${_pic_optional} ${_addon}" || \
-                                try "${_addon} ${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var --runstatedir=${SERVICE_DIR}/run ${_pic_optional}" || \
-                                try "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var ${_pic_optional} ${_addon}" || \
-                                try "${_addon} ${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var ${_pic_optional}" || \
-                                try "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var ${_addon}" || \
-                                try "${_addon} ${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var" || \
-                                try "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc ${_pic_optional} ${_addon}" || \
-                                try "${_addon} ${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc ${_pic_optional}" || \
-                                try "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc ${_addon}" || \
-                                try "${_addon} ${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc" || \
-                                try "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} ${_pic_optional} ${_addon}" || \
-                                try "${_addon} ${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} ${_pic_optional}" || \
-                                try "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} ${_addon}" || \
-                                run "${_addon} ${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix}" # last two - only as a fallback
+                                try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var --runstatedir=${SERVICE_DIR}/run ${_pic_optional} ${_addon}" || \
+                                try "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var --runstatedir=${SERVICE_DIR}/run ${_pic_optional}" || \
+                                try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var ${_pic_optional} ${_addon}" || \
+                                try "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var ${_pic_optional}" || \
+                                try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var ${_addon}" || \
+                                try "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var" || \
+                                try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc ${_pic_optional} ${_addon}" || \
+                                try "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc ${_pic_optional}" || \
+                                try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc ${_addon}" || \
+                                try "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc" || \
+                                try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} ${_pic_optional} ${_addon}" || \
+                                try "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} ${_pic_optional}" || \
+                                try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} ${_addon}" || \
+                                run "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix}" # last two - only as a fallback
 
                             else # fallback again:
                                 # NOTE: First - try to specify GNU prefix,
                                 # then trust prefix given in software definition.
-                                try "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} ${_addon}" || \
-                                try "${_addon} ${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix}" || \
-                                try "${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS} ${_addon}" || \
-                                run "${_addon} ${DEF_CONFIGURE} ${DEF_CONFIGURE_ARGS}"
+                                try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} ${_addon}" || \
+                                try "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix}" || \
+                                try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} ${_addon}" || \
+                                run "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS}"
                             fi
                         fi
                         ;;
