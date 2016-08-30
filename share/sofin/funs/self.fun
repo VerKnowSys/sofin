@@ -74,5 +74,5 @@ install_sofin_files () {
             note "Sofin installed with version: $(distn "${SOFIN_VERSION}")"
 
     permnote "Type: $(distn "s usage") for help."
-    permnote "Read: $(distn "https://bitbucket.org/verknowsys/sofin") for more details."
+    note "Read: $(distn "https://bitbucket.org/verknowsys/sofin") for more details."
 }

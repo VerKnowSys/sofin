@@ -78,13 +78,13 @@ deploy_binbuild () {
     _dbbundles=${*}
     create_dirs
     load_defaults
-    permnote "Requested to build and deploy bundle(s): $(distn "${_dbbundles}")"
+    permnote "Requested deploy of bundles: $(distn "${_dbbundles}")"
     for _dbbundle in ${_dbbundles}; do
         USE_BINBUILD=NO
         build "${_dbbundle}"
     done
     push_binbuilds ${_dbbundles}
-    permnote "Deployed successfully: $(distn "${_dbbundles}")"
+    note "Bundles deployed successfully: $(distn "${_dbbundles}")"
     unset _dbbundles _dbbundle
 }
 
@@ -670,7 +670,6 @@ process_flat () {
             create_software_dir "${_prefix##*/}"
         fi
         _dis_def="${_prefix}/${_req_defname}${DEFAULT_INST_MARK_EXT}"
-        debug "Disabled requirement: $(distd "${_req_defname}"), writing '${DEFAULT_REQ_OS_PROVIDED}' to: $(distd "${_dis_def}")"
         run "${PRINTF_BIN} '%s' \"${DEFAULT_REQ_OS_PROVIDED}\" > ${_dis_def}"
     fi
     unset _current_branch _dis_def _req_defname _app_param _prefix _bundlnm
