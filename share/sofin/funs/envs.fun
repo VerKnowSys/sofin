@@ -57,7 +57,7 @@ compiler_setup () {
 
         Darwin)
             DEFAULT_COMPILER_FLAGS="${COMMON_COMPILER_FLAGS} -mmacosx-version-min=10.11 -arch=x86_64"
-            DEFAULT_LDFLAGS="${COMMON_LDFLAGS}"
+            DEFAULT_LDFLAGS="${COMMON_LDFLAGS} -arch x86_64"
             ;;
 
         Linux)
