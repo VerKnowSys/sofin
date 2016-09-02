@@ -645,7 +645,7 @@ process_flat () {
             debug "Cleaning man dir from previous dependencies, we want to install man pages that belong to LAST requirement which is app bundle itself"
             for place in man share/man share/info share/doc share/docs; do
                 if [ -e "${_prefix}/${place}" ]; then
-                    try "${FIND_BIN} ${_prefix}/${place} -delete"
+                    try "${RM_BIN} -rf '${_prefix}/${place}'"
                 fi
             done
 
