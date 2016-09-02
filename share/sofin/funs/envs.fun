@@ -234,10 +234,10 @@ compiler_setup () {
             if [ -x "/usr/bin/ld.lld" ]; then
                 DEFAULT_COMPILER_FLAGS="${DEFAULT_COMPILER_FLAGS} -fuse-ld=lld"
                 LD="/usr/bin/ld.lld"
-                NM="/Software/Lld/exports/llvm-nm"
-                AR="/Software/Lld/exports/llvm-ar"
-                AS="/Software/Lld/exports/llvm-as"
-                RANLIB="/Software/Lld/exports/llvm-ranlib"
+                NM="/usr/bin/nm"
+                AR="/usr/bin/ar"
+                AS="/usr/bin/as"
+                RANLIB="/usr/bin/ranlib"
 
                 debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "llvm-linker" ${ColorGreen})"
                 debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "gold-linker" ${ColorGray})"
