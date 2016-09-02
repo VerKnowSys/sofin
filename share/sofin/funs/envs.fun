@@ -177,6 +177,12 @@ compiler_setup () {
         fi
     fi
 
+    # TODO:
+    # Default Linker pick order:
+    # 1. LLVM Linker (ld.lld)
+    # 2. Gold Linker (ld.gold)
+    # 3. Legacy Linker (ld)
+
     # Golden linker support
     if [ -z "${DEF_NO_GOLDEN_LINKER}" -a \
          -x "${GOLD_BIN}" -a \
@@ -203,8 +209,6 @@ compiler_setup () {
                     if [ "${?}" != "0" ]; then
                         DEFAULT_COMPILER_FLAGS="${DEFAULT_COMPILER_FLAGS} -Wl,-fuse-ld=gold"
                         DEFAULT_LDFLAGS="${DEFAULT_LDFLAGS} -fuse-ld=gold"
-                    else
-                        DEFAULT_LDFLAGS="${DEFAULT_LDFLAGS}"
                     fi
                     CFLAGS="-I${PREFIX}/include ${DEF_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
                     CXXFLAGS="-I${PREFIX}/include ${DEF_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
@@ -217,22 +221,33 @@ compiler_setup () {
         debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "llvm-linker" ${ColorGray})"
         debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "gold-linker" ${ColorGreen})"
 
-    elif [ -z "${DEF_NO_LLVM_LINKER}" -a \
-           -x "/usr/bin/ld.lld" -a \
-           "${SYSTEM_NAME}" != "Darwin" ]; then
+    elif [ -z "${DEF_NO_LLVM_LINKER}" ]; then
+
         # LLVM linker support:
-        DEFAULT_COMPILER_FLAGS="${DEFAULT_COMPILER_FLAGS} -fuse-ld=lld"
+        if [ "${SYSTEM_NAME}" = "Darwin" ]; then
+            # NOTE: under Darwin we have to replace /usr/bin/ld with lld:
+            #   sudo mv /usr/bin/ld /usr/bin/ld.orig
+            #   sudo install `which lld` /usr/bin/ld
+            debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "llvm-linker" ${ColorGreen})"
+        else
+            if [ -x "/usr/bin/ld.lld" ]; then
+                DEFAULT_COMPILER_FLAGS="${DEFAULT_COMPILER_FLAGS} -fuse-ld=lld"
+                LD="/usr/bin/ld.lld"
+                NM="/Software/Lld/exports/llvm-nm"
+                AR="/Software/Lld/exports/llvm-ar"
+                AS="/Software/Lld/exports/llvm-as"
+                RANLIB="/Software/Lld/exports/llvm-ranlib"
+
+                debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "llvm-linker" ${ColorGreen})"
+                debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "gold-linker" ${ColorGray})"
+            else
+                debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "llvm-linker" ${ColorGray})"
+                debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "gold-linker" ${ColorGray})"
+            fi
+        fi
         CFLAGS="-I${PREFIX}/include ${DEF_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
         CXXFLAGS="-I${PREFIX}/include ${DEF_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
         LDFLAGS="-L${PREFIX}/lib ${DEF_LINKER_ARGS} ${DEFAULT_LDFLAGS}"
-        LD="/usr/bin/ld.lld"
-        NM="/Software/Lld/exports/llvm-nm"
-        AR="/Software/Lld/exports/llvm-ar"
-        AS="/Software/Lld/exports/llvm-as"
-        RANLIB="/Software/Lld/exports/llvm-ranlib"
-
-        debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "llvm-linker" ${ColorGreen})"
-        debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "gold-linker" ${ColorGray})"
     else
         # NOTE: fallback with reset to system defaults - usually regular linker:
         unset NM AR AS RANLIB LD
