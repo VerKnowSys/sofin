@@ -216,10 +216,8 @@ remove_bundles () {
     # first look for a list with that name:
     if [ -e "${DEFINITIONS_LISTS_DIR}${_bundle_nam}" ]; then
         _picked_bundles="$(${CAT_BIN} ${DEFINITIONS_LISTS_DIR}${_bundle_nam} 2>/dev/null | eval "${NEWLINES_TO_SPACES_GUARD}")"
-        debug "Removing list of bundles: $(distd "${_picked_bundles}")"
     else
         _picked_bundles="${_bundle_nam}"
-        debug "Removing bundles: $(distd "${_picked_bundles}")"
     fi
     if [ "${_bundle_nam}" != "${_bundle_name}" ]; then
         # Specified + - a wildcard
@@ -248,7 +246,6 @@ remove_bundles () {
                 debug "Removed bundle: $(distd "${_given_name}")"
 
             # if removing a single bundle, then look for alternatives. Otherwise, just remove bundle..
-            debug "_picked_bundles: ${_picked_bundles}, _given_name: ${_given_name}"
             if [ "${_picked_bundles}" = "${_given_name}" ]; then
                 debug "Looking for other installed versions of: $(distd "${_aname}"), that might be exported automatically.."
                 _inname="$(${PRINTF_BIN} '%s\n' "$(lowercase "${_given_name}")" | ${SED_BIN} 's/[0-9]*//g' 2>/dev/null)"
@@ -296,7 +293,6 @@ make_exports () {
         error "Second argument with $(diste "BundleName") is required!"
     fi
     for _bindir in "/bin/" "/sbin/" "/libexec/"; do
-        debug "Looking into bundle binary dir: $(distd "${SOFTWARE_DIR}${_bundle_name}${_bindir}")"
         if [ -e "${SOFTWARE_DIR}${_bundle_name}${_bindir}${_export_bin}" ]; then
             note "Exporting binary: $(distn "${SOFTWARE_DIR}${_bundle_name}${_bindir}${_export_bin}")"
             _cdir="$(${PWD_BIN} 2>/dev/null)"
