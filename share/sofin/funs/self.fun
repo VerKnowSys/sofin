@@ -20,11 +20,12 @@ load_requirements () {
 
 
 install_sofin () {
+    permnote "Installing Software Installer, version: $(distn "${SOFIN_VERSION}")"
     CAP_SYS_PRODUCTION=YES
-    compiler_setup
-    build_sofin_natives
-    install_sofin_files
-    update_env_files
+    compiler_setup && \
+        build_sofin_natives && \
+            install_sofin_files && \
+                note "Installation successful."
     update_system_shell_env_files
 }
 
@@ -37,7 +38,7 @@ update_defs () {
 
 build_sofin_natives () {
     _okch="$(distn "${SUCCESS_CHAR}" ${ColorParams})"
-    permnote "Building.."
+    permnote "Building native utils.."
     compiler_setup
     for _prov in ${SOFIN_PROVIDES}; do
         if [ -f "src/${_prov}.cc" ]; then
@@ -72,8 +73,8 @@ install_sofin_files () {
 
     run "${INSTALL_BIN} -v src/s.sh ${PREFIX}usr/bin/s" && \
         permnote "  ${_okch} sofin launcher" && \
-            note "Sofin installed with version: $(distn "${SOFIN_VERSION}")"
-
-    permnote "Type: $(distn "s usage") for help."
-    note "Read: $(distn "https://bitbucket.org/verknowsys/sofin") for more details."
+        permnote "Type: $(distn "s usage") for help." && \
+        note "Read: $(distn "https://bitbucket.org/verknowsys/sofin") for more details." && \
+            return 0
+    return 1
 }
