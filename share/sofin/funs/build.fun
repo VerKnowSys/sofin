@@ -309,9 +309,7 @@ build () {
 
     validate_pie_on_exports "${_build_list}"
 
-    note "Build successfull: $(distn "${_build_list}")"
     unset _build_list _bund_lcase _req_all _req
-
     env_reset
 }
 
