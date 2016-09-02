@@ -42,6 +42,7 @@ disable_sofin_env () {
 
 
 compiler_setup () {
+    # TODO: linker pick should be implemented via "capabilities"!
     debug "---------------- COMPILER FEATURES DUMP -----------------"
     debug "Listing compiler features for platform: $(distd "${SYSTEM_NAME}")"
     case "${SYSTEM_NAME}" in
