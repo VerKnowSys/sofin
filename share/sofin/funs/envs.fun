@@ -284,6 +284,8 @@ compiler_setup () {
     unset default_c default_cxx default_cpp
 
     export CFLAGS CXXFLAGS LDFLAGS LD AR AS NM CC CXX CPP RANLIB
+
+    return 0
 }
 
 
