@@ -31,4 +31,6 @@ GVR_BIN="/usr/bin/gvr"
 CPUS="$(${SYSCTL_BIN} -e kern.smp.cpus 2>/dev/null | ${CUT_BIN} -d'=' -f2 2>/dev/null)"
 ALL_CPUS="${CPUS:-${DEFAULT_CPUS}}"
 MAKE_OPTS="-s -j${CPUS:-${DEFAULT_CPUS}}"
-DEFAULT_STRIP_OPTS="${DEFAULT_STRIP_OPTS} --strip-debug"
+
+# *BSD specific strip utility options:
+DEFAULT_STRIP_OPTS="--strip-debug --strip-unneeded --preserve-dates"
