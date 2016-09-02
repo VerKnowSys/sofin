@@ -665,7 +665,7 @@ process_flat () {
             unset _cwd _addon
         fi
     else
-        note "   ${WARN_CHAR} Requirement: $(distn "${_req_defname}") is provided by base system or disabled for $(distn ${SYSTEM_NAME})."
+        permnote "   ${WARN_CHAR} Requirement: $(distn "${_req_defname}") is provided by base system or disabled for $(distn ${SYSTEM_NAME})."
         if [ ! -d "${_prefix}" ]; then # case when disabled requirement is first on list of dependencies
             create_software_dir "${_prefix##*/}"
         fi
