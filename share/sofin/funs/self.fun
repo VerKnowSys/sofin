@@ -25,6 +25,7 @@ install_sofin () {
     build_sofin_natives
     install_sofin_files
     update_env_files
+    update_system_shell_env_files
 }
 
 
