@@ -15,7 +15,9 @@ SOFIN_ARGS="$(${PRINTF_BIN} '%s\n' "${SOFIN_ARGS_FULL}" | ${CUT_BIN} -d' ' -f2- 
 SOFIN_PID="${SOFIN_PID:-$$}"
 
 
+env_pedantic
 env_reset
+
 if [ -n "${SOFIN_COMMAND_ARG}" ]; then
     case ${SOFIN_COMMAND_ARG} in
 

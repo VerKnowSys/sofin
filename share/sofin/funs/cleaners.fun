@@ -84,6 +84,7 @@ finalize_shell_reload () {
 
 finalize_onquit () {
     untrap_signals
+    env_forgivable
     summary
     # Bring back echo
     ${STTY_BIN} echo
