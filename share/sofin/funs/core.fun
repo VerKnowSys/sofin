@@ -90,9 +90,9 @@ error () {
     warn "  ${NOTE_CHAR}  Github: $(distw "${DEFAULT_ISSUE_REPORT_SITE_ALT}")"
     ${PRINTF_BIN} "\n"
     warn "$(fill "${SEPARATOR_CHAR}" 46)$(distw "  Daniel (dmilith) Dettlaff  ")$(fill "${SEPARATOR_CHAR}" 5)"
-    restore_security_state
     ${PRINTF_BIN} "\n"
     # TODO: add "history backtrace". Play with: fc -lnd -5, but separate sh/zsh history file should solve the problem
+    finalize_interrupt
     exit ${ERRORCODE_TASK_FAILURE}
 }
 
