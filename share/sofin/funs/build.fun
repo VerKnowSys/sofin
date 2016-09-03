@@ -295,9 +295,6 @@ build () {
                 fi
 
                 strip_bundle "${_bund_lcase}"
-                export_binaries "${_bund_lcase}"
-                after_export_callback
-                after_export_snapshot
             done
 
             track_useful_and_useless_files
@@ -307,6 +304,9 @@ build () {
         finalize_afterbuild "${_bund_name}"
     done
 
+    export_binaries "${_bund_lcase}"
+    after_export_callback
+    after_export_snapshot
     validate_pie_on_exports "${_build_list}"
 
     unset _build_list _bund_lcase _req_all _req
