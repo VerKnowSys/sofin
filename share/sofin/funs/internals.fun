@@ -93,14 +93,11 @@ get_shell_vars () {
     # PATH:
     _path="${DEFAULT_PATH}"
     gsv_int_path () {
-        for _app in ${1}*; do
-            _exp="${_app}/exports"
-            if [ -e "${_exp}" ]; then
-                _path="${_exp}:${_path}"
-            fi
+        for _exppart in $(${FIND_BIN} "${SOFTWARE_DIR%/}" -mindepth 2 -maxdepth 2 -name 'exports' -type d 2>/dev/null); do
+            _path="${_exppart}:${_path}"
         done
     }
-    gsv_int_path "${SOFTWARE_DIR}"
+    gsv_int_path
 
     # LDFLAGS, PKG_CONFIG_PATH:
     # _ldresult="/lib:/usr/lib"
