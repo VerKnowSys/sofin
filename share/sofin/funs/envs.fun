@@ -69,6 +69,15 @@ compiler_setup () {
         Darwin)
             DEFAULT_COMPILER_FLAGS="${COMMON_COMPILER_FLAGS} -mmacosx-version-min=10.11 -arch=x86_64"
             DEFAULT_LDFLAGS="${COMMON_LDFLAGS} -arch x86_64"
+
+            # XQuartz support to make things easier:
+            if [ -d "/opt/X11/lib" -a \
+                 -d "/opt/X11/include" ]; then
+                 debug "XQuartz /opt prefix detected. Appending to compiler environment.."
+                 DEFAULT_COMPILER_FLAGS="${DEFAULT_COMPILER_FLAGS} -I/opt/X11/include"
+                 DEFAULT_LDFLAGS="${DEFAULT_LDFLAGS} -L/opt/X11/lib"
+            fi
+
             # NOTE: So if Lld is installed, and both /Software/Lld/exports/ld and
             #       /usr/bin/ld are same files => We use LLVM lld linker by default:
             if [ "${LD_BIN}" = "${LLD_BIN}" -a \
