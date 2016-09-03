@@ -61,9 +61,6 @@ DEFAULT_ID_USER_NAME_OPTS="-un"
 DEFAULT_DATE_TS_OPTS="+%s"
 DEFAULT_DATE_TRYRUN_OPTS="+%F-%H%M%S"
 
-# Default options of "strip" utility:
-DEFAULT_STRIP_OPTS="--strip-debug --strip-unneeded --preserve-dates"
-
 # Security related values:
 PIE_TYPE_ENTRY="LSB shared object"
 
