@@ -541,7 +541,7 @@ process_flat () {
                         _addon="CFLAGS='${CFLAGS}' CXXFLAGS='${CXXFLAGS}' LDFLAGS='${LDFLAGS}'"
                         if [ "${SYSTEM_NAME}" = "Linux" ]; then
                             # NOTE: No /Services feature implemented for Linux.
-                            ${PRINTF_BIN} '%s\n' "${DEF_CONFIGURE_METHOD}" | ${GREP_BIN} "configure" >/dev/null 2>&1
+                            try "${PRINTF_BIN} '%s\n' \"${DEF_CONFIGURE_METHOD}\" | ${GREP_BIN} \"configure\" >/dev/null 2>&1"
                             if [ "${?}" = "0" ]; then
                                 # NOTE: by defaultautoconf configure accepts influencing variables as configure script params
                                 try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} ${_pic_optional} ${_addon}" || \
@@ -557,7 +557,7 @@ process_flat () {
                         else
                             # do a simple check for "configure" in DEF_CONFIGURE_METHOD definition
                             # this way we can tell if we want to put configure options as params
-                            ${PRINTF_BIN} '%s\n' "${DEF_CONFIGURE_METHOD}" | ${GREP_BIN} "configure" >/dev/null 2>&1
+                            try "${PRINTF_BIN} '%s\n' \"${DEF_CONFIGURE_METHOD}\" | ${GREP_BIN} \"configure\" >/dev/null 2>&1"
                             if [ "${?}" = "0" ]; then
                                 # TODO: add --docdir=${_prefix}/docs
                                 # NOTE: By default try to configure software with these options:
