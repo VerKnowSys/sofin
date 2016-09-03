@@ -118,6 +118,33 @@ determine_system_capabilites () {
         unset CAP_SYS_BUILDHOST
     fi
 
+    # Detect available linkers:
+    unset CAP_SYS_COMPILER_FLAGS CAP_SYS_LLVM_LD CAP_SYS_GOLD_LD CAP_SYS_FALLBACK_LD
+
+    # NOTE: Default Linker pick/use order:
+    # 1. LLVM Linker (ld.lld)
+    # 2. Gold Linker (ld.gold)
+    # 3. Legacy Linker (ld)
+    #
+    if [ -x "${GOLD_BIN}" -a \
+         -x "${GOLD_SO}" ]; then
+        unset CAP_SYS_LLVM_LD
+        CAP_SYS_GOLD_LD=YES
+        CAP_SYS_COMPILER_FLAGS="-fuse-ld=gold"
+    fi
+    if [ -x "${LLD_BIN}" ]; then
+        unset CAP_SYS_GOLD_LD
+        CAP_SYS_LLVM_LD=YES
+        CAP_SYS_COMPILER_FLAGS="-fuse-ld=lld"
+    fi
+
+    # Darwin is an "UNIX unicorn".. therefore it requires special threatment:
+    if [ "Darwin" = "${SYSTEM_NAME}" ]; then
+        # NOTE: Under Darwin we have to replace original linker with LLVM one.
+        #       On this system it has to be: /usr/bin/ld
+        unset CAP_SYS_LLVM_LD CAP_SYS_GOLD_LD CAP_SYS_COMPILER_FLAGS
+    fi
+
     # core functions will use production mode by default for performance
     if [ -z "${CAP_SYS_PRODUCTION}" ]; then
         if [ -d "share/sofin/facts/" -a \
