@@ -63,8 +63,6 @@ LOGGER_BIN="/usr/bin/logger"
 RSYNC_BIN="/usr/bin/rsync"
 TIME_BIN="/usr/bin/time"
 YES_BIN="/usr/bin/yes"
-GOLD_BIN="/usr/bin/ld.gold"
-GOLD_SO="/usr/lib/LLVMgold.so" # Golden linker specific so.
 PGREP_BIN="/bin/pgrep"
 ENV_BIN="/usr/bin/env"
 REV_BIN="/usr/bin/rev"
@@ -75,6 +73,8 @@ FILE_BIN="/usr/bin/file"
 READLINK_BIN="/usr/bin/readlink"
 RANLIB_BIN="/usr/bin/ranlib"
 STTY_BIN="/bin/stty"
+LD_BIN="/usr/bin/ld" # Fallback linker that actually has to be present on build host
+GOLD_SO="/usr/lib/LLVMgold.so" # Golden linker specific library
 
 # Pick best utilities available:
 if [ -f "${DEFAULT_FACTS_DIR}alternatives.fact" ]; then
