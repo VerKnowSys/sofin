@@ -69,6 +69,15 @@ compiler_setup () {
         Darwin)
             DEFAULT_COMPILER_FLAGS="${COMMON_COMPILER_FLAGS} -mmacosx-version-min=10.11 -arch=x86_64"
             DEFAULT_LDFLAGS="${COMMON_LDFLAGS} -arch x86_64"
+            # NOTE: So if Lld is installed, and both /Software/Lld/exports/ld and
+            #       /usr/bin/ld are same files => We use LLVM lld linker by default:
+            if [ "${LD_BIN}" = "${LLD_BIN}" -a \
+                 "$(file_checksum "${LD_BIN}")" = "$(file_checksum "${LLD_BIN}")" ]; then
+                debug "Checksum matches LLVM linker - looks like Linker override under Darwin!"
+                CAP_SYS_LLVM_LD=YES
+            else
+                debug "Falling to system linker for Darwin!"
+            fi
             ;;
 
         Linux)
