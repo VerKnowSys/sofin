@@ -475,7 +475,7 @@ track_useful_and_useless_files () {
     if [ "${DEF_CLEAN_USELESS}" = "YES" ]; then
         unset _fordel
         # we shall clean the bundle, from useless files..
-        if [ -n "${PREFIX}" ]; then
+        if [ -d "${PREFIX}" ]; then
             # step 0: clean defaults side DEF_DEFAULT_USELESS entries only if DEF_USEFUL is empty
             if [ -n "${DEF_DEFAULT_USELESS}" -a \
                  -z "${DEF_USEFUL}" ]; then
@@ -579,7 +579,7 @@ conflict_resolve () {
             _crfind_s="$(${FIND_BIN} ${SOFTWARE_DIR} -maxdepth 1 -type d -iname "${_cr_app}*" 2>/dev/null)"
             for _cr_name in ${_crfind_s}; do
                 _crn="${_cr_name##*/}"
-                if [ -e "${_cr_name}/exports" \
+                if [ -d "${_cr_name}/exports" \
                      -a "${_crn}" != "${DEF_NAME}" \
                      -a "${_crn}" != "${DEF_NAME}${DEF_POSTFIX}" \
                 ]; then
