@@ -123,6 +123,7 @@ diste () {
 
 run () {
     _run_params="${@}"
+    env_forgivable
     if [ -n "${_run_params}" ]; then
         touch_logsdir_and_logfile
         ${PRINTF_BIN} '%s\n' "${_run_params}" | eval "${MATCH_PRINT_STDOUT_GUARD}" && _run_shw_prgr=YES
