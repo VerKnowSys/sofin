@@ -298,7 +298,6 @@ build () {
             done
 
             track_useful_and_useless_files
-            create_apple_bundle_if_necessary
         fi
 
         finalize_afterbuild "${_bund_name}"
@@ -308,6 +307,9 @@ build () {
     after_export_callback
     after_export_snapshot
     validate_pie_on_exports "${_build_list}"
+
+    # TODO: XXX: requires some more <3:
+    #            create_apple_bundle_if_necessary
 
     unset _build_list _bund_lcase _req_all _req
     env_reset

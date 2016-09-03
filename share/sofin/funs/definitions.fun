@@ -370,36 +370,36 @@ wipe_remote_archives () {
 }
 
 
-create_apple_bundle_if_necessary () { # XXXXXX
-    if [ -n "${DEF_APPLE_BUNDLE}" -a \
-         "Darwin" = "${SYSTEM_NAME}" ]; then
-        _aname="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
-        DEF_NAME="$(${PRINTF_BIN} '%s' "${DEF_NAME}" | ${CUT_BIN} -c1 2>/dev/null | ${TR_BIN} '[a-z]' '[A-Z]' 2>/dev/null)$(${PRINTF_BIN} '%s' "${DEF_NAME}" | ${SED_BIN} 's/^[a-zA-Z]//' 2>/dev/null)"
-        DEF_BUNDLE_NAME="${PREFIX}.app"
-        note "Creating Apple bundle: $(distn "${DEF_NAME}") in: $(distn "${DEF_BUNDLE_NAME}")"
-        ${MKDIR_BIN} -p "${DEF_BUNDLE_NAME}/libs" "${DEF_BUNDLE_NAME}/Contents" "${DEF_BUNDLE_NAME}/Contents/Resources/${_aname}" "${DEF_BUNDLE_NAME}/exports" "${DEF_BUNDLE_NAME}/share"
-        try "${CP_BIN} -R ${PREFIX}/${DEF_NAME}.app/Contents/* ${DEF_BUNDLE_NAME}/Contents/"
-        try "${CP_BIN} -R ${PREFIX}/bin/${_aname} ${DEF_BUNDLE_NAME}/exports/"
-        for lib in $(${FIND_BIN} "${PREFIX}" -name '*.dylib' -type f 2>/dev/null); do
-            try "${CP_BIN} -vf ${lib} ${DEF_BUNDLE_NAME}/libs/"
-        done
+# create_apple_bundle_if_necessary () { # XXXXXX
+#     if [ -n "${DEF_APPLE_BUNDLE}" -a \
+#          "Darwin" = "${SYSTEM_NAME}" ]; then
+#         _aname="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
+#         DEF_NAME="$(${PRINTF_BIN} '%s' "${DEF_NAME}" | ${CUT_BIN} -c1 2>/dev/null | ${TR_BIN} '[a-z]' '[A-Z]' 2>/dev/null)$(${PRINTF_BIN} '%s' "${DEF_NAME}" | ${SED_BIN} 's/^[a-zA-Z]//' 2>/dev/null)"
+#         DEF_BUNDLE_NAME="${PREFIX}.app"
+#         note "Creating Apple bundle: $(distn "${DEF_NAME}") in: $(distn "${DEF_BUNDLE_NAME}")"
+#         ${MKDIR_BIN} -p "${DEF_BUNDLE_NAME}/libs" "${DEF_BUNDLE_NAME}/Contents" "${DEF_BUNDLE_NAME}/Contents/Resources/${_aname}" "${DEF_BUNDLE_NAME}/exports" "${DEF_BUNDLE_NAME}/share"
+#         try "${CP_BIN} -R ${PREFIX}/${DEF_NAME}.app/Contents/* ${DEF_BUNDLE_NAME}/Contents/"
+#         try "${CP_BIN} -R ${PREFIX}/bin/${_aname} ${DEF_BUNDLE_NAME}/exports/"
+#         for lib in $(${FIND_BIN} "${PREFIX}" -name '*.dylib' -type f 2>/dev/null); do
+#             try "${CP_BIN} -vf ${lib} ${DEF_BUNDLE_NAME}/libs/"
+#         done
 
-        # if symlink exists, remove it.
-        try "${RM_BIN} -vf ${DEF_BUNDLE_NAME}/lib"
-        try "${LN_BIN} -vs ${DEF_BUNDLE_NAME}/libs ${DEF_BUNDLE_NAME}/lib"
+#         # if symlink exists, remove it.
+#         try "${RM_BIN} -vf ${DEF_BUNDLE_NAME}/lib"
+#         try "${LN_BIN} -vs ${DEF_BUNDLE_NAME}/libs ${DEF_BUNDLE_NAME}/lib"
 
-        # move data, and support files from origin:
-        try "${CP_BIN} -vR ${PREFIX}/share/${_aname} ${DEF_BUNDLE_NAME}/share/"
-        try "${CP_BIN} -vR ${PREFIX}/lib/${_aname} ${DEF_BUNDLE_NAME}/libs/"
+#         # move data, and support files from origin:
+#         try "${CP_BIN} -vR ${PREFIX}/share/${_aname} ${DEF_BUNDLE_NAME}/share/"
+#         try "${CP_BIN} -vR ${PREFIX}/lib/${_aname} ${DEF_BUNDLE_NAME}/libs/"
 
-        cd "${DEF_BUNDLE_NAME}/Contents"
-        try "${TEST_BIN} -L MacOS || ${LN_BIN} -s ../exports MacOS"
-        debug "Creating relative libraries search path"
-        cd "${DEF_BUNDLE_NAME}"
-        note "Processing exported binary: $(distn "${i}")" # XXX: i?
-        try "${SOFIN_LIBBUNDLE_BIN} -x ${DEF_BUNDLE_NAME}/Contents/MacOS/${_aname}"
-    fi
-}
+#         cd "${DEF_BUNDLE_NAME}/Contents"
+#         try "${TEST_BIN} -L MacOS || ${LN_BIN} -s ../exports MacOS"
+#         debug "Creating relative libraries search path"
+#         cd "${DEF_BUNDLE_NAME}"
+#         note "Processing exported binary: $(distn "${i}")" # XXX: i?
+#         try "${SOFIN_LIBBUNDLE_BIN} -x ${DEF_BUNDLE_NAME}/Contents/MacOS/${_aname}"
+#     fi
+# }
 
 
 strip_bundle () {
