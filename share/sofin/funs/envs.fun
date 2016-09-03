@@ -178,16 +178,43 @@ compiler_setup () {
         fi
     fi
 
-    # TODO:
-    # Default Linker pick order:
+    # NOTE: Default Linker pick order:
     # 1. LLVM Linker (ld.lld)
     # 2. Gold Linker (ld.gold)
     # 3. Legacy Linker (ld)
+    if [ -z "${DEF_NO_LLVM_LINKER}" ]; then
 
-    # Golden linker support
-    if [ -z "${DEF_NO_GOLDEN_LINKER}" -a \
+        # Support of default: LLVM linker:
+        if [ "${SYSTEM_NAME}" = "Darwin" ]; then
+            # NOTE: under Darwin we have to replace /usr/bin/ld with lld:
+            #   sudo mv /usr/bin/ld /usr/bin/ld.orig
+            #   sudo install `which lld` /usr/bin/ld
+            debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "llvm-linker" ${ColorGreen})"
+        else
+            if [ -x "/usr/bin/ld.lld" ]; then
+                DEFAULT_COMPILER_FLAGS="${DEFAULT_COMPILER_FLAGS} -fuse-ld=lld"
+                LD="/usr/bin/ld.lld"
+                NM="/usr/bin/nm"
+                AR="/usr/bin/ar"
+                AS="/usr/bin/as"
+                RANLIB="/usr/bin/ranlib"
+
+                debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "llvm-linker" ${ColorGreen})"
+                debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "gold-linker" ${ColorGray})"
+            else
+                debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "llvm-linker" ${ColorGray})"
+                debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "gold-linker" ${ColorGray})"
+            fi
+        fi
+        CFLAGS="-I${PREFIX}/include ${DEF_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
+        CXXFLAGS="-I${PREFIX}/include ${DEF_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
+        LDFLAGS="-L${PREFIX}/lib ${DEF_LINKER_ARGS} ${DEFAULT_LDFLAGS}"
+
+    elif [ -z "${DEF_NO_GOLDEN_LINKER}" -a \
          -x "${GOLD_BIN}" -a \
          -f "${GOLD_SO}" ]; then
+
+        # Golden linker support:
         case "${SYSTEM_NAME}" in
             FreeBSD|Minix)
                 DEFAULT_COMPILER_FLAGS="${DEFAULT_COMPILER_FLAGS} -Wl,-fuse-ld=gold"
@@ -195,8 +222,8 @@ compiler_setup () {
                 CFLAGS="-I${PREFIX}/include ${DEF_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
                 CXXFLAGS="-I${PREFIX}/include ${DEF_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
                 LDFLAGS="-L${PREFIX}/lib ${DEF_LINKER_ARGS} ${DEFAULT_LDFLAGS}"
-                LD="/usr/bin/ld --plugin ${GOLD_SO}"
-                NM="/usr/bin/nm --plugin ${GOLD_SO}"
+                LD="/usr/bin/ld.gold --plugin ${GOLD_SO}"
+                NM="/Software/Gold/${SYSTEM_ARCH}-unknown-$(lowercase "${SYSTEM_NAME}")${SYSTEM_VERSION}/bin/nm --plugin ${GOLD_SO}"
                 ;;
 
             Darwin)
@@ -222,33 +249,6 @@ compiler_setup () {
         debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "llvm-linker" ${ColorGray})"
         debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "gold-linker" ${ColorGreen})"
 
-    elif [ -z "${DEF_NO_LLVM_LINKER}" ]; then
-
-        # LLVM linker support:
-        if [ "${SYSTEM_NAME}" = "Darwin" ]; then
-            # NOTE: under Darwin we have to replace /usr/bin/ld with lld:
-            #   sudo mv /usr/bin/ld /usr/bin/ld.orig
-            #   sudo install `which lld` /usr/bin/ld
-            debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "llvm-linker" ${ColorGreen})"
-        else
-            if [ -x "/usr/bin/ld.lld" ]; then
-                DEFAULT_COMPILER_FLAGS="${DEFAULT_COMPILER_FLAGS} -fuse-ld=lld"
-                LD="/usr/bin/ld.lld"
-                NM="/usr/bin/nm"
-                AR="/usr/bin/ar"
-                AS="/usr/bin/as"
-                RANLIB="/usr/bin/ranlib"
-
-                debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "llvm-linker" ${ColorGreen})"
-                debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "gold-linker" ${ColorGray})"
-            else
-                debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "llvm-linker" ${ColorGray})"
-                debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "gold-linker" ${ColorGray})"
-            fi
-        fi
-        CFLAGS="-I${PREFIX}/include ${DEF_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
-        CXXFLAGS="-I${PREFIX}/include ${DEF_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
-        LDFLAGS="-L${PREFIX}/lib ${DEF_LINKER_ARGS} ${DEFAULT_LDFLAGS}"
     else
         # NOTE: fallback with reset to system defaults - usually regular linker:
         unset NM AR AS RANLIB LD
