@@ -247,7 +247,7 @@ remove_bundles () {
 
             # if removing a single bundle, then look for alternatives. Otherwise, just remove bundle..
             if [ "${_picked_bundles}" = "${_given_name}" ]; then
-                permnote "Looking for other installed versions of: $(distd "${_aname}"), that might be exported automatically.."
+                permnote "Looking for other installed versions of: $(distn "${_aname}"), that might be exported automatically.."
                 _inname="$(${PRINTF_BIN} '%s\n' "$(lowercase "${_given_name}")" | ${SED_BIN} 's/[0-9]*//g' 2>/dev/null)"
                 _alternative="$(${FIND_BIN} ${SOFTWARE_DIR} -mindepth 1 -maxdepth 1 -type d -iname "${_inname}*" -not -name "${_given_name}" 2>/dev/null | ${SED_BIN} 's/^.*\///g' 2>/dev/null | ${HEAD_BIN} -n1 2>/dev/null)"
             fi
