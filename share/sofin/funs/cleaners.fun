@@ -116,10 +116,13 @@ finalize_afterbuild () {
 
 remove_useless () {
     _rufiles=${@}
+    env_forgivable
     if [ -n "${_rufiles}" ]; then
         try "${RM_BIN} -rf ${_rufiles}" && \
-            return 0
-        debug "Failed to remove useless files: '$(distd "${_rufiles}")'"
+            debug "Useless files wiped out: $(distd "${_rufiles}")" && \
+                env_pedantic && \
+                return 0
     fi
+    debug "Failure removing useless files: '$(distd "${_rufiles}")'"
     return 1
 }
