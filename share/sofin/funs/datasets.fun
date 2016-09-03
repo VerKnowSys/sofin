@@ -281,9 +281,9 @@ create_software_dir () {
     fi
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
         _dsname="${DEFAULT_ZPOOL}${SOFTWARE_DIR}${USER}/${_dset_create}"
-        debug "Creating ZFS software-dataset: $(distd "${_dsname}")"
         try "${ZFS_BIN} list -H -t filesystem '${_dsname}'" || \
-            receive_origin "${_dsname}" "Software" "user"
+            receive_origin "${_dsname}" "Software" "user" && \
+                debug "Created ZFS software-dataset: $(distd "${_dsname}")"
         try "${ZFS_BIN} mount '${_dsname}'"
         unset _dsname
     else
@@ -302,9 +302,9 @@ destroy_software_dir () {
     fi
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
         _dsname="${DEFAULT_ZPOOL}${SOFTWARE_DIR}${USER}/${_dset_destroy}"
-        debug "Destroying software-dataset: $(distd "${_dsname}")"
         try "${ZFS_BIN} umount -f '${_dsname}'"
-        try "${ZFS_BIN} destroy -fr '${_dsname}'"
+        try "${ZFS_BIN} destroy -fr '${_dsname}'" && \
+            debug "Destroyed software-dataset: $(distd "${_dsname}")"
         try "${RM_BIN} -rf '${SOFTWARE_DIR}${_dset_destroy}'"
         unset _dsname
     else
@@ -326,8 +326,9 @@ create_builddir () {
             error "Second argument with $(diste "dataset-checksum") is required!"
         fi
         _dset="${DEFAULT_ZPOOL}${SOFTWARE_DIR}${USER}/${_cb_bundle_name}/${DEFAULT_SRC_EXT}${_dset_namesum}"
-        debug "Creating ZFS build-dataset: $(distd "${_dset}")"
-        try "${ZFS_BIN} create -p -o mountpoint=${SOFTWARE_DIR}${_cb_bundle_name}/${DEFAULT_SRC_EXT}${_dset_namesum} '${_dset}'"
+        try "${ZFS_BIN} create -p -o mountpoint=${SOFTWARE_DIR}${_cb_bundle_name}/${DEFAULT_SRC_EXT}${_dset_namesum} '${_dset}'" && \
+            debug "Created ZFS build-dataset: $(distd "${_dset}")"
+
         try "${ZFS_BIN} mount '${_dset}'"
         unset _dset _dset_namesum
     else
