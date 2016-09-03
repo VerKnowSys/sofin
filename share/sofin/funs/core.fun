@@ -274,16 +274,16 @@ noop_handler () {
 }
 
 
-handle_error () {
-    debug "ErrorLine: ${ColorViolet}${1}"
-}
+# handle_error () {
+#     debug "ErrorLine: ${ColorViolet}${1}"
+# }
 
 
 trap_signals () {
     trap 'cleanup_handler' EXIT
-    if [ "YES" = "${CAP_TERM_BASH}" ]; then
-        trap 'handle_error $LINENO' ERR
-    fi
+    # if [ "YES" = "${CAP_TERM_BASH}" ]; then
+    #     trap 'handle_error $LINENO' ERR
+    # fi
     trap 'interrupt_handler' INT
     trap 'terminate_handler' TERM
     trap 'noop_handler' USR2 # This signal is used to "reload shell"-feature. Sofin should ignore it
