@@ -17,6 +17,16 @@ env_reset () {
 }
 
 
+env_pedantic () {
+    set -e
+}
+
+
+env_forgivable () {
+    set +e
+}
+
+
 enable_sofin_env () {
     try "${RM_BIN} -f ${SOFIN_ENV_DISABLED_INDICATOR_FILE}" && \
         update_shell_vars
