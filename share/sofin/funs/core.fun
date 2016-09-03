@@ -156,6 +156,7 @@ run () {
 
 try () {
     _try_params="${@}"
+    env_forgivable
     if [ -n "${_try_params}" ]; then
         touch_logsdir_and_logfile
         ${PRINTF_BIN} "${_try_params}\n" | eval "${MATCH_PRINT_STDOUT_GUARD}" && _show_prgrss=YES
@@ -165,27 +166,33 @@ try () {
         if [ -z "${_try_aname}" ]; then
             if [ -z "${_show_prgrss}" ]; then
                 eval "PATH=${PATH}${GIT_EXPORTS} ${_try_params}" >> "${LOG}" 2>> "${LOG}" && \
+                    env_pedantic && \
                     return 0
             else
                 # show progress on stderr
                 ${PRINTF_BIN} "${ColorBlue}"
                 eval "PATH=${PATH}${GIT_EXPORTS} ${_try_params}" >> "${LOG}" && \
+                    env_pedantic && \
                     return 0
             fi
         else
             if [ -z "${_show_prgrss}" ]; then
                 eval "PATH=${PATH}${GIT_EXPORTS} ${_try_params}" >> "${LOG}-${_try_aname}" 2>> "${LOG}-${_try_aname}" && \
+                    env_pedantic && \
                     return 0
             else
                 ${PRINTF_BIN} "${ColorBlue}"
                 eval "PATH=${PATH}${GIT_EXPORTS} ${_try_params}" >> "${LOG}-${_try_aname}" && \
+                    env_pedantic && \
                     return 0
             fi
         fi
     else
+        env_pedantic
         error "Specified an empty command to try()!"
     fi
     unset _dt _try_aname _try_params
+    env_pedantic
     return 1
 }
 
@@ -193,6 +200,7 @@ try () {
 retry () {
     _targets=${*}
     _ammo="OOO"
+    env_forgivable
     touch_logsdir_and_logfile
     # check for commands that puts something important/intersting on stdout
     ${PRINTF_BIN} '%s\n' "${_targets}" 2>/dev/null | eval "${MATCH_PRINT_STDOUT_GUARD}" && _rtry_blue=YES
@@ -203,14 +211,17 @@ retry () {
             if [ -z "${_rtry_blue}" ]; then
                 eval "PATH=${DEFAULT_PATH}${GIT_EXPORTS} ${_targets}" >> "${LOG}" 2>> "${LOG}" && \
                     unset _ammo _targets && \
+                        env_pedantic && \
                         return 0
             else
                 ${PRINTF_BIN} "${ColorBlue}"
                 eval "PATH=${DEFAULT_PATH}${GIT_EXPORTS} ${_targets}" >> "${LOG}" && \
                     unset _ammo _targets && \
+                        env_pedantic && \
                         return 0
             fi
         else
+            env_pedantic
             error "Given an empty command to evaluate!"
         fi
         _ammo="$(${PRINTF_BIN} '%s\n' "${_ammo}" 2>/dev/null | ${SED_BIN} 's/O//' 2>/dev/null)"
@@ -218,6 +229,7 @@ retry () {
     done
     debug "All available ammo exhausted to invoke a command: $(distd "${_targets}")"
     unset _ammo _targets _rtry_blue
+    env_pedantic
     return 1
 }
 
