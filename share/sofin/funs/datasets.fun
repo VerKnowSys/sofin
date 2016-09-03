@@ -117,13 +117,13 @@ build_service_dataset () {
                     try "${ZFS_BIN} snapshot '${_full_dataset_name}@${ORIGIN_ZFS_SNAP_NAME}'"
                     try "${ZFS_BIN} umount -f '${_full_dataset_name}'"
                     run "${ZFS_BIN} send ${ZFS_SEND_OPTS} '${_full_dataset_name}@${ORIGIN_ZFS_SNAP_NAME}' | ${XZ_BIN} ${DEFAULT_XZ_OPTS} > ${FILE_CACHE_DIR}${_ps_snap_file}"
-                    try "${ZFS_BIN} mount '${_full_dataset_name}'"
+                    run "${ZFS_BIN} mount '${_full_dataset_name}'"
                 else
                     run "${ZFS_BIN} create -p -o mountpoint=${SERVICES_DIR}${_ps_elem} '${_full_dataset_name}'"
                     try "${ZFS_BIN} snapshot '${_full_dataset_name}@${ORIGIN_ZFS_SNAP_NAME}'"
                     try "${ZFS_BIN} umount -f '${_full_dataset_name}'"
                     run "${ZFS_BIN} send ${ZFS_SEND_OPTS} '${_full_dataset_name}@${ORIGIN_ZFS_SNAP_NAME}' | ${XZ_BIN} ${DEFAULT_XZ_OPTS} > ${FILE_CACHE_DIR}${_ps_snap_file}"
-                    try "${ZFS_BIN} mount '${_full_dataset_name}'"
+                    run "${ZFS_BIN} mount '${_full_dataset_name}'"
                 fi
                 _snap_size="$(file_size "${FILE_CACHE_DIR}${_ps_snap_file}")"
                 if [ "${_snap_size}" = "0" ]; then
