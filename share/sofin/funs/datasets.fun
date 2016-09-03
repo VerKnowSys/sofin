@@ -114,14 +114,14 @@ build_service_dataset () {
                 try "${ZFS_BIN} list -H -t filesystem '${_full_dataset_name}'"
                 if [ "${?}" = "0" ]; then
                     note "Preparing to send service dataset: $(distn "${_full_dataset_name}"), for bundle: $(distn "${_ps_elem}")"
-                    try "${ZFS_BIN} umount -f '${_full_dataset_name}'"
                     try "${ZFS_BIN} snapshot '${_full_dataset_name}@${ORIGIN_ZFS_SNAP_NAME}'"
+                    try "${ZFS_BIN} umount -f '${_full_dataset_name}'"
                     run "${ZFS_BIN} send ${ZFS_SEND_OPTS} '${_full_dataset_name}@${ORIGIN_ZFS_SNAP_NAME}' | ${XZ_BIN} ${DEFAULT_XZ_OPTS} > ${FILE_CACHE_DIR}${_ps_snap_file}"
                     try "${ZFS_BIN} mount '${_full_dataset_name}'"
                 else
                     run "${ZFS_BIN} create -p -o mountpoint=${SERVICES_DIR}${_ps_elem} '${_full_dataset_name}'"
-                    try "${ZFS_BIN} umount -f '${_full_dataset_name}'"
                     try "${ZFS_BIN} snapshot '${_full_dataset_name}@${ORIGIN_ZFS_SNAP_NAME}'"
+                    try "${ZFS_BIN} umount -f '${_full_dataset_name}'"
                     run "${ZFS_BIN} send ${ZFS_SEND_OPTS} '${_full_dataset_name}@${ORIGIN_ZFS_SNAP_NAME}' | ${XZ_BIN} ${DEFAULT_XZ_OPTS} > ${FILE_CACHE_DIR}${_ps_snap_file}"
                     try "${ZFS_BIN} mount '${_full_dataset_name}'"
                 fi
@@ -392,12 +392,15 @@ create_software_bundle_archive () {
     debug "Creating destfile: $(distd "${_cddestfile}")"
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
         _csbd_dataset="${DEFAULT_ZPOOL}${SOFTWARE_DIR}${USER}/${_csbname}"
-        debug "Creating archive from dataset: $(distd "${_csbd_dataset}") to file: $(distd "${_cddestfile}")"
-        try "${ZFS_BIN} umount -f '${_csbd_dataset}'"
+        debug "Creating archive from snapshot: $(distd "${ORIGIN_ZFS_SNAP_NAME}") dataset: $(distd "${_csbd_dataset}") to file: $(distd "${_cddestfile}")"
+        _cdir="$(${PWD_BIN} 2>/dev/null)"
+        cd /tmp
         try "${ZFS_BIN} snapshot '${_csbd_dataset}@${ORIGIN_ZFS_SNAP_NAME}'"
+        try "${ZFS_BIN} umount -f '${_csbd_dataset}'"
         try "${ZFS_BIN} send ${ZFS_SEND_OPTS} '${_csbd_dataset}@${ORIGIN_ZFS_SNAP_NAME}' | ${XZ_BIN} ${DEFAULT_XZ_OPTS} > ${_cddestfile}" && \
             note "Created bin-bundle from dataset: $(distd "${_csbd_dataset}")"
-        try "${ZFS_BIN} mount '${_csbd_dataset}'"
+        cd "${_cdir}"
+        run "${ZFS_BIN} mount '${_csbd_dataset}'"
     else
         debug "No ZFS-binbuilds feature. Falling back to tarballs.."
         _cdir="$(${PWD_BIN} 2>/dev/null)"
