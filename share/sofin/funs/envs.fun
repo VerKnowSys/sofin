@@ -202,21 +202,21 @@ compiler_setup () {
     # 2. Gold Linker (ld.gold)
     # 3. Legacy Linker (ld)
     if [ -z "${DEF_NO_LLVM_LINKER}" ]; then
-
         # Support of default: LLVM linker:
         if [ "${SYSTEM_NAME}" = "Darwin" ]; then
-            # NOTE: under Darwin we have to replace /usr/bin/ld with lld:
-            #   sudo mv /usr/bin/ld /usr/bin/ld.orig
-            #   sudo install `which lld` /usr/bin/ld
-            debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "llvm-linker" ${ColorGreen})"
+            if [ "YES" = "${CAP_SYS_LLVM_LD}" ]; then
+                debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "llvm-linker" ${ColorGreen})"
+            else
+                debug " $(distd "${FAIL_CHAR}" ${ColorGray}) $(distd "llvm-linker" ${ColorGray})"
+            fi
         else
-            if [ -x "/usr/bin/ld.lld" ]; then
-                DEFAULT_COMPILER_FLAGS="${DEFAULT_COMPILER_FLAGS} -fuse-ld=lld"
-                LD="/usr/bin/ld.lld"
-                NM="/usr/bin/nm"
-                AR="/usr/bin/ar"
-                AS="/usr/bin/as"
-                RANLIB="/usr/bin/ranlib"
+            if [ "YES" = "${CAP_SYS_LLVM_LD}" ]; then
+                # DEFAULT_COMPILER_FLAGS="${DEFAULT_COMPILER_FLAGS} -fuse-ld=lld"
+                LD="${LD_BIN}.lld"
+                NM="${NM_BIN}"
+                AR="${AR_BIN}"
+                AS="${AS_BIN}"
+                RANLIB="${RANLIB_BIN}"
 
                 debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "llvm-linker" ${ColorGreen})"
                 debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "gold-linker" ${ColorGray})"
@@ -225,24 +225,17 @@ compiler_setup () {
                 debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "gold-linker" ${ColorGray})"
             fi
         fi
-        CFLAGS="-I${PREFIX}/include ${DEF_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
-        CXXFLAGS="-I${PREFIX}/include ${DEF_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
-        LDFLAGS="-L${PREFIX}/lib ${DEF_LINKER_ARGS} ${DEFAULT_LDFLAGS}"
 
     elif [ -z "${DEF_NO_GOLDEN_LINKER}" -a \
-         -x "${GOLD_BIN}" -a \
-         -f "${GOLD_SO}" ]; then
+         "YES" = "${CAP_SYS_GOLD_LD}" ]; then
 
         # Golden linker support:
         case "${SYSTEM_NAME}" in
             FreeBSD|Minix)
-                DEFAULT_COMPILER_FLAGS="${DEFAULT_COMPILER_FLAGS} -Wl,-fuse-ld=gold"
-                DEFAULT_LDFLAGS="${DEFAULT_LDFLAGS} -Wl,-fuse-ld=gold"
-                CFLAGS="-I${PREFIX}/include ${DEF_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
-                CXXFLAGS="-I${PREFIX}/include ${DEF_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
-                LDFLAGS="-L${PREFIX}/lib ${DEF_LINKER_ARGS} ${DEFAULT_LDFLAGS}"
-                LD="/usr/bin/ld.gold --plugin ${GOLD_SO}"
+                # DEFAULT_COMPILER_FLAGS="${DEFAULT_COMPILER_FLAGS} ${COMMON_COMPILER_FLAGS}"
+                # DEFAULT_LDFLAGS="${DEFAULT_LDFLAGS} -Wl,-fuse-ld=gold"
                 NM="/Software/Gold/${SYSTEM_ARCH}-unknown-$(lowercase "${SYSTEM_NAME}")${SYSTEM_VERSION}/bin/nm --plugin ${GOLD_SO}"
+                LD="${LD_BIN}.gold --plugin ${GOLD_SO}"
                 ;;
 
             Darwin)
@@ -250,21 +243,15 @@ compiler_setup () {
                 ;;
 
             Linux)
-                # Golden linker support without LLVM plugin:
-                if [ -x "${GOLD_BIN}" ]; then
-                    ${GREP_BIN} '7\.' /etc/debian_version >/dev/null 2>&1
-                    if [ "${?}" != "0" ]; then
-                        DEFAULT_COMPILER_FLAGS="${DEFAULT_COMPILER_FLAGS} -Wl,-fuse-ld=gold"
-                        DEFAULT_LDFLAGS="${DEFAULT_LDFLAGS} -fuse-ld=gold"
-                    fi
-                    CFLAGS="-I${PREFIX}/include ${DEF_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
-                    CXXFLAGS="-I${PREFIX}/include ${DEF_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
-                    LDFLAGS="-L${PREFIX}/lib ${DEF_LINKER_ARGS} ${DEFAULT_LDFLAGS}"
-                    RANLIB="${RANLIB_BIN}"
-                    unset NM LD
-                fi
+                unset NM LD
+                RANLIB="${RANLIB_BIN}"
                 ;;
         esac
+
+        CFLAGS="-I${PREFIX}/include ${DEF_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
+        CXXFLAGS="-I${PREFIX}/include ${DEF_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
+        LDFLAGS="-L${PREFIX}/lib ${DEF_LINKER_ARGS} ${DEFAULT_LDFLAGS}"
+
         debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "llvm-linker" ${ColorGray})"
         debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "gold-linker" ${ColorGreen})"
 
