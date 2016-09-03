@@ -153,8 +153,8 @@ fetch_binbuild () {
             fi
         fi
 
-        debug "BB-archive: $(distd "${_bb_archive}"). Expecting binbuild to be available in: $(distd "${FILE_CACHE_DIR}${_bb_archive}")"
         if [ -e "${FILE_CACHE_DIR}${_bb_archive}" ]; then
+            debug "BB-archive: $(distd "${_bb_archive}"). Expecting binbuild to be available in: $(distd "${FILE_CACHE_DIR}${_bb_archive}")"
             validate_archive_sha1 "${FILE_CACHE_DIR}${_bb_archive}"
             install_software_from_binbuild "${_bb_archive}" "${_fbb_bundname}"
         else
@@ -411,7 +411,7 @@ process_flat () {
                     else
                         _a_file_checksum="$(file_checksum "${_dest_file}")"
                         if [ "${_a_file_checksum}" = "${DEF_SHA}" ]; then
-                            debug "${SUCCESS_CHAR}: $(distd "${_base}"): checksum matches: $(distd "${DEF_SHA}")"
+                            debug "$(distd "${SUCCESS_CHAR}" "${ColorGreen}"): $(distd "${_base}"): checksum matches: $(distd "${DEF_SHA}")"
                         else
                             warn "   ${WARN_CHAR} Source checksum mismatch: $(distw "${_a_file_checksum}") vs $(distw "${DEF_SHA}")"
                             _bname="${_dest_file##*/}"
