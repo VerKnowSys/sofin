@@ -188,7 +188,6 @@ try () {
             fi
         fi
     else
-        env_pedantic
         error "Specified an empty command to try()!"
     fi
     unset _dt _try_aname _try_params

@@ -175,6 +175,7 @@ fetch_dset_zfs_stream () {
             unset _dataset_name
         else
             debug "Origin service dataset unavailable for: $(distd "${_fdz_bund_name}")."
+            env_forgivable
             return 1
         fi
     else
@@ -543,6 +544,7 @@ do_prefix_snapshot () {
                  "${_p2}" = "0" ]; then
                 return 0
             else
+                env_forgivable
                 return 1
             fi
         fi
