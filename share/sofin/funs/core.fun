@@ -192,7 +192,6 @@ try () {
         error "Specified an empty command to try()!"
     fi
     unset _dt _try_aname _try_params
-    env_pedantic
     return 1
 }
 
@@ -229,7 +228,6 @@ retry () {
     done
     debug "All available ammo exhausted to invoke a command: $(distd "${_targets}")"
     unset _ammo _targets _rtry_blue
-    env_pedantic
     return 1
 }
 
