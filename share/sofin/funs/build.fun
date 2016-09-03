@@ -393,7 +393,7 @@ process_flat () {
                 cd "${BUILD_DIR}"
                 if [ -z "${DEF_GIT_MODE}" ]; then # Standard "fetch source archive" method
                     _base="${DEF_SOURCE_PATH##*/}"
-                    debug "DEF_SOURCE_PATH: $(distd "${DEF_SOURCE_PATH}") base: $(distd "${_base}")"
+                    # debug "DEF_SOURCE_PATH: $(distd "${DEF_SOURCE_PATH}") base: $(distd "${_base}")"
                     _dest_file="${FILE_CACHE_DIR}${_base}"
                     # TODO: implement auto picking fetch method based on DEF_SOURCE_PATH contents
                     if [ ! -e "${_dest_file}" ]; then
@@ -401,18 +401,18 @@ process_flat () {
                             error "Failed to fetch source: $(diste "${DEF_SOURCE_PATH}")"
                         note "   ${NOTE_CHAR} Source fetched: $(distn "${_base}")"
                     fi
-                    debug "Build root: $(distd "${BUILD_DIR}"), file: $(distd "${_dest_file}")"
+                    # debug "Build root: $(distd "${BUILD_DIR}"), file: $(distd "${_dest_file}")"
                     if [ -z "${DEF_SHA}" ]; then
                         error "Missing SHA sum for source: $(diste "${_dest_file}")!"
                     else
                         _a_file_checksum="$(file_checksum "${_dest_file}")"
                         if [ "${_a_file_checksum}" = "${DEF_SHA}" ]; then
-                            debug "Source checksum is fine"
+                            debug "${SUCCESS_CHAR}: $(distd "${_base}"): checksum matches: $(distd "${DEF_SHA}")"
                         else
-                            warn "${WARN_CHAR} Source checksum mismatch: $(distw "${_a_file_checksum}") vs $(distw "${DEF_SHA}")"
+                            warn "   ${WARN_CHAR} Source checksum mismatch: $(distw "${_a_file_checksum}") vs $(distw "${DEF_SHA}")"
                             _bname="${_dest_file##*/}"
                             try "${RM_BIN} -vf ${_dest_file}" && \
-                                warn "${WARN_CHAR} Removed corrupted cache file: $(distw "${_bname}") and retrying.."
+                                debug "Removed corrupted cache file: $(distd "${_bname}") and retrying.."
                             process_flat "${_app_param}" "${_prefix}" "${_bundlnm}"
                         fi
                         unset _bname _a_file_checksum
@@ -433,7 +433,7 @@ process_flat () {
                 unset _fd
                 _prm_nolib="$(${PRINTF_BIN} '%s\n' "${_app_param}" | ${SED_BIN} 's/lib//' 2>/dev/null)"
                 _prm_no_undrlne_and_minus="$(${PRINTF_BIN} '%s\n' "${_app_param}" | ${SED_BIN} 's/[-_].*$//' 2>/dev/null)"
-                debug "Requirement: ${_app_param} short: ${_prm_nolib}, nafter-: ${_prm_no_undrlne_and_minus}, DEF_NAME: ${DEF_NAME}, BUILD_DIR: ${BUILD_DIR}"
+                # debug "Requirement: ${_app_param} short: ${_prm_nolib}, nafter-: ${_prm_no_undrlne_and_minus}, DEF_NAME: ${DEF_NAME}, BUILD_DIR: ${BUILD_DIR}"
                 # NOTE: patterns sorted by safety
                 for _pati in    "*${_app_param}*${DEF_VERSION}" \
                                 "*${_prm_no_undrlne_and_minus}*${DEF_VERSION}" \
@@ -663,7 +663,8 @@ process_flat () {
             unset _cwd _addon
         fi
     else
-        permnote "   ${WARN_CHAR} Requirement: $(distn "${_req_defname}") is provided by base system or disabled for $(distn ${SYSTEM_NAME})."
+
+        warn "   ${WARN_CHAR} Requirement: $(distw "${_req_defname}") is provided by base system or disabled for $(distw ${SYSTEM_NAME})."
         if [ ! -d "${_prefix}" ]; then # case when disabled requirement is first on list of dependencies
             create_software_dir "${_prefix##*/}"
         fi
