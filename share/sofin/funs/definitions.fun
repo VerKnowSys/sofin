@@ -435,7 +435,8 @@ strip_bundle () {
             warn "$(distw "${_sbfdefinition_name}"): Strip nothing? Valid options are: ALL | BIN | LIB | NO"
             ;;
     esac
-    if [ "${DEF_STRIP}" != "no" ]; then
+    if [ "NO" != "${DEF_STRIP}" -o \
+         "no" != "${DEF_STRIP}" ]; then
         if [ -z "${DEBUGBUILD}" ]; then
             _counter="0"
             for _stripdir in ${_dirs_to_strip}; do
