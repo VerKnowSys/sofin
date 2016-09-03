@@ -80,11 +80,16 @@ compiler_setup () {
 
             # NOTE: So if Lld is installed, and both /Software/Lld/exports/ld and
             #       /usr/bin/ld are same files => We use LLVM lld linker by default:
-            if [ "${LD_BIN}" = "${LLD_BIN}" -a \
-                 "$(file_checksum "${LD_BIN}")" = "$(file_checksum "${LLD_BIN}")" ]; then
-                debug "Checksum matches LLVM linker - looks like Linker override under Darwin!"
+            LLD_ORIGIN="/Software/Lld/exports/lld"
+            if [ -x "${LLD_ORIGIN}" ]; then
+                LLD_BIN="${LLD_BIN:-${LLD_ORIGIN}}"
+            fi
+            if [ "$(file_checksum "${LD_BIN}")" = "$(file_checksum "${LLD_BIN}")" ]; then
+                debug "Checksum matches origin: Default system linker is overriden with LLVM-linker!"
+                unset LLD_BIN
                 CAP_SYS_LLVM_LD=YES
             else
+                unset LLD_BIN CAP_SYS_LLVM_LD
                 debug "Falling to system linker for Darwin!"
             fi
             ;;
