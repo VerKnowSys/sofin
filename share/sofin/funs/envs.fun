@@ -199,13 +199,7 @@ compiler_setup () {
     # 3. Legacy Linker (ld)
     if [ -z "${DEF_NO_LLVM_LINKER}" ]; then
         # Support of default: LLVM linker:
-        if [ "${SYSTEM_NAME}" = "Darwin" ]; then
-            if [ "YES" = "${CAP_SYS_LLVM_LD}" ]; then
-                debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "llvm-linker" ${ColorGreen})"
-            else
-                debug " $(distd "${FAIL_CHAR}" ${ColorGray}) $(distd "llvm-linker" ${ColorGray})"
-            fi
-        else
+        if [ "${SYSTEM_NAME}" != "Darwin" ]; then
             if [ "YES" = "${CAP_SYS_LLVM_LD}" ]; then
                 # DEFAULT_COMPILER_FLAGS="${DEFAULT_COMPILER_FLAGS} -fuse-ld=lld"
                 LD="${LD_BIN}.lld"
@@ -243,26 +237,19 @@ compiler_setup () {
                 RANLIB="${RANLIB_BIN}"
                 ;;
         esac
-
-        CFLAGS="-I${PREFIX}/include ${DEF_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
-        CXXFLAGS="-I${PREFIX}/include ${DEF_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
-        LDFLAGS="-L${PREFIX}/lib ${DEF_LINKER_ARGS} ${DEFAULT_LDFLAGS}"
-
         debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "llvm-linker" ${ColorGray})"
         debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "gold-linker" ${ColorGreen})"
 
     else
         # NOTE: fallback with reset to system defaults - usually regular linker:
         unset NM AR AS RANLIB LD
-
-        # Legacy (slowest) mode:
-        CFLAGS="-I${PREFIX}/include ${DEF_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
-        CXXFLAGS="-I${PREFIX}/include ${DEF_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
-        LDFLAGS="-L${PREFIX}/lib ${DEF_LINKER_ARGS} ${DEFAULT_LDFLAGS}"
-
         debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "llvm-linker" ${ColorGray})"
         debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "gold-linker" ${ColorGray})"
     fi
+
+    CFLAGS="-I${PREFIX}/include ${DEF_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
+    CXXFLAGS="-I${PREFIX}/include ${DEF_COMPILER_ARGS} ${DEFAULT_COMPILER_FLAGS}"
+    LDFLAGS="-L${PREFIX}/lib ${DEF_LINKER_ARGS} ${DEFAULT_LDFLAGS}"
 
     if [ -z "${DEF_LINKER_NO_DTAGS}" ]; then
         if [ "${SYSTEM_NAME}" != "Darwin" ]; then # feature isn't required on Darwin
