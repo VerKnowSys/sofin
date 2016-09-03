@@ -557,13 +557,11 @@ track_useful_and_useless_files () {
         done
 
         if [ -n "${_dbg_exp_lst}" ]; then
-            debug "Found exports: $(distd "${_dbg_exp_lst}")"
+            debug "Found exports: $(distd "${_dbg_exp_lst}"). Proceeding with useless files cleanup of: $(distd "${_fordel}")"
+            remove_useless "${_fordel}"
         else
-            debug "Empty exports list?"
+            debug "Empty exports list? Useless files removal skipped (cause it's damn annoing). Remember to invoke track_useful_and_useless_files() _after_ you do exports!"
         fi
-
-        remove_useless "${_fordel}" && \
-            debug "Useless files were wiped."
     else
         debug "Useless files cleanup skipped since DEF_CLEAN_USELESS=$(distd "${DEF_CLEAN_USELESS:-''}")!"
     fi
