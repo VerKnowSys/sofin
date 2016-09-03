@@ -181,19 +181,6 @@ compiler_setup () {
         debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "no-strict-overflow" ${ColorGreen})" || \
         debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "no-strict-overflow" ${ColorGray})"
 
-    if [ "${default_c}" = "${C_COMPILER_NAME}" ]; then
-        debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "clang-compiler" ${ColorGreen})"
-        debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "gnu-c-compiler" ${ColorGray})"
-    elif [ "${default_c}" = "${C_COMPILER_NAME_ALT}" ]; then
-        debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "gnu-c-compiler" ${ColorGreen})"
-        debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "clang-compiler" ${ColorGray})"
-    fi
-
-    # Support for other definition options
-    if [ -n "${FORCE_GNU_COMPILER}" ]; then # force GNU compiler usage on definition side:
-        warn "Support for GNU compiler was recently dropped, and is ignored since Sofin 1.0. Try using $(diste Gcc) instead?"
-    fi
-
     # TODO: make a alternatives / or capability
     if [ -z "${DEF_NO_CCACHE}" ]; then # ccache is supported by default but it's optional
         if [ -x "${CCACHE_BIN_OPTIONAL}" ]; then # check for CCACHE availability
