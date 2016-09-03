@@ -64,7 +64,7 @@ COMMON_FLAGS="-fPIC"
 HARDEN_FLAGS="-fno-strict-overflow -w -Wformat -Wformat-security -fstack-protector-strong --param ssp-buffer-size=4"
 # NOTE: XXX: To add -Werror=format-security as a default, we have to get rid of GNU software ;)
 # NOTE:-D is recognized as "a macro" and rejected f.i. configure script of "c-ares" definiton
-COMMON_COMPILER_FLAGS="${COMMON_FLAGS} ${HARDEN_FLAGS} -D_FORTIFY_SOURCE=2"
+COMMON_COMPILER_FLAGS="${CAP_SYS_COMPILER_FLAGS} ${COMMON_FLAGS} ${HARDEN_FLAGS} -D_FORTIFY_SOURCE=2"
 
 COMMON_LDFLAGS="${COMMON_FLAGS}"
 DEFAULT_LDFLAGS="${COMMON_FLAGS}"
