@@ -301,7 +301,7 @@ make_exports () {
             try "${LN_BIN} -vfs ..${_bindir}/${_export_bin} ../exports/${_export_bin}"
             cd "${_cdir}"
             unset _cdir _bindir _bundle_name _export_bin
-            return
+            return 0
         else
             debug "Export not found: $(distd "${SOFTWARE_DIR}${_bundle_name}${_bindir}${_export_bin}")"
         fi
@@ -457,7 +457,7 @@ strip_bundle () {
                     done
                 fi
             done
-            _sbresult="$(${PRINTF_BIN} '%s\n' "${_counter}" | ${BC_BIN} 2>/dev/null)"
+            _sbresult="$(${PRINTF_BIN} '%s\n' "${_counter}" 2>/dev/null | ${BC_BIN} 2>/dev/null)"
             if [ "${_sbresult}" -lt "0" -o \
                  -z "${_sbresult}" ]; then
                 _sbresult="0"
@@ -572,9 +572,8 @@ track_useful_and_useless_files () {
 
 
 conflict_resolve () {
-    debug "Resolving conflicts for: $(distd "${DEF_CONFLICTS_WITH}")"
     if [ -n "${DEF_CONFLICTS_WITH}" ]; then
-        debug "Resolving possible conflicts with: $(distd "${DEF_CONFLICTS_WITH}")"
+        debug "Seeking possible bundle conflicts: $(distd "${DEF_CONFLICTS_WITH}")"
         for _cr_app in ${DEF_CONFLICTS_WITH}; do
             _crfind_s="$(${FIND_BIN} ${SOFTWARE_DIR} -maxdepth 1 -type d -iname "${_cr_app}*" 2>/dev/null)"
             for _cr_name in ${_crfind_s}; do
@@ -584,7 +583,7 @@ conflict_resolve () {
                      -a "${_crn}" != "${DEF_NAME}${DEF_POSTFIX}" \
                 ]; then
                     ${MV_BIN} "${_cr_name}/exports" "${_cr_name}/exports-disabled" && \
-                        debug "Resolved conflict with: $(distn "${_crn}")"
+                        debug "Disabled exports of bundle: $(distn "${_crn}") due to a conflict with current definition."
                 fi
             done
         done
