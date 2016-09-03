@@ -96,7 +96,7 @@ rebuild_bundle () {
         error "Missing second argument with library/software name."
     fi
     # go to definitions dir, and gather software list that include given _a_dependency:
-    _alldefs_avail="$(${FIND_BIN} ${DEFINITIONS_DIR} -maxdepth 1 -type f -name "*${DEFAULT_DEF_EXT}" 2>/dev/null)"
+    _alldefs_avail="$(${FIND_BIN} ${DEFINITIONS_DIR%/} -maxdepth 1 -type f -name "*${DEFAULT_DEF_EXT}" 2>/dev/null)"
     _those_to_rebuild=""
     for _dep in ${_alldefs_avail}; do
         load_defaults

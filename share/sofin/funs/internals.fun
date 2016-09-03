@@ -258,7 +258,7 @@ sofin_status () {
 list_bundles_alphabetic () {
     if [ -d "${SOFTWARE_DIR}" ]; then
         debug "Listing installed software bundles in alphabetical order."
-        ${FIND_BIN} ${SOFTWARE_DIR} -maxdepth 1 -mindepth 1 -type d  -not -name ".*" -print 2>/dev/null | \
+        ${FIND_BIN} ${SOFTWARE_DIR%/} -maxdepth 1 -mindepth 1 -type d  -not -name ".*" -print 2>/dev/null | \
         ${SED_BIN} -e 's#/.*/##' 2>/dev/null | ${SORT_BIN} 2>/dev/null
     fi
 }
@@ -307,7 +307,7 @@ show_alt_definitions_and_exit () {
     _an_app="${1}"
     if [ ! -f "${DEFINITIONS_DIR}${_an_app}${DEFAULT_DEF_EXT}" ]; then
         unset _contents
-        _maybe_version="$(${FIND_BIN} ${DEFINITIONS_DIR} -maxdepth 1 -name "${_an_app}*${DEFAULT_DEF_EXT}" 2>/dev/null)"
+        _maybe_version="$(${FIND_BIN} ${DEFINITIONS_DIR%/} -maxdepth 1 -name "${_an_app}*${DEFAULT_DEF_EXT}" 2>/dev/null)"
         for _maybe in ${_maybe_version}; do
             _contents="${_contents}$(${PRINTF_BIN} '%s\n' "$(capitalize "${_maybe##*/}")" | ${SED_BIN} 's/\..*//' 2>/dev/null) "
         done

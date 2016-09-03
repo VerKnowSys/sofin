@@ -222,7 +222,7 @@ remove_bundles () {
     if [ "${_bundle_nam}" != "${_bundle_name}" ]; then
         # Specified + - a wildcard
         _picked_bundles="" # to remove first entry with *
-        _found="$(${FIND_BIN} ${SOFTWARE_DIR} -mindepth 1 -maxdepth 1 -iname "${_bundle_nam}" -type d 2>/dev/null)"
+        _found="$(${FIND_BIN} ${SOFTWARE_DIR%/} -mindepth 1 -maxdepth 1 -iname "${_bundle_nam}" -type d 2>/dev/null)"
         for _bund in ${_found}; do
             _bname="${_bund##*/}"
             _picked_bundles="${_picked_bundles} ${_bname}"
@@ -249,7 +249,7 @@ remove_bundles () {
             if [ "${_picked_bundles}" = "${_given_name}" ]; then
                 permnote "Looking for other installed versions of: $(distn "${_aname}"), that might be exported automatically.."
                 _inname="$(${PRINTF_BIN} '%s\n' "$(lowercase "${_given_name}")" | ${SED_BIN} 's/[0-9]*//g' 2>/dev/null)"
-                _alternative="$(${FIND_BIN} ${SOFTWARE_DIR} -mindepth 1 -maxdepth 1 -type d -iname "${_inname}*" -not -name "${_given_name}" 2>/dev/null | ${SED_BIN} 's/^.*\///g' 2>/dev/null | ${HEAD_BIN} -n1 2>/dev/null)"
+                _alternative="$(${FIND_BIN} ${SOFTWARE_DIR%/} -mindepth 1 -maxdepth 1 -type d -iname "${_inname}*" -not -name "${_given_name}" 2>/dev/null | ${SED_BIN} 's/^.*\///g' 2>/dev/null | ${HEAD_BIN} -n1 2>/dev/null)"
             fi
 
             if [ -n "${_alternative}" -a \
@@ -272,7 +272,7 @@ remove_bundles () {
 available_definitions () {
     if [ -d "${DEFINITIONS_DIR}" ]; then
         cd "${DEFINITIONS_DIR}"
-        _alldefs="$(${FIND_BIN} ${DEFINITIONS_DIR} -mindepth 1 -maxdepth 1 -type f -name "*${DEFAULT_DEF_EXT}" 2>/dev/null)"
+        _alldefs="$(${FIND_BIN} ${DEFINITIONS_DIR%/} -mindepth 1 -maxdepth 1 -type f -name "*${DEFAULT_DEF_EXT}" 2>/dev/null)"
         permnote "All definitions defined in current cache: $(distn "$(${LS_BIN} -m *def 2>/dev/null | eval "${CUT_TRAILING_SPACES_GUARD}")" "${ColorReset}")"
     fi
     if [ -d "${DEFINITIONS_LISTS_DIR}" ]; then
@@ -314,7 +314,7 @@ show_outdated () {
     create_dirs
     load_defaults
     if [ -d "${SOFTWARE_DIR}" ]; then
-        for _prefix in $(${FIND_BIN} ${SOFTWARE_DIR} -mindepth 1 -maxdepth 1 -type d -not -name ".*" 2>/dev/null); do
+        for _prefix in $(${FIND_BIN} ${SOFTWARE_DIR%/} -mindepth 1 -maxdepth 1 -type d -not -name ".*" 2>/dev/null); do
             _bundle="$(lowercase "${_prefix##*/}")"
             debug "Bundle name: ${_bundle}, Prefix: ${_prefix}"
 
@@ -573,7 +573,7 @@ conflict_resolve () {
     if [ -n "${DEF_CONFLICTS_WITH}" ]; then
         debug "Seeking possible bundle conflicts: $(distd "${DEF_CONFLICTS_WITH}")"
         for _cr_app in ${DEF_CONFLICTS_WITH}; do
-            _crfind_s="$(${FIND_BIN} ${SOFTWARE_DIR} -maxdepth 1 -type d -iname "${_cr_app}*" 2>/dev/null)"
+            _crfind_s="$(${FIND_BIN} ${SOFTWARE_DIR%/} -maxdepth 1 -type d -iname "${_cr_app}*" 2>/dev/null)"
             for _cr_name in ${_crfind_s}; do
                 _crn="${_cr_name##*/}"
                 if [ -d "${_cr_name}/exports" \
@@ -642,7 +642,7 @@ hack_def () {
     fi
     _hack_pattern="${1}"
     _abeauty_pat="$(distn "*${_hack_pattern}*")"
-    _all_hackdirs=$(${FIND_BIN} ${FILE_CACHE_DIR} -type d -mindepth 2 -maxdepth 2 -iname "*${_hack_pattern}*" 2>/dev/null)
+    _all_hackdirs=$(${FIND_BIN} ${FILE_CACHE_DIR%/} -type d -mindepth 2 -maxdepth 2 -iname "*${_hack_pattern}*" 2>/dev/null)
     _all_am="$(${PRINTF_BIN} '%s\n' "${_all_hackdirs}" | ${WC_BIN} -l 2>/dev/null | ${TR_BIN} -d '\t|\r|\ ' 2>/dev/null)"
     ${TEST_BIN} -z "${_all_am}" && _all_am="0"
     if [ -z "${_all_hackdirs}" ]; then
