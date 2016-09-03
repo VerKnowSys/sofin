@@ -149,13 +149,13 @@ get_shell_vars () {
     }
     gsv_int_manpath "${SOFTWARE_DIR}"
 
-    ${PRINTF_BIN} "# ${ColorParams}PATH${ColorReset}:\n"
-    ${PRINTF_BIN} '%s\n' "export PATH=\"$(${PRINTF_BIN} '%s\n' "${_path}" 2>/dev/null | eval "${CUT_TRAILING_SPACES_GUARD}")\""
-    ${PRINTF_BIN} "# ${ColorParams}CC${ColorReset}:\n"
+    ${PRINTF_BIN} '%s\n' "# ${ColorParams}PATH${ColorReset}:"
+    ${PRINTF_BIN} '%s\n' "export PATH=\"${_path}\"" | eval "${CUT_TRAILING_SPACES_GUARD}"
+    ${PRINTF_BIN} "# ${ColorParams}CC${ColorReset}:"
     ${PRINTF_BIN} '%s\n' "export CC=\"${CC}\""
-    ${PRINTF_BIN} "# ${ColorParams}CXX${ColorReset}:\n"
+    ${PRINTF_BIN} "# ${ColorParams}CXX${ColorReset}:"
     ${PRINTF_BIN} '%s\n' "export CXX=\"${CXX}\""
-    ${PRINTF_BIN} "# ${ColorParams}CPP${ColorReset}:\n"
+    ${PRINTF_BIN} "# ${ColorParams}CPP${ColorReset}:"
     ${PRINTF_BIN} '%s\n' "export CPP=\"${CPP}\""
 
     if [ -f "${SOFIN_ENV_DISABLED_INDICATOR_FILE}" ]; then # sofin disabled. Default system environment

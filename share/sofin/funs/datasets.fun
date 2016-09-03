@@ -283,7 +283,7 @@ create_software_dir () {
         _dsname="${DEFAULT_ZPOOL}${SOFTWARE_DIR}${USER}/${_dset_create}"
         try "${ZFS_BIN} list -H -t filesystem '${_dsname}'" || \
             receive_origin "${_dsname}" "Software" "user" && \
-                debug "Created ZFS software-dataset: $(distd "${_dsname}")"
+                debug "Received ZFS software-dataset: $(distd "${_dsname}")"
         try "${ZFS_BIN} mount '${_dsname}'"
         unset _dsname
     else
