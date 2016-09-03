@@ -42,6 +42,8 @@ elif [ -x "/usr/pkg/bin/ld.lld" ]; then
 elif [ -x "/usr/local/bin/ld.lld" ]; then
     LLD_BIN="/usr/local/bin/ld.lld"
 else
+    # NOTE: Darwin should end here, cause it requires manual linker override
+    #       Linker setup finalizes in compiler_setup()
     unset LLD_BIN
 fi
 

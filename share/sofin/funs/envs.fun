@@ -202,23 +202,18 @@ compiler_setup () {
     # 1. LLVM Linker (ld.lld)
     # 2. Gold Linker (ld.gold)
     # 3. Legacy Linker (ld)
-    if [ -z "${DEF_NO_LLVM_LINKER}" ]; then
-        # Support of default: LLVM linker:
-        if [ "${SYSTEM_NAME}" != "Darwin" ]; then
-            if [ "YES" = "${CAP_SYS_LLVM_LD}" ]; then
-                # DEFAULT_COMPILER_FLAGS="${DEFAULT_COMPILER_FLAGS} -fuse-ld=lld"
-                LD="${LD_BIN}.lld"
-                NM="${NM_BIN}"
-                AR="${AR_BIN}"
-                AS="${AS_BIN}"
-                RANLIB="${RANLIB_BIN}"
+    if [ -z "${DEF_NO_LLVM_LINKER}" -a \
+         "YES" = "${CAP_SYS_LLVM_LD}" ]; then
 
-                debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "llvm-linker" ${ColorGreen})"
-                debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "gold-linker" ${ColorGray})"
-            else
-                debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "llvm-linker" ${ColorGray})"
-                debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "gold-linker" ${ColorGray})"
-            fi
+        # Support of default: LLVM linker:
+        debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "llvm-linker" ${ColorGreen})"
+        debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "gold-linker" ${ColorGray})"
+        if [ "${SYSTEM_NAME}" != "Darwin" ]; then
+            LD="${LD_BIN}.lld"
+            NM="${NM_BIN}"
+            AR="${AR_BIN}"
+            AS="${AS_BIN}"
+            RANLIB="${RANLIB_BIN}"
         fi
 
     elif [ -z "${DEF_NO_GOLDEN_LINKER}" -a \
