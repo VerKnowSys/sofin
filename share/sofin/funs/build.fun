@@ -297,7 +297,6 @@ build () {
                 strip_bundle "${_bund_lcase}"
             done
 
-            track_useful_and_useless_files
         fi
 
         finalize_afterbuild "${_bund_name}"
@@ -310,6 +309,9 @@ build () {
 
     # TODO: XXX: requires some more <3:
     #            create_apple_bundle_if_necessary
+
+    # After exports - track useless files:
+    track_useful_and_useless_files
 
     unset _build_list _bund_lcase _req_all _req
     env_reset
