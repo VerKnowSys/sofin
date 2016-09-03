@@ -100,12 +100,12 @@ update_defs () {
         debug "Definitions update skipped on demand"
         return
     fi
-    try "${MKDIR_BIN} -p ${LOGS_DIR}"
+    run "${MKDIR_BIN} -p ${LOGS_DIR}"
     _cwd="$(${PWD_BIN} 2>/dev/null)"
     if [ ! -x "${GIT_BIN}" ]; then
         note "Installing initial definition list from tarball to cache dir: $(distn "${CACHE_DIR}")"
         try "${RM_BIN} -rf ${CACHE_DIR}${DEFINITIONS_BASE}"
-        try "${MKDIR_BIN} -p ${LOGS_DIR} ${CACHE_DIR}${DEFINITIONS_BASE}"
+        run "${MKDIR_BIN} -p ${LOGS_DIR} ${CACHE_DIR}${DEFINITIONS_BASE}"
         _initial_defs="${MAIN_SOURCE_REPOSITORY}${DEFINITIONS_INITIAL_FILE_NAME}${DEFAULT_ARCHIVE_TARBALL_EXT}"
         debug "Fetching latest tarball with initial definitions from: $(distd "${_initial_defs}")"
         _out_file="${FILE_CACHE_DIR}${DEFINITIONS_INITIAL_FILE_NAME}${DEFAULT_ARCHIVE_TARBALL_EXT}"
@@ -292,12 +292,12 @@ make_exports () {
     if [ -z "${_bundle_name}" ]; then
         error "Second argument with $(diste "BundleName") is required!"
     fi
+    run "${MKDIR_BIN} -p '${SOFTWARE_DIR}${_bundle_name}/exports'"
     for _bindir in "/bin/" "/sbin/" "/libexec/"; do
         if [ -e "${SOFTWARE_DIR}${_bundle_name}${_bindir}${_export_bin}" ]; then
             note "Exporting binary: $(distn "${SOFTWARE_DIR}${_bundle_name}${_bindir}${_export_bin}")"
             _cdir="$(${PWD_BIN} 2>/dev/null)"
             cd "${SOFTWARE_DIR}${_bundle_name}${_bindir}"
-            try "${MKDIR_BIN} -p ${SOFTWARE_DIR}${_bundle_name}/exports" # make sure exports dir exists
             try "${LN_BIN} -vfs ..${_bindir}/${_export_bin} ../exports/${_export_bin}"
             cd "${_cdir}"
             unset _cdir _bindir _bundle_name _export_bin
@@ -606,7 +606,7 @@ export_binaries () {
     fi
     if [ -d "${PREFIX}/exports-disabled" ]; then # just bring back disabled exports
         debug "Moving $(distd "${PREFIX}/exports-disabled") to $(distd "${PREFIX}/exports")"
-        try "${MV_BIN} -v ${PREFIX}/exports-disabled ${PREFIX}/exports"
+        run "${MV_BIN} -v ${PREFIX}/exports-disabled ${PREFIX}/exports"
     fi
     if [ -z "${DEF_EXPORTS}" ]; then
         note "Defined no exports of prefix: $(distn "${PREFIX}")"
@@ -614,7 +614,7 @@ export_binaries () {
         _a_name="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
         _an_amount="$(${PRINTF_BIN} '%s\n' "${DEF_EXPORTS}" | ${WC_BIN} -w 2>/dev/null | ${TR_BIN} -d '\t|\r|\ ' 2>/dev/null)"
         debug "Exporting $(distd "${_an_amount}") binaries of prefix: $(distd "${PREFIX}")"
-        try "${MKDIR_BIN} -p ${PREFIX}/exports"
+        run "${MKDIR_BIN} -p ${PREFIX}/exports"
         _expolist=""
         for exp in ${DEF_EXPORTS}; do
             for dir in "/bin/" "/sbin/" "/libexec/"; do
@@ -788,7 +788,7 @@ clone_or_fetch_git_bare_repo () {
     _chk_branch="${3}"
     _build_dir="${4}"
     _git_cached="${GIT_CACHE_DIR}${_bare_name}${DEFAULT_GIT_DIR_NAME}"
-    try "${MKDIR_BIN} -p ${GIT_CACHE_DIR}"
+    run "${MKDIR_BIN} -p ${GIT_CACHE_DIR}"
     note "   ${NOTE_CHAR} Fetching source repository: $(distn "${_source_path}")"
     try "${GIT_BIN} clone ${DEFAULT_GIT_CLONE_OPTS} --mirror ${_source_path} ${_git_cached}" || \
         try "${GIT_BIN} clone ${DEFAULT_GIT_CLONE_OPTS} --mirror ${_source_path} ${_git_cached}"

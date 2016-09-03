@@ -198,7 +198,7 @@ create_service_dir () {
         unset _dsname
     else
         debug "Creating regular service-directory: $(distd "${SERVICES_DIR}${_dset_create}")"
-        try "${MKDIR_BIN} -p '${SERVICES_DIR}${_dset_create}'"
+        run "${MKDIR_BIN} -p '${SERVICES_DIR}${_dset_create}'"
     fi
     try "${CHMOD_BIN} -v 0710 '${SERVICES_DIR}${_dset_create}'"
     unset _dset_create
@@ -288,7 +288,7 @@ create_software_dir () {
         unset _dsname
     else
         debug "Creating regular software-directory: $(distd "${SOFTWARE_DIR}${_dset_create}")"
-        try "${MKDIR_BIN} -p '${SOFTWARE_DIR}${_dset_create}'"
+        run "${MKDIR_BIN} -p '${SOFTWARE_DIR}${_dset_create}'"
     fi
     try "${CHMOD_BIN} 0710 '${SOFTWARE_DIR}${_dset_create}'"
     unset _dset_create
@@ -334,7 +334,7 @@ create_builddir () {
     else
         _bdir="${SOFTWARE_DIR}${_cb_bundle_name}/${DEFAULT_SRC_EXT}${_dset_namesum}"
         debug "Creating regular build-directory: $(distd "${_bdir}")"
-        try "${MKDIR_BIN} -p '${_bdir}'"
+        run "${MKDIR_BIN} -p '${_bdir}'"
     fi
     unset _bdir _cb_bundle_name _dset_namesum
 }

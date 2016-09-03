@@ -138,7 +138,7 @@ fetch_binbuild () {
         if [ -z "${_bb_archive}" ]; then
             error "Cannot fetch binbuild! An empty $(diste "file-archive-name") given!"
         fi
-        try "${MKDIR_BIN} -p ${FILE_CACHE_DIR}"
+        run "${MKDIR_BIN} -p ${FILE_CACHE_DIR}"
         # If sha1 of bundle file exists locally..
         if [ ! -e "${FILE_CACHE_DIR}${_bb_archive}${DEFAULT_CHKSUM_EXT}" ]; then
             try "${FETCH_BIN} -o ${FILE_CACHE_DIR}${_bb_archive}${DEFAULT_CHKSUM_EXT} ${FETCH_OPTS} '${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}${DEFAULT_CHKSUM_EXT}'" || \
@@ -226,7 +226,7 @@ build () {
                     create_service_dir "${_bundl_name}"
                 fi
 
-                try "${MKDIR_BIN} -p ${FILE_CACHE_DIR}"
+                run "${MKDIR_BIN} -p ${FILE_CACHE_DIR}"
                 _an_archive="${_bundl_name}-${DEF_VERSION}-${OS_TRIPPLE}${DEFAULT_ARCHIVE_EXT}"
                 _installed_indicator="${PREFIX}/${_bund_lcase}${DEFAULT_INST_MARK_EXT}"
                 if [ ! -e "${_installed_indicator}" ]; then
