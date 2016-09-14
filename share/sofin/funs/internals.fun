@@ -149,36 +149,36 @@ get_shell_vars () {
     }
     gsv_int_manpath "${SOFTWARE_DIR}"
 
-    ${PRINTF_BIN} '%s\n' "# ${ColorParams}PATH${ColorReset}:"
-    ${PRINTF_BIN} '%s\n' "export PATH=\"${_path}\"" | eval "${CUT_TRAILING_SPACES_GUARD}"
-    ${PRINTF_BIN} "# ${ColorParams}CC${ColorReset}:"
-    ${PRINTF_BIN} '%s\n' "export CC=\"${CC}\""
-    ${PRINTF_BIN} "# ${ColorParams}CXX${ColorReset}:"
-    ${PRINTF_BIN} '%s\n' "export CXX=\"${CXX}\""
-    ${PRINTF_BIN} "# ${ColorParams}CPP${ColorReset}:"
-    ${PRINTF_BIN} '%s\n' "export CPP=\"${CPP}\""
+    ${PRINTF_BIN} "# ${ColorParams}%s${ColorReset}:\n" "PATH"
+    ${PRINTF_BIN} "%s\n" "export PATH=\"${_path}\"" | eval "${CUT_TRAILING_SPACES_GUARD}"
+    ${PRINTF_BIN} "# ${ColorParams}%s${ColorReset}:\n" "CC"
+    ${PRINTF_BIN} "%s\n" "export CC=\"${CC}\""
+    ${PRINTF_BIN} "# ${ColorParams}%s${ColorReset}:\n" "CXX"
+    ${PRINTF_BIN} "%s\n" "export CXX=\"${CXX}\""
+    ${PRINTF_BIN} "# ${ColorParams}%s${ColorReset}:\n" "CPP"
+    ${PRINTF_BIN} "%s\n" "export CPP=\"${CPP}\""
 
     if [ -f "${SOFIN_ENV_DISABLED_INDICATOR_FILE}" ]; then # sofin disabled. Default system environment
-        ${PRINTF_BIN} "# ${ColorParams}CFLAGS${ColorReset}:\n"
-        ${PRINTF_BIN} '%s\n' "export CFLAGS=\"\""
-        ${PRINTF_BIN} "# ${ColorParams}CXXFLAGS${ColorReset}:\n"
-        ${PRINTF_BIN} '%s\n' "export CXXFLAGS=\"\""
-        ${PRINTF_BIN} "# ${ColorParams}LDFLAGS${ColorReset}:\n"
-        ${PRINTF_BIN} '%s\n' "export LDFLAGS=\"\""
+        ${PRINTF_BIN} "# ${ColorParams}%s${ColorReset}:\n" "CFLAGS"
+        ${PRINTF_BIN} "%s\n" "export CFLAGS=\"\""
+        ${PRINTF_BIN} "# ${ColorParams}%s${ColorReset}:\n" "CXXFLAGS"
+        ${PRINTF_BIN} "%s\n" "export CXXFLAGS=\"\""
+        ${PRINTF_BIN} "# ${ColorParams}%s${ColorReset}:\n" "LDFLAGS"
+        ${PRINTF_BIN} "%s\n" "export LDFLAGS=\"\""
     else # sofin environment override enabled, Default behavior:
-        ${PRINTF_BIN} "# ${ColorParams}CFLAGS${ColorReset}:\n"
-        ${PRINTF_BIN} '%s\n' "export CFLAGS=\"$(${PRINTF_BIN} '%s\n' "${_cflags}" 2>/dev/null | eval "${CUT_TRAILING_SPACES_GUARD}")\""
-        ${PRINTF_BIN} "# ${ColorParams}CXXFLAGS${ColorReset}:\n"
-        ${PRINTF_BIN} '%s\n' "export CXXFLAGS=\"$(${PRINTF_BIN} '%s\n' "${_cxxflags}" 2>/dev/null | eval "${CUT_TRAILING_SPACES_GUARD}")\"${ColorReset}"
-        ${PRINTF_BIN} "# ${ColorParams}LDFLAGS${ColorReset}:\n"
-        ${PRINTF_BIN} '%s\n' "export LDFLAGS=\"$(${PRINTF_BIN} '%s\n' "${_ldflags}" 2>/dev/null | eval "${CUT_TRAILING_SPACES_GUARD}")\""
+        ${PRINTF_BIN} "# ${ColorParams}%s${ColorReset}:\n" "CFLAGS"
+        ${PRINTF_BIN} "%s\n" "export CFLAGS=\"$(${PRINTF_BIN} "%s\n" "${_cflags}" 2>/dev/null | eval "${CUT_TRAILING_SPACES_GUARD}")\""
+        ${PRINTF_BIN} "# ${ColorParams}%s${ColorReset}:\n" "CXXFLAGS"
+        ${PRINTF_BIN} "%s\n" "export CXXFLAGS=\"$(${PRINTF_BIN} "%s\n" "${_cxxflags}" 2>/dev/null | eval "${CUT_TRAILING_SPACES_GUARD}")\"${ColorReset}"
+        ${PRINTF_BIN} "# ${ColorParams}%s${ColorReset}:\n" "LDFLAGS"
+        ${PRINTF_BIN} "%s\n" "export LDFLAGS=\"$(${PRINTF_BIN} "%s\n" "${_ldflags}" 2>/dev/null | eval "${CUT_TRAILING_SPACES_GUARD}")\""
     fi
 
     # common
-    ${PRINTF_BIN} "# ${ColorParams}PKG_CONFIG_PATH${ColorReset}:\n"
-    ${PRINTF_BIN} '%s\n' "export PKG_CONFIG_PATH=\"$(${PRINTF_BIN} '%s\n' "${_pkg_config_path}" 2>/dev/null | eval "${CUT_TRAILING_SPACES_GUARD}")\""
-    ${PRINTF_BIN} "# ${ColorParams}MANPATH${ColorReset}:\n"
-    ${PRINTF_BIN} '%s\n' "export MANPATH=\"$(${PRINTF_BIN} '%s\n' "${_manpath}" 2>/dev/null | eval "${CUT_TRAILING_SPACES_GUARD}")\""
+    ${PRINTF_BIN} "# ${ColorParams}%s${ColorReset}:\n" "PKG_CONFIG_PATH"
+    ${PRINTF_BIN} "%s\n" "export PKG_CONFIG_PATH=\"$(${PRINTF_BIN} "%s\n" "${_pkg_config_path}" 2>/dev/null | eval "${CUT_TRAILING_SPACES_GUARD}")\""
+    ${PRINTF_BIN} "# ${ColorParams}%s${ColorReset}:\n" "MANPATH"
+    ${PRINTF_BIN} "%s\n" "export MANPATH=\"$(${PRINTF_BIN} "%s\n" "${_manpath}" 2>/dev/null | eval "${CUT_TRAILING_SPACES_GUARD}")\""
 
     unset _cflags _cxxflags _ldflags _pkg_config_path _manpath _app _exp
 }
