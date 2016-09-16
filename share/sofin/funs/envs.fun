@@ -57,18 +57,18 @@ compiler_setup () {
     debug "Listing compiler features for platform: $(distd "${SYSTEM_NAME}")"
     case "${SYSTEM_NAME}" in
         Minix)
-            DEFAULT_COMPILER_FLAGS="${COMMON_COMPILER_FLAGS} -I/usr/pkg/include"
-            DEFAULT_LDFLAGS="${COMMON_LDFLAGS} -L/usr/pkg/lib"
+            DEFAULT_COMPILER_FLAGS="${COMMON_COMPILER_FLAGS} ${DEF_SYSTEM_SPECIFIC_CFLAGS}"
+            DEFAULT_LDFLAGS="${COMMON_LDFLAGS} ${DEF_SYSTEM_SPECIFIC_LDFLAGS}"
             ;;
 
         FreeBSD)
-            DEFAULT_COMPILER_FLAGS="${COMMON_COMPILER_FLAGS} -fPIE"
-            DEFAULT_LDFLAGS="${COMMON_LDFLAGS} -pie -z relro"
+            DEFAULT_COMPILER_FLAGS="${COMMON_COMPILER_FLAGS} ${DEF_SYSTEM_SPECIFIC_CFLAGS}"
+            DEFAULT_LDFLAGS="${COMMON_LDFLAGS} ${DEF_SYSTEM_SPECIFIC_LDFLAGS}"
             ;;
 
         Darwin)
-            DEFAULT_COMPILER_FLAGS="${COMMON_COMPILER_FLAGS} -mmacosx-version-min=10.11 -arch=x86_64"
-            DEFAULT_LDFLAGS="${COMMON_LDFLAGS} -arch x86_64"
+            DEFAULT_COMPILER_FLAGS="${COMMON_COMPILER_FLAGS} ${DEF_SYSTEM_SPECIFIC_CFLAGS}"
+            DEFAULT_LDFLAGS="${COMMON_LDFLAGS} ${DEF_SYSTEM_SPECIFIC_LDFLAGS}"
 
             # XQuartz support to make things easier:
             if [ -d "/opt/X11/lib" -a \
@@ -95,8 +95,8 @@ compiler_setup () {
             ;;
 
         Linux)
-            DEFAULT_COMPILER_FLAGS="${COMMON_COMPILER_FLAGS} -mno-avx" # NOTE: Disable on Centos 5, XXX: old Xeons case :)
-            DEFAULT_LDFLAGS="${COMMON_LDFLAGS}"
+            DEFAULT_COMPILER_FLAGS="${COMMON_COMPILER_FLAGS} ${DEF_SYSTEM_SPECIFIC_CFLAGS}" # NOTE: Disable on Centos 5, XXX: old Xeons case :)
+            DEFAULT_LDFLAGS="${COMMON_LDFLAGS} ${DEF_SYSTEM_SPECIFIC_LDFLAGS}"
             ;;
     esac
 
