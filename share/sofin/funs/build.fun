@@ -320,7 +320,7 @@ build () {
 
 dump_debug_info () {
     # TODO: add DEF_ insight
-    debug "-------------- PRE CONFIGURE SETTINGS DUMP --------------"
+    debug "-------------- PRE-BUILD SETTINGS DUMP --------------"
     debug "CPUS (used): $(distd "${CPUS}")"
     debug "ALL_CPUS: $(distd "${ALL_CPUS}")"
     debug "MAKE_OPTS: $(distd "${MAKE_OPTS}")"
@@ -349,7 +349,7 @@ dump_debug_info () {
     debug "RANLIB: $(distd "${RANLIB}")"
     debug "AR: $(distd "${AR}")"
     debug "AS: $(distd "${AS}")"
-    debug "-------------- PRE CONFIGURE SETTINGS DUMP ENDS ---------"
+    debug "-------------- PRE-BUILD SETTINGS DUMP ENDS ---------"
 }
 
 
