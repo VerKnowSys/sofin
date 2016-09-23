@@ -310,7 +310,7 @@ trap_signals () {
     # 31    SIGUSR2      terminate process    User defined signal 2
     #
     if [ "YES" = "${CAP_TERM_ZSH}" ]; then
-        trap 'error' ZERR
+        trap - ZERR
     elif [ "YES" = "${CAP_TERM_BASH}" ]; then
         trap 'error' ERR
     fi
