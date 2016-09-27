@@ -422,7 +422,7 @@ process_flat () {
                         unset _bname _a_file_checksum
                     fi
 
-                    note "   ${NOTE_CHAR} Unpacking source of: $(distn "${DEF_NAME}${DEF_POSTFIX}")"
+                    note "   ${NOTE_CHAR} Unpacking source of: $(distn "${DEF_NAME}${DEF_POSTFIX}"), version: $(distn "${DEF_VERSION}")"
                     debug "Build dir: $(distd "${BUILD_DIR}")"
                     try "${TAR_BIN} -xf ${_dest_file} --directory ${BUILD_DIR}" || \
                         try "${TAR_BIN} -xjf ${_dest_file} --directory ${BUILD_DIR}" || \
@@ -607,7 +607,7 @@ process_flat () {
 
             # and common part between normal and continue modes:
             cd "${_pwd}"
-            note "   ${NOTE_CHAR} Building requirement: $(distn "${_app_param}")"
+            note "   ${NOTE_CHAR} Building requirement: $(distn "${_app_param}"), version: $(distn "${DEF_VERSION}")"
             run "${DEF_MAKE_METHOD}"
             cd "${_pwd}"
             after_make_callback
@@ -625,7 +625,7 @@ process_flat () {
 
             if [ -z "${USE_NO_TEST}" -a \
                  -z "${_this_test_skipped}" ]; then
-                note "   ${NOTE_CHAR} Testing requirement: $(distn "${_app_param}")"
+                note "   ${NOTE_CHAR} Testing requirement: $(distn "${_app_param}"), version: $(distn "${DEF_VERSION}")"
                 cd "${_pwd}"
 
                 unset _anadd
@@ -652,7 +652,7 @@ process_flat () {
             done
 
             cd "${_pwd}"
-            note "   ${NOTE_CHAR} Installing requirement: $(distn "${_app_param}")"
+            note "   ${NOTE_CHAR} Installing requirement: $(distn "${_app_param}"), version: $(distn "${DEF_VERSION}")"
             run "${DEF_INSTALL_METHOD}"
             cd "${_pwd}"
             after_install_callback
