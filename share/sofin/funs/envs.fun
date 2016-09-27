@@ -51,6 +51,13 @@ disable_sofin_env () {
 }
 
 
+set_c_and_cxx_flags () {
+    CFLAGS="$(${PRINTF_BIN} '%s\n' "-I${PREFIX}/include ${DEFAULT_COMPILER_FLAGS}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
+    CXXFLAGS="$(${PRINTF_BIN} '%s\n' "-I${PREFIX}/include ${DEFAULT_COMPILER_FLAGS}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
+    LDFLAGS="$(${PRINTF_BIN} '%s\n' "-L${PREFIX}/lib ${DEFAULT_LDFLAGS}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
+}
+
+
 compiler_setup () {
     # TODO: linker pick should be implemented via "capabilities"!
     debug "---------------- COMPILER FEATURES DUMP -----------------"
