@@ -544,6 +544,7 @@ do_prefix_snapshot () {
                  "${_p2}" = "0" ]; then
                 return 0
             else
+                debug "Failed snapshot? _p1: $(distd "${_snap_name}_${TIMESTAMP}@${_snap_name}")=${_p1};  _p2: $(distd "${_pr_bdir_snp}@${_snap_name}")=${_p2}"
                 env_forgivable
                 return 1
             fi
