@@ -182,13 +182,13 @@ compiler_setup () {
     # pick compiler in order:
     # 1. /usr/bin/clang
     # 2. /usr/bin/gcc
-    default_c="${C_COMPILER_NAME}"
-    default_cxx="${CXX_COMPILER_NAME}"
-    default_cpp="${CPP_PREPROCESSOR_NAME}"
+    _default_c="${C_COMPILER_NAME}"
+    _default_cxx="${CXX_COMPILER_NAME}"
+    _default_cpp="${CPP_PREPROCESSOR_NAME}"
     if [ "YES" = "${DEF_USE_ALT_COMPILER}" ]; then
-        default_c="${C_COMPILER_NAME_ALT}"
-        default_cxx="${CXX_COMPILER_NAME_ALT}"
-        default_cpp="${CPP_PREPROCESSOR_NAME_ALT}"
+        _default_c="${C_COMPILER_NAME_ALT}"
+        _default_cxx="${CXX_COMPILER_NAME_ALT}"
+        _default_cpp="${CPP_PREPROCESSOR_NAME_ALT}"
     fi
     # BASE_COMPILER="${SOFTWARE_DIR}$(capitalize ${C_COMPILER_NAME})" # /Software/Clang
     # if [ -x "${default_c}" -a \
@@ -233,6 +233,10 @@ compiler_setup () {
     # if [ ! -x "${default_cpp}" ]; then # fallback for systems with clang without standalone preprocessor binary:
     #     CPP="${default_c} -E"
     # fi
+    CC="$(${PRINTF_BIN} '%s\n' "${_default_c} ${DEF_COMPILER_ARGS}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
+    CXX="$(${PRINTF_BIN} '%s\n' "${_default_cxx} ${DEF_COMPILER_ARGS}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
+    CPP="$(${PRINTF_BIN} '%s\n' "${_default_cpp}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
+    unset _default_c _default_cxx _default_cpp
 
     # TODO: make a alternatives / or capability
     if [ -z "${DEF_NO_CCACHE}" ]; then # ccache is supported by default but it's optional
@@ -301,8 +305,6 @@ compiler_setup () {
     if [ -n "${DEF_LINKER_ARGS}" ]; then
         LDFLAGS="${LDFLAGS} ${DEF_LINKER_ARGS}"
     fi
-
-    unset default_c default_cxx default_cpp
 
     export CFLAGS CXXFLAGS LDFLAGS LD AR AS NM CC CXX CPP RANLIB
 
