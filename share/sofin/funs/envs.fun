@@ -58,10 +58,81 @@ set_c_and_cxx_flags () {
 }
 
 
-compiler_setup () {
-    # TODO: linker pick should be implemented via "capabilities"!
+dump_compiler_setup () {
     debug "---------------- COMPILER FEATURES DUMP -----------------"
     debug "Listing compiler features for platform: $(distd "${SYSTEM_NAME}")"
+    if [ "YES" = "${DEBUGBUILD}" ]; then
+        debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "debug-build" ${ColorGreen})"
+        debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "production-build" ${ColorGray})"
+    else
+        debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "production-build" ${ColorGreen})"
+        debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "debug-build" ${ColorGray})"
+    fi
+
+    if [ -z "${DEF_NO_CCACHE}" ]; then # ccache is supported by default but it's optional
+        debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "ccache" ${ColorGreen})"
+    else
+        debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "ccache" ${ColorGray})"
+    fi
+
+    if [ -z "${DEF_NO_LLVM_LINKER}" -a "YES" = "${CAP_SYS_LLVM_LD}" ]; then
+        debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "llvm-linker" ${ColorGreen})"
+        debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "gold-linker" ${ColorGray})"
+        debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "system-linker" ${ColorGray})"
+    elif [ -z "${DEF_NO_GOLDEN_LINKER}" -a "YES" = "${CAP_SYS_GOLD_LD}" ]; then
+        debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "llvm-linker" ${ColorGray})"
+        debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "gold-linker" ${ColorGreen})"
+        debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "system-linker" ${ColorGray})"
+    else
+        debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "llvm-linker" ${ColorGray})"
+        debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "gold-linker" ${ColorGray})"
+        debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "system-linker" ${ColorGreen})"
+    fi
+
+    # -fPIC check:
+    echo "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'f[Pp][Ii][Cc]' >/dev/null 2>/dev/null && \
+        debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "position-independent-code" ${ColorGreen})" || \
+        debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "position-independent-code" ${ColorGray})"
+
+    # -fPIE check:
+    echo "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'f[Pp][Ii][Ee]' >/dev/null 2>/dev/null && \
+        debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "position-independent-executable" ${ColorGreen})" || \
+        debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "position-independent-executable" ${ColorGray})"
+
+    # -fstack-protector-all check:
+    echo "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'fstack-protector-all' >/dev/null 2>/dev/null && \
+        debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "stack-protector-all" ${ColorGreen})" || \
+        debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "stack-protector-all" ${ColorGray})"
+
+    # -fstack-protector-strong check:
+    echo "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'fstack-protector-strong' >/dev/null 2>/dev/null && \
+        debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "stack-protector-strong" ${ColorGreen})" || \
+        debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "stack-protector-strong" ${ColorGray})"
+
+    # -fno-strict-overflow check:
+    echo "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'fno-strict-overflow' >/dev/null 2>/dev/null && \
+        debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "no-strict-overflow" ${ColorGreen})" || \
+        debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "no-strict-overflow" ${ColorGray})"
+
+    if [ -z "${DEF_LINKER_NO_DTAGS}" ]; then
+        if [ "${SYSTEM_NAME}" != "Darwin" ]; then # feature isn't required on Darwin
+            debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "enable-new-dtags" ${ColorGreen})"
+        else
+            debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "enable-new-dtags" ${ColorGray})"
+        fi
+    fi
+
+    if [ -z "${DEF_NO_FAST_MATH}" ]; then
+        debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "fast-math" ${ColorGreen})"
+    else
+        debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "fast-math" ${ColorGray})"
+    fi
+    debug "-------------- COMPILER FEATURES DUMP ENDS --------------"
+}
+
+
+compiler_setup () {
+    # TODO: linker pick should be implemented via "capabilities"!
     case "${SYSTEM_NAME}" in
         Minix)
             DEFAULT_COMPILER_FLAGS="${COMMON_COMPILER_FLAGS} ${DEF_SYSTEM_SPECIFIC_CFLAGS}"
@@ -108,12 +179,8 @@ compiler_setup () {
     esac
 
     if [ "YES" = "${DEBUGBUILD}" ]; then
-        debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "debug-build" ${ColorGreen})"
-        debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "production-build" ${ColorGray})"
         DEFAULT_COMPILER_FLAGS="${DEFAULT_COMPILER_FLAGS} -O0 -ggdb"
     else
-        debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "production-build" ${ColorGreen})"
-        debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "debug-build" ${ColorGray})"
         DEFAULT_COMPILER_FLAGS="${DEFAULT_COMPILER_FLAGS} -O2"
     fi
 
@@ -123,56 +190,61 @@ compiler_setup () {
     default_c="${C_COMPILER_NAME}"
     default_cxx="${CXX_COMPILER_NAME}"
     default_cpp="${CPP_PREPROCESSOR_NAME}"
-    BASE_COMPILER="${SOFTWARE_DIR}$(capitalize ${C_COMPILER_NAME})" # /Software/Clang
-    if [ -x "${BASE_COMPILER}/bin/${default_c}" -a \
-         -x "${BASE_COMPILER}/bin/${default_cxx}" ]; then
-        debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "base-compiler: ${default_c}" ${ColorGreen})"
-    else # /usr/bin/clang
-        BASE_COMPILER="/usr"
-        if [ "${SYSTEM_NAME}" = "Minix" ]; then
-            BASE_COMPILER="/usr/pkg"
-        fi
-        if [ -x "${BASE_COMPILER}/bin/${default_c}" -a \
-             -x "${BASE_COMPILER}/bin/${default_cxx}" ]; then
-            debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "base-compiler: ${default_c}" ${ColorGreen})"
-        else
-            if [ -x "${BASE_COMPILER}/bin/${C_COMPILER_NAME_ALT}" -a \
-                 -x "${BASE_COMPILER}/bin/${CXX_COMPILER_NAME_ALT}" -a \
-                 -x "${BASE_COMPILER}/bin/${CPP_PREPROCESSOR_NAME_ALT}" ]; then
-                default_c="${C_COMPILER_NAME_ALT}"
-                default_cxx="${CXX_COMPILER_NAME_ALT}"
-                default_cpp="${CPP_PREPROCESSOR_NAME_ALT}"
-                debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "base-compiler: ${default_c}" ${ColorGreen})"
-            else
-                debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "base-compiler: ${default_c}" ${ColorGray})"
-            fi
-        fi
+    if [ "YES" = "${DEF_USE_ALT_COMPILER}" ]; then
+        default_c="${C_COMPILER_NAME_ALT}"
+        default_cxx="${CXX_COMPILER_NAME_ALT}"
+        default_cpp="${CPP_PREPROCESSOR_NAME_ALT}"
     fi
+    # BASE_COMPILER="${SOFTWARE_DIR}$(capitalize ${C_COMPILER_NAME})" # /Software/Clang
+    # if [ -x "${default_c}" -a \
+    #      -x "${default_cxx}" ]; then
+        # debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "base-compiler: ${default_c}" ${ColorGreen})"
+    # else # /usr/bin/clang
+    #     BASE_COMPILER="/usr"
+    #     if [ "${SYSTEM_NAME}" = "Minix" ]; then
+    #         BASE_COMPILER="/usr/pkg"
+    #     fi
+    #     if [ -x "${default_c}" -a \
+    #          -x "${default_cxx}" -a \
+    #          -z "${DEF_USE_ALT_COMPILER}" ]; then
+    #         debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "base-compiler: ${default_c}" ${ColorGreen})"
+    #     else
+    #         if [ -x "${C_COMPILER_NAME_ALT}" -a \
+    #              -x "${CXX_COMPILER_NAME_ALT}" -a \
+    #              -x "${CPP_PREPROCESSOR_NAME_ALT}" ]; then
+    #             default_c="${C_COMPILER_NAME_ALT}"
+    #             default_cxx="${CXX_COMPILER_NAME_ALT}"
+    #             default_cpp="${CPP_PREPROCESSOR_NAME_ALT}"
+    #             debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "base-compiler: ${default_c}" ${ColorGreen})"
+    #         # elif [ -x "${PREFIX}/bin/${C_COMPILER_NAME_ALT}" ]
 
-    CC="$(${PRINTF_BIN} '%s\n' "${BASE_COMPILER}/bin/${default_c} ${DEF_COMPILER_ARGS}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
-    if [ ! -x "${BASE_COMPILER}/bin/${default_c}" ]; then # fallback for systems with clang without standalone preprocessor binary:
-        error "Base C compiler: $(diste "${CC}") should be an executable!"
-    fi
+    #         else
+    #             debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "base-compiler: ${default_c}" ${ColorGray})"
+    #         fi
+    #     fi
+    # fi
 
-    CXX="$(${PRINTF_BIN} '%s\n' "${BASE_COMPILER}/bin/${default_cxx} ${DEF_COMPILER_ARGS}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
-    if [ ! -x "${BASE_COMPILER}/bin/${default_cxx}" ]; then # fallback for systems with clang without standalone preprocessor binary:
-        error "Base C++ compiler: $(diste "${CXX}") should be an executable!"
-    fi
+    CC="$(${PRINTF_BIN} '%s\n' "${default_c} ${DEF_COMPILER_ARGS}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
+    # if [ ! -x "${default_c}" ]; then # fallback for systems with clang without standalone preprocessor binary:
+    #     error "Base C compiler: $(diste "${CC}") should be an executable!"
+    # fi
 
-    CPP="$(${PRINTF_BIN} '%s\n' "${BASE_COMPILER}/bin/${default_cpp}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
-    if [ ! -x "${BASE_COMPILER}/bin/${default_cpp}" ]; then # fallback for systems with clang without standalone preprocessor binary:
-        CPP="${BASE_COMPILER}/bin/${default_c} -E"
-    fi
+    CXX="$(${PRINTF_BIN} '%s\n' "${default_cxx} ${DEF_COMPILER_ARGS}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
+    # if [ ! -x "${default_cxx}" ]; then # fallback for systems with clang without standalone preprocessor binary:
+    #     error "Base C++ compiler: $(diste "${CXX}") should be an executable!"
+    # fi
+
+    CPP="$(${PRINTF_BIN} '%s\n' "${default_cpp}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
+    # if [ ! -x "${default_cpp}" ]; then # fallback for systems with clang without standalone preprocessor binary:
+    #     CPP="${default_c} -E"
+    # fi
 
     # TODO: make a alternatives / or capability
     if [ -z "${DEF_NO_CCACHE}" ]; then # ccache is supported by default but it's optional
         if [ -x "${CCACHE_BIN_OPTIONAL}" ]; then # check for CCACHE availability
-            debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "ccache" ${ColorGreen})"
             CC="${CCACHE_BIN_OPTIONAL} ${CC}"
             CXX="${CCACHE_BIN_OPTIONAL} ${CXX}"
             CPP="${CCACHE_BIN_OPTIONAL} ${CPP}"
-        else
-            debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "ccache" ${ColorGray})"
         fi
     fi
 
@@ -180,12 +252,8 @@ compiler_setup () {
     # 1. LLVM Linker (ld.lld)
     # 2. Gold Linker (ld.gold)
     # 3. Legacy Linker (ld)
-    if [ -z "${DEF_NO_LLVM_LINKER}" -a \
-         "YES" = "${CAP_SYS_LLVM_LD}" ]; then
-
+    if [ -z "${DEF_NO_LLVM_LINKER}" -a "YES" = "${CAP_SYS_LLVM_LD}" ]; then
         # Support of default: LLVM linker:
-        debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "llvm-linker" ${ColorGreen})"
-        debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "gold-linker" ${ColorGray})"
         if [ "${SYSTEM_NAME}" != "Darwin" ]; then
             LD="${LD_BIN}.lld"
             NM="${NM_BIN}"
@@ -215,62 +283,25 @@ compiler_setup () {
                 RANLIB="${RANLIB_BIN}"
                 ;;
         esac
-        debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "llvm-linker" ${ColorGray})"
-        debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "gold-linker" ${ColorGreen})"
-
     else
         # NOTE: fallback with reset to system defaults - usually regular linker:
         unset NM AR AS RANLIB LD
-        debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "llvm-linker" ${ColorGray})"
-        debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "gold-linker" ${ColorGray})"
     fi
 
     # CFLAGS, CXXFLAGS setup:
     set_c_and_cxx_flags
-
-    # -fPIC check:
-    echo "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'f[Pp][Ii][Cc]' >/dev/null 2>/dev/null && \
-        debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "position-independent-code" ${ColorGreen})" || \
-        debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "position-independent-code" ${ColorGray})"
-
-    # -fPIE check:
-    echo "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'f[Pp][Ii][Ee]' >/dev/null 2>/dev/null && \
-        debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "position-independent-executable" ${ColorGreen})" || \
-        debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "position-independent-executable" ${ColorGray})"
-
-    # -fstack-protector-all check:
-    echo "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'fstack-protector-all' >/dev/null 2>/dev/null && \
-        debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "stack-protector-all" ${ColorGreen})" || \
-        debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "stack-protector-all" ${ColorGray})"
-
-    # -fstack-protector-strong check:
-    echo "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'fstack-protector-strong' >/dev/null 2>/dev/null && \
-        debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "stack-protector-strong" ${ColorGreen})" || \
-        debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "stack-protector-strong" ${ColorGray})"
-
-    # -fno-strict-overflow check:
-    echo "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'fno-strict-overflow' >/dev/null 2>/dev/null && \
-        debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "no-strict-overflow" ${ColorGreen})" || \
-        debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "no-strict-overflow" ${ColorGray})"
 
     if [ -z "${DEF_LINKER_NO_DTAGS}" ]; then
         if [ "${SYSTEM_NAME}" != "Darwin" ]; then # feature isn't required on Darwin
             CFLAGS="${CFLAGS} -Wl,-rpath=${PREFIX}/lib,--enable-new-dtags"
             CXXFLAGS="${CXXFLAGS} -Wl,-rpath=${PREFIX}/lib,--enable-new-dtags"
             LDFLAGS="${LDFLAGS} -Wl,-rpath=${PREFIX}/lib,--enable-new-dtags"
-            debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "enable-new-dtags" ${ColorGreen})"
-        else
-            debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "enable-new-dtags" ${ColorGray})"
         fi
     fi
     if [ -z "${DEF_NO_FAST_MATH}" ]; then
-        debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "fast-math" ${ColorGreen})"
         CFLAGS="${CFLAGS} -ffast-math"
         CXXFLAGS="${CXXFLAGS} -ffast-math"
-    else
-        debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "fast-math" ${ColorGray})"
     fi
-    debug "-------------- COMPILER FEATURES DUMP ENDS --------------"
 
     unset default_c default_cxx default_cpp
 
