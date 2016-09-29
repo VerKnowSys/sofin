@@ -299,6 +299,11 @@ compiler_setup () {
         CXXFLAGS="${CXXFLAGS} -ffast-math"
     fi
 
+    # If DEF_LINKER_ARGS is set on definition side, append it's content to LDFLAGS:
+    if [ -n "${DEF_LINKER_ARGS}" ]; then
+        LDFLAGS="${LDFLAGS} ${DEF_LINKER_ARGS}"
+    fi
+
     unset default_c default_cxx default_cpp
 
     export CFLAGS CXXFLAGS LDFLAGS LD AR AS NM CC CXX CPP RANLIB
