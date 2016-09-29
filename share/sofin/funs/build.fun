@@ -77,7 +77,6 @@ push_binbuilds () {
 deploy_binbuild () {
     _dbbundles=${*}
     create_dirs
-    load_defaults
     permnote "Requested deploy of bundles: $(distn "${_dbbundles}")"
     for _dbbundle in ${_dbbundles}; do
         USE_BINBUILD=NO
