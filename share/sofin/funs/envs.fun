@@ -134,12 +134,7 @@ dump_compiler_setup () {
 compiler_setup () {
     # TODO: linker pick should be implemented via "capabilities"!
     case "${SYSTEM_NAME}" in
-        Minix)
-            DEFAULT_COMPILER_FLAGS="${COMMON_COMPILER_FLAGS} ${DEF_SYSTEM_SPECIFIC_CFLAGS}"
-            DEFAULT_LDFLAGS="${COMMON_LDFLAGS} ${DEF_SYSTEM_SPECIFIC_LDFLAGS}"
-            ;;
-
-        FreeBSD)
+        FreeBSD|Minix)
             DEFAULT_COMPILER_FLAGS="${COMMON_COMPILER_FLAGS} ${DEF_SYSTEM_SPECIFIC_CFLAGS}"
             DEFAULT_LDFLAGS="${COMMON_LDFLAGS} ${DEF_SYSTEM_SPECIFIC_LDFLAGS}"
             ;;
@@ -268,8 +263,6 @@ compiler_setup () {
         # Golden linker support:
         case "${SYSTEM_NAME}" in
             FreeBSD|Minix)
-                # DEFAULT_COMPILER_FLAGS="${DEFAULT_COMPILER_FLAGS} ${COMMON_COMPILER_FLAGS}"
-                # DEFAULT_LDFLAGS="${DEFAULT_LDFLAGS} -Wl,-fuse-ld=gold"
                 NM="/Software/Gold/${SYSTEM_ARCH}-unknown-$(lowercase "${SYSTEM_NAME}")${SYSTEM_VERSION}/bin/nm --plugin ${GOLD_SO}"
                 LD="${LD_BIN}.gold --plugin ${GOLD_SO}"
                 ;;
