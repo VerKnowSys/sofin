@@ -135,12 +135,10 @@ compiler_setup () {
     # TODO: linker pick should be implemented via "capabilities"!
     case "${SYSTEM_NAME}" in
         FreeBSD|Minix)
-            DEFAULT_COMPILER_FLAGS="${COMMON_COMPILER_FLAGS} ${DEF_SYSTEM_SPECIFIC_CFLAGS}"
             DEFAULT_LDFLAGS="${COMMON_LDFLAGS} ${DEF_SYSTEM_SPECIFIC_LDFLAGS}"
             ;;
 
         Darwin)
-            DEFAULT_COMPILER_FLAGS="${COMMON_COMPILER_FLAGS} ${DEF_SYSTEM_SPECIFIC_CFLAGS}"
             DEFAULT_LDFLAGS="${COMMON_LDFLAGS} ${DEF_SYSTEM_SPECIFIC_LDFLAGS}"
 
             # XQuartz support to make things easier:
@@ -168,10 +166,12 @@ compiler_setup () {
             ;;
 
         Linux)
-            DEFAULT_COMPILER_FLAGS="${COMMON_COMPILER_FLAGS} ${DEF_SYSTEM_SPECIFIC_CFLAGS}" # NOTE: Disable on Centos 5, XXX: old Xeons case :)
             DEFAULT_LDFLAGS="${COMMON_LDFLAGS} ${DEF_SYSTEM_SPECIFIC_LDFLAGS}"
             ;;
     esac
+
+    # NOTE: Default flags can contains linker setup options:
+    DEFAULT_COMPILER_FLAGS="${CAP_SYS_COMPILER_FLAGS} ${COMMON_FLAGS} ${HARDEN_FLAGS} -D_FORTIFY_SOURCE=2 ${DEF_SYSTEM_SPECIFIC_CFLAGS}"
 
     if [ "YES" = "${DEBUGBUILD}" ]; then
         DEFAULT_COMPILER_FLAGS="${DEFAULT_COMPILER_FLAGS} -O0 -ggdb"
@@ -281,8 +281,7 @@ compiler_setup () {
         unset NM AR AS RANLIB LD
 
         # NOTE: Default system linker fallback: CAP_SYS_COMPILER_FLAGS not included:
-        COMMON_COMPILER_FLAGS="${COMMON_FLAGS} ${HARDEN_FLAGS} -D_FORTIFY_SOURCE=2"
-        DEFAULT_COMPILER_FLAGS="${COMMON_COMPILER_FLAGS} ${DEF_SYSTEM_SPECIFIC_CFLAGS}"
+        DEFAULT_COMPILER_FLAGS="${COMMON_FLAGS} ${HARDEN_FLAGS} -D_FORTIFY_SOURCE=2 ${DEF_SYSTEM_SPECIFIC_CFLAGS}"
     fi
 
     # CFLAGS, CXXFLAGS setup:
