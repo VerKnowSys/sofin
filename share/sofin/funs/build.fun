@@ -604,6 +604,7 @@ process_flat () {
             fi
 
             dump_debug_info
+            dump_compiler_setup
 
             # and common part between normal and continue modes:
             cd "${_pwd}"
