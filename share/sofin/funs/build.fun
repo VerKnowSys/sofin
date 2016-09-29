@@ -322,6 +322,8 @@ dump_debug_info () {
     debug "-------------- PRE-BUILD SETTINGS DUMP --------------"
     debug "CPUS (used): $(distd "${CPUS}")"
     debug "ALL_CPUS: $(distd "${ALL_CPUS}")"
+    debug "DEF_COMPILER_ARGS: $(distd "${DEF_COMPILER_ARGS}")"
+    debug "DEF_LINKER_ARGS: $(distd "${DEF_LINKER_ARGS}")"
     debug "MAKE_OPTS: $(distd "${MAKE_OPTS}")"
     debug "FETCH_BIN: $(distd "${FETCH_BIN}")"
     debug "FETCH_OPTS: $(distd "${FETCH_OPTS}")"
