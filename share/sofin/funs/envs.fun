@@ -286,6 +286,10 @@ compiler_setup () {
     else
         # NOTE: fallback with reset to system defaults - usually regular linker:
         unset NM AR AS RANLIB LD
+
+        # NOTE: Default system linker fallback: CAP_SYS_COMPILER_FLAGS not included:
+        COMMON_COMPILER_FLAGS="${COMMON_FLAGS} ${HARDEN_FLAGS} -D_FORTIFY_SOURCE=2"
+        DEFAULT_COMPILER_FLAGS="${COMMON_COMPILER_FLAGS} ${DEF_SYSTEM_SPECIFIC_CFLAGS}"
     fi
 
     # CFLAGS, CXXFLAGS setup:
