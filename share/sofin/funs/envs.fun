@@ -236,11 +236,9 @@ compiler_setup () {
 
     # TODO: make a alternatives / or capability
     if [ -z "${DEF_NO_CCACHE}" ]; then # ccache is supported by default but it's optional
-        if [ -x "${CCACHE_BIN_OPTIONAL}" ]; then # check for CCACHE availability
-            CC="${CCACHE_BIN_OPTIONAL} ${CC}"
-            CXX="${CCACHE_BIN_OPTIONAL} ${CXX}"
-            CPP="${CCACHE_BIN_OPTIONAL} ${CPP}"
-        fi
+        CC="${CCACHE_BIN_OPTIONAL} ${CC}"
+        CXX="${CCACHE_BIN_OPTIONAL} ${CXX}"
+        CPP="${CCACHE_BIN_OPTIONAL} ${CPP}"
     fi
 
     # NOTE: Default Linker pick order:
