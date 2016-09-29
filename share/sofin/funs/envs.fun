@@ -190,49 +190,6 @@ compiler_setup () {
         _default_cxx="${CXX_COMPILER_NAME_ALT}"
         _default_cpp="${CPP_PREPROCESSOR_NAME_ALT}"
     fi
-    # BASE_COMPILER="${SOFTWARE_DIR}$(capitalize ${C_COMPILER_NAME})" # /Software/Clang
-    # if [ -x "${default_c}" -a \
-    #      -x "${default_cxx}" ]; then
-        # debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "base-compiler: ${default_c}" ${ColorGreen})"
-    # else # /usr/bin/clang
-    #     BASE_COMPILER="/usr"
-    #     if [ "${SYSTEM_NAME}" = "Minix" ]; then
-    #         BASE_COMPILER="/usr/pkg"
-    #     fi
-    #     if [ -x "${default_c}" -a \
-    #          -x "${default_cxx}" -a \
-    #          -z "${DEF_USE_ALT_COMPILER}" ]; then
-    #         debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "base-compiler: ${default_c}" ${ColorGreen})"
-    #     else
-    #         if [ -x "${C_COMPILER_NAME_ALT}" -a \
-    #              -x "${CXX_COMPILER_NAME_ALT}" -a \
-    #              -x "${CPP_PREPROCESSOR_NAME_ALT}" ]; then
-    #             default_c="${C_COMPILER_NAME_ALT}"
-    #             default_cxx="${CXX_COMPILER_NAME_ALT}"
-    #             default_cpp="${CPP_PREPROCESSOR_NAME_ALT}"
-    #             debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "base-compiler: ${default_c}" ${ColorGreen})"
-    #         # elif [ -x "${PREFIX}/bin/${C_COMPILER_NAME_ALT}" ]
-
-    #         else
-    #             debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "base-compiler: ${default_c}" ${ColorGray})"
-    #         fi
-    #     fi
-    # fi
-
-    CC="$(${PRINTF_BIN} '%s\n' "${default_c} ${DEF_COMPILER_ARGS}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
-    # if [ ! -x "${default_c}" ]; then # fallback for systems with clang without standalone preprocessor binary:
-    #     error "Base C compiler: $(diste "${CC}") should be an executable!"
-    # fi
-
-    CXX="$(${PRINTF_BIN} '%s\n' "${default_cxx} ${DEF_COMPILER_ARGS}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
-    # if [ ! -x "${default_cxx}" ]; then # fallback for systems with clang without standalone preprocessor binary:
-    #     error "Base C++ compiler: $(diste "${CXX}") should be an executable!"
-    # fi
-
-    CPP="$(${PRINTF_BIN} '%s\n' "${default_cpp}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
-    # if [ ! -x "${default_cpp}" ]; then # fallback for systems with clang without standalone preprocessor binary:
-    #     CPP="${default_c} -E"
-    # fi
     CC="$(${PRINTF_BIN} '%s\n' "${_default_c} ${DEF_COMPILER_ARGS}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
     CXX="$(${PRINTF_BIN} '%s\n' "${_default_cxx} ${DEF_COMPILER_ARGS}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
     CPP="$(${PRINTF_BIN} '%s\n' "${_default_cpp}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
