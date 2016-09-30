@@ -209,6 +209,7 @@ list_bundles_full () {
 show_diff () {
     create_dirs
     _sddefname="${1}"
+    env_forgivable
     # if specified a file name, make sure it's named properly:
     ${EGREP_BIN} "${DEFAULT_DEF_EXT}$" "${_sddefname}" >/dev/null 2>&1 || \
         _sddefname="${_sddefname}${DEFAULT_DEF_EXT}"
@@ -229,6 +230,7 @@ show_diff () {
         ${GIT_BIN} status --short 2>/dev/null
     fi
     unset _sddefname _beauty_defn
+    env_pedantic
 }
 
 
