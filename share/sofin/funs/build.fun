@@ -625,7 +625,7 @@ process_flat () {
                 try "ninja -j${CPUS}" || \
                     run "${DEF_MAKE_METHOD}"
             else
-                run "${DEF_INSTALL_METHOD}"
+                run "${DEF_MAKE_METHOD}"
             fi
             cd "${_pwd}"
             after_make_callback
