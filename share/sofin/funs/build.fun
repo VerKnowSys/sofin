@@ -617,6 +617,8 @@ process_flat () {
             if [ "cmake" = "${DEF_CONFIGURE_METHOD}" ]; then
                 try "ninja -j${CPUS}" || \
                     run "${DEF_MAKE_METHOD}"
+            else
+                run "${DEF_INSTALL_METHOD}"
             fi
             cd "${_pwd}"
             after_make_callback
@@ -664,6 +666,8 @@ process_flat () {
             if [ "cmake" = "${DEF_CONFIGURE_METHOD}" ]; then
                 try "ninja install -j${CPUS}" || \
                     run "${DEF_INSTALL_METHOD}"
+            else
+                run "${DEF_INSTALL_METHOD}"
             fi
             cd "${_pwd}"
             after_install_callback
