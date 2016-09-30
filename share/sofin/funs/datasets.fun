@@ -538,9 +538,9 @@ do_prefix_snapshot () {
 
             # Try removing existing snaps:
             try "${ZFS_BIN} destroy ${_pr_snp}@${_snap_name} > /dev/null" && \
-                debug "Renamed snapshot to: $(distd "${_pr_snp}@${_snap_name} ${_snap_name}_${TIMESTAMP}")"
+                debug "Destroyed snapshot: $(distd "${_pr_snp}@${_snap_name}")"
             try "${ZFS_BIN} destroy ${_pr_bdir_snp}@${_snap_name} > /dev/null" && \
-                debug "Renamed snapshot to: $(distd "${_pr_bdir_snp}@${_snap_name} ${_snap_name}_${TIMESTAMP}")"
+                debug "Destroyed snapshot: $(distd "${_pr_bdir_snp}@${_snap_name}")"
 
             # Do snapshots:
             try "${ZFS_BIN} snapshot ${_pr_snp}@${_snap_name} > /dev/null" && \
