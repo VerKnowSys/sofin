@@ -148,12 +148,12 @@ compiler_setup () {
             DEFAULT_LINKER_FLAGS="${COMMON_LDFLAGS} ${DEF_SYSTEM_SPECIFIC_LDFLAGS}"
 
             # XQuartz support to make things easier:
-            if [ -d "/opt/X11/lib" -a \
-                 -d "/opt/X11/include" ]; then
-                 debug "XQuartz /opt prefix detected. Appending to compiler environment.."
-                 DEFAULT_COMPILER_FLAGS="${DEFAULT_COMPILER_FLAGS} -I/opt/X11/include"
-                 DEFAULT_LDFLAGS="${DEFAULT_LDFLAGS} -L/opt/X11/lib"
-            fi
+            # if [ -d "/opt/X11/lib" -a \
+            #      -d "/opt/X11/include" ]; then
+            #      debug "XQuartz /opt prefix detected. Appending to compiler environment.."
+            #      DEFAULT_COMPILER_FLAGS="${DEFAULT_COMPILER_FLAGS} -I/opt/X11/include"
+            #      DEFAULT_LINKER_FLAGS="${DEFAULT_LINKER_FLAGS} -L/opt/X11/lib"
+            # fi
 
             # NOTE: So if Lld is installed, and both /Software/Lld/exports/ld and
             #       /usr/bin/ld are same files => We use LLVM lld linker by default:
