@@ -70,7 +70,8 @@ HARDEN_CMACROS="-D_FORTIFY_SOURCE=2"
 HARDEN_CFLAGS_PRODUCTION="-fPIE -Wl,-z,relro,-z,now"
 HARDEN_LDFLAGS_PRODUCTION="-pie -z relro -z now"
 
-if [ "${SYSTEM_NAME}" = "Darwin" ]; then
+if [ "${SYSTEM_NAME}" = "Darwin" -o \
+     "YES" != "${CAP_SYS_HARDENED}" ]; then
     # not supported under macOS
     unset HARDEN_CFLAGS_PRODUCTION HARDEN_LDFLAGS_PRODUCTION
 fi
