@@ -614,7 +614,10 @@ process_flat () {
             # and common part between normal and continue modes:
             cd "${_pwd}"
             note "   ${NOTE_CHAR} Building requirement: $(distn "${_app_param}"), version: $(distn "${DEF_VERSION}")"
-            run "${DEF_MAKE_METHOD}"
+            if [ "cmake" = "${DEF_CONFIGURE_METHOD}" ]; then
+                try "ninja -j${CPUS}" || \
+                    run "${DEF_MAKE_METHOD}"
+            fi
             cd "${_pwd}"
             after_make_callback
             cd "${_pwd}"
@@ -659,7 +662,10 @@ process_flat () {
 
             cd "${_pwd}"
             note "   ${NOTE_CHAR} Installing requirement: $(distn "${_app_param}"), version: $(distn "${DEF_VERSION}")"
-            run "${DEF_INSTALL_METHOD}"
+            if [ "cmake" = "${DEF_CONFIGURE_METHOD}" ]; then
+                try "ninja install -j${CPUS}" || \
+                    run "${DEF_INSTALL_METHOD}"
+            fi
             cd "${_pwd}"
             after_install_callback
             cd "${_pwd}"
