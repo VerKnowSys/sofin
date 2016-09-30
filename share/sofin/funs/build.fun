@@ -639,10 +639,6 @@ process_flat () {
                 note "   ${NOTE_CHAR} Testing requirement: $(distn "${_app_param}"), version: $(distn "${DEF_VERSION}")"
                 cd "${_pwd}"
 
-                unset _anadd
-                if [ "Darwin" = "${SYSTEM_NAME}" ]; then
-                    _anadd="DY"
-                fi
                 # NOTE: mandatory on production machines:
                 # XXX: in future it should throw an error here..
                 test_and_rate_def "${_app_param}" "${DEF_TEST_METHOD}"
@@ -698,13 +694,25 @@ process_flat () {
 
 test_and_rate_def () {
     # $1 => name of definition
-    # $2 => test command invocation
-    env TEST_JOBS="${CPUS}" \
+    _name="${1}"
+    shift
+    # $@ => test command invocation
+
+    unset _anadd
+    if [ "Darwin" = "${SYSTEM_NAME}" ]; then
+        _anadd="DY"
+    fi
+
+    debug "Invoking test of definition: $(distd "${_name}") [$(distd "${@}")]"
+    exec env \
+        ${_anadd}LD_LIBRARY_PATH="${PREFIX}/lib:${PREFIX}/libexec:/usr/lib:/lib" \
+        TEST_JOBS="${CPUS}" \
         TEST_ENV="${DEF_TEST_ENV}" \
-        ${_anadd}LD_LIBRARY_PATH="${PREFIX}/lib:${PREFIX}/libexec:${_pwd}:/usr/lib" \
-        "${2}" \
-        >> ${PREFIX}/${1}.test.results \
-        2>> ${PREFIX}/${1}.test.fails && \
-            ${PREFIX}/${1}.test.passed
+        ${@} \
+        >> ${PREFIX}/${_name}.test.results \
+        2>> ${PREFIX}/${_name}.test.fails && \
+            ${PREFIX}/${_name}.test.passed
+
+    unset _name _an
     return 0
 }
