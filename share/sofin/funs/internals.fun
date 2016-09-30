@@ -102,7 +102,7 @@ get_shell_vars () {
     # LDFLAGS, PKG_CONFIG_PATH:
     # _ldresult="/lib:/usr/lib"
     _pkg_config_path="."
-    _ldflags="${LDFLAGS} ${DEFAULT_LDFLAGS}"
+    _ldflags="${LDFLAGS} ${DEFAULT_LINKER_FLAGS}"
     gsv_int_ldflags () {
         for _app in ${1}*; do # LIB_DIR
             if [ -e "${_app}/lib" ]; then

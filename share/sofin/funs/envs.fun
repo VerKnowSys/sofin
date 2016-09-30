@@ -54,7 +54,7 @@ disable_sofin_env () {
 set_c_and_cxx_flags () {
     CFLAGS="$(${PRINTF_BIN} '%s\n' "-I${PREFIX}/include ${DEFAULT_COMPILER_FLAGS}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
     CXXFLAGS="$(${PRINTF_BIN} '%s\n' "-I${PREFIX}/include ${DEFAULT_COMPILER_FLAGS}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
-    LDFLAGS="$(${PRINTF_BIN} '%s\n' "-L${PREFIX}/lib ${DEFAULT_LDFLAGS}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
+    LDFLAGS="$(${PRINTF_BIN} '%s\n' "-L${PREFIX}/lib ${DEFAULT_LINKER_FLAGS}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
 }
 
 
@@ -135,11 +135,11 @@ compiler_setup () {
     # TODO: linker pick should be implemented via "capabilities"!
     case "${SYSTEM_NAME}" in
         FreeBSD|Minix)
-            DEFAULT_LDFLAGS="${COMMON_LDFLAGS} ${DEF_SYSTEM_SPECIFIC_LDFLAGS}"
+            DEFAULT_LINKER_FLAGS="${COMMON_LDFLAGS} ${DEF_SYSTEM_SPECIFIC_LDFLAGS}"
             ;;
 
         Darwin)
-            DEFAULT_LDFLAGS="${COMMON_LDFLAGS} ${DEF_SYSTEM_SPECIFIC_LDFLAGS}"
+            DEFAULT_LINKER_FLAGS="${COMMON_LDFLAGS} ${DEF_SYSTEM_SPECIFIC_LDFLAGS}"
 
             # XQuartz support to make things easier:
             if [ -d "/opt/X11/lib" -a \
@@ -166,7 +166,7 @@ compiler_setup () {
             ;;
 
         Linux)
-            DEFAULT_LDFLAGS="${COMMON_LDFLAGS} ${DEF_SYSTEM_SPECIFIC_LDFLAGS}"
+            DEFAULT_LINKER_FLAGS="${COMMON_LDFLAGS} ${DEF_SYSTEM_SPECIFIC_LDFLAGS}"
             ;;
     esac
 
