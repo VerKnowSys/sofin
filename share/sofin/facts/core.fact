@@ -31,20 +31,16 @@ DEFAULT_LOCALE="en_US.UTF-8"
 DEFAULT_PARTIAL_FILE_EXT=".partial"
 DEFAULT_DEF_EXT=".def"
 DEFAULT_LOCK_EXT=".lock"
-
-DEFAULT_ARCHIVE_TARBALL_EXT=".txz" # can be used for files that have to be delivered in tarball format
+DEFAULT_ARCHIVE_TARBALL_EXT=".txz" # deprecated - tarball fallback
 DEFAULT_CHKSUM_EXT=".sha1"
 DEFAULT_REQ_OS_PROVIDED="os-provided"
 DEFAULT_INST_MARK_EXT=".installed"
-DEFAULT_TEST_PASSED_EXT=".passed"
-DEFAULT_SOFTWARE_SNAPSHOT_EXT=".zfsx"
-DEFAULT_SERVICE_SNAPSHOT_EXT=".zfsp"
-# For ZFS we don't use tarballs anymore:
-if [ "YES" = "${CAP_SYS_ZFS}" ]; then
-    DEFAULT_ARCHIVE_EXT="${DEFAULT_SOFTWARE_SNAPSHOT_EXT}"
-else
-    DEFAULT_ARCHIVE_EXT=".txz" # gets value of DEFAULT_SOFTWARE_SNAPSHOT_EXT under systems with ZFS support
-fi
+DEFAULT_TEST_PASSED_EXT=".test.passed"
+DEFAULT_TEST_FAILED_EXT=".test.failed"
+DEFAULT_TEST_MISSING_EXT=".test.missing"
+DEFAULT_SOFTWARE_SNAPSHOT_EXT=".zfsx" # zfs xz'd file snapshot of Software dir
+DEFAULT_SERVICE_SNAPSHOT_EXT=".zfsp" # zfs xz'd file snapshot of Service dir
+DEFAULT_ARCHIVE_EXT="${DEFAULT_ARCHIVE_EXT:-${DEFAULT_SOFTWARE_SNAPSHOT_EXT}}"
 DEFAULT_SRC_EXT=".src_"
 DEFAULT_GIT_DIR_NAME=".git"
 DEFAULT_PROJECT_DEPS_LIST_FILE=".dependencies"
@@ -60,6 +56,12 @@ DEFAULT_GIT_CLONE_OPTS="--progress --recursive"
 DEFAULT_ID_USER_NAME_OPTS="-un"
 DEFAULT_DATE_TS_OPTS="+%s"
 DEFAULT_DATE_TRYRUN_OPTS="+%F-%H%M%S"
+
+# Base values used by ZFS:
+DEFAULT_ORIGIN_SNAPSHOT_NAME="origin"
+DEFAULT_SNAPSHOT_SEND_OPTS="-D -L -e -p -v" # dedup, large-blocks, write-embed, include-properties, verbose
+DEFAULT_SNAPSHOT_RECEIVE_OPTS="-s -v" # save-interrupted-state, verbose
+
 
 # Security related values:
 PIE_TYPE_ENTRY="LSB shared object"
