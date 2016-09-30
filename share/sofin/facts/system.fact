@@ -55,31 +55,43 @@ EOF
 )
 
 
+setup_zfs_default_setup () {
+    # Zfs: set DEFAULT_ZPOOL to first available zpool
+    _zpool="$(${ZPOOL_BIN} list -H 2>/dev/null | eval "${FIRST_ARG_GUARD}")"
+    if [ -n "${_zpool}" ]; then
+        DEFAULT_ZPOOL="${DEFAULT_ZPOOL:-${_zpool}}"
+    else
+        DEFAULT_ZPOOL="${DEFAULT_ZPOOL:-zroot}"
+    fi
+    ORIGIN_ZFS_SNAP_NAME="${DEFAULT_ORIGIN_SNAPSHOT_NAME}"
+    ZFS_SEND_OPTS="${DEFAULT_SNAPSHOT_SEND_OPTS}"
+    ZFS_RECEIVE_OPTS="${DEFAULT_SNAPSHOT_RECEIVE_OPTS}"
+
+    # For ZFS we don't use tarballs anymore:
+    DEFAULT_ARCHIVE_EXT="${DEFAULT_SOFTWARE_SNAPSHOT_EXT}"
+}
+
+
+fallback_nonzfs_setup () {
+    # NOTE: Even if ZFS is present on OSX; We want it disabled (for now)
+    unset CAP_SYS_ZFS ORIGIN_ZFS_SNAP_NAME DEFAULT_ZPOOL ZFS_SEND_OPTS ZFS_RECEIVE_OPTS
+    # 1. ZFS default archive extension determines file type
+    # 2. Fallback to tarballs on ZFS-less OSes is done by capability check
+    DEFAULT_ARCHIVE_EXT="${DEFAULT_ARCHIVE_TARBALL_EXT}"
+}
+
+
 determine_system_capabilites () {
-    # TODO: add ability to run on systems without present C_COMPILER_NAME
     ${ZPOOL_BIN} list >/dev/null 2>/dev/null
     if [ "${?}" = "0" ]; then
         CAP_SYS_ZFS=YES
         if [ "${SYSTEM_NAME}" = "Darwin" ]; then
-            # NOTE: Even if ZFS is present on OSX, by now we want it disabled for now..
-            unset CAP_SYS_ZFS
+            fallback_nonzfs_setup
         else
-            # Zfs: set DEFAULT_ZPOOL to first available zpool
-            _zpool="$(${ZPOOL_BIN} list -H 2>/dev/null | eval "${FIRST_ARG_GUARD}")"
-            if [ -n "${_zpool}" ]; then
-                DEFAULT_ZPOOL="${DEFAULT_ZPOOL:-${_zpool}}"
-            else
-                DEFAULT_ZPOOL="${DEFAULT_ZPOOL:-zroot}"
-            fi
-            ORIGIN_ZFS_SNAP_NAME="origin"
-            ZFS_SEND_OPTS="-D -L -e -p -v" # dedup, large-blocks, write-embed, include-properties, verbose
-            ZFS_RECEIVE_OPTS="-s -v" # save-interrupted-state verbose
-
-            # For ZFS we don't use tarballs anymore:
-            DEFAULT_ARCHIVE_EXT="${DEFAULT_SOFTWARE_SNAPSHOT_EXT}"
+            setup_zfs_default_setup
         fi
-    else
-        unset CAP_SYS_ZFS DEFAULT_ZPOOL ORIGIN_ZFS_SNAP_NAME
+    else # NOTE: fallback, cause zpool command failed:
+        fallback_nonzfs_setup
     fi
 
     ${SYSCTL_BIN} hardening.pax >/dev/null 2>&1
