@@ -206,19 +206,29 @@ create_service_dir () {
 }
 
 
+unmount_and_destroy () {
+    _dataset_name="${1}"
+    try "${ZFS_BIN} list -H -t filesystem '${_dataset_name}'"
+    if [ "${?}" = "0" ]; then
+        try "${ZFS_BIN} umount -f '${_dataset_name}' > /dev/null"
+        try "${ZFS_BIN} destroy -fr '${_dataset_name}' > /dev/null"
+        if [ "${?}" = "0" ]; then
+            debug "Service dataset destroyed: $(distd "${_dataset_name}")"
+        else
+            warn "Service dataset NOT destroyed: $(distd "${_dataset_name}")"
+        fi
+    fi
+    unset _dataset_name
+}
+
+
 destroy_service_dir () {
     _dset_destroy="${1}"
     if [ -z "${_dset_destroy}" ]; then
         error "First argument with $(diste "BundleName") to destroy is required!"
     fi
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
-        _dsname="${DEFAULT_ZPOOL}${SERVICES_DIR}${USER}/${_dset_destroy}"
-        try "${ZFS_BIN} umount -f '${_dsname}'"
-        try "${ZFS_BIN} destroy -r '${_dsname}'" && \
-            try "${RM_BIN} -rf '${SERVICES_DIR}${_dset_destroy}'" && \
-                debug "Service dataset destroyed: $(distd "${_dsname}")"
-
-        unset _dsname
+        unmount_and_destroy "${DEFAULT_ZPOOL}${SERVICES_DIR}${USER}/${_dset_destroy}"
     else
         try "${RM_BIN} -rf '${SERVICES_DIR}${_dset_destroy}'" && \
             debug "Removed regular software-directory: $(distd "${SERVICES_DIR}${_dset_destroy}")"
