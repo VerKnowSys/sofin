@@ -711,17 +711,11 @@ test_and_rate_def () {
     fi
 
     debug "Invoking test of definition: $(distd "${_name}") [$(distd "${@}")]"
-    env_forgivable
-    exec env \
-        ${_anadd}LD_LIBRARY_PATH="${PREFIX}/lib:${PREFIX}/libexec:/usr/lib:/lib" \
-        TEST_JOBS="${CPUS}" \
-        TEST_ENV="${DEF_TEST_ENV}" \
-        ${@} \
-        >> ${PREFIX}/${_name}.test.results \
-        2>> ${PREFIX}/${_name}.test.fails && \
-            ${PREFIX}/${_name}.test.passed
-
+    try "${_anadd}LD_LIBRARY_PATH=\"${PREFIX}/lib:${PREFIX}/libexec:/usr/lib:/lib\" \
+TEST_JOBS=\"${CPUS}\" \
+TEST_ENV=\"${DEF_TEST_ENV}\" \
+${@} >> ${PREFIX}/${_name}.test.results && ${PREFIX}/${_name}.test.passed \
+"
     unset _name _an
-    env_pedantic
     return 0
 }
