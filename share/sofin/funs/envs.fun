@@ -76,16 +76,16 @@ dump_compiler_setup () {
     fi
 
     if [ -z "${DEF_NO_LLVM_LINKER}" -a "YES" = "${CAP_SYS_LLVM_LD}" ]; then
-        debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "llvm-linker" ${ColorGreen})"
-        debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "gold-linker" ${ColorGray})"
+        debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "llvm-lld-linker" ${ColorGreen})"
+        debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "gnu-gold-linker" ${ColorGray})"
         debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "system-linker" ${ColorGray})"
     elif [ -z "${DEF_NO_GOLDEN_LINKER}" -a "YES" = "${CAP_SYS_GOLD_LD}" ]; then
-        debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "llvm-linker" ${ColorGray})"
-        debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "gold-linker" ${ColorGreen})"
+        debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "llvm-lld-linker" ${ColorGray})"
+        debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "gnu-gold-linker" ${ColorGreen})"
         debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "system-linker" ${ColorGray})"
     else
-        debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "llvm-linker" ${ColorGray})"
-        debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "gold-linker" ${ColorGray})"
+        debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "llvm-lld-linker" ${ColorGray})"
+        debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "gnu-gold-linker" ${ColorGray})"
         debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "system-linker" ${ColorGreen})"
     fi
 
