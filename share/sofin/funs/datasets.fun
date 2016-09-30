@@ -536,17 +536,17 @@ do_prefix_snapshot () {
             _pr_bdir_snp="${DEFAULT_ZPOOL}${SOFTWARE_DIR}${USER}/${_pr_name}/${DEFAULT_SRC_EXT}${BUILD_NAMESUM}"
             debug "_pr_name: $(distd "${_pr_name}"), _pr_snp: $(distd "${_pr_snp}"), _pr_bdir_snp: $(distd "${_pr_bdir_snp}")"
 
-            # Try renaming existing snaps:
-            try "${ZFS_BIN} rename ${_pr_snp}@${_snap_name} ${_snap_name}_${TIMESTAMP}" && \
+            # Try removing existing snaps:
+            try "${ZFS_BIN} destroy ${_pr_snp}@${_snap_name} > /dev/null" && \
                 debug "Renamed snapshot to: $(distd "${_pr_snp}@${_snap_name} ${_snap_name}_${TIMESTAMP}")"
-            try "${ZFS_BIN} rename ${_pr_bdir_snp}@${_snap_name} ${_snap_name}_${TIMESTAMP}" && \
+            try "${ZFS_BIN} destroy ${_pr_bdir_snp}@${_snap_name} > /dev/null" && \
                 debug "Renamed snapshot to: $(distd "${_pr_bdir_snp}@${_snap_name} ${_snap_name}_${TIMESTAMP}")"
 
             # Do snapshots:
-            try "${ZFS_BIN} snapshot ${_pr_snp}@${_snap_name}" && \
+            try "${ZFS_BIN} snapshot ${_pr_snp}@${_snap_name} > /dev/null" && \
                 debug "Done @${_snap_name} snapshot of PREFIX: $(distd "${PREFIX}") of dataset: $(distd "${_pr_snp}")" && \
                     _p1=0
-            try "${ZFS_BIN} snapshot ${_pr_bdir_snp}@${_snap_name}" && \
+            try "${ZFS_BIN} snapshot ${_pr_bdir_snp}@${_snap_name} > /dev/null" && \
                 debug "Done @${_snap_name} snapshot of PREFIX: $(distd "${PREFIX}") of dataset: $(distd "${_pr_bdir_snp}")" && \
                     _p2=0
 
