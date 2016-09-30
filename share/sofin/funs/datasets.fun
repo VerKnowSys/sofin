@@ -537,10 +537,10 @@ do_prefix_snapshot () {
             debug "_pr_name: $(distd "${_pr_name}"), _pr_snp: $(distd "${_pr_snp}"), _pr_bdir_snp: $(distd "${_pr_bdir_snp}")"
 
             # Try removing existing snaps:
-            try "${ZFS_BIN} destroy ${_pr_snp}@${_snap_name} > /dev/null" && \
-                debug "Destroyed snapshot: $(distd "${_pr_snp}@${_snap_name}")"
-            try "${ZFS_BIN} destroy ${_pr_bdir_snp}@${_snap_name} > /dev/null" && \
-                debug "Destroyed snapshot: $(distd "${_pr_bdir_snp}@${_snap_name}")"
+            # try "${ZFS_BIN} destroy ${_pr_snp}@${_snap_name} > /dev/null" && \
+            #     debug "Destroyed snapshot: $(distd "${_pr_snp}@${_snap_name}")"
+            # try "${ZFS_BIN} destroy ${_pr_bdir_snp}@${_snap_name} > /dev/null" && \
+            #     debug "Destroyed snapshot: $(distd "${_pr_bdir_snp}@${_snap_name}")"
 
             # Do snapshots:
             try "${ZFS_BIN} snapshot ${_pr_snp}@${_snap_name} > /dev/null" && \
