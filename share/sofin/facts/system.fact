@@ -85,7 +85,6 @@ determine_system_capabilites () {
     ${SYSCTL_BIN} hardening.pax >/dev/null 2>&1
     if [ "${?}" = "0" ]; then
         CAP_SYS_HARDENED=YES
-        # NOTE: This implies: we request/expect PIC and PIE on every binary and library built by Sofin
     else
         unset CAP_SYS_HARDENED
     fi
@@ -138,22 +137,12 @@ determine_system_capabilites () {
         CAP_SYS_COMPILER_FLAGS="-fuse-ld=lld"
     fi
 
-    # Darwin is an "UNIX unicorn".. therefore it requires special threatment:
+    # NOTE: workstation system:
     if [ "Darwin" = "${SYSTEM_NAME}" ]; then
         # NOTE: Under Darwin we have to replace original linker with LLVM one.
-        #       On this system it has to be: /usr/bin/ld
-        unset CAP_SYS_LLVM_LD CAP_SYS_GOLD_LD CAP_SYS_COMPILER_FLAGS
-    fi
-
-    # core functions will use production mode by default for performance
-    if [ -z "${CAP_SYS_PRODUCTION}" ]; then
-        if [ -d "share/sofin/facts/" -a \
-             -f "share/sofin/facts/core.fact" ]; then
-            . share/sofin/facts/core.fact
-        elif [ -d "/usr/share/sofin/facts/" -a \
-             -f "/usr/share/sofin/facts/core.fact" ]; then
-            . /usr/share/sofin/facts/core.fact
-        fi
+        #       On this system it has to be: /usr/bin/ld.
+        # WARN: You may need to disable macOS SIP protection (10.11+) to modify files in /usr/bin
+        unset CAP_SYS_GOLD_LD CAP_SYS_COMPILER_FLAGS
     fi
 }
 
