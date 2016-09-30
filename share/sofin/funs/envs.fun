@@ -114,6 +114,12 @@ dump_compiler_setup () {
         debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "no-strict-overflow" ${ColorGreen})" || \
         debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "no-strict-overflow" ${ColorGray})"
 
+    # -ftrapv check:
+    # NOTE: Signed integer overflow raises the signal SIGILL instead of SIGABRT/SIGSEGV:
+    echo "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'ftrapv' >/dev/null 2>/dev/null && \
+        debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "trap-signed-integer-overflow" ${ColorGreen})" || \
+        debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "trap-signed-integer-overflow" ${ColorGray})"
+
     if [ -z "${DEF_LINKER_NO_DTAGS}" ]; then
         if [ "${SYSTEM_NAME}" != "Darwin" ]; then # feature isn't required on Darwin
             debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "enable-new-dtags" ${ColorGreen})"
