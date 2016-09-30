@@ -643,8 +643,7 @@ process_flat () {
                 fi
                 # NOTE: mandatory on production machines:
                 # XXX: in future it should throw an error here..
-                try "TEST_ENV=${DEF_TEST_ENV} TEST_JOBS=${CPUS} ${_anadd}LD_LIBRARY_PATH=${PREFIX}/lib:${_pwd}:/usr/lib ${DEF_TEST_METHOD}" && \
-                    mark_dependency_test_passed "${_app_param}"
+                test_and_rate_def "${_app_param}" "${DEF_TEST_METHOD}"
             else
                 warn "   ${WARN_CHAR} Tests for definition: $(distw "${_app_param}") skipped on demand"
             fi
@@ -690,4 +689,18 @@ process_flat () {
     unset _current_branch _dis_def _req_defname _app_param _prefix _bundlnm
 
     # TODO: reset env here?
+}
+
+
+test_and_rate_def () {
+    # $1 => name of definition
+    # $2 => test command invocation
+    env TEST_JOBS="${CPUS}" \
+        TEST_ENV="${DEF_TEST_ENV}" \
+        ${_anadd}LD_LIBRARY_PATH="${PREFIX}/lib:${PREFIX}/libexec:${_pwd}:/usr/lib" \
+        "${2}" \
+        >> ${PREFIX}/${1}.test.results \
+        2>> ${PREFIX}/${1}.test.fails && \
+            ${PREFIX}/${1}.test.passed
+    return 0
 }
