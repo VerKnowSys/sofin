@@ -320,36 +320,48 @@ build () {
 dump_debug_info () {
     # TODO: add DEF_ insight
     debug "-------------- PRE-BUILD SETTINGS DUMP --------------"
-    debug "CPUS (used): $(distd "${CPUS}")"
-    debug "ALL_CPUS: $(distd "${ALL_CPUS}")"
-    debug "DEF_COMPILER_ARGS: $(distd "${DEF_COMPILER_ARGS}")"
-    debug "DEF_LINKER_ARGS: $(distd "${DEF_LINKER_ARGS}")"
-    debug "MAKE_OPTS: $(distd "${MAKE_OPTS}")"
+    debug "CPUS: (used/total): ($(distd "${CPUS}")/$(distd "${ALL_CPUS}"))"
+    debug "PREFIX: $(distd "${PREFIX}")"
+    debug "PATH: $(distd "${PATH}")"
+    debug "BUILD_DIR: $(distd "${BUILD_DIR}")"
+    debug "BUILD_NAMESUM: $(distd "${BUILD_NAMESUM}")"
+    debug "CURRENT_DIR: $(distd $(${PWD_BIN} 2>/dev/null))"
+    debug "SERVICE_DIR: $(distd "${SERVICE_DIR}")"
     debug "FETCH_BIN: $(distd "${FETCH_BIN}")"
     debug "FETCH_OPTS: $(distd "${FETCH_OPTS}")"
-    debug "PREFIX: $(distd "${PREFIX}")"
-    debug "SERVICE_DIR: $(distd "${SERVICE_DIR}")"
-    debug "CURRENT_DIR: $(distd $(${PWD_BIN} 2>/dev/null))"
-    debug "BUILD_NAMESUM: $(distd "${BUILD_NAMESUM}")"
-    debug "BUILD_DIR: $(distd "${BUILD_DIR}")"
-    debug "PATH: $(distd "${PATH}")"
-    debug "CXXFLAGS: $(distd "${CXXFLAGS}")"
-    debug "CFLAGS: $(distd "${CFLAGS}")"
-    debug "LDFLAGS: $(distd "${LDFLAGS}")"
-    debug "LD_PRELOAD: $(distd "${LD_PRELOAD}")"
     if [ "Darwin" = "${SYSTEM_NAME}" ]; then
         debug "DYLD_LIBRARY_PATH: $(distd "${DYLD_LIBRARY_PATH}")"
     else
         debug "LD_LIBRARY_PATH: $(distd "${LD_LIBRARY_PATH}")"
     fi
+    debug "LD_PRELOAD: $(distd "${LD_PRELOAD}")"
     debug "CC: $(distd "${CC}")"
     debug "CXX: $(distd "${CXX}")"
     debug "CPP: $(distd "${CPP}")"
     debug "LD: $(distd "${LD}")"
     debug "NM: $(distd "${NM}")"
-    debug "RANLIB: $(distd "${RANLIB}")"
     debug "AR: $(distd "${AR}")"
     debug "AS: $(distd "${AS}")"
+    debug "RANLIB: $(distd "${RANLIB}")"
+    debug "CXXFLAGS: $(distd "${CXXFLAGS}")"
+    debug "CFLAGS: $(distd "${CFLAGS}")"
+    debug "LDFLAGS: $(distd "${LDFLAGS}")"
+    debug "MAKE_OPTS: $(distd "${MAKE_OPTS}")"
+    debug "DEF_COMPILER_ARGS: $(distd "${DEF_COMPILER_ARGS}")"
+    debug "DEF_LINKER_ARGS: $(distd "${DEF_LINKER_ARGS}")"
+
+    debug "DEF_CONFIGURE_METHOD: $(distd "${DEF_CONFIGURE_METHOD}")"
+    debug "DEF_MAKE_METHOD: $(distd "${DEF_MAKE_METHOD}")"
+    debug "DEF_TEST_METHOD: $(distd "${DEF_TEST_METHOD}")"
+    debug "DEF_INSTALL_METHOD: $(distd "${DEF_INSTALL_METHOD}")"
+
+    debug "DEF_AFTER_UNPACK_METHOD: $(distd "${DEF_AFTER_UNPACK_METHOD}")"
+    debug "DEF_AFTER_PATCH_METHOD: $(distd "${DEF_AFTER_PATCH_METHOD}")"
+    debug "DEF_AFTER_CONFIGURE_METH: $(distd "${DEF_AFTER_CONFIGURE_METH}")"
+    debug "DEF_AFTER_MAKE_METHOD: $(distd "${DEF_AFTER_MAKE_METHOD}")"
+    debug "DEF_AFTER_INSTALL_METHOD: $(distd "${DEF_AFTER_INSTALL_METHOD}")"
+    debug "DEF_AFTER_EXPORT_METHOD: $(distd "${DEF_AFTER_EXPORT_METHOD}")"
+
     debug "-------------- PRE-BUILD SETTINGS DUMP ENDS ---------"
 }
 
@@ -429,7 +441,7 @@ process_flat () {
                     _possible_old_build_dir="$(${TAR_BIN} -t --list --file "${_dest_file}" 2>/dev/null | ${HEAD_BIN} -n1 2>/dev/null | ${AWK_BIN} '{print $9;}' 2>/dev/null)"
                     if [ -d "${BUILD_DIR}/${_possible_old_build_dir%/}" ]; then
                         try "${RM_BIN} -rf '${BUILD_DIR}/${_possible_old_build_dir%/}'" && \
-                            note "Previous build dir was removed to avoid conflicts: $(distd "${BUILD_DIR}/${_possible_old_build_dir%/}")"
+                            debug "Previous dependency build dir was removed to avoid conflicts: $(distd "${BUILD_DIR}/${_possible_old_build_dir%/}")"
                     fi
 
                     try "${TAR_BIN} -xf ${_dest_file} --directory ${BUILD_DIR}" || \
