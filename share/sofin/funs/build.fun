@@ -425,6 +425,13 @@ process_flat () {
 
                     note "   ${NOTE_CHAR} Unpacking source of: $(distn "${DEF_NAME}${DEF_POSTFIX}"), version: $(distn "${DEF_VERSION}")"
                     debug "Build dir: $(distd "${BUILD_DIR}")"
+
+                    _possible_old_build_dir="$(${TAR_BIN} -t --list --file "${_dest_file}" 2>/dev/null | ${HEAD_BIN} -n1 2>/dev/null | ${AWK_BIN} '{print $9;}' 2>/dev/null)"
+                    if [ -d "${BUILD_DIR}/${_possible_old_build_dir%/}" ]; then
+                        try "${RM_BIN} -rf '${BUILD_DIR}/${_possible_old_build_dir%/}'" && \
+                            note "Previous build dir was removed to avoid conflicts: $(distd "${BUILD_DIR}/${_possible_old_build_dir%/}")"
+                    fi
+
                     try "${TAR_BIN} -xf ${_dest_file} --directory ${BUILD_DIR}" || \
                         try "${TAR_BIN} -xjf ${_dest_file} --directory ${BUILD_DIR}" || \
                             run "${TAR_BIN} -xJf ${_dest_file} --directory ${BUILD_DIR}"
