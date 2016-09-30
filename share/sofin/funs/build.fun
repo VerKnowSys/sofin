@@ -711,6 +711,7 @@ test_and_rate_def () {
     fi
 
     debug "Invoking test of definition: $(distd "${_name}") [$(distd "${@}")]"
+    env_forgivable
     exec env \
         ${_anadd}LD_LIBRARY_PATH="${PREFIX}/lib:${PREFIX}/libexec:/usr/lib:/lib" \
         TEST_JOBS="${CPUS}" \
@@ -721,5 +722,6 @@ test_and_rate_def () {
             ${PREFIX}/${_name}.test.passed
 
     unset _name _an
+    env_pedantic
     return 0
 }
