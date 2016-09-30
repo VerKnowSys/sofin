@@ -51,7 +51,7 @@ fail_any_bg_jobs () {
 validate_reqs () {
     if [ "${SYSTEM_NAME}" != "Darwin" ]; then
         if [ -d "/usr/local" ]; then
-            _a_files="$(${FIND_BIN} /usr/local -maxdepth 3 -type f 2>/dev/null | ${WC_BIN} -l 2>/dev/null | ${SED_BIN} -e 's/^ *//g;s/ *$//g' 2>/dev/null)"
+            _a_files="$(${FIND_BIN} /usr/local -maxdepth 2 -type f 2>/dev/null | ${WC_BIN} -l 2>/dev/null | ${SED_BIN} -e 's/^ *//g;s/ *$//g' 2>/dev/null)"
             if [ "${_a_files}" != "0" ]; then
                 if [ "${_a_files}" != "1" ]; then
                     _pstfix="s"
