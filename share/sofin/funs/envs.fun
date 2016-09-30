@@ -264,6 +264,11 @@ compiler_setup () {
         CXXFLAGS="${CXXFLAGS} -ffast-math"
     fi
 
+    if [ -z "${DEF_NO_TRAP_INT_OVERFLOW}" ]; then
+        CFLAGS="${CFLAGS} ${HARDEN_OFLOW_CFLAGS}"
+        CXXFLAGS="${CXXFLAGS} ${HARDEN_OFLOW_CFLAGS}"
+    fi
+
     # If DEF_LINKER_ARGS is set on definition side, append it's content to LDFLAGS:
     if [ -n "${DEF_LINKER_ARGS}" ]; then
         LDFLAGS="${LDFLAGS} ${DEF_LINKER_ARGS}"
