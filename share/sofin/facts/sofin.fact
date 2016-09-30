@@ -65,7 +65,7 @@ COMMON_FLAGS="-w -fPIC"
 # NOTE: XXX: To add -Werror=format-security as a default, we have to get rid of GNU software ;)
 # NOTE:-D is recognized as "a macro" and rejected f.i. configure script of "c-ares" definiton
 # NOTE: Under production systems, explicitly use RELRO and BINDNOW:
-HARDEN_CFLAGS="-fstack-protector -fstack-protector-strong -fstack-protector-all --param ssp-buffer-size=4 -fno-strict-overflow -Wformat -Wformat-security"
+HARDEN_CFLAGS="-ftrapv -fstack-protector -fstack-protector-strong -fstack-protector-all --param ssp-buffer-size=4 -fno-strict-overflow -Wformat -Wformat-security"
 HARDEN_CMACROS="-D_FORTIFY_SOURCE=2"
 HARDEN_CFLAGS_PRODUCTION="-fPIE -Wl,-z,relro,-z,now"
 HARDEN_LDFLAGS_PRODUCTION="-pie -z relro -z now"
@@ -79,6 +79,7 @@ fi
 COMMON_COMPILER_FLAGS="${COMMON_FLAGS} ${CAP_SYS_COMPILER_FLAGS} ${HARDEN_CFLAGS} ${HARDEN_CFLAGS_PRODUCTION} ${HARDEN_CMACROS}"
 COMMON_LDFLAGS="${COMMON_FLAGS} ${HARDEN_LDFLAGS_PRODUCTION}"
 
+# NOTE: initial setup, later used by compiler_setup():
 DEFAULT_COMPILER_FLAGS="${COMMON_COMPILER_FLAGS}"
 DEFAULT_LINKER_FLAGS="${COMMON_LDFLAGS}"
 
