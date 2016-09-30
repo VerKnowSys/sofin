@@ -171,7 +171,7 @@ compiler_setup () {
     esac
 
     # NOTE: Default flags can contains linker setup options:
-    DEFAULT_COMPILER_FLAGS="${CAP_SYS_COMPILER_FLAGS} ${COMMON_FLAGS} ${HARDEN_FLAGS} -D_FORTIFY_SOURCE=2 ${DEF_SYSTEM_SPECIFIC_CFLAGS}"
+    DEFAULT_COMPILER_FLAGS="${COMMON_COMPILER_FLAGS}"
 
     if [ "YES" = "${DEBUGBUILD}" ]; then
         DEFAULT_COMPILER_FLAGS="${DEFAULT_COMPILER_FLAGS} -O0 -ggdb"
@@ -240,7 +240,7 @@ compiler_setup () {
         unset NM AR AS RANLIB LD
 
         # NOTE: Default system linker fallback: CAP_SYS_COMPILER_FLAGS not included:
-        DEFAULT_COMPILER_FLAGS="${COMMON_FLAGS} ${HARDEN_FLAGS} -D_FORTIFY_SOURCE=2 ${DEF_SYSTEM_SPECIFIC_CFLAGS}"
+        DEFAULT_COMPILER_FLAGS="${COMMON_FLAGS} ${HARDEN_CFLAGS} ${HARDEN_CFLAGS_PRODUCTION} ${HARDEN_CMACROS}"
     fi
 
     # CFLAGS, CXXFLAGS setup:
