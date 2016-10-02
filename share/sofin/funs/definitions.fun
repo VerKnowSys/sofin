@@ -787,7 +787,7 @@ clone_or_fetch_git_bare_repo () {
     _git_cached="${GIT_CACHE_DIR}${_bare_name}${DEFAULT_GIT_DIR_NAME}"
     try "${MKDIR_BIN} -p ${GIT_CACHE_DIR}"
     note "   ${NOTE_CHAR} Fetching source repository: $(distn "${_source_path}")"
-    try "${GIT_BIN} clone ${DEFAULT_GIT_CLONE_OPTS} --mirror ${_source_path} ${_git_cached} 2> /dev/null" || \
+    try "${GIT_BIN} clone ${DEFAULT_GIT_CLONE_OPTS} --recursive --mirror ${_source_path} ${_git_cached} 2> /dev/null" || \
         try "${GIT_BIN} clone ${DEFAULT_GIT_CLONE_OPTS} --mirror ${_source_path} ${_git_cached} 2> /dev/null"
     if [ "${?}" = "0" ]; then
         debug "Cloned bare repository: $(distd "${_bare_name}")"
