@@ -2,7 +2,7 @@ create_dirs () {
     # special threatment for LOGS_DIR
     if [ ! -d "${LOGS_DIR}" ]; then
         debug "LOGS_DIR: $(distd "${LOGS_DIR}")"
-        run "${MKDIR_BIN} -p ${LOGS_DIR}"
+        try "${MKDIR_BIN} -p ${LOGS_DIR}"
     fi
 
     # check for regular cache dirs for existence:
@@ -10,7 +10,7 @@ create_dirs () {
          ! -d "${FILE_CACHE_DIR}" -o \
          ! -d "${LOCKS_DIR}" ]; then
          for dir in "${FILE_CACHE_DIR}" "${CACHE_DIR}" "${LOCKS_DIR}"; do
-            run "${MKDIR_BIN} -p ${dir}"
+            try "${MKDIR_BIN} -p ${dir}"
          done
     fi
     if [ ! -d "${DEFINITIONS_DIR}" -o \

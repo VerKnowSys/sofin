@@ -100,12 +100,12 @@ update_defs () {
         debug "Definitions update skipped on demand"
         return
     fi
-    run "${MKDIR_BIN} -p ${LOGS_DIR}"
+    try "${MKDIR_BIN} -p ${LOGS_DIR}"
     _cwd="$(${PWD_BIN} 2>/dev/null)"
     if [ ! -x "${GIT_BIN}" ]; then
         note "Installing initial definition list from tarball to cache dir: $(distn "${CACHE_DIR}")"
         try "${RM_BIN} -rf ${CACHE_DIR}${DEFINITIONS_BASE}"
-        run "${MKDIR_BIN} -p ${LOGS_DIR} ${CACHE_DIR}${DEFINITIONS_BASE}"
+        try "${MKDIR_BIN} -p ${LOGS_DIR} ${CACHE_DIR}${DEFINITIONS_BASE}"
         _initial_defs="${MAIN_SOURCE_REPOSITORY}${DEFINITIONS_INITIAL_FILE_NAME}${DEFAULT_ARCHIVE_TARBALL_EXT}"
         debug "Fetching latest tarball with initial definitions from: $(distd "${_initial_defs}")"
         _out_file="${FILE_CACHE_DIR}${DEFINITIONS_INITIAL_FILE_NAME}${DEFAULT_ARCHIVE_TARBALL_EXT}"
@@ -292,7 +292,7 @@ make_exports () {
     if [ -z "${_bundle_name}" ]; then
         error "Second argument with $(diste "BundleName") is required!"
     fi
-    run "${MKDIR_BIN} -p '${SOFTWARE_DIR}${_bundle_name}/exports'"
+    try "${MKDIR_BIN} -p '${SOFTWARE_DIR}${_bundle_name}/exports'"
     for _bindir in "/bin/" "/sbin/" "/libexec/"; do
         if [ -e "${SOFTWARE_DIR}${_bundle_name}${_bindir}${_export_bin}" ]; then
             note "Exporting binary: $(distn "${SOFTWARE_DIR}${_bundle_name}${_bindir}${_export_bin}")"
@@ -612,7 +612,7 @@ export_binaries () {
         _a_name="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
         _an_amount="$(${PRINTF_BIN} '%s\n' "${DEF_EXPORTS}" | ${WC_BIN} -w 2>/dev/null | ${TR_BIN} -d '\t|\r|\ ' 2>/dev/null)"
         debug "Exporting $(distd "${_an_amount}") binaries of prefix: $(distd "${PREFIX}")"
-        run "${MKDIR_BIN} -p ${PREFIX}/exports"
+        try "${MKDIR_BIN} -p ${PREFIX}/exports"
         _expolist=""
         for exp in ${DEF_EXPORTS}; do
             for dir in "/bin/" "/sbin/" "/libexec/"; do
@@ -785,7 +785,7 @@ clone_or_fetch_git_bare_repo () {
     _chk_branch="${3}"
     _build_dir="${4}"
     _git_cached="${GIT_CACHE_DIR}${_bare_name}${DEFAULT_GIT_DIR_NAME}"
-    run "${MKDIR_BIN} -p ${GIT_CACHE_DIR}"
+    try "${MKDIR_BIN} -p ${GIT_CACHE_DIR}"
     note "   ${NOTE_CHAR} Fetching source repository: $(distn "${_source_path}")"
     try "${GIT_BIN} clone ${DEFAULT_GIT_CLONE_OPTS} --mirror ${_source_path} ${_git_cached} 2> /dev/null" || \
         try "${GIT_BIN} clone ${DEFAULT_GIT_CLONE_OPTS} --mirror ${_source_path} ${_git_cached} 2> /dev/null"
@@ -793,7 +793,7 @@ clone_or_fetch_git_bare_repo () {
         debug "Cloned bare repository: $(distd "${_bare_name}")"
     elif [ -d "${_git_cached}" ]; then
         _cwddd="$(${PWD_BIN} 2>/dev/null)"
-        debug "Trying to update  existing bare repository cache in: $(distd "${_git_cached}")"
+        debug "Trying to update existing bare repository cache in: $(distd "${_git_cached}")"
         cd "${_git_cached}"
         try "${GIT_BIN} fetch ${DEFAULT_GIT_OPTS} origin ${_chk_branch} > /dev/null" || \
             warn "   ${WARN_CHAR} Failed to fetch an update from bare repository: $(distw "${_git_cached}") [branch: $(distw "${_chk_branch}")]"

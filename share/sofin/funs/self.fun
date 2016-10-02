@@ -55,7 +55,7 @@ install_sofin_files () {
     permnote "Installing.."
     if [ -n "${PREFIX}" ]; then
         for _a_destph in "${PREFIX}" "${PREFIX}etc" "${PREFIX}usr/bin"; do
-            run "${MKDIR_BIN} -p ${_a_destph}"
+            try "${MKDIR_BIN} -p ${_a_destph}"
         done
     else
         PREFIX="/"
