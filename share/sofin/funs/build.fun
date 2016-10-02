@@ -726,7 +726,9 @@ test_and_rate_def () {
     try "${_anadd}LD_LIBRARY_PATH=\"${PREFIX}/lib:${PREFIX}/libexec:/usr/lib:/lib\" \
 TEST_JOBS=\"${CPUS}\" \
 TEST_ENV=\"${DEF_TEST_ENV}\" \
-${@} >> ${PREFIX}/${_name}.test.results && ${PREFIX}/${_name}.test.passed \
+${@} >> ${PREFIX}/${_name}.test.results && \
+${TOUCH_BIN} ${PREFIX}/${_name}.test.passed \
+\n\
 "
     unset _name _an
     return 0
