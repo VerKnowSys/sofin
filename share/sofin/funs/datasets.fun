@@ -400,18 +400,23 @@ create_software_bundle_archive () {
         error "Third argument with $(diste "version-string") is required!"
     fi
     _cddestfile="${FILE_CACHE_DIR}${_csbelem}"
-    debug "Creating destfile: $(distd "${_cddestfile}")"
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
-        _csbd_dataset="${DEFAULT_ZPOOL}${SOFTWARE_DIR}${USER}/${_csbname}"
-        debug "Creating archive from snapshot: $(distd "${ORIGIN_ZFS_SNAP_NAME}") dataset: $(distd "${_csbd_dataset}") to file: $(distd "${_cddestfile}")"
-        _cdir="$(${PWD_BIN} 2>/dev/null)"
-        cd /tmp
-        try "${ZFS_BIN} snapshot '${_csbd_dataset}@${ORIGIN_ZFS_SNAP_NAME}'"
-        try "${ZFS_BIN} umount -f '${_csbd_dataset}'"
-        try "${ZFS_BIN} send ${ZFS_SEND_OPTS} '${_csbd_dataset}@${ORIGIN_ZFS_SNAP_NAME}' | ${XZ_BIN} ${DEFAULT_XZ_OPTS} > ${_cddestfile}" && \
-            note "Created bin-bundle from dataset: $(distd "${_csbd_dataset}")"
-        cd "${_cdir}"
-        run "${ZFS_BIN} mount '${_csbd_dataset}'"
+        _inst_ind="${_csbname}/$(lowercase "${_csbname}")${DEFAULT_INST_MARK_EXT}"
+        if [ -d "${_csbname}" -a \
+             -f "${_inst_ind}" ]; then
+            _csbd_dataset="${DEFAULT_ZPOOL}${SOFTWARE_DIR}${USER}/${_csbname}"
+            debug "Creating archive from snapshot: $(distd "${ORIGIN_ZFS_SNAP_NAME}") dataset: $(distd "${_csbd_dataset}") to file: $(distd "${_cddestfile}")"
+            _cdir="$(${PWD_BIN} 2>/dev/null)"
+            cd /tmp
+            try "${ZFS_BIN} snapshot '${_csbd_dataset}@${ORIGIN_ZFS_SNAP_NAME}'"
+            try "${ZFS_BIN} umount -f '${_csbd_dataset}'"
+            try "${ZFS_BIN} send ${ZFS_SEND_OPTS} '${_csbd_dataset}@${ORIGIN_ZFS_SNAP_NAME}' | ${XZ_BIN} ${DEFAULT_XZ_OPTS} > ${_cddestfile}" && \
+                note "Created bin-bundle from dataset: $(distd "${_csbd_dataset}")"
+            cd "${_cdir}"
+            run "${ZFS_BIN} mount '${_csbd_dataset}'"
+        else
+            error "Can't build snapshot from broken/empty bundle dir: $(diste "${_inst_ind}")"
+        fi
     else
         debug "No ZFS-binbuilds feature. Falling back to tarballs.."
         _cdir="$(${PWD_BIN} 2>/dev/null)"
