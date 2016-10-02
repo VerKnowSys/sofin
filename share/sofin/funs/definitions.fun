@@ -37,7 +37,7 @@ load_defs () {
     for _required_field in  "DEF_NAME=${DEF_NAME}" \
                             "DEF_NAME_DEF_POSTFIX=${DEF_NAME}${DEF_POSTFIX}" \
                             "DEF_VERSION=${DEF_VERSION}" \
-                            "DEF_SHA_OR_DEF_GIT_MODE=${DEF_SHA}${DEF_GIT_MODE}" \
+                            "DEF_SHA_OR_DEF_GIT_CHECKOUT=${DEF_SHA}${DEF_GIT_CHECKOUT}" \
                             "DEF_COMPLIANCE=${DEF_COMPLIANCE}" \
                             "DEF_SOURCE_PATH=${DEF_SOURCE_PATH}" \
                             "SYSTEM_VERSION=${SYSTEM_VERSION}" \
@@ -48,7 +48,7 @@ load_defs () {
             for _check in   "DEF_NAME" \
                             "DEF_NAME_DEF_POSTFIX" \
                             "DEF_VERSION" \
-                            "DEF_SHA_OR_DEF_GIT_MODE" \
+                            "DEF_SHA_OR_DEF_GIT_CHECKOUT" \
                             "DEF_COMPLIANCE" \
                             "DEF_SOURCE_PATH" \
                             "SYSTEM_VERSION" \

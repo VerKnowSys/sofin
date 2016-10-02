@@ -408,7 +408,7 @@ process_flat () {
             if [ -n "${BUILD_DIR}" -a \
                  -n "${BUILD_NAMESUM}" ]; then
                 cd "${BUILD_DIR}"
-                if [ -z "${DEF_GIT_MODE}" ]; then # Standard "fetch source archive" method
+                if [ -z "${DEF_GIT_CHECKOUT}" ]; then # Standard "fetch source archive" method
                     _base="${DEF_SOURCE_PATH##*/}"
                     # debug "DEF_SOURCE_PATH: $(distd "${DEF_SOURCE_PATH}") base: $(distd "${_base}")"
                     _dest_file="${FILE_CACHE_DIR}${_base}"
