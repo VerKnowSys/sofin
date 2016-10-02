@@ -451,7 +451,7 @@ process_flat () {
                     # git method:
                     # .cache/git-cache => git bare repos
                     # NOTE: if DEF_GIT_CHECKOUT is unset, use DEF_VERSION:
-                    clone_or_fetch_git_bare_repo "${DEF_SOURCE_PATH}" "${DEF_NAME}${DEF_POSTFIX}-master" "${DEF_GIT_CHECKOUT:-${DEF_VERSION}}" "${BUILD_DIR}"
+                    clone_or_fetch_git_bare_repo "${DEF_SOURCE_PATH}" "${DEF_NAME}${DEF_POSTFIX}-bare" "${DEF_GIT_CHECKOUT:-${DEF_VERSION}}" "${BUILD_DIR}"
                 fi
 
                 unset _fd
