@@ -402,7 +402,7 @@ create_software_bundle_archive () {
     _cddestfile="${FILE_CACHE_DIR}${_csbelem}"
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
         _inst_ind="${_csbname}/$(lowercase "${_csbname}")${DEFAULT_INST_MARK_EXT}"
-        if [ -d "${_csbname}" -a \
+        if [ -d "${SOFTWARE_DIR}${_csbname}" -a \
              -f "${_inst_ind}" ]; then
             _csbd_dataset="${DEFAULT_ZPOOL}${SOFTWARE_DIR}${USER}/${_csbname}"
             debug "Creating archive from snapshot: $(distd "${ORIGIN_ZFS_SNAP_NAME}") dataset: $(distd "${_csbd_dataset}") to file: $(distd "${_cddestfile}")"
