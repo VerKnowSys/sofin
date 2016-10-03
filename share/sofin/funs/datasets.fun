@@ -403,7 +403,7 @@ create_software_bundle_archive () {
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
         _inst_ind="${_csbname}/$(lowercase "${_csbname}")${DEFAULT_INST_MARK_EXT}"
         if [ -d "${SOFTWARE_DIR}${_csbname}" -a \
-             -f "${_inst_ind}" ]; then
+             -f "${SOFTWARE_DIR}${_inst_ind}" ]; then
             _csbd_dataset="${DEFAULT_ZPOOL}${SOFTWARE_DIR}${USER}/${_csbname}"
             debug "Creating archive from snapshot: $(distd "${ORIGIN_ZFS_SNAP_NAME}") dataset: $(distd "${_csbd_dataset}") to file: $(distd "${_cddestfile}")"
             _cdir="$(${PWD_BIN} 2>/dev/null)"
@@ -415,7 +415,7 @@ create_software_bundle_archive () {
             cd "${_cdir}"
             run "${ZFS_BIN} mount '${_csbd_dataset}'"
         else
-            error "Can't build snapshot from broken/empty bundle dir: $(diste "${_inst_ind}")"
+            error "Can't build snapshot from broken/empty bundle dir: $(diste "${SOFTWARE_DIR}${_inst_ind}")"
         fi
     else
         debug "No ZFS-binbuilds feature. Falling back to tarballs.."
