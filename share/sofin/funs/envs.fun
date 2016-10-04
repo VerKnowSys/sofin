@@ -196,6 +196,10 @@ compiler_setup () {
         _default_cxx="${CXX_COMPILER_NAME_ALT}"
         _default_cpp="${CPP_PREPROCESSOR_NAME_ALT}"
     fi
+    # NOTE: Darwin case: no clang-cpp but clang -E as preprocesor there:
+    if [ ! -x "${PREFIX}/bin/${_default_cpp}" ]; then
+        _default_cpp="${_default_c} -E"
+    fi
     CC="$(${PRINTF_BIN} '%s\n' "${_default_c} ${DEF_COMPILER_ARGS}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
     CXX="$(${PRINTF_BIN} '%s\n' "${_default_cxx} ${DEF_COMPILER_ARGS}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
     CPP="$(${PRINTF_BIN} '%s\n' "${_default_cpp}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
@@ -207,16 +211,13 @@ compiler_setup () {
             if [ -d "${PREFIX}/bin" ]; then
                 CC="${CCACHE_BIN_OPTIONAL} ${PREFIX}/bin/${CC}"
                 CXX="${CCACHE_BIN_OPTIONAL} ${PREFIX}/bin/${CXX}"
-                CPP="${CCACHE_BIN_OPTIONAL} ${PREFIX}/bin/${CPP}"
             else
                 CC="${CCACHE_BIN_OPTIONAL} ${CC}"
                 CXX="${CCACHE_BIN_OPTIONAL} ${CXX}"
-                CPP="${CCACHE_BIN_OPTIONAL} ${CPP}"
             fi
         else
             CC="${CCACHE_BIN_OPTIONAL} /usr/bin/${CC}"
             CXX="${CCACHE_BIN_OPTIONAL} /usr/bin/${CXX}"
-            CPP="${CCACHE_BIN_OPTIONAL} /usr/bin/${CPP}"
         fi
     fi
 
