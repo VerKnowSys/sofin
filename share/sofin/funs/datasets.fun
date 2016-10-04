@@ -402,8 +402,7 @@ create_software_bundle_archive () {
     _cddestfile="${FILE_CACHE_DIR}${_csbelem}"
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
         _inst_ind="${_csbname}/$(lowercase "${_csbname}")${DEFAULT_INST_MARK_EXT}"
-        if [ -d "${SOFTWARE_DIR}${_csbname}" -a \
-             -f "${SOFTWARE_DIR}${_inst_ind}" ]; then
+        if [ -f "${SOFTWARE_DIR}${_inst_ind}" ]; then
             _csbd_dataset="${DEFAULT_ZPOOL}${SOFTWARE_DIR}${USER}/${_csbname}"
             debug "Creating archive from snapshot: $(distd "${ORIGIN_ZFS_SNAP_NAME}") dataset: $(distd "${_csbd_dataset}") to file: $(distd "${_cddestfile}")"
             _cdir="$(${PWD_BIN} 2>/dev/null)"
@@ -541,7 +540,7 @@ do_prefix_snapshot () {
             _pr_bdir_snp="${DEFAULT_ZPOOL}${SOFTWARE_DIR}${USER}/${_pr_name}/${DEFAULT_SRC_EXT}${BUILD_NAMESUM}"
             debug "_pr_name: $(distd "${_pr_name}"), _pr_snp: $(distd "${_pr_snp}"), _pr_bdir_snp: $(distd "${_pr_bdir_snp}")"
 
-            Try removing existing snaps:
+            # Try removing existing snaps:
             try "${ZFS_BIN} destroy ${_pr_snp}@${_snap_name} > /dev/null" && \
                 debug "Destroyed snapshot: $(distd "${_pr_snp}@${_snap_name}")"
             try "${ZFS_BIN} destroy ${_pr_bdir_snp}@${_snap_name} > /dev/null" && \
