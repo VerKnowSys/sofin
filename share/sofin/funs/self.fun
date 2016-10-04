@@ -21,6 +21,9 @@ load_requirements () {
 
 install_sofin () {
     permnote "Installing Software Installer, version: $(distn "${SOFIN_VERSION}")"
+    if [ -n "${PREFIX}" ]; then
+        permnote "Installing to given PREFIX: $(distn "${PREFIX}")"
+    fi
     CAP_SYS_PRODUCTION=YES
     compiler_setup && \
         build_sofin_natives && \
