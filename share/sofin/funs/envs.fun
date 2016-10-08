@@ -241,9 +241,11 @@ compiler_setup () {
         # Golden linker support:
         case "${SYSTEM_NAME}" in
             FreeBSD|Minix)
+                LD="${LD_BIN}.gold --plugin ${GOLD_SO}"
                 NM="/Software/Gold/exports/llvm-nm --plugin ${GOLD_SO}"
                 AR="/Software/Gold/exports/llvm-ar --plugin ${GOLD_SO}"
-                LD="${LD_BIN}.gold --plugin ${GOLD_SO}"
+                AS="/Software/Gold/exports/llvm-as"
+                RANLIB="/Software/Gold/exports/llvm-ranlib"
                 ;;
 
             Darwin)
