@@ -344,6 +344,7 @@ acquire_lock_for () {
 destroy_locks () {
     _pattern="${1}"
     _pid="${SOFIN_PID:-$$}"
+    env_forgivable
     for _dlf in $(${FIND_BIN} ${LOCKS_DIR%/} -mindepth 1 -maxdepth 1 -name "*${_pattern}*${DEFAULT_LOCK_EXT}" -print 2>/dev/null); do
         try "${EGREP_BIN} '^${_pid}$' ${_dlf}" && \
             try "${RM_BIN} -f ${_dlf}" && \
@@ -363,6 +364,7 @@ destroy_locks () {
         fi
     done && \
         debug "Finished locks cleanup using pattern: $(distd "${_pattern:-''}") that belong to pid: $(distd "${_pid}")"
+    env_pedantic
     unset _dlf _pid
 }
 
