@@ -472,6 +472,7 @@ strip_bundle () {
 
 
 track_useful_and_useless_files () {
+    env_forgivable
     if [ "${DEF_CLEAN_USELESS}" = "YES" ]; then
         unset _fordel
         # we shall clean the bundle, from useless files..
@@ -565,6 +566,7 @@ track_useful_and_useless_files () {
     else
         debug "Useless files cleanup skipped since DEF_CLEAN_USELESS=$(distd "${DEF_CLEAN_USELESS:-''}")!"
     fi
+    env_pedantic
     unset _cu_pattern _cufile _cuall_binaries _cu_commit_removal _cubase _fordel _dbg_exp_lst
 }
 
