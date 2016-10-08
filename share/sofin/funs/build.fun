@@ -292,8 +292,6 @@ build () {
                         permnote "$(distn "${SUCCESS_CHAR}") $(distn "${_bund_lcase}") [$(distn "${DEF_VERSION}")]"
                     fi
                 fi
-
-                strip_bundle "${_bund_lcase}"
             done
 
         fi
@@ -305,6 +303,7 @@ build () {
     after_export_callback
     after_export_snapshot
     validate_pie_on_exports "${_build_list}"
+    strip_bundle "${_bund_lcase}"
 
     # TODO: XXX: requires some more <3:
     #            create_apple_bundle_if_necessary
