@@ -540,28 +540,28 @@ do_prefix_snapshot () {
             _pr_bdir_snp="${DEFAULT_ZPOOL}${SOFTWARE_DIR}${USER}/${_pr_name}/${DEFAULT_SRC_EXT}${BUILD_NAMESUM}"
             debug "_pr_name: $(distd "${_pr_name}"), _pr_snp: $(distd "${_pr_snp}"), _pr_bdir_snp: $(distd "${_pr_bdir_snp}")"
 
-            # Try removing existing snaps:
-            try "${ZFS_BIN} destroy ${_pr_snp}@${_snap_name} > /dev/null" && \
-                debug "Destroyed snapshot: $(distd "${_pr_snp}@${_snap_name}")"
-            try "${ZFS_BIN} destroy ${_pr_bdir_snp}@${_snap_name} > /dev/null" && \
-                debug "Destroyed snapshot: $(distd "${_pr_bdir_snp}@${_snap_name}")"
+            # # Try removing existing snaps:
+            # try "${ZFS_BIN} destroy ${_pr_snp}@${_snap_name} > /dev/null" && \
+            #     debug "Destroyed snapshot: $(distd "${_pr_snp}@${_snap_name}")"
+            # try "${ZFS_BIN} destroy ${_pr_bdir_snp}@${_snap_name} > /dev/null" && \
+            #     debug "Destroyed snapshot: $(distd "${_pr_bdir_snp}@${_snap_name}")"
 
-            # Do snapshots:
-            try "${ZFS_BIN} snapshot ${_pr_snp}@${_snap_name} > /dev/null" && \
-                debug "Done @${_snap_name} snapshot of PREFIX: $(distd "${PREFIX}") of dataset: $(distd "${_pr_snp}")" && \
-                    _p1=0
-            try "${ZFS_BIN} snapshot ${_pr_bdir_snp}@${_snap_name} > /dev/null" && \
-                debug "Done @${_snap_name} snapshot of PREFIX: $(distd "${PREFIX}") of dataset: $(distd "${_pr_bdir_snp}")" && \
-                    _p2=0
+            # # Do snapshots:
+            # try "${ZFS_BIN} snapshot ${_pr_snp}@${_snap_name} > /dev/null" && \
+            #     debug "Done @${_snap_name} snapshot of PREFIX: $(distd "${PREFIX}") of dataset: $(distd "${_pr_snp}")" && \
+            #         _p1=0
+            # try "${ZFS_BIN} snapshot ${_pr_bdir_snp}@${_snap_name} > /dev/null" && \
+            #     debug "Done @${_snap_name} snapshot of PREFIX: $(distd "${PREFIX}") of dataset: $(distd "${_pr_bdir_snp}")" && \
+            #         _p2=0
 
-            if [ "${_p1}" = "0" -a \
-                 "${_p2}" = "0" ]; then
-                return 0
-            else
-                debug "Failed snapshot? _p1: $(distd "${_snap_name}_${TIMESTAMP}@${_snap_name}")=${_p1};  _p2: $(distd "${_pr_bdir_snp}@${_snap_name}")=${_p2}"
-                env_forgivable
-                return 1
-            fi
+            # if [ "${_p1}" = "0" -a \
+            #      "${_p2}" = "0" ]; then
+            #     return 0
+            # else
+            #     debug "Failed snapshot? _p1: $(distd "${_snap_name}_${TIMESTAMP}@${_snap_name}")=${_p1};  _p2: $(distd "${_pr_bdir_snp}@${_snap_name}")=${_p2}"
+            #     env_forgivable
+            #     return 1
+            # fi
         fi
     else
         debug "Value of USER unset!"
