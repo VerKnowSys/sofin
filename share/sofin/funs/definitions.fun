@@ -403,6 +403,7 @@ wipe_remote_archives () {
 
 
 strip_bundle () {
+    env_forgivable
     _sbfdefinition_name="${1}"
     if [ -z "${_sbfdefinition_name}" ]; then
         error "No definition name specified as first param!"
@@ -412,6 +413,10 @@ strip_bundle () {
     if [ -z "${PREFIX}" ]; then
         PREFIX="${SOFTWARE_DIR}$(capitalize "${DEF_NAME}${DEF_POSTFIX}")"
         debug "An empty prefix for: $(distd "${_sbfdefinition_name}"). Resetting to: $(distd "${PREFIX}")"
+    fi
+    if [ -f "${PREFIX}/${_sbfdefinition_name}${DEFAULT_STRIPPED_MARK_EXT}" ]; then
+        debug "Bundle looks like already stripped: $(distd "${_sbfdefinition_name}")"
+        return 0
     fi
 
     _dirs_to_strip=""
@@ -462,11 +467,13 @@ strip_bundle () {
                  -z "${_sbresult}" ]; then
                 _sbresult="0"
             fi
-            debug "$(distd "${_sbresult}") files were stripped"
+            run "${TOUCH_BIN} ${PREFIX}/${_sbfdefinition_name}${DEFAULT_STRIPPED_MARK_EXT}" && \
+                debug "$(distd "${_sbresult}") files were stripped. Strip indicator touched!"
         else
             warn "Symbol strip disabled for debug build."
         fi
     fi
+    env_pedantic
     unset _sbfdefinition_name _dirs_to_strip _sbresult _counter _files _stripdir _bundlower
 }
 
