@@ -293,10 +293,7 @@ build () {
                     fi
                 fi
             done
-
         fi
-
-        finalize_afterbuild "${_bund_name}"
     done
 
     export_binaries "${_bund_lcase}"
@@ -310,6 +307,11 @@ build () {
 
     # After exports - track useless files:
     track_useful_and_useless_files
+
+    for _bund_name in ${_build_list}; do
+        debug "finalize_afterbuild for: ${_bund_name}"
+        finalize_afterbuild "${_bund_name}"
+    done
 
     unset _build_list _bund_lcase _req_all _req
     env_reset
