@@ -241,7 +241,8 @@ compiler_setup () {
         # Golden linker support:
         case "${SYSTEM_NAME}" in
             FreeBSD|Minix)
-                NM="/Software/Gold/${SYSTEM_ARCH}-unknown-$(lowercase "${SYSTEM_NAME}")${SYSTEM_VERSION}/bin/nm --plugin ${GOLD_SO}"
+                NM="/Software/Gold/exports/llvm-nm --plugin ${GOLD_SO}"
+                AR="/Software/Gold/exports/llvm-ar --plugin ${GOLD_SO}"
                 LD="${LD_BIN}.gold --plugin ${GOLD_SO}"
                 ;;
 
