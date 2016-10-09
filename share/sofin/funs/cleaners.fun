@@ -22,27 +22,29 @@ clean_filecache () {
 }
 
 
-clean_failbuilds () {
-    if [ -n ${BUILD_DIR} -a \
-         -d "${BUILD_DIR}" ]; then
-        _cf_number="0"
-        _cf_files=$(${FIND_BIN} "${BUILD_DIR}" -maxdepth 2 -mindepth 1 -type d 2>/dev/null)
+clean_all_bdirs_leftovers () {
+    env_forgivable
+    if [ "YES" = "${CAP_SYS_ZFS}" ]; then
+        _list_zfs_dsets=$(${ZFS_BIN} list -H -o name -t filesystem 2>/dev/null | ${EGREP_BIN} "${DEFAULT_SRC_EXT}" 2>/dev/null)
+        for i in ${_list_zfs_dsets}; do
+            try "${ZFS_BIN} destroy -vfR '${i}'" && \
+                debug "Dataset destroyed: $(distd "${i}")"
+        done
+        unset _list_zfs_dsets
+    else
+        _cf_files=$(${FIND_BIN} "${SOFTWARE_DIR}" -mindepth 2 -maxdepth 2 -name "${DEFAULT_SRC_EXT}*" -type d 2>/dev/null)
         if [ -z "${_cf_files}" ]; then
-            debug "No cache dirs. Skipped"
+            debug "No leftover dirs.. Clean skipped."
         else
-            num="$(${PRINTF_BIN} '%s\n' "${_cf_files}" | eval "${FILES_COUNT_GUARD}")"
-            if [ -n "${num}" ]; then
-                _cf_number="${_cf_number} + ${num} - 1"
-            fi
             for i in ${_cf_files}; do
-                debug "Removing cache directory: ${i}"
-                try "${RM_BIN} -rf ${i}"
+                try "${RM_BIN} -vf '${i}'" && \
+                    debug "Empty dir removed using <slow-file-IO>: $(distd "${i}")"
             done
-            _cf_result="$(${PRINTF_BIN} '%s\n' "${_cf_number}" | ${BC_BIN} 2>/dev/null)"
-            note "$(distn "${_cf_result}") directories cleaned."
+            debug "Done cleaning of build-dir leftovers."
         fi
+        unset _cf_files
     fi
-    unset _cf_number _cf_files _cf_result
+    env_pedantic
 }
 
 
@@ -57,11 +59,11 @@ perform_clean () {
             note "Dist cleaning.."
             clean_logs
             clean_filecache
-            clean_failbuilds
+            clean_all_bdirs_leftovers
             ;;
 
         *) # clean
-            clean_failbuilds
+            clean_all_bdirs_leftovers
             ;;
     esac
 }
