@@ -228,11 +228,26 @@ compiler_setup () {
     if [ -z "${DEF_NO_LLVM_LINKER}" -a "YES" = "${CAP_SYS_LLVM_LD}" ]; then
         # Support of default: LLVM linker:
         if [ "${SYSTEM_NAME}" != "Darwin" ]; then
+            _llvm_pfx="/Software/Lld"
+            if [ -x "${_llvm_pfx}/bin/llvm-config" ]; then
+                RANLIB="${_llvm_pfx}/bin/llvm-ranlib"
+                NM="${_llvm_pfx}/bin/llvm-nm"
+                AR="${_llvm_pfx}/bin/llvm-ar"
+                AS="${_llvm_pfx}/bin/llvm-as"
+                debug "LLVM-LD linker configured."
+                unset STRIP
+            else
+                debug "Failed to get LLVM-host-target hint from llvm-config. Got: '$(distd "${_llvm_target}")'"
+                unset RANLIB STRIP AS NM AR
+                if [ -x "${LD_BIN}.lld" ]; then
+                    LD="${LD_BIN}.lld"
+                else
+                    # Fallback:
+                    LD="${LD_BIN}"
+                fi
+            fi
             LD="${LD_BIN}.lld"
-            NM="${NM_BIN}"
-            AR="${AR_BIN}"
-            AS="${AS_BIN}"
-            RANLIB="${RANLIB_BIN}"
+            unset _llvm_pfx _llvm_target
         fi
 
     elif [ -z "${DEF_NO_GOLDEN_LINKER}" -a \
@@ -241,19 +256,39 @@ compiler_setup () {
         # Golden linker support:
         case "${SYSTEM_NAME}" in
             FreeBSD|Minix)
-                LD="${LD_BIN}.gold --plugin ${GOLD_SO}"
-                NM="/Software/Gold/exports/llvm-nm --plugin ${GOLD_SO}"
-                AR="/Software/Gold/exports/llvm-ar --plugin ${GOLD_SO}"
-                AS="/Software/Gold/exports/llvm-as"
-                RANLIB="/Software/Gold/exports/llvm-ranlib"
+                _llvm_pfx="/Software/Gold"
+                _llvm_target="$(${_llvm_pfx}/exports/llvm-config --host-target 2>/dev/null || :)"
+                if [ -n "${_llvm_target}" -a \
+                     -d "${_llvm_pfx}/${_llvm_target}" -a \
+                     -x "${GOLD_SO}" -a \
+                     -x "${LD_BIN}.gold" ]; then
+                    LD="${LD_BIN}.gold --plugin ${GOLD_SO}"
+                    RANLIB="${_llvm_pfx}/${_llvm_target}/bin/ranlib --plugin ${GOLD_SO}"
+                    NM="${_llvm_pfx}/${_llvm_target}/bin/nm --plugin ${GOLD_SO}"
+                    AR="${_llvm_pfx}/${_llvm_target}/bin/ar --plugin ${GOLD_SO}"
+                    AS="${_llvm_pfx}/${_llvm_target}/bin/as"
+                    STRIP="${_llvm_pfx}/${_llvm_target}/bin/strip"
+                    debug "GNU-GOLD-LD linker configured."
+                else
+                    debug "Failed to get LLVM-host-target hint from llvm-config. Got: '$(distd "${_llvm_target}")'"
+                    unset NM AR AS RANLIB STRIP
+                    if [ -x "${GOLD_SO}" -a \
+                         -x "${LD_BIN}.gold" ]; then
+                        LD="${LD_BIN}.gold --plugin ${GOLD_SO}"
+                    else
+                        # Fallback:
+                        LD="${LD_BIN}"
+                    fi
+                fi
+                unset _llvm_pfx _llvm_target
                 ;;
 
             Darwin)
-                unset NM AR AS RANLIB LD
+                unset NM AR AS RANLIB LD STRIP
                 ;;
 
             Linux)
-                unset NM LD
+                unset NM AR AS RANLIB LD STRIP
                 RANLIB="${RANLIB_BIN}"
                 ;;
         esac
