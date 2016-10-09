@@ -200,8 +200,8 @@ compiler_setup () {
     if [ ! -x "${PREFIX}/bin/${_default_cpp}" ]; then
         _default_cpp="${_default_c} -E"
     fi
-    CC="$(${PRINTF_BIN} '%s\n' "${_default_c} ${DEF_COMPILER_ARGS}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
-    CXX="$(${PRINTF_BIN} '%s\n' "${_default_cxx} ${DEF_COMPILER_ARGS}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
+    CC="$(${PRINTF_BIN} '%s\n' "${_default_c} ${DEF_SYSTEM_SPECIFIC_CFLAGS} ${DEF_COMPILER_ARGS}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
+    CXX="$(${PRINTF_BIN} '%s\n' "${_default_cxx} ${DEF_SYSTEM_SPECIFIC_CXXFLAGS} ${DEF_COMPILER_ARGS}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
     CPP="$(${PRINTF_BIN} '%s\n' "${_default_cpp}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
     unset _default_c _default_cxx _default_cpp
 
