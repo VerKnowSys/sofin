@@ -130,7 +130,7 @@ determine_system_capabilites () {
     fi
 
     # Detect available linkers:
-    unset CAP_SYS_COMPILER_FLAGS CAP_SYS_LLVM_LD CAP_SYS_GOLD_LD CAP_SYS_FALLBACK_LD
+    unset CAP_SYS_LLVM_LD CAP_SYS_GOLD_LD
 
     # NOTE: Default Linker pick/use order:
     # 1. LLVM Linker (ld.lld)
@@ -139,14 +139,10 @@ determine_system_capabilites () {
     #
     if [ -x "${GOLD_BIN}" -a \
          -x "${GOLD_SO}" ]; then
-        unset CAP_SYS_LLVM_LD
         CAP_SYS_GOLD_LD=YES
-        CAP_SYS_COMPILER_FLAGS="-fuse-ld=gold"
     fi
     if [ -x "${LLD_BIN}" ]; then
-        unset CAP_SYS_GOLD_LD
         CAP_SYS_LLVM_LD=YES
-        CAP_SYS_COMPILER_FLAGS="-fuse-ld=lld"
     fi
 
     # NOTE: workstation system:
@@ -154,7 +150,7 @@ determine_system_capabilites () {
         # NOTE: Under Darwin we have to replace original linker with LLVM one.
         #       On this system it has to be: /usr/bin/ld.
         # WARN: You may need to disable macOS SIP protection (10.11+) to modify files in /usr/bin
-        unset CAP_SYS_GOLD_LD CAP_SYS_COMPILER_FLAGS
+        unset CAP_SYS_GOLD_LD
     fi
 }
 
