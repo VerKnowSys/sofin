@@ -52,9 +52,11 @@ disable_sofin_env () {
 
 
 set_c_and_cxx_flags () {
-    CFLAGS="$(${PRINTF_BIN} '%s\n' "-I${PREFIX}/include ${DEFAULT_COMPILER_FLAGS}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
-    CXXFLAGS="$(${PRINTF_BIN} '%s\n' "-I${PREFIX}/include ${DEFAULT_COMPILER_FLAGS}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
+    _flagz="${@}"
+    CFLAGS="$(${PRINTF_BIN} '%s\n' "-I${PREFIX}/include ${_flagz} ${DEFAULT_COMPILER_FLAGS}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
+    CXXFLAGS="$(${PRINTF_BIN} '%s\n' "-I${PREFIX}/include ${_flagz} ${DEFAULT_COMPILER_FLAGS}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
     LDFLAGS="$(${PRINTF_BIN} '%s\n' "-L${PREFIX}/lib ${DEFAULT_LINKER_FLAGS}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
+    unset _flagz
 }
 
 
@@ -79,7 +81,7 @@ dump_compiler_setup () {
         debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "llvm-lld-linker" ${ColorGreen})"
         debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "gnu-gold-linker" ${ColorGray})"
         debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "system-linker" ${ColorGray})"
-    elif [ -z "${DEF_NO_GOLDEN_LINKER}" -a "YES" = "${CAP_SYS_GOLD_LD}" ]; then
+    elif [ -z "${DEF_NO_GOLDEN_LINKER}" -a -n "${DEF_NO_LLVM_LINKER}" -a "YES" = "${CAP_SYS_GOLD_LD}" ]; then
         debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "llvm-lld-linker" ${ColorGray})"
         debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "gnu-gold-linker" ${ColorGreen})"
         debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "system-linker" ${ColorGray})"
@@ -225,11 +227,13 @@ compiler_setup () {
     # 1. LLVM Linker (ld.lld)
     # 2. Gold Linker (ld.gold)
     # 3. Legacy Linker (ld)
+    unset _compiler_use_linker_flags
     if [ -z "${DEF_NO_LLVM_LINKER}" -a "YES" = "${CAP_SYS_LLVM_LD}" ]; then
         # Support of default: LLVM linker:
         if [ "${SYSTEM_NAME}" != "Darwin" ]; then
             _llvm_pfx="/Software/Lld"
             if [ -x "${_llvm_pfx}/bin/llvm-config" ]; then
+                _compiler_use_linker_flags="-fuse-ld=lld"
                 RANLIB="${_llvm_pfx}/bin/llvm-ranlib"
                 NM="${_llvm_pfx}/bin/llvm-nm"
                 AR="${_llvm_pfx}/bin/llvm-ar"
@@ -251,20 +255,20 @@ compiler_setup () {
         fi
 
     elif [ -z "${DEF_NO_GOLDEN_LINKER}" -a \
-         "YES" = "${CAP_SYS_GOLD_LD}" ]; then
+           "YES" = "${CAP_SYS_GOLD_LD}" ]; then
 
         # Golden linker support:
         case "${SYSTEM_NAME}" in
             FreeBSD|Minix)
                 _llvm_pfx="/Software/Gold"
-                _llvm_target="$(${_llvm_pfx}/exports/llvm-config --host-target 2>/dev/null || :)"
+                _llvm_target="$(${_llvm_pfx}/bin/llvm-config --host-target 2>/dev/null || :)"
                 if [ -n "${_llvm_target}" -a \
-                     -d "${_llvm_pfx}/${_llvm_target}" -a \
-                     -x "${GOLD_SO}" -a \
-                     -x "${LD_BIN}.gold" ]; then
+                     -d "${_llvm_pfx}/${_llvm_target}" ]; then
+                    _compiler_use_linker_flags="-fuse-ld=gold"
                     LD="${LD_BIN}.gold --plugin ${GOLD_SO}"
                     RANLIB="${_llvm_pfx}/${_llvm_target}/bin/ranlib --plugin ${GOLD_SO}"
                     NM="${_llvm_pfx}/${_llvm_target}/bin/nm --plugin ${GOLD_SO}"
+                    # AR="${_llvm_pfx}/${_llvm_target}/bin/ar --plugin ${GOLD_SO}"
                     AS="${_llvm_pfx}/${_llvm_target}/bin/as"
                     STRIP="${_llvm_pfx}/${_llvm_target}/bin/strip"
                     debug "GNU-GOLD-LD linker configured."
@@ -294,13 +298,10 @@ compiler_setup () {
     else
         # NOTE: fallback with reset to system defaults - usually regular linker:
         unset NM AR AS RANLIB LD
-
-        # NOTE: Default system linker fallback: CAP_SYS_COMPILER_FLAGS not included:
-        DEFAULT_COMPILER_FLAGS="${COMMON_FLAGS} ${HARDEN_CFLAGS} ${HARDEN_CFLAGS_PRODUCTION} ${HARDEN_CMACROS}"
     fi
 
     # CFLAGS, CXXFLAGS setup:
-    set_c_and_cxx_flags
+    set_c_and_cxx_flags "${_compiler_use_linker_flags}"
 
     if [ -z "${DEF_LINKER_NO_DTAGS}" ]; then
         if [ "${SYSTEM_NAME}" != "Darwin" ]; then # feature isn't required on Darwin
