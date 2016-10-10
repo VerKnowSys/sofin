@@ -140,12 +140,14 @@ dump_compiler_setup () {
 
 
 dump_system_capabilities () {
-    ${ENV_BIN} 2>/dev/null | ${GREP_BIN} 'CAP_SYS_' 2>/dev/null | while IFS= read -r _envv
+    debug "---------------- SYSTEM CAPABILITIES DUMP ---------------"
+    IFS=\n set 2>/dev/null | ${GREP_BIN} 'CAP_SYS_' 2>/dev/null | while IFS= read -r _envv
     do
         if [ -n "${_envv}" ]; then
-            debug "CAP_SYS_${_envv}=${CAP_SYS_${_envv}}"
+            debug "$(distd "${_envv}")"
         fi
     done
+    debug "------------- SYSTEM CAPABILITIES DUMP ENDS -------------"
     unset _envv
 }
 
