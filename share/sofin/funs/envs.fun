@@ -139,6 +139,17 @@ dump_compiler_setup () {
 }
 
 
+dump_system_capabilities () {
+    ${ENV_BIN} 2>/dev/null | ${GREP_BIN} 'CAP_SYS_' 2>/dev/null | while IFS= read -r _envv
+    do
+        if [ -n "${_envv}" ]; then
+            debug "CAP_SYS_${_envv}=${CAP_SYS_${_envv}}"
+        fi
+    done
+    unset _envv
+}
+
+
 compiler_setup () {
     # TODO: linker pick should be implemented via "capabilities"!
     case "${SYSTEM_NAME}" in
