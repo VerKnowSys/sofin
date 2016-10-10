@@ -265,7 +265,6 @@ compiler_setup () {
                     LD="${LD_BIN}.gold --plugin ${GOLD_SO}"
                     RANLIB="${_llvm_pfx}/${_llvm_target}/bin/ranlib --plugin ${GOLD_SO}"
                     NM="${_llvm_pfx}/${_llvm_target}/bin/nm --plugin ${GOLD_SO}"
-                    AR="${_llvm_pfx}/${_llvm_target}/bin/ar --plugin ${GOLD_SO}"
                     AS="${_llvm_pfx}/${_llvm_target}/bin/as"
                     STRIP="${_llvm_pfx}/${_llvm_target}/bin/strip"
                     debug "GNU-GOLD-LD linker configured."
