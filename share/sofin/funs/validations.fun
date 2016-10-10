@@ -172,24 +172,38 @@ validate_pie_on_exports () {
         error "At least single bundle name has to be specified for pie validation."
     fi
     if [ "YES" = "${CAP_SYS_HARDENED}" ]; then
-        # Make sure PIE is applied on binaries:
         debug "Checking PIE on exports: $(distd "${_bundz}")"
         for _bun in ${_bundz}; do
             if [ -d "${SOFTWARE_DIR}${_bun}/exports" ]; then
-                for _bin in $(${FIND_BIN} ${SOFTWARE_DIR}${_bun}/exports -mindepth 1 -maxdepth 1 -type l 2>/dev/null | ${XARGS_BIN} ${READLINK_BIN} -f 2>/dev/null); do
-                    try "${FILE_BIN} '${_bin}' 2>/dev/null | ${GREP_BIN} 'ELF'"
-                    if [ "$?" = "0" ]; then
-                        # it's ELF binary/library:
-                        try "${FILE_BIN} '${_bin}' 2>/dev/null | ${GREP_BIN} 'ELF' | ${EGREP_BIN} '${PIE_TYPE_ENTRY}'" || \
-                            warn "Exported ELF binary: $(distw "${_bin}"), is not a $(distw "${PIE_TYPE_ENTRY}") (not-PIE)!"
+                _a_dir="${SOFTWARE_DIR}${_bun}/exports"
+            elif [ -d "${SOFTWARE_DIR}${_bun}/exports-disabled" ]; then
+                _a_dir="${SOFTWARE_DIR}${_bun}/exports-disabled"
+            else
+                debug "No exports of bundle: $(distd "${_bun}"). PIE validation skipped."
+                return 0
+            fi
+            _pie_indicator="${SOFTWARE_DIR}/${_bun}/$(lowercase "${_bun}")${DEFAULT_PIE_MARK_EXT}"
+            if [ -f "${_pie_indicator}" ]; then
+                debug "PIE exports were checked already for bundle: $(distd "${_bun}")"
+                continue
+            else
+                for _bin in $(${FIND_BIN} ${_a_dir} -mindepth 1 -maxdepth 1 -type l 2>/dev/null | ${XARGS_BIN} ${READLINK_BIN} -f 2>/dev/null); do
+                    try "${FILE_BIN} '${_bin}' 2>/dev/null | ${GREP_BIN} 'ELF' 2>/dev/null"
+                    if [ "$?" = "0" ]; then # it's ELF binary/library:
+                        try "${FILE_BIN} '${_bin}' 2>/dev/null | ${GREP_BIN} 'ELF' 2>/dev/null | ${EGREP_BIN} '${PIE_TYPE_ENTRY}' 2>/dev/null" || \
+                            warn "Exported ELF binary: $(distw "${_bin}"), is not a $(distw "${PIE_TYPE_ENTRY}") (not-PIE)!" && \
+                                ${PRINTF_BIN} "WARNING: ELF binary: '${_bin}', is not a '${PIE_TYPE_ENTRY}' (not-PIE)!\n" >> "${_pie_indicator}.warn"
                     else
                         debug "Executable, but not an ELF: $(distd "${_bin}")"
                     fi
                 done
+                run "${TOUCH_BIN} ${_pie_indicator}" && \
+                    debug "PIE check done for bundle: $(distd "${_bun}")"
             fi
         done
-        debug "PIE exports check finished."
+
     else
         debug "Nothing required."
     fi
+    unset _bin _a_dir _pie_indicator _bun _bundz
 }
