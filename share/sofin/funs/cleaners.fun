@@ -88,8 +88,10 @@ finalize_onquit () {
     untrap_signals
     env_forgivable
     summary
-    # Bring back echo
-    ${STTY_BIN} echo
+    if [ "${TTY}" = "YES" ]; then
+        # Bring back echo
+        ${STTY_BIN} echo
+    fi
 }
 
 

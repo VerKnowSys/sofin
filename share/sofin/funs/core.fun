@@ -404,6 +404,8 @@ initialize () {
     check_os
     trap_signals
 
-    # turn echo off
-    ${STTY_BIN} -echo
+    if [ "${TTY}" = "YES" ]; then
+        # turn echo off
+        ${STTY_BIN} -echo
+    fi
 }
