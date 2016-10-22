@@ -1,4 +1,4 @@
-SOFIN_VERSION="1.1.46"
+SOFIN_VERSION="1.1.47"
 
 
 SOFIN_ORIGIN="git@bitbucket.org:verknowsys/${DEFAULT_NAME}${DEFAULT_GIT_DIR_NAME}"
