@@ -709,7 +709,7 @@ process_flat () {
         fi
     else
 
-        warn "   ${WARN_CHAR} Requirement: $(distw "${_req_defname}") is provided by base system or disabled for $(distw ${SYSTEM_NAME})."
+        permnote "   ${WARN_CHAR} Requirement preinstalled: $(distn "${_req_defname}") on platform: $(distn ${SYSTEM_NAME})"
         if [ ! -d "${_prefix}" ]; then # case when disabled requirement is first on list of dependencies
             create_software_dir "${_prefix##*/}"
         fi
