@@ -517,6 +517,7 @@ process_flat () {
                 after_unpack_snapshot
 
                 cd "${_pwd}"
+                apply_definition_patches "${DEF_NAME}"
                 apply_definition_patches "${DEF_NAME}${DEF_POSTFIX}"
 
                 cd "${_pwd}"
