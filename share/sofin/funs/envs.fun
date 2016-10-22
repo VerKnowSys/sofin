@@ -265,6 +265,8 @@ compiler_setup () {
             fi
             LD="${LD_BIN}.lld"
             unset _llvm_pfx _llvm_target
+        else
+            LD="${LD_BIN} -arch ${DEFAULT_DARWIN_SYS_ARCH:-x86_64} -sdk_version ${DEFAULT_DARWIN_SDK_VERSION:-10.11}"
         fi
 
     elif [ -z "${DEF_NO_GOLDEN_LINKER}" -a \

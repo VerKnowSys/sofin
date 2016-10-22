@@ -64,6 +64,9 @@ DEFAULT_ORIGIN_SNAPSHOT_NAME="origin"
 DEFAULT_SNAPSHOT_SEND_OPTS="-D -L -e -p -v" # dedup, large-blocks, write-embed, include-properties, verbose
 DEFAULT_SNAPSHOT_RECEIVE_OPTS="-s -v" # save-interrupted-state, verbose
 
+# Darwin lld specific:
+DEFAULT_DARWIN_SYS_ARCH="x86_64"
+DEFAULT_DARWIN_SDK_VERSION="10.11"
 
 # Security related values:
 PIE_TYPE_ENTRY="LSB shared object"
