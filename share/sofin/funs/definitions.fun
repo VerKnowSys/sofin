@@ -768,18 +768,16 @@ apply_definition_patches () {
     if [ -z "${_pcpaname}" ]; then
         error "First argument with definition name is required!"
     fi
-    _common_patches_dir="${DEFINITIONS_DIR}patches/${_app_param}/"
-    _platform_patches_dir="${_common_patches_dir}${SYSTEM_NAME}/"
-    if [ -d "${_common_patches_dir}" -o \
-         -L "${_common_patches_dir}" ]; then
-        _ps_patches="$(${FIND_BIN} ${_common_patches_dir%/} -mindepth 1 -maxdepth 1 -type f 2>/dev/null)"
+    _common_patches_dir="${DEFINITIONS_DIR}patches/${_pcpaname}"
+    _platform_patches_dir="${_common_patches_dir}/${SYSTEM_NAME}"
+    if [ -d "${_common_patches_dir}/" ]; then
+        _ps_patches="$(${FIND_BIN} "${_common_patches_dir}/" -mindepth 1 -maxdepth 1 -type f 2>/dev/null)"
         if [ -n "${_ps_patches}" ]; then
             note "   ${NOTE_CHAR} Applying common patches for: $(distn "${_pcpaname}")"
             traverse_patchlevels ${_ps_patches}
         fi
-        if [ -d "${_platform_patches_dir}" -o \
-             -L "${_platform_patches_dir}" ]; then
-            _ps_patches="$(${FIND_BIN} ${_platform_patches_dir%/} -mindepth 1 -maxdepth 1 -type f 2>/dev/null)"
+        if [ -d "${_platform_patches_dir}/" ]; then
+            _ps_patches="$(${FIND_BIN} "${_platform_patches_dir}/" -mindepth 1 -maxdepth 1 -type f 2>/dev/null)"
             if [ -n "${_ps_patches}" ]; then
                 note "   ${NOTE_CHAR} Applying platform specific patches for: $(distn "${_pcpaname}/${SYSTEM_NAME}")"
                 traverse_patchlevels ${_ps_patches}
