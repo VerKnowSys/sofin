@@ -543,7 +543,6 @@ push_software_archive () {
 
 try_destroy_binbuild () {
     _bundle="${1}"
-    debug "Binbuild destroy skipped for: $(distd "${_bundle}")"
     if [ -n "${PREFIX}" -a \
          -d "${PREFIX}" ]; then
         _installed_indicator="${PREFIX}/$(lowercase "${_bundle}")${DEFAULT_INST_MARK_EXT}"
