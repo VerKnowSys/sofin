@@ -542,17 +542,23 @@ push_software_archive () {
 
 
 try_destroy_binbuild () {
+    _bundle="${1}"
+    debug "Binbuild destroy skipped for: $(distd "${_bundle}")"
     if [ -n "${PREFIX}" -a \
          -d "${PREFIX}" ]; then
-        if [ -n "${BUILD_NAMESUM}" ]; then
+        _installed_indicator="${PREFIX}/$(lowercase "${_bundle}")${DEFAULT_INST_MARK_EXT}"
+        if [ -f "${_installed_indicator}" -a \
+             -n "${BUILD_NAMESUM}" ]; then
+            debug "Installed indicator found for: $(distd "${_installed_indicator}"). Proceeding with build dir cleanup.."
             destroy_builddir "${PREFIX##*/}" "${BUILD_NAMESUM}"
         else
             # shouldn't happen..
-            debug "No BUILD_NAMESUM set! Can't identify build-dir!"
+            debug "No BUILD_NAMESUM set! Can't identify build-dir for: ${_bundle}!"
         fi
     else
         debug "Empty prefix. No build-dir to destroy"
     fi
+    unset _bundle
 }
 
 
