@@ -3,7 +3,7 @@ push_to_all_mirrors () {
     _pbto_bundle_name="${1}"
     _pversion_element="${2}"
     _ptelm_file_name="${_pbto_bundle_name}-${_pversion_element}-${OS_TRIPPLE}${DEFAULT_ARCHIVE_EXT}"
-    _ptelm_service_name="${_pbto_bundle_name}-${_pversion_element}${DEFAULT_SERVICE_SNAPSHOT_EXT}"
+    _ptelm_service_name="${_pbto_bundle_name}-${_pversion_element}"
     _pt_query="$(${HOST_BIN} A "${MAIN_SOFTWARE_ADDRESS}" 2>/dev/null | ${GREP_BIN} 'Address:' 2>/dev/null | eval "${HOST_ADDRESS_GUARD}")"
     debug "Address: $(distd "${_pt_query}"), bundle: $(distd "${_pbto_bundle_name}"), name: $(distd "${_ptelm_file_name}")"
     if [ -z "${_pbto_bundle_name}" ]; then
@@ -32,7 +32,12 @@ push_to_all_mirrors () {
         push_software_archive "${_ptelm_file_name}" "${_ptmirror}" "${_ptaddress}"
 
         build_service_dataset "${_pbto_bundle_name}" "${_pversion_element}"
-        push_dset_zfs_stream "${_ptelm_service_name}" "${_pbto_bundle_name}" "${_ptmirror}" "${_pversion_element}"
+        _pfin_svc_name="${_ptelm_service_name}${DEFAULT_SERVICE_SNAPSHOT_EXT}"
+        if [ "YES" != "${CAP_SYS_ZFS}" ]; then
+            # Fallback to tarball extension for service datadir:
+            _pfin_svc_name="${_ptelm_service_name}${DEFAULT_ARCHIVE_EXT}"
+        fi
+        push_dset_zfs_stream ${_pfin_svc_name} "${_pbto_bundle_name}" "${_ptmirror}" "${_pversion_element}"
     done
     note "Bundle pushed successfully: $(distn "${_pbto_bundle_name}")!"
     unset _ptaddress _ptmirror _pversion_element _ptelm_file_name _pt_query
@@ -47,42 +52,38 @@ push_dset_zfs_stream () {
     if [ -z "${_psfin_snapfile}" ]; then
         error "First argument with a $(diste "some-snapshot-file.txz") is required!"
     fi
-    if [ "YES" = "${CAP_SYS_ZFS}" ]; then
-        if [ -z "${_pselement}" ]; then
-            error "Second argument with a $(diste "BundleName") is required!"
-        fi
-        if [ -z "${_psmirror}" ]; then
-            error "Third argument with a $(diste "mirror-IP") is required!"
-        fi
-        if [ -z "${_psversion_element}" ]; then
-            error "Fourth argument with a $(diste "version-string") is required!"
-        fi
-        debug "push_dset_zfs_stream file: $(distd "${_psfin_snapfile}")"
-        if [ -f "${FILE_CACHE_DIR}${_psfin_snapfile}" ]; then
-            # create required dirs and stuff:
-            try "${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} ${MAIN_USER}@${_psmirror} \"${MKDIR_BIN} -vp '${COMMON_BINARY_REMOTE}'; ${CHMOD_BIN} -v 0755 '${COMMON_BINARY_REMOTE}'\""
+    if [ -z "${_pselement}" ]; then
+        error "Second argument with a $(diste "BundleName") is required!"
+    fi
+    if [ -z "${_psmirror}" ]; then
+        error "Third argument with a $(diste "mirror-IP") is required!"
+    fi
+    if [ -z "${_psversion_element}" ]; then
+        error "Fourth argument with a $(diste "version-string") is required!"
+    fi
+    debug "push_dset_zfs_stream file: $(distd "${_psfin_snapfile}")"
+    if [ -f "${FILE_CACHE_DIR}${_psfin_snapfile}" ]; then
+        # create required dirs and stuff:
+        try "${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} ${MAIN_USER}@${_psmirror} \"${MKDIR_BIN} -vp '${COMMON_BINARY_REMOTE}'; ${CHMOD_BIN} -v 0755 '${COMMON_BINARY_REMOTE}'\""
 
-            # NOTE: check if service dataset bundle isn't already pushed. ZFS streams cannot be overwritten!
-            try "${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} ${MAIN_USER}@${_psmirror} \"${FILE_BIN} ${COMMON_BINARY_REMOTE}/${_psfin_snapfile}\""
-            if [ "${?}" = "0" ]; then
-                debug "Service dataset file found existing on remote mirror: $(distd "${_psmirror}"). Service dataset origins can be stored only once (future ZFS-related features will rely on this!)"
-            else
-                try "${CHMOD_BIN} -v a+r ${FILE_CACHE_DIR}${_psfin_snapfile}" && \
-                    debug "Archive access a+r for: $(distd "${_psfin_snapfile}")"
-                retry "${SCP_BIN} ${DEFAULT_SSH_OPTS} ${DEFAULT_SCP_OPTS} -P ${MAIN_PORT} ${FILE_CACHE_DIR}${_psfin_snapfile} ${MAIN_USER}@${_psmirror}:${COMMON_BINARY_REMOTE}/${_psfin_snapfile}${DEFAULT_PARTIAL_FILE_EXT}"
-                if [ "${?}" = "0" ]; then
-                    debug "Service origin stream was sent to: $(distd "${MAIN_COMMON_NAME}") repository: $(distd "${MAIN_COMMON_REPOSITORY}/${_psfin_snapfile}")"
-                    retry "${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} ${MAIN_USER}@${_psmirror} \"cd ${COMMON_BINARY_REMOTE} && ${MV_BIN} -v ${_psfin_snapfile}${DEFAULT_PARTIAL_FILE_EXT} ${_psfin_snapfile}\"" && \
-                        debug "Partial file renamed successfully"
-                else
-                    error "Failed to send service stream of bundle: $(diste "${_pselement}") file: $(diste "${_psfin_snapfile}") to remote host: $(diste "${MAIN_USER}@${_psmirror}")!"
-                fi
-            fi
+        # NOTE: check if service dataset bundle isn't already pushed. ZFS streams cannot be overwritten!
+        try "${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} ${MAIN_USER}@${_psmirror} \"${FILE_BIN} ${COMMON_BINARY_REMOTE}/${_psfin_snapfile}\""
+        if [ "${?}" = "0" ]; then
+            debug "Service dataset file found existing on remote mirror: $(distd "${_psmirror}"). Service dataset origins can be stored only once (future ZFS-related features will rely on this!)"
         else
-            warn "No service stream available for bundle: $(distw "${_pselement}")"
+            try "${CHMOD_BIN} -v a+r ${FILE_CACHE_DIR}${_psfin_snapfile}" && \
+                debug "Archive access a+r for: $(distd "${_psfin_snapfile}")"
+            retry "${SCP_BIN} ${DEFAULT_SSH_OPTS} ${DEFAULT_SCP_OPTS} -P ${MAIN_PORT} ${FILE_CACHE_DIR}${_psfin_snapfile} ${MAIN_USER}@${_psmirror}:${COMMON_BINARY_REMOTE}/${_psfin_snapfile}${DEFAULT_PARTIAL_FILE_EXT}"
+            if [ "${?}" = "0" ]; then
+                debug "Service origin stream was sent to: $(distd "${MAIN_COMMON_NAME}") repository: $(distd "${MAIN_COMMON_REPOSITORY}/${_psfin_snapfile}")"
+                retry "${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} ${MAIN_USER}@${_psmirror} \"cd ${COMMON_BINARY_REMOTE} && ${MV_BIN} -v ${_psfin_snapfile}${DEFAULT_PARTIAL_FILE_EXT} ${_psfin_snapfile}\"" && \
+                    debug "Partial file renamed successfully"
+            else
+                error "Failed to send service stream of bundle: $(diste "${_pselement}") file: $(diste "${_psfin_snapfile}") to remote host: $(diste "${MAIN_USER}@${_psmirror}")!"
+            fi
         fi
     else
-        debug "No ZFS support"
+        warn "No service stream available for bundle: $(distw "${_pselement}")"
     fi
     unset _psmirror _pselement _psfin_snapfile _psfin_snapfile _psversion_element
 }
@@ -137,6 +138,39 @@ build_service_dataset () {
             debug "Service ${ORIGIN_ZFS_SNAP_NAME} snapshot file exists: $(distd "${FILE_CACHE_DIR}${_ps_snap_file}")"
         fi
         unset _snap_size _ps_ver_elem _full_dataset_name _ps_snap_file _ps_elem
+    else
+        # fallback for hosts without ZFS feature
+        if [ -z "${_ps_elem}" ]; then
+            error "First argument with a $(diste "BundleName") is required!"
+        fi
+        if [ -z "${_ps_ver_elem}" ]; then
+            error "Second argument with a $(diste "version-string") is required!"
+        fi
+        if [ -z "${USER}" ]; then
+            error "Second argument with env value for: $(diste "USER") is required!"
+        fi
+        _full_svc_dirname="${SERVICES_DIR}/${_ps_elem}"
+        _ps_snap_file="${_ps_elem}-${_ps_ver_elem}${DEFAULT_ARCHIVE_TARBALL_EXT}" # XXX: use DEFAULT_ARCHIVE_TARBALL_EXT
+        debug "Dir name: $(distd "${_full_svc_dirname}"), snapshot-file: $(distd "${_ps_snap_file}")"
+        if [ ! -f "${FILE_CACHE_DIR}${_ps_snap_file}" ]; then
+            fetch_dset_zfs_stream "${_ps_elem}" "${_ps_snap_file}"
+            if [ -f "${FILE_CACHE_DIR}${_ps_snap_file}" ]; then
+                debug "Service origin available!"
+            else
+                debug "Service origin unavailable! Creating new one."
+                run "${TAR_BIN} cJf ${FILE_CACHE_DIR}${_ps_snap_file} ${SERVICES_DIR}${_ps_elem}"
+                _snap_size="$(file_size "${FILE_CACHE_DIR}${_ps_snap_file}")"
+                if [ "${_snap_size}" = "0" ]; then
+                    try "${RM_BIN} -vf ${FILE_CACHE_DIR}${_ps_snap_file}"
+                    debug "Service tarball dump is empty for bundle: $(distd "${_ps_elem}-${_ps_ver_elem}")"
+                else
+                    debug "Snapshot of size: $(distd "${_snap_size}") is ready for bundle: $(distd "${_ps_elem}")"
+                fi
+            fi
+        else
+            debug "Service tarball file exists: $(distd "${FILE_CACHE_DIR}${_ps_snap_file}")"
+        fi
+        unset _snap_size _ps_ver_elem _full_svc_dirname _ps_snap_file _ps_elem
     fi
 }
 
@@ -179,7 +213,19 @@ fetch_dset_zfs_stream () {
             return 1
         fi
     else
-        debug "ZFS feature disabled"
+        debug "ZFS feature disabled. Falling back to tarballs.."
+        _commons_path="${MAIN_COMMON_REPOSITORY}/${_fdz_out_file}"
+        debug "Fetch service stream-tarball: $(distd "${FILE_CACHE_DIR}${_fdz_out_file}")"
+        retry "${FETCH_BIN} -o ${FILE_CACHE_DIR}${_fdz_out_file} ${FETCH_OPTS} '${_commons_path}'"
+        if [ "${?}" = "0" ]; then
+            try "${TAR_BIN} xf ${FILE_CACHE_DIR}${_fdz_out_file} --directory ${SERVICES_DIR}" && \
+                note "Received service tarball for service: $(distn "${_fdz_bund_name}")"
+            unset _tarball_name
+        else
+            debug "Origin service tarball unavailable for: $(distd "${_fdz_bund_name}")."
+            env_forgivable
+            return 1
+        fi
     fi
     unset _fdz_bund_name _fdz_out_file _commons_path
 }
