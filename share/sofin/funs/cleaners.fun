@@ -106,7 +106,7 @@ finalize_afterbuild () {
     _bund_name="${1}"
     # Cleanup build dir if DEVEL unset:
     if [ -z "${DEVEL}" ]; then
-        try_destroy_binbuild
+        try_destroy_binbuild "${_bund_name}"
     else
         # TODO: dump srcdir? here?
         debug "No-Op - not yet implemented"
