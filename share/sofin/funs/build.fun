@@ -12,6 +12,7 @@ build_bundle () {
     if [ -z "${_bsversion}" ]; then
         error "Third argument with $(diste "version-string") is required!"
     fi
+    env_forgivable
     debug "build_bundle: $(distd "${_bsbname}"), should be in: $(distd "${SOFTWARE_DIR}${_bsbname}"), full-name: $(distd "${_bsbelement}")"
     if [ ! -d "${SOFTWARE_DIR}${_bsbname}" ]; then
         create_software_dir "${_bsbname}"
@@ -42,6 +43,7 @@ build_bundle () {
             fi
         fi
     fi
+    env_pedantic
     unset _bsbname _bsbelement
 }
 
