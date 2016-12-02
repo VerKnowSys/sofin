@@ -156,7 +156,7 @@ space than it does with "old fasioned, system wide, shared software".
 ### Darwin/ Mac OS X specific:
   - Install Mac OS X 10.9, 10.10 or 10.11 (one currently supported)
   - Disable write lock to /usr/bin by disabling [SIP](http://osxdaily.com/2015/10/05/disable-rootless-system-integrity-protection-mac-os-x/) (applies only for 10.11 - 'El Capitan' and derivatives)
-  - Type `git clone https://verknowsys@bitbucket.org/verknowsys/sofin.git && cd sofin && sudo bin/install` in your terminal, and you're ready to go.
+  - Type `git clone https://github.com/VerKnowSys/sofin && cd sofin && sudo bin/install` in your terminal, and you're ready to go.
   - Type `s get Zsh`, then when it finishes, do: `grep 'Software/Zsh' /etc/shells || sudo echo '/Software/Zsh/exports/zsh' >> /etc/shells; sudo chsh -s /Software/Zsh/exports/zsh ${USER}` to change your shell, to one that is supported by default by Sofin.
     - Start using Sofin as regular user.
 
@@ -164,6 +164,13 @@ space than it does with "old fasioned, system wide, shared software".
 ## Conflicts/ Problems/ Known issues:
 * Sofin build mechanism is known to be in conflict with other software managment solutions like: BSD Ports, HomeBrew, MacPorts, Fink. Keep that in mind before reporting problems, cause they're the root of true evil on your OS :)
 * It's recommended to change shell by doing: `chsh -s /Software/Zsh/exports/zsh` for each user which will use Sofin. It's caused shells built the way, they don't read default shell initialization scripts like /etc/zshenv for Zsh.
+
+
+## Major changes since 1.0:
+* Pedantic mode by default - any command (called by Sofin), that throws non 0 exit code, has to be wrapped with try() or retry()
+* Internal design reworked from ground up to be more in "functional" / "modular" fashion.
+* System capabilities detected and used, instead of non-DRY checks over and over again.
+* Tests running by default.
 
 
 ## License:
