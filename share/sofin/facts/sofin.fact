@@ -41,7 +41,7 @@ DEFAULT_PATH="${DEFAULT_PATH:-/bin:/usr/bin:/sbin:/usr/sbin:/usr/pkg/bin:/usr/pk
 SOFIN_BIN_SHORT="${SOFIN_BIN##*/}"
 
 # Build timestamp in seconds since 1970
-TIMESTAMP="${TIMESTAMP:-$(${DATE_BIN} ${DEFAULT_DATE_TS_OPTS} 2>/dev/null)}"
+TIMESTAMP="${TIMESTAMP:-$(${DATE_BIN} "${DEFAULT_DATE_TS_OPTS}" 2>/dev/null)}"
 
 # Hardened system support:
 DEFAULT_SECURITY_STATE_FILE="${SOFTWARE_DIR}.sys-security-state.${TIMESTAMP}"
@@ -68,8 +68,8 @@ HARDEN_CMACROS="-D_FORTIFY_SOURCE=2"
 HARDEN_CFLAGS_PRODUCTION="-fPIE -Wl,-z,relro,-z,now"
 HARDEN_LDFLAGS_PRODUCTION="-pie -z relro -z now"
 
-if [ "${SYSTEM_NAME}" = "Darwin" -o \
-     "YES" != "${CAP_SYS_HARDENED}" ]; then
+if [ "${SYSTEM_NAME}" = "Darwin" ] || \
+   [ "YES" != "${CAP_SYS_HARDENED}" ]; then
     # not supported under macOS
     unset HARDEN_CFLAGS_PRODUCTION HARDEN_LDFLAGS_PRODUCTION
 fi
@@ -112,8 +112,8 @@ if [ -n "${SOFIN_TRACE}" ]; then
 fi
 
 if [ -n "${SOFIN_VERBOSE}" ]; then
-    if [ "YES" = "${CAP_TERM_ZSH}" -o \
-         "YES" = "${CAP_TERM_BASH}" ]; then
+    if [ "YES" = "${CAP_TERM_ZSH}" ] || \
+       [ "YES" = "${CAP_TERM_BASH}" ]; then
         set -o verbose
     else
         set -v

@@ -119,7 +119,7 @@ finalize_afterbuild () {
 
 
 remove_useless () {
-    _rufiles=${@}
+    _rufiles=${*}
     env_forgivable
     if [ -n "${_rufiles}" ]; then
         try "${RM_BIN} -rf ${_rufiles}" && \

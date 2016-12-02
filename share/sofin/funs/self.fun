@@ -40,7 +40,7 @@ update_defs () {
 
 
 build_sofin_natives () {
-    _okch="$(distn "${SUCCESS_CHAR}" ${ColorParams})"
+    _okch="$(distn "${SUCCESS_CHAR}" "${ColorParams}")"
     permnote "Building native utils.."
     compiler_setup
     for _prov in ${SOFIN_PROVIDES}; do
@@ -54,7 +54,7 @@ build_sofin_natives () {
 
 install_sofin_files () {
     set -e
-    _okch="$(distn "${SUCCESS_CHAR}" ${ColorParams})"
+    _okch="$(distn "${SUCCESS_CHAR}" "${ColorParams}")"
     permnote "Installing.."
     if [ -n "${PREFIX}" ]; then
         for _a_destph in "${PREFIX}" "${PREFIX}etc" "${PREFIX}usr/bin"; do
@@ -77,7 +77,7 @@ install_sofin_files () {
     run "${INSTALL_BIN} -v src/s.sh ${PREFIX}usr/bin/s" && \
         permnote "  ${_okch} sofin launcher" && \
         permnote "Type: $(distn "s usage") for help." && \
-        note "Read: $(distn "https://bitbucket.org/verknowsys/sofin") for more details." && \
+        note "Read: $(distn "https://github.com/VerKnowSys/sofin") for more details." && \
             return 0
     return 1
 }

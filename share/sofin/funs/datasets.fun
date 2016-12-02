@@ -37,7 +37,7 @@ push_to_all_mirrors () {
             # Fallback to tarball extension for service datadir:
             _pfin_svc_name="${_ptelm_service_name}${DEFAULT_ARCHIVE_EXT}"
         fi
-        push_dset_zfs_stream ${_pfin_svc_name} "${_pbto_bundle_name}" "${_ptmirror}" "${_pversion_element}"
+        push_dset_zfs_stream "${_pfin_svc_name}" "${_pbto_bundle_name}" "${_ptmirror}" "${_pversion_element}"
     done
     note "Bundle pushed successfully: $(distn "${_pbto_bundle_name}")!"
     unset _ptaddress _ptmirror _pversion_element _ptelm_file_name _pt_query
@@ -481,7 +481,7 @@ install_software_from_binbuild () {
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
         # On systems with ZFS capability, we use zfs receive instead of tarballing:
         _isfb_dataset="${DEFAULT_ZPOOL}${SOFTWARE_DIR}${USER}/${_isfb_fullname}"
-        debug "isfb: $(distd ${_isfb_archive}), isff: $(distd ${_isfb_fullname}), isfbdset: $(distd ${_isfb_dataset})"
+        debug "isfb: $(distd "${_isfb_archive}"), isff: $(distd "${_isfb_fullname}"), isfbdset: $(distd "${_isfb_dataset}")"
         try "${ZFS_BIN} list -H -t filesystem '${_isfb_dataset}'"
         if [ "${?}" != "0" ]; then
             debug "Installing ZFS based binary build to dataset: $(distd "${_isfb_dataset}")"
@@ -498,7 +498,7 @@ install_software_from_binbuild () {
             note "Installed bin-build: $(distn "${_isfb_fullname}")"
             DONT_BUILD_BUT_DO_EXPORTS=YES
         else
-            debug "No binary bundle available for: $(distd "${_bbaname}")"
+            debug "No binary bundle available for: $(distd "${_isfb_fullname}")"
             try "${RM_BIN} -vf ${FILE_CACHE_DIR}${_isfb_archive} ${FILE_CACHE_DIR}${_isfb_archive}${DEFAULT_CHKSUM_EXT}"
         fi
     fi
@@ -543,11 +543,11 @@ push_software_archive () {
 
 try_destroy_binbuild () {
     _bundle="${1}"
-    if [ -n "${PREFIX}" -a \
-         -d "${PREFIX}" ]; then
+    if [ -n "${PREFIX}" ] && \
+       [ -d "${PREFIX}" ]; then
         _installed_indicator="${PREFIX}/$(lowercase "${_bundle}")${DEFAULT_INST_MARK_EXT}"
-        if [ -f "${_installed_indicator}" -a \
-             -n "${BUILD_NAMESUM}" ]; then
+        if [ -f "${_installed_indicator}" ] && \
+                  [ -n "${BUILD_NAMESUM}" ]; then
             debug "Installed indicator found for: $(distd "${_installed_indicator}"). Proceeding with build dir cleanup.."
             destroy_builddir "${PREFIX##*/}" "${BUILD_NAMESUM}"
         else

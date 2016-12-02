@@ -52,7 +52,7 @@ disable_sofin_env () {
 
 
 set_c_and_cxx_flags () {
-    _flagz="${@}"
+    _flagz=${*}
     CFLAGS="$(${PRINTF_BIN} '%s\n' "-I${PREFIX}/include ${_flagz} ${DEFAULT_COMPILER_FLAGS}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
     CXXFLAGS="$(${PRINTF_BIN} '%s\n' "-I${PREFIX}/include ${_flagz} ${DEFAULT_COMPILER_FLAGS}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
     LDFLAGS="$(${PRINTF_BIN} '%s\n' "-L${PREFIX}/lib ${DEFAULT_LINKER_FLAGS}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
@@ -64,76 +64,76 @@ dump_compiler_setup () {
     debug "---------------- COMPILER FEATURES DUMP -----------------"
     debug "Listing compiler features for platform: $(distd "${SYSTEM_NAME}")"
     if [ "YES" = "${DEBUGBUILD}" ]; then
-        debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "debug-build" ${ColorGreen})"
-        debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "production-build" ${ColorGray})"
+        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "debug-build" "${ColorGreen}")"
+        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "production-build" "${ColorGray}")"
     else
-        debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "production-build" ${ColorGreen})"
-        debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "debug-build" ${ColorGray})"
+        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "production-build" "${ColorGreen}")"
+        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "debug-build" "${ColorGray}")"
     fi
 
     if [ -z "${DEF_NO_CCACHE}" ]; then # ccache is supported by default but it's optional
-        debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "ccache" ${ColorGreen})"
+        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "ccache" "${ColorGreen}")"
     else
-        debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "ccache" ${ColorGray})"
+        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "ccache" "${ColorGray}")"
     fi
 
-    if [ -z "${DEF_NO_LLVM_LINKER}" -a "YES" = "${CAP_SYS_LLVM_LD}" ]; then
-        debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "llvm-lld-linker" ${ColorGreen})"
-        debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "gnu-gold-linker" ${ColorGray})"
-        debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "system-linker" ${ColorGray})"
-    elif [ -z "${DEF_NO_GOLDEN_LINKER}" -a -n "${DEF_NO_LLVM_LINKER}" -a "YES" = "${CAP_SYS_GOLD_LD}" ]; then
-        debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "llvm-lld-linker" ${ColorGray})"
-        debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "gnu-gold-linker" ${ColorGreen})"
-        debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "system-linker" ${ColorGray})"
+    if [ -z "${DEF_NO_LLVM_LINKER}" ] && [ "YES" = "${CAP_SYS_LLVM_LD}" ]; then
+        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "llvm-lld-linker" "${ColorGreen}")"
+        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "gnu-gold-linker" "${ColorGray}")"
+        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "system-linker" "${ColorGray}")"
+    elif [ -z "${DEF_NO_GOLDEN_LINKER}" ] && [ -n "${DEF_NO_LLVM_LINKER}" ] && [ "YES" = "${CAP_SYS_GOLD_LD}" ]; then
+        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "llvm-lld-linker" "${ColorGray}")"
+        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "gnu-gold-linker" "${ColorGreen}")"
+        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "system-linker" "${ColorGray}")"
     else
-        debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "llvm-lld-linker" ${ColorGray})"
-        debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "gnu-gold-linker" ${ColorGray})"
-        debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "system-linker" ${ColorGreen})"
+        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "llvm-lld-linker" "${ColorGray}")"
+        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "gnu-gold-linker" "${ColorGray}")"
+        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "system-linker" "${ColorGreen}")"
     fi
 
     # -fPIC check:
-    echo "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'f[Pp][Ii][Cc]' >/dev/null 2>/dev/null && \
-        debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "position-independent-code" ${ColorGreen})" || \
-        debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "position-independent-code" ${ColorGray})"
+    echo "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'f[Pp][Ii][Cc]' >/dev/null 2>/dev/null && ( \
+        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "position-independent-code" "${ColorGreen}")" || \
+        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "position-independent-code" "${ColorGray}")")
 
     # -fPIE check:
-    echo "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'f[Pp][Ii][Ee]' >/dev/null 2>/dev/null && \
-        debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "position-independent-executable" ${ColorGreen})" || \
-        debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "position-independent-executable" ${ColorGray})"
+    echo "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'f[Pp][Ii][Ee]' >/dev/null 2>/dev/null && ( \
+        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "position-independent-executable" "${ColorGreen}")" || \
+        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "position-independent-executable" "${ColorGray}")")
 
     # -fstack-protector-all check:
-    echo "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'fstack-protector-all' >/dev/null 2>/dev/null && \
-        debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "stack-protector-all" ${ColorGreen})" || \
-        debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "stack-protector-all" ${ColorGray})"
+    echo "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'fstack-protector-all' >/dev/null 2>/dev/null && ( \
+        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "stack-protector-all" "${ColorGreen}")" || \
+        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "stack-protector-all" "${ColorGray}")")
 
     # -fstack-protector-strong check:
-    echo "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'fstack-protector-strong' >/dev/null 2>/dev/null && \
-        debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "stack-protector-strong" ${ColorGreen})" || \
-        debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "stack-protector-strong" ${ColorGray})"
+    echo "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'fstack-protector-strong' >/dev/null 2>/dev/null && ( \
+        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "stack-protector-strong" "${ColorGreen}")" || \
+        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "stack-protector-strong" "${ColorGray}")")
 
     # -fno-strict-overflow check:
-    echo "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'fno-strict-overflow' >/dev/null 2>/dev/null && \
-        debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "no-strict-overflow" ${ColorGreen})" || \
-        debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "no-strict-overflow" ${ColorGray})"
+    echo "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'fno-strict-overflow' >/dev/null 2>/dev/null && ( \
+        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "no-strict-overflow" "${ColorGreen}")" || \
+        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "no-strict-overflow" "${ColorGray}")")
 
     # -ftrapv check:
     # NOTE: Signed integer overflow raises the signal SIGILL instead of SIGABRT/SIGSEGV:
-    echo "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'ftrapv' >/dev/null 2>/dev/null && \
-        debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "trap-signed-integer-overflow" ${ColorGreen})" || \
-        debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "trap-signed-integer-overflow" ${ColorGray})"
+    echo "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'ftrapv' >/dev/null 2>/dev/null && ( \
+        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "trap-signed-integer-overflow" "${ColorGreen}")" || \
+        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "trap-signed-integer-overflow" "${ColorGray}")")
 
     if [ -z "${DEF_LINKER_NO_DTAGS}" ]; then
         if [ "${SYSTEM_NAME}" != "Darwin" ]; then # feature isn't required on Darwin
-            debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "enable-new-dtags" ${ColorGreen})"
+            debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "enable-new-dtags" "${ColorGreen}")"
         else
-            debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "enable-new-dtags" ${ColorGray})"
+            debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "enable-new-dtags" "${ColorGray}")"
         fi
     fi
 
     if [ -z "${DEF_NO_FAST_MATH}" ]; then
-        debug " $(distd "${SUCCESS_CHAR}" ${ColorGreen}) $(distd "fast-math" ${ColorGreen})"
+        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "fast-math" "${ColorGreen}")"
     else
-        debug " $(distd "${FAIL_CHAR}" ${ColorYellow}) $(distd "fast-math" ${ColorGray})"
+        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "fast-math" "${ColorGray}")"
     fi
     debug "-------------- COMPILER FEATURES DUMP ENDS --------------"
 }
@@ -241,7 +241,7 @@ compiler_setup () {
     # 2. Gold Linker (ld.gold)
     # 3. Legacy Linker (ld)
     unset _compiler_use_linker_flags
-    if [ -z "${DEF_NO_LLVM_LINKER}" -a "YES" = "${CAP_SYS_LLVM_LD}" ]; then
+    if [ -z "${DEF_NO_LLVM_LINKER}" ] && [ "YES" = "${CAP_SYS_LLVM_LD}" ]; then
         # Support of default: LLVM linker:
         if [ "${SYSTEM_NAME}" != "Darwin" ]; then
             _llvm_pfx="/Software/Lld"
@@ -265,20 +265,22 @@ compiler_setup () {
             fi
             LD="${LD_BIN}.lld"
             unset _llvm_pfx _llvm_target
+
         else
+            # NOTE: on Darwin hosts it's the same linker binry but skipping options when DEF_NO_LLVM_LINKER is defined
             LD="${LD_BIN} -arch ${DEFAULT_DARWIN_SYS_ARCH:-x86_64} -sdk_version ${DEFAULT_DARWIN_SDK_VERSION:-10.11}"
         fi
 
-    elif [ -z "${DEF_NO_GOLDEN_LINKER}" -a \
-           "YES" = "${CAP_SYS_GOLD_LD}" ]; then
+    elif [ -z "${DEF_NO_GOLDEN_LINKER}" ] && \
+         [ "YES" = "${CAP_SYS_GOLD_LD}" ]; then
 
         # Golden linker support:
         case "${SYSTEM_NAME}" in
             FreeBSD|Minix)
                 _llvm_pfx="/Software/Gold"
                 _llvm_target="$(${_llvm_pfx}/bin/llvm-config --host-target 2>/dev/null || :)"
-                if [ -n "${_llvm_target}" -a \
-                     -d "${_llvm_pfx}/${_llvm_target}" ]; then
+                if [ -n "${_llvm_target}" ] && \
+                   [ -d "${_llvm_pfx}/${_llvm_target}" ]; then
                     _compiler_use_linker_flags="-fuse-ld=gold"
                     LD="${LD_BIN}.gold --plugin ${GOLD_SO}"
                     RANLIB="${_llvm_pfx}/${_llvm_target}/bin/ranlib --plugin ${GOLD_SO}"
@@ -290,8 +292,8 @@ compiler_setup () {
                 else
                     debug "Failed to get LLVM-host-target hint from llvm-config. Got: '$(distd "${_llvm_target}")'"
                     unset NM AR AS RANLIB STRIP
-                    if [ -x "${GOLD_SO}" -a \
-                         -x "${LD_BIN}.gold" ]; then
+                    if [ -x "${GOLD_SO}" ] && \
+                       [ -x "${LD_BIN}.gold" ]; then
                         LD="${LD_BIN}.gold --plugin ${GOLD_SO}"
                     else
                         # Fallback:
@@ -356,7 +358,7 @@ create_lock () {
     SOFIN_PID="${SOFIN_PID:-$$}"
     debug "Pid of current Sofin session: $(distd "${SOFIN_PID}")"
     _bundle="$(capitalize "${_bundle_name}")"
-    ${MKDIR_BIN} -p ${LOCKS_DIR} 2>/dev/null
+    ${MKDIR_BIN} -p "${LOCKS_DIR}" 2>/dev/null
     ${PRINTF_BIN} '%s\n' "${SOFIN_PID}" > "${LOCKS_DIR}${_bundle}${DEFAULT_LOCK_EXT}"
     unset _bundle _bundle_name
 }
@@ -368,15 +370,15 @@ acquire_lock_for () {
     for _bundle in ${_bundles}; do
         if [ -f "${LOCKS_DIR}${_bundle}${DEFAULT_LOCK_EXT}" ]; then
             _lock_pid="$(${CAT_BIN} "${LOCKS_DIR}${_bundle}${DEFAULT_LOCK_EXT}" 2>/dev/null)"
-            _lock_ppid="$(${PGREP_BIN} -P${_lock_pid} 2>/dev/null)"
+            _lock_ppid="$(${PGREP_BIN} -P "${_lock_pid}" 2>/dev/null)"
             debug "Lock pid: $(distd "${_lock_pid}"), Sofin pid: $(distd "${SOFIN_PID}"), _lock_ppid: $(distd "${_lock_ppid}")"
             try "${KILL_BIN} -0 ${_lock_pid}"
             if [ "${?}" = "0" ]; then # NOTE: process is alive
-                if [ "${_lock_pid}" = "${SOFIN_PID}" -o \
-                     "${_lock_ppid}" = "${SOFIN_PID}" ]; then
+                if [ "${_lock_pid}" = "${SOFIN_PID}" ] || \
+                   [ "${_lock_ppid}" = "${SOFIN_PID}" ]; then
                     debug "Dealing with own process or it's fork, process may continue.."
-                elif [ "${_lock_pid}" = "${SOFIN_PID}" -a \
-                       -z "${_lock_ppid}" ]; then
+                elif [ "${_lock_pid}" = "${SOFIN_PID}" ] && \
+                     [ -z "${_lock_ppid}" ]; then
                     debug "Dealing with no fork, process may continue.."
                 else
                     error "Bundle: $(diste "${_bundle}") is locked due to background job pid: $(diste "${_lock_pid}")"
@@ -398,7 +400,7 @@ destroy_locks () {
     _pattern="${1}"
     _pid="${SOFIN_PID:-$$}"
     env_forgivable
-    for _dlf in $(${FIND_BIN} ${LOCKS_DIR%/} -mindepth 1 -maxdepth 1 -name "*${_pattern}*${DEFAULT_LOCK_EXT}" -print 2>/dev/null); do
+    for _dlf in $(${FIND_BIN} "${LOCKS_DIR%/}" -mindepth 1 -maxdepth 1 -name "*${_pattern}*${DEFAULT_LOCK_EXT}" -print 2>/dev/null); do
         try "${EGREP_BIN} '^${_pid}$' ${_dlf}" && \
             try "${RM_BIN} -f ${_dlf}" && \
                 debug "Removed currently owned pid lock: $(distd "${_dlf}")"

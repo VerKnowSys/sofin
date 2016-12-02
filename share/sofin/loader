@@ -1,29 +1,29 @@
 #!/usr/bin/env sh
 
 # NOTE: Load core.fact for basic definitions:
-if [ -d "share/sofin/facts/" -a \
-     -f "share/sofin/facts/core.fact" ]; then
+if [ -d "share/sofin/facts/" ] && \
+   [ -f "share/sofin/facts/core.fact" ]; then
     . share/sofin/facts/core.fact
-elif [ -d "/usr/share/sofin/facts/" -a \
-     -f "/usr/share/sofin/facts/core.fact" ]; then
+elif [ -d "/usr/share/sofin/facts/" ] && \
+     [ -f "/usr/share/sofin/facts/core.fact" ]; then
     . /usr/share/sofin/facts/core.fact
 fi
 
 
 # loading functions have to know both FACTS and FUNS dirs:
 load_facts () {
-    for _fact in ${@}; do
+    for _fact in "${@}"; do
         # echo "# L: ${DEFAULT_FACTS_DIR}${_fact}"
-        . ${DEFAULT_FACTS_DIR}${_fact}
+        . "${DEFAULT_FACTS_DIR}${_fact}"
     done
     unset _fact
 }
 
 
 load_funs () {
-    for _fun in ${@}; do
+    for _fun in "${@}"; do
         # echo "# L: ${DEFAULT_FACTS_DIR}${_fun}"
-        . ${DEFAULT_FUNS_DIR}${_fun}
+        . "${DEFAULT_FUNS_DIR}${_fun}"
     done
     unset _fun
 }

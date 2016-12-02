@@ -6,15 +6,15 @@ create_dirs () {
     fi
 
     # check for regular cache dirs for existence:
-    if [ ! -d "${CACHE_DIR}" -o \
-         ! -d "${FILE_CACHE_DIR}" -o \
-         ! -d "${LOCKS_DIR}" ]; then
+    if [ ! -d "${CACHE_DIR}" ] || \
+       [ ! -d "${FILE_CACHE_DIR}" ] || \
+       [ ! -d "${LOCKS_DIR}" ]; then
          for dir in "${FILE_CACHE_DIR}" "${CACHE_DIR}" "${LOCKS_DIR}"; do
             try "${MKDIR_BIN} -p ${dir}"
          done
     fi
-    if [ ! -d "${DEFINITIONS_DIR}" -o \
-         ! -f "${DEFINITIONS_DEFAULTS}" ]; then
+    if [ ! -d "${DEFINITIONS_DIR}" ] || \
+       [ ! -f "${DEFINITIONS_DEFAULTS}" ]; then
         debug "No valid definitions cache found in: $(distd "${DEFINITIONS_DIR}"). Creating one."
         clean_purge
         update_defs
@@ -36,16 +36,16 @@ log_helper () {
     fi
     debug "Log helper, files found: $(distd "${_lognum_f}")"
     if [ -z "${_log_files}" ]; then
-        log_helper ${_log_h_pattern}
+        log_helper "${_log_h_pattern}"
     else
         case ${_lognum_f} in
             0)
-                log_helper ${_log_h_pattern}
+                log_helper "${_log_h_pattern}"
                 ;;
 
             1)
                 note "Found $(distn "${_lognum_f}") log file, that matches _log_h_pattern: $(distn "${_log_h_pattern}"). Attaching tail.."
-                ${TAIL_BIN} -n ${LOG_LINES_AMOUNT} -F $(${PRINTF_BIN} '%s\n' "${_log_files}" | eval "${NEWLINES_TO_SPACES_GUARD}")
+                ${TAIL_BIN} -n "${LOG_LINES_AMOUNT}" -F $(${PRINTF_BIN} '%s\n' "${_log_files}" | eval "${NEWLINES_TO_SPACES_GUARD}")
                 ;;
 
             *)
@@ -71,9 +71,9 @@ show_logs () {
     debug "_logf_minutes: $(distd "${_logf_minutes}"), pattern: $(distd "${_logf_pattern}")"
     _files_x_min=$(${FIND_BIN} "${LOGS_DIR}" -maxdepth 1 -mindepth 1 -mmin -${_logf_minutes} -amin -${_logf_minutes} -iname "${DEFAULT_NAME}*${_logf_pattern}*" -print 2>/dev/null)
     touch_logsdir_and_logfile
-    if [ "-" = "${_logf_pattern}" -o \
-         "${DEFAULT_NAME}" = "${_logf_pattern}" ]; then
-        ${TAIL_BIN} -n ${LOG_LINES_AMOUNT} "${LOG}" 2>&1
+    if [ "-" = "${_logf_pattern}" ] || \
+       [ "${DEFAULT_NAME}" = "${_logf_pattern}" ]; then
+        ${TAIL_BIN} -n "${LOG_LINES_AMOUNT}" "${LOG}" 2>&1
 
     elif [ "+" = "${_logf_pattern}" ]; then
         if [ -d "${LOGS_DIR}" ]; then
@@ -135,7 +135,7 @@ pretouch_logs () {
         if [ -z "${_app}" ]; then
             debug "Empty app given out of params: $(distd "${_params}")?"
         else
-            _lapp="$(lowercase ${_app})"
+            _lapp="$(lowercase "${_app}")"
             if [ -z "${_pret_list}" ]; then
                 _pret_list="${LOGS_DIR}${DEFAULT_NAME}-${_lapp}"
             else
@@ -152,7 +152,7 @@ pretouch_logs () {
 show_log_if_available () {
     if [ -f "${LOG}" ]; then
         note "$(fill)"
-        ${TAIL_BIN} -n${LOG_LINES_AMOUNT_ON_ERR} "${LOG}" 2>/dev/null
+        ${TAIL_BIN} -n "${LOG_LINES_AMOUNT_ON_ERR}" "${LOG}" 2>/dev/null
     else
         debug "No log available to attach tail to.."
     fi

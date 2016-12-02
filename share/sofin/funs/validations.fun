@@ -2,7 +2,7 @@ check_version () { # $1 => installed version, $2 => available version
     if [ ! "${1}" = "" ]; then
         if [ ! "${2}" = "" ]; then
             if [ ! "${1}" = "${2}" ]; then
-                warn "Bundle: $(distw $(capitalize "${3}")), version: $(distw "${2}") is definied, but installed version is: $(distw "${1}")"
+                warn "Bundle: $(distw "$(capitalize "${3}")"), version: $(distw "${2}") is definied, but installed version is: $(distw "${1}")"
                 FOUND_OUTDATED=YES
             fi
         fi
@@ -18,7 +18,7 @@ validate_env () {
         if [ ! -x "${_var_value}" ]; then
             error "Required binary is unavailable: $(diste "${_envvar}")"
         fi
-    done || exit ${ERRORCODE_VALIDATE_ENV_FAILURE}
+    done || exit "${ERRORCODE_VALIDATE_ENV_FAILURE}"
     unset _var_value _envvar
 }
 
@@ -78,8 +78,8 @@ check_defs_dir () {
 
 validate_archive_sha1 () {
     _archive_name="${1}"
-    if [ ! -f "${_archive_name}" -o \
-           -z "${_archive_name}" ]; then
+    if [ ! -f "${_archive_name}" ] || \
+         [ -z "${_archive_name}" ]; then
          error "Specified empty $(diste archive_name), or file doesn't exist: $(diste "${_archive_name}")"
     fi
     # checking archive sha1 checksum
@@ -91,8 +91,8 @@ validate_archive_sha1 () {
     fi
     _current_sha_file="${_archive_name}${DEFAULT_CHKSUM_EXT}"
     _sha1_value="$(${CAT_BIN} "${_current_sha_file}" 2>/dev/null)"
-    if [ ! -f "${_current_sha_file}" -o \
-           -z "${_sha1_value}" ]; then
+    if [ ! -f "${_current_sha_file}" ] || \
+               [ -z "${_sha1_value}" ]; then
         debug "No sha1 file available for archive, or sha1 value is empty! Removing local bin-builds of: $(distd "${_archive_name}")"
         try "${RM_BIN} -fv ${_archive_name}"
         try "${RM_BIN} -fv ${_current_sha_file}"
@@ -125,15 +125,15 @@ validate_def_postfix () {
         _cispc_nme_diff="$(difftext "${_cigiven_name}" "$(lowercase "${DEF_NAME}")")"
     fi
     debug "validate_def_postfix: DEF_NAME: ${DEF_NAME}, 1: ${_cigiven_name}, 2: ${_cidefinition_name}, DIFF: ${_cispc_nme_diff}"
-    if [ -z "${DEF_POSTFIX}" -a \
-         "${_cispc_nme_diff}" != "${DEF_NAME}" -a \
-         "${_cispc_nme_diff}" != "${DEF_NAME}${DEF_POSTFIX}" ]; then
+    if  [ -z "${DEF_POSTFIX}" ] && \
+        [ "${_cispc_nme_diff}" != "${DEF_NAME}" ] && \
+        [ "${_cispc_nme_diff}" != "${DEF_NAME}${DEF_POSTFIX}" ]; then
         debug "Inferred DEF_POSTFIX=$(distd "${_cispc_nme_diff}") from definition: $(distd "${DEF_NAME}")"
         DEF_POSTFIX="${_cispc_nme_diff}"
         # TODO: detect if postfix isn't already applied here
 
-    elif [ "${_cispc_nme_diff}" = "${DEF_NAME}" -a \
-           "${_cispc_nme_diff}" = "${DEF_NAME}${DEF_POSTFIX}" ]; then
+    elif [ "${_cispc_nme_diff}" = "${DEF_NAME}" ] && \
+         [  "${_cispc_nme_diff}" = "${DEF_NAME}${DEF_POSTFIX}" ]; then
         # NOTE: This is case when dealing with definition file name,
         # that has nothing in common with DEF_NAME (usually it's a postfix).
         # In that case, we should pick specified name, *NOT* DEF_NAME:
@@ -167,7 +167,7 @@ validate_definition_disabled () {
 
 
 validate_pie_on_exports () {
-    _bundz=${@}
+    _bundz=${*}
     if [ -z "${_bundz}" ]; then
         error "At least single bundle name has to be specified for pie validation."
     fi
@@ -187,7 +187,7 @@ validate_pie_on_exports () {
                 debug "PIE exports were checked already for bundle: $(distd "${_bun}")"
                 continue
             else
-                for _bin in $(${FIND_BIN} ${_a_dir} -mindepth 1 -maxdepth 1 -type l 2>/dev/null | ${XARGS_BIN} ${READLINK_BIN} -f 2>/dev/null); do
+                for _bin in $(${FIND_BIN} "${_a_dir}" -mindepth 1 -maxdepth 1 -type l 2>/dev/null | ${XARGS_BIN} "${READLINK_BIN}" -f 2>/dev/null); do
                     try "${FILE_BIN} '${_bin}' 2>/dev/null | ${GREP_BIN} 'ELF' 2>/dev/null"
                     if [ "$?" = "0" ]; then # it's ELF binary/library:
                         try "${FILE_BIN} '${_bin}' 2>/dev/null | ${GREP_BIN} 'ELF' 2>/dev/null | ${EGREP_BIN} '${PIE_TYPE_ENTRY}' 2>/dev/null" || \

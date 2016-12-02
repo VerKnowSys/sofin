@@ -1,12 +1,12 @@
 usage_howto () {
     permnote "Built in tasks:"
-    permnote "  $(distn "install | get | pick | choose | use  ") installs software from list or from definition and switches exports for it ($(distn "example: ${SOFIN_BIN_SHORT} install Rubinius" ${ColorExample}))"
+    permnote "  $(distn "install | get | pick | choose | use  ") installs software from list or from definition and switches exports for it ($(distn "example: "${SOFIN_BIN_SHORT}" install Rubinius" "${ColorExample}"))"
     permnote "  $(distn "dependencies | deps | local          ") installs software from list defined in '$(distn "${DEFAULT_PROJECT_DEPS_LIST_FILE}")' file in current directory"
-    permnote "  $(distn "uninstall | remove | delete          ") removes an application or list ($(distn "example: ${SOFIN_BIN_SHORT} uninstall Rubinius" ${ColorExample}))"
+    permnote "  $(distn "uninstall | remove | delete          ") removes an application or list ($(distn "example: "${SOFIN_BIN_SHORT}" uninstall Rubinius" "${ColorExample}"))"
     permnote "  $(distn "list | installed                     ") gives short list of installed software"
     permnote "  $(distn "full | fulllist | fullinstalled      ") gives detailed list with installed software including requirements"
     permnote "  $(distn "available | avail                    ") lists available software"
-    permnote "  $(distn "export | exp | exportapp             ") adds given command to application exports ($(distn "example: ${SOFIN_BIN_SHORT} export rails Rubinius" ${ColorExample}))"
+    permnote "  $(distn "export | exp | exportapp             ") adds given command to application exports ($(distn "example: "${SOFIN_BIN_SHORT}" export rails Rubinius" "${ColorExample}"))"
     permnote "  $(distn "getshellvars | shellvars | vars      ") returns shell variables for installed software"
     permnote "  $(distn "log                                  ") shows tail of all logs (for debug messages and verbose info)"
     permnote "  $(distn "log -                                ") shows tail of Sofin internal log only"
@@ -14,20 +14,20 @@ usage_howto () {
     permnote "  $(distn "log any-part-of-def-name             ") shows and watches log(s) which name matches pattern"
     permnote "  $(distn "reload | rehash                      ") recreates shell vars and reloads current shell"
     permnote "  $(distn "up | update                          ") only update definitions from remote repository and exit"
-    permnote "  $(distn "ver | version                        ") shows ${SOFIN_BIN_SHORT} script version"
+    permnote "  $(distn "ver | version                        ") shows "${SOFIN_BIN_SHORT}" script version"
     permnote "  $(distn "clean                                ") cleans binbuilds cache, unpacked source content and logs"
     permnote "  $(distn "distclean                            ") cleans binbuilds cache, unpacked source content, logs and definitions"
     permnote "  $(distn "purge                                ") cleans binbuilds cache, unpacked source content, logs, definitions, source cache and possible states"
     permnote "  $(distn "out | outdated                       ") lists outdated software"
     permnote "  $(distn "build                                ") does binary build from source for software specified as params"
     permnote "  $(distn "deploy                               ") build + push"
-    permnote "  $(distn "push | binpush | send                ") creates binary build from prebuilt software bundles name given as params ($(distn "example: ${SOFIN_BIN_SHORT} push Rubinius Vifm Curl" ${ColorExample}))"
-    permnote "  $(distn "wipe                                 ") wipes binary builds (matching given name) from binary respositories ($(distn "example: ${SOFIN_BIN_SHORT} wipe Rubinius Vifm" ${ColorExample}))"
+    permnote "  $(distn "push | binpush | send                ") creates binary build from prebuilt software bundles name given as params ($(distn "example: "${SOFIN_BIN_SHORT}" push Rubinius Vifm Curl" "${ColorExample}"))"
+    permnote "  $(distn "wipe                                 ") wipes binary builds (matching given name) from binary respositories ($(distn "example: "${SOFIN_BIN_SHORT}" wipe Rubinius Vifm" "${ColorExample}"))"
     permnote "  $(distn "enable                               ") enables Sofin developer environment (full environment stored in ~/.profile). It's the default"
     permnote "  $(distn "disable                              ") disables Sofin developer environment (only PATH, PKG_CONFIG_PATH and MANPATH written to ~/.profile)"
     permnote "  $(distn "status                               ") shows Sofin status"
-    permnote "  $(distn "dev                                  ") puts definition content on the fly. Second argument is (lowercase) definition name (no extension). ($(distn "example: ${SOFIN_BIN_SHORT} dev rubinius" ${ColorExample}))"
-    permnote "  $(distn "rebuild                              ") rebuilds and pushes each software bundle that depends on definition given as a param. ($(distn "example: ${SOFIN_BIN_SHORT} rebuild openssl - will rebuild all bundles that have 'openssl' dependency" ${ColorExample}))"
+    permnote "  $(distn "dev                                  ") puts definition content on the fly. Second argument is (lowercase) definition name (no extension). ($(distn "example: "${SOFIN_BIN_SHORT}" dev rubinius" "${ColorExample}"))"
+    permnote "  $(distn "rebuild                              ") rebuilds and pushes each software bundle that depends on definition given as a param. ($(distn "example: "${SOFIN_BIN_SHORT}" rebuild openssl - will rebuild all bundles that have 'openssl' dependency" "${ColorExample}"))"
     permnote "  $(distn "reset                               ") resets local definitions repository"
     permnote "  $(distn "diff                                ") displays changes in current definitions cache. Accepts any part of definition name"
     # TODO: fix-hack
@@ -50,7 +50,7 @@ sofin_header () {
 
 
 processes_all () {
-    ${PS_BIN} ${DEFAULT_PS_OPTS} 2>/dev/null | ${EGREP_BIN} -v "(grep|egrep)" 2>/dev/null
+    ${PS_BIN} "${DEFAULT_PS_OPTS}" 2>/dev/null | ${EGREP_BIN} -v "(grep|egrep)" 2>/dev/null
 }
 
 
@@ -194,11 +194,11 @@ list_bundles_full () {
             if [ -e "${_lbinstald_file}" ]; then
                 permnote "${SUCCESS_CHAR} ${_lbfapp_name}"
             else
-                permnote "$(distn "${FAIL_CHAR}" ${ColorRed}) ${_lbfapp_name} $(distn "[!]" ${ColorRed})"
+                permnote "$(distn "${FAIL_CHAR}" "${ColorRed}") ${_lbfapp_name} $(distn "[!]" "${ColorRed}")"
             fi
-            for _lbfreq in $(${FIND_BIN} ${_lbfapp} -mindepth 1 -maxdepth 1 -iname "*${DEFAULT_INST_MARK_EXT}" 2>/dev/null | ${SORT_BIN} 2>/dev/null); do
+            for _lbfreq in $(${FIND_BIN} "${_lbfapp}" -mindepth 1 -maxdepth 1 -iname "*${DEFAULT_INST_MARK_EXT}" 2>/dev/null | ${SORT_BIN} 2>/dev/null); do
                 _lbpp="$(${PRINTF_BIN} '%s' "${_lbfreq##*/}" | ${SED_BIN} "s/${DEFAULT_INST_MARK_EXT}//" 2>/dev/null)"
-                permnote "   ${NOTE_CHAR} ${_lbpp} $(distn "[" ${ColorGray})$(distn $(${CAT_BIN} "${_lbfreq}" 2>/dev/null))$(distn "]" ${ColorGray})"
+                permnote "   ${NOTE_CHAR} ${_lbpp} $(distn "[" "${ColorGray}")$(distn "$(${CAT_BIN} "${_lbfreq}" 2>/dev/null)")$(distn "]" "${ColorGray}")"
             done
         done
         unset _lbfreq _lbfapp _lbflowercase _lbfapp_name _lbinstald_file _lbpp
@@ -235,7 +235,7 @@ show_diff () {
 
 
 develop () {
-    _defname_input="${@}"
+    _defname_input="${*}"
     ${TEST_BIN} -d "${DEFINITIONS_DIR}" 2>/dev/null || create_dirs # only definiions dir is requires, so skip dir traverse
     _defname_no_ext="$(${PRINTF_BIN} '%s\n' "${_defname_input}" | ${SED_BIN} -e "s#\.${DEFAULT_DEF_EXT}##" 2>/dev/null)"
     _devname="$(lowercase "${_defname_no_ext##*/}")"
@@ -249,10 +249,10 @@ develop () {
 
 
 sofin_status () {
-    if [ -f ${SOFIN_ENV_DISABLED_INDICATOR_FILE} ]; then
-        note "Sofin shell environment is: $(distn "disabled" ${ColorRed})"
+    if [ -f "${SOFIN_ENV_DISABLED_INDICATOR_FILE}" ]; then
+        note "Sofin shell environment is: $(distn "disabled" "${ColorRed}")"
     else
-        note "Sofin shell environment is: $(distn "enabled" ${ColorParams})"
+        note "Sofin shell environment is: $(distn "enabled" "${ColorParams}")"
     fi
 }
 
@@ -261,7 +261,7 @@ list_bundles_alphabetic () {
     if [ -d "${SOFTWARE_DIR}" ]; then
         debug "Listing installed software bundles in alphabetical order."
         env_forgivable
-        ${FIND_BIN} ${SOFTWARE_DIR%/} -maxdepth 1 -mindepth 1 -type d  -not -name ".*" -print 2>/dev/null | \
+        ${FIND_BIN} "${SOFTWARE_DIR%/}" -maxdepth 1 -mindepth 1 -type d  -not -name ".*" -print 2>/dev/null | \
         ${SED_BIN} -e 's#/.*/##' 2>/dev/null | ${SORT_BIN} 2>/dev/null
         env_pedantic
     fi
@@ -311,7 +311,7 @@ show_alt_definitions_and_exit () {
     _an_app="${1}"
     if [ ! -f "${DEFINITIONS_DIR}${_an_app}${DEFAULT_DEF_EXT}" ]; then
         unset _contents
-        _maybe_version="$(${FIND_BIN} ${DEFINITIONS_DIR%/} -maxdepth 1 -name "${_an_app}*${DEFAULT_DEF_EXT}" 2>/dev/null)"
+        _maybe_version="$(${FIND_BIN} "${DEFINITIONS_DIR%/}" -maxdepth 1 -name "${_an_app}*${DEFAULT_DEF_EXT}" 2>/dev/null)"
         for _maybe in ${_maybe_version}; do
             _contents="${_contents}$(${PRINTF_BIN} '%s\n' "$(capitalize "${_maybe##*/}")" | ${SED_BIN} 's/\..*//' 2>/dev/null) "
         done

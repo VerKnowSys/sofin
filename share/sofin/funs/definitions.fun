@@ -206,7 +206,7 @@ reset_defs () {
 
 
 remove_bundles () {
-    _bundle_name=${@}
+    _bundle_name=${*}
     if [ -z "${_bundle_name}" ]; then
         error "Second argument with at least one bundle name is required!"
     fi
@@ -215,14 +215,14 @@ remove_bundles () {
 
     # first look for a list with that name:
     if [ -e "${DEFINITIONS_LISTS_DIR}${_bundle_nam}" ]; then
-        _picked_bundles="$(${CAT_BIN} ${DEFINITIONS_LISTS_DIR}${_bundle_nam} 2>/dev/null | eval "${NEWLINES_TO_SPACES_GUARD}")"
+        _picked_bundles="$(${CAT_BIN} "${DEFINITIONS_LISTS_DIR}${_bundle_nam}" 2>/dev/null | eval "${NEWLINES_TO_SPACES_GUARD}")"
     else
         _picked_bundles="${_bundle_nam}"
     fi
     if [ "${_bundle_nam}" != "${_bundle_name}" ]; then
         # Specified + - a wildcard
         _picked_bundles="" # to remove first entry with *
-        _found="$(${FIND_BIN} ${SOFTWARE_DIR%/} -mindepth 1 -maxdepth 1 -iname "${_bundle_nam}" -type d 2>/dev/null)"
+        _found="$(${FIND_BIN} "${SOFTWARE_DIR%/}" -mindepth 1 -maxdepth 1 -iname "${_bundle_nam}" -type d 2>/dev/null)"
         for _bund in ${_found}; do
             _bname="${_bund##*/}"
             _picked_bundles="${_picked_bundles} ${_bname}"
@@ -249,11 +249,11 @@ remove_bundles () {
             if [ "${_picked_bundles}" = "${_given_name}" ]; then
                 permnote "Looking for other installed versions of: $(distn "${_aname}"), that might be exported automatically.."
                 _inname="$(${PRINTF_BIN} '%s\n' "$(lowercase "${_given_name}")" | ${SED_BIN} 's/[0-9]*//g' 2>/dev/null)"
-                _alternative="$(${FIND_BIN} ${SOFTWARE_DIR%/} -mindepth 1 -maxdepth 1 -type d -iname "${_inname}*" -not -name "${_given_name}" 2>/dev/null | ${SED_BIN} 's/^.*\///g' 2>/dev/null | ${HEAD_BIN} -n1 2>/dev/null)"
+                _alternative="$(${FIND_BIN} "${SOFTWARE_DIR%/}" -mindepth 1 -maxdepth 1 -type d -iname "${_inname}*" -not -name "${_given_name}" 2>/dev/null | ${SED_BIN} 's/^.*\///g' 2>/dev/null | ${HEAD_BIN} -n1 2>/dev/null)"
             fi
 
-            if [ -n "${_alternative}" -a \
-                 -f "${SOFTWARE_DIR}${_alternative}/$(lowercase "${_alternative}")${DEFAULT_INST_MARK_EXT}" ]; then
+            if [ -n "${_alternative}" ] && \
+               [ -f "${SOFTWARE_DIR}${_alternative}/$(lowercase "${_alternative}")${DEFAULT_INST_MARK_EXT}" ]; then
                 permnote "Updating environment for installed alternative: $(distn "${_alternative}")"
                 export_binaries "${_alternative}"
                 finalize
@@ -272,12 +272,12 @@ remove_bundles () {
 available_definitions () {
     if [ -d "${DEFINITIONS_DIR}" ]; then
         cd "${DEFINITIONS_DIR}"
-        _alldefs="$(${FIND_BIN} ${DEFINITIONS_DIR%/} -mindepth 1 -maxdepth 1 -type f -name "*${DEFAULT_DEF_EXT}" 2>/dev/null)"
-        permnote "All definitions defined in current cache: $(distn "$(${LS_BIN} -m *def 2>/dev/null | eval "${CUT_TRAILING_SPACES_GUARD}")" "${ColorReset}")"
+        _alldefs="$(${FIND_BIN} "${DEFINITIONS_DIR%/}" -mindepth 1 -maxdepth 1 -type f -name "*${DEFAULT_DEF_EXT}" 2>/dev/null)"
+        permnote "All definitions defined in current cache: $(distn "$(${LS_BIN} -m 2>/dev/null | eval "${CUT_TRAILING_SPACES_GUARD}")" "${ColorReset}")"
     fi
     if [ -d "${DEFINITIONS_LISTS_DIR}" ]; then
         cd "${DEFINITIONS_LISTS_DIR}"
-        permnote "Available lists: $(distn "$(${LS_BIN} -m * 2>/dev/null | ${SED_BIN} "s/${DEFAULT_DEF_EXT}//g" 2>/dev/null)" "${ColorReset}")"
+        permnote "Available lists: $(distn "$(${LS_BIN} -m 2>/dev/null | ${SED_BIN} "s/${DEFAULT_DEF_EXT}//g" 2>/dev/null)" "${ColorReset}")"
     fi
     note "Definitions count: $(distn "$(${PRINTF_BIN} '%s' "${_alldefs:-0}" | eval "${FILES_COUNT_GUARD}")")"
 }
@@ -314,7 +314,7 @@ show_outdated () {
     create_dirs
     load_defaults
     if [ -d "${SOFTWARE_DIR}" ]; then
-        for _prefix in $(${FIND_BIN} ${SOFTWARE_DIR%/} -mindepth 1 -maxdepth 1 -type d -not -name ".*" 2>/dev/null); do
+        for _prefix in $(${FIND_BIN} "${SOFTWARE_DIR%/}" -mindepth 1 -maxdepth 1 -type d -not -name ".*" 2>/dev/null); do
             _bundle="$(lowercase "${_prefix##*/}")"
             debug "Bundle name: ${_bundle}, Prefix: ${_prefix}"
 
@@ -333,7 +333,7 @@ show_outdated () {
     fi
 
     if [ "${FOUND_OUTDATED}" = "YES" ]; then
-        exit ${ERRORCODE_TASK_FAILURE}
+        exit "${ERRORCODE_TASK_FAILURE}"
     else
         note "Installed bundles seems to be recent"
     fi
@@ -342,11 +342,11 @@ show_outdated () {
 
 
 wipe_remote_archives () {
-    _bund_names=${@}
+    _bund_names=${*}
     _ans="YES"
     if [ -z "${USE_FORCE}" ]; then
         warn "Are you sure you want to wipe binary bundles: $(distw "${_bund_names}") from binary repository: $(distw "${MAIN_BINARY_REPOSITORY}")? (Type $(distw YES) to confirm)"
-        read _ans
+        read -r _ans
     fi
     if [ "${_ans}" = "YES" ]; then
         cd "${SOFTWARE_DIR}"
@@ -440,13 +440,13 @@ strip_bundle () {
             warn "$(distw "${_sbfdefinition_name}"): Strip nothing? Valid options are: ALL | BIN | LIB | NO"
             ;;
     esac
-    if [ "NO" != "${DEF_STRIP}" -o \
-         "no" != "${DEF_STRIP}" ]; then
+    if [ "NO" != "${DEF_STRIP}" ] || \
+       [ "no" != "${DEF_STRIP}" ]; then
         if [ -z "${DEBUGBUILD}" ]; then
             _counter="0"
             for _stripdir in ${_dirs_to_strip}; do
                 if [ -d "${_stripdir}" ]; then
-                    _tbstripfiles=$(${FIND_BIN} ${_stripdir} -maxdepth 1 -type f 2>/dev/null)
+                    _tbstripfiles=$(${FIND_BIN} "${_stripdir}" -maxdepth 1 -type f 2>/dev/null)
                     for _file in ${_tbstripfiles}; do
                         _bundlower="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
                         if [ -n "${_bundlower}" ]; then
@@ -463,8 +463,8 @@ strip_bundle () {
                 fi
             done
             _sbresult="$(${PRINTF_BIN} '%s\n' "${_counter}" 2>/dev/null | ${BC_BIN} 2>/dev/null)"
-            if [ "${_sbresult}" -lt "0" -o \
-                 -z "${_sbresult}" ]; then
+            if [ "${_sbresult}" -lt "0" ] || \
+               [ -z "${_sbresult}" ]; then
                 _sbresult="0"
             fi
             run "${TOUCH_BIN} ${PREFIX}/${_sbfdefinition_name}${DEFAULT_STRIPPED_MARK_EXT}" && \
@@ -485,8 +485,8 @@ track_useful_and_useless_files () {
         # we shall clean the bundle, from useless files..
         if [ -d "${PREFIX}" ]; then
             # step 0: clean defaults side DEF_DEFAULT_USELESS entries only if DEF_USEFUL is empty
-            if [ -n "${DEF_DEFAULT_USELESS}" -a \
-                 -z "${DEF_USEFUL}" ]; then
+            if [ -n "${DEF_DEFAULT_USELESS}" ] && \
+               [ -z "${DEF_USEFUL}" ]; then
                 for _cu_pattern in ${DEF_DEFAULT_USELESS}; do
                     if [ -e "${PREFIX}/${_cu_pattern}" ]; then
                         if [ -z "${_fordel}" ]; then
@@ -519,7 +519,7 @@ track_useful_and_useless_files () {
         unset _dbg_exp_lst
         for _cu_dir in bin sbin libexec; do
             if [ -d "${PREFIX}/${_cu_dir}" ]; then
-                _cuall_binaries=$(${FIND_BIN} ${PREFIX}/${_cu_dir} -mindepth 1 -maxdepth 1 -type f -or -type l 2>/dev/null)
+                _cuall_binaries=$(${FIND_BIN} "${PREFIX}/${_cu_dir}" -mindepth 1 -maxdepth 1 -type f -or -type l 2>/dev/null)
                 for _cufile in ${_cuall_binaries}; do
                     unset _cu_commit_removal
                     _cubase="${_cufile##*/}" # NOTE: faster "basename"
@@ -582,13 +582,12 @@ conflict_resolve () {
     if [ -n "${DEF_CONFLICTS_WITH}" ]; then
         debug "Seeking possible bundle conflicts: $(distd "${DEF_CONFLICTS_WITH}")"
         for _cr_app in ${DEF_CONFLICTS_WITH}; do
-            _crfind_s="$(${FIND_BIN} ${SOFTWARE_DIR%/} -maxdepth 1 -type d -iname "${_cr_app}*" 2>/dev/null)"
+            _crfind_s="$(${FIND_BIN} "${SOFTWARE_DIR%/}" -maxdepth 1 -type d -iname "${_cr_app}*" 2>/dev/null)"
             for _cr_name in ${_crfind_s}; do
                 _crn="${_cr_name##*/}"
-                if [ -d "${_cr_name}/exports" \
-                     -a "${_crn}" != "${DEF_NAME}" \
-                     -a "${_crn}" != "${DEF_NAME}${DEF_POSTFIX}" \
-                ]; then
+                if [ -d "${_cr_name}/exports" ] && \
+                   [ "${_crn}" != "${DEF_NAME}" ] && \
+                   [ "${_crn}" != "${DEF_NAME}${DEF_POSTFIX}" ]; then
                     ${MV_BIN} "${_cr_name}/exports" "${_cr_name}/exports-disabled" && \
                         debug "Disabled exports of bundle: $(distn "${_crn}") due to a conflict with current definition."
                 fi
@@ -651,7 +650,7 @@ hack_def () {
     fi
     _hack_pattern="${1}"
     _abeauty_pat="$(distn "*${_hack_pattern}*")"
-    _all_hackdirs=$(${FIND_BIN} ${FILE_CACHE_DIR%/} -type d -mindepth 2 -maxdepth 2 -iname "*${_hack_pattern}*" 2>/dev/null)
+    _all_hackdirs=$(${FIND_BIN} "${FILE_CACHE_DIR%/}" -type d -mindepth 2 -maxdepth 2 -iname "*${_hack_pattern}*" 2>/dev/null)
     _all_am="$(${PRINTF_BIN} '%s\n' "${_all_hackdirs}" | ${WC_BIN} -l 2>/dev/null | ${TR_BIN} -d '\t|\r|\ ' 2>/dev/null)"
     ${TEST_BIN} -z "${_all_am}" && _all_am="0"
     if [ -z "${_all_hackdirs}" ]; then
@@ -774,13 +773,13 @@ apply_definition_patches () {
         _ps_patches="$(${FIND_BIN} "${_common_patches_dir}/" -mindepth 1 -maxdepth 1 -type f 2>/dev/null)"
         if [ -n "${_ps_patches}" ]; then
             note "   ${NOTE_CHAR} Applying common patches for: $(distn "${_pcpaname}")"
-            traverse_patchlevels ${_ps_patches}
+            traverse_patchlevels "${_ps_patches}"
         fi
         if [ -d "${_platform_patches_dir}/" ]; then
             _ps_patches="$(${FIND_BIN} "${_platform_patches_dir}/" -mindepth 1 -maxdepth 1 -type f 2>/dev/null)"
             if [ -n "${_ps_patches}" ]; then
                 note "   ${NOTE_CHAR} Applying platform specific patches for: $(distn "${_pcpaname}/${SYSTEM_NAME}")"
-                traverse_patchlevels ${_ps_patches}
+                traverse_patchlevels "${_ps_patches}"
             fi
         fi
     fi
@@ -807,8 +806,8 @@ clone_or_fetch_git_bare_repo () {
         try "${GIT_BIN} fetch ${DEFAULT_GIT_OPTS} origin ${_chk_branch} > /dev/null" || \
             warn "   ${WARN_CHAR} Failed to fetch an update from bare repository: $(distw "${_git_cached}") [branch: $(distw "${_chk_branch}")]"
         cd "${_cwddd}"
-    elif [ ! -d "${_git_cached}/branches" -a \
-           ! -f "${_git_cached}/config" ]; then
+    elif [ ! -d "${_git_cached}/branches" ] && \
+         [ ! -f "${_git_cached}/config" ]; then
         error "Failed to fetch source repository: $(diste "${_source_path}") [branch: $(diste "${_chk_branch}")]"
     fi
 

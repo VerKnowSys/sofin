@@ -1,6 +1,6 @@
 
 debug () {
-    _in=${@}
+    _in=${*}
     if [ "${TTY}" = "YES" ]; then
         _permdbg="\n"
     else
@@ -8,40 +8,39 @@ debug () {
     fi
     if [ -n "${CAP_SYS_PRODUCTION}" ]; then
         if [ -n "${DEBUG}" ]; then
-            ${PRINTF_BIN} "# (%s) λ ${ColorDebug}%s${ColorReset}\n" "${SHLVL}" "${@}"
+            ${PRINTF_BIN} "# (%s) λ ${ColorDebug}%s${ColorReset}\n" "${SHLVL}" "${*}"
         else
-            ${PRINTF_BIN} "# (%s) λ ${ColorDebug}%s${ColorReset}\n" "${SHLVL}" "${@}" >/dev/null
+            ${PRINTF_BIN} "# (%s) λ ${ColorDebug}%s${ColorReset}\n" "${SHLVL}" "${*}" >/dev/null
         fi
     else
         _sep="${_sep:-$(distd "λ " ${ColorDarkgray})}"
         if [ "${CAP_TERM_BASH}" = "YES" ]; then
-            _dbfile="$(distd "${BASH_SOURCE#/usr/share/sofin/}:${BASH_LINENO[0]}" ${ColorBlue})"
-            _fun="$(distd "${FUNCNAME[2]}()" ${ColorBlue})"
+            _dbfile="$(distd "${BASH_SOURCE#/usr/share/sofin/}:${BASH_LINENO[0]}" "${ColorBlue}")"
+            _fun="$(distd "${FUNCNAME[2]}()" "${ColorBlue}")"
 
         elif [ "${CAP_TERM_ZSH}" = "YES" ]; then
             # NOTE: $funcstack[2]; ${funcfiletrace[@]} ${funcsourcetrace[@]} ${funcstack[@]} ${functrace[@]}
-            _dbfile="$(distd "${funcfiletrace[2]#/usr/share/sofin/}" ${ColorBlue})"
-            _fun="$(distd " ${funcstack[2]}()" ${ColorBlue})"
+            _dbfile="$(distd "${funcfiletrace[2]#/usr/share/sofin/}" "${ColorBlue}")"
+            _fun="$(distd " ${funcstack[2]}()" "${ColorBlue}")"
 
         else
             _dbfile=""
             _fun=""
         fi
 
-        _dbfn=" (${SHLVL}) [${_sep}${_fun} @ ${_dbfile}] "
+        touch_logsdir_and_logfile
+        _dbfn=" (#${SHLVL}) [${_sep}${_fun} @ ${_dbfile}] "
         if [ -z "${DEBUG}" ]; then
             _dbgnme="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
-            if [ -n "${_dbgnme}" -a \
-                 -d "${LOGS_DIR}" ]; then
+            if [ -n "${_dbgnme}" ]; then
                 # Definition log
                 ${PRINTF_BIN} "#${ColorDebug}%s%s${ColorReset}${_permdbg}" "${_dbfn}" "${_in}" 2>> "${LOG}-${_dbgnme}" >> "${LOG}-${_dbgnme}"
-            elif [ -z "${_dbgnme}" -a \
-                   -d "${LOGS_DIR}" ]; then
+            elif [ -z "${_dbgnme}" ]; then
                 # Main log
                 ${PRINTF_BIN} "#${ColorDebug}%s%s${ColorReset}${_permdbg}" "${_dbfn}" "${_in}" 2>> "${LOG}" >> "${LOG}"
             elif [ ! -d "${LOGS_DIR}" ]; then
                 # System logger fallback
-                ${LOGGER_BIN} "# λ ${ColorDebug}${_dbfn}${_in}${ColorReset}" 2>> "${LOG}"
+                ${LOGGER_BIN} "# λ ${ColorDebug}${_dbfn}${_in}${ColorReset}" 2>/dev/null
             fi
         else # DEBUG is set. Print to stdout
             ${PRINTF_BIN} "#${ColorDebug}%s%s${ColorReset}\n" "${_dbfn}" "${_in}"
@@ -53,27 +52,27 @@ debug () {
 
 warn () {
     if [ "${TTY}" = "YES" ]; then
-        ${PRINTF_BIN} "${REPLAY_PREVIOUS_LINE}${ColorYellow}%s${ColorReset}\n\n" "${@}"
+        ${PRINTF_BIN} "${REPLAY_PREVIOUS_LINE}${ColorYellow}%s${ColorReset}\n\n" "${*}"
     else
-        ${PRINTF_BIN} "${ColorYellow}%s${ColorReset}\n" "${@}"
+        ${PRINTF_BIN} "${ColorYellow}%s${ColorReset}\n" "${*}"
     fi
 }
 
 
 note () {
     if [ "${TTY}" = "YES" ]; then
-        ${PRINTF_BIN} "${REPLAY_PREVIOUS_LINE}${ColorGreen}%s${ColorReset}\n" "${@}"
+        ${PRINTF_BIN} "${REPLAY_PREVIOUS_LINE}${ColorGreen}%s${ColorReset}\n" "${*}"
     else
-        ${PRINTF_BIN} "${ColorGreen}%s${ColorReset}\n" "${@}"
+        ${PRINTF_BIN} "${ColorGreen}%s${ColorReset}\n" "${*}"
     fi
 }
 
 
 permnote () {
     if [ "${TTY}" = "YES" ]; then
-        ${PRINTF_BIN} "${REPLAY_PREVIOUS_LINE}${ColorGreen}%s${ColorReset}\n\n" "${@}"
+        ${PRINTF_BIN} "${REPLAY_PREVIOUS_LINE}${ColorGreen}%s${ColorReset}\n\n" "${*}"
     else
-        ${PRINTF_BIN} "${ColorGreen}%s${ColorReset}\n" "${@}"
+        ${PRINTF_BIN} "${ColorGreen}%s${ColorReset}\n" "${*}"
     fi
 }
 
@@ -82,18 +81,17 @@ error () {
     # Get three recently modified logs:
     _last_two_mod_logs=$(${LS_BIN} -1t "${LOGS_DIR}" 2>/dev/null | ${HEAD_BIN} -3 2>/dev/null | eval "${NEWLINES_TO_SPACES_GUARD}")
     ${PRINTF_BIN} "\n\n${ColorRed}%s\n\n  ${FAIL_CHAR} Error!\n\n    %s\n\n%s\n\n${ColorReset}%s\n\n${ColorWhite}Showing tail of 3 most recent Sofin logs:\n\n${ColorReset}%s${ColorWhite}\n\n%s\n\n%s\n\n%s\n\n\n" \
-        "$(fill "${SEPARATOR_CHAR2}")" "${@}" "$(fill "${SEPARATOR_CHAR2}")" "$(fill "${SEPARATOR_CHAR2}")" "$(fill "${SEPARATOR_CHAR2}")" "$(cd "${LOGS_DIR}" && ${TAIL_BIN} -n${LOG_LINES_AMOUNT_ON_ERR} ${_last_two_mod_logs})" "$(fill "${SEPARATOR_CHAR2}")"
+        "$(fill "${SEPARATOR_CHAR2}")" "${*}" "$(fill "${SEPARATOR_CHAR2}")" "$(fill "${SEPARATOR_CHAR2}")" "$(fill "${SEPARATOR_CHAR2}")" "$(cd "${LOGS_DIR}" && ${TAIL_BIN} -n "${LOG_LINES_AMOUNT_ON_ERR}" ${_last_two_mod_logs})" "$(fill "${SEPARATOR_CHAR2}")"
     warn "  ${NOTE_CHAR2} If you think this error is a bug in definition, please report an info about"
     warn "    encountered problem on one of issue trackers:"
     ${PRINTF_BIN} "\n"
-    warn "  ${NOTE_CHAR}  Bitbucket: $(distw "${DEFAULT_ISSUE_REPORT_SITE}")"
-    warn "  ${NOTE_CHAR}  Github: $(distw "${DEFAULT_ISSUE_REPORT_SITE_ALT}")"
+    warn "  ${NOTE_CHAR}  Github: $(distw "${DEFAULT_ISSUE_REPORT_SITE}")"
     ${PRINTF_BIN} "\n"
     warn "$(fill "${SEPARATOR_CHAR}" 46)$(distw "  Daniel (dmilith) Dettlaff  ")$(fill "${SEPARATOR_CHAR}" 5)"
     ${PRINTF_BIN} "\n"
     # TODO: add "history backtrace". Play with: fc -lnd -5, but separate sh/zsh history file should solve the problem
     finalize_interrupt
-    exit ${ERRORCODE_TASK_FAILURE}
+    exit "${ERRORCODE_TASK_FAILURE}"
 }
 
 
@@ -122,12 +120,12 @@ diste () {
 
 
 run () {
-    _run_params="${@}"
+    _run_params=${*}
     env_forgivable
     if [ -n "${_run_params}" ]; then
         touch_logsdir_and_logfile
         ${PRINTF_BIN} '%s\n' "${_run_params}" | eval "${MATCH_PRINT_STDOUT_GUARD}" && _run_shw_prgr=YES
-        # debug "$(distd "$(${DATE_BIN} ${DEFAULT_DATE_TRYRUN_OPTS} 2>/dev/null)" ${ColorDarkgray}): $(distd "${RUN_CHAR}" ${ColorWhite}): $(distd "${_run_params}" ${ColorParams}) $(distd "[show-blueout:${_run_shw_prgr:-NO}]" ${ColorBlue})"
+        # debug "$(distd "$(${DATE_BIN} ${DEFAULT_DATE_TRYRUN_OPTS} 2>/dev/null)" ${ColorDarkgray}): $(distd "${RUN_CHAR}" ${ColorWhite}): $(distd "${_run_params}" ${ColorParams}) $(distd "[show-blueout:${_run_shw_prgr:-NO}]" "${ColorBlue}")"
         if [ -z "${DEF_NAME}${DEF_POSTFIX}" ]; then
             if [ -z "${_run_shw_prgr}" ]; then
                 eval "PATH=${PATH}${GIT_EXPORTS} ${_run_params}" >> "${LOG}" 2>> "${LOG}"
@@ -156,13 +154,13 @@ run () {
 
 
 try () {
-    _try_params="${@}"
+    _try_params=${*}
     env_forgivable
     if [ -n "${_try_params}" ]; then
         touch_logsdir_and_logfile
         ${PRINTF_BIN} "${_try_params}\n" | eval "${MATCH_PRINT_STDOUT_GUARD}" && _show_prgrss=YES
         # _dt="$(distd "$(${DATE_BIN} ${DEFAULT_DATE_TRYRUN_OPTS} 2>/dev/null)" ${ColorDarkgray})"
-        # debug "${_dt}: $(distd "${TRY_CHAR}" ${ColorWhite}) $(distd "${_try_params}" ${ColorParams}) $(distd "[${_show_prgrss:-NO}]" ${ColorBlue})"
+        # debug "${_dt}: $(distd "${TRY_CHAR}" ${ColorWhite}) $(distd "${_try_params}" ${ColorParams}) $(distd "[${_show_prgrss:-NO}]" "${ColorBlue}")"
         _try_aname="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
         if [ -z "${_try_aname}" ]; then
             if [ -z "${_show_prgrss}" ]; then
@@ -206,7 +204,7 @@ retry () {
     while [ -n "${_ammo}" ]; do
         if [ -n "${_targets}" ]; then
             # _dt="$(distd "$(${DATE_BIN} ${DEFAULT_DATE_TRYRUN_OPTS} 2>/dev/null)" ${ColorDarkgray})"
-            # debug "${_dt}: $(distd "${TRY_CHAR}${NOTE_CHAR}${RUN_CHAR}" ${ColorWhite}) $(distd "${_targets}" ${ColorParams}) $(distd "[${_show_prgrss:-NO}]" ${ColorBlue})"
+            # debug "${_dt}: $(distd "${TRY_CHAR}${NOTE_CHAR}${RUN_CHAR}" ${ColorWhite}) $(distd "${_targets}" ${ColorParams}) $(distd "[${_show_prgrss:-NO}]" "${ColorBlue}")"
             if [ -z "${_rtry_blue}" ]; then
                 eval "PATH=${DEFAULT_PATH}${GIT_EXPORTS} ${_targets}" >> "${LOG}" 2>> "${LOG}" && \
                     unset _ammo _targets && \
@@ -258,14 +256,14 @@ cleanup_handler () {
 interrupt_handler () {
     warn "Interrupted: $(distw "${SOFIN_PID:-$$}")"
     finalize_interrupt
-    exit ${ERRORCODE_USER_INTERRUPT}
+    exit "${ERRORCODE_USER_INTERRUPT}"
 }
 
 
 terminate_handler () {
     warn "Terminated: $(distw "${SOFIN_PID:-$$}")"
     finalize
-    exit ${ERRORCODE_TERMINATED}
+    exit "${ERRORCODE_TERMINATED}"
 }
 
 
@@ -338,7 +336,7 @@ restore_security_state () {
     if [ "YES" = "${CAP_SYS_HARDENED}" ]; then
         if [ -f "${DEFAULT_SECURITY_STATE_FILE}" ]; then
             note "Restoring pre-build security state"
-            . ${DEFAULT_SECURITY_STATE_FILE} >> "${LOG}" 2>> "${LOG}"
+            . "${DEFAULT_SECURITY_STATE_FILE}" #>> "${LOG}" 2>> "${LOG}"
         else
             debug "No security state file found: $(distd "${DEFAULT_SECURITY_STATE_FILE}")"
         fi
@@ -355,7 +353,7 @@ store_security_state () {
         for _key in ${DEFAULT_HARDEN_KEYS}; do
             _sss_value="$(${SYSCTL_BIN} -n "${_key}" 2>/dev/null)"
             _sss_cntnt="${SYSCTL_BIN} ${_key}=${_sss_value}"
-            ${PRINTF_BIN} "${_sss_cntnt}\n" >> ${DEFAULT_SECURITY_STATE_FILE} 2>/dev/null
+            ${PRINTF_BIN} "${_sss_cntnt}\n" >> "${DEFAULT_SECURITY_STATE_FILE}" 2>/dev/null
         done
         unset _key _sss_cntnt _sss_value
     else
@@ -383,7 +381,7 @@ summary () {
     SOFIN_END="${SOFIN_END:-$(${SOFIN_MICROSECONDS_UTILITY_BIN})}"
     SOFIN_RUNTIME="$(calculate_bc "(${SOFIN_END} - ${SOFIN_START:-${SOFIN_END}}) / 1000")"
 
-    ${PRINTF_BIN} "${ColorExample}%s${ColorReset}\n" "$(fill ${SEPARATOR_CHAR2})" >> "${LOG:-/var/log/sofin}"
+    ${PRINTF_BIN} "${ColorExample}%s${ColorReset}\n" "$(fill "${SEPARATOR_CHAR2}")" >> "${LOG:-/var/log/sofin}"
     ${PRINTF_BIN} "${ColorExample}args.head: ${ColorYellow}%s\n" "${SOFIN_COMMAND_ARG:-''}" >> "${LOG:-/var/log/sofin}"
     ${PRINTF_BIN} "${ColorExample}args.tail: ${ColorYellow}%s\n" "${SOFIN_ARGS:-''}" >> "${LOG:-/var/log/sofin}"
     ${PRINTF_BIN} "${ColorExample}pid: ${ColorYellow}%d${ColorExample}\n" "${SOFIN_PID:--1}" >> "${LOG:-/var/log/sofin}"
@@ -393,7 +391,7 @@ summary () {
     ${PRINTF_BIN} "${ColorExample}shell times: ${ColorReset}\n" >> "${LOG:-/var/log/sofin}"
     times >> "${LOG:-/var/log/sofin}"
 
-    ${PRINTF_BIN} "${ColorExample}%s${ColorReset}\n" "$(fill ${SEPARATOR_CHAR2})" >> "${LOG:-/var/log/sofin}"
+    ${PRINTF_BIN} "${ColorExample}%s${ColorReset}\n" "$(fill "${SEPARATOR_CHAR2}")" >> "${LOG:-/var/log/sofin}"
 }
 
 

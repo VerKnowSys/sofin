@@ -62,9 +62,9 @@ push_binbuilds () {
         if [ ! -f "${_pbinstall_indicator_file}" ]; then
             error "Bundle install indicator: $(diste "${_pbinstall_indicator_file}") doesn't exist!"
         fi
-        if [ -n "${_pbelement}" -a \
-             -d "${SOFTWARE_DIR}${_pbelement}" -a \
-             -n "${_pbbversion_element}" ]; then
+        if [ -n "${_pbelement}" ] && \
+           [ -d "${SOFTWARE_DIR}${_pbelement}" ] && \
+           [ -n "${_pbbversion_element}" ]; then
             debug "About to push: $(distd "${_pbelement}"), install-indicator: $(distd "${_pbinstall_indicator_file}"), soft-version: $(distd "${_pbbversion_element}")"
             push_to_all_mirrors "${_pbelement}" "${_pbbversion_element}"
         else
@@ -82,7 +82,7 @@ deploy_binbuild () {
         USE_BINBUILD=NO
         build "${_dbbundle}"
     done
-    push_binbuilds ${_dbbundles}
+    push_binbuilds "${_dbbundles}"
     note "Bundles deployed successfully: $(distn "${_dbbundles}")"
     unset _dbbundles _dbbundle
 }
@@ -95,7 +95,7 @@ rebuild_bundle () {
         error "Missing second argument with library/software name."
     fi
     # go to definitions dir, and gather software list that include given _a_dependency:
-    _alldefs_avail="$(${FIND_BIN} ${DEFINITIONS_DIR%/} -maxdepth 1 -type f -name "*${DEFAULT_DEF_EXT}" 2>/dev/null)"
+    _alldefs_avail="$(${FIND_BIN} "${DEFINITIONS_DIR%/}" -maxdepth 1 -type f -name "*${DEFAULT_DEF_EXT}" 2>/dev/null)"
     _those_to_rebuild=""
     for _dep in ${_alldefs_avail}; do
         load_defaults
@@ -111,7 +111,7 @@ rebuild_bundle () {
 
     note "Will rebuild, wipe and push these bundles: $(distn "${_those_to_rebuild}")"
     for _reb_ap_bundle in ${_those_to_rebuild}; do
-        if [ "${_reb_ap_bundle}" = "Git" -o "${_reb_ap_bundle}" = "Zsh" ]; then
+        if [ "${_reb_ap_bundle}" = "Git" ] || [ "${_reb_ap_bundle}" = "Zsh" ]; then
             continue
         fi
         remove_bundles "${_reb_ap_bundle}"
@@ -173,7 +173,7 @@ build () {
     store_security_state
     disable_security_features
 
-    debug "Sofin v$(distd ${SOFIN_VERSION}): New build started for bundles: $(distd ${_build_list})"
+    debug "Sofin v$(distd "${SOFIN_VERSION}"): New build started for bundles: $(distd "${_build_list}")"
     PATH="${DEFAULT_PATH}"
     for _bund_name in ${_build_list}; do
         _specified="${_bund_name}" # store original value of user input
@@ -732,11 +732,11 @@ test_and_rate_def () {
     if [ "Darwin" = "${SYSTEM_NAME}" ]; then
         _anadd="DY"
     fi
-    debug "Invoking test of definition: $(distd "${_name}") [$(distd "${@}")]"
+    debug "Invoking test of definition: $(distd "${_name}") [$(distd "${*}")]"
     try "${_anadd}LD_LIBRARY_PATH=\"${PREFIX}/lib:${PREFIX}/libexec\" \
 TEST_JOBS=\"${CPUS}\" \
 TEST_ENV=\"${DEF_TEST_ENV}\" \
-${@} >> ${PREFIX}/${_name}.test.results 2>> ${PREFIX}/${_name}.test.results && \
+${*} >> ${PREFIX}/${_name}.test.results 2>> ${PREFIX}/${_name}.test.results && \
 ${TOUCH_BIN} ${PREFIX}/${_name}.test.passed || ${TOUCH_BIN} ${PREFIX}/${_name}.test.failed"
     debug "Test of definition: $(distd "${_name}") has ended."
     unset _name _an
