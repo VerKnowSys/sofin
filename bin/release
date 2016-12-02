@@ -6,13 +6,10 @@
 
 note "Pulling from origin and mirror.."
 ${GIT_BIN} pull "${SOFIN_ORIGIN}" >/dev/null
-${GIT_BIN} pull "${SOFIN_ORIGIN_ALT}" >/dev/null
 
 note "Pushing repo to origin: ${SOFIN_ORIGIN} and mirror: ${SOFIN_ORIGIN_ALT}"
 ${GIT_BIN} push --all "${SOFIN_ORIGIN}" >/dev/null && \
-${GIT_BIN} push --tags "${SOFIN_ORIGIN}" >/dev/null && \
-${GIT_BIN} push --all "${SOFIN_ORIGIN_ALT}" >/dev/null && \
-${GIT_BIN} push --tags "${SOFIN_ORIGIN_ALT}" >/dev/null
+${GIT_BIN} push --tags "${SOFIN_ORIGIN}" >/dev/null
 
 note "Cleaning natives"
 ${RM_BIN} -fv bin/s-* src/.*.o
@@ -22,16 +19,16 @@ base_name="${DEFAULT_NAME}-${SOFIN_VERSION}"
 archive_name="${base_name}${DEFAULT_ARCHIVE_TARBALL_EXT}"
 note "Preparing package: ${archive_name} with version: ${SOFIN_VERSION}"
 
-${TAR_BIN} cJf releases/${archive_name} README.md src bin
-${MKDIR_BIN} -p releases/${base_name}
-${MV_BIN} releases/${archive_name} releases/${base_name}/
-cd releases/${base_name}
-${TAR_BIN} xf ${archive_name}
-${RM_BIN} -f ${archive_name}
-cd ..
-${TAR_BIN} cJf ${archive_name} ./${base_name}
-${RM_BIN} -rf ${base_name}
-cd ..
+${TAR_BIN} cJf "releases/${archive_name}" README.md src bin
+${MKDIR_BIN} -p "releases/${base_name}"
+${MV_BIN} "releases/${archive_name}" "releases/${base_name}/"
+cd "releases/${base_name}"
+${TAR_BIN} xf "${archive_name}"
+${RM_BIN} -f "${archive_name}"
+cd ../
+${TAR_BIN} cJf "${archive_name}" "./${base_name}"
+${RM_BIN} -rf "${base_name}"
+cd ../
 
 if [ "${USER}" != "dmilith" ]; then
     warn "You should be dmilith, to push a release."
@@ -39,23 +36,23 @@ else
     DEST_NAME="${DEFAULT_NAME}-${SOFIN_VERSION}${DEFAULT_ARCHIVE_TARBALL_EXT}"
 
     note "Pushing Sofin package to remote server: "
-    ${CHMOD_BIN} a+r releases/${DEST_NAME}
-    ${SCP_BIN} releases/${DEST_NAME} "${DEFAULT_RELEASE_HOST}:${DEFAULT_RELEASE_REMOTE_PATH}" >/dev/null
-    ${SSH_BIN} ${DEFAULT_NAME}@${DEFAULT_RELEASE_HOST} "source ~/.functions.sh && gather-source ${DEFAULT_RELEASE_PATH}/${DEST_NAME}"
+    ${CHMOD_BIN} a+r "releases/${DEST_NAME}"
+    ${SCP_BIN} "releases/${DEST_NAME}" "${DEFAULT_RELEASE_HOST}:${DEFAULT_RELEASE_REMOTE_PATH}" >/dev/null
+    ${SSH_BIN} "${DEFAULT_NAME}@${DEFAULT_RELEASE_HOST}" "source ~/.functions.sh && gather-source ${DEFAULT_RELEASE_PATH}/${DEST_NAME}"
 
     note "Preparing initial snapshot from repository: ${DEFAULT_DEFINITIONS_REPOSITORY}"
-    ${GIT_BIN} clone ${DEFAULT_DEFINITIONS_REPOSITORY} ${DEFAULT_SOFIN_DEFINITIONS_NAME} >/dev/null
-    cd ./${DEFAULT_SOFIN_DEFINITIONS_NAME}
+    ${GIT_BIN} clone "${DEFAULT_DEFINITIONS_REPOSITORY}" "${DEFAULT_SOFIN_DEFINITIONS_NAME}" >/dev/null
+    cd "./${DEFAULT_SOFIN_DEFINITIONS_NAME}"
     ${GIT_BIN} push --all "${DEFAULT_DEFINITIONS_REPOSITORY_ALT}" >/dev/null
     ${GIT_BIN} push --tags "${DEFAULT_DEFINITIONS_REPOSITORY_ALT}" >/dev/null
-    ${TAR_BIN} cJf ../releases/${DEFINITIONS_INITIAL_FILE_NAME}${DEFAULT_ARCHIVE_TARBALL_EXT} definitions lists README.md >/dev/null
-    cd ..
+    ${TAR_BIN} cJf "../releases/${DEFINITIONS_INITIAL_FILE_NAME}${DEFAULT_ARCHIVE_TARBALL_EXT}" definitions lists README.md >/dev/null
+    cd ../
 
     note "Pushing snapshot to remote server(s)"
-    ${CHMOD_BIN} a+r releases/${DEFINITIONS_INITIAL_FILE_NAME}${DEFAULT_ARCHIVE_TARBALL_EXT}
-    ${SCP_BIN} releases/${DEFINITIONS_INITIAL_FILE_NAME}${DEFAULT_ARCHIVE_TARBALL_EXT} "${DEFAULT_RELEASE_HOST}:${DEFAULT_RELEASE_REMOTE_PATH}" >/dev/null
-    ${SSH_BIN} ${DEFAULT_NAME}@${DEFAULT_RELEASE_HOST} "rm /Mirror/software/source/${DEFINITIONS_INITIAL_FILE_NAME}${DEFAULT_ARCHIVE_TARBALL_EXT} ; source ~/.functions.sh && gather-source ${DEFAULT_RELEASE_PATH}/${DEFINITIONS_INITIAL_FILE_NAME}${DEFAULT_ARCHIVE_TARBALL_EXT}" >/dev/null
-    ${RM_BIN} -rf ./${DEFAULT_SOFIN_DEFINITIONS_NAME} ${DEFINITIONS_INITIAL_FILE_NAME}${DEFAULT_ARCHIVE_TARBALL_EXT}
+    ${CHMOD_BIN} a+r "releases/${DEFINITIONS_INITIAL_FILE_NAME}${DEFAULT_ARCHIVE_TARBALL_EXT}"
+    ${SCP_BIN} "releases/${DEFINITIONS_INITIAL_FILE_NAME}${DEFAULT_ARCHIVE_TARBALL_EXT}" "${DEFAULT_RELEASE_HOST}:${DEFAULT_RELEASE_REMOTE_PATH}" >/dev/null
+    ${SSH_BIN} "${DEFAULT_NAME}@${DEFAULT_RELEASE_HOST}" "rm /Mirror/software/source/${DEFINITIONS_INITIAL_FILE_NAME}${DEFAULT_ARCHIVE_TARBALL_EXT} ; source ~/.functions.sh && gather-source ${DEFAULT_RELEASE_PATH}/${DEFINITIONS_INITIAL_FILE_NAME}${DEFAULT_ARCHIVE_TARBALL_EXT}" >/dev/null
+    ${RM_BIN} -rf "./${DEFAULT_SOFIN_DEFINITIONS_NAME}" "${DEFINITIONS_INITIAL_FILE_NAME}${DEFAULT_ARCHIVE_TARBALL_EXT}"
 
     note "Sofin v$(distn "${SOFIN_VERSION}") deployed to: $(distn "${DEFAULT_RELEASE_PATH}")"
 fi
