@@ -1,9 +1,8 @@
 SOFIN_VERSION="1.1.49"
 
-
-SOFIN_ORIGIN="git@github.com:VerKnowSys/${DEFAULT_NAME}${DEFAULT_GIT_DIR_NAME}"
+SOFIN_ORIGIN="https://github.com/VerKnowSys/${DEFAULT_NAME}${DEFAULT_GIT_DIR_NAME}"
 DEFAULT_ISSUE_REPORT_SITE="https://github.com/VerKnowSys/sofin/issues"
-DEFAULT_GITHUB_REPO="git@github.com:VerKnowSys/${DEFAULT_SOFIN_DEFINITIONS_NAME}${DEFAULT_GIT_DIR_NAME}"
+DEFAULT_GITHUB_REPO="https://github.com/VerKnowSys/${DEFAULT_SOFIN_DEFINITIONS_NAME}${DEFAULT_GIT_DIR_NAME}"
 
 DEFAULT_RELEASE_HOST="v" # NOTE: use value for v from /etc/hosts
 DEFAULT_RELEASE_PATH="http://dmilith.verknowsys.com/Public/Sofin-releases"
