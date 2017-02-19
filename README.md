@@ -175,3 +175,4 @@ space than it does with "old fasioned, system wide, shared software".
 
 ## License:
 * Released under the [BSD](http://opensource.org/licenses/BSD-2-Clause) license.
+* Used a :bus:
