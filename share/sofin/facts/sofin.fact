@@ -61,7 +61,7 @@ COMMON_FLAGS="-w -fPIC"
 # NOTE: XXX: To add -Werror=format-security as a default, we have to get rid of GNU software ;)
 # NOTE:-D is recognized as "a macro" and rejected f.i. configure script of "c-ares" definiton
 # NOTE: Under production systems, explicitly use RELRO and BINDNOW:
-LTO_CFLAGS="-flto -fsanitize=safe-stack" # # LLVM 4.0+ => -fsanitize=safe-stack,cfi
+LTO_CFLAGS="-flto" # -fsanitize=safe-stack # # LLVM 4.0+ => -fsanitize=safe-stack,cfi # -flto
 HARDEN_CFLAGS="-fstack-protector -fstack-protector-strong -fstack-protector-all --param ssp-buffer-size=4 -fno-strict-overflow -Wformat -Wformat-security"
 HARDEN_OFLOW_CFLAGS="-ftrapv"
 HARDEN_CMACROS="-D_FORTIFY_SOURCE=2"
