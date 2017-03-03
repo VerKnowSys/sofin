@@ -564,7 +564,7 @@ process_flat () {
                             run "${_cmake_cmdline} -G\"Unix Makefiles\""
                         else
                             try "${_cmake_cmdline} -G\"Ninja\"" || \
-                                run "${_cmake_cmdline} -G\"Unix Makefiles\""
+                                run "${RM_BIN} -f CMakeCache.txt; ${_cmake_cmdline} -G\"Unix Makefiles\""
                         fi
                         unset _cmake_cmdline
                         ;;
