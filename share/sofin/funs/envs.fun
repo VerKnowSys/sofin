@@ -241,6 +241,9 @@ compiler_setup () {
                 CC="${CCACHE_BIN_OPTIONAL} /usr/bin/${CC}"
                 CXX="${CCACHE_BIN_OPTIONAL} /usr/bin/${CXX}"
             fi
+        else
+            CC="/usr/bin/${CC}"
+            CXX="/usr/bin/${CXX}"
         fi
     fi
 
