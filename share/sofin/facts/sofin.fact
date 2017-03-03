@@ -72,6 +72,8 @@ if [ "${SYSTEM_NAME}" = "Darwin" ] || \
    [ "YES" != "${CAP_SYS_HARDENED}" ]; then
     # not supported under macOS
     unset HARDEN_CFLAGS_PRODUCTION HARDEN_LDFLAGS_PRODUCTION
+    # override -fsanitize=safe-stack which is not supported under Darwin
+    LTO_CFLAGS="-flto"
 fi
 # NOTE: set base + hardened compiler options:
 COMMON_COMPILER_FLAGS="${COMMON_FLAGS} ${HARDEN_CFLAGS} ${HARDEN_CFLAGS_PRODUCTION} ${HARDEN_CMACROS}"
