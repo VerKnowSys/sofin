@@ -337,6 +337,11 @@ compiler_setup () {
         CXXFLAGS="${CXXFLAGS} ${HARDEN_OFLOW_CFLAGS}"
     fi
 
+    if [ -z "${DEF_NO_LTO}" ]; then
+        CFLAGS="${CFLAGS} ${LTO_CFLAGS}"
+        CXXFLAGS="${CXXFLAGS} ${LTO_CFLAGS}"
+    fi
+
     # If DEF_LINKER_ARGS is set on definition side, append it's content to LDFLAGS:
     if [ -n "${DEF_LINKER_ARGS}" ]; then
         LDFLAGS="${LDFLAGS} ${DEF_LINKER_ARGS}"
