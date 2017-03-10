@@ -158,6 +158,7 @@ build_service_dataset () {
                 debug "Service origin available!"
             else
                 debug "Service origin unavailable! Creating new one."
+                ${MKDIR_BIN} -p "${SERVICES_DIR}${_ps_elem}"
                 run "${TAR_BIN} cJf ${FILE_CACHE_DIR}${_ps_snap_file} ${SERVICES_DIR}${_ps_elem}"
                 _snap_size="$(file_size "${FILE_CACHE_DIR}${_ps_snap_file}")"
                 if [ "${_snap_size}" = "0" ]; then
