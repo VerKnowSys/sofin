@@ -4,6 +4,7 @@
 . share/sofin/loader
 . bin/install
 
+SOFIN_ORIGIN="git@github.com:VerKnowSys/sofin.git"
 note "Pulling from origin and mirror.."
 ${GIT_BIN} pull "${SOFIN_ORIGIN}" >/dev/null
 
