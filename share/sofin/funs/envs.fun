@@ -358,9 +358,17 @@ compiler_setup () {
         LDFLAGS="${LDFLAGS} ${DEF_LINKER_ARGS}"
     fi
 
-    export CFLAGS CXXFLAGS LDFLAGS LD AR AS NM CC CXX CPP RANLIB
+    # NOTE: some definitions fails on missing values for these:
+    AR="${AR:-ar}"
+    AS="${AS:-as}"
+    NM="${NM:-nm}"
+    CC="${CC:-cc}"
+    CXX="${CXX:-c++}"
+    CPP="${CPP:-cpp}"
+    RANLIB="${RANLIB:-ranlib}"
 
-    return 0
+    # export definitions critical to compiler environment:
+    export CFLAGS CXXFLAGS LDFLAGS LD AR AS NM CC CXX CPP RANLIB
 }
 
 
