@@ -357,6 +357,7 @@ compiler_setup () {
     if [ -z "${DEF_NO_SAFE_STACK}" ]; then
         CFLAGS="${CFLAGS} ${HARDEN_SAFE_STACK_FLAGS}"
         CXXFLAGS="${CXXFLAGS} ${HARDEN_SAFE_STACK_FLAGS}"
+        LDFLAGS="${LDFLAGS} ${HARDEN_SAFE_STACK_FLAGS}"
     fi
 
     if [ -z "${DEF_NO_LTO}" ]; then
