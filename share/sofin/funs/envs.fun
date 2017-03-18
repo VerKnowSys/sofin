@@ -77,6 +77,12 @@ dump_compiler_setup () {
         debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "ccache" "${ColorGray}")"
     fi
 
+    if [ -z "${DEF_NO_SAFE_STACK}" ]; then
+        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "safe-stack" "${ColorGreen}")"
+    else
+        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "safe-stack" "${ColorGray}")"
+    fi
+
     if [ -z "${DEF_NO_LTO}" ]; then
         debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "link-time-optimization" "${ColorGreen}")"
     else
@@ -346,6 +352,11 @@ compiler_setup () {
     if [ -z "${DEF_NO_TRAP_INT_OVERFLOW}" ]; then
         CFLAGS="${CFLAGS} ${HARDEN_OFLOW_CFLAGS}"
         CXXFLAGS="${CXXFLAGS} ${HARDEN_OFLOW_CFLAGS}"
+    fi
+
+    if [ -z "${DEF_NO_SAFE_STACK}" ]; then
+        CFLAGS="${CFLAGS} ${HARDEN_SAFE_STACK_FLAGS}"
+        CXXFLAGS="${CXXFLAGS} ${HARDEN_SAFE_STACK_FLAGS}"
     fi
 
     if [ -z "${DEF_NO_LTO}" ]; then
