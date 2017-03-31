@@ -172,6 +172,8 @@ compiler_setup () {
             ;;
 
         Darwin)
+            # NOTE: Default flags can contains linker setup options:
+            DEFAULT_COMPILER_FLAGS="${COMMON_FLAGS} ${HARDEN_CFLAGS} ${HARDEN_CMACROS}"
             DEFAULT_LINKER_FLAGS="${COMMON_LDFLAGS} ${DEF_SYSTEM_SPECIFIC_LDFLAGS}"
 
             # XQuartz support to make things easier:
@@ -202,9 +204,6 @@ compiler_setup () {
             DEFAULT_LINKER_FLAGS="${COMMON_LDFLAGS} ${DEF_SYSTEM_SPECIFIC_LDFLAGS}"
             ;;
     esac
-
-    # NOTE: Default flags can contains linker setup options:
-    DEFAULT_COMPILER_FLAGS="${COMMON_COMPILER_FLAGS}"
 
     if [ "YES" = "${DEBUGBUILD}" ]; then
         DEFAULT_COMPILER_FLAGS="${DEFAULT_COMPILER_FLAGS} -O0 -ggdb"
