@@ -419,8 +419,13 @@ strip_bundle () {
         return 0
     fi
 
+    DEF_STRIP="${DEF_STRIP:-NO}" # unset DEF_STRIP to say "NO", but don't allow no value further
     _dirs_to_strip=""
     case "${DEF_STRIP}" in
+        no|NO)
+            permnote "$(distn "${_sbfdefinition_name}"): No symbols will be stripped from bundle"
+            ;;
+
         all|ALL)
             debug "$(distd "${_sbfdefinition_name}"): Strip both binaries and libraries."
             _dirs_to_strip="${PREFIX}/bin ${PREFIX}/sbin ${PREFIX}/lib ${PREFIX}/libexec"
@@ -435,44 +440,35 @@ strip_bundle () {
             debug "$(distd "${_sbfdefinition_name}"): Strip libraries only"
             _dirs_to_strip="${PREFIX}/lib"
             ;;
-
-        *)
-            warn "$(distw "${_sbfdefinition_name}"): Strip nothing? Valid options are: ALL | BIN | LIB | NO"
-            ;;
     esac
-    if [ "NO" != "${DEF_STRIP}" ] || \
-       [ "no" != "${DEF_STRIP}" ]; then
-        if [ -z "${DEBUGBUILD}" ]; then
-            _counter="0"
-            for _stripdir in ${_dirs_to_strip}; do
-                if [ -d "${_stripdir}" ]; then
-                    _tbstripfiles=$(${FIND_BIN} "${_stripdir}" -maxdepth 1 -type f 2>/dev/null)
-                    for _file in ${_tbstripfiles}; do
-                        _bundlower="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
-                        if [ -n "${_bundlower}" ]; then
-                            try "${STRIP_BIN} ${DEFAULT_STRIP_OPTS} ${_file} > /dev/null 2>&1"
-                        else
-                            try "${STRIP_BIN} ${DEFAULT_STRIP_OPTS} ${_file} > /dev/null 2>&1"
-                        fi
-                        if [ "${?}" = "0" ]; then
-                            _counter="${_counter} + 1"
-                        else
-                            _counter="${_counter} - 1"
-                        fi
-                    done
+
+    _counter="0"
+    for _stripdir in ${_dirs_to_strip}; do
+        if [ -d "${_stripdir}" ]; then
+            _tbstripfiles=$(${FIND_BIN} "${_stripdir}" -maxdepth 1 -type f 2>/dev/null)
+            for _file in ${_tbstripfiles}; do
+                _bundlower="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
+                if [ -n "${_bundlower}" ]; then
+                    try "${STRIP_BIN} ${DEFAULT_STRIP_OPTS} ${_file} > /dev/null 2>&1"
+                else
+                    try "${STRIP_BIN} ${DEFAULT_STRIP_OPTS} ${_file} > /dev/null 2>&1"
+                fi
+                if [ "${?}" = "0" ]; then
+                    _counter="${_counter} + 1"
+                else
+                    _counter="${_counter} - 1"
                 fi
             done
-            _sbresult="$(${PRINTF_BIN} '%s\n' "${_counter}" 2>/dev/null | ${BC_BIN} 2>/dev/null)"
-            if [ "${_sbresult}" -lt "0" ] || \
-               [ -z "${_sbresult}" ]; then
-                _sbresult="0"
-            fi
-            run "${TOUCH_BIN} ${PREFIX}/${_sbfdefinition_name}${DEFAULT_STRIPPED_MARK_EXT}" && \
-                debug "$(distd "${_sbresult}") files were stripped. Strip indicator touched!"
-        else
-            warn "Symbol strip disabled for debug build."
         fi
+    done
+    _sbresult="$(${PRINTF_BIN} '%s\n' "${_counter}" 2>/dev/null | ${BC_BIN} 2>/dev/null)"
+    if [ "${_sbresult}" -lt "0" ] || \
+       [ -z "${_sbresult}" ]; then
+        _sbresult="0"
     fi
+    run "${TOUCH_BIN} ${PREFIX}/${_sbfdefinition_name}${DEFAULT_STRIPPED_MARK_EXT}" && \
+        debug "$(distd "${_sbresult}") files were stripped. Strip indicator touched!"
+
     env_pedantic
     unset _sbfdefinition_name _dirs_to_strip _sbresult _counter _files _stripdir _bundlower
 }
