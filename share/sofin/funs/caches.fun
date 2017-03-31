@@ -65,6 +65,7 @@ less_logs () {
 
 
 show_logs () {
+    clear
     create_dirs
     _logf_pattern="${1:-+}"
     _logf_minutes="${LOG_LAST_ACCESS_OR_MOD_MINUTES}"
