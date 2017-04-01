@@ -43,7 +43,7 @@ SOFIN_BIN_SHORT="${SOFIN_BIN##*/}"
 TIMESTAMP="${TIMESTAMP:-$(${DATE_BIN} "${DEFAULT_DATE_TS_OPTS}" 2>/dev/null)}"
 
 # Hardened system support:
-DEFAULT_SECURITY_STATE_FILE="${SOFTWARE_DIR}.sys-security-state.${TIMESTAMP}"
+DEFAULT_SECURITY_STATE_FILE="${SOFTWARE_DIR}/.sys-security-state.${TIMESTAMP}"
 
 # LLVM backend:
 C_COMPILER_NAME="clang"
