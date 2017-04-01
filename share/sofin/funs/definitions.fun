@@ -240,7 +240,7 @@ remove_bundles () {
         if [ -z "${_given_name}" ]; then
             error "Empty bundle name given as first param!"
         fi
-        if [ -d "${SOFTWARE_DIR}${_given_name}" ]; then
+        if [ -d "${SOFTWARE_DIR}/${_given_name}" ]; then
             _aname="$(lowercase "${_given_name}")"
             destroy_software_dir "${_given_name}" && \
                 permnote "Removed bundle: $(distn "${_given_name}")"
@@ -253,7 +253,7 @@ remove_bundles () {
             fi
 
             if [ -n "${_alternative}" ] && \
-               [ -f "${SOFTWARE_DIR}${_alternative}/$(lowercase "${_alternative}")${DEFAULT_INST_MARK_EXT}" ]; then
+               [ -f "${SOFTWARE_DIR}/${_alternative}/$(lowercase "${_alternative}")${DEFAULT_INST_MARK_EXT}" ]; then
                 permnote "Updating environment for installed alternative: $(distn "${_alternative}")"
                 export_binaries "${_alternative}"
                 finalize
@@ -292,18 +292,18 @@ make_exports () {
     if [ -z "${_bundle_name}" ]; then
         error "Second argument with $(diste "BundleName") is required!"
     fi
-    try "${MKDIR_BIN} -p '${SOFTWARE_DIR}${_bundle_name}/exports'"
+    try "${MKDIR_BIN} -p '${SOFTWARE_DIR}/${_bundle_name}/exports'"
     for _bindir in "/bin/" "/sbin/" "/libexec/"; do
-        if [ -e "${SOFTWARE_DIR}${_bundle_name}${_bindir}${_export_bin}" ]; then
-            note "Exporting binary: $(distn "${SOFTWARE_DIR}${_bundle_name}${_bindir}${_export_bin}")"
+        if [ -e "${SOFTWARE_DIR}/${_bundle_name}${_bindir}${_export_bin}" ]; then
+            note "Exporting binary: $(distn "${SOFTWARE_DIR}/${_bundle_name}${_bindir}${_export_bin}")"
             _cdir="$(${PWD_BIN} 2>/dev/null)"
-            cd "${SOFTWARE_DIR}${_bundle_name}${_bindir}"
+            cd "${SOFTWARE_DIR}/${_bundle_name}${_bindir}"
             try "${LN_BIN} -vfs ..${_bindir}/${_export_bin} ../exports/${_export_bin}"
             cd "${_cdir}"
             unset _cdir _bindir _bundle_name _export_bin
             return 0
         else
-            debug "Export not found: $(distd "${SOFTWARE_DIR}${_bundle_name}${_bindir}${_export_bin}")"
+            debug "Export not found: $(distd "${SOFTWARE_DIR}/${_bundle_name}${_bindir}${_export_bin}")"
         fi
     done
     error "No executable to export from bin paths of: $(diste "${_bundle_name}/\{bin,sbin,libexec\}/${_export_bin}")"
@@ -411,7 +411,7 @@ strip_bundle () {
     load_defaults
     load_defs "${_sbfdefinition_name}"
     if [ -z "${PREFIX}" ]; then
-        PREFIX="${SOFTWARE_DIR}$(capitalize "${DEF_NAME}${DEF_POSTFIX}")"
+        PREFIX="${SOFTWARE_DIR}/$(capitalize "${DEF_NAME}${DEF_POSTFIX}")"
         debug "An empty prefix for: $(distd "${_sbfdefinition_name}"). Resetting to: $(distd "${PREFIX}")"
     fi
     if [ -f "${PREFIX}/${_sbfdefinition_name}${DEFAULT_STRIPPED_MARK_EXT}" ]; then
@@ -603,7 +603,7 @@ export_binaries () {
     conflict_resolve
 
     if [ -z "${PREFIX}" ]; then
-        PREFIX="${SOFTWARE_DIR}$(capitalize "${DEF_NAME}${DEF_POSTFIX}")"
+        PREFIX="${SOFTWARE_DIR}/$(capitalize "${DEF_NAME}${DEF_POSTFIX}")"
         debug "An empty prefix in export_binaries() for $(distd "${_ebdef_name}"). Resetting to: $(distd "${PREFIX}")"
     fi
     if [ -d "${PREFIX}/exports-disabled" ]; then # just bring back disabled exports

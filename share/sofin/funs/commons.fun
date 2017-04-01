@@ -193,6 +193,16 @@ text_checksum () {
 }
 
 
+# First n chars of content in first argument
+firstn () {
+    _contents=${1:-""}
+    _length=${2:-16}
+    ${PRINTF_BIN} \
+        "%.${_length}s" \
+        "${_contents}"
+}
+
+
 file_checksum () {
     _fcsmname="${1}"
     if [ -z "${_fcsmname}" ]; then

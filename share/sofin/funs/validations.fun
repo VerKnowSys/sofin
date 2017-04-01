@@ -174,10 +174,10 @@ validate_pie_on_exports () {
     if [ "YES" = "${CAP_SYS_HARDENED}" ]; then
         debug "Checking PIE on exports: $(distd "${_bundz}")"
         for _bun in ${_bundz}; do
-            if [ -d "${SOFTWARE_DIR}${_bun}/exports" ]; then
-                _a_dir="${SOFTWARE_DIR}${_bun}/exports"
-            elif [ -d "${SOFTWARE_DIR}${_bun}/exports-disabled" ]; then
-                _a_dir="${SOFTWARE_DIR}${_bun}/exports-disabled"
+            if [ -d "${SOFTWARE_DIR}/${_bun}/exports" ]; then
+                _a_dir="${SOFTWARE_DIR}/${_bun}/exports"
+            elif [ -d "${SOFTWARE_DIR}/${_bun}/exports-disabled" ]; then
+                _a_dir="${SOFTWARE_DIR}/${_bun}/exports-disabled"
             else
                 debug "No exports of bundle: $(distd "${_bun}"). PIE validation skipped."
                 return 0

@@ -23,8 +23,8 @@ MAIN_COMMON_REPOSITORY="${MAIN_BINARY_REPOSITORY}${MAIN_COMMON_NAME}"
 MAIN_PORT="${MAIN_PORT:-60022}"
 MAIN_USER="${MAIN_USER:-sofin}"
 
-SERVICES_DIR="${SERVICES_DIR:-/Services/}"
-SOFTWARE_DIR="${SOFTWARE_DIR:-/Software/}"
+SERVICES_DIR="${SERVICES_DIR:-/Services}"
+SOFTWARE_DIR="${SOFTWARE_DIR:-/Software}"
 
 DEFINITIONS_DEFAULT_FILE_NAME="defaults" # NOTE: Base "def" file, loaded before each software definition
 DEFINITIONS_LISTS_FILE_NAME="lists" # NOTE: It's name of lists directory from "Sofin-definitions" repository

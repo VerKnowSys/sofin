@@ -13,8 +13,8 @@ build_bundle () {
         error "Third argument with $(diste "version-string") is required!"
     fi
     env_forgivable
-    debug "build_bundle: $(distd "${_bsbname}"), should be in: $(distd "${SOFTWARE_DIR}${_bsbname}"), full-name: $(distd "${_bsbelement}")"
-    if [ ! -d "${SOFTWARE_DIR}${_bsbname}" ]; then
+    debug "build_bundle: $(distd "${_bsbname}"), should be in: $(distd "${SOFTWARE_DIR}/${_bsbname}"), full-name: $(distd "${_bsbelement}")"
+    if [ ! -d "${SOFTWARE_DIR}/${_bsbname}" ]; then
         create_software_dir "${_bsbname}"
         create_software_bundle_archive "${_bsbname}" "${_bsbelement}" "${_bsversion}"
     else
@@ -59,13 +59,13 @@ push_binbuilds () {
         if [ -z "${_pblowercase_element}" ]; then
             error "Lowercase bundle name is empty!"
         fi
-        _pbinstall_indicator_file="${SOFTWARE_DIR}${_pbelement}/${_pblowercase_element}${DEFAULT_INST_MARK_EXT}"
+        _pbinstall_indicator_file="${SOFTWARE_DIR}/${_pbelement}/${_pblowercase_element}${DEFAULT_INST_MARK_EXT}"
         _pbbversion_element="$(${CAT_BIN} "${_pbinstall_indicator_file}" 2>/dev/null)"
         if [ ! -f "${_pbinstall_indicator_file}" ]; then
             error "Bundle install indicator: $(diste "${_pbinstall_indicator_file}") doesn't exist!"
         fi
         if [ -n "${_pbelement}" ] && \
-           [ -d "${SOFTWARE_DIR}${_pbelement}" ] && \
+           [ -d "${SOFTWARE_DIR}/${_pbelement}" ] && \
            [ -n "${_pbbversion_element}" ]; then
             debug "About to push: $(distd "${_pbelement}"), install-indicator: $(distd "${_pbinstall_indicator_file}"), soft-version: $(distd "${_pbbversion_element}")"
             push_to_all_mirrors "${_pbelement}" "${_pbbversion_element}"
@@ -211,9 +211,9 @@ build () {
                     fi
                 fi
 
-                PREFIX="${SOFTWARE_DIR}${_bundl_name}"
-                SERVICE_DIR="${SERVICES_DIR}${_bundl_name}"
-                BUILD_NAMESUM="$(text_checksum "${_bund_lcase}-${DEF_VERSION}")"
+                PREFIX="${SOFTWARE_DIR}/${_bundl_name}"
+                SERVICE_DIR="${SERVICES_DIR}/${_bundl_name}"
+                BUILD_NAMESUM="$(firstn "$(text_checksum "${_bund_lcase}-${DEF_VERSION}")")"
                 BUILD_DIR="${PREFIX}/${DEFAULT_SRC_EXT}${BUILD_NAMESUM}"
 
                 # These values has to be exported because external build mechanisms

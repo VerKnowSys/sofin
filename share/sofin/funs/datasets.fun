@@ -102,7 +102,7 @@ build_service_dataset () {
         if [ -z "${USER}" ]; then
             error "Second argument with env value for: $(diste "USER") is required!"
         fi
-        _full_dataset_name="${DEFAULT_ZPOOL}${SERVICES_DIR}${USER}/${_ps_elem}"
+        _full_dataset_name="${DEFAULT_ZPOOL}${SERVICES_DIR}/${USER}/${_ps_elem}"
         _ps_snap_file="${_ps_elem}-${_ps_ver_elem}${DEFAULT_SERVICE_SNAPSHOT_EXT}"
         debug "Dataset name: $(distd "${_full_dataset_name}"), snapshot-file: $(distd "${_ps_snap_file}")"
         if [ ! -f "${FILE_CACHE_DIR}${_ps_snap_file}" ]; then
@@ -120,7 +120,7 @@ build_service_dataset () {
                     run "${ZFS_BIN} send ${ZFS_SEND_OPTS} '${_full_dataset_name}@${ORIGIN_ZFS_SNAP_NAME}' | ${XZ_BIN} ${DEFAULT_XZ_OPTS} > ${FILE_CACHE_DIR}${_ps_snap_file}"
                     run "${ZFS_BIN} mount '${_full_dataset_name}'"
                 else
-                    run "${ZFS_BIN} create -p -o mountpoint=${SERVICES_DIR}${_ps_elem} '${_full_dataset_name}'"
+                    run "${ZFS_BIN} create -p -o mountpoint=${SERVICES_DIR}/${_ps_elem} '${_full_dataset_name}'"
                     try "${ZFS_BIN} snapshot '${_full_dataset_name}@${ORIGIN_ZFS_SNAP_NAME}'"
                     try "${ZFS_BIN} umount -f '${_full_dataset_name}'"
                     run "${ZFS_BIN} send ${ZFS_SEND_OPTS} '${_full_dataset_name}@${ORIGIN_ZFS_SNAP_NAME}' | ${XZ_BIN} ${DEFAULT_XZ_OPTS} > ${FILE_CACHE_DIR}${_ps_snap_file}"
@@ -158,8 +158,8 @@ build_service_dataset () {
                 debug "Service origin available!"
             else
                 debug "Service origin unavailable! Creating new one."
-                ${MKDIR_BIN} -p "${SERVICES_DIR}${_ps_elem}"
-                run "${TAR_BIN} cJf ${FILE_CACHE_DIR}${_ps_snap_file} ${SERVICES_DIR}${_ps_elem}"
+                ${MKDIR_BIN} -p "${SERVICES_DIR}/${_ps_elem}"
+                run "${TAR_BIN} cJf ${FILE_CACHE_DIR}${_ps_snap_file} ${SERVICES_DIR}/${_ps_elem}"
                 _snap_size="$(file_size "${FILE_CACHE_DIR}${_ps_snap_file}")"
                 if [ "${_snap_size}" = "0" ]; then
                     try "${RM_BIN} -vf ${FILE_CACHE_DIR}${_ps_snap_file}"
@@ -183,7 +183,7 @@ build_service_dataset () {
 #     fi
 #     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
 #         debug "Initial service dataset unavailable for: $(distd "${_bund_name}")"
-#         _dataset_name="${DEFAULT_ZPOOL}${SERVICES_DIR}${USER}/${_bund_name}"
+#         _dataset_name="${DEFAULT_ZPOOL}${SERVICES_DIR}/${USER}/${_bund_name}"
 #         try "${ZFS_BIN} create -p ${_dataset_name}"
 #     else
 #         debug "ZFS feature disabled"
@@ -204,7 +204,7 @@ fetch_dset_zfs_stream () {
         debug "Fetch service stream-dataset: $(distd "${FILE_CACHE_DIR}${_fdz_out_file}")"
         retry "${FETCH_BIN} -o ${FILE_CACHE_DIR}${_fdz_out_file} ${FETCH_OPTS} '${_commons_path}'"
         if [ "${?}" = "0" ]; then
-            _dataset_name="${DEFAULT_ZPOOL}${SERVICES_DIR}${USER}/${_fdz_bund_name}"
+            _dataset_name="${DEFAULT_ZPOOL}${SERVICES_DIR}/${USER}/${_fdz_bund_name}"
             try "${XZCAT_BIN} '${FILE_CACHE_DIR}${_fdz_out_file}' | ${ZFS_BIN} receive ${ZFS_RECEIVE_OPTS} '${_dataset_name}' | ${TAIL_BIN} -n1 2>/dev/null" && \
                     note "Received service dataset: $(distn "${_dataset_name}")"
             unset _dataset_name
@@ -238,17 +238,17 @@ create_service_dir () {
         error "First argument with $(diste "BundleName") is required!"
     fi
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
-        _dsname="${DEFAULT_ZPOOL}${SERVICES_DIR}${USER}/${_dset_create}"
+        _dsname="${DEFAULT_ZPOOL}${SERVICES_DIR}/${USER}/${_dset_create}"
         debug "Creating ZFS service-dataset: $(distd "${_dsname}")"
         try "${ZFS_BIN} list -H -t filesystem '${_dsname}'" || \
-            try "${ZFS_BIN} create -p -o mountpoint=${SERVICES_DIR}${_dset_create} '${_dsname}'"
+            try "${ZFS_BIN} create -p -o mountpoint=${SERVICES_DIR}/${_dset_create} '${_dsname}'"
         try "${ZFS_BIN} mount '${_dsname}'"
         unset _dsname
     else
-        debug "Creating regular service-directory: $(distd "${SERVICES_DIR}${_dset_create}")"
-        try "${MKDIR_BIN} -p '${SERVICES_DIR}${_dset_create}'"
+        debug "Creating regular service-directory: $(distd "${SERVICES_DIR}/${_dset_create}")"
+        try "${MKDIR_BIN} -p '${SERVICES_DIR}/${_dset_create}'"
     fi
-    try "${CHMOD_BIN} -v 0710 '${SERVICES_DIR}${_dset_create}'"
+    try "${CHMOD_BIN} -v 0710 '${SERVICES_DIR}/${_dset_create}'"
     unset _dset_create
 }
 
@@ -275,10 +275,10 @@ destroy_service_dir () {
         error "First argument with $(diste "BundleName") to destroy is required!"
     fi
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
-        unmount_and_destroy "${DEFAULT_ZPOOL}${SERVICES_DIR}${USER}/${_dset_destroy}"
+        unmount_and_destroy "${DEFAULT_ZPOOL}${SERVICES_DIR}/${USER}/${_dset_destroy}"
     else
-        try "${RM_BIN} -rf '${SERVICES_DIR}${_dset_destroy}'" && \
-            debug "Removed regular software-directory: $(distd "${SERVICES_DIR}${_dset_destroy}")"
+        try "${RM_BIN} -rf '${SERVICES_DIR}/${_dset_destroy}'" && \
+            debug "Removed regular software-directory: $(distd "${SERVICES_DIR}/${_dset_destroy}")"
     fi
     unset _dset_destroy
 }
@@ -338,17 +338,17 @@ create_software_dir () {
         error "First argument with $(diste "BundleName") is required!"
     fi
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
-        _dsname="${DEFAULT_ZPOOL}${SOFTWARE_DIR}${USER}/${_dset_create}"
+        _dsname="${DEFAULT_ZPOOL}${SOFTWARE_DIR}/${USER}/${_dset_create}"
         try "${ZFS_BIN} list -H -t filesystem '${_dsname}'" || \
             receive_origin "${_dsname}" "Software" "user" && \
                 debug "Received ZFS software-dataset: $(distd "${_dsname}")"
         try "${ZFS_BIN} mount '${_dsname}'"
         unset _dsname
     else
-        debug "Creating regular software-directory: $(distd "${SOFTWARE_DIR}${_dset_create}")"
-        try "${MKDIR_BIN} -p '${SOFTWARE_DIR}${_dset_create}'"
+        debug "Creating regular software-directory: $(distd "${SOFTWARE_DIR}/${_dset_create}")"
+        try "${MKDIR_BIN} -p '${SOFTWARE_DIR}/${_dset_create}'"
     fi
-    try "${CHMOD_BIN} 0710 '${SOFTWARE_DIR}${_dset_create}'"
+    try "${CHMOD_BIN} 0710 '${SOFTWARE_DIR}/${_dset_create}'"
     unset _dset_create
 }
 
@@ -359,15 +359,15 @@ destroy_software_dir () {
         error "First argument with $(diste "BundleName") to destroy is required!"
     fi
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
-        _dsname="${DEFAULT_ZPOOL}${SOFTWARE_DIR}${USER}/${_dset_destroy}"
+        _dsname="${DEFAULT_ZPOOL}${SOFTWARE_DIR}/${USER}/${_dset_destroy}"
         try "${ZFS_BIN} umount -f '${_dsname}'"
         try "${ZFS_BIN} destroy -fr '${_dsname}'" && \
             debug "Destroyed software-dataset: $(distd "${_dsname}")"
-        try "${RM_BIN} -rf '${SOFTWARE_DIR}${_dset_destroy}'"
+        try "${RM_BIN} -rf '${SOFTWARE_DIR}/${_dset_destroy}'"
         unset _dsname
     else
-        debug "Removing regular software-directory: $(distd "${SOFTWARE_DIR}${_dset_destroy}")"
-        try "${RM_BIN} -rf '${SOFTWARE_DIR}${_dset_destroy}'"
+        debug "Removing regular software-directory: $(distd "${SOFTWARE_DIR}/${_dset_destroy}")"
+        try "${RM_BIN} -rf '${SOFTWARE_DIR}/${_dset_destroy}'"
     fi
     unset _dset_destroy
 }
@@ -383,14 +383,14 @@ create_builddir () {
         if [ -z "${_dset_namesum}" ]; then
             error "Second argument with $(diste "dataset-checksum") is required!"
         fi
-        _dset="${DEFAULT_ZPOOL}${SOFTWARE_DIR}${USER}/${_cb_bundle_name}/${DEFAULT_SRC_EXT}${_dset_namesum}"
-        try "${ZFS_BIN} create -p -o mountpoint=${SOFTWARE_DIR}${_cb_bundle_name}/${DEFAULT_SRC_EXT}${_dset_namesum} '${_dset}'" && \
+        _dset="${DEFAULT_ZPOOL}${SOFTWARE_DIR}/${USER}/${_cb_bundle_name}/${DEFAULT_SRC_EXT}${_dset_namesum}"
+        try "${ZFS_BIN} create -p -o mountpoint=${SOFTWARE_DIR}/${_cb_bundle_name}/${DEFAULT_SRC_EXT}${_dset_namesum} '${_dset}'" && \
             debug "Created ZFS build-dataset: $(distd "${_dset}")"
 
         try "${ZFS_BIN} mount '${_dset}'"
         unset _dset _dset_namesum
     else
-        _bdir="${SOFTWARE_DIR}${_cb_bundle_name}/${DEFAULT_SRC_EXT}${_dset_namesum}"
+        _bdir="${SOFTWARE_DIR}/${_cb_bundle_name}/${DEFAULT_SRC_EXT}${_dset_namesum}"
         debug "Creating regular build-directory: $(distd "${_bdir}")"
         try "${MKDIR_BIN} -p '${_bdir}'"
     fi
@@ -408,18 +408,18 @@ destroy_builddir () {
         if [ -z "${_dset_sum}" ]; then
             error "Second argument with $(diste "bundle-sha-sum") is required!"
         fi
-        _dsname="${DEFAULT_ZPOOL}${SOFTWARE_DIR}${USER}/${_deste_bund_name}/${DEFAULT_SRC_EXT}${_dset_sum}"
+        _dsname="${DEFAULT_ZPOOL}${SOFTWARE_DIR}/${USER}/${_deste_bund_name}/${DEFAULT_SRC_EXT}${_dset_sum}"
         if [ -z "${DEVEL}" ]; then
             debug "Destroying ZFS build-dataset: $(distd "${_dsname}")"
             try "${ZFS_BIN} umount -f '${_dsname}'"
             try "${ZFS_BIN} destroy -fr '${_dsname}'"
-            try "${RM_BIN} -fr '${SOFTWARE_DIR}${_deste_bund_name}/${DEFAULT_SRC_EXT}${_dset_sum}'"
+            try "${RM_BIN} -fr '${SOFTWARE_DIR}/${_deste_bund_name}/${DEFAULT_SRC_EXT}${_dset_sum}'"
         else
             debug "DEVEL mode enabled, skipped dataset destroy: $(distd "${_dsname}")"
         fi
         unset _dsname
     else
-        _bdir="${SOFTWARE_DIR}${_deste_bund_name}/${DEFAULT_SRC_EXT}${_dset_sum}"
+        _bdir="${SOFTWARE_DIR}/${_deste_bund_name}/${DEFAULT_SRC_EXT}${_dset_sum}"
         debug "Removing regular build-directory: $(distd "${_bdir}")"
         try "${RM_BIN} -fr '${_bdir}'"
     fi
@@ -449,8 +449,8 @@ create_software_bundle_archive () {
     _cddestfile="${FILE_CACHE_DIR}${_csbelem}"
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
         _inst_ind="${_csbname}/$(lowercase "${_csbname}")${DEFAULT_INST_MARK_EXT}"
-        if [ -f "${SOFTWARE_DIR}${_inst_ind}" ]; then
-            _csbd_dataset="${DEFAULT_ZPOOL}${SOFTWARE_DIR}${USER}/${_csbname}"
+        if [ -f "${SOFTWARE_DIR}/${_inst_ind}" ]; then
+            _csbd_dataset="${DEFAULT_ZPOOL}${SOFTWARE_DIR}/${USER}/${_csbname}"
             debug "Creating archive from snapshot: $(distd "${ORIGIN_ZFS_SNAP_NAME}") dataset: $(distd "${_csbd_dataset}") to file: $(distd "${_cddestfile}")"
             _cdir="$(${PWD_BIN} 2>/dev/null)"
             cd /tmp
@@ -461,7 +461,7 @@ create_software_bundle_archive () {
             cd "${_cdir}"
             run "${ZFS_BIN} mount '${_csbd_dataset}'"
         else
-            error "Can't build snapshot from broken/empty bundle dir: $(diste "${SOFTWARE_DIR}${_inst_ind}")"
+            error "Can't build snapshot from broken/empty bundle dir: $(diste "${SOFTWARE_DIR}/${_inst_ind}")"
         fi
     else
         debug "No ZFS-binbuilds feature. Falling back to tarballs.."
@@ -481,7 +481,7 @@ install_software_from_binbuild () {
     _isfb_fullname="${2}"
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
         # On systems with ZFS capability, we use zfs receive instead of tarballing:
-        _isfb_dataset="${DEFAULT_ZPOOL}${SOFTWARE_DIR}${USER}/${_isfb_fullname}"
+        _isfb_dataset="${DEFAULT_ZPOOL}${SOFTWARE_DIR}/${USER}/${_isfb_fullname}"
         debug "isfb: $(distd "${_isfb_archive}"), isff: $(distd "${_isfb_fullname}"), isfbdset: $(distd "${_isfb_dataset}")"
         try "${ZFS_BIN} list -H -t filesystem '${_isfb_dataset}'"
         if [ "${?}" != "0" ]; then
@@ -587,9 +587,9 @@ do_prefix_snapshot () {
         if [ "YES" = "${CAP_SYS_ZFS}" ]; then
             _pr_name="${PREFIX##*/}"
             # Software main dir:
-            _pr_snp="${DEFAULT_ZPOOL}${SOFTWARE_DIR}${USER}/${_pr_name}"
+            _pr_snp="${DEFAULT_ZPOOL}${SOFTWARE_DIR}/${USER}/${_pr_name}"
             # Build dir:
-            _pr_bdir_snp="${DEFAULT_ZPOOL}${SOFTWARE_DIR}${USER}/${_pr_name}/${DEFAULT_SRC_EXT}${BUILD_NAMESUM}"
+            _pr_bdir_snp="${DEFAULT_ZPOOL}${SOFTWARE_DIR}/${USER}/${_pr_name}/${DEFAULT_SRC_EXT}${BUILD_NAMESUM}"
             debug "_pr_name: $(distd "${_pr_name}"), _pr_snp: $(distd "${_pr_snp}"), _pr_bdir_snp: $(distd "${_pr_bdir_snp}")"
 
             # # Try removing existing snaps:
