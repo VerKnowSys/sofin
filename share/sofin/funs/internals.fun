@@ -45,7 +45,7 @@ write_info_about_shell_configuration () {
 
 
 sofin_header () {
-    ${PRINTF_BIN} '%s\n' "$(distn 'Sof')tware $(distn 'In')staller v$(distn "${SOFIN_VERSION}") -- 2011-2017 -- Daniel ($(distn dmilith)) Dettlaff -- License: MIT/BSD"
+    ${PRINTF_BIN} '%s\n' "$(distn 'Sof')tware $(distn 'In')staller v$(distn "${SOFIN_VERSION}") -- 2011-2017 -- by: $(distn "@dmilith") -- License: MIT/BSD."
 }
 
 
