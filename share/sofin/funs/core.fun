@@ -417,8 +417,9 @@ create_dirs () {
 
 
 summary () {
+    set +e
     # Sofin performance counters:
-    SOFIN_END="${SOFIN_END:-$(${SOFIN_MICROSECONDS_UTILITY_BIN})}"
+    SOFIN_END="${SOFIN_END:-$(${SOFIN_MICROSECONDS_UTILITY_BIN} 2>/dev/null)}"
     SOFIN_RUNTIME="$(calculate_bc "(${SOFIN_END} - ${SOFIN_START:-${SOFIN_END}}) / 1000")"
 
     ${PRINTF_BIN} "${ColorExample}%s${ColorReset}\n" "$(fill "${SEPARATOR_CHAR2}")" >> "${LOG:-/var/log/sofin}"
