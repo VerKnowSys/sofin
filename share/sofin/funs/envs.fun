@@ -502,12 +502,12 @@ update_system_shell_env_files () {
             if [ "${?}" = "0" ]; then
                 continue
             else
-                ${PRINTF_BIN} '%s\n' "${SOFIN_SHELL_BLOCK}" >> "${_env_file}" && \
+                ${PRINTF_BIN} '\n\n%s\n' "${SOFIN_SHELL_BLOCK}" >> "${_env_file}" && \
                     debug "Environment block appended to file: $(distd "${_env_file}")"
 
             fi
         else
-            ${PRINTF_BIN} '%s\n' "${SOFIN_SHELL_BLOCK}" >> "${_env_file}" && \
+            ${PRINTF_BIN} '\n\n%s\n' "${SOFIN_SHELL_BLOCK}" >> "${_env_file}" && \
                 debug "Environment block written to file: $(distd "${_env_file}")"
         fi
     done
