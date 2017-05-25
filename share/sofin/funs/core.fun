@@ -79,6 +79,8 @@ permnote () {
 
 error () {
     # Get three recently modified logs:
+    LOGS_DIR="${LOGS_DIR:-${TMPDIR}/sofin.tmp-logs}"
+    ${MKDIR_BIN} -p "${LOGS_DIR}"
     _last_two_mod_logs=$(${LS_BIN} -1t "${LOGS_DIR}" 2>/dev/null | ${HEAD_BIN} -3 2>/dev/null | eval "${NEWLINES_TO_SPACES_GUARD}")
     ${PRINTF_BIN} "\n\n${ColorRed}%s\n\n  ${FAIL_CHAR} Error!\n\n    %s\n\n%s\n\n${ColorReset}%s\n\n${ColorWhite}Showing tail of 3 most recent Sofin logs:\n\n${ColorReset}%s${ColorWhite}\n\n%s\n\n%s\n\n%s\n\n\n" \
         "$(fill "${SEPARATOR_CHAR2}")" "${*}" "$(fill "${SEPARATOR_CHAR2}")" "$(fill "${SEPARATOR_CHAR2}")" "$(fill "${SEPARATOR_CHAR2}")" "$(cd "${LOGS_DIR}" && ${TAIL_BIN} -n "${LOG_LINES_AMOUNT_ON_ERR}" ${_last_two_mod_logs})" "$(fill "${SEPARATOR_CHAR2}")"
