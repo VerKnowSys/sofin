@@ -20,7 +20,7 @@ base_name="${DEFAULT_NAME}-${SOFIN_VERSION}"
 archive_name="${base_name}${DEFAULT_ARCHIVE_TARBALL_EXT}"
 note "Preparing package: ${archive_name} with version: ${SOFIN_VERSION}"
 
-${TAR_BIN} cJf "releases/${archive_name}" README.md src bin
+${TAR_BIN} cJf "releases/${archive_name}" README.md src bin share
 ${MKDIR_BIN} -p "releases/${base_name}"
 ${MV_BIN} "releases/${archive_name}" "releases/${base_name}/"
 cd "releases/${base_name}"
