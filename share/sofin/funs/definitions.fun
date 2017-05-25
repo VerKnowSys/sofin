@@ -319,12 +319,14 @@ show_outdated () {
             debug "Bundle name: ${_bundle}, Prefix: ${_prefix}"
 
             if [ ! -f "${_prefix}/${_bundle}${DEFAULT_INST_MARK_EXT}" ]; then
-                warn "Bundle: $(distw "${_bundle}") is not yet installed or damaged."
+                warn "Bundle: $(distw $(capitalize "${_bundle}")) is not yet installed or damaged."
                 continue
             fi
             _bund_vers="$(${CAT_BIN} "${_prefix}/${_bundle}${DEFAULT_INST_MARK_EXT}" 2>/dev/null)"
             if [ ! -f "${DEFINITIONS_DIR}${_bundle}${DEFAULT_DEF_EXT}" ]; then
-                warn "No such bundle found: $(distw "${_bundle}")"
+                if [ "${_bundle}" != "${DEFAULT_NAME}" ]; then
+                    warn "No such bundle found: $(distw $(capitalize "${_bundle}"))"
+                fi
                 continue
             fi
             load_defs "${_bundle}"
