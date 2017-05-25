@@ -4,9 +4,9 @@
 if [ -d "share/sofin/facts/" ] && \
    [ -f "share/sofin/facts/core.fact" ]; then
     . share/sofin/facts/core.fact
-elif [ -d "/usr/share/sofin/facts/" ] && \
-     [ -f "/usr/share/sofin/facts/core.fact" ]; then
-    . /usr/share/sofin/facts/core.fact
+elif [ -d "/Software/Sofin/share/facts/" ] && \
+     [ -f "/Software/Sofin/share/facts/core.fact" ]; then
+    . /Software/Sofin/share/facts/core.fact
 fi
 
 
