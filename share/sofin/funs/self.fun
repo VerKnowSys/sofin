@@ -64,7 +64,7 @@ install_sofin_files () {
     if [ -z "${SOFTWARE_DIR}" ] || [ -z "${PREFIX}" ]; then
         exit 666
     fi
-    ${MKDIR_BIN} -p "${SOFTWARE_DIR}" "${SERVICES_DIR}" || \
+    ${MKDIR_BIN} -p "${SOFTWARE_DIR}" "${SERVICES_DIR}" "${PREFIX}/bin" "${PREFIX}/share" || \
         try_sudo_installation
 
     set -e
