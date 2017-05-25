@@ -437,6 +437,7 @@ summary () {
 
 
 initialize () {
+    create_dirs
     setup_defs_branch
     setup_defs_repo
     check_defs_dir

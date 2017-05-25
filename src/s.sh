@@ -105,7 +105,6 @@ if [ -n "${SOFIN_COMMAND_ARG}" ]; then
 
         i|install|get|pick|choose|use|switch)
             initialize
-            create_dirs
             _list_maybe="$(lowercase "${2}")"
             if [ -z "${_list_maybe}" ]; then
                 error "Second argument, with at least one application (or list) name is required!"
