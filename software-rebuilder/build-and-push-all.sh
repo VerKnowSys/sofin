@@ -1,7 +1,7 @@
 #!/usr/bin/env zsh
 
 
-. /usr/share/sofin/loader
+. /Software/Sofin/share/loader
 
 if [ "FreeBSD" = "${SYSTEM_NAME}" ]; then
     try "${CHMOD_BIN} 600 ~/.ssh/id_rsa"

@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 # @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
 
-. /usr/share/sofin/loader
+. /Software/Sofin/share/loader
 
 # this is internal version check for defaults.def
 unset COMPLIANCE_CHECK

@@ -496,7 +496,7 @@ reload_zsh_shells () {
 
 
 update_system_shell_env_files () {
-    for _env_file in /etc/profile /etc/zshenv /etc/bashrc; do
+    for _env_file in ${HOME}/.profile ${HOME}/.zshenv ${HOME}/.bashrc; do
         if [ -f "${_env_file}" ]; then
             ${EGREP_BIN} "SHELL_PID=" "${_env_file}" >/dev/null 2>&1
             if [ "${?}" = "0" ]; then
