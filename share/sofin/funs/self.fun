@@ -20,15 +20,14 @@ load_requirements () {
 
 
 install_sofin () {
-    permnote "Installing Software Installer, version: $(distn "${SOFIN_VERSION}")"
-    if [ -n "${PREFIX}" ]; then
-        permnote "Installing to given PREFIX: $(distn "${PREFIX}")"
-    fi
-    CAP_SYS_PRODUCTION=YES
+    export CAP_SYS_PRODUCTION=YES
+    export PREFIX="${PREFIX:-/Software/Sofin}"
+    permnote "Installing Software Installer with version: $(distn "${SOFIN_VERSION}")"
     compiler_setup && \
         build_sofin_natives && \
             install_sofin_files && \
-                note "Installation successful."
+                note "Installation successful for: $(distn "${SOFIN_VERSION}")" && \
+                echo "${SOFIN_VERSION}" > "${PREFIX}/${DEFAULT_NAME}${DEFAULT_INST_MARK_EXT}"
     update_system_shell_env_files
 }
 
@@ -52,29 +51,37 @@ build_sofin_natives () {
 }
 
 
+try_sudo_installation () {
+    _cmds="sudo ${MKDIR_BIN} -vp ${SOFTWARE_DIR} ${SERVICES_DIR} && sudo ${CHOWN_BIN} -R ${USER} ${SOFTWARE_DIR} ${SERVICES_DIR}"
+    note "Please provide password for commands: $(distn "${_cmds}")"
+    eval "${_cmds}" || \
+        exit 66
+    unset _cmds
+}
+
+
 install_sofin_files () {
+    if [ -z "${SOFTWARE_DIR}" ] || [ -z "${PREFIX}" ]; then
+        exit 666
+    fi
+    ${MKDIR_BIN} -p "${SOFTWARE_DIR}" "${SERVICES_DIR}" || \
+        try_sudo_installation
+
     set -e
     _okch="$(distn "${SUCCESS_CHAR}" "${ColorParams}")"
-    permnote "Installing.."
-    if [ -n "${PREFIX}" ]; then
-        for _a_destph in "${PREFIX}" "${PREFIX}etc" "${PREFIX}usr/bin"; do
-            try "${MKDIR_BIN} -p ${_a_destph}"
-        done
-    else
-        PREFIX="/"
-    fi
+    permnote "Installing to prefix: $(distn "${PREFIX}")"
     for _prov in ${SOFIN_PROVIDES}; do
         if [ -f "bin/${_prov}" ]; then
-            run "${INSTALL_BIN} -v bin/${_prov} ${PREFIX}usr/bin"
+            run "${INSTALL_BIN} -v bin/${_prov} ${PREFIX}/bin"
             run "${RM_BIN} -f bin/${_prov}"
         fi
     done && \
         permnote "  ${_okch} native utils"
 
-    run "${CP_BIN} -vfR share/sofin ${PREFIX}usr/share/" && \
+    run "${CP_BIN} -vfR share/sofin/* ${PREFIX}/share/" && \
         permnote "  ${_okch} facts and functions"
 
-    run "${INSTALL_BIN} -v src/s.sh ${PREFIX}usr/bin/s" && \
+    run "${INSTALL_BIN} -v src/s.sh ${PREFIX}/bin/s" && \
         permnote "  ${_okch} sofin launcher" && \
         permnote "Type: $(distn "s usage") for help." && \
         note "Read: $(distn "https://github.com/VerKnowSys/sofin") for more details." && \
