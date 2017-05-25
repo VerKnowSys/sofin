@@ -49,7 +49,7 @@ fi
 readonly SHELL_PID="\$\$"
 export SHELL_PID
 s () {
-    exec /Software/Sofin/bin/s \${\@}
+    eval /Software/Sofin/bin/s \${@}
 }
 
 EOF
