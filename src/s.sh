@@ -146,6 +146,9 @@ if [ -n "${SOFIN_COMMAND_ARG}" ]; then
         p|push|binpush|send)
             initialize
             fail_on_bg_job "${SOFIN_ARGS}"
+            debug "Removing any dangling src dirs of prefix: $(distd "${PREFIX}/${DEFAULT_SRC_EXT}*")"
+            eval "${RM_BIN} -vfr ${PREFIX}/${DEFAULT_SRC_EXT}*" >> "${LOG}" 2>> "${LOG}"
+            debug "Pushing binary build. Sofin args: $(distd "${SOFIN_ARGS}")"
             push_binbuilds "${SOFIN_ARGS}"
             finalize
             ;;
