@@ -205,7 +205,8 @@ compiler_setup () {
             ;;
     esac
 
-    if [ "YES" = "${DEBUGBUILD}" ]; then
+    if [ -n "${DEBUGBUILD}" ]; then
+        debug "DEBUGBUILD defined! Appending compiler flags with: $(distd "-O0 -ggdb")"
         DEFAULT_COMPILER_FLAGS="${DEFAULT_COMPILER_FLAGS} -O0 -ggdb"
     else
         DEFAULT_COMPILER_FLAGS="${DEFAULT_COMPILER_FLAGS} -O2"
