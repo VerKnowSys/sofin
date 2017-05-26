@@ -45,20 +45,31 @@ write_info_about_shell_configuration () {
 
 
 sofin_header () {
-    ${PRINTF_BIN} '\r\n     %s\n%s\n\n  %s\n  %s\n  %s\n\n  %s\n\n  %s\n' \
+    ${PRINTF_BIN} '\r\n     %s\n%s\n\n  %s\n  %s\n  %s\n\n  %s\n\n' \
         "$(distn 'Soft' "${ColorWhite}")$(distn 'ware' "${ColorGray}") $(distn 'Ins' "${ColorWhite}")$(distn 'taller v' "${ColorGray}")$(distn "${SOFIN_VERSION}" "${ColorWhite}")" \
         "$(distn "____________________________________" "${ColorGreen}")" \
         "design, implementation: $(distn "@dmilith")" \
         "developed since: $(distn "2011")" \
         "released under: $(distn "MIT/BSD")" \
-        "running os: $(distn "${OS_TRIPPLE}")" \
-        "os capabilities:"
+        "running os: $(distn "${OS_TRIPPLE}")"
 
-    IFS=\n set 2>/dev/null | ${EGREP_BIN} -I 'CAP_' 2>/dev/null | while IFS= read -r _envv; do
+    ${PRINTF_BIN} '  %s\n' \
+        "system capabilities:"
+    IFS=\n set 2>/dev/null | ${EGREP_BIN} -I 'CAP_SYS_' 2>/dev/null | while IFS= read -r _envv; do
         if [ -n "${_envv}" ]; then
             ${PRINTF_BIN} '   %s %s\n' \
-                "$(distd "${SUCCESS_CHAR}" "${ColorGreen}")" \
-                "$(distd "$(lowercase "${_envv%=YES}")")"
+                "$(distn "${SUCCESS_CHAR}" "${ColorGreen}")" \
+                "$(distn "$(lowercase "${_envv%=YES}")")"
+        fi
+    done
+
+    ${PRINTF_BIN} '\r\n  %s\n' \
+        "terminal capabilities:"
+    IFS=\n set 2>/dev/null | ${EGREP_BIN} -I 'CAP_TERM_' 2>/dev/null | while IFS= read -r _envv; do
+        if [ -n "${_envv}" ]; then
+            ${PRINTF_BIN} '   %s %s\n' \
+                "$(distn "${SUCCESS_CHAR}" "${ColorGreen}")" \
+                "$(distn "$(lowercase "${_envv%=YES}")")"
         fi
     done
     unset _envv
