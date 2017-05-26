@@ -54,7 +54,7 @@ sofin_header () {
         "running os: $(distn "${OS_TRIPPLE}")" \
         "os capabilities:"
 
-    IFS=\n set 2>/dev/null | ${GREP_BIN} -I 'CAP_' 2>/dev/null | while IFS= read -r _envv; do
+    IFS=\n set 2>/dev/null | ${GREP_BIN} -i 'CAP_' 2>/dev/null | while IFS= read -r _envv; do
         if [ -n "${_envv}" ]; then
             ${PRINTF_BIN} '   %s %s\n' \
                 "$(distd "${SUCCESS_CHAR}" "${ColorGreen}")" \
