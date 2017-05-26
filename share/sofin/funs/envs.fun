@@ -153,7 +153,7 @@ dump_compiler_setup () {
 
 dump_system_capabilities () {
     debug "---------------- SYSTEM CAPABILITIES DUMP ---------------"
-    IFS=\n set 2>/dev/null | ${GREP_BIN} 'CAP_SYS_' 2>/dev/null | while IFS= read -r _envv
+    IFS=\n set 2>/dev/null | ${EGREP_BIN} -i 'CAP_SYS_' 2>/dev/null | while IFS= read -r _envv
     do
         if [ -n "${_envv}" ]; then
             debug "$(distd "${_envv}")"
