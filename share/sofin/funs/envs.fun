@@ -374,6 +374,7 @@ compiler_setup () {
     AS="${AS:-as}"
     NM="${NM:-nm}"
     CC="${CC:-cc}"
+    LD="${LD:-ld}"
     CXX="${CXX:-c++}"
     CPP="${CPP:-cpp}"
     RANLIB="${RANLIB:-ranlib}"
