@@ -45,7 +45,14 @@ write_info_about_shell_configuration () {
 
 
 sofin_header () {
-    ${PRINTF_BIN} '%s\n' "$(distn 'Sof')tware $(distn 'In')staller v$(distn "${SOFIN_VERSION}") -- 2011-2017 -- by: $(distn "@dmilith") -- License: MIT/BSD."
+    ${PRINTF_BIN} '\r%s\n     %s\n%s\n %s\n %s\n %s\n %s\n\n' \
+        "$(distn "----------------------------------" "${ColorGreen}")" \
+        "$(distn 'Soft' "${ColorWhite}")$(distn 'ware' "${ColorGray}") $(distn 'Ins' "${ColorWhite}")$(distn 'taller v' "${ColorGray}")$(distn "${SOFIN_VERSION}" "${ColorWhite}")" \
+        "----------------------------------" \
+        "design, implementation: $(distn "@dmilith")" \
+        "developed since: $(distn "2011")" \
+        "released under: $(distn "MIT/BSD")" \
+        "local os/arch: $(distn "${SYSTEM_NAME}")/$(distn "${SYSTEM_ARCH}")"
 }
 
 
