@@ -45,16 +45,16 @@ write_info_about_shell_configuration () {
 
 
 sofin_header () {
-    ${PRINTF_BIN} '\r\n     %s\n%s\n\n  %s\n  %s\n  %s\n\n  %s\n  %s\n' \
+    ${PRINTF_BIN} '\r\n     %s\n%s\n\n  %s\n  %s\n  %s\n\n  %s\n\n  %s\n' \
         "$(distn 'Soft' "${ColorWhite}")$(distn 'ware' "${ColorGray}") $(distn 'Ins' "${ColorWhite}")$(distn 'taller v' "${ColorGray}")$(distn "${SOFIN_VERSION}" "${ColorWhite}")" \
         "$(distn "____________________________________" "${ColorGreen}")" \
         "design, implementation: $(distn "@dmilith")" \
         "developed since: $(distn "2011")" \
         "released under: $(distn "MIT/BSD")" \
         "running os: $(distn "${OS_TRIPPLE}")" \
-        "capabilities:"
+        "os capabilities:"
 
-    IFS=\n set 2>/dev/null | ${GREP_BIN} 'CAP_' 2>/dev/null | while IFS= read -r _envv; do
+    IFS=\n set 2>/dev/null | ${GREP_BIN} -I 'CAP_' 2>/dev/null | while IFS= read -r _envv; do
         if [ -n "${_envv}" ]; then
             ${PRINTF_BIN} '   %s %s\n' \
                 "$(distd "${SUCCESS_CHAR}" "${ColorGreen}")" \
@@ -63,7 +63,7 @@ sofin_header () {
     done
     unset _envv
 
-    ${PRINTF_BIN} '%s\r\n' \
+    ${PRINTF_BIN} '%s\n' \
         "${ColorReset}"
 }
 
