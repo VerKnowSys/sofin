@@ -29,6 +29,12 @@ install_sofin () {
                 note "Installation successful for: $(distn "${SOFIN_VERSION}")" && \
                 echo "${SOFIN_VERSION}" > "${PREFIX}/${DEFAULT_NAME}${DEFAULT_INST_MARK_EXT}"
     update_system_shell_env_files
+
+    permnote "Post install. Exporting default Sofin binaries…"
+    try "${PREFIX}/bin/s export s Sofin"
+    try "${PREFIX}/bin/s export s-osver Sofin"
+    try "${PREFIX}/bin/s export s-usec Sofin"
+    return 0
 }
 
 
@@ -67,7 +73,7 @@ install_sofin_files () {
     if [ -z "${SOFTWARE_DIR}" ] || [ -z "${PREFIX}" ]; then
         exit 67
     fi
-    ${MKDIR_BIN} -p "${SOFTWARE_DIR}" "${SERVICES_DIR}" "${PREFIX}/bin" "${PREFIX}/share" || \
+    ${MKDIR_BIN} -p "${SOFTWARE_DIR}" "${SERVICES_DIR}" "${PREFIX}/bin" "${PREFIX}/exports" "${PREFIX}/share" || \
         try_sudo_installation
 
     set -e
