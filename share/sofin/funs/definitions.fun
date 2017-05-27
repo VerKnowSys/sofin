@@ -114,8 +114,8 @@ update_defs () {
                 try "${RM_BIN} -vrf ${_initial_defs}" && \
                     return
     fi
-    if [ -d "${CACHE_DIR}${DEFINITIONS_BASE}/${DEFAULT_GIT_DIR_NAME}" -a \
-         -f "${DEFINITIONS_DEFAULTS}" ]; then
+    if [ -d "${CACHE_DIR}${DEFINITIONS_BASE}/${DEFAULT_GIT_DIR_NAME}" ] && \
+       [ -f "${DEFINITIONS_DEFAULTS}" ]; then
         cd "${CACHE_DIR}${DEFINITIONS_BASE}"
         _def_cur_branch="$(${GIT_BIN} rev-parse --abbrev-ref HEAD 2>/dev/null)"
         _def_head="$(${CAT_BIN} "${CACHE_DIR}${DEFINITIONS_BASE}/${DEFAULT_GIT_DIR_NAME}/refs/heads/${_def_cur_branch}" 2>/dev/null)"
