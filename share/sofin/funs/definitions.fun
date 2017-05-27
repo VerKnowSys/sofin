@@ -180,7 +180,6 @@ update_defs () {
 
 
 reset_defs () {
-    create_dirs
     _cwd="$(${PWD_BIN} 2>/dev/null)"
     cd "${DEFINITIONS_DIR}"
     try "${GIT_BIN} reset --hard HEAD"
@@ -311,7 +310,6 @@ make_exports () {
 
 
 show_outdated () {
-    create_dirs
     load_defaults
     if [ -d "${SOFTWARE_DIR}" ]; then
         for _prefix in $(${FIND_BIN} "${SOFTWARE_DIR%/}" -mindepth 1 -maxdepth 1 -type d -not -name ".*" 2>/dev/null); do
@@ -642,7 +640,6 @@ export_binaries () {
 
 
 hack_def () {
-    create_dirs
     if [ -z "${1}" ]; then
         error "No name of pattern to hack given!"
     fi

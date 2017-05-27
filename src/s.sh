@@ -14,7 +14,7 @@ SOFIN_ARGS_FULL=${*}
 SOFIN_COMMAND_ARG="${1}"
 SOFIN_ARGS="$(${PRINTF_BIN} '%s\n' "${SOFIN_ARGS_FULL}" | ${CUT_BIN} -d' ' -f2- 2>/dev/null)"
 SOFIN_PID="${SOFIN_PID:-$$}"
-
+create_dirs
 
 env_pedantic
 env_reset
@@ -126,7 +126,6 @@ if [ -n "${SOFIN_COMMAND_ARG}" ]; then
 
         deps|dependencies|local)
             initialize
-            create_dirs
             if [ "${USER}" = "root" ]; then
                 warn "Installation of project dependencies as root is immoral"
             fi
@@ -156,7 +155,6 @@ if [ -n "${SOFIN_COMMAND_ARG}" ]; then
 
         b|build)
             initialize
-            create_dirs
             _to_be_built=${SOFIN_ARGS}
             note "Requested build of: $(distn "${_to_be_built}")"
             fail_on_bg_job "${_to_be_built}"

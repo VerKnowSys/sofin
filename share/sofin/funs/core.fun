@@ -410,7 +410,7 @@ create_dirs () {
 
 
 summary () {
-    set +e
+    env_forgivable
     # Sofin performance counters:
     SOFIN_END="${SOFIN_END:-$(${SOFIN_TIMER_BIN} 2>/dev/null)}"
     SOFIN_RUNTIME="$(calculate_bc "(${SOFIN_END} - ${SOFIN_START:-${SOFIN_END}}) / 1000")"

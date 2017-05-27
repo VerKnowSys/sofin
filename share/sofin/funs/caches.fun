@@ -1,7 +1,6 @@
 
 log_helper () {
     _log_h_pattern="${1}"
-    create_dirs
     if [ -z "${_log_h_pattern}" ]; then
         _log_files="$(find_all "${LOGS_DIR}" "${SOFIN_NAME}*")"
     else
@@ -43,7 +42,6 @@ less_logs () {
 
 show_logs () {
     clear
-    create_dirs
     _logf_pattern="${1:-+}"
     _logf_minutes="${LOG_LAST_ACCESS_OR_MOD_MINUTES}"
     debug "_logf_minutes: $(distd "${_logf_minutes}"), pattern: $(distd "${_logf_pattern}")"
@@ -105,7 +103,6 @@ show_logs () {
 
 pretouch_logs () {
     _params=${*}
-    create_dirs
     debug "Logs pretouch called with params: $(distd "${_params}")"
     try "${TOUCH_BIN} ${LOGS_DIR}${SOFIN_NAME}"
     _pret_list=""

@@ -53,7 +53,6 @@ push_binbuilds () {
     if [ -z "${_push_bundles}" ]; then
         error "At least single argument with $(diste "BundleName") to push is required!"
     fi
-    create_dirs
     for _pbelement in ${_push_bundles}; do
         _pblowercase_element="$(lowercase "${_pbelement}")"
         if [ -z "${_pblowercase_element}" ]; then
@@ -78,7 +77,6 @@ push_binbuilds () {
 
 deploy_binbuild () {
     _dbbundles=${*}
-    create_dirs
     permnote "Requested deploy of bundles: $(distn "${_dbbundles}")"
     for _dbbundle in ${_dbbundles}; do
         USE_BINBUILD=NO
@@ -91,7 +89,6 @@ deploy_binbuild () {
 
 
 rebuild_bundle () {
-    create_dirs
     _a_dependency="$(lowercase "${1}")"
     if [ -z "${_a_dependency}" ]; then
         error "Missing second argument with library/software name."
