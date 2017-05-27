@@ -96,11 +96,11 @@ inherit () {
 
 
 update_defs () {
+    create_dirs
     if [ -n "${USE_UPDATE}" ]; then
         debug "Definitions update skipped on demand"
         return
     fi
-    try "${MKDIR_BIN} -p ${LOGS_DIR}"
     _cwd="$(${PWD_BIN} 2>/dev/null)"
     if [ ! -x "${GIT_BIN}" ]; then
         note "Installing initial definition list from tarball to cache dir: $(distn "${CACHE_DIR}")"
