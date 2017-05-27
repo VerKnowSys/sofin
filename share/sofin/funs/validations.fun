@@ -67,15 +67,6 @@ validate_reqs () {
 }
 
 
-check_defs_dir () {
-    create_base_datasets
-    if [ ! -d "${CACHE_DIR}" ]; then
-        debug "No cache directory found. Creating one at: $(distd "${CACHE_DIR}")"
-        "${MKDIR_BIN}" -p "${CACHE_DIR}" >/dev/null 2>&1
-    fi
-}
-
-
 validate_archive_sha1 () {
     _archive_name="${1}"
     if [ ! -f "${_archive_name}" ] || \
