@@ -1,24 +1,15 @@
 clean_purge () {
-    if [ -d "${CACHE_DIR}" ]; then
-        debug "Purging whole CACHE_DIR: $(distn "${CACHE_DIR}")"
-        ${RM_BIN} -rf "${CACHE_DIR}"
-    fi
+    ${RM_BIN} -rf "${CACHE_DIR}"
 }
 
 
 clean_logs () {
-    if [ -d "${LOGS_DIR}" ]; then
-        debug "Cleaning LOGS_DIR: $(distn "${LOGS_DIR}")"
-        ${RM_BIN} -rf "${LOGS_DIR}"
-    fi
+    ${RM_BIN} -rf "${LOGS_DIR}"
 }
 
 
 clean_filecache () {
-    if [ -d "${FILE_CACHE_DIR}" ]; then
-        debug "Wiping out FILE_CACHE_DIR: $(distn "${FILE_CACHE_DIR}")"
-        ${RM_BIN} -rf "${FILE_CACHE_DIR}"
-    fi
+    ${RM_BIN} -rf "${FILE_CACHE_DIR}"
 }
 
 
