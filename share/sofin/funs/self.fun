@@ -46,15 +46,17 @@ update_defs () {
 
 build_sofin_natives () {
     _okch="$(distn "${SUCCESS_CHAR}" "${ColorParams}")"
-    permnote "Building native utils.."
     compiler_setup
+    _harden_flags="${COMMON_FLAGS} ${HARDEN_CFLAGS} ${HARDEN_OFLOW_CFLAGS} ${HARDEN_SAFE_STACK_FLAGS} ${HARDEN_CMACROS} ${HARDEN_CFLAGS_PRODUCTION} ${HARDEN_LDFLAGS_PRODUCTION}"
     for _prov in ${SOFIN_PROVIDES}; do
-        if [ -f "src/${_prov}.cc" ]; then
-            debug "cmd: ${CXX_COMPILER_NAME} ${COMMON_COMPILER_FLAGS} ${HARDEN_CFLAGS_PRODUCTION} ${HARDEN_CMACROS} -o bin/${_prov} src/${_prov}.cc"
-            try "${CXX_COMPILER_NAME} ${COMMON_COMPILER_FLAGS} ${HARDEN_CFLAGS_PRODUCTION} ${HARDEN_CMACROS} -o bin/${_prov} src/${_prov}.cc" || \
-            run "${CXX_COMPILER_NAME} ${COMMON_COMPILER_FLAGS} -o bin/${_prov} src/${_prov}.cc"
+        if [ -f "./src/${_prov}.cc" ]; then
+            debug "Sofin: Build: ${CXX_NAME} -o bin/${_prov} ${_harden_flags} src/${_prov}.cc"
+            ${CXX_NAME} -o "bin/${_prov}" \
+                ${_harden_flags} "src/${_prov}.cc" && \
+                permnote "  ${_okch} src/${_prov}.cc" && \
+                continue
 
-            permnote "  ${_okch} src/${_prov}.cc"
+            return 1
         fi
     done
 }
