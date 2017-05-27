@@ -459,7 +459,7 @@ destroy_locks () {
     done && \
         debug "Finished locks cleanup using pattern: $(distd "${_pattern:-''}") that belong to pid: $(distd "${_pid}")"
     env_pedantic
-    unset _dlf _pid
+    unset _dlf _pid _possiblepid _pattern
 }
 
 

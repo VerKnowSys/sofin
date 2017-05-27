@@ -15,19 +15,6 @@ MAIN_SOURCE_REPOSITORY="http://${MAIN_SOFTWARE_ADDRESS}/source/"
 MAIN_COMMON_REPOSITORY="${MAIN_BINARY_REPOSITORY}${MAIN_COMMON_NAME}"
 MAIN_SSH_PORT="${MAIN_SSH_PORT:-60022}"
 
-SERVICES_DIR="${SERVICES_DIR:-/Services}"
-SOFTWARE_DIR="${SOFTWARE_DIR:-/Software}"
-SOFIN_ROOT="${SOFTWARE_DIR}/${SOFIN_BUNDLE_NAME}"
-
-DEFINITIONS_DEFAULT_FILE_NAME="defaults" # NOTE: Base "def" file, loaded before each software definition
-DEFINITIONS_LISTS_FILE_NAME="lists" # NOTE: It's name of lists directory from "Sofin-definitions" repository
-DEFINITIONS_INITIAL_FILE_NAME="initial-definitions" # NOTE: if no git vailable in system, use initial snapshot
-DEFINITIONS_BASE="definitions" # NOTE: It's main directory in "Sofin-definitions" repository
-
-DEFINITIONS_DIR="${CACHE_DIR}${DEFINITIONS_BASE}/${DEFINITIONS_BASE}/"
-DEFINITIONS_DEFAULTS="${DEFINITIONS_DIR}${DEFINITIONS_DEFAULT_FILE_NAME}${DEFAULT_DEF_EXT}"
-DEFINITIONS_LISTS_DIR="${CACHE_DIR}${DEFINITIONS_BASE}/${DEFINITIONS_LISTS_FILE_NAME}/"
-
 CCACHE_BIN_OPTIONAL="/Software/Ccache/exports/ccache" # NOTE: pick first ccache it can find
 DEFAULT_PATH="${DEFAULT_PATH:-/bin:/usr/bin:/sbin:/usr/sbin:/usr/pkg/bin:/usr/pkg/sbin}"
 SOFIN_BIN_SHORT="${SOFIN_BIN##*/}"

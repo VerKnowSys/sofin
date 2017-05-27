@@ -6,11 +6,11 @@ load_defs () {
         for _given_def in ${_definitions}; do
             _name_base="${_given_def##*/}"
             _def="$(lowercase "${_name_base}")"
-            if [ -e "${DEFINITIONS_DIR}${_def}${DEFAULT_DEF_EXT}" ]; then
-                . "${DEFINITIONS_DIR}${_def}${DEFAULT_DEF_EXT}"
+            if [ -e "${DEFINITIONS_DIR}/${_def}${DEFAULT_DEF_EXT}" ]; then
+                . "${DEFINITIONS_DIR}/${_def}${DEFAULT_DEF_EXT}"
 
-            elif [ -e "${DEFINITIONS_DIR}${_def}" ]; then
-                . "${DEFINITIONS_DIR}${_def}"
+            elif [ -e "${DEFINITIONS_DIR}/${_def}" ]; then
+                . "${DEFINITIONS_DIR}/${_def}"
                 _given_def="$(${PRINTF_BIN} '%s' "${_def}" | eval "${CUTOFF_DEF_EXT_GUARD}")"
 
             else
@@ -91,16 +91,18 @@ load_defaults () {
 inherit () {
     _inhnm="$(${PRINTF_BIN} '%s' "${1}" | eval "${CUTOFF_DEF_EXT_GUARD}")"
     debug "Loading parent definition: $(distd "${_inhnm}")"
-    . ${DEFINITIONS_DIR}${_inhnm}${DEFAULT_DEF_EXT}
+    . "${DEFINITIONS_DIR}/${_inhnm}${DEFAULT_DEF_EXT}"
 }
 
 
 update_defs () {
-    create_dirs
     if [ -n "${USE_UPDATE}" ]; then
         debug "Definitions update skipped on demand"
         return
     fi
+    create_dirs
+    setup_defs_branch
+    setup_defs_repo
     _cwd="$(${PWD_BIN} 2>/dev/null)"
     if [ ! -x "${GIT_BIN}" ]; then
         note "Installing initial definition list from tarball to cache dir: $(distn "${CACHE_DIR}")"
@@ -321,7 +323,7 @@ show_outdated () {
                 continue
             fi
             _bund_vers="$(${CAT_BIN} "${_prefix}/${_bundle}${DEFAULT_INST_MARK_EXT}" 2>/dev/null)"
-            if [ ! -f "${DEFINITIONS_DIR}${_bundle}${DEFAULT_DEF_EXT}" ]; then
+            if [ ! -f "${DEFINITIONS_DIR}/${_bundle}${DEFAULT_DEF_EXT}" ]; then
                 if [ "${_bundle}" != "${SOFIN_NAME}" ]; then
                     warn "No such bundle found: $(distw $(capitalize "${_bundle}"))"
                 fi

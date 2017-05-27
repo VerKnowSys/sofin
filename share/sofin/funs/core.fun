@@ -391,7 +391,7 @@ create_dirs () {
        [ ! -d "${CACHE_DIR}" ] || \
        [ ! -d "${FILE_CACHE_DIR}" ] || \
        [ ! -d "${LOCKS_DIR}" ]; then
-        ${MKDIR_BIN} -p "${FILE_CACHE_DIR}" "${CACHE_DIR}" "${LOCKS_DIR}" "${LOGS_DIR}"
+        ${MKDIR_BIN} -p "${CACHE_DIR}" "${FILE_CACHE_DIR}" "${LOCKS_DIR}" "${LOGS_DIR}"
     fi
     env_pedantic
 }
@@ -420,8 +420,6 @@ summary () {
 initialize () {
     check_os
     create_dirs
-    setup_defs_branch
-    setup_defs_repo
     create_base_datasets
     trap_signals
 

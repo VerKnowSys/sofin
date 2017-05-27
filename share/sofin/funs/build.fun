@@ -184,7 +184,7 @@ build () {
             warn "Bundle: $(distw "${_anm}") is disabled on: $(distw "${OS_TRIPPLE}")"
             destroy_software_dir "${_anm}"
         else
-            for _req_name in ${DEFINITIONS_DIR}${_bund_name}${DEFAULT_DEF_EXT}; do
+            for _req_name in ${DEFINITIONS_DIR}/${_bund_name}${DEFAULT_DEF_EXT}; do
                 unset DONT_BUILD_BUT_DO_EXPORTS
                 debug "Reading definition: $(distd "${_req_name}")"
                 load_defaults
@@ -379,7 +379,7 @@ process_flat () {
     if [ -z "${_bundlnm}" ]; then
         error "Third argument with $(diste "BundleName") is required!"
     fi
-    _req_definition="${DEFINITIONS_DIR}$(lowercase "${_app_param}")${DEFAULT_DEF_EXT}"
+    _req_definition="${DEFINITIONS_DIR}/$(lowercase "${_app_param}")${DEFAULT_DEF_EXT}"
     if [ ! -e "${_req_definition}" ]; then
         error "Cannot read definition file: $(diste "${_req_definition}")!"
     fi
