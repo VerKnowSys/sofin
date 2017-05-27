@@ -418,14 +418,12 @@ summary () {
 
 
 initialize () {
-    env_forgivable
+    check_os
     create_dirs
     setup_defs_branch
     setup_defs_repo
-    check_defs_dir
-    check_os
+    create_base_datasets
     trap_signals
-    env_pedantic
 
     if [ "${TTY}" = "YES" ]; then
         # turn echo off
