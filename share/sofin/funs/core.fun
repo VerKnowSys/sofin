@@ -234,17 +234,12 @@ retry () {
 
 
 setup_defs_branch () {
-    # setting up definitions repository
-    if [ -z "${BRANCH}" ]; then
-        BRANCH="${DEFAULT_DEFINITIONS_BRANCH}"
-    fi
+    BRANCH="${BRANCH:-${DEFAULT_DEFINITIONS_BRANCH}}"
 }
 
 
 setup_defs_repo () {
-    if [ -z "${REPOSITORY}" ]; then
-        REPOSITORY="${DEFAULT_DEFINITIONS_REPOSITORY}"
-    fi
+    REPOSITORY="${REPOSITORY:-${DEFAULT_DEFINITIONS_REPOSITORY}}"
 }
 
 
