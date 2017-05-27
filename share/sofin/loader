@@ -1,12 +1,14 @@
 #!/usr/bin/env sh
 
+
 # NOTE: Load core.fact for basic definitions:
+SOFIN_ROOT="${SOFIN_ROOT:-/Software/Sofin}"
 if [ -d "share/sofin/facts/" ] && \
    [ -f "share/sofin/facts/core.fact" ]; then
-    . share/sofin/facts/core.fact
-elif [ -d "/Software/Sofin/share/facts/" ] && \
-     [ -f "/Software/Sofin/share/facts/core.fact" ]; then
-    . /Software/Sofin/share/facts/core.fact
+    . "share/sofin/facts/core.fact"
+elif [ -d "${SOFIN_ROOT}/share/facts/" ] && \
+     [ -f "${SOFIN_ROOT}/share/facts/core.fact" ]; then
+    . "${SOFIN_ROOT}/share/facts/core.fact"
 fi
 
 

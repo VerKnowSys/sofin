@@ -1,13 +1,14 @@
 #!/usr/bin/env sh
 # @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
 
-. /Software/Sofin/share/loader
+SOFIN_ROOT="${SOFIN_ROOT:-/Software/Sofin}"
+. "${SOFIN_ROOT}/share/loader"
 
 # this is internal version check for defaults.def
 unset COMPLIANCE_CHECK
 
 # performance counts:
-SOFIN_START="${SOFIN_START:-$(${SOFIN_MICROSECONDS_UTILITY_BIN})}"
+SOFIN_START="${SOFIN_START:-$(${SOFIN_TIMER_BIN})}"
 
 SOFIN_ARGS_FULL=${*}
 SOFIN_COMMAND_ARG="${1}"

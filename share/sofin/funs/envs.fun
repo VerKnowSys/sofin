@@ -215,13 +215,13 @@ compiler_setup () {
     # pick compiler in order:
     # 1. /usr/bin/clang
     # 2. /usr/bin/gcc
-    _default_c="${C_COMPILER_NAME}"
-    _default_cxx="${CXX_COMPILER_NAME}"
-    _default_cpp="${CPP_PREPROCESSOR_NAME}"
+    _default_c="${CC_NAME}"
+    _default_cxx="${CXX_NAME}"
+    _default_cpp="${CPP_NAME}"
     if [ "YES" = "${DEF_USE_ALT_COMPILER}" ]; then
-        _default_c="${C_COMPILER_NAME_ALT}"
-        _default_cxx="${CXX_COMPILER_NAME_ALT}"
-        _default_cpp="${CPP_PREPROCESSOR_NAME_ALT}"
+        _default_c="${CC_NAME_ALT}"
+        _default_cxx="${CXX_NAME_ALT}"
+        _default_cpp="${CPP_NAME_ALT}"
     fi
     # NOTE: Darwin case: no clang-cpp but clang -E as preprocesor there:
     if [ ! -x "${PREFIX}/bin/${_default_cpp}" ]; then

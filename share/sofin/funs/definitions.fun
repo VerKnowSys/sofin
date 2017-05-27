@@ -55,9 +55,9 @@ load_defs () {
                             "OS_TRIPPLE" \
                             "SYS_SPECIFIC_BINARY_REMOTE";
                 do
-                    if [ "${_check}=" = "${_required_field}" -o \
-                         "${_check}=." = "${_required_field}" -o \
-                         "${_check}=${DEFAULT_DEF_EXT}" = "${_required_field}" ]; then
+                    if [ "${_check}=" = "${_required_field}" ] || \
+                       [ "${_check}=." = "${_required_field}" ] || \
+                       [ "${_check}=${DEFAULT_DEF_EXT}" = "${_required_field}" ]; then
                         error "Empty or wrong value for required field: $(diste "${_check}") from definition: $(diste "${_def}")."
                     else
                         # gather passed checks, but print it only once..
@@ -324,7 +324,7 @@ show_outdated () {
             fi
             _bund_vers="$(${CAT_BIN} "${_prefix}/${_bundle}${DEFAULT_INST_MARK_EXT}" 2>/dev/null)"
             if [ ! -f "${DEFINITIONS_DIR}${_bundle}${DEFAULT_DEF_EXT}" ]; then
-                if [ "${_bundle}" != "${DEFAULT_NAME}" ]; then
+                if [ "${_bundle}" != "${SOFIN_NAME}" ]; then
                     warn "No such bundle found: $(distw $(capitalize "${_bundle}"))"
                 fi
                 continue
@@ -362,7 +362,7 @@ wipe_remote_archives () {
             debug "Using defined mirror(s): $(distd "${_wr_dig}")"
             for _wr_mirr in ${_wr_dig}; do
                 note "Wiping out remote: $(distn "${_wr_mirr}") binary archives: $(distn "${_remote_ar_name}")"
-                retry "${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_PORT} ${MAIN_USER}@${_wr_mirr} \"${FIND_BIN} ${MAIN_BINARY_PREFIX}/${SYS_SPECIFIC_BINARY_REMOTE} -iname '${_remote_ar_name}' -delete\""
+                retry "${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_SSH_PORT} ${SOFIN_NAME}@${_wr_mirr} \"${FIND_BIN} ${MAIN_BINARY_PREFIX}/${SYS_SPECIFIC_BINARY_REMOTE} -iname '${_remote_ar_name}' -delete\""
             done
         done
     else
