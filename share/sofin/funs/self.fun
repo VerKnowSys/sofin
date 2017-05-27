@@ -21,19 +21,19 @@ load_requirements () {
 
 install_sofin () {
     export CAP_SYS_PRODUCTION=YES
-    export PREFIX="${PREFIX:-/Software/Sofin}"
-    permnote "Installing Software Installer with version: $(distn "${SOFIN_VERSION}")"
+
     compiler_setup && \
         build_sofin_natives && \
-            install_sofin_files && \
-                note "Installation successful for: $(distn "${SOFIN_VERSION}")" && \
-                echo "${SOFIN_VERSION}" > "${PREFIX}/${DEFAULT_NAME}${DEFAULT_INST_MARK_EXT}"
-    update_system_shell_env_files
+        install_sofin_files && \
+        note "${SOFIN_BUNDLE_NAME} installed successfully with version: $(distn "${SOFIN_VERSION}")" && \
+        echo "${SOFIN_VERSION}" > "${SOFIN_DIR}/${SOFIN_NAME}${DEFAULT_INST_MARK_EXT}"
 
-    permnote "Post install. Exporting default Sofin binaries…"
-    try "${PREFIX}/bin/s export s Sofin"
-    try "${PREFIX}/bin/s export s-osver Sofin"
-    try "${PREFIX}/bin/s export s-usec Sofin"
+    for _bin in "s" "s-osver" "s-usec"; do
+        test ! -L "${SOFIN_DIR}/exports/${_bin}" && \
+            run "${SOFIN_DIR}/bin/${_bin} export ${_bin} ${SOFIN_BUNDLE_NAME}"
+    done
+
+    update_system_shell_env_files
     return 0
 }
 
@@ -50,7 +50,7 @@ build_sofin_natives () {
     _harden_flags="${COMMON_FLAGS} ${HARDEN_CFLAGS} ${HARDEN_OFLOW_CFLAGS} ${HARDEN_SAFE_STACK_FLAGS} ${HARDEN_CMACROS} ${HARDEN_CFLAGS_PRODUCTION} ${HARDEN_LDFLAGS_PRODUCTION}"
     for _prov in ${SOFIN_PROVIDES}; do
         if [ -f "./src/${_prov}.cc" ]; then
-            debug "Sofin: Build: ${CXX_NAME} -o bin/${_prov} ${_harden_flags} src/${_prov}.cc"
+            debug "${SOFIN_BUNDLE_NAME}: Build: ${CXX_NAME} -o bin/${_prov} ${_harden_flags} src/${_prov}.cc"
             ${CXX_NAME} -o "bin/${_prov}" \
                 ${_harden_flags} "src/${_prov}.cc" && \
                 permnote "  ${_okch} src/${_prov}.cc" && \
@@ -72,27 +72,27 @@ try_sudo_installation () {
 
 
 install_sofin_files () {
-    if [ -z "${SOFTWARE_DIR}" ] || [ -z "${PREFIX}" ]; then
+    if [ -z "${SOFTWARE_DIR}" ] || [ -z "${SOFIN_DIR}" ]; then
         exit 67
     fi
-    ${MKDIR_BIN} -p "${SOFTWARE_DIR}" "${SERVICES_DIR}" "${PREFIX}/bin" "${PREFIX}/exports" "${PREFIX}/share" || \
+    ${MKDIR_BIN} -p "${SOFTWARE_DIR}" "${SERVICES_DIR}" "${SOFIN_DIR}/bin" "${SOFIN_DIR}/exports" "${SOFIN_DIR}/share" || \
         try_sudo_installation
 
     set -e
     _okch="$(distn "${SUCCESS_CHAR}" "${ColorParams}")"
-    permnote "Installing to prefix: $(distn "${PREFIX}")"
+    permnote "Installing to prefix: $(distn "${SOFIN_DIR}")"
     for _prov in ${SOFIN_PROVIDES}; do
         if [ -f "bin/${_prov}" ]; then
-            run "${INSTALL_BIN} -v bin/${_prov} ${PREFIX}/bin"
+            run "${INSTALL_BIN} -v bin/${_prov} ${SOFIN_DIR}/bin"
             run "${RM_BIN} -f bin/${_prov}"
         fi
     done && \
         permnote "  ${_okch} native utils"
 
-    run "${CP_BIN} -vfR share/sofin/* ${PREFIX}/share/" && \
+    run "${CP_BIN} -vfR share/sofin/* ${SOFIN_DIR}/share/" && \
         permnote "  ${_okch} facts and functions"
 
-    run "${INSTALL_BIN} -v src/s.sh ${PREFIX}/bin/s" && \
+    run "${INSTALL_BIN} -v src/s.sh ${SOFIN_DIR}/bin/s" && \
         permnote "  ${_okch} sofin launcher" && \
         permnote "Type: $(distn "s usage") for help." && \
         note "Read: $(distn "https://github.com/VerKnowSys/sofin") for more details." && \
