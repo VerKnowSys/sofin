@@ -8,14 +8,13 @@ SOFIN_ROOT="${SOFIN_ROOT:-/Software/Sofin}"
 unset COMPLIANCE_CHECK
 
 # performance counts:
-SOFIN_START="${SOFIN_START:-$(${SOFIN_TIMER_BIN})}"
-
-SOFIN_ARGS_FULL=${*}
-SOFIN_COMMAND_ARG="${1}"
+export SOFIN_START="${SOFIN_START:-$(${SOFIN_TIMER_BIN})}"
+export SOFIN_COMMAND_ARG="${1}"
+export SOFIN_PID="${SOFIN_PID:-$$}"
+export SOFIN_ARGS_FULL=${*}
 SOFIN_ARGS="$(${PRINTF_BIN} '%s\n' "${SOFIN_ARGS_FULL}" | ${CUT_BIN} -d' ' -f2- 2>/dev/null)"
-SOFIN_PID="${SOFIN_PID:-$$}"
-create_dirs
 
+create_dirs
 env_pedantic
 env_reset
 
