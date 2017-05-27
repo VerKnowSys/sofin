@@ -11,9 +11,11 @@ env_reset () {
 
     # NOTE: By default environment should treat non-ASCII characters as literals.
     #       It's often required for test suites:
-    LANG=C
-    LC_ALL=C
-    LC_CTYPE=C
+
+    # NOTE: should be considered legacy?
+    # LANG=C
+    # LC_ALL=C
+    # LC_CTYPE=C
 }
 
 
