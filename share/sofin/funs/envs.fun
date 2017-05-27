@@ -465,7 +465,7 @@ destroy_locks () {
 
 update_shell_vars () {
     env_forgivable
-    if [ -n "${SOFIN_PROFILE}" ]; then
+    if [ -f "${SOFIN_PROFILE}" ]; then
         debug "Generating shell environment and writing to: $(distd "${SOFIN_PROFILE}")"
         get_shell_vars > "${SOFIN_PROFILE}"
     else
