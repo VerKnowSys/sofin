@@ -4,7 +4,7 @@ env_reset () {
     unset LD_PRELOAD LD_LIBRARY_PATH DYLD_LIBRARY_PATH
 
     # utils
-    unset CC CXX LD AR RANLIB NM AS
+    unset CC CXX CPP LD AR RANLIB NM AS
 
     # flags
     unset CFLAGS CXXFLAGS CPPFLAGS LDFLAGS
