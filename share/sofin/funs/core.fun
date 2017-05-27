@@ -393,23 +393,16 @@ disable_security_features () {
 create_dirs () {
     # special threatment for LOGS_DIR
     if [ ! -d "${LOGS_DIR}" ]; then
-        try "${MKDIR_BIN} -p ${CACHE_DIR} ${LOGS_DIR}"
-        debug "No LOGS_DIR: $(distd "${LOGS_DIR}"). It was created."
-    else
-        debug "Existent LOGS_DIR: $(distd "${LOGS_DIR}")"
+        ${MKDIR_BIN} -p "${LOGS_DIR}"
     fi
-
     # check for regular cache dirs for existence:
     if [ ! -d "${CACHE_DIR}" ] || \
        [ ! -d "${FILE_CACHE_DIR}" ] || \
        [ ! -d "${LOCKS_DIR}" ]; then
-         for dir in "${FILE_CACHE_DIR}" "${CACHE_DIR}" "${LOCKS_DIR}"; do
-            try "${MKDIR_BIN} -p ${dir}"
-         done
+        ${MKDIR_BIN} -p "${FILE_CACHE_DIR}" "${CACHE_DIR}" "${LOCKS_DIR}"
     fi
     if [ ! -d "${DEFINITIONS_DIR}" ] || \
        [ ! -f "${DEFINITIONS_DEFAULTS}" ]; then
-        debug "No valid definitions cache found in: $(distd "${DEFINITIONS_DIR}"). Creating one."
         clean_purge
         update_defs
     fi
