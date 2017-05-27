@@ -1,14 +1,12 @@
 #!/usr/bin/env sh
 # @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
 
-if [ "${1}" = "trace" -o \
-     -n "${SOFIN_TRACE}" ]; then
+if [ "${1}" = "trace" ] || [ -n "${SOFIN_TRACE}" ]; then
     printf "Enabling trace mode\n"
     set -x
 fi
 
-if [ "${1}" = "verbose" -o \
-     -n "${SOFIN_TRACE}" ]; then
+if [ "${1}" = "verbose" ] || [ -n "${SOFIN_TRACE}" ]; then
     printf "Enabling verbose mode\n"
     set -v
 fi
