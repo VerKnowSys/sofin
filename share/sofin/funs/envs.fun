@@ -462,6 +462,7 @@ destroy_locks () {
 
 
 update_shell_vars () {
+    env_forgivable
     if [ -n "${SOFIN_PROFILE}" ]; then
         debug "Generating shell environment and writing to: $(distd "${SOFIN_PROFILE}")"
         get_shell_vars > "${SOFIN_PROFILE}"
@@ -472,6 +473,7 @@ update_shell_vars () {
 
 
 reload_zsh_shells () {
+    env_forgivable
     _shell_pattern="zsh"
     if [ "Darwin" = "${SYSTEM_NAME}" ]; then
         _shell_pattern="\d ${ZSH_BIN}" # NOTE: this fixes issue with SIGUSR2 signal sent to iTerm
@@ -498,6 +500,7 @@ reload_zsh_shells () {
 
 
 update_system_shell_env_files () {
+    env_forgivable
     for _env_file in ${HOME}/.profile ${HOME}/.zshenv ${HOME}/.bashrc; do
         if [ -f "${_env_file}" ]; then
             ${EGREP_BIN} "SHELL_PID=" "${_env_file}" >/dev/null 2>&1

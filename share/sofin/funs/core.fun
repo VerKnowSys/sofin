@@ -391,21 +391,14 @@ disable_security_features () {
 
 
 create_dirs () {
-    # special threatment for LOGS_DIR
-    if [ ! -d "${LOGS_DIR}" ]; then
-        ${MKDIR_BIN} -p "${LOGS_DIR}"
-    fi
-    # check for regular cache dirs for existence:
-    if [ ! -d "${CACHE_DIR}" ] || \
+    env_forgivable
+    if [ ! -d "${LOGS_DIR}" ] || \
+       [ ! -d "${CACHE_DIR}" ] || \
        [ ! -d "${FILE_CACHE_DIR}" ] || \
        [ ! -d "${LOCKS_DIR}" ]; then
-        ${MKDIR_BIN} -p "${FILE_CACHE_DIR}" "${CACHE_DIR}" "${LOCKS_DIR}"
+        ${MKDIR_BIN} -p "${FILE_CACHE_DIR}" "${CACHE_DIR}" "${LOCKS_DIR}" "${LOGS_DIR}"
     fi
-    if [ ! -d "${DEFINITIONS_DIR}" ] || \
-       [ ! -f "${DEFINITIONS_DEFAULTS}" ]; then
-        clean_purge
-        update_defs
-    fi
+    env_pedantic
 }
 
 
@@ -430,12 +423,14 @@ summary () {
 
 
 initialize () {
+    env_forgivable
     create_dirs
     setup_defs_branch
     setup_defs_repo
     check_defs_dir
     check_os
     trap_signals
+    env_pedantic
 
     if [ "${TTY}" = "YES" ]; then
         # turn echo off
