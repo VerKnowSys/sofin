@@ -1,7 +1,8 @@
 #!/usr/bin/env zsh
 
 
-. /Software/Sofin/share/loader
+SOFIN_ROOT="${SOFIN_ROOT:-/Software/Sofin}"
+. "${SOFIN_ROOT}/share/loader"
 
 if [ "FreeBSD" = "${SYSTEM_NAME}" ]; then
     try "${CHMOD_BIN} 600 ~/.ssh/id_rsa"
@@ -13,7 +14,7 @@ fi
 ${TEST_BIN} ! -x /Software/Ccache/bin/ccache || ${SOFIN_BIN} i Ccache
 
 note "Checking remote machine connection (shouldn't take more than a second).."
-run "${SSH_BIN} sofin@verknowsys.com uname -a"
+run "${SSH_BIN} sofin@git.verknowsys.com uname -a"
 
 set +e
 
