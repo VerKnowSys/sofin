@@ -479,28 +479,20 @@ create_software_bundle_archive () {
 # returns name of device which is used in main ZFS pool:
 boot_device_name () {
     env_forgivable
-    _geom_disks="$(${GEOM_BIN} disk list 2>/dev/null | ${EGREP_BIN} -i "Geom name:" 2>/dev/null | ${SED_BIN} 's/^.*\: //' 2>/dev/null)"
-    if [ "YES" = "${CAP_SYS_ZFS}" ]; then
-        for _dsk in ${_geom_disks}; do
-            ${ZPOOL_BIN} status "${ZPOOL}" 2>/dev/null | \
-                ${EGREP_BIN} -i "${_dsk}p[0-9]+" >/dev/null 2>&1 && \
-                env_pedantic && \
-                printf '%s\n' "${_dsk}" && \
-                return 0
+    for _dsk in $(${GEOM_BIN} disk list 2>/dev/null | ${EGREP_BIN} -i "Geom name:" 2>/dev/null | ${SED_BIN} 's/^.*\: //' 2>/dev/null); do
 
-            continue
-        done
-    else # No ZFS:
-        for _dsk in ${_geom_disks}; do
+        if [ "YES" = "${CAP_SYS_ZFS}" ]; then
+            ${ZPOOL_BIN} status "${DEFAULT_ZPOOL}" 2>/dev/null | \
+                ${EGREP_BIN} -i "${_dsk}p[0-9]+" >/dev/null 2>&1 && \
+                ${PRINTF_BIN} '%s\n' "${_dsk}" && \
+                return 0
+        else
             ${MOUNT_BIN} 2>/dev/null | \
                 ${EGREP_BIN} -i "/dev/${_dsk}" >/dev/null 2>&1 && \
-                env_pedantic && \
-                printf '%s\n' "${_dsk}" && \
+                ${PRINTF_BIN} '%s\n' "${_dsk}" && \
                 return 0
-
-            continue
-        done
-    fi
+        fi
+    done
 
     env_pedantic
     return 1
