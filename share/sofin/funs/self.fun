@@ -20,6 +20,8 @@ load_requirements () {
 
 
 install_sofin () {
+    permnote "Installing ${SOFIN_BUNDLE_NAME} to prefix: $(distn "${SOFIN_ROOT}")"
+
     export CAP_SYS_PRODUCTION=YES
 
     compiler_setup && \
@@ -47,16 +49,13 @@ update_defs () {
 build_sofin_natives () {
     _okch="$(distn "${SUCCESS_CHAR}" "${ColorParams}")"
     compiler_setup
-    _harden_flags="${COMMON_FLAGS} ${HARDEN_CFLAGS} ${HARDEN_OFLOW_CFLAGS} ${HARDEN_SAFE_STACK_FLAGS} ${HARDEN_CMACROS} ${HARDEN_CFLAGS_PRODUCTION} ${HARDEN_LDFLAGS_PRODUCTION}"
     for _prov in ${SOFIN_PROVIDES}; do
-        if [ -f "./src/${_prov}.cc" ]; then
-            debug "${SOFIN_BUNDLE_NAME}: Build: ${CXX_NAME} -o bin/${_prov} ${_harden_flags} src/${_prov}.cc"
-            ${CXX_NAME} -o "bin/${_prov}" \
-                ${_harden_flags} "src/${_prov}.cc" && \
-                permnote "  ${_okch} src/${_prov}.cc" && \
-                continue
+        if [ -f "src/${_prov}.cc" ]; then
+            debug "${SOFIN_BUNDLE_NAME}: Build: ${CXX_NAME} -o bin/${_prov} ${CFLAGS} src/${_prov}.cc"
+            run "${CXX_NAME} ${DEFAULT_COMPILER_FLAGS} ${DEFAULT_LINKER_FLAGS} src/${_prov}.cc -o bin/${_prov}" && \
+                permnote "  ${_okch} cc: src/${_prov}.cc"
 
-            return 1
+            continue
         fi
     done
 }
@@ -80,7 +79,6 @@ install_sofin_files () {
 
     set -e
     _okch="$(distn "${SUCCESS_CHAR}" "${ColorParams}")"
-    permnote "Installing to prefix: $(distn "${SOFIN_ROOT}")"
     for _prov in ${SOFIN_PROVIDES}; do
         if [ -f "bin/${_prov}" ]; then
             run "${INSTALL_BIN} -v bin/${_prov} ${SOFIN_ROOT}/bin"
