@@ -525,6 +525,9 @@ process_flat () {
                 after_patch_snapshot
                 cd "${_pwd}"
 
+                # configuration log:
+                _config_log="${LOGS_DIR}${DEF_NAME}${DEF_POSTFIX}.src-configure-options"
+
                 note "   ${NOTE_CHAR} Configuring: $(distn "${_app_param}"), version: $(distn "${DEF_VERSION}")"
                 case "${DEF_CONFIGURE_METHOD}" in
 
@@ -545,6 +548,7 @@ process_flat () {
                         ;;
 
                     posix)
+                        cache_conf_scrpt_hlp_opts "${_config_log}"
                         try "./configure -prefix ${_prefix} -cc '${CC_NAME} ${CFLAGS}' -libs '-L${PREFIX}/lib ${LDFLAGS}' -mandir ${PREFIX}/share/man -libdir ${PREFIX}/lib -aspp '${CC_NAME} ${CFLAGS} -c' ${DEF_CONFIGURE_ARGS}" || \
                         try "./configure -prefix ${_prefix} -cc '${CC_NAME} ${CFLAGS}' -libs '-L${PREFIX}/lib ${LDFLAGS}' -libdir ${PREFIX}/lib -aspp '${CC_NAME} ${CFLAGS} -c' ${DEF_CONFIGURE_ARGS}" || \
                         run "./configure -prefix ${_prefix} -cc '${CC_NAME} ${CFLAGS}' -libs '-L${PREFIX}/lib ${LDFLAGS}' -aspp '${CC_NAME} ${CFLAGS} -c' ${DEF_CONFIGURE_ARGS}"
@@ -572,6 +576,10 @@ process_flat () {
                             _pic_optional="--with-pic"
                         fi
                         _addon="CFLAGS='${CFLAGS}' CXXFLAGS='${CXXFLAGS}' LDFLAGS='${LDFLAGS}'"
+
+                        # NOTE: Store `configure --help` outputs per definition (useful):
+                        cache_conf_scrpt_hlp_opts "${_config_log}"
+
                         if [ "${SYSTEM_NAME}" = "Linux" ]; then
                             # NOTE: No /Services feature implemented for Linux.
                             try "${PRINTF_BIN} '%s\n' \"${DEF_CONFIGURE_METHOD}\" | ${GREP_BIN} \"configure\" >/dev/null 2>&1"
