@@ -25,9 +25,6 @@ TIMESTAMP="${TIMESTAMP:-$(${DATE_BIN} "${DEFAULT_DATE_TS_OPTS}" 2>/dev/null)}"
 # Hardened system support:
 DEFAULT_SECURITY_STATE_FILE="${SOFTWARE_DIR}/.sys-security-state.${TIMESTAMP}"
 
-# explicit compiler CPU features setup:
-DEFAULT_COMPILER_CPU_FEATURES="-ffp-contract=fast -msse -msse2 -msse3 -msse4 -msse4.1 -msse4.2 -mfma -mavx -mno-avx2"
-
 # LLVM backend:
 CC_NAME="clang"
 CXX_NAME="${CC_NAME}++"
@@ -39,7 +36,7 @@ CXX_NAME_ALT="g++"
 CPP_NAME_ALT="cpp"
 
 # Compiler cross platform defaults:
-COMMON_FLAGS="-w -fPIC ${DEFAULT_COMPILER_CPU_FEATURES}"
+COMMON_FLAGS="-w -fPIC"
 
 # NOTE: XXX: To add -Werror=format-security as a default, we have to get rid of GNU software ;)
 # NOTE:-D is recognized as "a macro" and rejected f.i. configure script of "c-ares" definiton
