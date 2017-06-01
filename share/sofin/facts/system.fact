@@ -74,7 +74,6 @@ setup_zfs_default_setup () {
 
     # For ZFS we don't use tarballs anymore:
     DEFAULT_ARCHIVE_EXT="${DEFAULT_SOFTWARE_SNAPSHOT_EXT}"
-    env_pedantic
 }
 
 
