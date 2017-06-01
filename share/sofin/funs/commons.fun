@@ -143,7 +143,6 @@ find_most_recent () {
             debug "Specified matcher: $(distd "${_frmatcher}")"
         fi
         if [ -d "${_frpath}" ]; then
-            debug "Find _frpath: $(distd "${_frpath}")"
             _frfind_results="$(${FIND_BIN} "${_frpath}" \
                 -maxdepth 2 \
                 -mindepth 1 \
@@ -155,7 +154,7 @@ find_most_recent () {
                 ${SORT_BIN} -nr 2>/dev/null | \
                 ${HEAD_BIN} -n "${MAX_OPEN_TAIL_LOGS}" 2>/dev/null | \
                 ${CUT_BIN} -d' ' -f2 2>/dev/null)"
-            _frres_singleline="$(${PRINTF_BIN} '%s\n' "${_frfind_results}" | eval "${NEWLINES_TO_SPACES_GUARD}")"
+            # _frres_singleline="$(${PRINTF_BIN} '%s\n' "${_frfind_results}" | eval "${NEWLINES_TO_SPACES_GUARD}")"
             # debug "Find results: $(distd "${_frres_singleline}")"
             if [ -n "${_frfind_results}" ]; then
                 ${PRINTF_BIN} '%s' "${_frfind_results}" 2>/dev/null

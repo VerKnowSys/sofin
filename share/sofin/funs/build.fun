@@ -230,7 +230,7 @@ build () {
                 if [ ! -e "${_installed_indicator}" ]; then
                     fetch_binbuild "${_bundl_name}" "${_an_archive}"
                 else
-                    _already_installed_version="$(${CAT_BIN} ${_installed_indicator} 2>/dev/null)"
+                    _already_installed_version="$(${CAT_BIN} "${_installed_indicator}" 2>/dev/null)"
                     if [ "${DEF_VERSION}" = "${_already_installed_version}" ]; then
                         debug "$(distd "${_bund_lcase}") bundle is installed with version: $(distd "${_already_installed_version}")"
                     else

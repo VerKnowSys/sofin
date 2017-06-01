@@ -10,7 +10,7 @@ debug () {
         if [ -n "${DEBUG}" ]; then
             ${PRINTF_BIN} "# (%s) λ %b%s%b\n" "${SHLVL}" "${ColorDebug}" "${_in}" "${ColorReset}"
         else
-            ${PRINTF_BIN} "# (%s) λ %b%s%b\n" "${SHLVL}" "${ColorDebug}" "${_in}" "${ColorReset}" >/dev/null
+            ${PRINTF_BIN} "# (%s) λ %b%s%b\n" "${SHLVL}" "${ColorDebug}" "${_in}" "${ColorReset}" >> "${LOG}" 2>> "${LOG}"
         fi
     else
         _sep="${_sep:-$(distd "λ " ${ColorDarkgray})}"
@@ -20,8 +20,8 @@ debug () {
 
         elif [ "${CAP_TERM_ZSH}" = "YES" ]; then
             # NOTE: $funcstack[2]; ${funcfiletrace[@]} ${funcsourcetrace[@]} ${funcstack[@]} ${functrace[@]}
-            _valzz="$(echo "${funcfiletrace[2]#${SOFIN_ROOT}/share/}" 2>/dev/null)"
-            _valxx="$(echo "${funcstack[2]}" 2>/dev/null)"
+            _valzz="${funcfiletrace[2]#${SOFIN_ROOT}/share/}"
+            _valxx="${funcstack[2]}"
             _dbfile="$(distd "${_valzz}" "${ColorBlue}")"
             _fun="$(distd " ${_valxx}()" "${ColorBlue}")"
         else

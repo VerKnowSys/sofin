@@ -147,7 +147,7 @@ validate_definition_disabled () {
     unset DEF_DISABLED_ON
     # check requirement for disabled state:
     if [ -n "${_ch_dis_name}" ]; then
-        for _def_disabled in ${_ch_dis_name}; do
+        for _def_disabled in $(echo "${_ch_dis_name}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
             if [ "${SYSTEM_NAME}" = "${_def_disabled}" ]; then
                 debug "Disabled: $(distd "${_def_disabled}") on $(distd "${SYSTEM_NAME}")"
                 DEF_DISABLED_ON=YES
