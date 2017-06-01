@@ -61,12 +61,12 @@ EOF
 
 
 setup_zfs_default_setup () {
-    # Zfs: set DEFAULT_ZPOOL to first available zpool
+    env_forgivable
+    DEFAULT_ZPOOL="zroot"
+
     _zpool="$(${ZPOOL_BIN} list -H 2>/dev/null | eval "${FIRST_ARG_GUARD}")"
     if [ -n "${_zpool}" ]; then
-        DEFAULT_ZPOOL="${DEFAULT_ZPOOL:-${_zpool}}"
-    else
-        DEFAULT_ZPOOL="${DEFAULT_ZPOOL:-zroot}"
+        DEFAULT_ZPOOL="${_zpool}"
     fi
     ORIGIN_ZFS_SNAP_NAME="${DEFAULT_ORIGIN_SNAPSHOT_NAME}"
     ZFS_SEND_OPTS="${DEFAULT_SNAPSHOT_SEND_OPTS}"
@@ -74,6 +74,7 @@ setup_zfs_default_setup () {
 
     # For ZFS we don't use tarballs anymore:
     DEFAULT_ARCHIVE_EXT="${DEFAULT_SOFTWARE_SNAPSHOT_EXT}"
+    env_pedantic
 }
 
 
