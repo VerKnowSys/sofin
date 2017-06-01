@@ -224,7 +224,7 @@ remove_bundles () {
     if [ "${_bundle_nam}" != "${_bundle_name}" ]; then
         # Specified + - a wildcard
         _picked_bundles="" # to remove first entry with *
-        _found="$(${FIND_BIN} "${SOFTWARE_DIR%/}" -mindepth 1 -maxdepth 1 -iname "${_bundle_nam}" -type d 2>/dev/null)"
+        _found="$(${FIND_BIN} "${SOFTWARE_DIR}" -mindepth 1 -maxdepth 1 -iname "${_bundle_nam}" -type d 2>/dev/null)"
         for _bund in ${_found}; do
             _bname="${_bund##*/}"
             _picked_bundles="${_picked_bundles} ${_bname}"
@@ -744,14 +744,13 @@ after_install_callback () {
 
 traverse_patchlevels () {
     _trav_patches="${@}"
-    for _patch in ${_trav_patches}; do
-        for _level in 0 1 2 3 4 5; do # Up to: -p5
-            debug "Applying patch: $(distd "${_patch##*/}"), level: $(distd "${_level}")"
-            try "${PATCH_BIN} -p${_level} -N -f -i ${_patch}"
-            if [ "${?}" = "0" ]; then # skip applying single patch if it already passed
-                debug "Patch: patches$(distd "${_patch##*patches}") applied successfully!"
-                break;
-            fi
+    debug "traverse_patchlevels: ${_trav_patches}"
+    for _patch in $(echo "${_trav_patches}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
+        for _level in $(${SEQ_BIN} 0 5); do # Up to: -p5
+            try "${PATCH_BIN} -p${_level} -N -f -i ${_patch}" && \
+            debug "Patch applied: $(distd "${_patch##*/}") (level: $(distd "${_level}"))" && \
+                break
+            debug "Patch: $(distd "patches${_patch##*patches}") failed for level: ${_level}!"
         done
     done
     unset _trav_patches
