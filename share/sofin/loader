@@ -18,7 +18,6 @@ load_facts () {
         # echo "# L: ${DEFAULT_FACTS_DIR}${_fact}"
         . "${DEFAULT_FACTS_DIR}${_fact}"
     done
-    unset _fact
 }
 
 
@@ -27,7 +26,6 @@ load_funs () {
         # echo "# L: ${DEFAULT_FACTS_DIR}${_fun}"
         . "${DEFAULT_FUNS_DIR}${_fun}"
     done
-    unset _fun
 }
 
 
