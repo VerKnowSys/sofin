@@ -1,10 +1,16 @@
 #!/usr/bin/env sh
 # @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
 
+SOFIN_PID="$$"
 SOFIN_ARGS_FULL="${@}"
-
 SOFIN_ROOT="${SOFIN_ROOT:-/Software/Sofin}"
+
 . "${SOFIN_ROOT}/share/loader"
+
+
+SOFIN_COMMAND_ARG="${1}"
+SOFIN_ARGS="$(${PRINTF_BIN} '%s\n' "${SOFIN_ARGS_FULL}" | ${CUT_BIN} -d' ' -f2- 2>/dev/null)"
+debug "Sofin args: ${SOFIN_ARGS}"
 
 # Tracing of Sofin itself:
 if [ -n "${SOFIN_TRACE}" ]; then
@@ -35,28 +41,22 @@ fi
 # this is internal version check for defaults.def
 unset COMPLIANCE_CHECK
 
-# performance counts:
-export SOFIN_START="${SOFIN_START:-$(${SOFIN_TIMER_BIN})}"
-export SOFIN_COMMAND_ARG="${1}"
-export SOFIN_PID="${SOFIN_PID:-$$}"
-SOFIN_ARGS="$(${PRINTF_BIN} '%s\n' "${SOFIN_ARGS_FULL}" | ${CUT_BIN} -d' ' -f2- 2>/dev/null)"
-
 if [ -n "${SOFIN_COMMAND_ARG}" ]; then
     case ${SOFIN_COMMAND_ARG} in
 
         dev)
-            develop ${SOFIN_ARGS}
+            develop "${SOFIN_ARGS}"
             ;;
 
 
         # TODO: re-enable this feature
         # hack|h)
-        #     hack_def ${SOFIN_ARGS}
+        #     hack_def "${SOFIN_ARGS}"
         #     ;;
 
 
         diffs|diff)
-            show_diff ${SOFIN_ARGS}
+            show_diff "${SOFIN_ARGS}"
             ;;
 
 
@@ -132,12 +132,12 @@ if [ -n "${SOFIN_COMMAND_ARG}" ]; then
             if [ -z "${_list_maybe}" ]; then
                 error "Second argument, with at least one application (or list) name is required!"
             fi
-            fail_on_bg_job ${SOFIN_ARGS}
+            fail_on_bg_job "${SOFIN_ARGS}"
             # NOTE: trying a list first - it will have priority if file exists:
             if [ -f "${DEFINITIONS_LISTS_DIR}${_list_maybe}" ]; then
                 _pickd_bundls="$(${CAT_BIN} "${DEFINITIONS_LISTS_DIR}${_list_maybe}" 2>/dev/null | eval "${NEWLINES_TO_SPACES_GUARD}")"
             else
-                _pickd_bundls=${SOFIN_ARGS}
+                _pickd_bundls="${SOFIN_ARGS}"
             fi
             debug "Processing software: $(distd "${_pickd_bundls}") for: $(distd "${OS_TRIPPLE}")"
             build "${_pickd_bundls}"
@@ -151,7 +151,7 @@ if [ -n "${SOFIN_COMMAND_ARG}" ]; then
             if [ "${USER}" = "root" ]; then
                 warn "Installation of project dependencies as root is immoral"
             fi
-            fail_on_bg_job ${SOFIN_ARGS}
+            fail_on_bg_job "${SOFIN_ARGS}"
             if [ ! -f "${DEFAULT_PROJECT_DEPS_LIST_FILE}" ]; then
                 error "Dependencies file not found! Expected file: $(diste "${DEFAULT_PROJECT_DEPS_LIST_FILE}") in current directory!"
             fi
@@ -166,18 +166,18 @@ if [ -n "${SOFIN_COMMAND_ARG}" ]; then
 
         p|push|binpush|send)
             initialize
-            fail_on_bg_job ${SOFIN_ARGS}
+            fail_on_bg_job "${SOFIN_ARGS}"
             debug "Removing any dangling src dirs of prefix: $(distd "${PREFIX}/${DEFAULT_SRC_EXT}*")"
             eval "${RM_BIN} -vfr ${PREFIX}/${DEFAULT_SRC_EXT}*" >> "${LOG}" 2>> "${LOG}"
-            debug "Pushing binary build. Sofin args: $(distd ${SOFIN_ARGS})"
-            push_binbuilds ${SOFIN_ARGS}
+            debug "Pushing binary build. Sofin args: $(distd "${SOFIN_ARGS}")"
+            push_binbuilds "${SOFIN_ARGS}"
             finalize
             ;;
 
 
         b|build)
             initialize
-            _to_be_built=${SOFIN_ARGS}
+            _to_be_built="${SOFIN_ARGS}"
             note "Requested build of: $(distn "${_to_be_built}")"
             fail_on_bg_job "${_to_be_built}"
             USE_UPDATE=NO
@@ -190,14 +190,14 @@ if [ -n "${SOFIN_COMMAND_ARG}" ]; then
 
         d|deploy)
             initialize
-            fail_on_bg_job ${SOFIN_ARGS}
-            deploy_binbuild ${SOFIN_ARGS}
+            fail_on_bg_job "${SOFIN_ARGS}"
+            deploy_binbuild "${SOFIN_ARGS}"
             finalize
             ;;
 
 
         reset)
-            fail_on_bg_job ${SOFIN_ARGS}
+            fail_on_bg_job "${SOFIN_ARGS}"
             reset_defs
             finalize
             ;;
@@ -205,21 +205,21 @@ if [ -n "${SOFIN_COMMAND_ARG}" ]; then
 
         rebuild)
             initialize
-            fail_on_bg_job ${SOFIN_ARGS}
-            rebuild_bundle ${SOFIN_ARGS}
+            fail_on_bg_job "${SOFIN_ARGS}"
+            rebuild_bundle "${SOFIN_ARGS}"
             finalize
             ;;
 
 
         wipe)
-            wipe_remote_archives ${SOFIN_ARGS}
+            wipe_remote_archives "${SOFIN_ARGS}"
             ;;
 
 
         delete|remove|uninstall|rm)
             initialize
-            fail_on_bg_job ${SOFIN_ARGS}
-            remove_bundles ${SOFIN_ARGS}
+            fail_on_bg_job "${SOFIN_ARGS}"
+            remove_bundles "${SOFIN_ARGS}"
             finalize
             ;;
 
@@ -247,7 +247,7 @@ if [ -n "${SOFIN_COMMAND_ARG}" ]; then
 
 
         old|out|outdated|rusk)
-            fail_on_bg_job ${SOFIN_ARGS}
+            fail_on_bg_job "${SOFIN_ARGS}"
             show_outdated
             ;;
 

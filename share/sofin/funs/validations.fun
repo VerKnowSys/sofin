@@ -27,7 +27,7 @@ fail_on_bg_job () {
     _deps="${@}"
     debug "deps=$(distd "$(${PRINTF_BIN} '%s\n' "${_deps}" | eval "${NEWLINES_TO_SPACES_GUARD}")")"
     create_dirs
-    acquire_lock_for ${_deps}
+    acquire_lock_for "${_deps}"
     unset _deps
 }
 
