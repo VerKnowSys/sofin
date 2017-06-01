@@ -39,20 +39,20 @@ determine_term_capabilites () {
     # setopt >/dev/null 2>/dev/null # zsh only command
     if [ "${SYSTEM_NAME}" = "FreeBSD" ]; then
         # if Zsh is still running as sh, so we want to load Zsh fancy features:
-        zmodload zsh/parameter
+        zmodload zsh/parameter 2>/dev/null
 
-        setopt debugbeforecmd
-        setopt appendhistory
-        setopt extendedhistory
+        setopt debugbeforecmd 2>/dev/null
+        setopt appendhistory 2>/dev/null
+        setopt extendedhistory 2>/dev/null
 
         # NOTE: don't send HUP on shell exit:
-        unsetopt hup
+        unsetopt hup 2>/dev/null
 
         # NOTE: required for funcstack to work:
-        setopt evallineno
+        setopt evallineno 2>/dev/null
 
         # NOTE: don't do notification on signal handling:
-        unsetopt monitor
+        unsetopt monitor 2>/dev/null
 
         CAP_TERM_ZSH=YES
         unset CAP_TERM_BASH
