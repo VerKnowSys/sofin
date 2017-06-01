@@ -1,10 +1,10 @@
 check_result () {
     if [ "${1}" = "0" ]; then
         shift
-        debug "$(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd ${@})"
+        debug "$(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "${@}")"
     else
         shift
-        error "$(diste "${FAIL_CHAR}" "${ColorRed}") $(diste ${@})"
+        error "$(diste "${FAIL_CHAR}" "${ColorRed}") $(diste "${@}")"
     fi
 }
 
@@ -65,12 +65,12 @@ file_size () {
 
 
 capitalize () {
-    ${PRINTF_BIN} '%s' ${@} 2>/dev/null | ${AWK_BIN} '{for(i=1;i<=NF;i++){ $i=toupper(substr($i,1,1)) substr($i,2) }}1' 2>/dev/null
+    ${PRINTF_BIN} '%s' "${@}" 2>/dev/null | ${AWK_BIN} '{for(i=1;i<=NF;i++){ $i=toupper(substr($i,1,1)) substr($i,2) }}1' 2>/dev/null
 }
 
 
 lowercase () {
-    ${PRINTF_BIN} '%s' ${@} 2>/dev/null | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null
+    ${PRINTF_BIN} '%s' "${@}" 2>/dev/null | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null
 }
 
 
@@ -224,7 +224,7 @@ file_checksum () {
 
 # give any input to pass it through bc:
 calculate_bc () {
-    ${PRINTF_BIN} '%s\n' ${@} 2>/dev/null | ${BC_BIN} 2>/dev/null
+    ${PRINTF_BIN} '%s\n' "${@}" 2>/dev/null | ${BC_BIN} 2>/dev/null
 }
 
 

@@ -1,6 +1,6 @@
 
 debug () {
-    _in=${@}
+    _in="${@}"
     if [ "${TTY}" = "YES" ]; then
         _permdbg="\n"
     else
@@ -54,9 +54,9 @@ debug () {
 
 warn () {
     if [ "${TTY}" = "YES" ]; then
-        ${PRINTF_BIN} "${REPLAY_PREVIOUS_LINE}%b%s%b\n\n" "${ColorYellow}" ${@} "${ColorReset}"
+        ${PRINTF_BIN} "${REPLAY_PREVIOUS_LINE}%b%s%b\n\n" "${ColorYellow}" "${@}" "${ColorReset}"
     else
-        ${PRINTF_BIN} "%b%s%b\n" "${ColorYellow}" ${@} "${ColorReset}"
+        ${PRINTF_BIN} "%b%s%b\n" "${ColorYellow}" "${@}" "${ColorReset}"
     fi
     return 0
 }
@@ -64,9 +64,9 @@ warn () {
 
 note () {
     if [ "${TTY}" = "YES" ]; then
-        ${PRINTF_BIN} "${REPLAY_PREVIOUS_LINE}%b%s%b\n" "${ColorGreen}" ${@} "${ColorReset}"
+        ${PRINTF_BIN} "${REPLAY_PREVIOUS_LINE}%b%s%b\n" "${ColorGreen}" "${@}" "${ColorReset}"
     else
-        ${PRINTF_BIN} "%b%s%b\n" "${ColorGreen}" ${@} "${ColorReset}"
+        ${PRINTF_BIN} "%b%s%b\n" "${ColorGreen}" "${@}" "${ColorReset}"
     fi
     return 0
 }
@@ -74,9 +74,9 @@ note () {
 
 permnote () {
     if [ "${TTY}" = "YES" ]; then
-        ${PRINTF_BIN} "${REPLAY_PREVIOUS_LINE}%b%s%b\n\n" "${ColorGreen}" ${@} "${ColorReset}"
+        ${PRINTF_BIN} "${REPLAY_PREVIOUS_LINE}%b%s%b\n\n" "${ColorGreen}" "${@}" "${ColorReset}"
     else
-        ${PRINTF_BIN} "%b%s%b\n" "${ColorGreen}" ${@} "${ColorReset}"
+        ${PRINTF_BIN} "%b%s%b\n" "${ColorGreen}" "${@}" "${ColorReset}"
     fi
     return 0
 }
@@ -86,7 +86,7 @@ error () {
     # Get three recently modified logs:
     # _last_two_mod_logs=$(${LS_BIN} -1t "${LOGS_DIR}" 2>/dev/null | ${HEAD_BIN} -3 2>/dev/null | eval "${NEWLINES_TO_SPACES_GUARD}")
     # ${PRINTF_BIN} "\n\n${ColorRed}%s\n\n  ${FAIL_CHAR} Error!\n\n    %s\n\n%s\n\n${ColorReset}%s\n\n${ColorWhite}Showing tail of 3 most recent Sofin logs:\n\n${ColorReset}%s${ColorWhite}\n\n%s\n\n%s\n\n%s\n\n\n" \
-        # "$(fill "${SEPARATOR_CHAR2}")" ${@} "$(fill "${SEPARATOR_CHAR2}")" "$(fill "${SEPARATOR_CHAR2}")" "$(fill "${SEPARATOR_CHAR2}")" "$(cd "${LOGS_DIR}" && ${TAIL_BIN} -n "${LOG_LINES_AMOUNT_ON_ERR}" ${_last_two_mod_logs})" "$(fill "${SEPARATOR_CHAR2}")"
+        # "$(fill "${SEPARATOR_CHAR2}")" "${@}" "$(fill "${SEPARATOR_CHAR2}")" "$(fill "${SEPARATOR_CHAR2}")" "$(fill "${SEPARATOR_CHAR2}")" "$(cd "${LOGS_DIR}" && ${TAIL_BIN} -n "${LOG_LINES_AMOUNT_ON_ERR}" ${_last_two_mod_logs})" "$(fill "${SEPARATOR_CHAR2}")"
     # warn "  ${NOTE_CHAR2} If you think this error is a bug in definition, please report an info about"
     # warn "    encountered problem on one of issue trackers:"
     # ${PRINTF_BIN} "\n"
@@ -96,7 +96,7 @@ error () {
     # ${PRINTF_BIN} "\n"
     # TODO: add "history backtrace". Play with: fc -lnd -5, but separate sh/zsh history file should solve the problem
 
-    ${PRINTF_BIN} "%b  %s %s\n    %b %b\n\n" "${ColorRed}" "${NOTE_CHAR2}" "Task crashed! Output:" ${@} "${ColorReset}"
+    ${PRINTF_BIN} "%b  %s %s\n    %b %b\n\n" "${ColorRed}" "${NOTE_CHAR2}" "Task crashed! Output:" "${@}" "${ColorReset}"
     ${PRINTF_BIN} "%b  %s Try: %b\n" "${ColorRed}" "${NOTE_CHAR2}" "$(diste "s log ${DEF_NAME}${DEF_SUFFIX}") to see the build log."
 
     finalize_interrupt
@@ -133,7 +133,7 @@ diste () {
 
 
 run () {
-    _run_params=${@}
+    _run_params="${@}"
     env_forgivable
     if [ -n "${_run_params}" ]; then
         touch_logsdir_and_logfile
@@ -167,7 +167,7 @@ run () {
 
 
 try () {
-    _try_params=${@}
+    _try_params="${@}"
     if [ -n "${_try_params}" ]; then
         touch_logsdir_and_logfile
         ${PRINTF_BIN} "${_try_params}\n" | eval "${MATCH_PRINT_STDOUT_GUARD}" && _show_prgrss=YES
@@ -203,7 +203,7 @@ try () {
 
 
 retry () {
-    _targets=${@}
+    _targets="${@}"
     _ammo="OOO"
     env_forgivable
     touch_logsdir_and_logfile

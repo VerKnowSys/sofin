@@ -48,7 +48,7 @@ build_bundle () {
 
 
 push_binbuilds () {
-    _push_bundles=${@}
+    _push_bundles="${@}"
     if [ -z "${_push_bundles}" ]; then
         error "At least single argument with $(diste "BundleName") to push is required!"
     fi
@@ -75,7 +75,7 @@ push_binbuilds () {
 
 
 deploy_binbuild () {
-    _dbbundles=${@}
+    _dbbundles="${@}"
     permnote "Requested deploy of bundles: $(distn "${_dbbundles}")"
     for _dbbundle in ${_dbbundles}; do
         USE_BINBUILD=NO
@@ -163,7 +163,7 @@ fetch_binbuild () {
 
 
 build () {
-    _build_list=${@}
+    _build_list="${@}"
 
     # Update definitions and perform more checks
     validate_reqs
@@ -739,11 +739,11 @@ test_and_rate_def () {
     if [ "Darwin" = "${SYSTEM_NAME}" ]; then
         _anadd="DY"
     fi
-    debug "Invoking test of definition: $(distd "${_name}") [$(distd ${@})]"
+    debug "Invoking test of definition: $(distd "${_name}") [$(distd "${@}")]"
     try "${_anadd}LD_LIBRARY_PATH=\"${PREFIX}/lib:${PREFIX}/libexec\" \
 TEST_JOBS=\"${CPUS}\" \
 TEST_ENV=\"${DEF_TEST_ENV}\" \
-${@} >> ${PREFIX}/${_name}.test.results 2>> ${PREFIX}/${_name}.test.results && \
+${*} >> ${PREFIX}/${_name}.test.results 2>> ${PREFIX}/${_name}.test.results && \
 ${TOUCH_BIN} ${PREFIX}/${_name}.test.passed || ${TOUCH_BIN} ${PREFIX}/${_name}.test.failed"
     debug "Test of definition: $(distd "${_name}") has ended."
     unset _name _an
