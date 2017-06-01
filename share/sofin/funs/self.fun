@@ -39,6 +39,13 @@ install_sofin () {
             run "${SOFIN_ROOT}/bin/${_bin} export ${_bin} ${SOFIN_BUNDLE_NAME}"
     done
 
+    if [ -x "${DEFAULT_SHELL_EXPORTS}/zsh" ]; then
+        ${SED_BIN} -i '' -e "s#/usr/bin/env sh#${DEFAULT_SHELL_EXPORTS}/zsh#" \
+            "${SOFIN_ROOT}/bin/s" \
+            "${SOFIN_ROOT}/share/loader" && \
+            permnote "Sofin setup completed"
+    fi
+
     update_system_shell_env_files
     return 0
 }
