@@ -241,8 +241,8 @@ create_service_dir () {
         _dsname="${DEFAULT_ZPOOL}${SERVICES_DIR}/${USER}/${_dset_create}"
         debug "Creating ZFS service-dataset: $(distd "${_dsname}")"
         try "${ZFS_BIN} list -H -t filesystem '${_dsname}'" || \
-            try "${ZFS_BIN} create -p -o mountpoint=${SERVICES_DIR}/${_dset_create} '${_dsname}'"
-        try "${ZFS_BIN} mount '${_dsname}'"
+            try "${ZFS_BIN} create -p -o mountpoint=${SERVICES_DIR}/${_dset_create} '${_dsname}'" || \
+                try "${ZFS_BIN} mount '${_dsname}'"
         unset _dsname
     else
         debug "Creating regular service-directory: $(distd "${SERVICES_DIR}/${_dset_create}")"
