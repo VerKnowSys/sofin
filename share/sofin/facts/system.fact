@@ -6,19 +6,23 @@ SYSTEM_NAME="${SYSTEM_NAME:-$(uname -s 2>/dev/null)}"
 SYSTEM_ARCH="${SYSTEM_ARCH:-$(uname -m 2>/dev/null)}"
 if [ -z "${SYSTEM_NAME}" ] || [ -z "${SYSTEM_ARCH}" ]; then
     ${PRINTF_BIN} "${ColorRed}%s\n" "FATAL: Both SYSTEM_NAME and SYSTEM_ARCH environment variables, require a value!"
-    exit ${ERRORCODE_TASK_FAILURE}
+    exit "${ERRORCODE_TASK_FAILURE}"
 fi
 
 if [ -x "${SOFIN_OS_VER_BIN}" ]; then
-    SYSTEM_VERSION="${SYSTEM_VERSION:-$(${SOFIN_OS_VER_BIN} 2>/dev/null)}"
+    SYSTEM_VERSION="$(${SOFIN_OS_VER_BIN} 2>/dev/null)"
     if [ -z "${SYSTEM_VERSION}" ]; then
         ${PRINTF_BIN} "${ColorRed}%s\n" "FATAL: SYSTEM_VERSION environment variable, requires a value!"
-        exit ${ERRORCODE_TASK_FAILURE}
+        exit "${ERRORCODE_TASK_FAILURE}"
     fi
+    # NOTE: MINIMAL_MAJOR_OS_VERSION is important here!
     OS_TRIPPLE="${SYSTEM_NAME}-${MINIMAL_MAJOR_OS_VERSION}-${SYSTEM_ARCH}"
     SYS_SPECIFIC_BINARY_REMOTE="${MAIN_BINARY_PREFIX}/${OS_TRIPPLE}"
 else
-    unset SYSTEM_VERSION OS_TRIPPLE SYS_SPECIFIC_BINARY_REMOTE
+    # Fallback to static version default:
+    SYSTEM_VERSION="${MINIMAL_MAJOR_OS_VERSION}"
+    OS_TRIPPLE="${SYSTEM_NAME}-${MINIMAL_MAJOR_OS_VERSION}-${SYSTEM_ARCH}"
+    SYS_SPECIFIC_BINARY_REMOTE="${MAIN_BINARY_PREFIX}/${OS_TRIPPLE}"
 fi
 
 # Since Git is often used in defaunitions, we're allowing definitions to use it's path:
