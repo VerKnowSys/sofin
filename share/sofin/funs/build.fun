@@ -87,40 +87,40 @@ deploy_binbuild () {
 }
 
 
-rebuild_bundle () {
-    _a_dependency="$(lowercase "${1}")"
-    if [ -z "${_a_dependency}" ]; then
-        error "Missing second argument with library/software name."
-    fi
-    # go to definitions dir, and gather software list that include given _a_dependency:
-    _alldefs_avail="$(${FIND_BIN} "${DEFINITIONS_DIR%/}" -maxdepth 1 -type f -name "*${DEFAULT_DEF_EXT}" 2>/dev/null)"
-    _those_to_rebuild=""
-    for _dep in ${_alldefs_avail}; do
-        load_defaults
-        . "${_dep}"
-        ${PRINTF_BIN} '%s\n' "${DEF_REQUIREMENTS}" 2>/dev/null | ${GREP_BIN} "${_a_dependency}" >/dev/null 2>&1
-        if [ "${?}" = "0" ]; then
-            _idep="${_dep##*/}"
-            _irawname="$(${PRINTF_BIN} '%s' "${_idep}" | ${SED_BIN} "s/${DEFAULT_DEF_EXT}//g" 2>/dev/null)"
-            _an_def_nam="$(capitalize "${_irawname}")"
-            _those_to_rebuild="${_an_def_nam} ${_those_to_rebuild}"
-        fi
-    done
+# rebuild_bundle () {
+#     _a_dependency="$(lowercase "${1}")"
+#     if [ -z "${_a_dependency}" ]; then
+#         error "Missing second argument with library/software name."
+#     fi
+#     # go to definitions dir, and gather software list that include given _a_dependency:
+#     _alldefs_avail="$(${FIND_BIN} "${DEFINITIONS_DIR%/}" -maxdepth 1 -type f -name "*${DEFAULT_DEF_EXT}" 2>/dev/null)"
+#     _those_to_rebuild=""
+#     for _dep in ${_alldefs_avail}; do
+#         load_defaults
+#         . "${_dep}"
+#         ${PRINTF_BIN} '%s\n' "${DEF_REQUIREMENTS}" 2>/dev/null | ${GREP_BIN} "${_a_dependency}" >/dev/null 2>&1
+#         if [ "${?}" = "0" ]; then
+#             _idep="${_dep##*/}"
+#             _irawname="$(${PRINTF_BIN} '%s' "${_idep}" | ${SED_BIN} "s/${DEFAULT_DEF_EXT}//g" 2>/dev/null)"
+#             _an_def_nam="$(capitalize "${_irawname}")"
+#             _those_to_rebuild="${_an_def_nam} ${_those_to_rebuild}"
+#         fi
+#     done
 
-    note "Will rebuild, wipe and push these bundles: $(distn "${_those_to_rebuild}")"
-    for _reb_ap_bundle in ${_those_to_rebuild}; do
-        if [ "${_reb_ap_bundle}" = "Git" ] || [ "${_reb_ap_bundle}" = "Zsh" ]; then
-            continue
-        fi
-        remove_bundles "${_reb_ap_bundle}"
-        USE_BINBUILD=NO
-        build "${_reb_ap_bundle}"
-        USE_FORCE=YES
-        wipe_remote_archives "${_reb_ap_bundle}"
-        push_binbuilds "${_reb_ap_bundle}"
-    done
-    unset _reb_ap_bundle _those_to_rebuild _a_dependency _dep _alldefs_avail _idep _irawname _an_def_nam
-}
+#     note "Will rebuild, wipe and push these bundles: $(distn "${_those_to_rebuild}")"
+#     for _reb_ap_bundle in ${_those_to_rebuild}; do
+#         if [ "${_reb_ap_bundle}" = "Git" ] || [ "${_reb_ap_bundle}" = "Zsh" ]; then
+#             continue
+#         fi
+#         remove_bundles "${_reb_ap_bundle}"
+#         USE_BINBUILD=NO
+#         build "${_reb_ap_bundle}"
+#         USE_FORCE=YES
+#         wipe_remote_archives "${_reb_ap_bundle}"
+#         push_binbuilds "${_reb_ap_bundle}"
+#     done
+#     unset _reb_ap_bundle _those_to_rebuild _a_dependency _dep _alldefs_avail _idep _irawname _an_def_nam
+# }
 
 
 fetch_binbuild () {
