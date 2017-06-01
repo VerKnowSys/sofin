@@ -326,7 +326,7 @@ trap_signals () {
     trap 'noop_handler' USR2 # This signal is used to "reload shell"-feature. Sofin should ignore it
 
     if [ -x "${BEADM_BIN}" ]; then
-        _active_boot_env="$(${BEADM_BIN} list | ${EGREP_BIN} -i "R" 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)"
+        _active_boot_env="$(${BEADM_BIN} list -H | ${EGREP_BIN} -i "R" 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)"
         debug "Turn on readonly mode for: ${DEFAULT_ZPOOL}/ROOT/${_active_boot_env}"
         ${ZFS_BIN} set readonly=on "${DEFAULT_ZPOOL}/ROOT/${_active_boot_env}"
     fi
@@ -350,7 +350,7 @@ untrap_signals () {
 
     if [ -x "${BEADM_BIN}" ]; then
         debug "Beadm found, turning off readonly mode for default boot environment"
-        _active_boot_env="$(${BEADM_BIN} list 2>/dev/null | ${EGREP_BIN} -i "R" 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)"
+        _active_boot_env="$(${BEADM_BIN} list -H 2>/dev/null | ${EGREP_BIN} -i "R" 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)"
         debug "Turn off readonly mode for: ${DEFAULT_ZPOOL}/ROOT/${_active_boot_env}"
         ${ZFS_BIN} set readonly=off "${DEFAULT_ZPOOL}/ROOT/${_active_boot_env}"
     fi

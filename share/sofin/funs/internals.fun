@@ -72,7 +72,7 @@ sofin_header () {
     done
     unset _envv
 
-    ${PRINTF_BIN} "%b" "${ColorReset}\n"
+    ${PRINTF_BIN} "%b\n" "${ColorReset}"
 }
 
 
