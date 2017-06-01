@@ -96,8 +96,8 @@ error () {
     # ${PRINTF_BIN} "\n"
     # TODO: add "history backtrace". Play with: fc -lnd -5, but separate sh/zsh history file should solve the problem
 
-    ${PRINTF_BIN} "%b  %s %s %b\n\n" "${ColorRed}" "${NOTE_CHAR2}" "Task crashed!" "${ColorReset}"
-    ${PRINTF_BIN} "Try $(diste "s log ${DEF_NAME}${DEF_SUFFIX}") to see the build log."
+    ${PRINTF_BIN} "%b  %s %s\n    %b %b\n\n" "${ColorRed}" "${NOTE_CHAR2}" "Task crashed! Output:" "${@}" "${ColorReset}"
+    ${PRINTF_BIN} "%b  %s Try: %b\n" "${ColorRed}" "${NOTE_CHAR2}" "$(diste "s log ${DEF_NAME}${DEF_SUFFIX}") to see the build log."
 
     finalize_interrupt
     exit "${ERRORCODE_TASK_FAILURE}"
@@ -319,8 +319,8 @@ trap_signals () {
 
     if [ -x "${BEADM_BIN}" ]; then
         _active_boot_env="$(${BEADM_BIN} list -H | ${EGREP_BIN} -i "R" 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)"
-        debug "Turn on readonly mode for: ${DEFAULT_ZPOOL}/ROOT/${_active_boot_env}"
-        ${ZFS_BIN} set readonly=on "${DEFAULT_ZPOOL}/ROOT/${_active_boot_env}"
+        debug "Turn on readonly mode for: $(distd "${DEFAULT_ZPOOL}/ROOT/${_active_boot_env}")"
+        try "${ZFS_BIN} set readonly=on '${DEFAULT_ZPOOL}/ROOT/${_active_boot_env}'"
     fi
     return 0
 }
@@ -329,10 +329,10 @@ trap_signals () {
 untrap_signals () {
     env_forgivable
 
-    trap - EXIT
     # if [ "YES" = "${CAP_TERM_ZSH}" ]; then
     #     trap - ZERR
     # el
+    trap - EXIT
     if [ "YES" = "${CAP_TERM_BASH}" ]; then
         trap - ERR
     fi
@@ -344,7 +344,7 @@ untrap_signals () {
         debug "Beadm found, turning off readonly mode for default boot environment"
         _active_boot_env="$(${BEADM_BIN} list -H 2>/dev/null | ${EGREP_BIN} -i "R" 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)"
         debug "Turn off readonly mode for: ${DEFAULT_ZPOOL}/ROOT/${_active_boot_env}"
-        ${ZFS_BIN} set readonly=off "${DEFAULT_ZPOOL}/ROOT/${_active_boot_env}"
+        try "${ZFS_BIN} set readonly=off '${DEFAULT_ZPOOL}/ROOT/${_active_boot_env}'"
     fi
 }
 

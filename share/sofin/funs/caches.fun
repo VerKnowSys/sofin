@@ -163,12 +163,14 @@ checksum_filecache_element () {
 
 cache_conf_scrpt_hlp_opts () {
     _config_log="${1}"
+    env_forgivable
     if [ -f "${_config_log}" ]; then
         debug "[C] Configure script options:\n$(distd "$(${CAT_BIN} "${_config_log}" 2>/dev/null)")"
     else
         # Store all options per definition from configure scripts
-        ${MKDIR_BIN} -p "$(${DIRNAME_BIN} "${_config_log}")" 2>/dev/null && \
-            ${DEF_CONFIGURE_METHOD} -h > "${_config_log}" 2>/dev/null && \
-            debug "[N] Configure script options:\n$(distd "$(${CAT_BIN} "${_config_log}" 2>/dev/null)")"
+        try "${MKDIR_BIN} -p \"$(${DIRNAME_BIN} ${_config_log})\" 2>/dev/null" && \
+            try "${DEF_CONFIGURE_METHOD} -h > \"${_config_log}\" 2>/dev/null" && \
+            debug "[N] Configure script output: $(distd "$(${CAT_BIN} "${_config_log}" 2>/dev/null)")"
     fi
+    return 0
 }
