@@ -327,9 +327,10 @@ trap_signals () {
 
 untrap_signals () {
     trap - EXIT
-    if [ "YES" = "${CAP_TERM_ZSH}" ]; then
-        trap - ZERR
-    elif [ "YES" = "${CAP_TERM_BASH}" ]; then
+    # if [ "YES" = "${CAP_TERM_ZSH}" ]; then
+    #     trap - ZERR
+    # el
+    if [ "YES" = "${CAP_TERM_BASH}" ]; then
         trap - ERR
     fi
     trap - INT
