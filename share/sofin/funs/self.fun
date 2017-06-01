@@ -20,9 +20,13 @@ load_requirements () {
 
 
 install_sofin () {
-    permnote "Installing ${SOFIN_BUNDLE_NAME} to prefix: $(distn "${SOFIN_ROOT}")"
+    env_reset
+    create_dirs
+    load_requirements
+    determine_system_capabilites
+    determine_term_capabilites
 
-    export CAP_SYS_PRODUCTION=YES
+    permnote "Installing ${SOFIN_BUNDLE_NAME} to prefix: $(distn "${SOFIN_ROOT}")"
 
     compiler_setup && \
         build_sofin_natives && \
@@ -77,7 +81,7 @@ install_sofin_files () {
     ${MKDIR_BIN} -p "${SOFTWARE_DIR}" "${SERVICES_DIR}" "${SOFIN_ROOT}/bin" "${SOFIN_ROOT}/exports" "${SOFIN_ROOT}/share" || \
         try_sudo_installation
 
-    set -e
+    env_pedantic
     _okch="$(distn "${SUCCESS_CHAR}" "${ColorParams}")"
     for _prov in ${SOFIN_PROVIDES}; do
         if [ -f "bin/${_prov}" ]; then

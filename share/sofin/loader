@@ -55,4 +55,9 @@ load_sofin () {
         build.fun
 }
 
+# Load functions
 load_sofin
+
+# Invoke determines
+determine_system_capabilites
+determine_term_capabilites
