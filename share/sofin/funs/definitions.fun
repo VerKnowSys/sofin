@@ -471,7 +471,6 @@ strip_bundle () {
     run "${TOUCH_BIN} ${PREFIX}/${_sbfdefinition_name}${DEFAULT_STRIPPED_MARK_EXT}" && \
         debug "$(distd "${_sbresult}") files were stripped. Strip indicator touched!"
 
-    env_pedantic
     unset _sbfdefinition_name _dirs_to_strip _sbresult _counter _files _stripdir _bundlower
 }
 
@@ -571,7 +570,6 @@ track_useful_and_useless_files () {
     else
         debug "Useless files cleanup skipped since DEF_CLEAN_USELESS=$(distd "${DEF_CLEAN_USELESS:-''}")!"
     fi
-    env_pedantic
     unset _cu_pattern _cufile _cuall_binaries _cu_commit_removal _cubase _fordel _dbg_exp_lst
 }
 

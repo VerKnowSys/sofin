@@ -122,5 +122,4 @@ determine_term_capabilites () {
         ColorExample="${ColorOrange}"
         ColorFunction="$(${TPUT_BIN} setaf 163)"
     fi
-    env_pedantic
 }

@@ -296,7 +296,6 @@ create_base_datasets () {
             receive_origin "${_serv_origin}" "Services"
 
         unset _soft_origin _serv_origin
-        env_pedantic
     fi
 }
 
@@ -497,7 +496,6 @@ boot_device_name () {
         fi
     done
 
-    env_pedantic
     return 1
 }
 

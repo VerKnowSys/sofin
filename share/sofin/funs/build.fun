@@ -43,7 +43,6 @@ build_bundle () {
             fi
         fi
     fi
-    env_pedantic
     unset _bsbname _bsbelement
 }
 

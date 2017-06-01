@@ -168,7 +168,6 @@ run () {
 
 try () {
     _try_params=${*}
-    env_forgivable
     if [ -n "${_try_params}" ]; then
         touch_logsdir_and_logfile
         ${PRINTF_BIN} "${_try_params}\n" | eval "${MATCH_PRINT_STDOUT_GUARD}" && _show_prgrss=YES
@@ -178,24 +177,20 @@ try () {
         if [ -z "${_try_aname}" ]; then
             if [ -z "${_show_prgrss}" ]; then
                 eval "PATH=${PATH}${GIT_EXPORTS} ${_try_params}" >> "${LOG}" 2>> "${LOG}" && \
-                    env_pedantic && \
                     return 0
             else
                 # show progress on stderr
                 ${PRINTF_BIN} "%b" "${ColorBlue}"
                 eval "PATH=${PATH}${GIT_EXPORTS} ${_try_params}" >> "${LOG}" && \
-                    env_pedantic && \
                     return 0
             fi
         else
             if [ -z "${_show_prgrss}" ]; then
                 eval "PATH=${PATH}${GIT_EXPORTS} ${_try_params}" >> "${LOG}-${_try_aname}" 2>> "${LOG}-${_try_aname}" && \
-                    env_pedantic && \
                     return 0
             else
                 ${PRINTF_BIN} "%b" "${ColorBlue}"
                 eval "PATH=${PATH}${GIT_EXPORTS} ${_try_params}" >> "${LOG}-${_try_aname}" && \
-                    env_pedantic && \
                     return 0
             fi
         fi
@@ -221,17 +216,14 @@ retry () {
             if [ -z "${_rtry_blue}" ]; then
                 eval "PATH=${DEFAULT_PATH}${GIT_EXPORTS} ${_targets}" >> "${LOG}" 2>> "${LOG}" && \
                     unset _ammo _targets && \
-                        env_pedantic && \
                         return 0
             else
                 ${PRINTF_BIN} "%b" "${ColorBlue}"
                 eval "PATH=${DEFAULT_PATH}${GIT_EXPORTS} ${_targets}" >> "${LOG}" && \
                     unset _ammo _targets && \
-                        env_pedantic && \
                         return 0
             fi
         else
-            env_pedantic
             error "Given an empty command to evaluate!"
         fi
         _ammo="$(${PRINTF_BIN} '%s\n' "${_ammo}" 2>/dev/null | ${SED_BIN} 's/O//' 2>/dev/null)"
@@ -257,7 +249,7 @@ setup_defs_repo () {
 cleanup_handler () {
     finalize
     debug "Normal exit."
-    return 0
+    exit 0
 }
 
 
@@ -358,6 +350,7 @@ untrap_signals () {
 
 
 restore_security_state () {
+    env_forgivable
     if [ "YES" = "${CAP_SYS_HARDENED}" ]; then
         if [ -f "${DEFAULT_SECURITY_STATE_FILE}" ]; then
             note "Restoring pre-build security state"
@@ -372,6 +365,7 @@ restore_security_state () {
 
 
 store_security_state () {
+    env_forgivable
     if [ "YES" = "${CAP_SYS_HARDENED}" ]; then
         try "${RM_BIN} -f ${DEFAULT_SECURITY_STATE_FILE}"
         debug "Storing current security state to file: $(distd "${DEFAULT_SECURITY_STATE_FILE}")"
@@ -409,7 +403,6 @@ create_dirs () {
        [ ! -d "${LOCKS_DIR}" ]; then
         ${MKDIR_BIN} -p "${CACHE_DIR}" "${FILE_CACHE_DIR}" "${LOCKS_DIR}" "${LOGS_DIR}"
     fi
-    env_pedantic
 }
 
 

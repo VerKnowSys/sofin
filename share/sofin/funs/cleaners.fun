@@ -35,7 +35,6 @@ clean_all_bdirs_leftovers () {
         fi
         unset _cf_files
     fi
-    env_pedantic
 }
 
 
@@ -114,7 +113,6 @@ remove_useless () {
     if [ -n "${_rufiles}" ]; then
         try "${RM_BIN} -rf ${_rufiles}" && \
             debug "Useless files wiped out: $(distd "${_rufiles}")" && \
-                env_pedantic && \
                 return 0
     fi
     debug "Failure removing useless files: '$(distd "${_rufiles}")'"
