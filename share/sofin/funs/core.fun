@@ -20,9 +20,10 @@ debug () {
 
         elif [ "${CAP_TERM_ZSH}" = "YES" ]; then
             # NOTE: $funcstack[2]; ${funcfiletrace[@]} ${funcsourcetrace[@]} ${funcstack[@]} ${functrace[@]}
-            _dbfile="$(distd "${funcfiletrace[2]#${SOFIN_ROOT}/share/}" "${ColorBlue}" 2>/dev/null)"
-            _fun="$(distd " ${funcstack[2]}()" "${ColorBlue}" 2>/dev/null)"
-
+            _valzz="$(echo "${funcfiletrace[2]#${SOFIN_ROOT}/share/}" 2>/dev/null)"
+            _valxx="$(echo "${funcstack[2]}" 2>/dev/null)"
+            _dbfile="$(distd "${_valzz}" "${ColorBlue}")"
+            _fun="$(distd " ${_valxx}()" "${ColorBlue}")"
         else
             _dbfile=""
             _fun=""
@@ -43,10 +44,11 @@ debug () {
                 ${LOGGER_BIN} "# λ ${ColorDebug}${_dbfn}${_in}${ColorReset}" 2>/dev/null
             fi
         else # DEBUG is set. Print to stdout
-            ${PRINTF_BIN} "#${ColorDebug}%s%s${ColorReset}\n" "${_dbfn}" "${_in}"
+            ${PRINTF_BIN} "#${ColorDebug}%s%s${ColorReset}\n" "${_dbfn}" "${_in}" 2>/dev/null
         fi
         unset _dbgnme _in _dbfn _dbfnin _elmz _cee
     fi
+    return 0
 }
 
 
@@ -56,6 +58,7 @@ warn () {
     else
         ${PRINTF_BIN} "${ColorYellow}%s${ColorReset}\n" "${*}"
     fi
+    return 0
 }
 
 
@@ -65,6 +68,7 @@ note () {
     else
         ${PRINTF_BIN} "${ColorGreen}%s${ColorReset}\n" "${*}"
     fi
+    return 0
 }
 
 
@@ -74,6 +78,7 @@ permnote () {
     else
         ${PRINTF_BIN} "${ColorGreen}%s${ColorReset}\n" "${*}"
     fi
+    return 0
 }
 
 
@@ -102,24 +107,28 @@ error () {
 # distdebug
 distd () {
     ${PRINTF_BIN} "${2:-${ColorDistinct}}%s${3:-${ColorDebug}}" "${1}" 2>/dev/null
+    return 0
 }
 
 
 # distnote
 distn () {
     ${PRINTF_BIN} "${2:-${ColorDistinct}}%s${3:-${ColorNote}}" "${1}" 2>/dev/null
+    return 0
 }
 
 
 # distwarn
 distw () {
     ${PRINTF_BIN} "${2:-${ColorDistinct}}%s${3:-${ColorWarning}}" "${1}" 2>/dev/null
+    return 0
 }
 
 
 # disterror
 diste () {
     ${PRINTF_BIN} "${2:-${ColorDistinct}}%s${3:-${ColorError}}" "${1}" 2>/dev/null
+    return 0
 }
 
 
