@@ -54,9 +54,9 @@ debug () {
 
 warn () {
     if [ "${TTY}" = "YES" ]; then
-        ${PRINTF_BIN} "${REPLAY_PREVIOUS_LINE}%s%s%s\n\n" "${ColorYellow}" "${*}" "${ColorReset}"
+        ${PRINTF_BIN} "${REPLAY_PREVIOUS_LINE}%b%s%b\n\n" "${ColorYellow}" "${*}" "${ColorReset}"
     else
-        ${PRINTF_BIN} "%s%s%s\n" "${ColorYellow}" "${*}" "${ColorReset}"
+        ${PRINTF_BIN} "%b%s%b\n" "${ColorYellow}" "${*}" "${ColorReset}"
     fi
     return 0
 }
@@ -64,9 +64,9 @@ warn () {
 
 note () {
     if [ "${TTY}" = "YES" ]; then
-        ${PRINTF_BIN} "${REPLAY_PREVIOUS_LINE}%s%s%s\n" "${ColorGreen}" "${*}" "${ColorReset}"
+        ${PRINTF_BIN} "${REPLAY_PREVIOUS_LINE}%b%s%b\n" "${ColorGreen}" "${*}" "${ColorReset}"
     else
-        ${PRINTF_BIN} "%s%s%s\n" "${ColorGreen}" "${*}" "${ColorReset}"
+        ${PRINTF_BIN} "%b%s%b\n" "${ColorGreen}" "${*}" "${ColorReset}"
     fi
     return 0
 }
@@ -74,9 +74,9 @@ note () {
 
 permnote () {
     if [ "${TTY}" = "YES" ]; then
-        ${PRINTF_BIN} "${REPLAY_PREVIOUS_LINE}%s%s%s\n\n" "${ColorGreen}" "${*}" "${ColorReset}"
+        ${PRINTF_BIN} "${REPLAY_PREVIOUS_LINE}%b%s%b\n\n" "${ColorGreen}" "${*}" "${ColorReset}"
     else
-        ${PRINTF_BIN} "%s%s%s\n" "${ColorGreen}" "${*}" "${ColorReset}"
+        ${PRINTF_BIN} "%b%s%b\n" "${ColorGreen}" "${*}" "${ColorReset}"
     fi
     return 0
 }
@@ -96,8 +96,8 @@ error () {
     # ${PRINTF_BIN} "\n"
     # TODO: add "history backtrace". Play with: fc -lnd -5, but separate sh/zsh history file should solve the problem
 
-    ${PRINTF_BIN} "%s  %s %s\n\n" "${ColorRed}" "${NOTE_CHAR2}" "Task crashed!"
-    warn "Try $(distw "s log ${DEF_NAME}${DEF_SUFFIX}") to see the build log."
+    ${PRINTF_BIN} "%b  %s %s %s\n\n" "${ColorRed}" "${NOTE_CHAR2}" "Task crashed!" "${ColorReset}"
+    ${PRINTF_BIN} "Try $(diste "s log ${DEF_NAME}${DEF_SUFFIX}") to see the build log."
 
     finalize_interrupt
     exit "${ERRORCODE_TASK_FAILURE}"
