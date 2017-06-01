@@ -4,6 +4,32 @@
 SOFIN_ROOT="${SOFIN_ROOT:-/Software/Sofin}"
 . "${SOFIN_ROOT}/share/loader"
 
+# Tracing of Sofin itself:
+if [ -n "${SOFIN_TRACE}" ]; then
+    # NOTE: may be useful later:
+    #
+    if [ "YES" = "${CAP_TERM_ZSH}" ]; then
+        setopt sourcetrace
+        setopt xtrace
+    elif [ "YES" = "${CAP_TERM_BASH}" ]; then
+        set -o xtrace
+    else
+        set -o xtrace
+    fi
+    set -x
+    ${PRINTF_BIN} "Enabled trace mode\n"
+fi
+
+if [ -n "${SOFIN_VERBOSE}" ]; then
+    if [ "YES" = "${CAP_TERM_ZSH}" ] || \
+       [ "YES" = "${CAP_TERM_BASH}" ]; then
+        set -o verbose
+    else
+        set -v
+    fi
+    ${PRINTF_BIN} "Enabled verbose mode\n"
+fi
+
 # this is internal version check for defaults.def
 unset COMPLIANCE_CHECK
 
