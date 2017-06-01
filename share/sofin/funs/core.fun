@@ -15,12 +15,12 @@ debug () {
     else
         _sep="${_sep:-$(distd "λ " ${ColorDarkgray})}"
         if [ "${CAP_TERM_BASH}" = "YES" ]; then
-            _dbfile="$(distd "${BASH_SOURCE#${SOFIN_ROOT}/share}:${BASH_LINENO[0]}" "${ColorBlue}")"
+            _dbfile="$(distd "${BASH_SOURCE#/Software/Sofin/share}:${BASH_LINENO[0]}" "${ColorBlue}")"
             _fun="$(distd "${FUNCNAME[2]}()" "${ColorBlue}")"
 
         elif [ "${CAP_TERM_ZSH}" = "YES" ]; then
             # NOTE: $funcstack[2]; ${funcfiletrace[@]} ${funcsourcetrace[@]} ${funcstack[@]} ${functrace[@]}
-            _dbfile="$(distd "${funcfiletrace[2]#${SOFIN_ROOT}/share}" "${ColorBlue}")"
+            _dbfile="$(distd "${funcfiletrace[2]#/Software/Sofin/share}" "${ColorBlue}")"
             _fun="$(distd " ${funcstack[2]}()" "${ColorBlue}")"
 
         else
