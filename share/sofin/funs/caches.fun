@@ -35,12 +35,14 @@ log_helper () {
 
 
 less_logs () {
+    env_forgivable
     # XXX: show only single log
     ${LESS_BIN} ${DEFAULT_LESS_OPTIONS} ${LOGS_DIR}/sofin*${1}* 2>/dev/null
 }
 
 
 show_logs () {
+    env_forgivable
     clear
     _logf_pattern="${1:-+}"
     _logf_minutes="${LOG_LAST_ACCESS_OR_MOD_MINUTES}"

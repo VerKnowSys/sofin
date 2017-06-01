@@ -335,6 +335,8 @@ trap_signals () {
 
 
 untrap_signals () {
+    env_forgivable
+
     trap - EXIT
     # if [ "YES" = "${CAP_TERM_ZSH}" ]; then
     #     trap - ZERR
@@ -346,8 +348,9 @@ untrap_signals () {
     trap - TERM
     trap - USR2
 
-    if [ -x "/usr/sbin/beadm" ]; then
-        _active_boot_env="$(/usr/sbin/beadm list | grep "R" 2>/dev/null | awk '{print $1;}' 2>/dev/null)"
+    if [ -x "${BEADM_BIN}" ]; then
+        debug "Beadm found, turning off readonly mode for default boot environment"
+        _active_boot_env="$(${BEADM_BIN} list 2>/dev/null | ${EGREP_BIN} -i "R" 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)"
         debug "Turn off readonly mode for: ${DEFAULT_ZPOOL}/ROOT/${_active_boot_env}"
         ${ZFS_BIN} set readonly=off "${DEFAULT_ZPOOL}/ROOT/${_active_boot_env}"
     fi
