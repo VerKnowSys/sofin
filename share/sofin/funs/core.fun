@@ -8,9 +8,9 @@ debug () {
     fi
     if [ -n "${CAP_SYS_PRODUCTION}" ]; then
         if [ -n "${DEBUG}" ]; then
-            ${PRINTF_BIN} "# (%s) λ ${ColorDebug}%s${ColorReset}\n" "${SHLVL}" "${*}"
+            ${PRINTF_BIN} "# (%s) λ %s%s%s\n" "${SHLVL}" "${ColorDebug}" "${*}" "${ColorReset}"
         else
-            ${PRINTF_BIN} "# (%s) λ ${ColorDebug}%s${ColorReset}\n" "${SHLVL}" "${*}" >/dev/null
+            ${PRINTF_BIN} "# (%s) λ %s%s%s\n" "${SHLVL}" "${ColorDebug}" "${*}" "${ColorReset}" >/dev/null
         fi
     else
         _sep="${_sep:-$(distd "λ " ${ColorDarkgray})}"
@@ -35,16 +35,16 @@ debug () {
             _dbgnme="$(lowercase "${DEF_NAME}${DEF_SUFFIX}")"
             if [ -n "${_dbgnme}" ]; then
                 # Definition log
-                ${PRINTF_BIN} "#${ColorDebug}%s%s${ColorReset}${_permdbg}" "${_dbfn}" "${_in}" 2>> "${LOG}-${_dbgnme}" >> "${LOG}-${_dbgnme}"
+                ${PRINTF_BIN} "#%s%s%s%s" "${ColorDebug}" "${_dbfn}" "${_in}" "${ColorReset}${_permdbg}" 2>> "${LOG}-${_dbgnme}" >> "${LOG}-${_dbgnme}"
             elif [ -z "${_dbgnme}" ]; then
                 # Main log
-                ${PRINTF_BIN} "#${ColorDebug}%s%s${ColorReset}${_permdbg}" "${_dbfn}" "${_in}" 2>> "${LOG}" >> "${LOG}"
+                ${PRINTF_BIN} "#%s%s%s%s" "${ColorDebug}" "${_dbfn}" "${_in}" "${ColorReset}${_permdbg}" 2>> "${LOG}" >> "${LOG}"
             elif [ ! -d "${LOGS_DIR}" ]; then
                 # System logger fallback
                 ${LOGGER_BIN} "# λ ${ColorDebug}${_dbfn}${_in}${ColorReset}" 2>/dev/null
             fi
         else # DEBUG is set. Print to stdout
-            ${PRINTF_BIN} "#${ColorDebug}%s%s${ColorReset}\n" "${_dbfn}" "${_in}" 2>/dev/null
+            ${PRINTF_BIN} "#%s%s%s%s\n" "${ColorDebug}" "${_dbfn}" "${_in}" "${ColorReset}" 2>/dev/null
         fi
         unset _dbgnme _in _dbfn _dbfnin _elmz _cee
     fi
@@ -54,9 +54,9 @@ debug () {
 
 warn () {
     if [ "${TTY}" = "YES" ]; then
-        ${PRINTF_BIN} "${REPLAY_PREVIOUS_LINE}${ColorYellow}%s${ColorReset}\n\n" "${*}"
+        ${PRINTF_BIN} "${REPLAY_PREVIOUS_LINE}%s%s%s\n\n" "${ColorYellow}" "${*}" "${ColorReset}"
     else
-        ${PRINTF_BIN} "${ColorYellow}%s${ColorReset}\n" "${*}"
+        ${PRINTF_BIN} "%s%s%s\n" "${ColorYellow}" "${*}" "${ColorReset}"
     fi
     return 0
 }
@@ -64,9 +64,9 @@ warn () {
 
 note () {
     if [ "${TTY}" = "YES" ]; then
-        ${PRINTF_BIN} "${REPLAY_PREVIOUS_LINE}${ColorGreen}%s${ColorReset}\n" "${*}"
+        ${PRINTF_BIN} "${REPLAY_PREVIOUS_LINE}%s%s%s\n" "${ColorGreen}" "${*}" "${ColorReset}"
     else
-        ${PRINTF_BIN} "${ColorGreen}%s${ColorReset}\n" "${*}"
+        ${PRINTF_BIN} "%s%s%s\n" "${ColorGreen}" "${*}" "${ColorReset}"
     fi
     return 0
 }
@@ -74,9 +74,9 @@ note () {
 
 permnote () {
     if [ "${TTY}" = "YES" ]; then
-        ${PRINTF_BIN} "${REPLAY_PREVIOUS_LINE}${ColorGreen}%s${ColorReset}\n\n" "${*}"
+        ${PRINTF_BIN} "${REPLAY_PREVIOUS_LINE}%s%s%s\n\n" "${ColorGreen}" "${*}" "${ColorReset}"
     else
-        ${PRINTF_BIN} "${ColorGreen}%s${ColorReset}\n" "${*}"
+        ${PRINTF_BIN} "%s%s%s\n" "${ColorGreen}" "${*}" "${ColorReset}"
     fi
     return 0
 }
@@ -96,7 +96,7 @@ error () {
     # ${PRINTF_BIN} "\n"
     # TODO: add "history backtrace". Play with: fc -lnd -5, but separate sh/zsh history file should solve the problem
 
-    ${PRINTF_BIN} '%s  %s %s\n\n' "${ColorRed}" "${NOTE_CHAR2}" "Task crashed!"
+    ${PRINTF_BIN} "%s  %s %s\n\n" "${ColorRed}" "${NOTE_CHAR2}" "Task crashed!"
     warn "Try $(distw "s log ${DEF_NAME}${DEF_SUFFIX}") to see the build log."
 
     finalize_interrupt
@@ -106,28 +106,28 @@ error () {
 
 # distdebug
 distd () {
-    ${PRINTF_BIN} "${2:-${ColorDistinct}}%s${3:-${ColorDebug}}" "${1}" 2>/dev/null
+    ${PRINTF_BIN} "%s%s%s" "${2:-${ColorDistinct}}" "${1}" "${3:-${ColorDebug}}" 2>/dev/null
     return 0
 }
 
 
 # distnote
 distn () {
-    ${PRINTF_BIN} "${2:-${ColorDistinct}}%s${3:-${ColorNote}}" "${1}" 2>/dev/null
+    ${PRINTF_BIN} "%s%s%s" "${2:-${ColorDistinct}}" "${1}" "${3:-${ColorNote}}" 2>/dev/null
     return 0
 }
 
 
 # distwarn
 distw () {
-    ${PRINTF_BIN} "${2:-${ColorDistinct}}%s${3:-${ColorWarning}}" "${1}" 2>/dev/null
+    ${PRINTF_BIN} "%s%s%s" "${2:-${ColorDistinct}}" "${1}" "${3:-${ColorWarning}}" 2>/dev/null
     return 0
 }
 
 
 # disterror
 diste () {
-    ${PRINTF_BIN} "${2:-${ColorDistinct}}%s${3:-${ColorError}}" "${1}" 2>/dev/null
+    ${PRINTF_BIN} "%s%s%s" "${2:-${ColorDistinct}}" "${1}" "${3:-${ColorError}}" 2>/dev/null
     return 0
 }
 
