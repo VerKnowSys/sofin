@@ -104,7 +104,7 @@ show_logs () {
 
 
 pretouch_logs () {
-    _params=${*}
+    _params=${@}
     debug "Logs pretouch called with params: $(distd "${_params}")"
     try "${TOUCH_BIN} ${LOGS_DIR}${SOFIN_NAME}"
     _pret_list=""
