@@ -214,7 +214,7 @@ get_shell_vars () {
 list_bundles_full () {
     permnote "Installed software bundles (with dependencies):"
     if [ -d "${SOFTWARE_DIR}" ]; then
-        for _lbfapp in ${SOFTWARE_DIR}/*; do
+        for _lbfapp in ${SOFTWARE_DIRf}/*; do
             _lbfapp_name="${_lbfapp##*/}"
             _lbflowercase="$(lowercase "${_lbfapp_name}")"
             _lbinstald_file="${SOFTWARE_DIR}/${_lbfapp_name}/${_lbflowercase}${DEFAULT_INST_MARK_EXT}"
@@ -261,7 +261,7 @@ show_diff () {
 
 
 develop () {
-    _defname_input="${@}"
+    _defname_input=${@}
     create_dirs
     _defname_no_ext="$(${PRINTF_BIN} '%s\n' "${_defname_input}" | ${SED_BIN} -e "s#\.${DEFAULT_DEF_EXT}##" 2>/dev/null)"
     _devname="$(lowercase "${_defname_no_ext##*/}")"

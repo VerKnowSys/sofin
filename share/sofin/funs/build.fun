@@ -739,7 +739,7 @@ test_and_rate_def () {
     if [ "Darwin" = "${SYSTEM_NAME}" ]; then
         _anadd="DY"
     fi
-    debug "Invoking test of definition: $(distd "${_name}") [$(distd "${@}")]"
+    debug "Invoking test of definition: $(distd "${_name}") [$(distd ${@})]"
     try "${_anadd}LD_LIBRARY_PATH=\"${PREFIX}/lib:${PREFIX}/libexec\" \
 TEST_JOBS=\"${CPUS}\" \
 TEST_ENV=\"${DEF_TEST_ENV}\" \
