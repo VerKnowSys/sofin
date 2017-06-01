@@ -287,11 +287,11 @@ destroy_service_dir () {
 create_base_datasets () {
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
         env_forgivable
-        _soft_origin="${DEFAULT_ZPOOL}${SOFTWARE_DIR%/}" # NOTE: cut last "/"
+        _soft_origin="${DEFAULT_ZPOOL}${SOFTWARE_DIR}"
         try "${ZFS_BIN} list -H -t filesystem '${_soft_origin}'" || \
             receive_origin "${_soft_origin}" "Software"
 
-        _serv_origin="${DEFAULT_ZPOOL}${SERVICES_DIR%/}"
+        _serv_origin="${DEFAULT_ZPOOL}${SERVICES_DIR}"
         try "${ZFS_BIN} list -H -t filesystem '${_serv_origin}'" || \
             receive_origin "${_serv_origin}" "Services"
 
@@ -315,8 +315,8 @@ receive_origin () {
         _dname="/${USER}/${_dname}"
         _head="${_dorigin_base}-user"
     else
-        unset _dname
-        _head="${_dorigin_base}" # not-mountable base dataset
+        # NOOP:
+        return 0
     fi
     _origin_name="${_head}-${ORIGIN_ZFS_SNAP_NAME}${DEFAULT_SOFTWARE_SNAPSHOT_EXT}"
     _origin_file="${FILE_CACHE_DIR}/${_origin_name}"
