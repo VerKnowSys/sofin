@@ -31,7 +31,7 @@ debug () {
         touch_logsdir_and_logfile
         _dbfn=" (#${SHLVL}) [${_sep}${_fun} @ ${_dbfile}] "
         if [ -z "${DEBUG}" ]; then
-            _dbgnme="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
+            _dbgnme="$(lowercase "${DEF_NAME}${DEF_SUFFIX}")"
             if [ -n "${_dbgnme}" ]; then
                 # Definition log
                 ${PRINTF_BIN} "#${ColorDebug}%s%s${ColorReset}${_permdbg}" "${_dbfn}" "${_in}" 2>> "${LOG}-${_dbgnme}" >> "${LOG}-${_dbgnme}"
@@ -92,7 +92,7 @@ error () {
     # TODO: add "history backtrace". Play with: fc -lnd -5, but separate sh/zsh history file should solve the problem
 
     ${PRINTF_BIN} "${ColorRed}  %s %s\n\n" "${NOTE_CHAR2}" "Task crashed!"
-    warn "Try $(distw "s log ${DEF_NAME}${DEF_POSTFIX}") to see the build log."
+    warn "Try $(distw "s log ${DEF_NAME}${DEF_SUFFIX}") to see the build log."
 
     finalize_interrupt
     exit "${ERRORCODE_TASK_FAILURE}"
@@ -130,7 +130,7 @@ run () {
         touch_logsdir_and_logfile
         ${PRINTF_BIN} '%s\n' "${_run_params}" | eval "${MATCH_PRINT_STDOUT_GUARD}" && _run_shw_prgr=YES
         # debug "$(distd "$(${DATE_BIN} ${DEFAULT_DATE_TRYRUN_OPTS} 2>/dev/null)" ${ColorDarkgray}): $(distd "${RUN_CHAR}" ${ColorWhite}): $(distd "${_run_params}" ${ColorParams}) $(distd "[show-blueout:${_run_shw_prgr:-NO}]" "${ColorBlue}")"
-        if [ -z "${DEF_NAME}${DEF_POSTFIX}" ]; then
+        if [ -z "${DEF_NAME}${DEF_SUFFIX}" ]; then
             if [ -z "${_run_shw_prgr}" ]; then
                 eval "PATH=${PATH}${GIT_EXPORTS} ${_run_params}" >> "${LOG}" 2>> "${LOG}"
                 check_result ${?} "${_run_params}"
@@ -140,7 +140,7 @@ run () {
                 check_result ${?} "${_run_params}"
             fi
         else
-            _rnm="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
+            _rnm="$(lowercase "${DEF_NAME}${DEF_SUFFIX}")"
             if [ -z "${_run_shw_prgr}" ]; then
                 eval "PATH=${PATH}${GIT_EXPORTS} ${_run_params}" >> "${LOG}-${_rnm}" 2>> "${LOG}-${_rnm}"
                 check_result ${?} "${_run_params}"
@@ -165,7 +165,7 @@ try () {
         ${PRINTF_BIN} "${_try_params}\n" | eval "${MATCH_PRINT_STDOUT_GUARD}" && _show_prgrss=YES
         # _dt="$(distd "$(${DATE_BIN} ${DEFAULT_DATE_TRYRUN_OPTS} 2>/dev/null)" ${ColorDarkgray})"
         # debug "${_dt}: $(distd "${TRY_CHAR}" ${ColorWhite}) $(distd "${_try_params}" ${ColorParams}) $(distd "[${_show_prgrss:-NO}]" "${ColorBlue}")"
-        _try_aname="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
+        _try_aname="$(lowercase "${DEF_NAME}${DEF_SUFFIX}")"
         if [ -z "${_try_aname}" ]; then
             if [ -z "${_show_prgrss}" ]; then
                 eval "PATH=${PATH}${GIT_EXPORTS} ${_try_params}" >> "${LOG}" 2>> "${LOG}" && \

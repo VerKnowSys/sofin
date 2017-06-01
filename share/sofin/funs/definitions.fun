@@ -35,7 +35,7 @@ load_defs () {
 
     # Perform several sanity checks here..
     for _required_field in  "DEF_NAME=${DEF_NAME}" \
-                            "DEF_NAME_DEF_POSTFIX=${DEF_NAME}${DEF_POSTFIX}" \
+                            "DEF_NAME_DEF_POSTFIX=${DEF_NAME}${DEF_SUFFIX}" \
                             "DEF_VERSION=${DEF_VERSION}" \
                             "DEF_SHA_OR_DEF_GIT_CHECKOUT=${DEF_SHA}${DEF_GIT_CHECKOUT}" \
                             "DEF_COMPLIANCE=${DEF_COMPLIANCE}" \
@@ -375,7 +375,7 @@ wipe_remote_archives () {
 # create_apple_bundle_if_necessary () { # XXXXXX
 #     if [ -n "${DEF_APPLE_BUNDLE}" -a \
 #          "Darwin" = "${SYSTEM_NAME}" ]; then
-#         _aname="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
+#         _aname="$(lowercase "${DEF_NAME}${DEF_SUFFIX}")"
 #         DEF_NAME="$(${PRINTF_BIN} '%s' "${DEF_NAME}" | ${CUT_BIN} -c1 2>/dev/null | ${TR_BIN} '[a-z]' '[A-Z]' 2>/dev/null)$(${PRINTF_BIN} '%s' "${DEF_NAME}" | ${SED_BIN} 's/^[a-zA-Z]//' 2>/dev/null)"
 #         DEF_BUNDLE_NAME="${PREFIX}.app"
 #         note "Creating Apple bundle: $(distn "${DEF_NAME}") in: $(distn "${DEF_BUNDLE_NAME}")"
@@ -413,7 +413,7 @@ strip_bundle () {
     load_defaults
     load_defs "${_sbfdefinition_name}"
     if [ -z "${PREFIX}" ]; then
-        PREFIX="${SOFTWARE_DIR}/$(capitalize "${DEF_NAME}${DEF_POSTFIX}")"
+        PREFIX="${SOFTWARE_DIR}/$(capitalize "${DEF_NAME}${DEF_SUFFIX}")"
         debug "An empty prefix for: $(distd "${_sbfdefinition_name}"). Resetting to: $(distd "${PREFIX}")"
     fi
     if [ -f "${PREFIX}/${_sbfdefinition_name}${DEFAULT_STRIPPED_MARK_EXT}" ]; then
@@ -449,7 +449,7 @@ strip_bundle () {
         if [ -d "${_stripdir}" ]; then
             _tbstripfiles=$(${FIND_BIN} "${_stripdir}" -maxdepth 1 -type f 2>/dev/null)
             for _file in ${_tbstripfiles}; do
-                _bundlower="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
+                _bundlower="$(lowercase "${DEF_NAME}${DEF_SUFFIX}")"
                 if [ -n "${_bundlower}" ]; then
                     try "${STRIP_BIN} ${DEFAULT_STRIP_OPTS} ${_file} > /dev/null 2>&1"
                 else
@@ -585,7 +585,7 @@ conflict_resolve () {
                 _crn="${_cr_name##*/}"
                 if [ -d "${_cr_name}/exports" ] && \
                    [ "${_crn}" != "${DEF_NAME}" ] && \
-                   [ "${_crn}" != "${DEF_NAME}${DEF_POSTFIX}" ]; then
+                   [ "${_crn}" != "${DEF_NAME}${DEF_SUFFIX}" ]; then
                     ${MV_BIN} "${_cr_name}/exports" "${_cr_name}/exports-disabled" && \
                         debug "Disabled exports of bundle: $(distn "${_crn}") due to a conflict with current definition."
                 fi
@@ -605,7 +605,7 @@ export_binaries () {
     conflict_resolve
 
     if [ -z "${PREFIX}" ]; then
-        PREFIX="${SOFTWARE_DIR}/$(capitalize "${DEF_NAME}${DEF_POSTFIX}")"
+        PREFIX="${SOFTWARE_DIR}/$(capitalize "${DEF_NAME}${DEF_SUFFIX}")"
         debug "An empty prefix in export_binaries() for $(distd "${_ebdef_name}"). Resetting to: $(distd "${PREFIX}")"
     fi
     if [ -d "${PREFIX}/exports-disabled" ]; then # just bring back disabled exports
@@ -615,7 +615,7 @@ export_binaries () {
     if [ -z "${DEF_EXPORTS}" ]; then
         note "Defined no exports of prefix: $(distn "${PREFIX}")"
     else
-        _a_name="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
+        _a_name="$(lowercase "${DEF_NAME}${DEF_SUFFIX}")"
         _an_amount="$(${PRINTF_BIN} '%s\n' "${DEF_EXPORTS}" | ${WC_BIN} -w 2>/dev/null | ${TR_BIN} -d '\t|\r|\ ' 2>/dev/null)"
         debug "Exporting $(distd "${_an_amount}") binaries of prefix: $(distd "${PREFIX}")"
         try "${MKDIR_BIN} -p ${PREFIX}/exports"

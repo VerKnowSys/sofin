@@ -196,8 +196,8 @@ build () {
                 fi
 
                 # Note: this acutally may break definitions like ImageMagick..
-                #_bund_lcase="$(lowercase "${DEF_NAME}${DEF_POSTFIX}")"
-                _bund_lcase="${DEF_NAME}${DEF_POSTFIX}"
+                #_bund_lcase="$(lowercase "${DEF_NAME}${DEF_SUFFIX}")"
+                _bund_lcase="${DEF_NAME}${DEF_SUFFIX}"
                 _bundl_name="$(capitalize "${_bund_lcase}")"
                 DEF_NAME="${_bundl_name}"
 
@@ -277,17 +277,17 @@ build () {
                             note "   ${NOTE_CHAR} Definition dependencies has changed. Rebuilding: $(distn "${_bund_lcase}")"
                             process_flat "${_bund_lcase}" "${PREFIX}" "${_bund_name}"
                             unset CHANGED
-                            mark_installed "${DEF_NAME}${DEF_POSTFIX}" "${DEF_VERSION}"
-                            show_done "${DEF_NAME}${DEF_POSTFIX}"
+                            mark_installed "${DEF_NAME}${DEF_SUFFIX}" "${DEF_VERSION}"
+                            show_done "${DEF_NAME}${DEF_SUFFIX}"
                         else
                             permnote "  $(distn "${_bund_lcase}") ($(distn 1) of $(distn "${_req_all}"))"
-                            show_done "${DEF_NAME}${DEF_POSTFIX}"
+                            show_done "${DEF_NAME}${DEF_SUFFIX}"
                             debug "${SUCCESS_CHAR} $(distd "${_bund_lcase}") current: $(distd "${_version_element}"), definition: [$(distd "${DEF_VERSION}")] Ok."
                         fi
                     else
                         permnote "  $(distn "${_bund_lcase}") ($(distn 1) of $(distn "${_req_all}"))"
                         process_flat "${_bund_lcase}" "${PREFIX}" "${_bund_name}"
-                        mark_installed "${DEF_NAME}${DEF_POSTFIX}" "${DEF_VERSION}"
+                        mark_installed "${DEF_NAME}${DEF_SUFFIX}" "${DEF_VERSION}"
                         permnote "$(distn "${SUCCESS_CHAR}") $(distn "${_bund_lcase}") [$(distn "${DEF_VERSION}")]"
                     fi
                 fi
@@ -435,7 +435,7 @@ process_flat () {
                         unset _bname _a_file_checksum
                     fi
 
-                    note "   ${NOTE_CHAR} Unpacking source of: $(distn "${DEF_NAME}${DEF_POSTFIX}"), version: $(distn "${DEF_VERSION}")"
+                    note "   ${NOTE_CHAR} Unpacking source of: $(distn "${DEF_NAME}${DEF_SUFFIX}"), version: $(distn "${DEF_VERSION}")"
                     debug "Build dir: $(distd "${BUILD_DIR}")"
 
                     _possible_old_build_dir="$(${TAR_BIN} -t --list --file "${_dest_file}" 2>/dev/null | ${HEAD_BIN} -n1 2>/dev/null | ${AWK_BIN} '{print $9;}' 2>/dev/null)"
@@ -455,7 +455,7 @@ process_flat () {
                     # git method:
                     # .cache/git-cache => git bare repos
                     # NOTE: if DEF_GIT_CHECKOUT is unset, use DEF_VERSION:
-                    clone_or_fetch_git_bare_repo "${DEF_SOURCE_PATH}" "${DEF_NAME}${DEF_POSTFIX}-bare" "${DEF_GIT_CHECKOUT:-${DEF_VERSION}}" "${BUILD_DIR}"
+                    clone_or_fetch_git_bare_repo "${DEF_SOURCE_PATH}" "${DEF_NAME}${DEF_SUFFIX}-bare" "${DEF_GIT_CHECKOUT:-${DEF_VERSION}}" "${BUILD_DIR}"
                 fi
 
                 unset _fd
@@ -517,7 +517,7 @@ process_flat () {
 
                 cd "${_pwd}"
                 apply_definition_patches "${DEF_NAME}"
-                apply_definition_patches "${DEF_NAME}${DEF_POSTFIX}"
+                apply_definition_patches "${DEF_NAME}${DEF_SUFFIX}"
 
                 cd "${_pwd}"
                 after_patch_callback
@@ -526,7 +526,7 @@ process_flat () {
                 cd "${_pwd}"
 
                 # configuration log:
-                _config_log="${LOGS_DIR}${DEF_NAME}${DEF_POSTFIX}.src-configure-options"
+                _config_log="${LOGS_DIR}${DEF_NAME}${DEF_SUFFIX}.src-configure-options"
 
                 note "   ${NOTE_CHAR} Configuring: $(distn "${_app_param}"), version: $(distn "${DEF_VERSION}")"
                 case "${DEF_CONFIGURE_METHOD}" in
