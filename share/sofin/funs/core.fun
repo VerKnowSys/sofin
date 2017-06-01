@@ -20,8 +20,8 @@ debug () {
 
         elif [ "${CAP_TERM_ZSH}" = "YES" ]; then
             # NOTE: $funcstack[2]; ${funcfiletrace[@]} ${funcsourcetrace[@]} ${funcstack[@]} ${functrace[@]}
-            _dbfile="$(distd "${funcfiletrace[2]#${SOFIN_ROOT}/share/}" "${ColorBlue}")"
-            _fun="$(distd " ${funcstack[2]}()" "${ColorBlue}")"
+            _dbfile="$(distd "${funcfiletrace[2]#${SOFIN_ROOT}/share/}" "${ColorBlue}" 2>/dev/null)"
+            _fun="$(distd " ${funcstack[2]}()" "${ColorBlue}" 2>/dev/null)"
 
         else
             _dbfile=""
