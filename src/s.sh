@@ -1,6 +1,8 @@
 #!/usr/bin/env sh
 # @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
 
+SOFIN_ARGS_FULL="${@}"
+
 SOFIN_ROOT="${SOFIN_ROOT:-/Software/Sofin}"
 . "${SOFIN_ROOT}/share/loader"
 
@@ -37,7 +39,6 @@ unset COMPLIANCE_CHECK
 export SOFIN_START="${SOFIN_START:-$(${SOFIN_TIMER_BIN})}"
 export SOFIN_COMMAND_ARG="${1}"
 export SOFIN_PID="${SOFIN_PID:-$$}"
-export SOFIN_ARGS_FULL=${@}
 SOFIN_ARGS="$(${PRINTF_BIN} '%s\n' "${SOFIN_ARGS_FULL}" | ${CUT_BIN} -d' ' -f2- 2>/dev/null)"
 
 if [ -n "${SOFIN_COMMAND_ARG}" ]; then
