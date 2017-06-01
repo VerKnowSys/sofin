@@ -1,6 +1,45 @@
+# LLVM backend:
+CC_NAME="clang"
+CXX_NAME="${CC_NAME}++"
+CPP_NAME="${CC_NAME}-cpp"
+
+# GNU backend:
+CC_NAME_ALT="gcc"
+CXX_NAME_ALT="g++"
+CPP_NAME_ALT="cpp"
+
+# Compiler cross platform defaults:
+COMMON_FLAGS="-w -fPIC"
+
+# NOTE: XXX: To add -Werror=format-security as a default, we have to get rid of GNU software ;)
+# NOTE:-D is recognized as "a macro" and rejected f.i. configure script of "c-ares" definiton
+# NOTE: Under production systems, explicitly use RELRO and BINDNOW:
+LTO_CFLAGS=""
+HARDEN_CFLAGS="-fstack-protector -fstack-protector-strong -fstack-protector-all --param ssp-buffer-size=4 -fno-strict-overflow -Wformat -Wformat-security"
+HARDEN_OFLOW_CFLAGS="-ftrapv"
+HARDEN_SAFE_STACK_FLAGS="-fsanitize=safe-stack"
+HARDEN_CMACROS="-D_FORTIFY_SOURCE=2"
+HARDEN_CFLAGS_PRODUCTION="-fPIE -Wl,-z,relro,-z,now"
+HARDEN_LDFLAGS_PRODUCTION="-pie -z relro -z now"
+
+if [ "${SYSTEM_NAME}" = "Darwin" ] || \
+   [ "YES" != "${CAP_SYS_HARDENED}" ]; then
+    # not supported under macOS
+    unset HARDEN_CFLAGS_PRODUCTION HARDEN_LDFLAGS_PRODUCTION HARDEN_SAFE_STACK_FLAGS
+    # override -fsanitize=safe-stack which is not supported under Darwin
+    LTO_CFLAGS="-flto"
+fi
+# NOTE: set base + hardened compiler options:
+COMMON_COMPILER_FLAGS="${COMMON_FLAGS} ${HARDEN_CFLAGS} ${HARDEN_CFLAGS_PRODUCTION} ${HARDEN_CMACROS}" # NOTE: this may be unset here! Look above for Darwin configuration block for details.
+COMMON_LDFLAGS="${COMMON_FLAGS} ${HARDEN_LDFLAGS_PRODUCTION}" # NOTE: this may be unset here! Look above for Darwin configuration block for details.
+
+# NOTE: initial setup, later used by compiler_setup():
+DEFAULT_COMPILER_FLAGS="${COMMON_COMPILER_FLAGS}"
+DEFAULT_LINKER_FLAGS="${COMMON_LDFLAGS}"
+
 
 # Some lazy stuff:
-FIRST_ARG_GUARD="${CUT_BIN} -f1 -d' ' 2>/dev/null"
+FIRST_ARG_GUARD="${CUT_BIN} -f1 2>/dev/null"
 WORDS_COUNT_GUARD="${WC_BIN} -w 2>/dev/null | ${SED_BIN} 's/ //g' 2>/dev/null"
 FILES_COUNT_GUARD="${WC_BIN} -l 2>/dev/null | ${SED_BIN} 's/ //g' 2>/dev/null" # XXX TODO: get rid of wc -l, replace with wc -w
 OLDEST_BUILD_DIR_GUARD="${SORT_BIN} -k1 -n 2>/dev/null | ${TAIL_BIN} -n1 2>/dev/null | ${CUT_BIN} -f2 -d' ' 2>/dev/null | ${SORT_BIN} -k1 -n 2>/dev/null | ${TAIL_BIN} -n1 2>/dev/null | ${CUT_BIN} -f2 -d' ' 2>/dev/null"
@@ -12,6 +51,12 @@ HOST_ADDRESS_GUARD="${CUT_BIN} -d' ' -f2 2>/dev/null | ${CUT_BIN} -d'#' -f1 2>/d
 CUTOFF_DEF_EXT_GUARD="${SED_BIN} -e \"s#${DEFAULT_DEF_EXT}##\" 2>/dev/null"
 DUP_OUT_TO_ERR_GUARD="${TEE_BIN} /dev/stderr"
 DUP_ERR_TO_OUT_GUARD="${TEE_BIN} /dev/stdout"
+
+# Build timestamp in seconds since 1970
+TIMESTAMP="${TIMESTAMP:-$(${DATE_BIN} "${DEFAULT_DATE_TS_OPTS}" 2>/dev/null)}"
+
+# Hardened system support:
+DEFAULT_SECURITY_STATE_FILE="${SOFTWARE_DIR}/.sys-security-state.${TIMESTAMP}"
 
 
 # System specific configuration
@@ -78,7 +123,7 @@ EOF
 
 setup_zfs_default_setup () {
     env_forgivable
-    _zpool="$(${ZPOOL_BIN} list -H 2>/dev/null | ${CUT_BIN} -f1 2>/dev/null)"
+    _zpool="$(${ZPOOL_BIN} list -H 2>/dev/null | eval "${FIRST_ARG_GUARD}")"
     if [ -n "${_zpool}" ]; then
         DEFAULT_ZPOOL="${_zpool}"
     fi
