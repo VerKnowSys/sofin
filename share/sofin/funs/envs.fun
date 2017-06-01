@@ -207,12 +207,12 @@ compiler_setup () {
             ;;
     esac
 
-    if [ -n "${DEBUGBUILD}" ]; then
-        debug "DEBUGBUILD defined! Appending compiler flags with: $(distd "-O0 -ggdb")"
-        DEFAULT_COMPILER_FLAGS="${DEFAULT_COMPILER_FLAGS} -O0 -ggdb"
-    else
-        DEFAULT_COMPILER_FLAGS="${DEFAULT_COMPILER_FLAGS} -O2"
-    fi
+    # if [ -n "${DEBUGBUILD}" ]; then
+    #     debug "DEBUGBUILD defined! Appending compiler flags with: $(distd "-O0 -ggdb")"
+    #     DEFAULT_COMPILER_FLAGS="${DEFAULT_COMPILER_FLAGS} -O0 -ggdb"
+    # else
+    #     DEFAULT_COMPILER_FLAGS="${DEFAULT_COMPILER_FLAGS} -O2"
+    # fi
 
     # pick compiler in order:
     # 1. /usr/bin/clang
