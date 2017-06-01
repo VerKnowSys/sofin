@@ -287,7 +287,6 @@ destroy_service_dir () {
 
 create_base_datasets () {
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
-        env_forgivable
         _soft_origin="${DEFAULT_ZPOOL}${SOFTWARE_DIR}"
         try "${ZFS_BIN} list -H -t filesystem '${_soft_origin}'" || \
             receive_origin "${_soft_origin}" "Software"

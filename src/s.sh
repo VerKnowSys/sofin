@@ -10,7 +10,7 @@ SOFIN_ROOT="${SOFIN_ROOT:-/Software/Sofin}"
 
 SOFIN_COMMAND_ARG="${1}"
 SOFIN_ARGS="$(${PRINTF_BIN} '%s\n' "${SOFIN_ARGS_FULL}" | ${CUT_BIN} -d' ' -f2- 2>/dev/null)"
-debug "Sofin args: ${SOFIN_ARGS}"
+debug "Sofin args full: ${SOFIN_ARGS_FULL}, sub_args: ${SOFIN_ARGS}"
 
 # Tracing of Sofin itself:
 if [ -n "${SOFIN_TRACE}" ]; then

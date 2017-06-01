@@ -396,12 +396,11 @@ disable_security_features () {
 
 
 create_dirs () {
-    env_forgivable
     if [ ! -d "${LOGS_DIR}" ] || \
        [ ! -d "${CACHE_DIR}" ] || \
        [ ! -d "${FILE_CACHE_DIR}" ] || \
        [ ! -d "${LOCKS_DIR}" ]; then
-        ${MKDIR_BIN} -p "${CACHE_DIR}" "${FILE_CACHE_DIR}" "${LOCKS_DIR}" "${LOGS_DIR}"
+        try "${MKDIR_BIN} -p \"${CACHE_DIR}\" \"${FILE_CACHE_DIR}\" \"${LOCKS_DIR}\" \"${LOGS_DIR}\""
     fi
 }
 

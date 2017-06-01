@@ -37,7 +37,7 @@ log_helper () {
 less_logs () {
     env_forgivable
     # XXX: show only single log
-    ${LESS_BIN} ${DEFAULT_LESS_OPTIONS} ${LOGS_DIR}/sofin*${1}* 2>/dev/null
+    ${LESS_BIN} ${DEFAULT_LESS_OPTIONS} ${LOGS_DIR}/sofin-*${1}* 2>/dev/null
 }
 
 
@@ -108,7 +108,7 @@ pretouch_logs () {
     debug "Logs pretouch called with params: $(distd "${_params}")"
     try "${TOUCH_BIN} ${LOGS_DIR}${SOFIN_NAME}"
     _pret_list=""
-    for _app in ${_params}; do
+    for _app in $(echo "${_params}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
         if [ -z "${_app}" ]; then
             debug "Empty app given out of params: $(distd "${_params}")?"
         else
