@@ -18,8 +18,8 @@ load_defs () {
                 show_alt_definitions_and_exit "${_given_def}"
             fi
 
-            # if definition lacks definition of DEF_POSTFIX, after loading
-            # the definition file, try to infer DEF_POSTFIX:
+            # if definition lacks definition of DEF_SUFFIX, after loading
+            # the definition file, try to infer DEF_SUFFIX:
             validate_def_postfix "${_given_def}" "${DEF_NAME}"
 
             # check disabled definition state
@@ -35,7 +35,7 @@ load_defs () {
 
     # Perform several sanity checks here..
     for _required_field in  "DEF_NAME=${DEF_NAME}" \
-                            "DEF_NAME_DEF_POSTFIX=${DEF_NAME}${DEF_SUFFIX}" \
+                            "DEF_NAME_DEF_SUFFIX=${DEF_NAME}${DEF_SUFFIX}" \
                             "DEF_VERSION=${DEF_VERSION}" \
                             "DEF_SHA_OR_DEF_GIT_CHECKOUT=${DEF_SHA}${DEF_GIT_CHECKOUT}" \
                             "DEF_COMPLIANCE=${DEF_COMPLIANCE}" \
@@ -46,7 +46,7 @@ load_defs () {
         do
             unset _valid_checks
             for _check in   "DEF_NAME" \
-                            "DEF_NAME_DEF_POSTFIX" \
+                            "DEF_NAME_DEF_SUFFIX" \
                             "DEF_VERSION" \
                             "DEF_SHA_OR_DEF_GIT_CHECKOUT" \
                             "DEF_COMPLIANCE" \
