@@ -483,9 +483,9 @@ reload_zsh_shells () {
     fi
     unset _wishlist
     _shellshort="${SHELL##*/}" # basename
-    _pids=$(processes_all | ${EGREP_BIN} "${_shell_pattern}" 2>/dev/null | eval "${FIRST_ARG_GUARD}")
-    # debug "Shell inspect: $(distd "${_shellshort}"), pattern: $(distd "${_shell_pattern}"), PIDS: $(distd "$(${PRINTF_BIN} "${_pids}" | eval "${NEWLINES_TO_SPACES_GUARD}")")"
-    for _pid in ${_pids}; do
+    _pids=$(processes_all | ${EGREP_BIN} -i "${_shell_pattern}" 2>/dev/null | ${CUT_BIN} -f1 -d' ' 2>/dev/null)
+    debug "Shell inspect: $(distd "${_shellshort}"), pattern: $(distd "${_shell_pattern}"), PIDS: $(distd "$(${PRINTF_BIN} "${_pids}" | eval "${NEWLINES_TO_SPACES_GUARD}")")"
+    for _pid in $(echo "${_pids}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
         if [ -z "${_wishlist}" ]; then
             _wishlist="${_pid}"
         else
