@@ -18,10 +18,10 @@ debug () {
             _dbfile="$(distd "${BASH_SOURCE#/Software/Sofin/share}:${BASH_LINENO[0]}" "${ColorBlue}")"
             _fun="$(distd "${FUNCNAME[2]}()" "${ColorBlue}")"
 
-        elif [ "${CAP_TERM_ZSH}" = "YES" ]; then
-            # NOTE: $funcstack[2]; ${funcfiletrace[@]} ${funcsourcetrace[@]} ${funcstack[@]} ${functrace[@]}
-            _dbfile="$(distd "${funcfiletrace[2]}" "${ColorBlue}")"
-            _fun="$(distd " ${funcstack[2]}()" "${ColorBlue}")"
+        # elif [ "${CAP_TERM_ZSH}" = "YES" ]; then
+        #     # NOTE: $funcstack[2]; ${funcfiletrace[@]} ${funcsourcetrace[@]} ${funcstack[@]} ${functrace[@]}
+        #     _dbfile="$(distd "${funcfiletrace}" "${ColorBlue}")"
+        #     _fun="$(distd " ${funcstack[2]}()" "${ColorBlue}")"
 
         else
             _dbfile=""
