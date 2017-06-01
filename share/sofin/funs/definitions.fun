@@ -619,14 +619,14 @@ export_binaries () {
         debug "Exporting $(distd "${_an_amount}") binaries of prefix: $(distd "${PREFIX}")"
         try "${MKDIR_BIN} -p ${PREFIX}/exports"
         _expolist=""
-        for exp in ${DEF_EXPORTS}; do
+        for _xp in $(echo "${DEF_EXPORTS}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
             for dir in "/bin/" "/sbin/" "/libexec/"; do
-                _afile_to_exp="${PREFIX}${dir}${exp}"
+                _afile_to_exp="${PREFIX}${dir}${_xp}"
                 if [ -f "${_afile_to_exp}" ]; then # a file
                     if [ -x "${_afile_to_exp}" ]; then # and it's executable'
                         _acurrdir="$(${PWD_BIN} 2>/dev/null)"
                         cd "${PREFIX}${dir}"
-                        try "${LN_BIN} -vfs ..${dir}${exp} ../exports/${exp}"
+                        try "${LN_BIN} -vfs ..${dir}${_xp} ../exports/${_xp}"
                         cd "${_acurrdir}"
                         _expo_elem="${_afile_to_exp##*/}"
                         _expolist="${_expolist} ${_expo_elem}"
