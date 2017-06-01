@@ -137,10 +137,7 @@ find_most_recent () {
         error "This function does bad things with GNU find. Fix it if you want.."
     else
         if [ -z "${_frmatcher}" ]; then
-            debug "Empty matcher given in find_most_recent(), using wildcard."
             _frmatcher="*"
-        else
-            debug "Specified matcher: $(distd "${_frmatcher}")"
         fi
         if [ -d "${_frpath}" ]; then
             _frfind_results="$(${FIND_BIN} "${_frpath}" \
@@ -157,7 +154,7 @@ find_most_recent () {
             # _frres_singleline="$(${PRINTF_BIN} '%s\n' "${_frfind_results}" | eval "${NEWLINES_TO_SPACES_GUARD}")"
             # debug "Find results: $(distd "${_frres_singleline}")"
             if [ -n "${_frfind_results}" ]; then
-                ${PRINTF_BIN} '%s' "${_frfind_results}" 2>/dev/null
+                ${PRINTF_BIN} '%s\n' "${_frfind_results}" 2>/dev/null
             fi
         else
             error "Directory $(diste "${_frpath}") doesn't exist!"

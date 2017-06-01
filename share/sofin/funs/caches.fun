@@ -2,31 +2,27 @@
 log_helper () {
     _log_h_pattern="${1}"
     if [ -z "${_log_h_pattern}" ]; then
-        _log_files="$(find_all "${LOGS_DIR}" "${SOFIN_NAME}*")"
+        _log_files="$(find_most_recent "${LOGS_DIR}" "${SOFIN_NAME}*")"
     else
-        _log_files="$(find_all "${LOGS_DIR}" "${SOFIN_NAME}*${_log_h_pattern}*")"
+        _log_files="$(find_most_recent "${LOGS_DIR}" "${SOFIN_NAME}*${_log_h_pattern}*")"
     fi
     _lognum_f="$(${PRINTF_BIN} '%s\n' "${_log_files}" | eval "${FILES_COUNT_GUARD}")"
     if [ -z "${_lognum_f}" ]; then
         _lognum_f="0"
     fi
     debug "Log helper, files found: $(distd "${_lognum_f}")"
-    if [ -z "${_log_files}" ]; then
-        log_helper "${_log_h_pattern}"
+    if [ "0" = "${_lognum_f}" ]; then
+        ${LESS_BIN} ${DEFAULT_LESS_OPTIONS} ${LOGS_DIR}${SOFIN_NAME}*
     else
+        _log_h_pattern="$(echo "${_log_h_pattern}" | ${CUT_BIN} -f1-${LOG_LAST_FILES} -d' ' 2>/dev/null)"
         case ${_lognum_f} in
             0)
                 log_helper "${_log_h_pattern}"
                 ;;
 
-            1)
-                note "Found $(distn "${_lognum_f}") log file, that matches _log_h_pattern: $(distn "${_log_h_pattern}"). Attaching tail.."
-                ${TAIL_BIN} -n "${LOG_LINES_AMOUNT}" -F $(${PRINTF_BIN} '%s\n' "${_log_files}" | eval "${NEWLINES_TO_SPACES_GUARD}")
-                ;;
-
             *)
                 note "Found $(distn "${_lognum_f}") log files, that match pattern: $(distn "${_log_h_pattern}"). Attaching to all available files.."
-                ${TAIL_BIN} -F $(${PRINTF_BIN} '%s\n' "${_log_files}" | eval "${NEWLINES_TO_SPACES_GUARD}")
+                ${TAIL_BIN} -n "${LOG_LINES_AMOUNT}" -F ${LOGS_DIR}${SOFIN_NAME}-*${_log_h_pattern}*
                 ;;
         esac
     fi
@@ -35,19 +31,14 @@ log_helper () {
 
 
 less_logs () {
-    env_forgivable
-    # XXX: show only single log
-    ${LESS_BIN} ${DEFAULT_LESS_OPTIONS} ${LOGS_DIR}/sofin-*${1}* 2>/dev/null
+    ${LESS_BIN} ${DEFAULT_LESS_OPTIONS} ${LOGS_DIR}/${SOFIN_NAME}-*${1}* 2>/dev/null
+    return 0
 }
 
 
 show_logs () {
-    env_forgivable
     clear
     _logf_pattern="${1:-+}"
-    _logf_minutes="${LOG_LAST_ACCESS_OR_MOD_MINUTES}"
-    debug "_logf_minutes: $(distd "${_logf_minutes}"), pattern: $(distd "${_logf_pattern}")"
-    _files_x_min=$(${FIND_BIN} "${LOGS_DIR}" -maxdepth 1 -mindepth 1 -mmin -${_logf_minutes} -amin -${_logf_minutes} -iname "${SOFIN_NAME}*${_logf_pattern}*" -print 2>/dev/null)
     touch_logsdir_and_logfile
     if [ "-" = "${_logf_pattern}" ] || \
        [ "${SOFIN_NAME}" = "${_logf_pattern}" ]; then
@@ -55,48 +46,19 @@ show_logs () {
 
     elif [ "+" = "${_logf_pattern}" ]; then
         if [ -d "${LOGS_DIR}" ]; then
-            if [ "${SYSTEM_NAME}" = "Linux" ]; then
-                _files_list="$(find_all "${LOGS_DIR}" "${SOFIN_NAME}*")"
-            else
-                _files_list="$(find_most_recent "${LOGS_DIR}" "${SOFIN_NAME}*")"
-            fi
-            _files_abspaths="$(${PRINTF_BIN} '%s\n' "${_files_list}" | eval "${NEWLINES_TO_SPACES_GUARD}")"
-            _files_count="$(${PRINTF_BIN} '%s\n' "${_files_list}" | eval "${FILES_COUNT_GUARD}")"
-            _files_blist="" # build file list without full path to each one
-            for _fl in $(echo "${_files_list}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
-                _base_fl="${_fl##*/}"
-                if [ -z "${_base_fl}" ]; then
-                    debug "Got an empty element basename: _base_fl=$(distd "${_base_fl}") of _fl=$(distd "${_fl}")"
-                else
-                    if [ -z "${_files_blist}" ]; then
-                        _files_blist="${_base_fl}"
-                    else
-                        _files_blist="${_files_blist} ${_base_fl}"
-                    fi
-                fi
+            _all_files=""
+            for _mr in $(find_most_recent "${LOGS_DIR%/}" "${SOFIN_NAME}*" | ${HEAD_BIN} -n${LOG_LAST_FILES} 2>/dev/null); do
+                _all_files="${_mr} ${_all_files}"
             done
-            if [ "0" = "${_files_count}" ]; then
-                note "Attaching tail only to internal log: [$(distn "${_files_blist}")]"
-            else
-                note "Attaching tail to $(distn "${_files_count}") most recently modified log files (exact order): [$(distn "${_files_blist}")]"
-            fi
-            # debug "_files_abspaths: $(distd "${_files_abspaths}")"
-            ${TAIL_BIN} -n0 -F ${_files_abspaths} 2>/dev/null
+            eval "${TAIL_BIN} -n ${LOG_LINES_AMOUNT} -F ${_all_files}" 2>&1
         else
             note "No logs to attach to. LOGS_DIR=($(distn "${LOGS_DIR}")) contain no log files?"
         fi
 
-    # elif [ -z "${_logf_pattern}" ]; then
-    #     note "No pattern specified, setting tail on all logs accessed or modified in last $(distn "${_logf_minutes}") minutes.."
-    #     if [ -z "${_files_x_min}" ]; then
-    #         note "No log files updated or accessed in last $(distn "${_logf_minutes}") minutes to show. Specify '$(distn "+")' as param, to attach a tail to all logs."
-    #     else
-    #         debug "show_log files: $(distd "$(${PRINTF_BIN} '%s\n' "${_files_x_min}" | eval "${FILES_COUNT_GUARD}")")"
-    #         ${TAIL_BIN} -n ${LOG_LINES_AMOUNT} $(${PRINTF_BIN} '%s\n' "${_files_x_min}" | eval "${NEWLINES_TO_SPACES_GUARD}")
-    #     fi
     else
-        note "Seeking log files that match pattern: '$(distn "${_logf_pattern}")' (check intervals: $(distn "${LOG_CHECK_INTERVAL:-3}")s)"
-        ${SLEEP_BIN} "${LOG_CHECK_INTERVAL:-3}" 2>/dev/null
+        debug "Seeking log files that match pattern: '$(distd "${_logf_pattern}")' (check intervals: $(distn "${LOG_CHECK_INTERVAL:-1}")s)" && \
+            note "Waiting for logs"
+        ${SLEEP_BIN} "${LOG_CHECK_INTERVAL:-1}" 2>/dev/null
         log_helper "${_logf_pattern}"
     fi
     unset _files_x_min _logf_minutes _logf_pattern _files_list _files_count _files_blist _mod_f_names
