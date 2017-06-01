@@ -764,7 +764,7 @@ apply_definition_patches () {
     if [ -z "${_pcpaname}" ]; then
         error "First argument with definition name is required!"
     fi
-    _common_patches_dir="${DEFINITIONS_DIR}patches/${_pcpaname}"
+    _common_patches_dir="${DEFINITIONS_DIR}/patches/${_pcpaname}"
     _platform_patches_dir="${_common_patches_dir}/${SYSTEM_NAME}"
     if [ -d "${_common_patches_dir}/" ]; then
         _ps_patches="$(${FIND_BIN} "${_common_patches_dir}/" -mindepth 1 -maxdepth 1 -type f 2>/dev/null)"
