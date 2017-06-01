@@ -13,3 +13,4 @@ SCP_BIN="/usr/pkg/bin/scp"
 CPUS="${CPUS:-${DEFAULT_CPUS}}" # XXX: hardcoded
 ALL_CPUS="${CPUS:-${DEFAULT_CPUS}}"
 MAKE_OPTS="-s -j${CPUS:-${DEFAULT_CPUS}}"
+MINIMAL_MAJOR_OS_VERSION="3.4"
