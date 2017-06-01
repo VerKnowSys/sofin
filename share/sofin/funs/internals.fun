@@ -120,7 +120,7 @@ get_shell_vars () {
     # PATH:
     _path="${DEFAULT_PATH}"
     gsv_int_path () {
-        for _exppart in $(${FIND_BIN} "${SOFTWARE_DIR%/}" -mindepth 2 -maxdepth 2 -name 'exports' -type d 2>/dev/null); do
+        for _exppart in $(${FIND_BIN} "${SOFTWARE_DIR}" -mindepth 2 -maxdepth 2 -name 'exports' -type d 2>/dev/null); do
             _path="${_exppart}:${_path}"
         done
     }
@@ -214,7 +214,7 @@ get_shell_vars () {
 list_bundles_full () {
     permnote "Installed software bundles (with dependencies):"
     if [ -d "${SOFTWARE_DIR}" ]; then
-        for _lbfapp in ${SOFTWARE_DIR}*; do
+        for _lbfapp in ${SOFTWARE_DIR}/*; do
             _lbfapp_name="${_lbfapp##*/}"
             _lbflowercase="$(lowercase "${_lbfapp_name}")"
             _lbinstald_file="${SOFTWARE_DIR}/${_lbfapp_name}/${_lbflowercase}${DEFAULT_INST_MARK_EXT}"
@@ -287,7 +287,7 @@ list_bundles_alphabetic () {
     if [ -d "${SOFTWARE_DIR}" ]; then
         debug "Listing installed software bundles in alphabetical order."
         env_forgivable
-        ${FIND_BIN} "${SOFTWARE_DIR%/}" -maxdepth 1 -mindepth 1 -type d  -not -name ".*" -print 2>/dev/null | \
+        ${FIND_BIN} "${SOFTWARE_DIR}" -maxdepth 1 -mindepth 1 -type d  -not -name ".*" -print 2>/dev/null | \
         ${SED_BIN} -e 's#/.*/##' 2>/dev/null | ${SORT_BIN} 2>/dev/null
     fi
 }
