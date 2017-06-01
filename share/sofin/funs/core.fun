@@ -144,7 +144,7 @@ run () {
                 eval "PATH=${PATH}${GIT_EXPORTS} ${_run_params}" >> "${LOG}" 2>> "${LOG}"
                 check_result ${?} "${_run_params}"
             else
-                ${PRINTF_BIN} "${ColorBlue}"
+                ${PRINTF_BIN} "%b" "${ColorBlue}"
                 eval "PATH=${PATH}${GIT_EXPORTS} ${_run_params}" >> "${LOG}"
                 check_result ${?} "${_run_params}"
             fi
@@ -154,7 +154,7 @@ run () {
                 eval "PATH=${PATH}${GIT_EXPORTS} ${_run_params}" >> "${LOG}-${_rnm}" 2>> "${LOG}-${_rnm}"
                 check_result ${?} "${_run_params}"
             else
-                ${PRINTF_BIN} "${ColorBlue}"
+                ${PRINTF_BIN} "%b" "${ColorBlue}"
                 eval "PATH=${PATH}${GIT_EXPORTS} ${_run_params}" >> "${LOG}-${_rnm}"
                 check_result ${?} "${_run_params}"
             fi
@@ -182,7 +182,7 @@ try () {
                     return 0
             else
                 # show progress on stderr
-                ${PRINTF_BIN} "${ColorBlue}"
+                ${PRINTF_BIN} "%b" "${ColorBlue}"
                 eval "PATH=${PATH}${GIT_EXPORTS} ${_try_params}" >> "${LOG}" && \
                     env_pedantic && \
                     return 0
@@ -193,7 +193,7 @@ try () {
                     env_pedantic && \
                     return 0
             else
-                ${PRINTF_BIN} "${ColorBlue}"
+                ${PRINTF_BIN} "%b" "${ColorBlue}"
                 eval "PATH=${PATH}${GIT_EXPORTS} ${_try_params}" >> "${LOG}-${_try_aname}" && \
                     env_pedantic && \
                     return 0
@@ -224,7 +224,7 @@ retry () {
                         env_pedantic && \
                         return 0
             else
-                ${PRINTF_BIN} "${ColorBlue}"
+                ${PRINTF_BIN} "%b" "${ColorBlue}"
                 eval "PATH=${DEFAULT_PATH}${GIT_EXPORTS} ${_targets}" >> "${LOG}" && \
                     unset _ammo _targets && \
                         env_pedantic && \
@@ -378,7 +378,7 @@ store_security_state () {
         for _key in ${DEFAULT_HARDEN_KEYS}; do
             _sss_value="$(${SYSCTL_BIN} -n "${_key}" 2>/dev/null)"
             _sss_cntnt="${SYSCTL_BIN} ${_key}=${_sss_value}"
-            ${PRINTF_BIN} "${_sss_cntnt}\n" >> "${DEFAULT_SECURITY_STATE_FILE}" 2>/dev/null
+            ${PRINTF_BIN} "%s\n" "${_sss_cntnt}" >> "${DEFAULT_SECURITY_STATE_FILE}" 2>/dev/null
         done
         unset _key _sss_cntnt _sss_value
     else
@@ -413,24 +413,24 @@ create_dirs () {
 }
 
 
-summary () {
-    env_forgivable
+# summary () {
+#     env_forgivable
     # Sofin performance counters:
-    SOFIN_END="${SOFIN_END:-$(${SOFIN_TIMER_BIN} 2>/dev/null)}"
-    SOFIN_RUNTIME="$(calculate_bc "(${SOFIN_END} - ${SOFIN_START:-${SOFIN_END}}) / 1000")"
+    # SOFIN_END="${SOFIN_END:-$(${SOFIN_TIMER_BIN} 2>/dev/null)}"
+    # SOFIN_RUNTIME="$(calculate_bc "(${SOFIN_END} - ${SOFIN_START:-${SOFIN_END}}) / 1000")"
 
-    ${PRINTF_BIN} "${ColorExample}%s${ColorReset}\n" "$(fill "${SEPARATOR_CHAR2}")" >> "${LOG:-/var/log/sofin}"
-    ${PRINTF_BIN} "${ColorExample}args.head: ${ColorYellow}%s\n" "${SOFIN_COMMAND_ARG:-''}" >> "${LOG:-/var/log/sofin}"
-    ${PRINTF_BIN} "${ColorExample}args.tail: ${ColorYellow}%s\n" "${SOFIN_ARGS:-''}" >> "${LOG:-/var/log/sofin}"
-    ${PRINTF_BIN} "${ColorExample}pid: ${ColorYellow}%d${ColorExample}\n" "${SOFIN_PID:-'-1'}" >> "${LOG:-/var/log/sofin}"
-    ${PRINTF_BIN} "${ColorExample}runtime: ${ColorYellow}%d${ColorExample} ms.\n" "${SOFIN_RUNTIME:-'-1'}" >> "${LOG:-/var/log/sofin}"
+    # ${PRINTF_BIN} "%b%s%b\n" "${ColorExample}" "$(fill "${SEPARATOR_CHAR2}")" "${ColorReset}" >> "${LOG:-/var/log/sofin}"
+    # ${PRINTF_BIN} "%bargs.head: ${ColorYellow}%s\n" "${ColorExample}" "${SOFIN_COMMAND_ARG:-''}" >> "${LOG:-/var/log/sofin}"
+    # ${PRINTF_BIN} "%bargs.tail: ${ColorYellow}%s\n" "${ColorExample}" "${SOFIN_ARGS:-''}" >> "${LOG:-/var/log/sofin}"
+    # ${PRINTF_BIN} "%bpid: ${ColorYellow}%d${ColorExample}\n" "${ColorExample}" "${SOFIN_PID:-'-1'}" >> "${LOG:-/var/log/sofin}"
+    # ${PRINTF_BIN} "%bruntime: ${ColorYellow}%d${ColorExample} ms.\n" "${ColorExample}" "${SOFIN_RUNTIME:-'-1'}" >> "${LOG:-/var/log/sofin}"
 
     # Show "times" stats from shell:
-    ${PRINTF_BIN} "${ColorExample}shell times: ${ColorReset}\n" >> "${LOG:-/var/log/sofin}"
-    times >> "${LOG:-/var/log/sofin}"
+    # ${PRINTF_BIN} "%bshell times: %b\n" "${ColorExample}" "${ColorReset}" >> "${LOG:-/var/log/sofin}"
+    # times >> "${LOG:-/var/log/sofin}"
 
-    ${PRINTF_BIN} "${ColorExample}%s${ColorReset}\n" "$(fill "${SEPARATOR_CHAR2}")" >> "${LOG:-/var/log/sofin}"
-}
+    # ${PRINTF_BIN} "%b%s%b\n" "${ColorExample}" "$(fill "${SEPARATOR_CHAR2}")" >> "${LOG:-/var/log/sofin}"
+# }
 
 
 initialize () {

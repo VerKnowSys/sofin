@@ -53,8 +53,7 @@ sofin_header () {
         "released under: $(distn "MIT/BSD")" \
         "running os: $(distn "${OS_TRIPPLE}")"
 
-    ${PRINTF_BIN} '  %s\n' \
-        "system capabilities:"
+    ${PRINTF_BIN} '  %s\n' "system capabilities:"
     IFS=\n set 2>/dev/null | ${EGREP_BIN} -I 'CAP_SYS_' 2>/dev/null | while IFS= read -r _envv; do
         if [ -n "${_envv}" ]; then
             ${PRINTF_BIN} '   %s %s\n' \
@@ -63,8 +62,7 @@ sofin_header () {
         fi
     done
 
-    ${PRINTF_BIN} '\r\n  %s\n' \
-        "terminal capabilities:"
+    ${PRINTF_BIN} '\r\n  %s\n' "terminal capabilities:"
     IFS=\n set 2>/dev/null | ${EGREP_BIN} -I 'CAP_TERM_' 2>/dev/null | while IFS= read -r _envv; do
         if [ -n "${_envv}" ]; then
             ${PRINTF_BIN} '   %s %s\n' \
@@ -74,7 +72,7 @@ sofin_header () {
     done
     unset _envv
 
-    ${PRINTF_BIN} "${ColorReset}\n"
+    ${PRINTF_BIN} "%b" "${ColorReset}\n"
 }
 
 
@@ -307,7 +305,7 @@ mark_installed () {
         error "Failed with an empty _verfile!"
     fi
     _softfile="$(lowercase "${_softname}")"
-    run "${PRINTF_BIN} \"${_verfile}\" > ${PREFIX}/${_softfile}${DEFAULT_INST_MARK_EXT}" && \
+    run "${PRINTF_BIN} '%s' \"${_verfile}\" > ${PREFIX}/${_softfile}${DEFAULT_INST_MARK_EXT}" && \
         debug "Stored version: $(distd "${_verfile}") of software: $(distd "${_softfile}") installed in: $(distd "${PREFIX}")"
     unset _softname _verfile _softfile
 }

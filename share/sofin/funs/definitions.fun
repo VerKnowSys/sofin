@@ -135,7 +135,7 @@ update_defs () {
                 note "Branch: $(distn "${_def_cur_branch}") is now at: $(distn "${_def_head}")" && \
                 return
 
-            ${PRINTF_BIN} "${ColorRed}%s${ColorReset}\n$(fill)\n" "Error occured: Update from branch: $(diste "${BRANCH}") of repository: $(diste "${REPOSITORY}") wasn't possible. Log's below:"
+            ${PRINTF_BIN} "%b%s%b\n$(fill)\n" "${ColorRed}" "Error occured: Update from branch: $(diste "${BRANCH}") of repository: $(diste "${REPOSITORY}") wasn't possible. Log's below:" "${ColorReset}"
             show_log_if_available
             return
 
