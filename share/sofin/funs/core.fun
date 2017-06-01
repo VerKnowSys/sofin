@@ -273,7 +273,6 @@ noop_handler () {
 
 
 trap_signals () {
-    trap 'cleanup_handler' EXIT
     # No    Name         Default Action       Description
     # 1     SIGHUP       terminate process    terminal line hangup
     # 2     SIGINT       terminate process    interrupt program
@@ -312,6 +311,7 @@ trap_signals () {
     #el
     if [ "YES" = "${CAP_TERM_BASH}" ]; then
         trap 'error' ERR
+        trap 'cleanup_handler' EXIT
     fi
     trap 'interrupt_handler' INT
     trap 'terminate_handler' TERM
