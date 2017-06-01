@@ -215,7 +215,7 @@ build () {
 
                 # These values has to be exported because external build mechanisms
                 # has to be able to reach these values to find dependencies and utilities
-                export PATH="${PREFIX}/bin:${PREFIX}/sbin:${DEFAULT_PATH}"
+                export PATH="${DEFAULT_SHELL_EXPORTS}:${PREFIX}/bin:${PREFIX}/sbin:${DEFAULT_PATH}"
                 export PKG_CONFIG_PATH="${PREFIX}/lib/pkgconfig"
                 export PREFIX
 
@@ -399,7 +399,7 @@ process_flat () {
     #       it's build environment values (flexibility, KISS)
     load_defs "${_req_definition}"
 
-    PATH="${_prefix}/bin:${_prefix}/sbin:${DEFAULT_PATH}"
+    PATH="${DEFAULT_SHELL_EXPORTS}:${_prefix}/bin:${_prefix}/sbin:${DEFAULT_PATH}"
     if [ -z "${DEF_DISABLED_ON}" ]; then
         if [ "${DEF_TYPE}" = "meta" ]; then
             note "   ${NOTE_CHAR2} Meta bundle detected."
