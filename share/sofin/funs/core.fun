@@ -311,7 +311,7 @@ trap_signals () {
     #el
     if [ "YES" = "${CAP_TERM_BASH}" ]; then
         trap 'error' ERR
-        trap 'cleanup_handler' EXIT
+        # trap 'cleanup_handler' EXIT
     fi
     trap 'interrupt_handler' INT
     trap 'terminate_handler' TERM
