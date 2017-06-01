@@ -59,6 +59,7 @@ push_binbuilds () {
         fi
         _pbinstall_indicator_file="${SOFTWARE_DIR}/${_pbelement}/${_pblowercase_element}${DEFAULT_INST_MARK_EXT}"
         _pbbversion_element="$(${CAT_BIN} "${_pbinstall_indicator_file}" 2>/dev/null)"
+        debug "Push: ${_pblowercase_element} indicator: ${_pbinstall_indicator_file}, version: ${_pbbversion_element}"
         if [ ! -f "${_pbinstall_indicator_file}" ]; then
             error "Bundle install indicator: $(diste "${_pbinstall_indicator_file}") doesn't exist!"
         fi

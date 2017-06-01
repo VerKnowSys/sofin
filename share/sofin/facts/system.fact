@@ -175,7 +175,7 @@ determine_system_capabilites () {
     ${SYSCTL_BIN} kern.features.linux64 >/dev/null 2>&1
     if [ "${?}" = "0" ]; then
         CAP_SYS_LINUX64_ABI=YES
-        ${KLDLOAD_BIN} linux64 >/dev/null 2>&1|| true
+        ${KLDLOAD_BIN} linux64 >/dev/null 2>&1 || true
     else
         unset CAP_SYS_LINUX64_ABI
     fi
@@ -183,8 +183,8 @@ determine_system_capabilites () {
     # Production mode is default mode
     CAP_SYS_PRODUCTION=YES
 
-    if [ -f "${SERVED_BUILDHOST_INDICATOR_FILE}" -o \
-         -f "${SERVED_BUILDHOST_INDICATOR_FILE_ALT}" ]; then
+    if [ -f "${SERVED_BUILDHOST_INDICATOR_FILE}" ] || \
+       [ -f "${SERVED_BUILDHOST_INDICATOR_FILE_ALT}" ]; then
         CAP_SYS_BUILDHOST=YES
         unset CAP_SYS_PRODUCTION
     else
