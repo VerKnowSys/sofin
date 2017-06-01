@@ -17,7 +17,7 @@ MAIN_SSH_PORT="${MAIN_SSH_PORT:-60022}"
 
 CCACHE_BIN_OPTIONAL="${SOFTWARE_DIR}/Ccache/exports/ccache" # NOTE: pick first ccache it can find
 DEFAULT_SHELL_EXPORTS="${SOFTWARE_DIR}/Zsh/exports"
-DEFAULT_PATH="${DEFAULT_PATH:-${DEFAULT_SHELL_EXPORTS}:/bin:/usr/bin:/sbin:/usr/sbin:/usr/pkg/bin:/usr/pkg/sbin}"
+DEFAULT_PATH="${DEFAULT_SHELL_EXPORTS}:/bin:/usr/bin:/sbin:/usr/sbin:/usr/pkg/bin:/usr/pkg/sbin"
 SOFIN_BIN_SHORT="${SOFIN_BIN##*/}"
 
 # Build timestamp in seconds since 1970
