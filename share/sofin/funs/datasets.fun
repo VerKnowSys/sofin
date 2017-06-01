@@ -326,7 +326,7 @@ receive_origin () {
     fi
     if [ -f "${_origin_file}" ]; then
         # NOTE: each user dataset is made of same origin, hence you can apply snapshots amongst them..
-        run "${XZCAT_BIN} "${_origin_file}" | ${ZFS_BIN} receive ${ZFS_RECEIVE_OPTS} '${ZFS_DEF_POOL_NAME}/${_dorigin_base}${_dname}' | ${TAIL_BIN} -n1 2>/dev/null" && \
+        run "${XZCAT_BIN} "${_origin_file}" | ${ZFS_BIN} receive ${ZFS_RECEIVE_OPTS} '${DEFAULT_ZPOOL}/${_dorigin_base}${_dname}' | ${TAIL_BIN} -n1 2>/dev/null" && \
             debug "Origin received successfully: $(distd "${_origin_name}")"
     else
         error "No origin file available! That's mandatory to have this file: $(diste "${_origin_file}")"
