@@ -406,7 +406,7 @@ create_lock () {
 acquire_lock_for () {
     _bundles="${@}"
     debug "Trying lock acquire for bundles: [$(distd "${_bundles}")]"
-    for _bundle in ${_bundles}; do
+    for _bundle in $(echo "${_bundles}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
         if [ -f "${LOCKS_DIR}${_bundle}${DEFAULT_LOCK_EXT}" ]; then
             _lock_pid="$(${CAT_BIN} "${LOCKS_DIR}${_bundle}${DEFAULT_LOCK_EXT}" 2>/dev/null)"
             _lock_ppid="$(${PGREP_BIN} -P "${_lock_pid}" 2>/dev/null)"

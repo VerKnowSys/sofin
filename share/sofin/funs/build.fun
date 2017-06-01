@@ -52,7 +52,7 @@ push_binbuilds () {
     if [ -z "${_push_bundles}" ]; then
         error "At least single argument with $(diste "BundleName") to push is required!"
     fi
-    for _pbelement in ${_push_bundles}; do
+    for _pbelement in $(echo "${_push_bundles}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
         _pblowercase_element="$(lowercase "${_pbelement}")"
         if [ -z "${_pblowercase_element}" ]; then
             error "Lowercase bundle name is empty!"
@@ -78,7 +78,7 @@ push_binbuilds () {
 deploy_binbuild () {
     _dbbundles="${@}"
     permnote "Requested deploy of bundles: $(distn "${_dbbundles}")"
-    for _dbbundle in ${_dbbundles}; do
+    for _dbbundle in $(echo "${_dbbundles}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
         USE_BINBUILD=NO
         build "${_dbbundle}"
     done
@@ -174,7 +174,7 @@ build () {
 
     debug "Sofin v$(distd "${SOFIN_VERSION}"): New build started for bundles: $(distd "${_build_list}")"
     PATH="${DEFAULT_PATH}"
-    for _bund_name in ${_build_list}; do
+    for _bund_name in $(echo "${_build_list}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
         _specified="${_bund_name}" # store original value of user input
         _bund_name="$(lowercase "${_bund_name}")"
         load_defaults
@@ -308,7 +308,7 @@ build () {
     # After exports - track useless files:
     track_useful_and_useless_files
 
-    for _bund_name in ${_build_list}; do
+    for _bund_name in $(echo "${_build_list}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
         debug "finalize_afterbuild for: ${_bund_name}"
         finalize_afterbuild "${_bund_name}"
     done
@@ -487,7 +487,7 @@ process_flat () {
                     if [ -z "${_inherited}" ]; then
                         error "No source dir found for definition: $(diste "${_app_param}")?"
                     else
-                        for _inh in ${_inherited}; do
+                        for _inh in $(echo "${_inherited}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
                             debug "Trying inherited value: $(distd "${_inh}")"
                             _fd="$(${FIND_BIN} "${BUILD_DIR}" -maxdepth 1 -mindepth 1 -type d -iname "*${_inh}*${DEF_VERSION}*" 2>/dev/null | ${HEAD_BIN} -n1 2>/dev/null)"
                             if [ -n "${_fd}" ]; then

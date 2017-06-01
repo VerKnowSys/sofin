@@ -63,7 +63,7 @@ show_logs () {
             _files_abspaths="$(${PRINTF_BIN} '%s\n' "${_files_list}" | eval "${NEWLINES_TO_SPACES_GUARD}")"
             _files_count="$(${PRINTF_BIN} '%s\n' "${_files_list}" | eval "${FILES_COUNT_GUARD}")"
             _files_blist="" # build file list without full path to each one
-            for _fl in ${_files_list}; do
+            for _fl in $(echo "${_files_list}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
                 _base_fl="${_fl##*/}"
                 if [ -z "${_base_fl}" ]; then
                     debug "Got an empty element basename: _base_fl=$(distd "${_base_fl}") of _fl=$(distd "${_fl}")"

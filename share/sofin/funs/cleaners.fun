@@ -16,24 +16,16 @@ clean_filecache () {
 clean_all_bdirs_leftovers () {
     env_forgivable
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
-        _list_zfs_dsets=$(${ZFS_BIN} list -H -o name -t filesystem 2>/dev/null | ${EGREP_BIN} "${DEFAULT_SRC_EXT}" 2>/dev/null)
-        for i in ${_list_zfs_dsets}; do
+        for i in $(${ZFS_BIN} list -H -o name -t filesystem 2>/dev/null | ${EGREP_BIN} "${DEFAULT_SRC_EXT}" 2>/dev/null); do
             try "${ZFS_BIN} destroy -vfR '${i}'" && \
                 debug "Dataset destroyed: $(distd "${i}")"
         done
-        unset _list_zfs_dsets
     else
-        _cf_files=$(${FIND_BIN} "${SOFTWARE_DIR}" -mindepth 2 -maxdepth 2 -name "${DEFAULT_SRC_EXT}*" -type d 2>/dev/null)
-        if [ -z "${_cf_files}" ]; then
-            debug "No leftover dirs.. Clean skipped."
-        else
-            for i in ${_cf_files}; do
-                try "${RM_BIN} -vf '${i}'" && \
-                    debug "Empty dir removed using <slow-file-IO>: $(distd "${i}")"
-            done
-            debug "Done cleaning of build-dir leftovers."
-        fi
-        unset _cf_files
+        for i in $(${FIND_BIN} "${SOFTWARE_DIR}" -mindepth 2 -maxdepth 2 -name "${DEFAULT_SRC_EXT}*" -type d 2>/dev/null); do
+            try "${RM_BIN} -vf '${i}'" && \
+                debug "Empty dir removed using <slow-file-IO>: $(distd "${i}")"
+        done
+        debug "Done cleaning of build-dir leftovers."
     fi
 }
 
