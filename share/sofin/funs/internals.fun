@@ -214,7 +214,7 @@ get_shell_vars () {
 list_bundles_full () {
     permnote "Installed software bundles (with dependencies):"
     if [ -d "${SOFTWARE_DIR}" ]; then
-        for _lbfapp in ${SOFTWARE_DIRf}/*; do
+        for _lbfapp in ${SOFTWARE_DIR}/*; do
             _lbfapp_name="${_lbfapp##*/}"
             _lbflowercase="$(lowercase "${_lbfapp_name}")"
             _lbinstald_file="${SOFTWARE_DIR}/${_lbfapp_name}/${_lbflowercase}${DEFAULT_INST_MARK_EXT}"
