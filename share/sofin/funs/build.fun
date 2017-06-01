@@ -169,8 +169,8 @@ build () {
     # Update definitions and perform more checks
     validate_reqs
 
-    store_security_state
-    disable_security_features
+    # store_security_state
+    # disable_security_features
 
     debug "Sofin v$(distd "${SOFIN_VERSION}"): New build started for bundles: $(distd "${_build_list}")"
     PATH="${DEFAULT_PATH}"

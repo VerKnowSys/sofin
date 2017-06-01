@@ -62,7 +62,7 @@ perform_clean () {
 
 
 finalize () {
-    restore_security_state
+    # restore_security_state
     destroy_locks
     finalize_shell_reload
 }
