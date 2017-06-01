@@ -306,9 +306,10 @@ trap_signals () {
     # 30    SIGUSR1      terminate process    User defined signal 1
     # 31    SIGUSR2      terminate process    User defined signal 2
     #
-    if [ "YES" = "${CAP_TERM_ZSH}" ]; then
-        trap - ZERR
-    elif [ "YES" = "${CAP_TERM_BASH}" ]; then
+    # if [ "YES" = "${CAP_TERM_ZSH}" ]; then
+        # trap - ERR
+    #el
+    if [ "YES" = "${CAP_TERM_BASH}" ]; then
         trap 'error' ERR
     fi
     trap 'interrupt_handler' INT
