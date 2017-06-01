@@ -325,8 +325,8 @@ trap_signals () {
     trap 'terminate_handler' TERM
     trap 'noop_handler' USR2 # This signal is used to "reload shell"-feature. Sofin should ignore it
 
-    if [ -x "/usr/sbin/beadm" ]; then
-        _active_boot_env="$(/usr/sbin/beadm list | grep "R" 2>/dev/null | awk '{print $1;}' 2>/dev/null)"
+    if [ -x "${BEADM_BIN}" ]; then
+        _active_boot_env="$(${BEADM_BIN} list | ${EGREP_BIN} -i "R" 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)"
         debug "Turn on readonly mode for: ${DEFAULT_ZPOOL}/ROOT/${_active_boot_env}"
         ${ZFS_BIN} set readonly=on "${DEFAULT_ZPOOL}/ROOT/${_active_boot_env}"
     fi
