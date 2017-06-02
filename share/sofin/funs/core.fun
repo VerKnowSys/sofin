@@ -83,20 +83,7 @@ permnote () {
 
 
 error () {
-    # Get three recently modified logs:
-    # _last_two_mod_logs=$(${LS_BIN} -1t "${LOGS_DIR}" 2>/dev/null | ${HEAD_BIN} -3 2>/dev/null | eval "${NEWLINES_TO_SPACES_GUARD}")
-    # ${PRINTF_BIN} "\n\n${ColorRed}%s\n\n  ${FAIL_CHAR} Error!\n\n    %s\n\n%s\n\n${ColorReset}%s\n\n${ColorWhite}Showing tail of 3 most recent Sofin logs:\n\n${ColorReset}%s${ColorWhite}\n\n%s\n\n%s\n\n%s\n\n\n" \
-        # "$(fill "${SEPARATOR_CHAR2}")" "${@}" "$(fill "${SEPARATOR_CHAR2}")" "$(fill "${SEPARATOR_CHAR2}")" "$(fill "${SEPARATOR_CHAR2}")" "$(cd "${LOGS_DIR}" && ${TAIL_BIN} -n "${LOG_LINES_AMOUNT_ON_ERR}" ${_last_two_mod_logs})" "$(fill "${SEPARATOR_CHAR2}")"
-    # warn "  ${NOTE_CHAR2} If you think this error is a bug in definition, please report an info about"
-    # warn "    encountered problem on one of issue trackers:"
-    # ${PRINTF_BIN} "\n"
-    # warn "  ${NOTE_CHAR}  Github: $(distw "${DEFAULT_ISSUE_REPORT_SITE}")"
-    # ${PRINTF_BIN} "\n"
-    # warn "$(fill "${SEPARATOR_CHAR}" 46)$(distw "  Daniel (dmilith) Dettlaff  ")$(fill "${SEPARATOR_CHAR}" 5)"
-    # ${PRINTF_BIN} "\n"
-    # TODO: add "history backtrace". Play with: fc -lnd -5, but separate sh/zsh history file should solve the problem
-
-    ${PRINTF_BIN} "%b\n  %s %s\n    %b %b\n\n" "${ColorRed}" "${NOTE_CHAR2}" "Task crashed!" "${@}" "${ColorReset}"
+    ${PRINTF_BIN} "%b\n  %s %s\n    %b %b\n\n" "${ColorRed}" "${NOTE_CHAR2}" "Task crashed!" "${0}-${1}${2}${3}${4}${5}" "${ColorReset}"
     ${PRINTF_BIN} "%b  %s Try: %b%b\n\n" "${ColorRed}" "${NOTE_CHAR2}" "$(diste "s log ${DEF_NAME}${DEF_SUFFIX}") to see the build log." "${ColorReset}"
 
     finalize_interrupt
