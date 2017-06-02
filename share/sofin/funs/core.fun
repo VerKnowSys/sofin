@@ -134,7 +134,6 @@ diste () {
 
 run () {
     _run_params="${@}"
-    env_forgivable
     if [ -n "${_run_params}" ]; then
         touch_logsdir_and_logfile
         ${PRINTF_BIN} '%s\n' "${_run_params}" | eval "${MATCH_PRINT_STDOUT_GUARD}" && _run_shw_prgr=YES
@@ -205,7 +204,6 @@ try () {
 retry () {
     _targets="${@}"
     _ammo="OOO"
-    env_forgivable
     touch_logsdir_and_logfile
     # check for commands that puts something important/intersting on stdout
     ${PRINTF_BIN} '%s\n' "${_targets}" 2>/dev/null | eval "${MATCH_PRINT_STDOUT_GUARD}" && _rtry_blue=YES
@@ -327,7 +325,6 @@ trap_signals () {
 
 
 untrap_signals () {
-    env_forgivable
 
     # if [ "YES" = "${CAP_TERM_ZSH}" ]; then
     #     trap - ZERR
@@ -350,7 +347,6 @@ untrap_signals () {
 
 
 restore_security_state () {
-    env_forgivable
     if [ "YES" = "${CAP_SYS_HARDENED}" ]; then
         if [ -f "${DEFAULT_SECURITY_STATE_FILE}" ]; then
             note "Restoring pre-build security state"
@@ -365,7 +361,6 @@ restore_security_state () {
 
 
 store_security_state () {
-    env_forgivable
     if [ "YES" = "${CAP_SYS_HARDENED}" ]; then
         try "${RM_BIN} -f ${DEFAULT_SECURITY_STATE_FILE}"
         debug "Storing current security state to file: $(distd "${DEFAULT_SECURITY_STATE_FILE}")"
@@ -406,7 +401,6 @@ create_dirs () {
 
 
 # summary () {
-#     env_forgivable
     # Sofin performance counters:
     # SOFIN_END="${SOFIN_END:-$(${SOFIN_TIMER_BIN} 2>/dev/null)}"
     # SOFIN_RUNTIME="$(calculate_bc "(${SOFIN_END} - ${SOFIN_START:-${SOFIN_END}}) / 1000")"
