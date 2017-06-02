@@ -4,7 +4,7 @@ load_defs () {
         error "No definition name specified!"
     else
         for _given_def in ${_definitions}; do
-            debug "# L: ${_given_def}"
+            #echo "# L: ${_given_def}"
             _name_base="${_given_def##*/}"
             _def="$(lowercase "${_name_base}")"
             if [ -e "${DEFINITIONS_DIR}/${_def}${DEFAULT_DEF_EXT}" ]; then
