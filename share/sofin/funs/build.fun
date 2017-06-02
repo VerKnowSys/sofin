@@ -253,7 +253,6 @@ build () {
                     _req_amount="$(${PRINTF_BIN} '%s\n' "${_req_amount} + 1" | ${BC_BIN} 2>/dev/null)"
                     _req_all="${_req_amount}"
                     for _req in $(echo "${DEF_REQUIREMENTS}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
-                        debug "_req: ${_req}"
                         if [ -n "${DEF_USER_INFO}" ]; then
                             warn "${DEF_USER_INFO}"
                         fi
