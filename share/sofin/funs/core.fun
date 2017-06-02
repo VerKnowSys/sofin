@@ -170,7 +170,7 @@ try () {
     _try_params="${@}"
     if [ -n "${_try_params}" ]; then
         touch_logsdir_and_logfile
-        ${PRINTF_BIN} "${_try_params}\n" | eval "${MATCH_PRINT_STDOUT_GUARD}" && _show_prgrss=YES
+        ${PRINTF_BIN} '%s\n' "${_try_params}" | eval "${MATCH_PRINT_STDOUT_GUARD}" && _show_prgrss=YES
         # _dt="$(distd "$(${DATE_BIN} ${DEFAULT_DATE_TRYRUN_OPTS} 2>/dev/null)" ${ColorDarkgray})"
         # debug "${_dt}: $(distd "${TRY_CHAR}" ${ColorWhite}) $(distd "${_try_params}" ${ColorParams}) $(distd "[${_show_prgrss:-NO}]" "${ColorBlue}")"
         _try_aname="$(lowercase "${DEF_NAME}${DEF_SUFFIX}")"
@@ -309,10 +309,10 @@ trap_signals () {
     # if [ "YES" = "${CAP_TERM_ZSH}" ]; then
         # trap - ERR
     #el
-    if [ "YES" = "${CAP_TERM_BASH}" ]; then
-        trap 'error' ERR
-        # trap 'cleanup_handler' EXIT
-    fi
+    # if [ "YES" = "${CAP_TERM_BASH}" ]; then
+    # #     trap 'cleanup_handler' EXIT
+    #     trap 'error' ERR
+    # fi
     trap 'interrupt_handler' INT
     trap 'terminate_handler' TERM
     trap 'noop_handler' USR2 # This signal is used to "reload shell"-feature. Sofin should ignore it
@@ -332,10 +332,10 @@ untrap_signals () {
     # if [ "YES" = "${CAP_TERM_ZSH}" ]; then
     #     trap - ZERR
     # el
-    trap - EXIT
-    if [ "YES" = "${CAP_TERM_BASH}" ]; then
-        trap - ERR
-    fi
+    # if [ "YES" = "${CAP_TERM_BASH}" ]; then
+    #     trap - ERR
+    # fi
+    # trap - EXIT
     trap - INT
     trap - TERM
     trap - USR2
