@@ -128,11 +128,11 @@ update_defs () {
         debug "State of definitions repository was re-set to: $(distd "${_def_head}")"
         if [ "${_def_cur_branch}" != "${BRANCH}" ]; then # use _def_cur_branch value if branch isn't matching default branch
             debug "Checking out branch: $(distd "${_def_cur_branch}")"
-            try "${GIT_BIN} checkout ${DEFAULT_GIT_OPTS} -b ${_def_cur_branch}" || \
-                try "${GIT_BIN} checkout ${DEFAULT_GIT_OPTS} ${_def_cur_branch}" || \
+            try "${GIT_BIN} checkout -b ${_def_cur_branch}" || \
+                try "${GIT_BIN} checkout ${_def_cur_branch}" || \
                     warn "Can't checkout branch: $(distw "${_def_cur_branch}")"
 
-            try "${GIT_BIN} pull ${DEFAULT_GIT_OPTS} origin ${_def_cur_branch}" && \
+            try "${GIT_BIN} pull ${DEFAULT_GIT_PULL_FETCH_OPTS} origin ${_def_cur_branch}" && \
                 note "Branch: $(distn "${_def_cur_branch}") is now at: $(distn "${_def_head}")" && \
                 return
 
@@ -143,11 +143,11 @@ update_defs () {
         else # else use default branch
             debug "Using default branch: $(distd "${BRANCH}")"
             if [ "${_def_cur_branch}" != "${BRANCH}" ]; then
-                try "${GIT_BIN} checkout ${DEFAULT_GIT_OPTS} -b ${BRANCH}" || \
-                    try "${GIT_BIN} checkout ${DEFAULT_GIT_OPTS} ${BRANCH}" || \
+                try "${GIT_BIN} checkout -b ${BRANCH}" || \
+                    try "${GIT_BIN} checkout ${BRANCH}" || \
                         warn "Can't checkout branch: $(distw "${BRANCH}")"
             fi
-            try "${GIT_BIN} pull ${DEFAULT_GIT_OPTS} origin ${BRANCH}" && \
+            try "${GIT_BIN} pull ${DEFAULT_GIT_PULL_FETCH_OPTS} origin ${BRANCH}" && \
                 note "Branch: $(distn "${BRANCH}") is at: $(distn "${_def_head}")" && \
                     return
 
@@ -165,8 +165,8 @@ update_defs () {
         cd "${CACHE_DIR}${DEFINITIONS_BASE}"
         _def_cur_branch="$(${GIT_BIN} rev-parse --abbrev-ref HEAD 2>/dev/null)"
         if [ "${BRANCH}" != "${_def_cur_branch}" ]; then
-            try "${GIT_BIN} checkout ${DEFAULT_GIT_OPTS} -b ${BRANCH}" || \
-                try "${GIT_BIN} checkout ${DEFAULT_GIT_OPTS} ${BRANCH}" || \
+            try "${GIT_BIN} checkout -b ${BRANCH}" || \
+                try "${GIT_BIN} checkout ${BRANCH}" || \
                     warn "Can't checkout branch: $(distw "${BRANCH}")"
         fi
         _def_head="HEAD"
@@ -784,15 +784,15 @@ clone_or_fetch_git_bare_repo () {
     _git_cached="${GIT_CACHE_DIR}${_bare_name}${DEFAULT_GIT_DIR_NAME}"
     try "${MKDIR_BIN} -p ${GIT_CACHE_DIR}"
     note "   ${NOTE_CHAR} Fetching source repository: $(distn "${_source_path}")"
-    try "${GIT_BIN} clone ${DEFAULT_GIT_CLONE_OPTS} --recursive --mirror ${_source_path} ${_git_cached} 2> /dev/null" || \
-        try "${GIT_BIN} clone ${DEFAULT_GIT_CLONE_OPTS} --mirror ${_source_path} ${_git_cached} 2> /dev/null"
+    try "${GIT_BIN} clone --jobs=3 --recursive --mirror ${_source_path} ${_git_cached} 2> /dev/null" || \
+        try "${GIT_BIN} clone --jobs=3 --mirror ${_source_path} ${_git_cached} 2> /dev/null"
     if [ "${?}" = "0" ]; then
         debug "Cloned bare repository: $(distd "${_bare_name}")"
     elif [ -d "${_git_cached}" ]; then
         _cwddd="$(${PWD_BIN} 2>/dev/null)"
         debug "Trying to update existing bare repository cache in: $(distd "${_git_cached}")"
         cd "${_git_cached}"
-        try "${GIT_BIN} fetch ${DEFAULT_GIT_OPTS} origin ${_chk_branch} > /dev/null" || \
+        try "${GIT_BIN} fetch ${DEFAULT_GIT_PULL_FETCH_OPTS} origin ${_chk_branch} > /dev/null" || \
             warn "   ${WARN_CHAR} Failed to fetch an update from bare repository: $(distw "${_git_cached}") [branch: $(distw "${_chk_branch}")]"
         cd "${_cwddd}"
     elif [ ! -d "${_git_cached}/branches" ] && \
