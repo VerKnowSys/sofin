@@ -401,10 +401,9 @@ create_lock () {
     else
         debug "Acquring bundle lock for: $(distd "${_bundle_name}")"
     fi
-    SOFIN_PID="${SOFIN_PID:-$$}"
     debug "Pid of current Sofin session: $(distd "${SOFIN_PID}")"
     _bundle="$(capitalize "${_bundle_name}")"
-    ${MKDIR_BIN} -p "${LOCKS_DIR}" 2>/dev/null
+    try "${MKDIR_BIN} -p ${LOCKS_DIR} 2>/dev/null"
     ${PRINTF_BIN} '%s\n' "${SOFIN_PID}" > "${LOCKS_DIR}${_bundle}${DEFAULT_LOCK_EXT}"
     unset _bundle _bundle_name
 }
@@ -412,13 +411,17 @@ create_lock () {
 
 acquire_lock_for () {
     _bundles="${@}"
-    debug "Trying lock acquire for bundles: [$(distd "${_bundles}")]"
     for _bundle in $(echo "${_bundles}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
+        debug "Acquiring lock for bundle: [$(distd "${_bundle}")]"
         if [ -f "${LOCKS_DIR}${_bundle}${DEFAULT_LOCK_EXT}" ]; then
             _lock_pid="$(${CAT_BIN} "${LOCKS_DIR}${_bundle}${DEFAULT_LOCK_EXT}" 2>/dev/null)"
-            _lock_ppid="$(${PGREP_BIN} -P "${_lock_pid}" 2>/dev/null)"
-            debug "Lock pid: $(distd "${_lock_pid}"), Sofin pid: $(distd "${SOFIN_PID}"), _lock_ppid: $(distd "${_lock_ppid}")"
-            try "${KILL_BIN} -0 ${_lock_pid}"
+            if [ -z "${_lock_pid}" ]; then
+                debug "Lock pid: $(distd "none"), Sofin pid: $(distd "${SOFIN_PID}")"
+            else
+                _lock_ppid="$(${PGREP_BIN} -P "${_lock_pid}" 2>/dev/null)"
+                debug "Lock pid: $(distd "${_lock_pid}"), Sofin pid: $(distd "${SOFIN_PID}"), _lock_ppid: $(distd "${_lock_ppid}")"
+            fi
+            try "${KILL_BIN} -0 ${_lock_pid} 2>/dev/null"
             if [ "${?}" = "0" ]; then # NOTE: process is alive
                 if [ "${_lock_pid}" = "${SOFIN_PID}" ] || \
                    [ "${_lock_ppid}" = "${SOFIN_PID}" ]; then
