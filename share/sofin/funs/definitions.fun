@@ -199,7 +199,6 @@ reset_defs () {
         try "${RM_BIN} -fv${_add_opt} '${line}'" && \
             debug "Removed untracked file${_add_opt:-/dir} from definition repository: $(distd "${line}")"
     done
-    update_defs
     cd "${_cwd}"
     unset _rdefs_branch _cwd
 }

@@ -199,6 +199,7 @@ if [ -n "${SOFIN_COMMAND_ARG}" ]; then
         reset)
             fail_on_bg_job "${SOFIN_ARGS}"
             reset_defs
+            update_defs
             finalize
             ;;
 
