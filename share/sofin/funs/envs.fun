@@ -264,32 +264,37 @@ compiler_setup () {
     unset _compiler_use_linker_flags
     if [ -z "${DEF_NO_LLVM_LINKER}" ] && [ "YES" = "${CAP_SYS_LLVM_LD}" ]; then
         # Support of default: LLVM linker:
-        if [ "${SYSTEM_NAME}" != "Darwin" ]; then
-            _llvm_pfx="/Software/Lld"
-            if [ -x "${_llvm_pfx}/bin/llvm-config" ]; then
-                _compiler_use_linker_flags="-fuse-ld=lld"
-                RANLIB="${_llvm_pfx}/bin/llvm-ranlib"
-                NM="${_llvm_pfx}/bin/llvm-nm"
-                AR="${_llvm_pfx}/bin/llvm-ar"
-                AS="${_llvm_pfx}/bin/llvm-as"
-                debug "LLVM-LD linker configured."
-                unset STRIP
-            else
-                debug "Failed to get LLVM-host-target hint from llvm-config. Got: '$(distd "${_llvm_target}")'"
-                unset RANLIB STRIP AS NM AR
-                if [ -x "${LD_BIN}.lld" ]; then
-                    LD="${LD_BIN}.lld"
-                else
-                    # Fallback:
-                    LD="${LD_BIN}"
-                fi
-            fi
-            LD="${LD_BIN}.lld"
-            unset _llvm_pfx _llvm_target
-
-        else
+        if [ "Darwin" = "${SYSTEM_NAME}" ]; then
             # NOTE: on Darwin hosts it's the same linker binry but skipping options when DEF_NO_LLVM_LINKER is defined
-            LD="${LD_BIN} -arch ${DEFAULT_DARWIN_SYS_ARCH:-x86_64} -sdk_version ${DEFAULT_DARWIN_SDK_VERSION:-10.11}"
+            _ld_arch="-arch ${DEFAULT_DARWIN_SYS_ARCH:-x86_64} -sdk_version ${DEFAULT_DARWIN_SDK_VERSION:-${MINIMAL_MAJOR_OS_VERSION}} -macosx_version_min ${MINIMAL_MAJOR_OS_VERSION}"
+            if [ -x "${LD_BIN}.lld" ]; then
+                LD="ld.lld ${_ld_arch}"
+            else
+                unset LD
+            fi
+            unset _ld_arch
+        else
+            LD="ld"
+            # _llvm_pfx="/Software/Lld"
+            # if [ -x "${_llvm_pfx}/bin/llvm-config" ]; then
+            #     _compiler_use_linker_flags="-fuse-ld=lld"
+            #     RANLIB="${_llvm_pfx}/bin/llvm-ranlib"
+            #     NM="${_llvm_pfx}/bin/llvm-nm"
+            #     AR="${_llvm_pfx}/bin/llvm-ar"
+            #     AS="${_llvm_pfx}/bin/llvm-as"
+            #     debug "LLVM-LD linker configured."
+            #     unset STRIP
+            # else
+            #     debug "Failed to get LLVM-host-target hint from llvm-config. Got: '$(distd "${_llvm_target}")'"
+            #     unset RANLIB STRIP AS NM AR
+            #     if [ -x "${LD_BIN}.lld" ]; then
+            #         LD="${LD_BIN}.lld"
+            #     else
+            #         # Fallback:
+            #         LD="${LD_BIN}"
+            #     fi
+            # fi
+            # unset _llvm_pfx _llvm_target
         fi
 
     elif [ -z "${DEF_NO_GOLDEN_LINKER}" ] && \
