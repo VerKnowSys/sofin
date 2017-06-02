@@ -457,6 +457,8 @@ process_flat () {
                 fi
 
                 dump_debug_info
+                dump_compiler_setup
+                dump_system_capabilities
 
                 unset _fd
                 _prm_nolib="$(${PRINTF_BIN} '%s\n' "${_app_param}" | ${SED_BIN} 's/lib//' 2>/dev/null)"
@@ -643,9 +645,6 @@ process_flat () {
             else
                 error "These values cannot be empty: BUILD_DIR, BUILD_NAMESUM"
             fi
-
-            dump_compiler_setup
-            dump_system_capabilities
 
             # and common part between normal and continue modes:
             cd "${_pwd}"
