@@ -77,13 +77,11 @@ push_binbuilds () {
 
 deploy_binbuild () {
     _dbbundles="${@}"
-    permnote "Requested deploy of bundles: $(distn "${_dbbundles}")"
     for _dbbundle in $(echo "${_dbbundles}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
         USE_BINBUILD=NO
         build "${_dbbundle}"
+        push_binbuilds "${_dbbundle}"
     done
-    push_binbuilds "${_dbbundles}"
-    note "Bundles deployed successfully: $(distn "${_dbbundles}")"
     unset _dbbundles _dbbundle
 }
 
