@@ -456,6 +456,8 @@ process_flat () {
                     clone_or_fetch_git_bare_repo "${DEF_SOURCE_PATH}" "${DEF_NAME}${DEF_SUFFIX}-bare" "${DEF_GIT_CHECKOUT:-${DEF_VERSION}}" "${BUILD_DIR}"
                 fi
 
+                dump_debug_info
+
                 unset _fd
                 _prm_nolib="$(${PRINTF_BIN} '%s\n' "${_app_param}" | ${SED_BIN} 's/lib//' 2>/dev/null)"
                 _prm_no_undrlne_and_minus="$(${PRINTF_BIN} '%s\n' "${_app_param}" | ${SED_BIN} 's/[-_].*$//' 2>/dev/null)"
@@ -642,7 +644,6 @@ process_flat () {
                 error "These values cannot be empty: BUILD_DIR, BUILD_NAMESUM"
             fi
 
-            dump_debug_info
             dump_compiler_setup
             dump_system_capabilities
 
