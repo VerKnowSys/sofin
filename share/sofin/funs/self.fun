@@ -25,6 +25,7 @@ install_sofin () {
     load_requirements
     determine_system_capabilites
     determine_term_capabilites
+    disable_sofin_env
 
     permnote "Installing ${SOFIN_BUNDLE_NAME} to prefix: $(distn "${SOFIN_ROOT}")"
 
