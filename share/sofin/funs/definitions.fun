@@ -224,8 +224,7 @@ remove_bundles () {
     if [ "${_bundle_nam}" != "${_bundle_name}" ]; then
         # Specified + - a wildcard
         _picked_bundles="" # to remove first entry with *
-        _found="$(${FIND_BIN} "${SOFTWARE_DIR}" -mindepth 1 -maxdepth 1 -iname "${_bundle_nam}" -type d 2>/dev/null)"
-        for _bund in ${_found}; do
+        for _bund in $(${FIND_BIN} "${SOFTWARE_DIR}" -mindepth 1 -maxdepth 1 -iname "${_bundle_nam}" -type d 2>/dev/null); do
             _bname="${_bund##*/}"
             _picked_bundles="${_picked_bundles} ${_bname}"
         done
@@ -237,7 +236,7 @@ remove_bundles () {
     fi
 
     load_defaults
-    for _def in ${_picked_bundles}; do
+    for _def in $(echo "${_picked_bundles}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
         _given_name="$(capitalize "${_def}")"
         if [ -z "${_given_name}" ]; then
             error "Empty bundle name given as first param!"
@@ -353,7 +352,7 @@ wipe_remote_archives () {
     fi
     if [ "${_ans}" = "YES" ]; then
         cd "${SOFTWARE_DIR}"
-        for _wr_element in ${_bund_names}; do
+        for _wr_element in $(echo "${_bund_names}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
             _lowercase_element="$(lowercase "${_wr_element}")"
             _remote_ar_name="${_wr_element}-"
             _wr_dig="$(${HOST_BIN} A "${MAIN_SOFTWARE_ADDRESS}" 2>/dev/null | ${GREP_BIN} 'Address:' 2>/dev/null | eval "${HOST_ADDRESS_GUARD}")"
@@ -361,7 +360,7 @@ wipe_remote_archives () {
                 error "No mirrors found in address: $(diste "${MAIN_SOFTWARE_ADDRESS}")"
             fi
             debug "Using defined mirror(s): $(distd "${_wr_dig}")"
-            for _wr_mirr in ${_wr_dig}; do
+            for _wr_mirr in $(echo "${_wr_dig}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
                 note "Wiping out remote: $(distn "${_wr_mirr}") binary archives: $(distn "${_remote_ar_name}")"
                 retry "${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_SSH_PORT} ${SOFIN_NAME}@${_wr_mirr} \"${FIND_BIN} ${MAIN_BINARY_PREFIX}/${SYS_SPECIFIC_BINARY_REMOTE} -iname '${_remote_ar_name}' -delete\""
             done
@@ -446,10 +445,9 @@ strip_bundle () {
     esac
 
     _counter="0"
-    for _stripdir in ${_dirs_to_strip}; do
+    for _stripdir in $(echo "${_dirs_to_strip}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
         if [ -d "${_stripdir}" ]; then
-            _tbstripfiles=$(${FIND_BIN} "${_stripdir}" -maxdepth 1 -type f 2>/dev/null)
-            for _file in ${_tbstripfiles}; do
+            for _file in $(${FIND_BIN} "${_stripdir}" -maxdepth 1 -type f 2>/dev/null); do
                 _bundlower="$(lowercase "${DEF_NAME}${DEF_SUFFIX}")"
                 if [ -n "${_bundlower}" ]; then
                     try "${STRIP_BIN} ${DEFAULT_STRIP_OPTS} ${_file} > /dev/null 2>&1"
@@ -485,7 +483,7 @@ track_useful_and_useless_files () {
             # step 0: clean defaults side DEF_DEFAULT_USELESS entries only if DEF_USEFUL is empty
             if [ -n "${DEF_DEFAULT_USELESS}" ] && \
                [ -z "${DEF_USEFUL}" ]; then
-                for _cu_pattern in ${DEF_DEFAULT_USELESS}; do
+                for _cu_pattern in $(echo "${DEF_DEFAULT_USELESS}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
                     if [ -e "${PREFIX}/${_cu_pattern}" ]; then
                         if [ -z "${_fordel}" ]; then
                             _fordel="${PREFIX}/${_cu_pattern}"
@@ -500,7 +498,7 @@ track_useful_and_useless_files () {
 
             # step 1: clean definition side DEF_USELESS entries only if DEF_USEFUL is empty
             if [ -n "${DEF_USELESS}" ]; then
-                for _cu_pattern in ${DEF_USELESS}; do
+                for _cu_pattern in $(echo "${DEF_USELESS}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
                     if [ -n "${_cu_pattern}" ]; then
                         if [ -z "${_fordel}" ]; then
                             _fordel="${PREFIX}/${_cu_pattern}"
@@ -517,8 +515,7 @@ track_useful_and_useless_files () {
         unset _dbg_exp_lst
         for _cu_dir in bin sbin libexec; do
             if [ -d "${PREFIX}/${_cu_dir}" ]; then
-                _cuall_binaries=$(${FIND_BIN} "${PREFIX}/${_cu_dir}" -mindepth 1 -maxdepth 1 -type f -or -type l 2>/dev/null)
-                for _cufile in ${_cuall_binaries}; do
+                for _cufile in $(${FIND_BIN} "${PREFIX}/${_cu_dir}" -mindepth 1 -maxdepth 1 -type f -or -type l 2>/dev/null); do
                     unset _cu_commit_removal
                     _cubase="${_cufile##*/}" # NOTE: faster "basename"
                     if [ -e "${PREFIX}/exports/${_cubase}" ]; then
@@ -529,7 +526,7 @@ track_useful_and_useless_files () {
                         fi
                     else
                         # traverse through DEF_USEFUL for _cufile patterns required by software but not exported
-                        for _is_useful in ${DEF_USEFUL}; do
+                        for _is_useful in $(echo "${DEF_USEFUL}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
                             # NOTE: split each by /, first argument will be subpath f.i. "bin"; second one - file pattern
                             # NOTE: legacy shell string ops sneak peak below:
                             #   ${var#*SubStr}  # will drop begin of string upto first occur of `SubStr`
