@@ -96,8 +96,8 @@ error () {
     # ${PRINTF_BIN} "\n"
     # TODO: add "history backtrace". Play with: fc -lnd -5, but separate sh/zsh history file should solve the problem
 
-    ${PRINTF_BIN} "%b  %s %s\n    %b %b\n\n" "${ColorRed}" "${NOTE_CHAR2}" "Task crashed! Output:" "${@}" "${ColorReset}"
-    ${PRINTF_BIN} "%b  %s Try: %b\n" "${ColorRed}" "${NOTE_CHAR2}" "$(diste "s log ${DEF_NAME}${DEF_SUFFIX}") to see the build log."
+    ${PRINTF_BIN} "%b\n  %s %s\n    %b %b\n\n" "${ColorRed}" "${NOTE_CHAR2}" "Task crashed!" "${@}" "${ColorReset}"
+    ${PRINTF_BIN} "%b  %s Try: %b%b\n\n" "${ColorRed}" "${NOTE_CHAR2}" "$(diste "s log ${DEF_NAME}${DEF_SUFFIX}") to see the build log." "${ColorReset}"
 
     finalize_interrupt
     exit "${ERRORCODE_TASK_FAILURE}"
