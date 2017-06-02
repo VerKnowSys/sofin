@@ -169,13 +169,11 @@ update_defs () {
                 try "${GIT_BIN} checkout ${DEFAULT_GIT_OPTS} ${BRANCH}" || \
                     warn "Can't checkout branch: $(distw "${BRANCH}")"
         fi
-        _def_head="$(${CAT_BIN} "${CACHE_DIR}${DEFINITIONS_BASE}/${DEFAULT_GIT_DIR_NAME}/refs/heads/${_def_cur_branch}" 2>/dev/null)"
-        if [ -z "${_def_head}" ]; then
-            _def_head="HEAD"
-        fi
+        _def_head="HEAD"
         try "${GIT_BIN} pull --progress origin ${BRANCH}" && \
-            note "Branch: $(distn "${BRANCH}") is currenly at: $(distn "${_def_head}") in repository: $(distn "${REPOSITORY}")" && \
-                    return
+            _def_head="$(${CAT_BIN} "${CACHE_DIR}${DEFINITIONS_BASE}/${DEFAULT_GIT_DIR_NAME}/refs/heads/${_def_cur_branch}" 2>/dev/null)"
+
+        note "Branch: $(distn "${BRANCH}") is currenly at: $(distn "${_def_head}") in repository: $(distn "${REPOSITORY}")"
     fi
     cd "${_cwd}"
     unset _def_head _def_branch _def_cur_branch _out_file _cwd
