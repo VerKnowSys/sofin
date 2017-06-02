@@ -12,7 +12,7 @@ log_helper () {
     fi
     debug "Log helper, files found: $(distd "${_lognum_f}")"
     if [ "0" = "${_lognum_f}" ]; then
-        ${LESS_BIN} ${DEFAULT_LESS_OPTIONS} ${LOGS_DIR}${SOFIN_NAME}*
+        ${LESS_BIN} ${DEFAULT_LESS_OPTIONS} ${LOGS_DIR}${SOFIN_NAME}* 2>/dev/null
     else
         _log_h_pattern="$(echo "${_log_h_pattern}" | ${CUT_BIN} -f1-${LOG_LAST_FILES} -d' ' 2>/dev/null)"
         case ${_lognum_f} in
@@ -20,9 +20,13 @@ log_helper () {
                 log_helper "${_log_h_pattern}"
                 ;;
 
+            1)
+                ${LESS_BIN} ${DEFAULT_LESS_OPTIONS} ${LOGS_DIR}/${SOFIN_NAME}-*${_log_h_pattern}* 2>/dev/null
+                ;;
+
             *)
                 note "Found $(distn "${_lognum_f}") log files, that match pattern: $(distn "${_log_h_pattern}"). Attaching to all available files.."
-                ${TAIL_BIN} -n "${LOG_LINES_AMOUNT}" -F ${LOGS_DIR}${SOFIN_NAME}-*${_log_h_pattern}*
+                ${TAIL_BIN} -n "${LOG_LINES_AMOUNT}" -F ${LOGS_DIR}${SOFIN_NAME}-*${_log_h_pattern}* 2>/dev/null
                 ;;
         esac
     fi
