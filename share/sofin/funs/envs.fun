@@ -170,6 +170,7 @@ compiler_setup () {
     # TODO: linker pick should be implemented via "capabilities"!
     case "${SYSTEM_NAME}" in
         FreeBSD|Minix)
+            DEFAULT_COMPILER_FLAGS="${COMMON_FLAGS} ${HARDEN_CFLAGS} ${HARDEN_CMACROS}"
             DEFAULT_LINKER_FLAGS="${COMMON_LDFLAGS} ${DEF_SYSTEM_SPECIFIC_LDFLAGS}"
             ;;
 
@@ -203,6 +204,7 @@ compiler_setup () {
             ;;
 
         Linux)
+            DEFAULT_COMPILER_FLAGS="${COMMON_FLAGS} ${HARDEN_CFLAGS} ${HARDEN_CMACROS}"
             DEFAULT_LINKER_FLAGS="${COMMON_LDFLAGS} ${DEF_SYSTEM_SPECIFIC_LDFLAGS}"
             ;;
     esac
