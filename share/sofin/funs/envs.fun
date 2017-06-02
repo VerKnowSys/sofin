@@ -484,10 +484,15 @@ reload_zsh_shells () {
     _pids=$(processes_all | ${EGREP_BIN} -i "${_shell_pattern}" 2>/dev/null | ${CUT_BIN} -f1 -d' ' 2>/dev/null)
     debug "Shell inspect: $(distd "${_shellshort}"), pattern: $(distd "${_shell_pattern}"), PIDS: $(distd "$(${PRINTF_BIN} "${_pids}" | eval "${NEWLINES_TO_SPACES_GUARD}")")"
     for _pid in $(echo "${_pids}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
-        if [ -z "${_wishlist}" ]; then
-            _wishlist="${_pid}"
+        try "${KILL_BIN} -0 ${_pid} 2>/dev/null"
+        if [ "0" = "${?}" ]; then
+            if [ -z "${_wishlist}" ]; then
+                _wishlist="${_pid}"
+            else
+                _wishlist="${_wishlist} ${_pid}"
+            fi
         else
-            _wishlist="${_wishlist} ${_pid}"
+            debug "Dead pid skipped: ${_pid}"
         fi
     done
     if [ -n "${_wishlist}" ]; then
