@@ -55,10 +55,11 @@ disable_sofin_env () {
 
 set_c_and_cxx_flags () {
     _flagz="${@}"
-    CFLAGS="$(${PRINTF_BIN} '%s\n' "-I${PREFIX}/include ${_flagz} ${DEFAULT_COMPILER_FLAGS}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
-    CXXFLAGS="$(${PRINTF_BIN} '%s\n' "-I${PREFIX}/include ${_flagz} ${DEFAULT_COMPILER_FLAGS}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
-    LDFLAGS="$(${PRINTF_BIN} '%s\n' "-L${PREFIX}/lib ${DEFAULT_LINKER_FLAGS}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
+    CFLAGS="$(${PRINTF_BIN} '%s\n' "${DEF_SYSTEM_SPECIFIC_CFLAGS} -I${PREFIX}/include ${_flagz} ${DEFAULT_COMPILER_FLAGS}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
+    CXXFLAGS="$(${PRINTF_BIN} '%s\n' "${DEF_SYSTEM_SPECIFIC_CFLAGS} -I${PREFIX}/include ${_flagz} ${DEFAULT_COMPILER_FLAGS}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
+    LDFLAGS="$(${PRINTF_BIN} '%s\n' "${DEF_SYSTEM_SPECIFIC_LDFLAGS} -L${PREFIX}/lib ${DEFAULT_LINKER_FLAGS}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
     unset _flagz
+    export CFLAGS CXXFLAGS LDFLAGS
 }
 
 
