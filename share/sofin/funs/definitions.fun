@@ -91,8 +91,13 @@ load_defaults () {
 
 inherit () {
     _inhnm="$(${PRINTF_BIN} '%s' "${1}" | eval "${CUTOFF_DEF_EXT_GUARD}")"
-    debug "Loading parent definition: $(distd "${_inhnm}")"
-    . "${DEFINITIONS_DIR}/${_inhnm}${DEFAULT_DEF_EXT}"
+    _def_inherit="${DEFINITIONS_DIR}/${_inhnm}${DEFAULT_DEF_EXT}"
+    . "${_def_inherit}" && \
+        debug "Loaded parent definition: $(distd "${_def_inherit}")" && \
+        return 0
+
+    debug "NOT loaded parent definition: $(distd "${_def_inherit}")"
+    return 0 # don't throw anything using this function?
 }
 
 
