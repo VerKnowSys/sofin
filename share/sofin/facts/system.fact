@@ -22,8 +22,7 @@ HARDEN_CMACROS="-D_FORTIFY_SOURCE=2"
 HARDEN_CFLAGS_PRODUCTION="-fPIE -Wl,-z,relro,-z,now"
 HARDEN_LDFLAGS_PRODUCTION="-pie -z relro -z now"
 
-if [ "${SYSTEM_NAME}" = "Darwin" ] || \
-   [ "YES" != "${CAP_SYS_HARDENED}" ]; then
+if [ "${SYSTEM_NAME}" = "Darwin" ]; then
     # not supported under macOS
     unset HARDEN_CFLAGS_PRODUCTION HARDEN_LDFLAGS_PRODUCTION HARDEN_SAFE_STACK_FLAGS
     # override -fsanitize=safe-stack which is not supported under Darwin
