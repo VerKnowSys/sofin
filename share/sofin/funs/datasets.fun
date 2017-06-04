@@ -381,18 +381,21 @@ create_builddir () {
     if [ -z "${_cb_bundle_name}" ]; then
         error "First argument with $(diste "BundleName") is required!"
     fi
+    _bdir="${SOFTWARE_DIR}/${_cb_bundle_name}/${DEFAULT_SRC_EXT}${_dset_namesum}"
+    try "${TEST_BIN} -d '${_bdir}'" && return 0
+
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
         if [ -z "${_dset_namesum}" ]; then
             error "Second argument with $(diste "dataset-checksum") is required!"
         fi
         _dset="${DEFAULT_ZPOOL}${SOFTWARE_DIR}/${USER}/${_cb_bundle_name}/${DEFAULT_SRC_EXT}${_dset_namesum}"
         try "${ZFS_BIN} create -p -o mountpoint=${SOFTWARE_DIR}/${_cb_bundle_name}/${DEFAULT_SRC_EXT}${_dset_namesum} '${_dset}'" && \
-            debug "Created ZFS build-dataset: $(distd "${_dset}")"
+            debug "Created ZFS build-dataset: $(distd "${_dset}")" && \
+            return 0
 
         try "${ZFS_BIN} mount '${_dset}'"
         unset _dset _dset_namesum
     else
-        _bdir="${SOFTWARE_DIR}/${_cb_bundle_name}/${DEFAULT_SRC_EXT}${_dset_namesum}"
         debug "Creating regular build-directory: $(distd "${_bdir}")"
         try "${MKDIR_BIN} -p '${_bdir}'"
     fi
@@ -406,6 +409,9 @@ destroy_builddir () {
     if [ -z "${_deste_bund_name}" ]; then
         error "First argument with $(diste "build-bundle-directory") is required!"
     fi
+    _bdir="${SOFTWARE_DIR}/${_deste_bund_name}/${DEFAULT_SRC_EXT}${_dset_sum}"
+    try "${TEST_BIN} ! -d '${_bdir}'" && return 0
+
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
         if [ -z "${_dset_sum}" ]; then
             error "Second argument with $(diste "bundle-sha-sum") is required!"
@@ -421,7 +427,6 @@ destroy_builddir () {
         fi
         unset _dsname
     else
-        _bdir="${SOFTWARE_DIR}/${_deste_bund_name}/${DEFAULT_SRC_EXT}${_dset_sum}"
         debug "Removing regular build-directory: $(distd "${_bdir}")"
         try "${RM_BIN} -fr '${_bdir}'"
     fi
