@@ -77,12 +77,15 @@ sofin_header () {
 
 
 processes_all () {
-    ${PS_BIN} "${DEFAULT_PS_OPTS}" 2>/dev/null | ${EGREP_BIN} -v "(grep|egrep)" 2>/dev/null
+    _ignorepid="${SOFIN_PID:-$$}"
+    ${PS_BIN} ${DEFAULT_PS_OPTS} 2>/dev/null | ${EGREP_BIN} -v "(grep|egrep|${_ignorepid}|s log|s env)" 2>/dev/null
+    return 0
 }
 
 
 processes_all_sofin () {
-    processes_all | ${EGREP_BIN} "${SOFIN_BIN}" 2>/dev/null
+    processes_all | ${EGREP_BIN} -i "${SOFIN_BIN}" 2>/dev/null | ${CUT_BIN} -f1 -d' ' 2>/dev/null
+    return 0
 }
 
 
