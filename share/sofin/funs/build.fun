@@ -400,6 +400,9 @@ process_flat () {
     # NOTE: ..load definition again, because each definition can also alter
     #       it's build environment values (flexibility, KISS)
     load_defs "${_req_definition}"
+    dump_system_capabilities
+    dump_compiler_setup
+    dump_debug_info
 
     PATH="${DEFAULT_SHELL_EXPORTS}:${_prefix}/bin:${_prefix}/sbin:${DEFAULT_PATH}"
     if [ -z "${DEF_DISABLED_ON}" ]; then
@@ -459,10 +462,6 @@ process_flat () {
                     # NOTE: if DEF_GIT_CHECKOUT is unset, use DEF_VERSION:
                     clone_or_fetch_git_bare_repo "${DEF_SOURCE_PATH}" "${DEF_NAME}${DEF_SUFFIX}-bare" "${DEF_GIT_CHECKOUT:-${DEF_VERSION}}" "${BUILD_DIR}"
                 fi
-
-                dump_debug_info
-                dump_compiler_setup
-                dump_system_capabilities
 
                 unset _fd
                 _prm_nolib="$(${PRINTF_BIN} '%s\n' "${_app_param}" | ${SED_BIN} 's/lib//' 2>/dev/null)"
