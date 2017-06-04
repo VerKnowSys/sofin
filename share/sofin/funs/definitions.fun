@@ -747,12 +747,12 @@ traverse_patchlevels () {
     for _patch in $(echo "${_trav_patches}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
         for _level in $(${SEQ_BIN} 0 3); do # Up to: -p3
             try "${PATCH_BIN} -p${_level} -N -f -i ${_patch}" && \
-            debug "Patch applied: $(distd "${_patch##*/}") (level: $(distd "${_level}"))" && \
+                debug "Patch applied: $(distd "${_patch##*/}") (level: $(distd "${_level}"))" && \
                 break
-            debug "Patch: $(distd "patches${_patch##*patches}") failed for level: ${_level}!"
+            # debug "Patch: $(distd "patches${_patch##*patches}") failed for level: ${_level}!"
         done
     done
-    unset _trav_patches
+    unset _trav_patches _patch _level
 }
 
 
