@@ -540,9 +540,14 @@ update_system_shell_env_files () {
 
 security_set_normal () {
     if [ -n "${CAP_SYS_HARDENED}" ]; then
-        debug "Setting security sysctls to normal"
-        run "${SYSCTL_BIN} hardening.pax.segvguard.status=1 hardening.pax.mprotect.status=2 hardening.pax.pageexec.status=2 hardening.pax.disallow_map32bit.status=1 hardening.pax.aslr.status=3"
-
+        _sp="$(processes_all_sofin)"
+        debug "Sofin processes: $(distd "${_sp}")"
+        if [ -z "${_sp}" ]; then
+            debug "Setting security sysctls to normal. No background Sofin jobs found!"
+            run "${SYSCTL_BIN} hardening.pax.segvguard.status=1 hardening.pax.mprotect.status=2 hardening.pax.pageexec.status=2 hardening.pax.disallow_map32bit.status=1 hardening.pax.aslr.status=3"
+        else
+            debug "Security sysctls untouched, since background Sofin jobs are still around!"
+        fi
     fi
 }
 
