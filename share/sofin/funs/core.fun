@@ -155,8 +155,8 @@ run () {
 try () {
     _try_params="${@}"
 
-    # NOTE: this one should just eval the task but when DEBUG is unset don't stderr log output from try()
-    if [ -z "${DEBUG}" ]; then
+    # NOTE: this one should just eval the task but when DEVEL is unset don't stderr log output from try()
+    if [ -z "${DEVEL}" ]; then
         eval "PATH=${PATH}${GIT_EXPORTS} ${_try_params}" >/dev/null 2>&1 \
             && return 0
         return 1
