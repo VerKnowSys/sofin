@@ -376,9 +376,13 @@ compiler_setup () {
     fi
 
     # If DEF_LINKER_FLAGS is set on definition side, append it's content to LDFLAGS:
-    if [ -n "${DEF_LINKER_FLAGS}" ]; then
-        LDFLAGS="${LDFLAGS} ${DEF_LINKER_FLAGS}"
-    fi
+    # if [ -n "${DEF_LINKER_FLAGS}" ]; then
+    #     LDFLAGS="${LDFLAGS} ${DEF_LINKER_FLAGS}"
+    # fi
+    # if [ -n "${DEF_COMPILER_FLAGS}" ]; then
+    #     CFLAGS="${CFLAGS} ${DEF_COMPILER_FLAGS}"
+    #     CXXFLAGS="${CXXFLAGS} ${DEF_COMPILER_FLAGS}"
+    # fi
 
     # NOTE: some definitions fails on missing values for these:
     AR="${AR:-ar}"
