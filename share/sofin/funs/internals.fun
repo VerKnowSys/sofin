@@ -246,7 +246,7 @@ show_diff () {
         _sddefname="${_sddefname}${DEFAULT_DEF_EXT}"
     _beauty_defn="$(distn "${_sddefname}")"
 
-    cd ${DEFINITIONS_DIR}
+    cd "${DEFINITIONS_DIR}"
     if [ -f "./${_sddefname}" ]; then
         debug "Checking status for untracked files.."
         ${GIT_BIN} status --short "${_sddefname}" 2>/dev/null | ${EGREP_BIN} '\?\?' >/dev/null 2>&1
