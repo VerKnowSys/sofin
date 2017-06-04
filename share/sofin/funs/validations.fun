@@ -198,3 +198,32 @@ validate_pie_on_exports () {
     fi
     unset _bin _a_dir _pie_indicator _bun _bundz
 }
+
+
+validate_sys_limits () {
+
+    # Limits for production CAP_SYS_HARDENED environment:
+    _ulimit_core="0"
+    _ulimit_nofile="16384"
+    _ulimit_stackkb="131070"
+    _ulimit_up_max_ps="8192"
+
+    if [ "Darwin" = "${SYSTEM_NAME}" ]; then
+        _ulimit_nofile="16384"
+        _ulimit_stackkb="16384"
+        _ulimit_up_max_ps="512"
+        debug "Initialised limits for Darwin workstation"
+    fi
+
+    env_forgivable
+    try "ulimit -n ${_ulimit_nofile}" || \
+        warn "Sofin has failed to set reasonable environment limit of open files: $(distw "${_ulimit_nofile}"). Local limit is: "$(ulimit -n)". Troubles may follow!"
+    try "ulimit -s ${_ulimit_stackkb}" || \
+        warn "Sofin has failed to set reasonable environment limit of stack (in kb) to value: $(distw "${_ulimit_stackkb}"). Local limit is: "$(ulimit -s)". Troubles may follow!"
+    try "ulimit -u ${_ulimit_up_max_ps}" || \
+        warn "Sofin has failed to set reasonable environment limit of running processes to: $(distw "${_ulimit_up_max_ps}"). Local limit is: "$(ulimit -u)". Troubles may follow!"
+    try "ulimit -c ${_ulimit_core}" || \
+        warn "Sofin has failed to set core size limit to: $(distw "${_ulimit_core}"). Local limit is: "$(ulimit -c)".!"
+
+    return 0
+}
