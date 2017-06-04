@@ -78,7 +78,8 @@ sofin_header () {
 
 processes_all () {
     _ignorepid="${SOFIN_PID:-$$}"
-    ${PS_BIN} ${DEFAULT_PS_OPTS} 2>/dev/null | ${EGREP_BIN} -v "(grep|egrep|${_ignorepid}|s log|s env)" 2>/dev/null
+    ${PS_BIN} ${DEFAULT_PS_OPTS} 2>/dev/null | \
+        ${EGREP_BIN} -v "(grep|egrep|${_ignorepid}|s\\ log\\ |s\\ env\\ )" 2>/dev/null
     return 0
 }
 
