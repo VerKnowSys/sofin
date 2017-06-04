@@ -577,20 +577,19 @@ track_useful_and_useless_files () {
 conflict_resolve () {
     if [ -n "${DEF_CONFLICTS_WITH}" ]; then
         debug "Seeking possible bundle conflicts: $(distd "${DEF_CONFLICTS_WITH}")"
-        for _cr_app in ${DEF_CONFLICTS_WITH}; do
-            _crfind_s="$(${FIND_BIN} "${SOFTWARE_DIR%/}" -maxdepth 1 -type d -iname "${_cr_app}*" 2>/dev/null)"
-            for _cr_name in ${_crfind_s}; do
+        for _cr_app in $(echo "${DEF_CONFLICTS_WITH}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
+            for _cr_name in $(${FIND_BIN} "${SOFTWARE_DIR%/}" -maxdepth 1 -type d -iname "${_cr_app}*" 2>/dev/null); do
                 _crn="${_cr_name##*/}"
                 if [ -d "${_cr_name}/exports" ] && \
                    [ "${_crn}" != "${DEF_NAME}" ] && \
                    [ "${_crn}" != "${DEF_NAME}${DEF_SUFFIX}" ]; then
-                    ${MV_BIN} "${_cr_name}/exports" "${_cr_name}/exports-disabled" && \
-                        debug "Disabled exports of bundle: $(distn "${_crn}") due to a conflict with current definition."
+                    run "${MV_BIN} ${_cr_name}/exports ${_cr_name}/exports-disabled" && \
+                        warn "Disabled exports of bundle: $(distn "${_crn}") due to a conflict with current definition."
                 fi
             done
         done
+        unset _cr_app _cr_name _crn
     fi
-    unset _crfind_s _cr_app _cr_name _crn
 }
 
 
