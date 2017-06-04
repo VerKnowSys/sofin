@@ -531,6 +531,7 @@ process_flat () {
                 cd "${_pwd}"
 
                 # configuration log:
+                TRY_LOUD=YES
                 _config_log="${LOGS_DIR}${DEF_NAME}${DEF_SUFFIX}.src-configure-options"
 
                 note "   ${NOTE_CHAR} Configuring: $(distn "${_app_param}"), version: $(distn "${DEF_VERSION}")"
@@ -640,6 +641,7 @@ process_flat () {
                         ;;
 
                 esac
+                unset TRY_LOUD
 
                 cd "${_pwd}"
                 after_configure_callback
