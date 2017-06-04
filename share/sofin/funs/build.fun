@@ -174,7 +174,6 @@ build () {
     debug "Sofin v$(distd "${SOFIN_VERSION}"): New build started for bundles: $(distd "${_build_list}")"
     PATH="${DEFAULT_PATH}"
     for _bund_name in $(echo "${_build_list}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
-        _specified="${_bund_name}" # store original value of user input
         _bund_name="$(lowercase "${_bund_name}")"
         load_defaults
         load_defs "${_bund_name}"
@@ -453,6 +452,7 @@ process_flat () {
                             debug "Previous dependency build dir was removed to avoid conflicts: $(distd "${BUILD_DIR}/${_possible_old_build_dir%/}")"
                     fi
 
+                    debug "Unpacking $(distd "${_dest_file}") to: $(distd "${BUILD_DIR}")"
                     try "${TAR_BIN} -xf ${_dest_file} --directory ${BUILD_DIR}" || \
                         try "${TAR_BIN} -xjf ${_dest_file} --directory ${BUILD_DIR}" || \
                             run "${TAR_BIN} -xJf ${_dest_file} --directory ${BUILD_DIR}"
