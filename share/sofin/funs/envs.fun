@@ -550,6 +550,6 @@ security_set_normal () {
 security_set_build () {
     if [ -n "${CAP_SYS_HARDENED}" ]; then
         debug "Setting security sysctls to build (lower)"
-        run "${SYSCTL_BIN} hardening.pax.segvguard.status=1 hardening.pax.mprotect.status=1 hardening.pax.pageexec.status=1 hardening.pax.disallow_map32bit.status=1 hardening.pax.aslr.status=1"
+        run "${SYSCTL_BIN} hardening.pax.segvguard.status=0 hardening.pax.mprotect.status=0 hardening.pax.pageexec.status=0 hardening.pax.disallow_map32bit.status=0 hardening.pax.aslr.status=0"
     fi
 }
