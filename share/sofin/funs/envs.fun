@@ -272,8 +272,8 @@ compiler_setup () {
             fi
         else
             _compiler_use_linker_flags="-fuse-ld=lld"
-            unset LD
-            #LD="ld"
+            LD="ld.lld -m elf_amd64"
+
             # _llvm_pfx="/Software/Lld"
             # if [ -x "${_llvm_pfx}/bin/llvm-config" ]; then
             #     _compiler_use_linker_flags="-fuse-ld=lld"
