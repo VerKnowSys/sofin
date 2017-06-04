@@ -55,9 +55,9 @@ disable_sofin_env () {
 
 set_c_and_cxx_flags () {
     _flagz="${@}"
-    CFLAGS="$(${PRINTF_BIN} '%s\n' "${DEF_SYSTEM_SPECIFIC_CFLAGS} -I${PREFIX}/include ${_flagz} ${DEFAULT_COMPILER_FLAGS}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
-    CXXFLAGS="$(${PRINTF_BIN} '%s\n' "${DEF_SYSTEM_SPECIFIC_CFLAGS} -I${PREFIX}/include ${_flagz} ${DEFAULT_COMPILER_FLAGS}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
-    LDFLAGS="$(${PRINTF_BIN} '%s\n' "${DEF_SYSTEM_SPECIFIC_LDFLAGS} -L${PREFIX}/lib ${DEFAULT_LINKER_FLAGS}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
+    CFLAGS="$(${PRINTF_BIN} '%s\n' "${DEF_COMPILER_FLAGS} -I${PREFIX}/include ${_flagz} ${DEFAULT_COMPILER_FLAGS}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
+    CXXFLAGS="$(${PRINTF_BIN} '%s\n' "${DEF_COMPILER_FLAGS} -I${PREFIX}/include ${_flagz} ${DEFAULT_COMPILER_FLAGS}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
+    LDFLAGS="$(${PRINTF_BIN} '%s\n' "${DEF_LINKER_FLAGS} -L${PREFIX}/lib ${DEFAULT_LINKER_FLAGS}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
     unset _flagz
     export CFLAGS CXXFLAGS LDFLAGS
 }
@@ -375,9 +375,9 @@ compiler_setup () {
         CXXFLAGS="${CXXFLAGS} ${LTO_CFLAGS}"
     fi
 
-    # If DEF_LINKER_ARGS is set on definition side, append it's content to LDFLAGS:
-    if [ -n "${DEF_LINKER_ARGS}" ]; then
-        LDFLAGS="${LDFLAGS} ${DEF_LINKER_ARGS}"
+    # If DEF_LINKER_FLAGS is set on definition side, append it's content to LDFLAGS:
+    if [ -n "${DEF_LINKER_FLAGS}" ]; then
+        LDFLAGS="${LDFLAGS} ${DEF_LINKER_FLAGS}"
     fi
 
     # NOTE: some definitions fails on missing values for these:

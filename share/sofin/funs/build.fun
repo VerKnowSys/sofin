@@ -326,6 +326,7 @@ dump_debug_info () {
     debug "BUILD_NAMESUM: $(distd "${BUILD_NAMESUM}")"
     debug "CURRENT_DIR: $(distd $(${PWD_BIN} 2>/dev/null))"
     debug "SERVICE_DIR: $(distd "${SERVICE_DIR}")"
+    debug
     debug "FETCH_BIN: $(distd "${FETCH_BIN}")"
     debug "FETCH_OPTS: $(distd "${FETCH_OPTS}")"
     if [ "Darwin" = "${SYSTEM_NAME}" ]; then
@@ -345,25 +346,24 @@ dump_debug_info () {
     debug "CXXFLAGS: $(distd "${CXXFLAGS}")"
     debug "CFLAGS: $(distd "${CFLAGS}")"
     debug "LDFLAGS: $(distd "${LDFLAGS}")"
-    debug "MAKE_OPTS: $(distd "${MAKE_OPTS}")"
-
-    # NOTE: soon deprecated:
-    # debug "DEF_COMPILER_ARGS: $(distd "${DEF_COMPILER_ARGS}")"
-    # debug "DEF_LINKER_ARGS: $(distd "${DEF_LINKER_ARGS}")"
-
-    debug "DEF_CONFIGURE_METHOD: $(distd "${DEF_CONFIGURE_METHOD}")"
+    debug "DEF_COMPILER_FLAGS: $(distd "${DEF_COMPILER_FLAGS}")"
+    debug "DEF_LINKER_FLAGS: $(distd "${DEF_LINKER_FLAGS}")"
+    debug
     debug "DEF_CONFIGURE_ARGS: $(distd "${DEF_CONFIGURE_ARGS}")"
+    debug "MAKE_OPTS: $(distd "${MAKE_OPTS}")"
+    debug
+    debug "DEF_CONFIGURE_METHOD: $(distd "${DEF_CONFIGURE_METHOD}")"
     debug "DEF_MAKE_METHOD: $(distd "${DEF_MAKE_METHOD}")"
     debug "DEF_TEST_METHOD: $(distd "${DEF_TEST_METHOD}")"
     debug "DEF_INSTALL_METHOD: $(distd "${DEF_INSTALL_METHOD}")"
-
+    debug
     debug "DEF_AFTER_UNPACK_METHOD: $(distd "${DEF_AFTER_UNPACK_METHOD}")"
     debug "DEF_AFTER_PATCH_METHOD: $(distd "${DEF_AFTER_PATCH_METHOD}")"
     debug "DEF_AFTER_CONFIGURE_METHOD: $(distd "${DEF_AFTER_CONFIGURE_METHOD}")"
     debug "DEF_AFTER_MAKE_METHOD: $(distd "${DEF_AFTER_MAKE_METHOD}")"
     debug "DEF_AFTER_INSTALL_METHOD: $(distd "${DEF_AFTER_INSTALL_METHOD}")"
     debug "DEF_AFTER_EXPORT_METHOD: $(distd "${DEF_AFTER_EXPORT_METHOD}")"
-
+    debug
     debug "-------------- PRE-BUILD SETTINGS DUMP ENDS ---------"
 }
 
