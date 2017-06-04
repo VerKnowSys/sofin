@@ -9,9 +9,9 @@ debug () {
     if [ -n "${CAP_SYS_PRODUCTION}" ]; then
         if [ -n "${DEBUG}" ]; then
             ${PRINTF_BIN} "# (%s) λ %b%s%b\n" "${SHLVL}" "${ColorDebug}" "${_in}" "${ColorReset}"
-        else
-            ${PRINTF_BIN} "# (%s) λ %b%s%b\n" "${SHLVL}" "${ColorDebug}" "${_in}" "${ColorReset}" >> "${LOG}" 2>> "${LOG}"
         fi
+        return 0
+        # ${PRINTF_BIN} "# (%s) λ %b%s%b\n" "${SHLVL}" "${ColorDebug}" "${_in}" "${ColorReset}" >> "${LOG}" 2>> "${LOG}"
     else
         _sep="${_sep:-$(distd "λ " ${ColorDarkgray})}"
         if [ "${CAP_TERM_BASH}" = "YES" ]; then
