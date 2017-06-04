@@ -9,27 +9,25 @@ log_helper () {
     _lognum_f="$(${PRINTF_BIN} '%s\n' "${_log_files}" | eval "${FILES_COUNT_GUARD}")"
     if [ -z "${_lognum_f}" ]; then
         _lognum_f="0"
-    fi
-    debug "Log helper, files found: $(distd "${_lognum_f}")"
-    if [ "0" = "${_lognum_f}" ]; then
-        ${LESS_BIN} ${DEFAULT_LESS_OPTIONS} ${LOGS_DIR}${SOFIN_NAME}* 2>/dev/null
     else
-        _log_h_pattern="$(echo "${_log_h_pattern}" | ${CUT_BIN} -f1-${LOG_LAST_FILES} -d' ' 2>/dev/null)"
-        case ${_lognum_f} in
-            0)
-                log_helper "${_log_h_pattern}"
-                ;;
-
-            1)
-                ${LESS_BIN} ${DEFAULT_LESS_OPTIONS} ${LOGS_DIR}/${SOFIN_NAME}-*${_log_h_pattern}* 2>/dev/null
-                ;;
-
-            *)
-                note "Found $(distn "${_lognum_f}") log files, that match pattern: $(distn "${_log_h_pattern}"). Attaching to all available files.."
-                ${TAIL_BIN} -n "${LOG_LINES_AMOUNT}" -F ${LOGS_DIR}${SOFIN_NAME}-*${_log_h_pattern}* 2>/dev/null
-                ;;
-        esac
+        debug "Found: $(distd "${_lognum_f}") recent log files matching pattern: $(distd "${_log_h_pattern}")"
     fi
+
+    _log_h_pattern="$(echo "${_log_h_pattern}" | ${CUT_BIN} -f1-${LOG_LAST_FILES} -d' ' 2>/dev/null)"
+    case ${_lognum_f} in
+        0)
+            ${TAIL_BIN} -n ${LOG_LINES_AMOUNT} ${LOGS_DIR}${SOFIN_NAME}-* 2>/dev/null
+            ;;
+
+        1)
+            ${LESS_BIN} ${DEFAULT_LESS_OPTIONS} ${LOGS_DIR}/${SOFIN_NAME}-*${_log_h_pattern}* 2>/dev/null
+            ;;
+
+        *)
+            note "Found $(distn "${_lognum_f}") log files, that match pattern: $(distn "${_log_h_pattern}"). Attaching to all available files.."
+            ${TAIL_BIN} -n "${LOG_LINES_AMOUNT}" -F ${LOGS_DIR}${SOFIN_NAME}-*${_log_h_pattern}* 2>/dev/null
+            ;;
+    esac
     unset _log_h_pattern _log_files _lognum_f
 }
 
