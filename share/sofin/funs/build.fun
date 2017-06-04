@@ -508,10 +508,10 @@ process_flat () {
                 cd "${_fd}"
                 _pwd="${_fd}"
 
-                # Handle DEF_BUILD_DIR_POSTFIX here
-                if [ -n "${DEF_BUILD_DIR_POSTFIX}" ]; then
-                    ${MKDIR_BIN} -p "${_fd}/${DEF_BUILD_DIR_POSTFIX}"
-                    _pwd="${_fd}/${DEF_BUILD_DIR_POSTFIX}"
+                # Handle DEF_BUILD_DIR_SUFFIX here
+                if [ -n "${DEF_BUILD_DIR_SUFFIX}" ]; then
+                    ${MKDIR_BIN} -p "${_fd}/${DEF_BUILD_DIR_SUFFIX}"
+                    _pwd="${_fd}/${DEF_BUILD_DIR_SUFFIX}"
                 fi
                 debug "Definition-build-dir: $(distd "${_pwd}")"
 
