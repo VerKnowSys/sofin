@@ -745,7 +745,7 @@ traverse_patchlevels () {
     _trav_patches="${@}"
     debug "traverse_patchlevels: ${_trav_patches}"
     for _patch in $(echo "${_trav_patches}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
-        for _level in $(${SEQ_BIN} 0 5); do # Up to: -p5
+        for _level in $(${SEQ_BIN} 0 3); do # Up to: -p3
             try "${PATCH_BIN} -p${_level} -N -f -i ${_patch}" && \
             debug "Patch applied: $(distd "${_patch##*/}") (level: $(distd "${_level}"))" && \
                 break
