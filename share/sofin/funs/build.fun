@@ -167,6 +167,7 @@ build () {
     # Update definitions and perform more checks
     validate_reqs
     security_set_build
+    env_pedantic
 
     # store_security_state
     # disable_security_features
