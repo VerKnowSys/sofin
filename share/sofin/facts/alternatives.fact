@@ -141,3 +141,16 @@ elif [ -x "/bin/zsh" ]; then
 else
     ZSH_BIN="${DEFAULT_FALLBACK_SHELL}"
 fi
+
+# Ccache
+if [ -x "/Software/Ccache/exports/ccache" ]; then
+    CCACHE_BIN="/Software/Ccache/exports/ccache"
+elif [ -x "/usr/bin/ccache" ]; then
+    CCACHE_BIN="/usr/bin/ccache"
+elif [ -x "/usr/pkg/bin/ccache" ]; then
+    CCACHE_BIN="/usr/pkg/bin/ccache"
+elif [ -x "/bin/ccache" ]; then
+    CCACHE_BIN="/bin/ccache"
+else
+    unset CCACHE_BIN
+fi

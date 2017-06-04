@@ -239,19 +239,19 @@ compiler_setup () {
 
     # TODO: make a alternatives / or capability
     if [ -z "${DEF_NO_CCACHE}" ]; then # ccache is supported by default but it's optional
-        if [ -x "${CCACHE_BIN_OPTIONAL}" ]; then
-            if [ "YES" = "${DEF_USE_ALT_COMPILER}" ]; then
-                if [ -d "${PREFIX}/bin" ]; then
-                    CC="${CCACHE_BIN_OPTIONAL} ${PREFIX}/bin/${CC}"
-                    CXX="${CCACHE_BIN_OPTIONAL} ${PREFIX}/bin/${CXX}"
-                else
-                    CC="${CCACHE_BIN_OPTIONAL} ${CC}"
-                    CXX="${CCACHE_BIN_OPTIONAL} ${CXX}"
-                fi
-            else
-                CC="${CCACHE_BIN_OPTIONAL} /usr/bin/${CC}"
-                CXX="${CCACHE_BIN_OPTIONAL} /usr/bin/${CXX}"
-            fi
+        if [ -x "${CCACHE_BIN}" ]; then
+            # if [ "YES" = "${DEF_USE_ALT_COMPILER}" ]; then
+            #     if [ -d "${PREFIX}/bin" ]; then
+            #         CC="${CCACHE_BIN} ${PREFIX}/bin/${CC}"
+            #         CXX="${CCACHE_BIN} ${PREFIX}/bin/${CXX}"
+            #     else
+            #         CC="${CCACHE_BIN} ${CC}"
+            #         CXX="${CCACHE_BIN} ${CXX}"
+            #     fi
+            # else
+                CC="${CCACHE_BIN} /usr/bin/${CC}"
+                CXX="${CCACHE_BIN} /usr/bin/${CXX}"
+            # fi
         else
             CC="/usr/bin/${CC}"
             CXX="/usr/bin/${CXX}"
