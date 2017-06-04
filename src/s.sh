@@ -12,6 +12,9 @@ SOFIN_COMMAND_ARG="${1}"
 SOFIN_ARGS="$(${PRINTF_BIN} '%s\n' "${SOFIN_ARGS_FULL}" | ${CUT_BIN} -d' ' -f2- 2>/dev/null)"
 debug "Sofin args full: ${SOFIN_ARGS_FULL}, sub_args: ${SOFIN_ARGS}"
 
+
+export SOFIN_PID SOFIN_ROOT SOFIN_ARGS SOFIN_ARGS_FULL SOFIN_COMMAND_ARG
+
 # Tracing of Sofin itself:
 if [ -n "${SOFIN_TRACE}" ]; then
     # NOTE: may be useful later:
