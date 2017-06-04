@@ -401,8 +401,8 @@ process_flat () {
     #       it's build environment values (flexibility, KISS)
     load_defs "${_req_definition}"
     dump_system_capabilities
-    dump_compiler_setup
     dump_debug_info
+    dump_compiler_setup
 
     PATH="${DEFAULT_SHELL_EXPORTS}:${_prefix}/bin:${_prefix}/sbin:${DEFAULT_PATH}"
     if [ -z "${DEF_DISABLED_ON}" ]; then
