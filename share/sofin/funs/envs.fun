@@ -536,3 +536,27 @@ update_system_shell_env_files () {
     update_shell_vars
     unset _default_envs _env_file
 }
+
+
+security_set_normal () {
+    if [ -n "${CAP_SYS_HARDENED}" ]; then
+        debug "Setting security sysctls to normal"
+        run "${SYSCTL_BIN} hardening.pax.segvguard.status=1"
+        run "${SYSCTL_BIN} hardening.pax.mprotect.status=2"
+        run "${SYSCTL_BIN} hardening.pax.pageexec.status=2"
+        run "${SYSCTL_BIN} hardening.pax.disallow_map32bit.status=1"
+        run "${SYSCTL_BIN} hardening.pax.aslr.status=3"
+    fi
+}
+
+
+security_set_build () {
+    if [ -n "${CAP_SYS_HARDENED}" ]; then
+        debug "Setting security sysctls to build (lower)"
+        run "${SYSCTL_BIN} hardening.pax.segvguard.status=1"
+        run "${SYSCTL_BIN} hardening.pax.mprotect.status=1"
+        run "${SYSCTL_BIN} hardening.pax.pageexec.status=1"
+        run "${SYSCTL_BIN} hardening.pax.disallow_map32bit.status=1"
+        run "${SYSCTL_BIN} hardening.pax.aslr.status=1"
+    fi
+}

@@ -54,6 +54,7 @@ perform_clean () {
 
 finalize () {
     # restore_security_state
+    security_set_normal
     destroy_locks
     finalize_shell_reload
 }
@@ -68,6 +69,7 @@ finalize_shell_reload () {
 
 finalize_onquit () {
     untrap_signals
+    security_set_normal
     # summary
     if [ "${TTY}" = "YES" ]; then
         # Bring back echo
@@ -96,6 +98,7 @@ finalize_afterbuild () {
     if [ -n "${_bund_name}" ]; then
         destroy_locks "${_bund_name}"
     fi
+    security_set_normal
 }
 
 
