@@ -1,0 +1,7 @@
+#!/usr/bin/env zsh
+# @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
+
+git pull
+bin/install
+echo
+
