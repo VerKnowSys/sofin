@@ -346,10 +346,13 @@ dump_debug_info () {
     debug "CFLAGS: $(distd "${CFLAGS}")"
     debug "LDFLAGS: $(distd "${LDFLAGS}")"
     debug "MAKE_OPTS: $(distd "${MAKE_OPTS}")"
-    debug "DEF_COMPILER_ARGS: $(distd "${DEF_COMPILER_ARGS}")"
-    debug "DEF_LINKER_ARGS: $(distd "${DEF_LINKER_ARGS}")"
+
+    # NOTE: soon deprecated:
+    # debug "DEF_COMPILER_ARGS: $(distd "${DEF_COMPILER_ARGS}")"
+    # debug "DEF_LINKER_ARGS: $(distd "${DEF_LINKER_ARGS}")"
 
     debug "DEF_CONFIGURE_METHOD: $(distd "${DEF_CONFIGURE_METHOD}")"
+    debug "DEF_CONFIGURE_ARGS: $(distd "${DEF_CONFIGURE_ARGS}")"
     debug "DEF_MAKE_METHOD: $(distd "${DEF_MAKE_METHOD}")"
     debug "DEF_TEST_METHOD: $(distd "${DEF_TEST_METHOD}")"
     debug "DEF_INSTALL_METHOD: $(distd "${DEF_INSTALL_METHOD}")"
