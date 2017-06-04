@@ -208,7 +208,7 @@ validate_sys_limits () {
     _ulimit_stackkb="131070"
     _ulimit_up_max_ps="8192"
 
-    if [ "Darwin" = "${SYSTEM_NAME}" ]; then
+    if [ "YES" = "${CAP_SYS_WORKSTATION}" ]; then
         _ulimit_nofile="16384"
         _ulimit_stackkb="16384"
         _ulimit_up_max_ps="512"
