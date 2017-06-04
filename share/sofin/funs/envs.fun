@@ -267,15 +267,15 @@ compiler_setup () {
         # Support of default: LLVM linker:
         if [ "Darwin" = "${SYSTEM_NAME}" ]; then
             # NOTE: on Darwin hosts it's the same linker binry but skipping options when DEF_NO_LLVM_LINKER is defined
-            _ld_arch="-arch ${DEFAULT_DARWIN_SYS_ARCH:-x86_64} -sdk_version ${DEFAULT_DARWIN_SDK_VERSION:-${MINIMAL_MAJOR_OS_VERSION}} -macosx_version_min ${MINIMAL_MAJOR_OS_VERSION}"
             if [ -x "${LD_BIN}.lld" ]; then
-                LD="ld.lld ${_ld_arch}"
+                LD="ld.lld -arch ${SYSTEM_ARCH} -sdk_version ${SYSTEM_VERSION:-${MINIMAL_MAJOR_OS_VERSION}} -macosx_version_min ${MINIMAL_MAJOR_OS_VERSION}"
             else
                 unset LD
             fi
-            unset _ld_arch
         else
-            LD="ld"
+            _compiler_use_linker_flags="-fuse-ld=lld"
+            unset LD
+            #LD="ld"
             # _llvm_pfx="/Software/Lld"
             # if [ -x "${_llvm_pfx}/bin/llvm-config" ]; then
             #     _compiler_use_linker_flags="-fuse-ld=lld"
