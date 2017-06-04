@@ -630,7 +630,7 @@ export_binaries () {
                     if [ -x "${_afile_to_exp}" ]; then # and it's executable'
                         _acurrdir="$(${PWD_BIN} 2>/dev/null)"
                         cd "${PREFIX}${dir}"
-                        try "${LN_BIN} -vfs ..${dir}${_xp} ../exports/${_xp}"
+                        run "${LN_BIN} -vfs ..${dir}${_xp} ../exports/${_xp}"
                         cd "${_acurrdir}"
                         _expo_elem="${_afile_to_exp##*/}"
                         _expolist="${_expolist} ${_expo_elem}"
