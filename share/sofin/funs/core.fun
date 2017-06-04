@@ -246,15 +246,15 @@ cleanup_handler () {
 
 
 interrupt_handler () {
-    warn "Interrupted: $(distw "${SOFIN_PID:-$$}")"
     finalize_interrupt
+    warn "Interrupted: $(distw "${SOFIN_PID:-$$}")"
     exit "${ERRORCODE_USER_INTERRUPT}"
 }
 
 
 terminate_handler () {
-    warn "Terminated: $(distw "${SOFIN_PID:-$$}")"
     finalize
+    warn "Terminated: $(distw "${SOFIN_PID:-$$}")"
     exit "${ERRORCODE_TERMINATED}"
 }
 
