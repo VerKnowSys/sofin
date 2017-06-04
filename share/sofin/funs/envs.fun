@@ -4,18 +4,16 @@ env_reset () {
     unset LD_PRELOAD LD_LIBRARY_PATH DYLD_LIBRARY_PATH
 
     # utils
-    unset CC CXX CPP LD AR RANLIB NM AS
+    unset CC CXX CPP LD AR RANLIB NM AS LIBTOOL
 
     # flags
     unset CFLAGS CXXFLAGS CPPFLAGS LDFLAGS
 
-    # NOTE: By default environment should treat non-ASCII characters as literals.
-    #       It's often required for test suites:
+    # env, shell:
+    unset LC_ALL LC_CTYPE LANGUAGE MAIL
 
-    # NOTE: should be considered legacy?
-    # LANG=C
-    # LC_ALL=C
-    # LC_CTYPE=C
+    LANG="${DEFAULT_LOCALE}"
+    export LANG
 }
 
 
