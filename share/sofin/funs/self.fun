@@ -32,7 +32,6 @@ install_sofin () {
     compiler_setup && \
         build_sofin_natives && \
         install_sofin_files && \
-        note "${SOFIN_BUNDLE_NAME} installed successfully with version: $(distn "${SOFIN_VERSION}")" && \
         echo "${SOFIN_VERSION}" > "${SOFIN_ROOT}/${SOFIN_NAME}${DEFAULT_INST_MARK_EXT}"
 
     for _bin in "s" "s-osver" "s-usec"; do
@@ -44,7 +43,7 @@ install_sofin () {
         ${SED_BIN} -i '' -e "s#/usr/bin/env sh#${DEFAULT_SHELL_EXPORTS}/zsh#" \
             "${SOFIN_ROOT}/bin/s" \
             "${SOFIN_ROOT}/share/loader" && \
-            permnote "Sofin setup completed"
+            permnote "${SOFIN_BUNDLE_NAME} v$(distn "${SOFIN_VERSION}") was installed successfully!"
     fi
 
     update_system_shell_env_files
