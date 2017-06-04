@@ -164,8 +164,8 @@ determine_system_capabilites () {
     try "${SYSCTL_BIN} kern.dtrace"
     if [ "${?}" = "0" ]; then
         CAP_SYS_DTRACE=YES
-        try "${KLDLOAD_BIN} dtrace"
-        try "${KLDLOAD_BIN} dtraceall"
+        try "${KLDLOAD_BIN} dtrace >/dev/null"
+        try "${KLDLOAD_BIN} dtraceall >/dev/null"
     else
         unset CAP_SYS_DTRACE
     fi
@@ -173,7 +173,7 @@ determine_system_capabilites () {
     try "${SYSCTL_BIN} kern.features.linux64"
     if [ "${?}" = "0" ]; then
         CAP_SYS_LINUX64_ABI=YES
-        try "${KLDLOAD_BIN} linux64"
+        try "${KLDLOAD_BIN} linux64 >/dev/null"
     else
         unset CAP_SYS_LINUX64_ABI
     fi
