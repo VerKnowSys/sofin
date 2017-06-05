@@ -164,7 +164,7 @@ validate_pie_on_exports () {
     fi
     if [ "YES" = "${CAP_SYS_HARDENED}" ]; then
         debug "Checking PIE on exports: $(distd "${_bundz}")"
-        for _bun in ${_bundz}; do
+        for _bun in $(echo "${_bundz}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
             if [ -d "${SOFTWARE_DIR}/${_bun}/exports" ]; then
                 _a_dir="${SOFTWARE_DIR}/${_bun}/exports"
             elif [ -d "${SOFTWARE_DIR}/${_bun}/exports-disabled" ]; then

@@ -87,6 +87,8 @@ finalize_interrupt () {
 
 finalize_afterbuild () {
     _bund_name="${1}"
+    debug "finalize_afterbuild for: ${_bund_name}"
+
     # Cleanup build dir if DEVEL unset:
     if [ -z "${DEVEL}" ]; then
         try_destroy_binbuild "${_bund_name}"

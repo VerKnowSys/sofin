@@ -584,13 +584,13 @@ conflict_resolve () {
     if [ -n "${DEF_CONFLICTS_WITH}" ]; then
         debug "Seeking possible bundle conflicts: $(distd "${DEF_CONFLICTS_WITH}")"
         for _cr_app in $(echo "${DEF_CONFLICTS_WITH}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
-            for _cr_name in $(${FIND_BIN} "${SOFTWARE_DIR%/}" -maxdepth 1 -type d -iname "${_cr_app}*" 2>/dev/null); do
+            for _cr_name in $(${FIND_BIN} "${SOFTWARE_DIR}" -maxdepth 1 -type d -iname "${_cr_app}*" 2>/dev/null); do
                 _crn="${_cr_name##*/}"
                 if [ -d "${_cr_name}/exports" ] && \
                    [ "${_crn}" != "${DEF_NAME}" ] && \
                    [ "${_crn}" != "${DEF_NAME}${DEF_SUFFIX}" ]; then
                     run "${MV_BIN} ${_cr_name}/exports ${_cr_name}/exports-disabled" && \
-                        warn "Disabled exports of bundle: $(distn "${_crn}") due to a conflict with current definition."
+                        warn "Disabled exports of bundle: $(distw "${_crn}") due to a conflict with current definition."
                 fi
             done
         done
