@@ -3,7 +3,7 @@ load_defs () {
     if [ -z "${_definitions}" ]; then
         error "No definition name specified!"
     else
-        for _given_def in ${_definitions}; do
+        for _given_def in $(echo "${_definitions}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
             #echo "# L: ${_given_def}"
             _name_base="${_given_def##*/}"
             _def="$(lowercase "${_name_base}")"

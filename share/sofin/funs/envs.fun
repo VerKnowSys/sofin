@@ -486,7 +486,6 @@ update_system_shell_env_files () {
             else
                 ${PRINTF_BIN} '\n\n%s\n' "${SOFIN_SHELL_BLOCK}" >> "${_env_file}" && \
                     debug "Environment block appended to file: $(distd "${_env_file}")"
-
             fi
         else
             ${PRINTF_BIN} '\n\n%s\n' "${SOFIN_SHELL_BLOCK}" >> "${_env_file}" && \
