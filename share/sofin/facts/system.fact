@@ -84,29 +84,34 @@ HARDEN_LDFLAGS_PRODUCTION="-pie -z relro -z now"
 
 SOFIN_SHELL_BLOCK=$(${CAT_BIN} <<EOF
 
+# Sofin SHELL_PID value:
+export SHELL_PID="\$\$"
+
 # Sofin launcher function:
 s () {
     eval /Software/Sofin/bin/s \${@}
 }
 
-# Setup SHELL_PID value
-SHELL_PID="\$\$"
-export SHELL_PID
-
 # Trap USR2 signal to reload ~/.profile:
 trap '. "\${HOME}/.profile"' USR2
 if [ -e "\${HOME}/.profile" ]; then
-    . "\${HOME}/.profile"
+    source "\${HOME}/.profile"
 fi
 
-# Load local environment when the current working directory changes:
-autoload -U zsh-cwd-change-hook
-load-local-sofin-env () {
-    if [ -f "./.sofin.env" ] && [ -r "./.sofin.env" ]; then
-        source "./.sofin.env"
+# Load .sofin.env if exists in PWD:
+load_sofin_env () {
+    if [ -r "$PWD/.sofin.env" ]; then
+        source "$PWD/.sofin.env"
     fi
 }
-zsh-cwd-change-hook chpwd load-local-sofin-env
+
+# Load local environment when the current working directory changes (zsh):
+chpwd() {
+    load_sofin_env
+}
+
+# Load with shell loads:
+load_sofin_env
 
 EOF
 )
