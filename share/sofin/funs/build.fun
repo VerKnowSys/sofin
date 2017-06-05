@@ -243,6 +243,8 @@ build () {
                 create_builddir "${_bundl_name}" "${BUILD_NAMESUM}"
 
                 if [ -z "${DONT_BUILD_BUT_DO_EXPORTS}" ]; then
+                    # NOTE: It's necessary to create build dir *after* binbuild check (which may create dataset itself)
+                    create_builddir "${_bundl_name}" "${BUILD_NAMESUM}"
                     if [ -z "${DEF_REQUIREMENTS}" ]; then
                         permnote "Installing: $(distn "${DEF_FULL_NAME:-${DEF_NAME}${DEF_SUFFIX}}"), version: $(distn "${DEF_VERSION}")"
                     else
