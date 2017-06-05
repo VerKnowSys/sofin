@@ -281,7 +281,7 @@ remove_bundles () {
 available_definitions () {
     if [ -d "${DEFINITIONS_DIR}" ]; then
         cd "${DEFINITIONS_DIR}"
-        _alldefs="$(${FIND_BIN} "${DEFINITIONS_DIR%/}" -mindepth 1 -maxdepth 1 -type f -name "*${DEFAULT_DEF_EXT}" 2>/dev/null)"
+        _alldefs="$(${FIND_BIN} "${DEFINITIONS_DIR}" -mindepth 1 -maxdepth 1 -type f -name "*${DEFAULT_DEF_EXT}" 2>/dev/null)"
         permnote "All definitions defined in current cache: $(distn "$(${LS_BIN} -m 2>/dev/null | eval "${CUT_TRAILING_SPACES_GUARD}")" "${ColorReset}")"
     fi
     if [ -d "${DEFINITIONS_LISTS_DIR}" ]; then
@@ -533,7 +533,7 @@ track_useful_and_useless_files () {
                     else
                         # traverse through DEF_USEFUL for _cufile patterns required by software but not exported
                         for _is_useful in $(echo "${DEF_USEFUL}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
-                            # NOTE: split each by /, first argument will be subpath f.i. "bin"; second one - file pattern
+                            # NOTE: split each by /, first argument will be subpath for instance: "bin"; second one - file pattern
                             # NOTE: legacy shell string ops sneak peak below:
                             #   ${var#*SubStr}  # will drop begin of string upto first occur of `SubStr`
                             #   ${var##*SubStr} # will drop begin of string upto last occur of `SubStr`
