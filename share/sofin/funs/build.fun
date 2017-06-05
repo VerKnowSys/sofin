@@ -169,7 +169,6 @@ build () {
     validate_reqs
     security_set_build
     validate_sys_limits
-    env_pedantic
 
     # store_security_state
     # disable_security_features
