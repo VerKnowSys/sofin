@@ -8,12 +8,16 @@ load_defs () {
             _name_base="${_given_def##*/}"
             _def="$(lowercase "${_name_base}")"
             if [ -e "${DEFINITIONS_DIR}/${_def}${DEFAULT_DEF_EXT}" ]; then
+                env_pedantic
                 . "${DEFINITIONS_DIR}/${_def}${DEFAULT_DEF_EXT}"
+                env_forgivable
 
             elif [ -e "${DEFINITIONS_DIR}/${_def}" ]; then
+                env_pedantic
                 . "${DEFINITIONS_DIR}/${_def}"
-                _given_def="$(${PRINTF_BIN} '%s' "${_def}" | eval "${CUTOFF_DEF_EXT_GUARD}")"
+                env_forgivable
 
+                _given_def="$(${PRINTF_BIN} '%s' "${_def}" | eval "${CUTOFF_DEF_EXT_GUARD}")"
             else
                 # validate available alternatives and quit no matter the result
                 show_alt_definitions_and_exit "${_given_def}"
@@ -76,7 +80,9 @@ load_defs () {
 
 
 load_defaults () {
+    env_pedantic
     . "${DEFINITIONS_DEFAULTS}"
+    env_forgivable
     if [ -z "${COMPLIANCE_CHECK}" ]; then
         # check definition/defaults compliance version
         ${PRINTF_BIN} "${SOFIN_VERSION}" | eval "${EGREP_BIN} '${DEF_COMPLIANCE}'" >/dev/null 2>&1
@@ -92,7 +98,10 @@ load_defaults () {
 inherit () {
     _inhnm="$(${PRINTF_BIN} '%s' "${1}" | eval "${CUTOFF_DEF_EXT_GUARD}")"
     _def_inherit="${DEFINITIONS_DIR}/${_inhnm}${DEFAULT_DEF_EXT}"
-    . "${_def_inherit}" && \
+
+    env_pedantic && \
+        . "${_def_inherit}" && \
+        env_forgivable && \
         debug "Loaded parent definition: $(distd "${_def_inherit}")" && \
         return 0
 
