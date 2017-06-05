@@ -413,7 +413,6 @@ wipe_remote_archives () {
 
 
 strip_bundle () {
-    env_forgivable
     _sbfdefinition_name="${1}"
     if [ -z "${_sbfdefinition_name}" ]; then
         error "No definition name specified as first param!"
@@ -483,7 +482,6 @@ strip_bundle () {
 
 
 track_useful_and_useless_files () {
-    env_forgivable
     if [ "${DEF_CLEAN_USELESS}" = "YES" ]; then
         unset _fordel
         # we shall clean the bundle, from useless files..

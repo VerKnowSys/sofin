@@ -240,7 +240,6 @@ list_bundles_full () {
 show_diff () {
     create_dirs
     _sddefname="${1}"
-    env_forgivable
     # if specified a file name, make sure it's named properly:
     ${EGREP_BIN} "${DEFAULT_DEF_EXT}$" "${_sddefname}" >/dev/null 2>&1 || \
         _sddefname="${_sddefname}${DEFAULT_DEF_EXT}"
@@ -290,7 +289,6 @@ sofin_status () {
 list_bundles_alphabetic () {
     if [ -d "${SOFTWARE_DIR}" ]; then
         debug "Listing installed software bundles in alphabetical order."
-        env_forgivable
         ${FIND_BIN} "${SOFTWARE_DIR}" -maxdepth 1 -mindepth 1 -type d  -not -name ".*" -print 2>/dev/null | \
         ${SED_BIN} -e 's#/.*/##' 2>/dev/null | ${SORT_BIN} 2>/dev/null
     fi

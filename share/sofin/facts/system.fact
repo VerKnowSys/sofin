@@ -118,7 +118,6 @@ EOF
 
 
 setup_zfs_default_setup () {
-    env_forgivable
     _zpool="$(${ZPOOL_BIN} list -H 2>/dev/null | eval "${FIRST_ARG_GUARD}")"
     if [ -n "${_zpool}" ]; then
         DEFAULT_ZPOOL="${_zpool}"

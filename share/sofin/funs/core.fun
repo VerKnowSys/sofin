@@ -154,7 +154,6 @@ run () {
 
 try () {
     _try_params="${@}"
-    env_forgivable
     # NOTE: this one should just eval the task but when DEVEL is unset don't stderr log output from try()
     if [ -z "${TRY_LOUD}" ] && [ -z "${DEVEL}" ]; then
         eval "PATH=${PATH}${GIT_EXPORTS} ${_try_params}" >/dev/null 2>&1 \

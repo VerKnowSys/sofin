@@ -215,7 +215,6 @@ validate_sys_limits () {
         debug "Initialised limits for Darwin workstation"
     fi
 
-    env_forgivable
     try "ulimit -n ${_ulimit_nofile}" || \
         warn "Sofin has failed to set reasonable environment limit of open files: $(distw "${_ulimit_nofile}"). Local limit is: "$(ulimit -n)". Troubles may follow!"
     try "ulimit -s ${_ulimit_stackkb}" || \

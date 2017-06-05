@@ -396,7 +396,6 @@ destroy_locks () {
     test -z "${_pattern}" && return 0
 
     _pid="${SOFIN_PID}"
-    env_forgivable
     for _dlf in $(${FIND_BIN} "${LOCKS_DIR%/}" -mindepth 1 -maxdepth 1 -name "*${_pattern}*${DEFAULT_LOCK_EXT}" -print 2>/dev/null); do
         try "${EGREP_BIN} '^${_pid}$' ${_dlf}" && \
             try "${RM_BIN} -f ${_dlf}" && \
@@ -419,7 +418,6 @@ destroy_locks () {
 
 
 update_shell_vars () {
-    env_forgivable
     if [ -f "${SOFIN_PROFILE}" ]; then
         debug "Generating shell environment and writing to: $(distd "${SOFIN_PROFILE}")"
         get_shell_vars > "${SOFIN_PROFILE}"
@@ -430,7 +428,6 @@ update_shell_vars () {
 
 
 reload_zsh_shells () {
-    env_forgivable
     _shell_pattern="zsh"
     if [ "Darwin" = "${SYSTEM_NAME}" ]; then
         _shell_pattern="\d ${ZSH_BIN}" # NOTE: this fixes issue with SIGUSR2 signal sent to iTerm
@@ -462,7 +459,6 @@ reload_zsh_shells () {
 
 
 update_system_shell_env_files () {
-    env_forgivable
     for _env_file in ${HOME}/.profile ${HOME}/.zshenv ${HOME}/.bashrc; do
         if [ -f "${_env_file}" ]; then
             ${EGREP_BIN} "SHELL_PID=" "${_env_file}" >/dev/null 2>&1

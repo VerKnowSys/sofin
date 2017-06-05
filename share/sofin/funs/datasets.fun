@@ -210,7 +210,6 @@ fetch_dset_zfs_stream () {
             unset _dataset_name
         else
             debug "Origin service dataset unavailable for: $(distd "${_fdz_bund_name}")."
-            env_forgivable
             return 1
         fi
     else
@@ -224,7 +223,6 @@ fetch_dset_zfs_stream () {
             unset _tarball_name
         else
             debug "Origin service tarball unavailable for: $(distd "${_fdz_bund_name}")."
-            env_forgivable
             return 1
         fi
     fi
@@ -485,7 +483,6 @@ create_software_bundle_archive () {
 
 # returns name of device which is used in main ZFS pool:
 boot_device_name () {
-    env_forgivable
     for _dsk in $(${GEOM_BIN} disk list 2>/dev/null | ${EGREP_BIN} -i "Geom name:" 2>/dev/null | ${SED_BIN} 's/^.*\: //' 2>/dev/null); do
 
         if [ "YES" = "${CAP_SYS_ZFS}" ]; then
@@ -637,8 +634,7 @@ do_prefix_snapshot () {
             #     return 0
             # else
             #     debug "Failed snapshot? _p1: $(distd "${_snap_name}_${TIMESTAMP}@${_snap_name}")=${_p1};  _p2: $(distd "${_pr_bdir_snp}@${_snap_name}")=${_p2}"
-            #     env_forgivable
-            #     return 1
+            #     #     return 1
             # fi
         fi
     else
