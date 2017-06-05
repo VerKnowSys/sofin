@@ -235,7 +235,26 @@ compiler_setup () {
     # 3. Legacy Linker (ld)
     unset _compiler_use_linker_flags
     if [ -z "${DEF_NO_LLVM_LINKER}" ] && [ "YES" = "${CAP_SYS_LLVM_LD}" ]; then
-        # Support of default: LLVM linker:
+        #
+        # NOTE: possible values for LLVM (LLD) linker emulation values (-m XYZ):
+        #
+        #       aarch64     =>          aarch64elf
+        #       amd64       =>          elf_x86_64_fbsd
+        #       arm         =>          armelf_fbsd
+        #       armeb       =>          armelf_fbsd
+        #       armv6       =>          armelf_fbsd
+        #       i386        =>          elf_i386_fbsd
+        #       mips        =>          elf32btsmip_fbsd
+        #       mips64      =>          elf64btsmip_fbsd
+        #       mipsel      =>          elf32ltsmip_fbsd
+        #       mips64el    =>          elf64ltsmip_fbsd
+        #       mipsn32     =>          elf32btsmipn32_fbsd
+        #       powerpc     =>          elf32ppc_fbsd
+        #       powerpc64   =>          elf64ppc_fbsd
+        #       riscv       =>          elf64riscv
+        #       sparc64     =>          elf64_sparc_fbsd
+        #
+
         _compiler_use_linker_flags="-fuse-ld=lld"
         # LD="ld.lld -m elf_amd64"
         unset LD
