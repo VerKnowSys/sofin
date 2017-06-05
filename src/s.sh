@@ -142,9 +142,11 @@ if [ -n "${SOFIN_COMMAND_ARG}" ]; then
             else
                 _pickd_bundls="${SOFIN_ARGS}"
             fi
-            debug "Processing software: $(distd "${_pickd_bundls}") for: $(distd "${OS_TRIPPLE}")"
-            build "${_pickd_bundls}"
-            unset _pickd_bundls
+            for _b in $(echo "${_pickd_bundls}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
+                debug "Buiding software: $(distd "${_b}") for: $(distd "${OS_TRIPPLE}")"
+                build "${_b}"
+            done
+            unset _pickd_bundls _b
             finalize
             ;;
 
@@ -161,7 +163,10 @@ if [ -n "${SOFIN_COMMAND_ARG}" ]; then
             _pickd_bundls="$(${CAT_BIN} "${DEFAULT_PROJECT_DEPS_LIST_FILE}" 2>/dev/null | eval "${NEWLINES_TO_SPACES_GUARD}")"
             _bundls_amount="$(${PRINTF_BIN} '%s\n' "${_pickd_bundls}" | eval "${WORDS_COUNT_GUARD}")"
             note "Dependencies list file found with $(distn "${_bundls_amount}") elements in order: $(distn "${_pickd_bundls}")"
-            build "${_pickd_bundls}"
+            for _b in $(echo "${_pickd_bundls}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
+                debug "Buiding software: $(distd "${_b}") for: $(distd "${OS_TRIPPLE}")"
+                build "${_b}"
+            done
             unset _pickd_bundls _bundls_amount
             finalize
             ;;
@@ -185,8 +190,10 @@ if [ -n "${SOFIN_COMMAND_ARG}" ]; then
             fail_on_bg_job "${_to_be_built}"
             USE_UPDATE=NO
             USE_BINBUILD=NO
-            build "${_to_be_built}"
-            unset _to_be_built
+            for _b in $(echo "${_to_be_built}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
+                build "${_b}"
+            done
+            unset _to_be_built _b
             finalize
             ;;
 
