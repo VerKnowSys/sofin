@@ -136,11 +136,9 @@ dump_compiler_setup () {
         debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "trap-signed-integer-overflow" "${ColorGray}")")
 
     if [ -z "${DEF_LINKER_NO_DTAGS}" ]; then
-        if [ "${SYSTEM_NAME}" != "Darwin" ]; then # feature isn't required on Darwin
-            debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "enable-new-dtags" "${ColorGreen}")"
-        else
-            debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "enable-new-dtags" "${ColorGray}")"
-        fi
+        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "enable-new-dtags" "${ColorGray}")"
+    else
+        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "enable-new-dtags" "${ColorGreen}")"
     fi
 
     if [ -z "${DEF_NO_FAST_MATH}" ]; then
@@ -238,38 +236,9 @@ compiler_setup () {
     unset _compiler_use_linker_flags
     if [ -z "${DEF_NO_LLVM_LINKER}" ] && [ "YES" = "${CAP_SYS_LLVM_LD}" ]; then
         # Support of default: LLVM linker:
-        if [ "Darwin" = "${SYSTEM_NAME}" ]; then
-            # NOTE: on Darwin hosts it's the same linker binry but skipping options when DEF_NO_LLVM_LINKER is defined
-            if [ -x "${LD_BIN}.lld" ]; then
-                LD="ld.lld -arch ${SYSTEM_ARCH} -sdk_version ${SYSTEM_VERSION:-${MINIMAL_MAJOR_OS_VERSION}} -macosx_version_min ${MINIMAL_MAJOR_OS_VERSION}"
-            else
-                unset LD
-            fi
-        else
-            _compiler_use_linker_flags="-fuse-ld=lld"
-            LD="ld.lld -m elf_amd64"
-
-            # _llvm_pfx="/Software/Lld"
-            # if [ -x "${_llvm_pfx}/bin/llvm-config" ]; then
-            #     _compiler_use_linker_flags="-fuse-ld=lld"
-            #     RANLIB="${_llvm_pfx}/bin/llvm-ranlib"
-            #     NM="${_llvm_pfx}/bin/llvm-nm"
-            #     AR="${_llvm_pfx}/bin/llvm-ar"
-            #     AS="${_llvm_pfx}/bin/llvm-as"
-            #     debug "LLVM-LD linker configured."
-            #     unset STRIP
-            # else
-            #     debug "Failed to get LLVM-host-target hint from llvm-config. Got: '$(distd "${_llvm_target}")'"
-            #     unset RANLIB STRIP AS NM AR
-            #     if [ -x "${LD_BIN}.lld" ]; then
-            #         LD="${LD_BIN}.lld"
-            #     else
-            #         # Fallback:
-            #         LD="${LD_BIN}"
-            #     fi
-            # fi
-            # unset _llvm_pfx _llvm_target
-        fi
+        _compiler_use_linker_flags="-fuse-ld=lld"
+        # LD="ld.lld -m elf_amd64"
+        unset LD
 
     elif [ -z "${DEF_NO_GOLDEN_LINKER}" ] && \
          [ "YES" = "${CAP_SYS_GOLD_LD}" ]; then
@@ -321,11 +290,9 @@ compiler_setup () {
     set_c_and_cxx_flags "${_compiler_use_linker_flags}"
 
     if [ -z "${DEF_LINKER_NO_DTAGS}" ]; then
-        if [ "${SYSTEM_NAME}" != "Darwin" ]; then # feature isn't required on Darwin
-            CFLAGS="${CFLAGS} -Wl,-rpath=${PREFIX}/lib,--enable-new-dtags"
-            CXXFLAGS="${CXXFLAGS} -Wl,-rpath=${PREFIX}/lib,--enable-new-dtags"
-            LDFLAGS="${LDFLAGS} -Wl,-rpath=${PREFIX}/lib,--enable-new-dtags"
-        fi
+        CFLAGS="${CFLAGS} -Wl,-rpath=${PREFIX}/lib,--enable-new-dtags"
+        CXXFLAGS="${CXXFLAGS} -Wl,-rpath=${PREFIX}/lib,--enable-new-dtags"
+        LDFLAGS="${LDFLAGS} -Wl,-rpath=${PREFIX}/lib,--enable-new-dtags"
     fi
     if [ -z "${DEF_NO_FAST_MATH}" ]; then
         CFLAGS="${CFLAGS} -ffast-math"
@@ -346,6 +313,7 @@ compiler_setup () {
     if [ -z "${DEF_NO_LTO}" ]; then
         CFLAGS="${CFLAGS} ${LTO_CFLAGS}"
         CXXFLAGS="${CXXFLAGS} ${LTO_CFLAGS}"
+        # LDFLAGS="${LDFLAGS} ${LTO_CFLAGS}"
     fi
 
     # If DEF_LINKER_FLAGS is set on definition side, append it's content to LDFLAGS:
