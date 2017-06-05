@@ -338,8 +338,7 @@ show_alt_definitions_and_exit () {
     _an_app="${1}"
     if [ ! -f "${DEFINITIONS_DIR}/${_an_app}${DEFAULT_DEF_EXT}" ]; then
         unset _contents
-        _maybe_version="$(${FIND_BIN} "${DEFINITIONS_DIR%/}" -maxdepth 1 -name "${_an_app}*${DEFAULT_DEF_EXT}" 2>/dev/null)"
-        for _maybe in ${_maybe_version}; do
+        for _maybe in $(${FIND_BIN} "${DEFINITIONS_DIR}" -maxdepth 1 -name "${_an_app}*${DEFAULT_DEF_EXT}" 2>/dev/null); do
             _contents="${_contents}$(${PRINTF_BIN} '%s\n' "$(capitalize "${_maybe##*/}")" | ${SED_BIN} 's/\..*//' 2>/dev/null) "
         done
         if [ -z "${_contents}" ]; then
@@ -347,7 +346,7 @@ show_alt_definitions_and_exit () {
         else
             warn "No such definition found: $(distw "${_an_app}"). Alternatives found: $(distw "${_contents}")"
         fi
-        unset _an_app _contents _maybe_version _maybe_version _maybe
+        unset _an_app _contents _maybe
         finalize_onquit
     fi
     unset _an_app
