@@ -512,15 +512,15 @@ install_software_from_binbuild () {
         # On systems with ZFS capability, we use zfs receive instead of tarballing:
         _isfb_dataset="${DEFAULT_ZPOOL}${SOFTWARE_DIR}/${USER}/${_isfb_fullname}"
         debug "isfb: $(distd "${_isfb_archive}"), isff: $(distd "${_isfb_fullname}"), isfbdset: $(distd "${_isfb_dataset}")"
-        try "${ZFS_BIN} list -H -t filesystem '${_isfb_dataset}'"
-        if [ "${?}" != "0" ]; then
+        try "${ZFS_BIN} list -H -t filesystem ${_isfb_dataset} >> ${LOG} 2>/dev/null"
+        if [ "${?}" = "0" ]; then
+            note "Software dataset: $(distn "${_isfb_fullname}") already installed."
+            DONT_BUILD_BUT_DO_EXPORTS=YES
+        else
             debug "Installing ZFS based binary build to dataset: $(distd "${_isfb_dataset}")"
             run "${XZCAT_BIN} '${FILE_CACHE_DIR}${_isfb_archive}' | ${ZFS_BIN} receive ${ZFS_RECEIVE_OPTS} '${_isfb_dataset}' | ${TAIL_BIN} -n1 2>/dev/null" && \
                     note "Installed: $(distn "${_isfb_fullname}")" && \
                         DONT_BUILD_BUT_DO_EXPORTS=YES
-        else
-            note "Installation not necessary for already existing dataset: $(distn "${_isfb_fullname}")"
-            DONT_BUILD_BUT_DO_EXPORTS=YES
         fi
     else
         try "${TAR_BIN} -xJf ${FILE_CACHE_DIR}${_isfb_archive} --directory ${SOFTWARE_DIR}"
