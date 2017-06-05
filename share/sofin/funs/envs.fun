@@ -483,15 +483,24 @@ update_system_shell_env_files () {
 }
 
 
+set_normal_security () {
+    debug "Setting security sysctls to normal. No background Sofin jobs found!"
+    run "${SYSCTL_BIN} hardening.pax.segvguard.status=1 hardening.pax.mprotect.status=2 hardening.pax.pageexec.status=2 hardening.pax.disallow_map32bit.status=1 hardening.pax.aslr.status=3"
+}
+
+
 security_set_normal () {
     if [ -n "${CAP_SYS_HARDENED}" ]; then
-        _sp="$(processes_all_sofin)"
-        debug "Sofin processes: $(distd "${_sp}")"
-        if [ -z "${_sp}" ]; then
-            debug "Setting security sysctls to normal. No background Sofin jobs found!"
-            run "${SYSCTL_BIN} hardening.pax.segvguard.status=1 hardening.pax.mprotect.status=2 hardening.pax.pageexec.status=2 hardening.pax.disallow_map32bit.status=1 hardening.pax.aslr.status=3"
+        if [ -n "${CAP_SYS_PRODUCTION}" ]; then
+            set_normal_security
         else
-            debug "Security sysctls untouched, since background Sofin jobs are still around!"
+            _sp="$(processes_all_sofin)"
+            if [ -z "${_sp}" ]; then
+                debug "No Sofin processes in background! Setting normal security"
+                set_normal_security
+            else
+                debug "Security sysctls untouched, Background Sofin jobs are still around!"
+            fi
         fi
     fi
 }
@@ -499,7 +508,9 @@ security_set_normal () {
 
 security_set_build () {
     if [ -n "${CAP_SYS_HARDENED}" ]; then
-        debug "Setting security sysctls to build (lower)"
-        run "${SYSCTL_BIN} hardening.pax.segvguard.status=0 hardening.pax.mprotect.status=0 hardening.pax.pageexec.status=0 hardening.pax.disallow_map32bit.status=0 hardening.pax.aslr.status=0"
+        if [ -z "${CAP_SYS_PRODUCTION}" ]; then
+            debug "Setting security sysctls to build (lower)"
+            run "${SYSCTL_BIN} hardening.pax.segvguard.status=0 hardening.pax.mprotect.status=0 hardening.pax.pageexec.status=0 hardening.pax.disallow_map32bit.status=0 hardening.pax.aslr.status=0"
+        fi
     fi
 }
