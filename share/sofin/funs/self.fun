@@ -20,32 +20,29 @@ load_requirements () {
 
 
 install_sofin () {
-    env_reset
-    create_dirs
     load_requirements
-    determine_system_capabilites
-    determine_term_capabilites
-    disable_sofin_env
+    create_dirs
 
-    permnote "Installing ${SOFIN_BUNDLE_NAME} to prefix: $(distn "${SOFIN_ROOT}")"
+    echo "Installing ${SOFIN_BUNDLE_NAME} to prefix: $(distn "${SOFIN_ROOT}")"
 
     compiler_setup && \
         build_sofin_natives && \
         install_sofin_files && \
         echo "${SOFIN_VERSION}" > "${SOFIN_ROOT}/${SOFIN_NAME}${DEFAULT_INST_MARK_EXT}"
 
-    for _bin in "s" "s-osver" "s-usec"; do
-        test ! -L "${SOFIN_ROOT}/exports/${_bin}" && \
-            run "${SOFIN_ROOT}/bin/${_bin} export ${_bin} ${SOFIN_BUNDLE_NAME}"
-    done
+    # for _bin in "s" "s-osver" "s-usec"; do
+    #     test ! -L "${SOFIN_ROOT}/exports/${_bin}" && \
+    #         run "${SOFIN_ROOT}/bin/${_bin} export ${_bin} ${SOFIN_BUNDLE_NAME}"
+    # done
 
     if [ -x "${DEFAULT_SHELL_EXPORTS}/zsh" ]; then
         ${SED_BIN} -i '' -e "s#/usr/bin/env sh#${DEFAULT_SHELL_EXPORTS}/zsh#" \
             "${SOFIN_ROOT}/bin/s" \
             "${SOFIN_ROOT}/share/loader" && \
-            permnote "${SOFIN_BUNDLE_NAME} v$(distn "${SOFIN_VERSION}") was installed successfully!"
+            echo "${SOFIN_BUNDLE_NAME} v$(distn "${SOFIN_VERSION}") was installed successfully!"
     fi
 
+    disable_sofin_env
     update_system_shell_env_files
     return 0
 }
@@ -64,7 +61,7 @@ build_sofin_natives () {
         if [ -f "src/${_prov}.cc" ]; then
             debug "${SOFIN_BUNDLE_NAME}: Build: ${CXX_NAME} -o bin/${_prov} ${CFLAGS} src/${_prov}.cc"
             run "${CXX_NAME} ${DEFAULT_COMPILER_FLAGS} ${DEFAULT_LINKER_FLAGS} src/${_prov}.cc -o bin/${_prov}" && \
-                permnote "  ${_okch} cc: src/${_prov}.cc"
+                echo "  ${_okch} cc: src/${_prov}.cc"
 
             continue
         fi
@@ -74,7 +71,7 @@ build_sofin_natives () {
 
 try_sudo_installation () {
     _cmds="sudo ${MKDIR_BIN} -vp ${SOFTWARE_DIR} ${SERVICES_DIR} && sudo ${CHOWN_BIN} -R ${USER} ${SOFTWARE_DIR} ${SERVICES_DIR}"
-    note "Please provide password for commands: $(distn "${_cmds}")"
+    echo "Please provide password for commands: $(distn "${_cmds}")"
     eval "${_cmds}" || \
         exit 66
     unset _cmds
@@ -88,7 +85,6 @@ install_sofin_files () {
     ${MKDIR_BIN} -p "${SOFTWARE_DIR}" "${SERVICES_DIR}" "${SOFIN_ROOT}/bin" "${SOFIN_ROOT}/exports" "${SOFIN_ROOT}/share" || \
         try_sudo_installation
 
-    env_pedantic
     _okch="$(distn "${SUCCESS_CHAR}" "${ColorParams}")"
     for _prov in ${SOFIN_PROVIDES}; do
         if [ -f "bin/${_prov}" ]; then
@@ -96,15 +92,15 @@ install_sofin_files () {
             run "${RM_BIN} -f bin/${_prov}"
         fi
     done && \
-        permnote "  ${_okch} native utils"
+        echo "  ${_okch} native utils"
 
     run "${CP_BIN} -vfR share/sofin/* ${SOFIN_ROOT}/share/" && \
-        permnote "  ${_okch} facts and functions"
+        echo "  ${_okch} facts and functions"
 
     run "${INSTALL_BIN} -v src/s.sh ${SOFIN_ROOT}/bin/s" && \
-        permnote "  ${_okch} sofin launcher" && \
-        permnote "Type: $(distn "s usage") for help." && \
-        note "Read: $(distn "https://github.com/VerKnowSys/sofin") for more details." && \
+        echo "  ${_okch} sofin launcher" && \
+        echo "Type: $(distn "s usage") for help." && \
+        echo "Read: $(distn "https://github.com/VerKnowSys/sofin") for more details." && \
             return 0
     return 1
 }
