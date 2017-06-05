@@ -214,6 +214,6 @@ determine_system_capabilites () {
         # NOTE: Under Darwin we have to replace original linker with LLVM one.
         #       On this system it has to be: /usr/bin/ld.
         # WARN: You may need to disable macOS SIP protection (10.11+) to modify files in /usr/bin
-        unset CAP_SYS_GOLD_LD
+        unset CAP_SYS_GOLD_LD CAP_SYS_LLVM_LD
     fi
 }
