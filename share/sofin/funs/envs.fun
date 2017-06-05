@@ -136,9 +136,9 @@ dump_compiler_setup () {
         debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "trap-signed-integer-overflow" "${ColorGray}")")
 
     if [ -z "${DEF_LINKER_NO_DTAGS}" ]; then
-        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "enable-new-dtags" "${ColorGray}")"
-    else
         debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "enable-new-dtags" "${ColorGreen}")"
+    else
+        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "enable-new-dtags" "${ColorGray}")"
     fi
 
     if [ -z "${DEF_NO_FAST_MATH}" ]; then
