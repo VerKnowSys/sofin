@@ -256,8 +256,7 @@ compiler_setup () {
         #
 
         _compiler_use_linker_flags="-fuse-ld=lld"
-        # LD="ld.lld -m elf_amd64"
-        unset LD
+        LD="ld.lld -m elf_x86_64_fbsd"
 
     elif [ -z "${DEF_NO_GOLDEN_LINKER}" ] && \
          [ "YES" = "${CAP_SYS_GOLD_LD}" ]; then
