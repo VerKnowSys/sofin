@@ -17,7 +17,7 @@ push_to_all_mirrors () {
     else
         debug "Processing mirror(s): $(distd "${_pt_query}")"
     fi
-    for _ptmirror in ${_pt_query}; do
+    for _ptmirror in $(echo "${_pt_query}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
         _ptaddress="${SOFIN_NAME}@${_ptmirror}:${MAIN_BINARY_PREFIX}/${SYS_SPECIFIC_BINARY_REMOTE}"
         debug "Remote address inspect: $(distd "${_ptaddress}")"
         try "${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_SSH_PORT} ${SOFIN_NAME}@${_ptmirror} '${MKDIR_BIN} -vp ${MAIN_BINARY_PREFIX}/${SYS_SPECIFIC_BINARY_REMOTE}'"
