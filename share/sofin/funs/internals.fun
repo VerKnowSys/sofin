@@ -152,7 +152,7 @@ get_shell_vars () {
     gsv_int_ldflags "${SOFTWARE_DIR}"
 
     # CFLAGS, CXXFLAGS:
-    _cflags="${COMMON_COMPILER_FLAGS}"
+    _cflags="${DEFAULT_COMPILER_FLAGS}"
     gsv_int_cflags () {
         for _app in ${1}*; do
             _exp="${_app}/include"
