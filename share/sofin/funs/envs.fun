@@ -167,44 +167,19 @@ dump_system_capabilities () {
 
 compiler_setup () {
     # TODO: linker pick should be implemented via "capabilities"!
+    unset DEFAULT_LINKER_FLAGS
     case "${SYSTEM_NAME}" in
-        FreeBSD|Minix)
-            DEFAULT_COMPILER_FLAGS="${COMMON_FLAGS} ${HARDEN_CFLAGS} ${HARDEN_CMACROS}"
-            DEFAULT_LINKER_FLAGS="${COMMON_LDFLAGS} ${DEF_SYSTEM_SPECIFIC_LDFLAGS}"
+        FreeBSD)
+            DEFAULT_COMPILER_FLAGS="${HARDEN_CFLAGS} ${HARDEN_CMACROS} ${HARDEN_CFLAGS_PRODUCTION}"
+            DEFAULT_LINKER_FLAGS="${HARDEN_LDFLAGS_PRODUCTION}"
             ;;
 
         Darwin)
-            # NOTE: Default flags can contains linker setup options:
-            DEFAULT_COMPILER_FLAGS="${COMMON_FLAGS} ${HARDEN_CFLAGS} ${HARDEN_CMACROS}"
-            DEFAULT_LINKER_FLAGS="${COMMON_LDFLAGS} ${DEF_SYSTEM_SPECIFIC_LDFLAGS}"
-
-            # XQuartz support to make things easier:
-            # if [ -d "/opt/X11/lib" -a \
-            #      -d "/opt/X11/include" ]; then
-            #      debug "XQuartz /opt prefix detected. Appending to compiler environment.."
-            #      DEFAULT_COMPILER_FLAGS="${DEFAULT_COMPILER_FLAGS} -I/opt/X11/include"
-            #      DEFAULT_LINKER_FLAGS="${DEFAULT_LINKER_FLAGS} -L/opt/X11/lib"
-            # fi
-
-            # NOTE: So if Lld is installed, and both /Software/Lld/exports/ld and
-            #       /usr/bin/ld are same files => We use LLVM lld linker by default:
-            LLD_ORIGIN="/Software/Lld/exports/lld"
-            if [ -x "${LLD_ORIGIN}" ]; then
-                LLD_BIN="${LLD_BIN:-${LLD_ORIGIN}}"
-            fi
-            if [ "$(file_checksum "${LD_BIN}")" = "$(file_checksum "${LLD_BIN}")" ]; then
-                debug "Checksum matches origin: Default system linker is overriden with LLVM-linker!"
-                unset LLD_BIN
-                CAP_SYS_LLVM_LD=YES
-            else
-                unset LLD_BIN CAP_SYS_LLVM_LD
-                debug "Falling to system linker for Darwin!"
-            fi
+            DEFAULT_COMPILER_FLAGS="${HARDEN_CFLAGS} ${HARDEN_CMACROS}"
             ;;
 
-        Linux)
-            DEFAULT_COMPILER_FLAGS="${COMMON_FLAGS} ${HARDEN_CFLAGS} ${HARDEN_CMACROS}"
-            DEFAULT_LINKER_FLAGS="${COMMON_LDFLAGS} ${DEF_SYSTEM_SPECIFIC_LDFLAGS}"
+        Linux|Minix)
+            DEFAULT_COMPILER_FLAGS="${HARDEN_CFLAGS} ${HARDEN_CMACROS}"
             ;;
     esac
 
