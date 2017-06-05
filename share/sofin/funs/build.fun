@@ -161,6 +161,7 @@ fetch_binbuild () {
 }
 
 
+# NOTE: build() works incorrectly now - when specified multiple arguments the post tasks fail
 build () {
     _build_list="${@}"
 
@@ -306,11 +307,7 @@ build () {
 
     # After exports - track useless files:
     track_useful_and_useless_files
-
-    for _bund_name in $(echo "${_build_list}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
-        debug "finalize_afterbuild for: ${_bund_name}"
-        finalize_afterbuild "${_bund_name}"
-    done
+    finalize_afterbuild "${_bund_lcase}"
 
     unset _build_list _bund_lcase _req_all _req
     env_reset
