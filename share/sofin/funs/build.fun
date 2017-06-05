@@ -239,8 +239,10 @@ build () {
                     unset _already_installed_version
                 fi
 
-                # NOTE: It's necessary to create build dir *after* binbuild check (which may create dataset itself)
-                create_builddir "${_bundl_name}" "${BUILD_NAMESUM}"
+                if [ -n "${CAP_SYS_PRODUCTION}" ]; then
+                    debug "Production mode enabled. Skipping build by setting DONT_BUILD_BUT_DO_EXPORTS=YES"
+                    DONT_BUILD_BUT_DO_EXPORTS=YES
+                fi
 
                 if [ -z "${DONT_BUILD_BUT_DO_EXPORTS}" ]; then
                     # NOTE: It's necessary to create build dir *after* binbuild check (which may create dataset itself)
@@ -300,14 +302,13 @@ build () {
     after_export_callback
     after_export_snapshot
     validate_pie_on_exports "${_build_list}"
-    strip_bundle "${_bund_lcase}"
 
-    # TODO: XXX: requires some more <3:
-    #            create_apple_bundle_if_necessary
-
-    # After exports - track useless files:
-    track_useful_and_useless_files
-    finalize_afterbuild "${_bund_lcase}"
+    if [ -z "${CAP_SYS_PRODUCTION}" ]; then
+        strip_bundle "${_bund_lcase}"
+        track_useful_and_useless_files
+        # After exports - track useless files:
+        finalize_afterbuild "${_bund_lcase}"
+    fi
 
     unset _build_list _bund_lcase _req_all _req
     env_reset
