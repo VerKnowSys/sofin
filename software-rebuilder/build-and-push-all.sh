@@ -4,11 +4,11 @@
 SOFIN_ROOT="${SOFIN_ROOT:-/Software/Sofin}"
 . "${SOFIN_ROOT}/share/loader"
 
-if [ "FreeBSD" = "${SYSTEM_NAME}" ]; then
-    try "${CHMOD_BIN} 600 ~/.ssh/id_rsa"
-    . /var/ServeD-OS/setup-buildhost
-    setup_buildhost
-fi
+# if [ "FreeBSD" = "${SYSTEM_NAME}" ]; then
+#     try "${CHMOD_BIN} 600 ~/.ssh/id_rsa"
+#     . /var/ServeD-OS/setup-buildhost
+#     setup_buildhost
+# fi
 
 # ${TEST_BIN} -f /.build-host && export DEVEL=YES
 ${TEST_BIN} ! -x /Software/Ccache/bin/ccache || ${SOFIN_BIN} i Ccache
