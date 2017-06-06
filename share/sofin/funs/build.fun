@@ -566,21 +566,17 @@ process_flat () {
                         _pwd="${_pwd}/build"
                         cd "${_pwd}"
                         _cmake_cmdline="${DEF_CONFIGURE_METHOD} ../ -LH -DCMAKE_INSTALL_RPATH=\"${_prefix}/lib;${_prefix}/libexec\" -DCMAKE_INSTALL_PREFIX=${_prefix} -DCMAKE_BUILD_TYPE=Release -DSYSCONFDIR=${SERVICE_DIR}/etc -DMAN_INSTALLDIR=${_prefix}/share/man -DDOCDIR=${_prefix}/share/doc -DJOB_POOL_COMPILE=${CPUS} -DJOB_POOL_LINK=${CPUS} -DCMAKE_C_FLAGS=\"${CFLAGS}\" -DCMAKE_CXX_FLAGS=\"${CXXFLAGS}\" ${DEF_CONFIGURE_ARGS}"
-                        # NOTE: Try ninja first, on non Darwin hosts:
-                        if [ "Darwin" = "${SYSTEM_NAME}" ]; then
-                            run "${_cmake_cmdline} -G\"Unix Makefiles\""
-                        else
-                            if [ -x "${PREFIX}/bin/ninja" ]; then
-                                run "${RM_BIN} -f CMakeCache.txt; ${_cmake_cmdline} -G\"Ninja\""
-                                DEF_MAKE_METHOD="ninja -j${CPUS}"
-                                DEF_INSTALL_METHOD="ninja install"
 
-                            else # Makefiles:
-                                run "${RM_BIN} -f CMakeCache.txt; ${_cmake_cmdline} -G\"Unix Makefiles\""
-                                DEF_MAKE_METHOD="make -j${CPUS}"
-                                DEF_INSTALL_METHOD="make install"
+                        if [ -x "${PREFIX}/bin/ninja" ]; then
+                            run "${RM_BIN} -f CMakeCache.txt; ${_cmake_cmdline} -G\"Ninja\""
+                            DEF_MAKE_METHOD="ninja -j${CPUS}"
+                            DEF_INSTALL_METHOD="ninja install"
 
-                            fi
+                        else # Makefiles:
+                            run "${RM_BIN} -f CMakeCache.txt; ${_cmake_cmdline} -G\"Unix Makefiles\""
+                            DEF_MAKE_METHOD="make -j${CPUS}"
+                            DEF_INSTALL_METHOD="make install"
+
                         fi
                         unset _cmake_cmdline
                         ;;
