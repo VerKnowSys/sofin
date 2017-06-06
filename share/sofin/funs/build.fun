@@ -570,8 +570,17 @@ process_flat () {
                         if [ "Darwin" = "${SYSTEM_NAME}" ]; then
                             run "${_cmake_cmdline} -G\"Unix Makefiles\""
                         else
-                            try "${_cmake_cmdline} -G\"Ninja\"" || \
+                            if [ -x "${PREFIX}/bin/ninja" ]; then
+                                run "${RM_BIN} -f CMakeCache.txt; ${_cmake_cmdline} -G\"Ninja\""
+                                DEF_MAKE_METHOD="ninja -j${CPUS}"
+                                DEF_INSTALL_METHOD="ninja install"
+
+                            else # Makefiles:
                                 run "${RM_BIN} -f CMakeCache.txt; ${_cmake_cmdline} -G\"Unix Makefiles\""
+                                DEF_MAKE_METHOD="make -j${CPUS}"
+                                DEF_INSTALL_METHOD="make install"
+
+                            fi
                         fi
                         unset _cmake_cmdline
                         ;;
@@ -654,12 +663,8 @@ process_flat () {
             # and common part between normal and continue modes:
             cd "${_pwd}"
             note "   ${NOTE_CHAR} Building requirement: $(distn "${_app_param}"), version: $(distn "${DEF_VERSION}")"
-            if [ "cmake" = "${DEF_CONFIGURE_METHOD}" ]; then
-                try "ninja -j${CPUS}" || \
-                    run "${DEF_MAKE_METHOD}"
-            else
-                run "${DEF_MAKE_METHOD}"
-            fi
+            run "${DEF_MAKE_METHOD}"
+
             cd "${_pwd}"
             after_make_callback
             cd "${_pwd}"
@@ -699,12 +704,8 @@ process_flat () {
 
             cd "${_pwd}"
             note "   ${NOTE_CHAR} Installing requirement: $(distn "${_app_param}"), version: $(distn "${DEF_VERSION}")"
-            if [ "cmake" = "${DEF_CONFIGURE_METHOD}" ]; then
-                try "ninja install -j${CPUS}" || \
-                    run "${DEF_INSTALL_METHOD}"
-            else
-                run "${DEF_INSTALL_METHOD}"
-            fi
+            run "${DEF_INSTALL_METHOD}"
+
             cd "${_pwd}"
             after_install_callback
             cd "${_pwd}"
