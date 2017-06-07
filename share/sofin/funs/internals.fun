@@ -46,7 +46,7 @@ write_info_about_shell_configuration () {
 
 sofin_header () {
     ${PRINTF_BIN} '\r\n     %s\n%s\n\n  %s\n  %s\n  %s\n\n  %s\n\n' \
-        "$(distn 'Soft' "${ColorWhite}")$(distn 'ware' "${ColorGray}") $(distn 'Ins' "${ColorWhite}")$(distn 'taller v' "${ColorGray}")$(distn "${SOFIN_VERSION}" "${ColorWhite}")" \
+        "$(distn 'Sof' "${ColorWhite}")$(distn 'tware' "${ColorGray}") $(distn 'In' "${ColorWhite}")$(distn 'staller v' "${ColorGray}")$(distn "${SOFIN_VERSION}" "${ColorWhite}")" \
         "$(distn "____________________________________" "${ColorGreen}")" \
         "design, implementation: $(distn "@dmilith")" \
         "developed since: $(distn "2011")" \
