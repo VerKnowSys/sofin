@@ -100,8 +100,8 @@ fi
 
 # Load .sofin.env if exists in PWD:
 load_sofin_env () {
-    if [ -r "$PWD/.sofin.env" ]; then
-        source "$PWD/.sofin.env"
+    if [ -r "\$PWD/.sofin.env" ]; then
+        source "\$PWD/.sofin.env"
     fi
 }
 
