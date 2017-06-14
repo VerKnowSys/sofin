@@ -356,11 +356,15 @@ untrap_signals () {
 
 restore_security_state () {
     if [ "YES" = "${CAP_SYS_HARDENED}" ]; then
-        if [ -f "${DEFAULT_SECURITY_STATE_FILE}" ]; then
-            note "Restoring pre-build security state"
-            . "${DEFAULT_SECURITY_STATE_FILE}" #>> "${LOG}" 2>> "${LOG}"
+        if [ -z "${CAP_SYS_PRODUCTION}" ]; then
+            if [ -f "${DEFAULT_SECURITY_STATE_FILE}" ]; then
+                note "Restoring pre-build security state"
+                . "${DEFAULT_SECURITY_STATE_FILE}" #>> "${LOG}" 2>> "${LOG}"
+            else
+                debug "No security state file found: $(distd "${DEFAULT_SECURITY_STATE_FILE}")"
+            fi
         else
-            debug "No security state file found: $(distd "${DEFAULT_SECURITY_STATE_FILE}")"
+            debug "Restore disabled in production mode"
         fi
     else
         debug "No hardening capabilities in system"
@@ -370,14 +374,18 @@ restore_security_state () {
 
 store_security_state () {
     if [ "YES" = "${CAP_SYS_HARDENED}" ]; then
-        try "${RM_BIN} -f ${DEFAULT_SECURITY_STATE_FILE}"
-        debug "Storing current security state to file: $(distd "${DEFAULT_SECURITY_STATE_FILE}")"
-        for _key in ${DEFAULT_HARDEN_KEYS}; do
-            _sss_value="$(${SYSCTL_BIN} -n "${_key}" 2>/dev/null)"
-            _sss_cntnt="${SYSCTL_BIN} ${_key}=${_sss_value}"
-            ${PRINTF_BIN} "%s\n" "${_sss_cntnt}" >> "${DEFAULT_SECURITY_STATE_FILE}" 2>/dev/null
-        done
-        unset _key _sss_cntnt _sss_value
+        if [ -z "${CAP_SYS_PRODUCTION}" ]; then
+            try "${RM_BIN} -f ${DEFAULT_SECURITY_STATE_FILE}"
+            debug "Storing current security state to file: $(distd "${DEFAULT_SECURITY_STATE_FILE}")"
+            for _key in ${DEFAULT_HARDEN_KEYS}; do
+                _sss_value="$(${SYSCTL_BIN} -n "${_key}" 2>/dev/null)"
+                _sss_cntnt="${SYSCTL_BIN} ${_key}=${_sss_value}"
+                ${PRINTF_BIN} "%s\n" "${_sss_cntnt}" >> "${DEFAULT_SECURITY_STATE_FILE}" 2>/dev/null
+            done
+            unset _key _sss_cntnt _sss_value
+        else
+            debug "Store disabled in production mode"
+        fi
     else
         debug "No hardening capabilities in system"
     fi
@@ -386,12 +394,16 @@ store_security_state () {
 
 disable_security_features () {
     if [ "YES" = "${CAP_SYS_HARDENED}" ]; then
-        debug "Disabling all security features.."
-        try "${RM_BIN} -f ${DEFAULT_SECURITY_STATE_FILE}"
-        for _key in ${DEFAULT_HARDEN_KEYS}; do
-            try "${SYSCTL_BIN} ${_key}=0"
-        done
-        unset _key _dsf_name
+        if [ -z "${CAP_SYS_PRODUCTION}" ]; then
+            debug "Disabling all security features (this host is NOT production).."
+            try "${RM_BIN} -f ${DEFAULT_SECURITY_STATE_FILE}"
+            for _key in ${DEFAULT_HARDEN_KEYS}; do
+                try "${SYSCTL_BIN} ${_key}=0"
+            done
+            unset _key _dsf_name
+        else
+            debug "Security features left intact cause in production mode."
+        fi
     else
         debug "No hardening capabilities in system"
     fi
