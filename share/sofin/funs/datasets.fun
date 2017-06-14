@@ -248,16 +248,19 @@ fetch_or_create_service_dir () {
         fi
         if [ -f "${_svce_org_file}" ]; then
             # NOTE: each user dataset is made of same origin, hence you can apply snapshots amongst them..
-            try "${ZFS_BIN} list '${DEFAULT_ZPOOL}${SERVICES_DIR}/${USER}/${_dset_create}'" || \
+            try "${ZFS_BIN} list '${DEFAULT_ZPOOL}${SERVICES_DIR}/${USER}/${_dset_create}'"
+            if [ "0" = "$?" ]; then
+                debug "Service origin is already present for: $(distd "${_svce_origin}")"
+            else
                 run "${XZCAT_BIN} "${_svce_org_file}" | ${ZFS_BIN} receive ${ZFS_RECEIVE_OPTS} '${DEFAULT_ZPOOL}${SERVICES_DIR}/${USER}/${_dset_create}' | ${TAIL_BIN} -n1 2>/dev/null" && \
-                debug "Service origin received successfully: $(distd "${_svce_origin}")"
+                    debug "Service origin received successfully: $(distd "${_svce_origin}")"
+            fi
         else
             _dsname="${DEFAULT_ZPOOL}${SERVICES_DIR}/${USER}/${_dset_create}"
             debug "No Service origin file available! Creating ZFS service-dataset: $(distd "${_dsname}")"
             try "${ZFS_BIN} list -H -t filesystem '${_dsname}'" || \
                 try "${ZFS_BIN} create -p -o mountpoint=${SERVICES_DIR}/${_dset_create} '${_dsname}'" || \
-                    try "${ZFS_BIN} mount '${_dsname}'" || \
-                        return 0
+                    try "${ZFS_BIN} mount '${_dsname}'" || :
         fi
     else
         debug "Creating regular service-directory: $(distd "${SERVICES_DIR}/${_dset_create}")"
