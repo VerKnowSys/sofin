@@ -333,14 +333,15 @@ untrap_signals () {
     if [ -x "${BEADM_BIN}" ]; then
         debug "Beadm found, turning off readonly mode for default boot environment"
         _active_boot_env="$(${BEADM_BIN} list -H 2>/dev/null | ${EGREP_BIN} -i "R" 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)"
-    fi
 
-    _sp="$(processes_all_sofin)"
-    if [ -z "${_sp}" ]; then
-        debug "No Sofin processes in background! Turning off readonly mode for: ${DEFAULT_ZPOOL}/ROOT/${_active_boot_env}"
-        run "${ZFS_BIN} set readonly=off '${DEFAULT_ZPOOL}/ROOT/${_active_boot_env}'"
-    else
-        debug "Background Sofin jobs are still around! Leaving readonly mode for ROOT."
+        _sp="$(processes_all_sofin)"
+        if [ -z "${_sp}" ]; then
+            debug "No Sofin processes in background! Turning off readonly mode for: ${DEFAULT_ZPOOL}/ROOT/${_active_boot_env}"
+            run "${ZFS_BIN} set readonly=off '${DEFAULT_ZPOOL}/ROOT/${_active_boot_env}'"
+        else
+            echo "${_sp}"
+            debug "Background Sofin jobs are still around! Leaving readonly mode for ROOT."
+        fi
     fi
 }
 
