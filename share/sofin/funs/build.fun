@@ -699,13 +699,14 @@ process_flat () {
                 fi
             done
 
-            _dsname="${DEFAULT_ZPOOL}${SERVICES_DIR}/${USER}/${_bundlnm}"
+            _bund="$(capitalize "${_bundlnm}")"
+            _dsname="${DEFAULT_ZPOOL}${SERVICES_DIR}/${USER}/${_bund}"
             if [ -n "${DEF_STANDALONE}" ] && [ -n "${CAP_SYS_ZFS}" ]; then
                 debug "Creating service dir for standalone bundle: $(distd "${_dsname}")"
                 try "${ZFS_BIN} list -H -t filesystem '${_dsname}'"
                 if [ "0" != "$?" ]; then
                     debug "No Service origin file available! Creating new ZFS service-dataset: $(distd "${_dsname}")"
-                    try "${ZFS_BIN} create -p -o mountpoint=${SERVICES_DIR}/${_bundlnm} '${_dsname}'" || \
+                    try "${ZFS_BIN} create -p -o mountpoint=${SERVICES_DIR}/${_bund} '${_dsname}'" || \
                         try "${ZFS_BIN} mount '${_dsname}'" || :
                 fi
             fi
@@ -720,8 +721,11 @@ process_flat () {
             after_install_snapshot
 
             if [ -n "${DEF_STANDALONE}" ] && [ -n "${CAP_SYS_ZFS}" ]; then
-                debug "Creating origin snapshot for service dataset: $(distd "${_bundlnm}")"
+                debug "Creating origin snapshot for service dataset: $(distd "${_bund}")"
                 try "${ZFS_BIN} snapshot '${_dsname}@${ORIGIN_ZFS_SNAP_NAME}'"
+                if [ "0" != "$?" ]; then
+                    run "${ZFS_BIN} destroy '${_dsname}@${ORIGIN_ZFS_SNAP_NAME}' && ${ZFS_BIN} snapshot '${_dsname}@${ORIGIN_ZFS_SNAP_NAME}'"
+                fi
             fi
 
             cd "${_pwd}"
@@ -729,7 +733,7 @@ process_flat () {
                 debug "Stored version: $(distd "${DEF_VERSION}") of software: $(distd "${DEF_NAME}") installed in: $(distd "${_prefix}")"
 
             cd "${_cwd}" 2>/dev/null
-            unset _cwd _addon _dsname
+            unset _cwd _addon _dsname _bund
         fi
     else
 
