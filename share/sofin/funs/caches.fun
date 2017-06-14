@@ -69,24 +69,26 @@ show_logs () {
 
 pretouch_logs () {
     _params="${@}"
-    debug "Logs pretouch called with params: $(distd "${_params}")"
     try "${TOUCH_BIN} ${LOGS_DIR}${SOFIN_NAME}"
-    _pret_list=""
-    for _app in $(echo "${_params}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
-        if [ -z "${_app}" ]; then
-            debug "Empty app given out of params: $(distd "${_params}")?"
-        else
-            _lapp="$(lowercase "${_app}")"
-            if [ -z "${_pret_list}" ]; then
-                _pret_list="${LOGS_DIR}${SOFIN_NAME}-${_lapp}"
+    if [ -z "${CAP_SYS_PRODUCTION}" ]; then
+        debug "Logs pretouch called with params: $(distd "${_params}")"
+        _pret_list=""
+        for _app in $(echo "${_params}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
+            if [ -z "${_app}" ]; then
+                debug "Empty app given out of params: $(distd "${_params}")?"
             else
-                _pret_list="${LOGS_DIR}${SOFIN_NAME}-${_lapp} ${_pret_list}"
+                _lapp="$(lowercase "${_app}")"
+                if [ -z "${_pret_list}" ]; then
+                    _pret_list="${LOGS_DIR}${SOFIN_NAME}-${_lapp}"
+                else
+                    _pret_list="${LOGS_DIR}${SOFIN_NAME}-${_lapp} ${_pret_list}"
+                fi
             fi
-        fi
-    done
-    try "${TOUCH_BIN} ${_pret_list}" && \
-        debug "Logs pre-touch-ed!"
-    unset _app _params _lapp _pret_list
+        done
+        try "${TOUCH_BIN} ${_pret_list}" && \
+            debug "Logs pre-touch-ed for: $(distd "${_pret_list}")!"
+        unset _app _params _lapp _pret_list
+    fi
 }
 
 

@@ -192,11 +192,7 @@ build () {
                 debug "Reading definition: $(distd "${_req_name}")"
                 load_defaults
                 load_defs "${_req_name}"
-                if [ -z "${DEF_REQUIREMENTS}" ]; then
-                    debug "No app requirements"
-                else
-                    pretouch_logs "${DEF_REQUIREMENTS}"
-                fi
+                pretouch_logs "${DEF_REQUIREMENTS}"
 
                 # Note: this acutally may break definitions like ImageMagick..
                 #_bund_lcase="$(lowercase "${DEF_NAME}${DEF_SUFFIX}")"
