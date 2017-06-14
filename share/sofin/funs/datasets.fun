@@ -230,7 +230,7 @@ fetch_dset_zfs_stream () {
 }
 
 
-fetch_or_create_service_dir () {
+try_fetch_service_dir () {
     _dset_create="${1}"
     if [ -z "${_dset_create}" ]; then
         error "First argument with $(diste "BundleName") is required!"
@@ -256,17 +256,13 @@ fetch_or_create_service_dir () {
                     debug "Service origin received successfully: $(distd "${_svce_origin}")"
             fi
         else
-            _dsname="${DEFAULT_ZPOOL}${SERVICES_DIR}/${USER}/${_dset_create}"
-            debug "No Service origin file available! Creating ZFS service-dataset: $(distd "${_dsname}")"
-            try "${ZFS_BIN} list -H -t filesystem '${_dsname}'" || \
-                try "${ZFS_BIN} create -p -o mountpoint=${SERVICES_DIR}/${_dset_create} '${_dsname}'" || \
-                    try "${ZFS_BIN} mount '${_dsname}'" || :
+            debug "No Service origin file available! Skipped."
         fi
     else
         debug "Creating regular service-directory: $(distd "${SERVICES_DIR}/${_dset_create}")"
         try "${MKDIR_BIN} -p '${SERVICES_DIR}/${_dset_create}'"
+        try "${CHMOD_BIN} -v 0710 '${SERVICES_DIR}/${_dset_create}'"
     fi
-    try "${CHMOD_BIN} -v 0710 '${SERVICES_DIR}/${_dset_create}'"
     unset _dset_create
 }
 

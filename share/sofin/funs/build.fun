@@ -221,7 +221,7 @@ build () {
                 # NOTE: standalone definition has own SERVICES_DIR/Bundlename/ prefix
                 if [ -n "${DEF_STANDALONE}" ]; then
                     debug "DEF_STANDALONE: ${DEF_STANDALONE}"
-                    fetch_or_create_service_dir "${_bundl_name}" "${DEF_VERSION}"
+                    try_fetch_service_dir "${_bundl_name}" "${DEF_VERSION}"
                 fi
 
                 try "${MKDIR_BIN} -p ${FILE_CACHE_DIR}"
