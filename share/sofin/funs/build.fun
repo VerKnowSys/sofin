@@ -156,7 +156,7 @@ fetch_binbuild () {
             debug "Binary build unavailable for bundle: $(distd "${_fbb_bundname}")"
             if [ -n "${CAP_SYS_PRODUCTION}" ]; then
                 permnote "Software build from source disabled on production hosts!"
-                finalize_afterbuild
+                finalize
             fi
         fi
     fi
