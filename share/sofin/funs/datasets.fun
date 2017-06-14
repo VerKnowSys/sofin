@@ -243,7 +243,7 @@ fetch_or_create_service_dir () {
         _svce_origin="${_dset_create}-${_dset_version}${DEFAULT_SERVICE_SNAPSHOT_EXT}"
         _svce_org_file="${FILE_CACHE_DIR}${_svce_origin}"
         if [ ! -f "${_svce_org_file}" ]; then
-            run "${FETCH_BIN} -o ${_svce_org_file} ${FETCH_OPTS} ${MAIN_COMMON_REPOSITORY}/${_svce_origin}" && \
+            retry "${FETCH_BIN} -o ${_svce_org_file} ${FETCH_OPTS} ${MAIN_COMMON_REPOSITORY}/${_svce_origin}" && \
                 debug "Service origin fetched successfully: $(distd "${_svce_origin}")"
         fi
         if [ -f "${_svce_org_file}" ]; then
