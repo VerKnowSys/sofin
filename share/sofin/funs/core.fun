@@ -309,9 +309,13 @@ trap_signals () {
     trap 'noop_handler' USR2 # This signal is used to "reload shell"-feature. Sofin should ignore it
 
     if [ -x "${BEADM_BIN}" ]; then
-        _active_boot_env="$(${BEADM_BIN} list -H | ${EGREP_BIN} -i "R" 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)"
-        debug "Turn on readonly mode for: $(distd "${DEFAULT_ZPOOL}/ROOT/${_active_boot_env}")"
-        try "${ZFS_BIN} set readonly=on '${DEFAULT_ZPOOL}/ROOT/${_active_boot_env}'"
+        if [ -n "${CAP_SYS_PRODUCTION}" ]; then
+            debug "Production mode, skipping readonly mode for /"
+        else
+            _active_boot_env="$(${BEADM_BIN} list -H | ${EGREP_BIN} -i "R" 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)"
+            debug "Turn on readonly mode for: $(distd "${DEFAULT_ZPOOL}/ROOT/${_active_boot_env}")"
+            try "${ZFS_BIN} set readonly=on '${DEFAULT_ZPOOL}/ROOT/${_active_boot_env}'"
+        fi
     fi
     return 0
 }
@@ -334,13 +338,17 @@ untrap_signals () {
         debug "Beadm found, turning off readonly mode for default boot environment"
         _active_boot_env="$(${BEADM_BIN} list -H 2>/dev/null | ${EGREP_BIN} -i "R" 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)"
 
-        _sp="$(processes_all_sofin)"
-        if [ -z "${_sp}" ]; then
-            debug "No Sofin processes in background! Turning off readonly mode for: ${DEFAULT_ZPOOL}/ROOT/${_active_boot_env}"
+        if [ -n "${CAP_SYS_PRODUCTION}" ]; then
+            debug "Production mode disabling readonly for /"
             run "${ZFS_BIN} set readonly=off '${DEFAULT_ZPOOL}/ROOT/${_active_boot_env}'"
         else
-            echo "${_sp}"
-            debug "Background Sofin jobs are still around! Leaving readonly mode for ROOT."
+            _sp="$(processes_all_sofin)"
+            if [ -z "${_sp}" ]; then
+                debug "No Sofin processes in background! Turning off readonly mode for: ${DEFAULT_ZPOOL}/ROOT/${_active_boot_env}"
+                run "${ZFS_BIN} set readonly=off '${DEFAULT_ZPOOL}/ROOT/${_active_boot_env}'"
+            else
+                debug "Background Sofin jobs are still around! Leaving readonly mode for ROOT."
+            fi
         fi
     fi
 }
