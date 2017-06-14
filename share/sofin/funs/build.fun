@@ -154,6 +154,10 @@ fetch_binbuild () {
             install_software_from_binbuild "${_bb_archive}" "${_fbb_bundname}"
         else
             debug "Binary build unavailable for bundle: $(distd "${_fbb_bundname}")"
+            if [ -n "${CAP_SYS_PRODUCTION}" ]; then
+                permnote "Software build from source disabled on production hosts!"
+                finalize_afterbuild
+            fi
         fi
     fi
     unset _fbb_bundname _fbb_bundname _bb_archive
