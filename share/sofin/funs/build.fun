@@ -700,7 +700,7 @@ process_flat () {
             done
 
             _dsname="${DEFAULT_ZPOOL}${SERVICES_DIR}/${USER}/${_bundlnm}"
-            if [ -n "${DEF_STANDALONE}" ]; then
+            if [ -n "${DEF_STANDALONE}" ] && [ -n "${CAP_SYS_ZFS}" ]; then
                 debug "Creating service dir for standalone bundle: $(distd "${_dsname}")"
                 try "${ZFS_BIN} list -H -t filesystem '${_dsname}'"
                 if [ "0" != "$?" ]; then
@@ -719,7 +719,7 @@ process_flat () {
             cd "${_pwd}"
             after_install_snapshot
 
-            if [ -n "${DEF_STANDALONE}" ]; then
+            if [ -n "${DEF_STANDALONE}" ] && [ -n "${CAP_SYS_ZFS}" ]; then
                 debug "Creating origin snapshot for service dataset: $(distd "${_bundlnm}")"
                 try "${ZFS_BIN} snapshot '${_dsname}@${ORIGIN_ZFS_SNAP_NAME}'"
             fi
