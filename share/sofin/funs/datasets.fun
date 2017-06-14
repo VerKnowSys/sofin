@@ -230,19 +230,35 @@ fetch_dset_zfs_stream () {
 }
 
 
-create_service_dir () {
+fetch_or_create_service_dir () {
     _dset_create="${1}"
     if [ -z "${_dset_create}" ]; then
         error "First argument with $(diste "BundleName") is required!"
     fi
+    _dset_version="${2}"
+    if [ -z "${_dset_version}" ]; then
+        error "Second argument with $(diste "version") is required!"
+    fi
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
-        _dsname="${DEFAULT_ZPOOL}${SERVICES_DIR}/${USER}/${_dset_create}"
-        debug "Creating ZFS service-dataset: $(distd "${_dsname}")"
-        try "${ZFS_BIN} list -H -t filesystem '${_dsname}'" || \
-            try "${ZFS_BIN} create -p -o mountpoint=${SERVICES_DIR}/${_dset_create} '${_dsname}'" || \
-                try "${ZFS_BIN} mount '${_dsname}'" || \
-                    return 0
-        unset _dsname
+        _svce_origin="${_dset_create}-${_dset_version}${DEFAULT_SERVICE_SNAPSHOT_EXT}"
+        _svce_org_file="${FILE_CACHE_DIR}${_svce_origin}"
+        if [ ! -f "${_svce_org_file}" ]; then
+            run "${FETCH_BIN} -o ${_svce_org_file} ${FETCH_OPTS} ${MAIN_COMMON_REPOSITORY}/${_svce_origin}" && \
+                debug "Service origin fetched successfully: $(distd "${_svce_origin}")"
+        fi
+        if [ -f "${_svce_org_file}" ]; then
+            # NOTE: each user dataset is made of same origin, hence you can apply snapshots amongst them..
+            try "${ZFS_BIN} list '${DEFAULT_ZPOOL}${SERVICES_DIR}/${USER}/${_dset_create}'" || \
+                run "${XZCAT_BIN} "${_svce_org_file}" | ${ZFS_BIN} receive ${ZFS_RECEIVE_OPTS} '${DEFAULT_ZPOOL}${SERVICES_DIR}/${USER}/${_dset_create}' | ${TAIL_BIN} -n1 2>/dev/null" && \
+                debug "Service origin received successfully: $(distd "${_svce_origin}")"
+        else
+            _dsname="${DEFAULT_ZPOOL}${SERVICES_DIR}/${USER}/${_dset_create}"
+            debug "No Service origin file available! Creating ZFS service-dataset: $(distd "${_dsname}")"
+            try "${ZFS_BIN} list -H -t filesystem '${_dsname}'" || \
+                try "${ZFS_BIN} create -p -o mountpoint=${SERVICES_DIR}/${_dset_create} '${_dsname}'" || \
+                    try "${ZFS_BIN} mount '${_dsname}'" || \
+                        return 0
+        fi
     else
         debug "Creating regular service-directory: $(distd "${SERVICES_DIR}/${_dset_create}")"
         try "${MKDIR_BIN} -p '${SERVICES_DIR}/${_dset_create}'"
