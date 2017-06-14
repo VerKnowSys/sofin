@@ -74,7 +74,7 @@ load_defs () {
                     fi
                 done
         done
-    debug "Requirements validated: $(distd "${_valid_checks}")"
+    debug "Necessary values were validated: $(distd "${_valid_checks}")"
     unset _def _definitions _check _required_field _name_base _given_def _valid_checks
 }
 

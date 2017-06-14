@@ -113,7 +113,7 @@ validate_def_postfix () {
         # if difference is the name itself..
         _cispc_nme_diff="$(difftext "${_cigiven_name}" "$(lowercase "${DEF_NAME}")")"
     fi
-    debug "validate_def_postfix: DEF_NAME: ${DEF_NAME}, 1: ${_cigiven_name}, 2: ${_cidefinition_name}, DIFF: ${_cispc_nme_diff}"
+    debug "validate_def_postfix() for: $(distd "${DEF_NAME}"), 1: $(distd "${_cigiven_name}"), 2: $(distd "${_cidefinition_name}"), DIFF: $(distd "${_cispc_nme_diff}")"
     if  [ -z "${DEF_SUFFIX}" ] && \
         [ "${_cispc_nme_diff}" != "${DEF_NAME}" ] && \
         [ "${_cispc_nme_diff}" != "${DEF_NAME}${DEF_SUFFIX}" ]; then
