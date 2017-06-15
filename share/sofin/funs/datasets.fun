@@ -394,22 +394,35 @@ create_builddir () {
         error "First argument with $(diste "BundleName") is required!"
     fi
     _bdir="${SOFTWARE_DIR}/${_cb_bundle_name}/${DEFAULT_SRC_EXT}${_dset_namesum}"
-    try "${TEST_BIN} -d '${_bdir}'" && return 0
+    try "${MKDIR_BIN} -p '${_bdir}'"
 
-    if [ "YES" = "${CAP_SYS_ZFS}" ]; then
-        if [ -z "${_dset_namesum}" ]; then
-            error "Second argument with $(diste "dataset-checksum") is required!"
-        fi
-        _dset="${DEFAULT_ZPOOL}${SOFTWARE_DIR}/${USER}/${_cb_bundle_name}/${DEFAULT_SRC_EXT}${_dset_namesum}"
-        try "${ZFS_BIN} create -p -o mountpoint=${SOFTWARE_DIR}/${_cb_bundle_name}/${DEFAULT_SRC_EXT}${_dset_namesum} '${_dset}'" && \
-            debug "Created ZFS build-dataset: $(distd "${_dset}")" && \
-            return 0
+    if [ -n "${CAP_SYS_BUILDHOST}" ]; then
+        try "${UMOUNT_BIN} -f ${_bdir}" && \
+            debug "Unmounted build-dir ramdisk: $(distd "${_bdir}")"
 
-        try "${ZFS_BIN} mount '${_dset}'"
-        unset _dset _dset_namesum
-    else
-        debug "Creating regular build-directory: $(distd "${_bdir}")"
-        try "${MKDIR_BIN} -p '${_bdir}'"
+        case "${SYSTEM_NAME}" in
+            Darwin)
+                if [ -n "${RAMDISK_DEV}" ]; then
+                    try "diskutil eject ${RAMDISK_DEV}" && \
+                        debug "Diskutil ejected ramdisk: $(distd "${RAMDISK_DEV}")"
+                fi
+                _ramfs_size_mb=2048
+                _ramfs_sectors=$((${_ramfs_size_mb}*1024*1024/512))
+                RAMDISK_DEV="$(${HDID_BIN} -nomount ram://${_ramfs_sectors} 2>/dev/null)"
+                export RAMDISK_DEV
+
+                debug "Darwin ramdisk dev: $(distd "${RAMDISK_DEV}")"
+                run "${NEWFS_HFS_BIN} -v '${_cb_bundle_name}' ${RAMDISK_DEV}"
+                run "${MOUNT_BIN} -o noatime -t hfs ${RAMDISK_DEV} ${_bdir}" && \
+                    debug "Mounted tmpfs build-directory: $(distd "${_bdir}")"
+                ;;
+
+            FreeBSD)
+                debug "Mounting clean 3GiB tmpfs build-dir: $(distd "${_bdir}")"
+                run "${MOUNT_BIN} -t tmpfs -o size=3G,mode=0750 tmpfs ${_bdir}" && \
+                    debug "Mounted tmpfs build-directory: $(distd "${_bdir}")"
+                ;;
+        esac
     fi
     unset _bdir _cb_bundle_name _dset_namesum
 }
@@ -422,27 +435,20 @@ destroy_builddir () {
         error "First argument with $(diste "build-bundle-directory") is required!"
     fi
     _bdir="${SOFTWARE_DIR}/${_deste_bund_name}/${DEFAULT_SRC_EXT}${_dset_sum}"
-    try "${TEST_BIN} ! -d '${_bdir}'" && return 0
-
-    if [ "YES" = "${CAP_SYS_ZFS}" ]; then
-        if [ -z "${_dset_sum}" ]; then
-            error "Second argument with $(diste "bundle-sha-sum") is required!"
-        fi
-        _dsname="${DEFAULT_ZPOOL}${SOFTWARE_DIR}/${USER}/${_deste_bund_name}/${DEFAULT_SRC_EXT}${_dset_sum}"
-        if [ -z "${DEVEL}" ]; then
-            debug "Destroying ZFS build-dataset: $(distd "${_dsname}")"
-            try "${ZFS_BIN} umount -f '${_dsname}'"
-            try "${ZFS_BIN} destroy -fr '${_dsname}'"
-            try "${RM_BIN} -fr '${SOFTWARE_DIR}/${_deste_bund_name}/${DEFAULT_SRC_EXT}${_dset_sum}'"
-        else
-            debug "DEVEL mode enabled, skipped dataset destroy: $(distd "${_dsname}")"
-        fi
-        unset _dsname
-    else
-        debug "Removing regular build-directory: $(distd "${_bdir}")"
-        try "${RM_BIN} -fr '${_bdir}'"
+    if [ -n "${CAP_SYS_BUILDHOST}" ]; then
+        try "${UMOUNT_BIN} -f ${_bdir}" && \
+            debug "Tmp build-dir unmounted: $(distd "${_bdir}")"
+        case "${SYSTEM_NAME}" in
+            Darwin)
+                if [ -n "${RAMDISK_DEV}" ]; then
+                    debug "Diskutil eject for Darwin ramdisk: $(distd "${RAMDISK_DEV}")"
+                    try "diskutil eject ${RAMDISK_DEV}"
+                    unset RAMDISK_DEV
+                fi
+                ;;
+        esac
     fi
-    unset _deste_bund_name _bdir _deste_bund_name _dset_sum _dsname
+    unset _deste_bund_name _bdir _deste_bund_name _dset_sum
 }
 
 
