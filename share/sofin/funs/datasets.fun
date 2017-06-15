@@ -117,7 +117,7 @@ build_service_dataset () {
                     note "Preparing to send service dataset: $(distn "${_full_dataset_name}"), for bundle: $(distn "${_ps_elem}")"
                     try "${ZFS_BIN} umount -f '${_full_dataset_name}'"
                     run "${ZFS_BIN} send ${ZFS_SEND_OPTS} '${_full_dataset_name}@${ORIGIN_ZFS_SNAP_NAME}' | ${XZ_BIN} ${DEFAULT_XZ_OPTS} > ${FILE_CACHE_DIR}${_ps_snap_file}"
-                    run "${ZFS_BIN} mount '${_full_dataset_name}'"
+                    try "${ZFS_BIN} mount '${_full_dataset_name}'" || :
                 # else
                 #     run "${ZFS_BIN} create -p -o mountpoint=${SERVICES_DIR}/${_ps_elem} '${_full_dataset_name}'"
                 #     try "${ZFS_BIN} snapshot '${_full_dataset_name}@${ORIGIN_ZFS_SNAP_NAME}'"
@@ -356,7 +356,7 @@ create_software_dir () {
         try "${ZFS_BIN} list -H -t filesystem '${_dsname}'" || \
             receive_origin "${_dsname}" "Software" "user" && \
                 debug "Received ZFS software-dataset: $(distd "${_dsname}")"
-        try "${ZFS_BIN} mount '${_dsname}'"
+        try "${ZFS_BIN} mount '${_dsname}'" || :
         unset _dsname
     else
         debug "Creating regular software-directory: $(distd "${SOFTWARE_DIR}/${_dset_create}")"
@@ -484,7 +484,7 @@ create_software_bundle_archive () {
             try "${ZFS_BIN} send ${ZFS_SEND_OPTS} '${_csbd_dataset}@${ORIGIN_ZFS_SNAP_NAME}' | ${XZ_BIN} ${DEFAULT_XZ_OPTS} > ${_cddestfile}" && \
                 note "Created bin-bundle from dataset: $(distd "${_csbd_dataset}")"
             cd "${_cdir}"
-            run "${ZFS_BIN} mount '${_csbd_dataset}'"
+            try "${ZFS_BIN} mount '${_csbd_dataset}'" || :
         else
             error "Can't build snapshot from broken/empty bundle dir: $(diste "${SOFTWARE_DIR}/${_inst_ind}")"
         fi
