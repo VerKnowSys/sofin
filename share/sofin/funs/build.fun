@@ -180,13 +180,14 @@ build () {
     PATH="${DEFAULT_PATH}"
     for _bund_name in $(echo "${_build_list}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
         _bund_name="$(lowercase "${_bund_name}")"
+        _anm="$(capitalize "${_bund_name}")"
         load_defaults
         load_defs "${_bund_name}"
         if [ "${DEF_DISABLED_ON}" = "YES" ]; then
-            _anm="$(capitalize "${_bund_name}")"
             warn "Bundle: $(distw "${_anm}") is disabled on: $(distw "${OS_TRIPPLE}")"
             destroy_software_dir "${_anm}"
         else
+            create_software_dir "${_anm}"
             for _req_name in ${DEFINITIONS_DIR}/${_bund_name}${DEFAULT_DEF_EXT}; do
                 unset DONT_BUILD_BUT_DO_EXPORTS
                 debug "Reading definition: $(distd "${_req_name}")"
