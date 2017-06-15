@@ -479,6 +479,7 @@ create_software_bundle_archive () {
             debug "Creating archive from snapshot: $(distd "${ORIGIN_ZFS_SNAP_NAME}") dataset: $(distd "${_csbd_dataset}") to file: $(distd "${_cddestfile}")"
             _cdir="$(${PWD_BIN} 2>/dev/null)"
             cd /tmp
+            try "${RM_BIN} -rf ${SOFTWARE_DIR}/${_csbname}/${DEFAULT_SRC_EXT}*"
             try "${ZFS_BIN} snapshot '${_csbd_dataset}@${ORIGIN_ZFS_SNAP_NAME}'"
             try "${ZFS_BIN} umount -f '${_csbd_dataset}'"
             try "${ZFS_BIN} send ${ZFS_SEND_OPTS} '${_csbd_dataset}@${ORIGIN_ZFS_SNAP_NAME}' | ${XZ_BIN} ${DEFAULT_XZ_OPTS} > ${_cddestfile}" && \
