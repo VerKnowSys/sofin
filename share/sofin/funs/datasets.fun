@@ -323,7 +323,7 @@ receive_origin () {
         error "No dataset bae given! Should be one of 'Services' or 'Software'"
     fi
     if [ -n "${_dtype}" ]; then
-        _dname="/${USER}/${_dname}"
+        # _dname="/${USER}/${_dname}"
         _head="${_dorigin_base}-user"
     else
         # NOOP:
@@ -337,7 +337,7 @@ receive_origin () {
     fi
     if [ -f "${_origin_file}" ]; then
         # NOTE: each user dataset is made of same origin, hence you can apply snapshots amongst them..
-        run "${XZCAT_BIN} "${_origin_file}" | ${ZFS_BIN} receive ${ZFS_RECEIVE_OPTS} '${DEFAULT_ZPOOL}/${_dorigin_base}${_dname}' | ${TAIL_BIN} -n1 2>/dev/null" && \
+        run "${XZCAT_BIN} "${_origin_file}" | ${ZFS_BIN} receive ${ZFS_RECEIVE_OPTS} '${_dname}' | ${TAIL_BIN} -n1 2>/dev/null" && \
             debug "Origin received successfully: $(distd "${_origin_name}")"
     else
         error "No origin file available! That's mandatory to have this file: $(diste "${_origin_file}")"
@@ -356,6 +356,7 @@ create_software_dir () {
         try "${ZFS_BIN} list -H -t filesystem '${_dsname}'" || \
             receive_origin "${_dsname}" "Software" "user" && \
                 debug "Received ZFS software-dataset: $(distd "${_dsname}")"
+        run "${ZFS_BIN} set mountpoint=${SOFTWARE_DIR}/${_dset_create} '${_dsname}'"
         try "${ZFS_BIN} mount '${_dsname}'" || :
         unset _dsname
     else
