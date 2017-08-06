@@ -403,10 +403,7 @@ create_builddir () {
 
         case "${SYSTEM_NAME}" in
             Darwin)
-                if [ -n "${RAMDISK_DEV}" ]; then
-                    try "diskutil eject ${RAMDISK_DEV}" && \
-                        debug "Diskutil ejected ramdisk: $(distd "${RAMDISK_DEV}")"
-                fi
+                destroy_ramdisk_device
                 _ramfs_size_mb=2048
                 _ramfs_sectors=$((${_ramfs_size_mb}*1024*1024/512))
                 RAMDISK_DEV="$(${HDID_BIN} -nomount ram://${_ramfs_sectors} 2>/dev/null)"
@@ -437,17 +434,17 @@ destroy_builddir () {
     fi
     _bdir="${SOFTWARE_DIR}/${_deste_bund_name}/${DEFAULT_SRC_EXT}${_dset_sum}"
     if [ -n "${CAP_SYS_BUILDHOST}" ]; then
-        try "${UMOUNT_BIN} -f ${_bdir}" && \
-            debug "Tmp build-dir unmounted: $(distd "${_bdir}")"
         case "${SYSTEM_NAME}" in
             Darwin)
                 if [ -n "${RAMDISK_DEV}" ]; then
-                    debug "Diskutil eject for Darwin ramdisk: $(distd "${RAMDISK_DEV}")"
-                    try "diskutil eject ${RAMDISK_DEV}"
-                    unset RAMDISK_DEV
+                    try "diskutil eject ${RAMDISK_DEV}" && \
+                        debug "Tmp ramdisk unmounted: $(distd "${RAMDISK_DEV}")"
                 fi
                 ;;
         esac
+        destroy_ramdisk_device
+        try "${UMOUNT_BIN} -f ${_bdir}" && \
+            debug "Tmp build-dir force-unmounted: $(distd "${_bdir}")"
     fi
     unset _deste_bund_name _bdir _deste_bund_name _dset_sum
 }
