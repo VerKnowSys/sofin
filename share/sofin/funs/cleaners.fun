@@ -79,15 +79,23 @@ finalize_onquit () {
 
 destroy_ramdisk_device () {
     if [ -n "${RAMDISK_DEV}" ] && [ -n "${CAP_SYS_BUILDHOST}" ]; then
+        umount_ramdisk
+        unset RAMDISK_DEV
+    fi
+}
+
+
+umount_ramdisk () {
+    if [ -z "${DEVEL}" ]; then
         try "${UMOUNT_BIN} -f ${RAMDISK_DEV}" && \
             debug "Tmp ramdisk force-unmounted: $(distd "${RAMDISK_DEV}")"
-        unset RAMDISK_DEV
     fi
 }
 
 
 # NOTE: C-c is handled differently, not full finalize is running. f.e. build dir isn't wiped out
 finalize_interrupt () {
+    umount_ramdisk
     destroy_locks
     finalize_onquit
 }
