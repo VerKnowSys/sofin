@@ -407,7 +407,6 @@ create_builddir () {
                 _ramfs_size_mb=2048
                 _ramfs_sectors=$((${_ramfs_size_mb}*1024*1024/512))
                 RAMDISK_DEV="$(${HDID_BIN} -nomount ram://${_ramfs_sectors} 2>/dev/null)"
-                export RAMDISK_DEV
 
                 debug "Darwin ramdisk dev: $(distd "${RAMDISK_DEV}")"
                 run "${NEWFS_HFS_BIN} -v '${_cb_bundle_name}' ${RAMDISK_DEV}"
@@ -416,11 +415,13 @@ create_builddir () {
                 ;;
 
             FreeBSD)
-                debug "Mounting clean 3GiB tmpfs build-dir: $(distd "${_bdir}")"
-                run "${MOUNT_BIN} -t tmpfs -o size=3G,mode=0750 tmpfs ${_bdir}" && \
-                    debug "Mounted tmpfs build-directory: $(distd "${_bdir}")"
+                RAMDISK_DEV="${_bdir}"
+                debug "Mounting clean 4GiB tmpfs build-dir: $(distd "${RAMDISK_DEV}")"
+                run "${MOUNT_BIN} -t tmpfs -o size=4G,mode=0750 tmpfs ${RAMDISK_DEV}" && \
+                    debug "Mounted tmpfs build-directory: $(distd "${RAMDISK_DEV}")"
                 ;;
         esac
+        export RAMDISK_DEV
     fi
     unset _bdir _cb_bundle_name _dset_namesum
 }
