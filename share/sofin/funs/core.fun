@@ -83,10 +83,11 @@ permnote () {
 
 
 error () {
-    ${PRINTF_BIN} "%b\n  %s %s\n    %b %b\n\n" "${ColorRed}" "${NOTE_CHAR2}" "Task crashed!" "${0}-${1}${2}${3}${4}${5}" "${ColorReset}"
-    ${PRINTF_BIN} "%b  %s Try: %b%b\n\n" "${ColorRed}" "${NOTE_CHAR2}" "$(diste "s log ${DEF_NAME}${DEF_SUFFIX}") to see the build log." "${ColorReset}"
-
-    finalize_interrupt
+    ${PRINTF_BIN} "%b\n  %s %s\n    %b %b\n\n" "${ColorRed}" "${NOTE_CHAR2}" "Task crashed!" "${0}: ${1}${2}${3}${4}${5}" "${ColorReset}"
+    if [ "error" = "${0}" ]; then
+        ${PRINTF_BIN} "%b  %s Try: %b%b\n\n" "${ColorRed}" "${NOTE_CHAR2}" "$(diste "s log ${DEF_NAME}${DEF_SUFFIX}") to see the build log." "${ColorReset}"
+        finalize_interrupt
+    fi
     exit "${ERRORCODE_TASK_FAILURE}"
 }
 
