@@ -78,6 +78,7 @@ GOLD_SO="/usr/lib/LLVMgold.so" # Golden linker specific library
 NM_BIN="/usr/bin/nm"
 AR_BIN="/usr/bin/ar"
 AS_BIN="/usr/bin/as"
+OPENSSL_BIN="/usr/bin/openssl"
 
 # Pick best utilities available:
 if [ -f "${DEFAULT_FACTS_DIR}alternatives.fact" ]; then
