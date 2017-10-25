@@ -155,8 +155,7 @@ space than it does with "old fasioned, system wide, shared software".
 
 ### Darwin/ Mac OS X specific:
   - Install Mac OS X 10.9, 10.10 or 10.11 (one currently supported)
-  - Disable write lock to /usr/bin by disabling [SIP](http://osxdaily.com/2015/10/05/disable-rootless-system-integrity-protection-mac-os-x/) (applies only for 10.11 - 'El Capitan' and derivatives)
-  - Type `git clone https://github.com/VerKnowSys/sofin && cd sofin && sudo bin/install` in your terminal, and you're ready to go.
+  - Type `sudo mkdir /Software; chown ${USER} /Software; git clone https://github.com/VerKnowSys/sofin && cd sofin && bin/install` in your terminal, and you're ready to go.
   - Type `s get Zsh`, then when it finishes, do: `grep 'Software/Zsh' /etc/shells || sudo echo '/Software/Zsh/exports/zsh' >> /etc/shells; sudo chsh -s /Software/Zsh/exports/zsh ${USER}` to change your shell, to one that is supported by default by Sofin.
     - Start using Sofin as regular user.
 
