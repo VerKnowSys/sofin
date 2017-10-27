@@ -103,7 +103,9 @@ finalize_interrupt () {
 
 finalize_afterbuild () {
     _bund_name="${1}"
-    debug "finalize_afterbuild for: ${_bund_name}"
+    require_prefix_set
+    require_namesum_set
+    debug "finalize_afterbuild for bundle: $(distd "${_bund_name}"), PREFIX: ${PREFIX}, BUILD_NAMESUM: ${BUILD_NAMESUM}"
 
     # Cleanup build dir if DEVEL unset:
     if [ -z "${DEVEL}" ]; then
