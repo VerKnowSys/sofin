@@ -108,7 +108,7 @@ finalize_afterbuild () {
     # Cleanup build dir if DEVEL unset:
     if [ -z "${DEVEL}" ]; then
         destroy_ramdisk_device
-        try_destroy_binbuild "${_bund_name}"
+        destroy_builddir "${PREFIX##*/}" "${BUILD_NAMESUM}"
     else
         # TODO: dump srcdir? here?
         debug "No-Op - not yet implemented"
