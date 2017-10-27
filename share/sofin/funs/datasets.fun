@@ -453,12 +453,6 @@ destroy_builddir () {
 }
 
 
-recreate_builddir () {
-    destroy_builddir "${1}" "${2}"
-    create_builddir "${1}" "${2}"
-}
-
-
 create_software_bundle_archive () {
     _csbname="${1}"
     _csbelem="${2}"
@@ -587,23 +581,6 @@ push_software_archive () {
         error "Failed to push binary build of: $(diste "${_bpbundle_file}") to remote: $(diste "${_bp_remotfs_file}")"
     fi
     unset _bpbundle_file _bpbundle_file _bpamirror _bpaddress _bpshortsha _bpfn_chksum_file _bp_remotfs_file _bpfn_chksum_file _bpfn_chksum_file_dest
-}
-
-
-try_destroy_binbuild () {
-    _bundle="${1}"
-    debug "try_destroy_binbuild() of PREFIX: '${PREFIX}'"
-    PREFIX="${PREFIX:-${SOFTWARE_DIR}/$(capitalize "$(${BASENAME_BIN} "${_bundle}")")}"
-    _installed_indicator="${PREFIX}/$(lowercase "${_bundle}")${DEFAULT_INST_MARK_EXT}"
-    if [ -f "${_installed_indicator}" ] && \
-              [ -n "${BUILD_NAMESUM}" ]; then
-        debug "Installed indicator found for: $(distd "${_installed_indicator}"). Proceeding with build dir cleanup.."
-        destroy_builddir "${PREFIX##*/}" "${BUILD_NAMESUM}"
-    else
-        # shouldn't happen..
-        debug "No BUILD_NAMESUM set! Can't identify build-dir for: ${_bundle}!"
-    fi
-    unset _bundle
 }
 
 
