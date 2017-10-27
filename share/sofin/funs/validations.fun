@@ -179,9 +179,11 @@ validate_pie_on_exports () {
                 for _bin in $(${FIND_BIN} "${_a_dir}" -mindepth 1 -maxdepth 1 -type l 2>/dev/null | ${XARGS_BIN} "${READLINK_BIN}" -f 2>/dev/null); do
                     try "${FILE_BIN} '${_bin}' 2>/dev/null | ${GREP_BIN} 'ELF' 2>/dev/null"
                     if [ "$?" = "0" ]; then # it's ELF binary/library:
-                        try "${FILE_BIN} '${_bin}' 2>/dev/null | ${GREP_BIN} 'ELF' 2>/dev/null | ${EGREP_BIN} '${PIE_TYPE_ENTRY}' 2>/dev/null" || \
-                            warn "Exported ELF binary: $(distw "${_bin}"), is not a $(distw "${PIE_TYPE_ENTRY}") (not-PIE)!" && \
-                                ${PRINTF_BIN} "WARNING: ELF binary: '${_bin}', is not a '${PIE_TYPE_ENTRY}' (not-PIE)!\n" >> "${_pie_indicator}.warn"
+                        big_fat_warn () {
+                            warn "Exported ELF binary: $(distw "${_bin}"), is not a $(distw "${PIE_TYPE_ENTRY}") (not-PIE)!"
+                            ${PRINTF_BIN} "WARNING: ELF binary: '${_bin}', is not a '${PIE_TYPE_ENTRY}' (not-PIE)!\n" >> "${_pie_indicator}.warn"
+                        }
+                        try "${FILE_BIN} '${_bin}' 2>/dev/null | ${GREP_BIN} 'ELF' 2>/dev/null | ${EGREP_BIN} '${PIE_TYPE_ENTRY}' 2>/dev/null" || big_fat_warn
                     else
                         debug "Executable, but not an ELF: $(distd "${_bin}")"
                     fi
