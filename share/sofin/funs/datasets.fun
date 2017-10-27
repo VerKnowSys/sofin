@@ -446,6 +446,8 @@ destroy_builddir () {
         destroy_ramdisk_device
         try "${UMOUNT_BIN} -f ${_bdir}" && \
             debug "Tmp build-dir force-unmounted: $(distd "${_bdir}")"
+        try "${RM_BIN} -rf '${_bdir}'" && \
+            debug "Tmp build-dir removed: $(distd "${_bdir}")"
     fi
     unset _deste_bund_name _bdir _deste_bund_name _dset_sum
 }
