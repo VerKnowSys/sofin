@@ -738,7 +738,7 @@ process_flat () {
         fi
     else
 
-        permnote "   ${WARN_CHAR} Requirement preinstalled: $(distn "${_req_defname}") on: $(distn "${SYSTEM_NAME}") platforms"
+        note "   ${WARN_CHAR} Requirement preinstalled: $(distn "${_req_defname}") on: $(distn "${SYSTEM_NAME}") platforms"
         if [ ! -d "${_prefix}" ]; then # case when disabled requirement is first on list of dependencies
             create_software_dir "${_prefix##*/}"
         fi
