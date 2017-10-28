@@ -120,7 +120,6 @@ finalize_afterbuild () {
     if [ -n "${_bund_name}" ]; then
         destroy_dead_locks "${_bund_name}"
     fi
-    security_set_normal
 }
 
 
