@@ -90,7 +90,7 @@ dump_compiler_setup () {
         debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "link-time-optimization" "${ColorGray}")"
     fi
 
-    if [ -z "${SSP_BUFFER_OVERRIDE}" ]; then
+    if [ -z "${DEF_NO_SSP_BUFFER_OVERRIDE}" ]; then
         debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "ssp-buffer-override" "${ColorGreen}")"
     else
         debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "ssp-buffer-override" "${ColorGray}")"
