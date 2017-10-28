@@ -74,7 +74,8 @@ CPP_NAME="${CC_NAME}-cpp"
 
 # Compiler flags:
 LTO_CFLAGS="-flto"
-HARDEN_CFLAGS="-fstack-protector -fstack-protector-strong -fstack-protector-all --param ssp-buffer-size=4 -fno-strict-overflow -Wformat -Wformat-security"
+SSP_BUFFER_OVERRIDE="--param ssp-buffer-size=4"
+HARDEN_CFLAGS="-fstack-protector -fstack-protector-strong -fstack-protector-all -fno-strict-overflow -Wformat -Wformat-security"
 HARDEN_OFLOW_CFLAGS="-ftrapv"
 HARDEN_SAFE_STACK_FLAGS="-fsanitize=safe-stack"
 HARDEN_CMACROS="-D_FORTIFY_SOURCE=2"

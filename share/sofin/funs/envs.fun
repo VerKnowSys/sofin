@@ -90,6 +90,12 @@ dump_compiler_setup () {
         debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "link-time-optimization" "${ColorGray}")"
     fi
 
+    if [ -z "${SSP_BUFFER_OVERRIDE}" ]; then
+        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "ssp-buffer-override" "${ColorGreen}")"
+    else
+        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "ssp-buffer-override" "${ColorGray}")"
+    fi
+
     if [ -z "${DEF_NO_LLVM_LINKER}" ] && [ "YES" = "${CAP_SYS_LLVM_LD}" ]; then
         debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "llvm-lld-linker" "${ColorGreen}")"
         debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "gnu-gold-linker" "${ColorGray}")"
@@ -152,6 +158,7 @@ dump_compiler_setup () {
 
 dump_system_capabilities () {
     debug "---------------- SYSTEM CAPABILITIES DUMP ---------------"
+    # NOTE: make sure that this is not the way with IFS instead of echoing on tr in for loops;
     IFS=\n set 2>/dev/null | ${EGREP_BIN} -i 'CAP_SYS_' 2>/dev/null | while IFS= read -r _envv
     do
         if [ -n "${_envv}" ]; then
@@ -332,6 +339,11 @@ compiler_setup () {
         CFLAGS="${CFLAGS} ${LTO_CFLAGS}"
         CXXFLAGS="${CXXFLAGS} ${LTO_CFLAGS}"
         # LDFLAGS="${LDFLAGS} ${LTO_CFLAGS}"
+    fi
+
+    if [ -z "${DEF_NO_SSP_BUFFER_OVERRIDE}" ]; then
+        CFLAGS="${CFLAGS} ${SSP_BUFFER_OVERRIDE}"
+        CXXFLAGS="${CXXFLAGS} ${SSP_BUFFER_OVERRIDE}"
     fi
 
     # If DEF_LINKER_FLAGS is set on definition side, append it's content to LDFLAGS:
