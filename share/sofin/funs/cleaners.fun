@@ -54,7 +54,6 @@ perform_clean () {
 finalize () {
     # restore_security_state
     untrap_signals
-    security_set_normal
     destroy_dead_locks
     finalize_shell_reload
 }
