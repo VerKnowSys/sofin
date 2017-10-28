@@ -235,7 +235,7 @@ build () {
                     if [ "${DEF_VERSION}" = "${_already_installed_version}" ]; then
                         debug "$(distd "${_bund_lcase}") bundle is installed with version: $(distd "${_already_installed_version}")"
                     else
-                        warn "$(distw "${_bund_lcase}") bundle is installed with version: $(distw "${_already_installed_version}"), different from defined: $(distw "${DEF_VERSION}")"
+                        error "$(diste "${_bund_lcase}") bundle is installed with version: $(distw "${_already_installed_version}"), different from found in definition: $(distw "${DEF_VERSION}"). Aborting!"
                     fi
                     DONT_BUILD_BUT_DO_EXPORTS=YES
                     unset _already_installed_version
