@@ -1,6 +1,6 @@
 
 debug () {
-    _in="${@}"
+    _in="${*}"
     if [ "${TTY}" = "YES" ]; then
         _permdbg="\n"
     else
@@ -13,40 +13,20 @@ debug () {
         return 0
         # ${PRINTF_BIN} "# (%s) λ %b%s%b\n" "${SHLVL}" "${ColorDebug}" "${_in}" "${ColorReset}" >> "${LOG}" 2>> "${LOG}"
     else
-        _sep="${_sep:-$(distd "λ " ${ColorDarkgray})}"
-        if [ "${CAP_TERM_BASH}" = "YES" ]; then
-            _dbfile="$(distd "${BASH_SOURCE#${SOFIN_ROOT}/share/}:${BASH_LINENO[0]}" "${ColorBlue}")"
-            _fun="$(distd "${FUNCNAME[2]}()" "${ColorBlue}")"
-
-        elif [ "${CAP_TERM_ZSH}" = "YES" ]; then
-            # NOTE: $funcstack[2]; ${funcfiletrace[@]} ${funcsourcetrace[@]} ${funcstack[@]} ${functrace[@]}
-            _valzz="${funcfiletrace[2]#${SOFIN_ROOT}/share/}"
-            _valxx="${funcstack[2]}"
-            _dbfile="$(distd "${_valzz}" "${ColorBlue}")"
-            _fun="$(distd " ${_valxx}()" "${ColorBlue}")"
-        else
-            _dbfile=""
-            _fun=""
-        fi
-
         touch_logsdir_and_logfile
-        _dbfn=" (#${SHLVL}) [${_sep}${_fun} @ ${_dbfile}] "
+        _dbfn=" "
         if [ -z "${DEBUG}" ]; then
-            _dbgnme="$(lowercase "${DEF_NAME}${DEF_SUFFIX}")"
-            if [ -n "${_dbgnme}" ]; then
+            if [ -n "${DEF_NAME}${DEF_SUFFIX}" ]; then
                 # Definition log
-                ${PRINTF_BIN} "#%b%s%s%b" "${ColorDebug}" "${_dbfn}" "${_in}" "${ColorReset}${_permdbg}" 2>> "${LOG}-${_dbgnme}" >> "${LOG}-${_dbgnme}"
-            elif [ -z "${_dbgnme}" ]; then
+                ${PRINTF_BIN} "#%b%s%s%b" "${ColorDebug}" "${_dbfn}" "${_in}" "${ColorReset}${_permdbg}" 2>> "${LOG}-${DEF_NAME}${DEF_SUFFIX}" >> "${LOG}-${DEF_NAME}${DEF_SUFFIX}"
+            else
                 # Main log
                 ${PRINTF_BIN} "#%b%s%s%b" "${ColorDebug}" "${_dbfn}" "${_in}" "${ColorReset}${_permdbg}" 2>> "${LOG}" >> "${LOG}"
-            elif [ ! -d "${LOGS_DIR}" ]; then
-                # System logger fallback
-                ${LOGGER_BIN} "# λ ${ColorDebug}${_dbfn}${_in}${ColorReset}" 2>/dev/null
             fi
         else # DEBUG is set. Print to stdout
             ${PRINTF_BIN} "#%b%s%s%b\n" "${ColorDebug}" "${_dbfn}" "${_in}" "${ColorReset}" 2>/dev/null
         fi
-        unset _dbgnme _in _dbfn _dbfnin _elmz _cee
+        unset _dbgnme _in _dbfn
     fi
     return 0
 }
@@ -136,7 +116,7 @@ run () {
                 check_result ${?} "${_run_params}"
             fi
         else
-            _rnm="$(lowercase "${DEF_NAME}${DEF_SUFFIX}")"
+            _rnm="${DEF_NAME}${DEF_SUFFIX}"
             if [ -z "${_run_shw_prgr}" ]; then
                 eval "PATH=${PATH}${GIT_EXPORTS} ${_run_params}" >> "${LOG}-${_rnm}" 2>> "${LOG}-${_rnm}"
                 check_result ${?} "${_run_params}"
@@ -163,10 +143,9 @@ try () {
     fi
     if [ -n "${_try_params}" ]; then
         touch_logsdir_and_logfile
+        # TODO: these guards sucks, it has to be done reasonable
         ${PRINTF_BIN} '%s\n' "${_try_params}" | eval "${MATCH_PRINT_STDOUT_GUARD}" && _show_prgrss=YES
-        # _dt="$(distd "$(${DATE_BIN} ${DEFAULT_DATE_TRYRUN_OPTS} 2>/dev/null)" ${ColorDarkgray})"
-        # debug "${_dt}: $(distd "${TRY_CHAR}" ${ColorWhite}) $(distd "${_try_params}" ${ColorParams}) $(distd "[${_show_prgrss:-NO}]" "${ColorBlue}")"
-        _try_aname="$(lowercase "${DEF_NAME}${DEF_SUFFIX}")"
+        _try_aname="${DEF_NAME}${DEF_SUFFIX}"
         if [ -z "${_try_aname}" ]; then
             if [ -z "${_show_prgrss}" ]; then
                 eval "PATH=${PATH}${GIT_EXPORTS} ${_try_params}" >> "${LOG}" 2>> "${LOG}" && \
@@ -203,8 +182,6 @@ retry () {
     ${PRINTF_BIN} '%s\n' "${_targets}" 2>/dev/null | eval "${MATCH_PRINT_STDOUT_GUARD}" && _rtry_blue=YES
     while [ -n "${_ammo}" ]; do
         if [ -n "${_targets}" ]; then
-            # _dt="$(distd "$(${DATE_BIN} ${DEFAULT_DATE_TRYRUN_OPTS} 2>/dev/null)" ${ColorDarkgray})"
-            # debug "${_dt}: $(distd "${TRY_CHAR}${NOTE_CHAR}${RUN_CHAR}" ${ColorWhite}) $(distd "${_targets}" ${ColorParams}) $(distd "[${_show_prgrss:-NO}]" "${ColorBlue}")"
             if [ -z "${_rtry_blue}" ]; then
                 eval "PATH=${DEFAULT_PATH}${GIT_EXPORTS} ${_targets}" >> "${LOG}" 2>> "${LOG}" && \
                     unset _ammo _targets && \
