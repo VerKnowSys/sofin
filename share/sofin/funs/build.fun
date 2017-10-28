@@ -233,9 +233,9 @@ build () {
                 else
                     _already_installed_version="$(${CAT_BIN} "${_installed_indicator}" 2>/dev/null)"
                     if [ "${DEF_VERSION}" = "${_already_installed_version}" ]; then
-                        debug "$(distd "${_bund_lcase}") bundle is installed with version: $(distd "${_already_installed_version}")"
+                        debug "$(capitalize "$(distd "${_bund_lcase}")") bundle is installed with version: $(distd "${_already_installed_version}")"
                     else
-                        error "$(diste "${_bund_lcase}") bundle is installed with version: $(distw "${_already_installed_version}"), different from found in definition: $(distw "${DEF_VERSION}"). Aborting!"
+                        error "$(capitalize "$(diste "${_bund_lcase}")") bundle is installed with version: $(diste "${_already_installed_version}"), different from found in definition: $(diste "${DEF_VERSION}"). Aborting!"
                     fi
                     DONT_BUILD_BUT_DO_EXPORTS=YES
                     unset _already_installed_version
