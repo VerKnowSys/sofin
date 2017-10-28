@@ -436,12 +436,7 @@ destroy_locks () {
 
 
 update_shell_vars () {
-    if [ -f "${SOFIN_PROFILE}" ]; then
-        debug "Generating shell environment and writing to: $(distd "${SOFIN_PROFILE}")"
-        get_shell_vars > "${SOFIN_PROFILE}"
-    else
-        debug "Empty profile file: $(distd "${SOFIN_PROFILE}")! No-Op!"
-    fi
+    get_shell_vars > "${SOFIN_PROFILE}"
 }
 
 
