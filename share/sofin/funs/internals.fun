@@ -82,7 +82,7 @@ processes_all_sofin () {
         _pid="$(${CAT_BIN} "${_ff}")"
         debug "Checking pid: $(distd "${_pid}") of lock: $(distd "${_pid}")"
         ${KILL_BIN} -0 "${_pid}" >/dev/null 2>/dev/null
-        if [ "0" = "${?}" ]; then
+        if [ "0" = "${?}" ] && [ "${SOFIN_PID}" != "${_pid}" ]; then
             _processes="${_pid} ${_processes}"
         fi
     done
