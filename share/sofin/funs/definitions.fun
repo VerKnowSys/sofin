@@ -625,7 +625,6 @@ export_binaries () {
     if [ -z "${DEF_EXPORTS}" ]; then
         note "Defined no exports of prefix: $(distn "${PREFIX}")"
     else
-        _a_name="$(lowercase "${DEF_NAME}${DEF_SUFFIX}")"
         _an_amount="$(${PRINTF_BIN} '%s\n' "${DEF_EXPORTS}" | ${WC_BIN} -w 2>/dev/null | ${TR_BIN} -d '\t|\r|\ ' 2>/dev/null)"
         debug "Exporting $(distd "${_an_amount}") binaries of prefix: $(distd "${PREFIX}")"
         try "${MKDIR_BIN} -p ${PREFIX}/exports"
@@ -647,7 +646,7 @@ export_binaries () {
         done
         debug "List of exports: $(distd "${_expolist}")"
     fi
-    unset _expo_elem _acurrdir _afile_to_exp _an_amount _a_name _expolist _ebdef_name
+    unset _expo_elem _acurrdir _afile_to_exp _an_amount _expolist _ebdef_name
 }
 
 
