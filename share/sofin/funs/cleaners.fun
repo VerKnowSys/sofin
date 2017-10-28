@@ -55,13 +55,12 @@ finalize () {
     # restore_security_state
     untrap_signals
     security_set_normal
-    destroy_locks
+    destroy_dead_locks
     finalize_shell_reload
 }
 
 
 finalize_shell_reload () {
-    untrap_signals
     update_shell_vars
     reload_shell
     finalize_onquit
@@ -69,7 +68,6 @@ finalize_shell_reload () {
 
 
 finalize_onquit () {
-    untrap_signals
     security_set_normal
     # summary
     if [ "${TTY}" = "YES" ]; then
@@ -99,7 +97,7 @@ umount_ramdisk () {
 finalize_interrupt () {
     untrap_signals
     umount_ramdisk
-    destroy_locks
+    destroy_dead_locks
     finalize_onquit
 }
 
@@ -121,7 +119,7 @@ finalize_afterbuild () {
     untrap_signals
     # Destroy lock of just built bundle:
     if [ -n "${_bund_name}" ]; then
-        destroy_locks "${_bund_name}"
+        destroy_dead_locks "${_bund_name}"
     fi
     security_set_normal
 }

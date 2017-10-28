@@ -409,7 +409,7 @@ acquire_lock_for () {
 }
 
 
-destroy_locks () {
+destroy_dead_locks () {
     _pattern="${1}"
     test -z "${_pattern}" && return 0
 
