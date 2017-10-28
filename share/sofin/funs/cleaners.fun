@@ -61,7 +61,7 @@ finalize () {
 
 finalize_shell_reload () {
     update_shell_vars
-    reload_zsh_shells
+    reload_shell
     finalize_onquit
 }
 
