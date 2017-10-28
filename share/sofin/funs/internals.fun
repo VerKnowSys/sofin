@@ -76,16 +76,19 @@ sofin_header () {
 }
 
 
-processes_all () {
-    _ignorepid="${SOFIN_PID:-$$}"
-    ${PS_BIN} ${DEFAULT_PS_OPTS} 2>/dev/null | \
-        ${EGREP_BIN} -v "(grep|egrep|${_ignorepid}|s\\ log\\ |s\\ env\\ )" 2>/dev/null
-    return 0
-}
-
-
 processes_all_sofin () {
-    processes_all | ${EGREP_BIN} -i "${SOFIN_BIN}" 2>/dev/null | ${CUT_BIN} -f1 -d' ' 2>/dev/null
+    unset _processes
+    for _ff in $(${FIND_BIN} "${LOCKS_DIR}" -name '*.lock'); do
+        _pid="$(${CAT_BIN} "${_ff}")"
+        debug "Checking pid: $(distd "${_pid}") of lock: $(distd "${_pid}")"
+        ${KILL_BIN} -0 "${_pid}" >/dev/null 2>/dev/null
+        if [ "0" = "${?}" ]; then
+            _processes="${_pid} ${_processes}"
+        fi
+    done
+    if [ -n "${_processes}" ]; then
+        echo "${_processes}"
+    fi
     return 0
 }
 
