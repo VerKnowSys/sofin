@@ -53,6 +53,7 @@ perform_clean () {
 
 finalize () {
     # restore_security_state
+    untrap_signals
     security_set_normal
     destroy_locks
     finalize_shell_reload
@@ -60,6 +61,7 @@ finalize () {
 
 
 finalize_shell_reload () {
+    untrap_signals
     update_shell_vars
     reload_shell
     finalize_onquit
@@ -95,6 +97,7 @@ umount_ramdisk () {
 
 # NOTE: C-c is handled differently, not full finalize is running. f.e. build dir isn't wiped out
 finalize_interrupt () {
+    untrap_signals
     umount_ramdisk
     destroy_locks
     finalize_onquit
@@ -115,6 +118,7 @@ finalize_afterbuild () {
         # TODO: dump srcdir? here?
         debug "No-Op - not yet implemented"
     fi
+    untrap_signals
     # Destroy lock of just built bundle:
     if [ -n "${_bund_name}" ]; then
         destroy_locks "${_bund_name}"
