@@ -302,6 +302,25 @@ compiler_setup () {
         unset NM AR AS RANLIB LD
     fi
 
+    unset DEFAULT_LINKER_FLAGS CMACROS
+    if [ -z "${DEF_NO_FORTIFY_SOURCE}" ]; then
+        CMACROS="${HARDEN_CMACROS}"
+    fi
+    case "${SYSTEM_NAME}" in
+        FreeBSD)
+            DEFAULT_COMPILER_FLAGS="${HARDEN_CFLAGS} ${HARDEN_CFLAGS_PRODUCTION} ${CMACROS}"
+            DEFAULT_LINKER_FLAGS="${HARDEN_LDFLAGS_PRODUCTION}"
+            ;;
+
+        Darwin)
+            DEFAULT_COMPILER_FLAGS="${HARDEN_CFLAGS} ${CMACROS}"
+            ;;
+
+        Linux|Minix)
+            DEFAULT_COMPILER_FLAGS="${HARDEN_CFLAGS} ${CMACROS}"
+            ;;
+    esac
+
     # CFLAGS, CXXFLAGS setup:
     set_c_and_cxx_flags "${_compiler_use_linker_flags}"
 
@@ -336,26 +355,6 @@ compiler_setup () {
         CFLAGS="${CFLAGS} ${SSP_BUFFER_OVERRIDE}"
         CXXFLAGS="${CXXFLAGS} ${SSP_BUFFER_OVERRIDE}"
     fi
-
-    unset DEFAULT_LINKER_FLAGS
-    if [ -z "${DEF_NO_FORTIFY_SOURCE}" ]; then
-        unset HARDEN_CMACROS
-    fi
-
-    case "${SYSTEM_NAME}" in
-        FreeBSD)
-            DEFAULT_COMPILER_FLAGS="${HARDEN_CFLAGS} ${HARDEN_CMACROS} ${HARDEN_CFLAGS_PRODUCTION}"
-            DEFAULT_LINKER_FLAGS="${HARDEN_LDFLAGS_PRODUCTION}"
-            ;;
-
-        Darwin)
-            DEFAULT_COMPILER_FLAGS="${HARDEN_CFLAGS} ${HARDEN_CMACROS}"
-            ;;
-
-        Linux|Minix)
-            DEFAULT_COMPILER_FLAGS="${HARDEN_CFLAGS} ${HARDEN_CMACROS}"
-            ;;
-    esac
 
     # If DEF_LINKER_FLAGS is set on definition side, append it's content to LDFLAGS:
     # if [ -n "${DEF_LINKER_FLAGS}" ]; then
