@@ -96,6 +96,12 @@ dump_compiler_setup () {
         debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "ssp-buffer-override" "${ColorGray}")"
     fi
 
+    if [ -z "${DEF_NO_FORTIFY_SOURCE}" ]; then
+        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "fortify-source" "${ColorGreen}")"
+    else
+        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "fortify-source" "${ColorGray}")"
+    fi
+
     if [ -z "${DEF_NO_LLVM_LINKER}" ] && [ "YES" = "${CAP_SYS_LLVM_LD}" ]; then
         debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "llvm-lld-linker" "${ColorGreen}")"
         debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "gnu-gold-linker" "${ColorGray}")"
@@ -172,21 +178,6 @@ dump_system_capabilities () {
 
 compiler_setup () {
     # TODO: linker pick should be implemented via "capabilities"!
-    unset DEFAULT_LINKER_FLAGS
-    case "${SYSTEM_NAME}" in
-        FreeBSD)
-            DEFAULT_COMPILER_FLAGS="${HARDEN_CFLAGS} ${HARDEN_CMACROS} ${HARDEN_CFLAGS_PRODUCTION}"
-            DEFAULT_LINKER_FLAGS="${HARDEN_LDFLAGS_PRODUCTION}"
-            ;;
-
-        Darwin)
-            DEFAULT_COMPILER_FLAGS="${HARDEN_CFLAGS} ${HARDEN_CMACROS}"
-            ;;
-
-        Linux|Minix)
-            DEFAULT_COMPILER_FLAGS="${HARDEN_CFLAGS} ${HARDEN_CMACROS}"
-            ;;
-    esac
 
     # if [ -n "${DEBUGBUILD}" ]; then
     #     debug "DEBUGBUILD defined! Appending compiler flags with: $(distd "-O0 -ggdb")"
@@ -345,6 +336,26 @@ compiler_setup () {
         CFLAGS="${CFLAGS} ${SSP_BUFFER_OVERRIDE}"
         CXXFLAGS="${CXXFLAGS} ${SSP_BUFFER_OVERRIDE}"
     fi
+
+    unset DEFAULT_LINKER_FLAGS
+    if [ -z "${DEF_NO_FORTIFY_SOURCE}" ]; then
+        unset HARDEN_CMACROS
+    fi
+
+    case "${SYSTEM_NAME}" in
+        FreeBSD)
+            DEFAULT_COMPILER_FLAGS="${HARDEN_CFLAGS} ${HARDEN_CMACROS} ${HARDEN_CFLAGS_PRODUCTION}"
+            DEFAULT_LINKER_FLAGS="${HARDEN_LDFLAGS_PRODUCTION}"
+            ;;
+
+        Darwin)
+            DEFAULT_COMPILER_FLAGS="${HARDEN_CFLAGS} ${HARDEN_CMACROS}"
+            ;;
+
+        Linux|Minix)
+            DEFAULT_COMPILER_FLAGS="${HARDEN_CFLAGS} ${HARDEN_CMACROS}"
+            ;;
+    esac
 
     # If DEF_LINKER_FLAGS is set on definition side, append it's content to LDFLAGS:
     # if [ -n "${DEF_LINKER_FLAGS}" ]; then
