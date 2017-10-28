@@ -78,11 +78,11 @@ sofin_header () {
 
 processes_all_sofin () {
     unset _processes
-    for _ff in $(${FIND_BIN} "${LOCKS_DIR}" -name '*.lock'); do
+    for _ff in $(${FIND_BIN} "${LOCKS_DIR}" -name '*.lock' 2>/dev/null); do
         _pid="$(${CAT_BIN} "${_ff}")"
-        debug "Checking pid: $(distd "${_pid}") of lock: $(distd "${_pid}")"
         ${KILL_BIN} -0 "${_pid}" >/dev/null 2>/dev/null
         if [ "0" = "${?}" ] && [ "${SOFIN_PID}" != "${_pid}" ]; then
+            debug "Sofin alive pid found: $(distd "${_pid}") in lock: $(distd "${_pid}")"
             _processes="${_pid} ${_processes}"
         fi
     done
@@ -91,36 +91,6 @@ processes_all_sofin () {
     fi
     return 0
 }
-
-
-# processes_installing () {
-#     filter="${1}"
-#     if [ -z "${filter}" ]; then # general case
-#         general_matcher="[A-Z0-9]+[a-z0-9]*"
-#         matcher=""
-#         for phrase in i install get pick choose use switch p push binpush send b build d deploy; do
-#             if [ -z "${matcher}" ]; then
-#                 matcher="(${SOFIN_BIN} ${phrase} ${general_matcher}"
-#             else
-#                 matcher="${matcher}|${SOFIN_BIN} ${phrase} ${general_matcher}"
-#             fi
-#         done
-#         matcher="${matcher})"
-#     else
-#         general_matcher="${filter}"
-#         matcher=""
-#         for phrase in i install get pick choose use switch p push binpush send b build d deploy; do
-#             if [ -z "${matcher}" ]; then
-#                 matcher="(${SOFIN_BIN} ${phrase} ${general_matcher}"
-#             else
-#                 matcher="${matcher}|${SOFIN_BIN} ${phrase} ${general_matcher}"
-#             fi
-#         done
-#         matcher="${matcher})"
-#     fi
-#     debug "processes_installing-matcher: /${matcher}/"
-#     processes_all_sofin | ${EGREP_BIN} "${matcher}" 2>/dev/null
-# }
 
 
 get_shell_vars () {

@@ -116,7 +116,6 @@ finalize_afterbuild () {
         # TODO: dump srcdir? here?
         debug "No-Op - not yet implemented"
     fi
-    untrap_signals
     # Destroy lock of just built bundle:
     if [ -n "${_bund_name}" ]; then
         destroy_dead_locks "${_bund_name}"
