@@ -53,7 +53,7 @@ show_logs () {
                 _all_files="${_mr} ${_all_files}"
             done
             debug "Tail of logs: $(distd "${_all_files}")"
-            eval "${TAIL_BIN} -n ${LOG_LINES_AMOUNT} -F ${_all_files}" 2>&1
+            eval "${TAIL_BIN} -F ${_all_files}" 2>&1
         else
             note "No logs to attach to. LOGS_DIR=($(distn "${LOGS_DIR}")) contain no log files?"
         fi
