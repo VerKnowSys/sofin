@@ -265,7 +265,7 @@ build () {
                             note "No additional requirements defined"
                             break
                         else
-                            note "  $(distn "${_req}") ($(distn "${_req_amount}") of $(distn "${_req_all}") remaining)"
+                            permnote "  $(distn "${_req}") ($(distn "${_req_amount}") of $(distn "${_req_all}") remaining)"
                             if [ ! -f "${PREFIX}/${_req}${DEFAULT_INST_MARK_EXT}" ]; then
                                 CHANGED=YES
                                 process_flat "${_req}" "${PREFIX}" "${_bund_name}"
