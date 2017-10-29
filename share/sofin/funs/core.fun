@@ -101,13 +101,12 @@ diste () {
 
 
 run () {
-    _run_params="${@}"
+    _run_params="${*}"
     if [ -n "${_run_params}" ]; then
         touch_logsdir_and_logfile
-        ${PRINTF_BIN} '%s\n' "${_run_params}" | eval "${MATCH_PRINT_STDOUT_GUARD}" && _run_shw_prgr=YES
         # debug "$(distd "$(${DATE_BIN} ${DEFAULT_DATE_TRYRUN_OPTS} 2>/dev/null)" ${ColorDarkgray}): $(distd "${RUN_CHAR}" ${ColorWhite}): $(distd "${_run_params}" ${ColorParams}) $(distd "[show-blueout:${_run_shw_prgr:-NO}]" "${ColorBlue}")"
         if [ -z "${DEF_NAME}${DEF_SUFFIX}" ]; then
-            if [ -z "${_run_shw_prgr}" ]; then
+            if [ -z "${DEBUG}" ]; then
                 eval "PATH=${PATH}${GIT_EXPORTS} ${_run_params}" >> "${LOG}" 2>> "${LOG}"
                 check_result ${?} "${_run_params}"
             else
@@ -117,7 +116,7 @@ run () {
             fi
         else
             _rnm="${DEF_NAME}${DEF_SUFFIX}"
-            if [ -z "${_run_shw_prgr}" ]; then
+            if [ -z "${DEBUG}" ]; then
                 eval "PATH=${PATH}${GIT_EXPORTS} ${_run_params}" >> "${LOG}-${_rnm}" 2>> "${LOG}-${_rnm}"
                 check_result ${?} "${_run_params}"
             else
@@ -134,8 +133,7 @@ run () {
 
 
 try () {
-    _try_params="${@}"
-    # NOTE: this one should just eval the task but when DEVEL is unset don't stderr log output from try()
+    _try_params="${*}"
     if [ -z "${TRY_LOUD}" ] && [ -z "${DEVEL}" ]; then
         eval "PATH=${PATH}${GIT_EXPORTS} ${_try_params}" >/dev/null 2>&1 \
             && return 0
@@ -143,11 +141,9 @@ try () {
     fi
     if [ -n "${_try_params}" ]; then
         touch_logsdir_and_logfile
-        # TODO: these guards sucks, it has to be done reasonable
-        ${PRINTF_BIN} '%s\n' "${_try_params}" | eval "${MATCH_PRINT_STDOUT_GUARD}" && _show_prgrss=YES
         _try_aname="${DEF_NAME}${DEF_SUFFIX}"
         if [ -z "${_try_aname}" ]; then
-            if [ -z "${_show_prgrss}" ]; then
+            if [ -z "${DEBUG}" ]; then
                 eval "PATH=${PATH}${GIT_EXPORTS} ${_try_params}" >> "${LOG}" 2>> "${LOG}" && \
                     return 0
             else
@@ -157,7 +153,7 @@ try () {
                     return 0
             fi
         else
-            if [ -z "${_show_prgrss}" ]; then
+            if [ -z "${DEBUG}" ]; then
                 eval "PATH=${PATH}${GIT_EXPORTS} ${_try_params}" >> "${LOG}-${_try_aname}" 2>> "${LOG}-${_try_aname}" && \
                     return 0
             else
@@ -175,14 +171,12 @@ try () {
 
 
 retry () {
-    _targets="${@}"
+    _targets="${*}"
     _ammo="OOO"
     touch_logsdir_and_logfile
-    # check for commands that puts something important/intersting on stdout
-    ${PRINTF_BIN} '%s\n' "${_targets}" 2>/dev/null | eval "${MATCH_PRINT_STDOUT_GUARD}" && _rtry_blue=YES
     while [ -n "${_ammo}" ]; do
         if [ -n "${_targets}" ]; then
-            if [ -z "${_rtry_blue}" ]; then
+            if [ -z "${DEBUG}" ]; then
                 eval "PATH=${DEFAULT_PATH}${GIT_EXPORTS} ${_targets}" >> "${LOG}" 2>> "${LOG}" && \
                     unset _ammo _targets && \
                         return 0
@@ -199,7 +193,7 @@ retry () {
         debug "Remaining attempts: $(distd "${_ammo}")"
     done
     debug "All available ammo exhausted to invoke a command: $(distd "${_targets}")"
-    unset _ammo _targets _rtry_blue
+    unset _ammo _targets
     return 1
 }
 
