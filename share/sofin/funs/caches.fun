@@ -46,12 +46,25 @@ show_logs () {
        [ "${SOFIN_NAME}" = "${_logf_pattern}" ]; then
         ${TAIL_BIN} -n "${LOG_LINES_AMOUNT}" "${LOG}" 2>&1
 
+    elif [ "@" = "${_logf_pattern}" ]; then
+        if [ -d "${LOGS_DIR}" ]; then
+            _all_files=""
+            for _mr in $(${FIND_BIN} "${LOGS_DIR%/}" -name "${SOFIN_NAME}*" -type f 2>/dev/null); do
+                _all_files="${_mr} ${_all_files}"
+            done
+            debug "Tail of logs: $(distd "${_all_files}")"
+            eval "${TAIL_BIN} -n ${LOG_LINES_AMOUNT} -F ${_all_files}" 2>&1
+        else
+            note "No logs to attach to. LOGS_DIR=($(distn "${LOGS_DIR}")) contain no log files?"
+        fi
+
     elif [ "+" = "${_logf_pattern}" ]; then
         if [ -d "${LOGS_DIR}" ]; then
             _all_files=""
             for _mr in $(find_most_recent "${LOGS_DIR%/}" "${SOFIN_NAME}*" | ${HEAD_BIN} -n "${LOG_LAST_FILES}" 2>/dev/null); do
                 _all_files="${_mr} ${_all_files}"
             done
+            debug "Tail of logs: $(distd "${_all_files}")"
             eval "${TAIL_BIN} -n ${LOG_LINES_AMOUNT} -F ${_all_files}" 2>&1
         else
             note "No logs to attach to. LOGS_DIR=($(distn "${LOGS_DIR}")) contain no log files?"
