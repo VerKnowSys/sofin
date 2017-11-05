@@ -28,15 +28,15 @@ env_forgivable () {
 
 
 enable_sofin_env () {
-    try "${RM_BIN} -f ${SOFIN_ENV_DISABLED_INDICATOR_FILE}" && \
-        update_shell_vars
+    ${RM_BIN} -f "${SOFIN_ENV_DISABLED_INDICATOR_FILE}"
+    update_shell_vars
     reload_shell
 }
 
 
 disable_sofin_env () {
-    try "${TOUCH_BIN} ${SOFIN_ENV_DISABLED_INDICATOR_FILE}" && \
-        update_shell_vars
+    ${TOUCH_BIN} "${SOFIN_ENV_DISABLED_INDICATOR_FILE}"
+    update_shell_vars
     reload_shell
 }
 
