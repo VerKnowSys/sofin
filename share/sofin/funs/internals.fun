@@ -109,15 +109,15 @@ get_shell_vars () {
     _ldflags="${LDFLAGS} ${DEFAULT_LINKER_FLAGS}"
     gsv_int_ldflags () {
         for _app in ${1}*; do # LIB_DIR
-            if [ -e "${_app}/lib" ]; then
+            if [ -d "${_app}/lib" ]; then
                 # _ldresult="${_app}/lib:${_ldresult}"
                 _ldflags="-L${_app}/lib ${_ldflags}" # NOTE: not required anymore? -R${_app}/lib
             fi
-            if [ -e "${_app}/libexec" ]; then
+            if [ -d "${_app}/libexec" ]; then
                 # _ldresult="${_app}/libexec:${_ldresult}"
                 _ldflags="-L${_app}/libexec ${_ldflags}" # NOTE: not required anymore? -R${_app}/libexec
             fi
-            if [ -e "${_app}/lib/pkgconfig" ]; then
+            if [ -d "${_app}/lib/pkgconfig" ]; then
                 _pkg_config_path="${_app}/lib/pkgconfig:${_pkg_config_path}"
             fi
         done
@@ -129,7 +129,7 @@ get_shell_vars () {
     gsv_int_cflags () {
         for _app in ${1}*; do
             _exp="${_app}/include"
-            if [ -e "${_exp}" ]; then
+            if [ -d "${_exp}" ]; then
                 _cflags="-I${_exp} ${_cflags}"
             fi
         done
@@ -142,11 +142,11 @@ get_shell_vars () {
     gsv_int_manpath () {
         for _app in ${1}*; do
             _exp="${_app}/man"
-            if [ -e "${_exp}" ]; then
+            if [ -d "${_exp}" ]; then
                 _manpath="${_exp}:${_manpath}"
             fi
             _exp="${_app}/share/man"
-            if [ -e "${_exp}" ]; then
+            if [ -d "${_exp}" ]; then
                 _manpath="${_exp}:${_manpath}"
             fi
         done
