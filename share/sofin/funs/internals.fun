@@ -148,6 +148,9 @@ get_shell_vars () {
         ${PRINTF_BIN} "# ${ColorParams}%s${ColorReset}:\n" "LDFLAGS"
         ${PRINTF_BIN} "%s\n" "export LDFLAGS=\"\""
     else # sofin environment override enabled, Default behavior:
+        _cflags="$(echo "${_cflags}" | ${SED_BIN} 's/ *$//g; s/  //g' 2>/dev/null)"
+        _cxxflags="$(echo "${_cxxflags}" | ${SED_BIN} 's/ *$//g; s/  //g' 2>/dev/null)"
+        _ldflags="$(echo "${_ldflags}" | ${SED_BIN} 's/ *$//g; s/  //g' 2>/dev/null)"
         ${PRINTF_BIN} "# ${ColorParams}%s${ColorReset}:\n" "CFLAGS"
         ${PRINTF_BIN} "%s\n" "export CFLAGS=\"${_cflags}\""
         ${PRINTF_BIN} "# ${ColorParams}%s${ColorReset}:\n" "CXXFLAGS"
