@@ -35,15 +35,6 @@ usage_howto () {
 }
 
 
-write_info_about_shell_configuration () {
-    if [ "YES" = "${TTY}" ]; then
-        warn "$(distw SHELL_PID) has no value (normally contains pid of current shell)\nShell auto reload function is disabled for this session"
-    else
-        debug "$(distd SHELL_PID) has no value (normally contains pid of current shell)\nShell auto reload function is disabled for this session"
-    fi
-}
-
-
 sofin_header () {
     ${PRINTF_BIN} '\r\n     %s\n%s\n\n  %s\n  %s\n  %s\n\n  %s\n\n' \
         "$(distn 'Sof' "${ColorWhite}")$(distn 'tware' "${ColorGray}") $(distn 'In' "${ColorWhite}")$(distn 'staller v' "${ColorGray}")$(distn "${SOFIN_VERSION}" "${ColorWhite}")" \
