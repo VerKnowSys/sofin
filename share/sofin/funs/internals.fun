@@ -164,7 +164,7 @@ get_shell_vars () {
         ${PRINTF_BIN} "# ${ColorParams}%s${ColorReset}:\n" "CFLAGS"
         ${PRINTF_BIN} "%s\n" "export CFLAGS=\"$(${PRINTF_BIN} "%s\n" "${_cflags}" 2>/dev/null | eval "${CUT_TRAILING_SPACES_GUARD}")\""
         ${PRINTF_BIN} "# ${ColorParams}%s${ColorReset}:\n" "CXXFLAGS"
-        ${PRINTF_BIN} "%s\n" "export CXXFLAGS=\"$(${PRINTF_BIN} "%s\n" "${_cxxflags}" 2>/dev/null | eval "${CUT_TRAILING_SPACES_GUARD}")\"${ColorReset}"
+        ${PRINTF_BIN} "%s\n" "export CXXFLAGS=\"$(${PRINTF_BIN} "%s\n" "${_cxxflags}" 2>/dev/null | eval "${CUT_TRAILING_SPACES_GUARD}")\""
         ${PRINTF_BIN} "# ${ColorParams}%s${ColorReset}:\n" "LDFLAGS"
         ${PRINTF_BIN} "%s\n" "export LDFLAGS=\"$(${PRINTF_BIN} "%s\n" "${_ldflags}" 2>/dev/null | eval "${CUT_TRAILING_SPACES_GUARD}")\""
     fi
