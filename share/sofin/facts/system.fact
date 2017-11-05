@@ -85,9 +85,6 @@ HARDEN_LDFLAGS_PRODUCTION="-pie -z relro -z now"
 
 SOFIN_SHELL_BLOCK=$(${CAT_BIN} <<EOF
 
-# Sofin SHELL_PID value:
-export SHELL_PID="\$\$"
-
 # Sofin launcher function:
 s () {
     eval /Software/Sofin/bin/s \${@}

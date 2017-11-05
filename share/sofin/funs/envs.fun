@@ -30,24 +30,14 @@ env_forgivable () {
 enable_sofin_env () {
     try "${RM_BIN} -f ${SOFIN_ENV_DISABLED_INDICATOR_FILE}" && \
         update_shell_vars
-    if [ -z "${SHELL_PID}" ]; then
-        note "Enabled Sofin environment, yet no SHELL_PID defined. Autoreload skipped."
-    else
-        note "Enabled Sofin environment. Reloading shell"
-        reload_shell
-    fi
+    reload_shell
 }
 
 
 disable_sofin_env () {
     try "${TOUCH_BIN} ${SOFIN_ENV_DISABLED_INDICATOR_FILE}" && \
         update_shell_vars
-    if [ -z "${SHELL_PID}" ]; then
-        note "Disabled Sofin environment, yet no SHELL_PID defined. Autoreload skipped."
-    else
-        note "Disabled Sofin environment. Reloading shell"
-        reload_shell
-    fi
+    reload_shell
 }
 
 
@@ -466,7 +456,9 @@ reload_shell () {
     # NOTE: PPID contains pid of parent shell of Sofin
     if [ -n "${PPID}" ]; then
         try "${KILL_BIN} -SIGUSR2 ${PPID}" && \
-            debug "Reload signal sent to $(distd "${_shellshort}") pids: $(distd "${PPID}")"
+            debug "Reload signal sent to parent pid: $(distd "${PPID}")"
+    else
+        debug "Unset PPID on reload_shell()!"
     fi
 }
 
