@@ -106,7 +106,6 @@ get_shell_vars () {
         done
     }
     gsv_int_ldflags "${SOFTWARE_DIR}"
-    # debug "LD/flags: '$(distd "${_ldflags}"), PKG/cfg-path: $(distd "${_pkg_config_path}")'"
 
     # CFLAGS, CXXFLAGS:
     _cflags="${DEFAULT_COMPILER_FLAGS}"
@@ -117,8 +116,6 @@ get_shell_vars () {
     }
     gsv_int_cflags "${SOFTWARE_DIR}"
     _cxxflags="-std=c++11 ${_cflags}"
-    # debug "C/flags: '$(distd "${_cflags}")'"
-    # debug "CXX/flags: '$(distd "${_cxxflags}")'"
 
     # MANPATH
     _manpath="${DEFAULT_MANPATH}"
@@ -128,17 +125,6 @@ get_shell_vars () {
         done
     }
     gsv_int_manpath "${SOFTWARE_DIR}"
-    # debug "MAN: '$(distd "${_manpath}")'"
-
-    ${PRINTF_BIN} "# ${ColorParams}%s${ColorReset}:\n" "PATH"
-    ${PRINTF_BIN} "%s\n" "export PATH=\"${_path}\""
-    ${PRINTF_BIN} "# ${ColorParams}%s${ColorReset}:\n" "CC"
-    ${PRINTF_BIN} "%s\n" "export CC=\"${CC_NAME}\""
-    ${PRINTF_BIN} "# ${ColorParams}%s${ColorReset}:\n" "CXX"
-    ${PRINTF_BIN} "%s\n" "export CXX=\"${CXX_NAME}\""
-    ${PRINTF_BIN} "# ${ColorParams}%s${ColorReset}:\n" "CPP"
-    ${PRINTF_BIN} "%s\n" "export CPP=\"${CPP}\""
-    # debug "CC=$(distd "${CC}"), CXX=$(distd "${CXX}"), CPP=$(distd "${CPP}"), PATH: $(distd "${_path}")"
 
     if [ -f "${SOFIN_ENV_DISABLED_INDICATOR_FILE}" ]; then # sofin disabled. Default system environment
         ${PRINTF_BIN} "# ${ColorParams}%s${ColorReset}:\n" "CFLAGS"
@@ -147,21 +133,32 @@ get_shell_vars () {
         ${PRINTF_BIN} "%s\n" "export CXXFLAGS=\"\""
         ${PRINTF_BIN} "# ${ColorParams}%s${ColorReset}:\n" "LDFLAGS"
         ${PRINTF_BIN} "%s\n" "export LDFLAGS=\"\""
+        ${PRINTF_BIN} "# ${ColorParams}%s${ColorReset}:\n" "PKG_CONFIG_PATH"
+        ${PRINTF_BIN} "%s\n" "export PKG_CONFIG_PATH=\"\""
     else # sofin environment override enabled, Default behavior:
         _cflags="$(echo "${_cflags}" | ${SED_BIN} 's/ *$//g; s/  //g' 2>/dev/null)"
         _cxxflags="$(echo "${_cxxflags}" | ${SED_BIN} 's/ *$//g; s/  //g' 2>/dev/null)"
         _ldflags="$(echo "${_ldflags}" | ${SED_BIN} 's/ *$//g; s/  //g' 2>/dev/null)"
+        _pkg_config_path="$(echo "${_pkg_config_path}" | ${SED_BIN} 's/ *$//g; s/  //g' 2>/dev/null)"
         ${PRINTF_BIN} "# ${ColorParams}%s${ColorReset}:\n" "CFLAGS"
         ${PRINTF_BIN} "%s\n" "export CFLAGS=\"${_cflags}\""
         ${PRINTF_BIN} "# ${ColorParams}%s${ColorReset}:\n" "CXXFLAGS"
         ${PRINTF_BIN} "%s\n" "export CXXFLAGS=\"${_cxxflags}\""
         ${PRINTF_BIN} "# ${ColorParams}%s${ColorReset}:\n" "LDFLAGS"
         ${PRINTF_BIN} "%s\n" "export LDFLAGS=\"${_ldflags}\""
+        ${PRINTF_BIN} "# ${ColorParams}%s${ColorReset}:\n" "PKG_CONFIG_PATH"
+        ${PRINTF_BIN} "%s\n" "export PKG_CONFIG_PATH=\"${_pkg_config_path}\""
     fi
 
     # common
-    ${PRINTF_BIN} "# ${ColorParams}%s${ColorReset}:\n" "PKG_CONFIG_PATH"
-    ${PRINTF_BIN} "%s\n" "export PKG_CONFIG_PATH=\"${_pkg_config_path}\""
+    ${PRINTF_BIN} "# ${ColorParams}%s${ColorReset}:\n" "PATH"
+    ${PRINTF_BIN} "%s\n" "export PATH=\"${_path}\""
+    ${PRINTF_BIN} "# ${ColorParams}%s${ColorReset}:\n" "CC"
+    ${PRINTF_BIN} "%s\n" "export CC=\"${CC_NAME}\""
+    ${PRINTF_BIN} "# ${ColorParams}%s${ColorReset}:\n" "CXX"
+    ${PRINTF_BIN} "%s\n" "export CXX=\"${CXX_NAME}\""
+    ${PRINTF_BIN} "# ${ColorParams}%s${ColorReset}:\n" "CPP"
+    ${PRINTF_BIN} "%s\n" "export CPP=\"${CPP}\""
     ${PRINTF_BIN} "# ${ColorParams}%s${ColorReset}:\n" "MANPATH"
     ${PRINTF_BIN} "%s\n" "export MANPATH=\"${_manpath}\""
 
