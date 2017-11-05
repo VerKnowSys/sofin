@@ -464,9 +464,9 @@ reload_shell () {
 
 
 update_system_shell_env_files () {
-    for _env_file in ${HOME}/.profile ${HOME}/.zshenv ${HOME}/.bashrc; do
+    for _env_file in ${HOME}/.zshenv ${HOME}/.bashrc; do
         if [ -f "${_env_file}" ]; then
-            ${EGREP_BIN} "SHELL_PID=" "${_env_file}" >/dev/null 2>&1
+            ${EGREP_BIN} "'Sofin launcher function'" "${_env_file}" >/dev/null 2>&1
             if [ "${?}" = "0" ]; then
                 continue
             else
