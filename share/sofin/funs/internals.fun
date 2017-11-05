@@ -88,70 +88,57 @@ get_shell_vars () {
     # PATH:
     _path="${DEFAULT_PATH}"
     gsv_int_path () {
-        for _exppart in $(${FIND_BIN} "${SOFTWARE_DIR}" -mindepth 2 -maxdepth 2 -name 'exports' -type d 2>/dev/null); do
-            _path="${_exppart}:${_path}"
+        for _exp in $(${FIND_BIN} "${SOFTWARE_DIR}" -mindepth 2 -maxdepth 2 -name 'exports' -type d 2>/dev/null); do
+            _path="${_exp}:${_path}"
         done
     }
     gsv_int_path
 
     # LDFLAGS, PKG_CONFIG_PATH:
-    # _ldresult="/lib:/usr/lib"
     _pkg_config_path="."
     _ldflags="${LDFLAGS} ${DEFAULT_LINKER_FLAGS}"
     gsv_int_ldflags () {
-        for _app in ${1}*; do # LIB_DIR
-            if [ -d "${_app}/lib" ]; then
-                # _ldresult="${_app}/lib:${_ldresult}"
-                _ldflags="-L${_app}/lib ${_ldflags}" # NOTE: not required anymore? -R${_app}/lib
-            fi
-            if [ -d "${_app}/libexec" ]; then
-                # _ldresult="${_app}/libexec:${_ldresult}"
-                _ldflags="-L${_app}/libexec ${_ldflags}" # NOTE: not required anymore? -R${_app}/libexec
-            fi
-            if [ -d "${_app}/lib/pkgconfig" ]; then
-                _pkg_config_path="${_app}/lib/pkgconfig:${_pkg_config_path}"
-            fi
+        for _exp in $(${FIND_BIN} "${SOFTWARE_DIR}" -mindepth 2 -maxdepth 2 -name 'lib' -or -name 'libexec' -type d 2>/dev/null); do
+            _ldflags="-L${_exp} ${_ldflags}"
+        done
+        for _exp in $(${FIND_BIN} "${SOFTWARE_DIR}" -mindepth 2 -maxdepth 3 -name 'pkgconfig' -type d 2>/dev/null); do
+            _pkg_config_path="${_exp}:${_pkg_config_path}"
         done
     }
     gsv_int_ldflags "${SOFTWARE_DIR}"
+    # debug "LD/flags: '$(distd "${_ldflags}"), PKG/cfg-path: $(distd "${_pkg_config_path}")'"
 
     # CFLAGS, CXXFLAGS:
     _cflags="${DEFAULT_COMPILER_FLAGS}"
     gsv_int_cflags () {
-        for _app in ${1}*; do
-            _exp="${_app}/include"
-            if [ -d "${_exp}" ]; then
-                _cflags="-I${_exp} ${_cflags}"
-            fi
+        for _exp in $(${FIND_BIN} "${SOFTWARE_DIR}" -mindepth 2 -maxdepth 2 -name 'include' -type d 2>/dev/null); do
+            _cflags="-I${_exp} ${_cflags}"
         done
     }
     gsv_int_cflags "${SOFTWARE_DIR}"
     _cxxflags="-std=c++11 ${_cflags}"
+    # debug "C/flags: '$(distd "${_cflags}")'"
+    # debug "CXX/flags: '$(distd "${_cxxflags}")'"
 
     # MANPATH
     _manpath="${DEFAULT_MANPATH}"
     gsv_int_manpath () {
-        for _app in ${1}*; do
-            _exp="${_app}/man"
-            if [ -d "${_exp}" ]; then
-                _manpath="${_exp}:${_manpath}"
-            fi
-            _exp="${_app}/share/man"
-            if [ -d "${_exp}" ]; then
-                _manpath="${_exp}:${_manpath}"
-            fi
+        for _exp in $(${FIND_BIN} "${SOFTWARE_DIR}" -mindepth 2 -maxdepth 3 -name 'man' -type d 2>/dev/null); do
+            _manpath="${_exp}:${_manpath}"
         done
     }
     gsv_int_manpath "${SOFTWARE_DIR}"
+    # debug "MAN: '$(distd "${_manpath}")'"
 
     ${PRINTF_BIN} "# ${ColorParams}%s${ColorReset}:\n" "PATH"
-    ${PRINTF_BIN} "%s\n" "export PATH=\"${_path}\"" | eval "${CUT_TRAILING_SPACES_GUARD}"
+    ${PRINTF_BIN} "%s\n" "export PATH=\"${_path}\""
     ${PRINTF_BIN} "# ${ColorParams}%s${ColorReset}:\n" "CC"
     ${PRINTF_BIN} "%s\n" "export CC=\"${CC}\""
     ${PRINTF_BIN} "# ${ColorParams}%s${ColorReset}:\n" "CXX"
     ${PRINTF_BIN} "%s\n" "export CXX=\"${CXX}\""
     ${PRINTF_BIN} "# ${ColorParams}%s${ColorReset}:\n" "CPP"
     ${PRINTF_BIN} "%s\n" "export CPP=\"${CPP}\""
+    # debug "CC=$(distd "${CC}"), CXX=$(distd "${CXX}"), CPP=$(distd "${CPP}"), PATH: $(distd "${_path}")"
 
     if [ -f "${SOFIN_ENV_DISABLED_INDICATOR_FILE}" ]; then # sofin disabled. Default system environment
         ${PRINTF_BIN} "# ${ColorParams}%s${ColorReset}:\n" "CFLAGS"
@@ -162,18 +149,18 @@ get_shell_vars () {
         ${PRINTF_BIN} "%s\n" "export LDFLAGS=\"\""
     else # sofin environment override enabled, Default behavior:
         ${PRINTF_BIN} "# ${ColorParams}%s${ColorReset}:\n" "CFLAGS"
-        ${PRINTF_BIN} "%s\n" "export CFLAGS=\"$(${PRINTF_BIN} "%s\n" "${_cflags}" 2>/dev/null | eval "${CUT_TRAILING_SPACES_GUARD}")\""
+        ${PRINTF_BIN} "%s\n" "export CFLAGS=\"${_cflags}\""
         ${PRINTF_BIN} "# ${ColorParams}%s${ColorReset}:\n" "CXXFLAGS"
-        ${PRINTF_BIN} "%s\n" "export CXXFLAGS=\"$(${PRINTF_BIN} "%s\n" "${_cxxflags}" 2>/dev/null | eval "${CUT_TRAILING_SPACES_GUARD}")\""
+        ${PRINTF_BIN} "%s\n" "export CXXFLAGS=\"${_cxxflags}\""
         ${PRINTF_BIN} "# ${ColorParams}%s${ColorReset}:\n" "LDFLAGS"
-        ${PRINTF_BIN} "%s\n" "export LDFLAGS=\"$(${PRINTF_BIN} "%s\n" "${_ldflags}" 2>/dev/null | eval "${CUT_TRAILING_SPACES_GUARD}")\""
+        ${PRINTF_BIN} "%s\n" "export LDFLAGS=\"${_ldflags}\""
     fi
 
     # common
     ${PRINTF_BIN} "# ${ColorParams}%s${ColorReset}:\n" "PKG_CONFIG_PATH"
-    ${PRINTF_BIN} "%s\n" "export PKG_CONFIG_PATH=\"$(${PRINTF_BIN} "%s\n" "${_pkg_config_path}" 2>/dev/null | eval "${CUT_TRAILING_SPACES_GUARD}")\""
+    ${PRINTF_BIN} "%s\n" "export PKG_CONFIG_PATH=\"${_pkg_config_path}\""
     ${PRINTF_BIN} "# ${ColorParams}%s${ColorReset}:\n" "MANPATH"
-    ${PRINTF_BIN} "%s\n" "export MANPATH=\"$(${PRINTF_BIN} "%s\n" "${_manpath}" 2>/dev/null | eval "${CUT_TRAILING_SPACES_GUARD}")\""
+    ${PRINTF_BIN} "%s\n" "export MANPATH=\"${_manpath}\""
 
     unset _cflags _cxxflags _ldflags _pkg_config_path _manpath _app _exp
 }
