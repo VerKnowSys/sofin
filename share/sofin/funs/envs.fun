@@ -176,17 +176,10 @@ compiler_setup () {
     #     DEFAULT_COMPILER_FLAGS="${DEFAULT_COMPILER_FLAGS} -O2"
     # fi
 
-    # pick compiler in order:
-    # 1. /usr/bin/clang
-    # 2. /usr/bin/gcc
     _default_c="${CC_NAME}"
     _default_cxx="${CXX_NAME}"
     _default_cpp="${CPP_NAME}"
-    # if [ "YES" = "${DEF_USE_ALT_COMPILER}" ]; then
-    #     _default_c="${CC_NAME_ALT}"
-    #     _default_cxx="${CXX_NAME_ALT}"
-    #     _default_cpp="${CPP_NAME_ALT}"
-    # fi
+
     # NOTE: Darwin case: no clang-cpp but clang -E as preprocesor there:
     if [ ! -x "${PREFIX}/bin/${_default_cpp}" ]; then
         _default_cpp="${_default_c} -E"
@@ -199,18 +192,8 @@ compiler_setup () {
     # TODO: make a alternatives / or capability
     if [ -z "${DEF_NO_CCACHE}" ]; then # ccache is supported by default but it's optional
         if [ -x "${CCACHE_BIN}" ]; then
-            # if [ "YES" = "${DEF_USE_ALT_COMPILER}" ]; then
-            #     if [ -d "${PREFIX}/bin" ]; then
-            #         CC="${CCACHE_BIN} ${PREFIX}/bin/${CC}"
-            #         CXX="${CCACHE_BIN} ${PREFIX}/bin/${CXX}"
-            #     else
-            #         CC="${CCACHE_BIN} ${CC}"
-            #         CXX="${CCACHE_BIN} ${CXX}"
-            #     fi
-            # else
-                CC="${CCACHE_BIN} /usr/bin/${CC}"
-                CXX="${CCACHE_BIN} /usr/bin/${CXX}"
-            # fi
+            CC="${CCACHE_BIN} /usr/bin/${CC}"
+            CXX="${CCACHE_BIN} /usr/bin/${CXX}"
         else
             CC="/usr/bin/${CC}"
             CXX="/usr/bin/${CXX}"
