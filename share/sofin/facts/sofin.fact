@@ -1,4 +1,4 @@
-SOFIN_VERSION="1.2.29"
+SOFIN_VERSION="1.2.30"
 
 DEFAULT_RELEASE_HOST="git.verknowsys.com" # NOTE: use value for v from /etc/hosts
 DEFAULT_RELEASE_PATH="http://dmilith.verknowsys.com/Public/${SOFIN_BUNDLE_NAME}-releases"
