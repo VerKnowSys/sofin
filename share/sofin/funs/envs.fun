@@ -28,14 +28,35 @@ env_forgivable () {
 
 
 enable_sofin_env () {
-    ${RM_BIN} -f "${SOFIN_ENV_DISABLED_INDICATOR_FILE}"
+    _envs="${*}"
+    if [ -z "${_envs}" ]; then
+        error "No bundles to enable provided!"
+    fi
+    debug "Enabling Sofin env for: $(distd "${_envs}")"
+    for _env in $(echo "${_envs}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
+        ${GREP_BIN} -F "${_env}" "${SOFIN_ENV_ENABLED_INDICATOR_FILE}" 2>/dev/null || \
+            ${PRINTF_BIN} "%s\n" "${_env}" >> "${SOFIN_ENV_ENABLED_INDICATOR_FILE}"
+    done
+    note "Disabled Sofin environment for bundles: $(distn "${_envs}")"
     update_shell_vars
     reload_shell
 }
 
 
 disable_sofin_env () {
-    ${TOUCH_BIN} "${SOFIN_ENV_DISABLED_INDICATOR_FILE}"
+    _envs="${*}"
+    if [ -z "${_envs}" ]; then
+        error "No bundles to disable were provided!"
+    fi
+    if [ "@" = "${_envs}" ]; then
+        debug "Wiping out environment for @!"
+        ${RM_BIN} -f "${SOFIN_ENV_ENABLED_INDICATOR_FILE}"
+    else
+        for _env in $(echo "${_envs}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
+            ${SED_BIN} -i '' -e "/^.*${_env}.*$/ d" "${SOFIN_ENV_ENABLED_INDICATOR_FILE}" 2>/dev/null
+        done
+        note "Disabled Sofin environment for bundles: $(distn "${_envs}")"
+    fi
     update_shell_vars
     reload_shell
 }
