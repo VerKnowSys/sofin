@@ -678,3 +678,8 @@ after_install_snapshot () {
 after_export_snapshot () {
     do_prefix_snapshot "after_export"
 }
+
+
+create_origin_snaphots () {
+    do_prefix_snapshot "origin"
+}
