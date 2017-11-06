@@ -87,7 +87,7 @@ processes_all_sofin () {
 
 get_shell_vars () {
     _pkg_config_path="."
-    _ldflags="${LDFLAGS} ${DEFAULT_LINKER_FLAGS}"
+    _ldflags="${DEFAULT_LINKER_FLAGS}"
     _cflags="${DEFAULT_COMPILER_FLAGS}"
     _cxxflags="-std=c++11 ${_cflags}"
     _path="${DEFAULT_PATH}"
