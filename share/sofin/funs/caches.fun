@@ -81,14 +81,11 @@ show_logs () {
 
 
 pretouch_logs () {
-    _params="${@}"
+    _params="${*}"
     if [ -z "${CAP_SYS_PRODUCTION}" ]; then
-        debug "Logs pretouch called with params: $(distd "${_params}")"
         unset _pret_list
-        for _app in $(echo "${_params}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
-            if [ -z "${_app}" ]; then
-                debug "Empty app given out of params: $(distd "${_params}")?"
-            else
+        for _app in ${_params}; do
+            if [ -n "${_app}" ]; then
                 if [ -z "${_pret_list}" ]; then
                     _pret_list="${LOGS_DIR}${SOFIN_NAME}-${_app}"
                 else

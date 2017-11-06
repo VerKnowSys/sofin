@@ -1,9 +1,9 @@
 load_defs () {
-    _definitions="${@}"
+    _definitions="${*}"
     if [ -z "${_definitions}" ]; then
         error "No definition name specified!"
     else
-        for _given_def in $(echo "${_definitions}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
+        for _given_def in ${_definitions}; do
             #echo "# L: ${_given_def}"
             _name_base="${_given_def##*/}"
             _def="$(lowercase "${_name_base}")"
@@ -219,7 +219,7 @@ reset_defs () {
 
 
 remove_bundles () {
-    _bundle_name="${@}"
+    _bundle_name="${*}"
     if [ -z "${_bundle_name}" ]; then
         error "Second argument with at least one bundle name is required!"
     fi
@@ -355,7 +355,7 @@ show_outdated () {
 
 
 wipe_remote_archives () {
-    _bund_names="${@}"
+    _bund_names="${*}"
     _ans="YES"
     if [ -z "${USE_FORCE}" ]; then
         warn "Are you sure you want to wipe binary bundles: $(distw "${_bund_names}") from binary repository: $(distw "${MAIN_BINARY_REPOSITORY}")? (Type $(distw YES) to confirm)"
