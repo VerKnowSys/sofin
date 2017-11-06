@@ -608,33 +608,31 @@ do_prefix_snapshot () {
         require_namesum_set
         if [ "YES" = "${CAP_SYS_ZFS}" ]; then
             _pr_name="${PREFIX##*/}"
-            # Software main dir:
-            _pr_snp="${DEFAULT_ZPOOL}${SOFTWARE_DIR}/${USER}/${_pr_name}"
-            # Build dir:
-            _pr_bdir_snp="${DEFAULT_ZPOOL}${SOFTWARE_DIR}/${USER}/${_pr_name}/${DEFAULT_SRC_EXT}${BUILD_NAMESUM}"
-            debug "Prefix name: $(distd "${_pr_name}"), Main dir: $(distd "${_pr_snp}"), Build dir: $(distd "${_pr_bdir_snp}")"
+            _pr_soft="${DEFAULT_ZPOOL}${SOFTWARE_DIR}/${USER}/${_pr_name}"
+            _pr_serv="${DEFAULT_ZPOOL}${SERVICES_DIR}/${USER}/${_pr_name}"
+            debug "Name: $(distd "${_pr_name}"), Software dir: $(distd "${_pr_soft}"), Service dir: $(distd "${_pr_serv}")"
 
             # # Try removing existing snaps:
-            # try "${ZFS_BIN} destroy ${_pr_snp}@${_snap_name} > /dev/null" && \
-            #     debug "Destroyed snapshot: $(distd "${_pr_snp}@${_snap_name}")"
-            # try "${ZFS_BIN} destroy ${_pr_bdir_snp}@${_snap_name} > /dev/null" && \
-            #     debug "Destroyed snapshot: $(distd "${_pr_bdir_snp}@${_snap_name}")"
+            do_snaps_destroy () {
+                try "${ZFS_BIN} destroy -r '${_pr_soft}@${_snap_name}'"
+                try "${ZFS_BIN} destroy -r '${_pr_serv}@${_snap_name}'"
+                return 0
+            }
 
             # # Do snapshots:
-            # try "${ZFS_BIN} snapshot ${_pr_snp}@${_snap_name} > /dev/null" && \
-            #     debug "Done @${_snap_name} snapshot of PREFIX: $(distd "${PREFIX}") of dataset: $(distd "${_pr_snp}")" && \
-            #         _p1=0
-            # try "${ZFS_BIN} snapshot ${_pr_bdir_snp}@${_snap_name} > /dev/null" && \
-            #     debug "Done @${_snap_name} snapshot of PREFIX: $(distd "${PREFIX}") of dataset: $(distd "${_pr_bdir_snp}")" && \
-            #         _p2=0
+            do_snaps () {
+                try "${ZFS_BIN} snapshot '${_pr_soft}@${_snap_name}'" \
+                    && try "${ZFS_BIN} snapshot '${_pr_serv}@${_snap_name}'" \
+                    && return 0
+                return 1
+            }
 
-            # if [ "${_p1}" = "0" -a \
-            #      "${_p2}" = "0" ]; then
-            #     return 0
-            # else
-            #     debug "Failed snapshot? _p1: $(distd "${_snap_name}_${TIMESTAMP}@${_snap_name}")=${_p1};  _p2: $(distd "${_pr_bdir_snp}@${_snap_name}")=${_p2}"
-            #     #     return 1
-            # fi
+            do_snaps_destroy \
+                && do_snaps \
+                && return 0
+
+            debug "Failed snapshot? 1. $(distd "${_snap_name}_${TIMESTAMP}@${_snap_name}");  2. $(distd "${_pr_serv}@${_snap_name}")"
+            return 1
         fi
     else
         debug "Value of USER unset!"
