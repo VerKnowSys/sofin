@@ -304,8 +304,9 @@ make_exports () {
     if [ -z "${_bundle_name}" ]; then
         error "Second argument with $(diste "BundleName") is required!"
     fi
-    try "${MKDIR_BIN} -p '${SOFTWARE_DIR}/${_bundle_name}/exports'"
+    try "${MKDIR_BIN} -p '${SOFTWARE_DIR}/${_bundle_name}/exports' '${SERVICES_DIR}/${_bundle_name}/exports'"
     for _bindir in "/bin/" "/sbin/" "/libexec/"; do
+        # SOFTWARE_DIR:
         if [ -e "${SOFTWARE_DIR}/${_bundle_name}${_bindir}${_export_bin}" ]; then
             note "Exporting binary: $(distn "${SOFTWARE_DIR}/${_bundle_name}${_bindir}${_export_bin}")"
             _cdir="$(${PWD_BIN} 2>/dev/null)"
@@ -316,6 +317,19 @@ make_exports () {
             return 0
         else
             debug "Export not found: $(distd "${SOFTWARE_DIR}/${_bundle_name}${_bindir}${_export_bin}")"
+        fi
+
+        # SERVICES_DIR:
+        if [ -e "${SERVICES_DIR}/${_bundle_name}${_bindir}${_export_bin}" ]; then
+            note "Exporting binary: $(distn "${SERVICES_DIR}/${_bundle_name}${_bindir}${_export_bin}")"
+            _cdir="$(${PWD_BIN} 2>/dev/null)"
+            cd "${SERVICES_DIR}/${_bundle_name}${_bindir}"
+            try "${LN_BIN} -fs ..${_bindir}/${_export_bin} ../exports/${_export_bin}"
+            cd "${_cdir}"
+            unset _cdir _bindir _bundle_name _export_bin
+            return 0
+        else
+            debug "Export not found: $(distd "${SERVICES_DIR}/${_bundle_name}${_bindir}${_export_bin}")"
         fi
     done
     error "No executable to export from bin paths of: $(diste "${_bundle_name}/\{bin,sbin,libexec\}/${_export_bin}")"
