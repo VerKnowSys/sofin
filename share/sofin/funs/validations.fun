@@ -24,7 +24,7 @@ validate_env () {
 
 
 fail_on_bg_job () {
-    _deps="${*}"
+    _deps="${@}"
     debug "deps=$(distd "$(${PRINTF_BIN} '%s\n' "${_deps}" | eval "${NEWLINES_TO_SPACES_GUARD}")")"
     create_dirs
     acquire_lock_for "${_deps}"
@@ -156,13 +156,13 @@ validate_definition_disabled () {
 
 
 validate_pie_on_exports () {
-    _bundz="${*}"
+    _bundz="${@}"
     if [ -z "${_bundz}" ]; then
         error "At least single bundle name has to be specified for pie validation."
     fi
     if [ "YES" = "${CAP_SYS_HARDENED}" ]; then
         debug "Checking PIE on exports: $(distd "${_bundz}")"
-        for _bun in ${_bundz}; do
+        for _bun in $(echo "${_bundz}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
             if [ -d "${SOFTWARE_DIR}/${_bun}/exports" ]; then
                 _a_dir="${SOFTWARE_DIR}/${_bun}/exports"
             elif [ -d "${SOFTWARE_DIR}/${_bun}/exports-disabled" ]; then

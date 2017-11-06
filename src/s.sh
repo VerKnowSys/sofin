@@ -264,13 +264,14 @@ if [ -n "${SOFIN_COMMAND}" ]; then
         b|build)
             initialize
             _to_be_built="${SOFIN_ARGS}"
-            fail_on_bg_job "${SOFIN_ARGS}"
+            note "Requested build of: $(distn "${_to_be_built}")"
+            fail_on_bg_job "${_to_be_built}"
             USE_UPDATE=NO
             USE_BINBUILD=NO
-            for _b in ${SOFIN_ARGS}; do
-                debug "Requested build of: $(distd "${_b}")"
+            for _b in $(echo "${_to_be_built}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
                 build "${_b}"
             done
+            unset _to_be_built _b
             finalize
             ;;
 

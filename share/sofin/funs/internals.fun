@@ -239,7 +239,7 @@ show_diff () {
 
 
 develop () {
-    _defname_input="${*}"
+    _defname_input="${@}"
     create_dirs
     _defname_no_ext="$(${PRINTF_BIN} '%s\n' "${_defname_input}" | ${SED_BIN} -e "s#\.${DEFAULT_DEF_EXT}##" 2>/dev/null)"
     _devname="$(lowercase "${_defname_no_ext##*/}")"

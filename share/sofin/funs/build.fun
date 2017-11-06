@@ -47,11 +47,11 @@ build_bundle () {
 
 
 push_binbuilds () {
-    _push_bundles="${*}"
+    _push_bundles="${@}"
     if [ -z "${_push_bundles}" ]; then
         error "At least single argument with $(diste "BundleName") to push is required!"
     fi
-    for _pbelement in ${_push_bundles}; do
+    for _pbelement in $(echo "${_push_bundles}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
         _pblowercase_element="$(lowercase "${_pbelement}")"
         if [ -z "${_pblowercase_element}" ]; then
             error "Lowercase bundle name is empty!"
@@ -75,8 +75,8 @@ push_binbuilds () {
 
 
 deploy_binbuild () {
-    _dbbundles="${*}"
-    for _dbbundle in ${_dbbundles}; do
+    _dbbundles="${@}"
+    for _dbbundle in $(echo "${_dbbundles}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
         USE_BINBUILD=NO
         build "${_dbbundle}"
         push_binbuilds "${_dbbundle}"
@@ -130,7 +130,7 @@ fetch_binbuild () {
 
 # NOTE: build() works incorrectly now - when specified multiple arguments the post tasks fail
 build () {
-    _build_list="${*}"
+    _build_list="${@}"
 
     # Update definitions and perform more checks
     validate_reqs
@@ -142,7 +142,7 @@ build () {
 
     debug "Sofin v$(distd "${SOFIN_VERSION}"): New build started for bundles: $(distd "${_build_list}")"
     PATH="${DEFAULT_PATH}"
-    for _bund_name in ${_build_list}; do
+    for _bund_name in $(echo "${_build_list}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
         _bund_name="$(lowercase "${_bund_name}")"
         _anm="$(capitalize "${_bund_name}")"
         load_defaults
