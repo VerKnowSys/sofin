@@ -142,7 +142,6 @@ update_defs () {
         debug "State of definitions repository was re-set to: $(distd "${_def_head}")"
         if [ "${_def_cur_branch}" != "${BRANCH}" ]; then # use _def_cur_branch value if branch isn't matching default branch
             debug "Checking out branch: $(distd "${_def_cur_branch}")"
-            TRY_LOUD=YES
             try "${GIT_BIN} checkout -b ${_def_cur_branch}" || \
                 try "${GIT_BIN} checkout ${_def_cur_branch}" || \
                     warn "Can't checkout branch: $(distw "${_def_cur_branch}")"
@@ -150,7 +149,6 @@ update_defs () {
             try "${GIT_BIN} pull ${DEFAULT_GIT_PULL_FETCH_OPTS} origin ${_def_cur_branch}" && \
                 note "Branch: $(distn "${_def_cur_branch}") is now at: $(distn "${_def_head}")" && \
                 return
-            unset TRY_LOUD
 
             ${PRINTF_BIN} "%b%s%b\n$(fill)\n" "${ColorRed}" "Error occured: Update from branch: $(diste "${BRANCH}") of repository: $(diste "${REPOSITORY}") wasn't possible. Log's below:" "${ColorReset}"
             show_log_if_available
@@ -158,7 +156,6 @@ update_defs () {
 
         else # else use default branch
             debug "Using default branch: $(distd "${BRANCH}")"
-            TRY_LOUD=YES
             if [ "${_def_cur_branch}" != "${BRANCH}" ]; then
                 try "${GIT_BIN} checkout -b ${BRANCH}" || \
                     try "${GIT_BIN} checkout ${BRANCH}" || \
@@ -167,7 +164,6 @@ update_defs () {
             try "${GIT_BIN} pull ${DEFAULT_GIT_PULL_FETCH_OPTS} origin ${BRANCH}" && \
                 note "Branch: $(distn "${BRANCH}") is at: $(distn "${_def_head}")" && \
                     return
-            unset TRY_LOUD
 
             ${PRINTF_BIN} "${ColorRed}%s${ColorReset}\n$(fill)\n" "Error occured: Update from branch: $(diste "${BRANCH}") of repository: $(diste "${REPOSITORY}") wasn't possible. Log's below:"
             show_log_if_available
@@ -182,7 +178,6 @@ update_defs () {
             error "Error cloning branch: $(diste "${BRANCH}") of repository: $(diste "${REPOSITORY}"). Please make sure that given repository and branch are valid!"
         cd "${CACHE_DIR}${DEFINITIONS_BASE}"
         _def_cur_branch="$(${GIT_BIN} rev-parse --abbrev-ref HEAD 2>/dev/null)"
-        TRY_LOUD=YES
         if [ "${BRANCH}" != "${_def_cur_branch}" ]; then
             try "${GIT_BIN} checkout -b ${BRANCH}" || \
                 try "${GIT_BIN} checkout ${BRANCH}" || \
@@ -191,7 +186,6 @@ update_defs () {
         _def_head="HEAD"
         try "${GIT_BIN} pull --progress origin ${BRANCH}" && \
             _def_head="$(${CAT_BIN} "${CACHE_DIR}${DEFINITIONS_BASE}/${DEFAULT_GIT_DIR_NAME}/refs/heads/${_def_cur_branch}" 2>/dev/null)"
-        unset TRY_LOUD
 
         note "Branch: $(distn "${BRANCH}") is currenly at: $(distn "${_def_head}") in repository: $(distn "${REPOSITORY}")"
     fi
@@ -754,7 +748,6 @@ after_install_callback () {
 
 traverse_patchlevels () {
     _trav_patches="${@}"
-    TRY_LOUD=YES
     for _patch in $(echo "${_trav_patches}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
         for _level in $(${SEQ_BIN} 0 3); do # Up to: -p3
             try "${PATCH_BIN} -p${_level} -N -f -i ${_patch}" && \
@@ -763,7 +756,6 @@ traverse_patchlevels () {
             # debug "Patch: $(distd "patches${_patch##*patches}") failed for level: ${_level}!"
         done
     done
-    unset TRY_LOUD
     unset _trav_patches _patch _level
 }
 
@@ -801,7 +793,6 @@ clone_or_fetch_git_bare_repo () {
     _git_cached="${GIT_CACHE_DIR}${_bare_name}${DEFAULT_GIT_DIR_NAME}"
     try "${MKDIR_BIN} -p ${GIT_CACHE_DIR}"
     note "   ${NOTE_CHAR} Fetching source repository: $(distn "${_source_path}")"
-    TRY_LOUD=YES
     try "${GIT_BIN} clone --jobs=3 --recursive --mirror ${_source_path} ${_git_cached} 2> /dev/null" || \
         try "${GIT_BIN} clone --jobs=3 --mirror ${_source_path} ${_git_cached} 2> /dev/null"
     if [ "${?}" = "0" ]; then
@@ -817,7 +808,6 @@ clone_or_fetch_git_bare_repo () {
          [ ! -f "${_git_cached}/config" ]; then
         error "Failed to fetch source repository: $(diste "${_source_path}") [branch: $(diste "${_chk_branch}")]"
     fi
-    unset TRY_LOUD
 
     # bare repository is already cloned, so we just clone from it now..
     _dest_repo="${_build_dir}/${_bare_name}-${_chk_branch}"
