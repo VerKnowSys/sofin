@@ -48,26 +48,28 @@ show_logs () {
 
     elif [ "@" = "${_logf_pattern}" ]; then
         if [ -d "${LOGS_DIR}" ]; then
-            _all_files=""
+            unset _all_files
             for _mr in $(${FIND_BIN} "${LOGS_DIR%/}" -name "${SOFIN_NAME}*" -not -name "*.log.*" -type f 2>/dev/null); do
                 _all_files="${_mr} ${_all_files}"
             done
-            debug "Tail of logs: $(distd "${_all_files}")"
+            _all_count="$(echo "${_all_files}" | env "${WORDS_COUNT_GUARD}")"
+            debug "@ Loading tail of $(distd "${_all_count}") log files"
             eval "${TAIL_BIN} -F ${_all_files}" 2>&1
         else
-            note "No logs to attach to. LOGS_DIR=($(distn "${LOGS_DIR}")) contain no log files?"
+            note "@ No logs to attach to. LOGS_DIR=($(distn "${LOGS_DIR}")) contain no log files?"
         fi
 
     elif [ "+" = "${_logf_pattern}" ]; then
         if [ -d "${LOGS_DIR}" ]; then
-            _all_files=""
+            unset _all_files
             for _mr in $(find_most_recent "${LOGS_DIR%/}" "${SOFIN_NAME}*" | ${HEAD_BIN} -n "${LOG_LAST_FILES}" 2>/dev/null); do
                 _all_files="${_mr} ${_all_files}"
             done
-            debug "Tail of logs: $(distd "${_all_files}")"
+            _all_count="$(echo "${_all_files}" | env "${WORDS_COUNT_GUARD}")"
+            debug "+ Loading tail of $(distd "${_all_count}") log files"
             eval "${TAIL_BIN} -n ${LOG_LINES_AMOUNT} -F ${_all_files}" 2>&1
         else
-            note "No logs to attach to. LOGS_DIR=($(distn "${LOGS_DIR}")) contain no log files?"
+            note "+ No logs to attach to. LOGS_DIR=($(distn "${LOGS_DIR}")) contain no log files?"
         fi
 
     else
@@ -76,7 +78,7 @@ show_logs () {
         ${SLEEP_BIN} "${LOG_CHECK_INTERVAL:-1}" 2>/dev/null
         log_helper "${_logf_pattern}"
     fi
-    unset _files_x_min _logf_minutes _logf_pattern _files_list _files_count _files_blist _mod_f_names
+    unset _files_x_min _logf_minutes _logf_pattern _files_list _files_count _files_blist _mod_f_names _all_count
 }
 
 
