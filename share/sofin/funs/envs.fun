@@ -468,9 +468,9 @@ reload_shell () {
 
 
 update_system_shell_env_files () {
-    for _env_file in ${HOME}/.zshenv ${HOME}/.bashrc; do
+    for _env_file in "${HOME}/.zshenv" "${HOME}/.bashrc"; do
         if [ -f "${_env_file}" ]; then
-            ${EGREP_BIN} "'Sofin launcher function'" "${_env_file}" >/dev/null 2>&1
+            ${GREP_BIN} -F 'Sofin launcher function' "${_env_file}" >/dev/null 2>&1
             if [ "${?}" = "0" ]; then
                 continue
             else
@@ -482,7 +482,6 @@ update_system_shell_env_files () {
                 debug "Environment block written to file: $(distd "${_env_file}")"
         fi
     done
-    update_shell_vars
     unset _default_envs _env_file
 }
 

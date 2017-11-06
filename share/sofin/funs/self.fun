@@ -30,11 +30,6 @@ install_sofin () {
         install_sofin_files && \
         echo "${SOFIN_VERSION}" > "${SOFIN_ROOT}/${SOFIN_NAME}${DEFAULT_INST_MARK_EXT}"
 
-    # for _bin in "s" "s-osver" "s-usec"; do
-    #     test ! -L "${SOFIN_ROOT}/exports/${_bin}" && \
-    #         run "${SOFIN_ROOT}/bin/${_bin} export ${_bin} ${SOFIN_BUNDLE_NAME}"
-    # done
-
     if [ -x "${DEFAULT_SHELL_EXPORTS}/zsh" ]; then
         ${SED_BIN} -i '' -e "s#/usr/bin/env sh#${DEFAULT_SHELL_EXPORTS}/zsh#" \
             "${SOFIN_ROOT}/bin/s" \
@@ -43,6 +38,8 @@ install_sofin () {
     fi
 
     update_system_shell_env_files
+    update_shell_vars
+    reload_shell
     return 0
 }
 
