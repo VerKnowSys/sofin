@@ -120,8 +120,50 @@ if [ -n "${SOFIN_COMMAND_ARG}" ]; then
             ;;
 
 
-        stat|status)
-            sofin_status
+        env)
+            shift
+            debug "Sofin-env mode: $(distd "${env}")"
+            case "${1}" in
+
+                +) # add
+                    shift
+                    _bundles="${*}"
+                    note "Enabling bundles: $(distn "${_bundles}")"
+                    enable_sofin_env "${_bundles}"
+                    ;;
+
+                -) # remove
+                    shift
+                    _bundles="${*}"
+                    note "Disabling bundles: $(distn "${_bundles}")"
+                    disable_sofin_env "${_bundles}"
+                    ;;
+
+                !) # save
+                    shift
+                    _fname="${SOFIN_ENV_ENABLED_INDICATOR_FILE}.${1}"
+                    note "Storing new environment profile: $(distn "${_fname}")"
+                    run "${INSTALL_BIN} -v ${SOFIN_ENV_ENABLED_INDICATOR_FILE} ${_fname}"
+                    ;;
+
+                @) # load
+                    shift
+                    _name="${1}"
+                    _fname="${SOFIN_ENV_ENABLED_INDICATOR_FILE}.${_name}"
+                    if [ -f "${_fname}" ]; then
+                        note "Loading environment profile: $(distn "${_fname}")"
+                        run "${INSTALL_BIN} -v ${_fname} ${SOFIN_ENV_ENABLED_INDICATOR_FILE}"
+                    else
+                        error "No such profile: $(diste "${_name}")"
+                    fi
+                    ;;
+
+                *)
+                    shift
+
+                    env_status
+                    ;;
+            esac
             ;;
 
 

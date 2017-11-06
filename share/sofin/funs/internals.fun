@@ -224,7 +224,7 @@ develop () {
 }
 
 
-sofin_status () {
+env_status () {
     if [ -f "${SOFIN_ENV_ENABLED_INDICATOR_FILE}" ]; then
         note "Sofin Shell environment enabled for: $(distn "$(${CAT_BIN} "${SOFIN_ENV_ENABLED_INDICATOR_FILE}" | ${TR_BIN} '\n' ' ' 2>/dev/null)")"
     else
