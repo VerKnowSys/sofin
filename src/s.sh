@@ -57,12 +57,6 @@ if [ -n "${SOFIN_COMMAND_ARG}" ]; then
             ;;
 
 
-        # TODO: re-enable this feature
-        # hack|h)
-        #     hack_def "${SOFIN_ARGS}"
-        #     ;;
-
-
         diffs|diff)
             show_diff "${SOFIN_ARGS}"
             ;;
@@ -99,24 +93,6 @@ if [ -n "${SOFIN_COMMAND_ARG}" ]; then
             initialize
             perform_clean purge
             update_defs
-            ;;
-
-
-        enable)
-            shift
-            _bundles="${*}"
-            debug "Enabling Sofin env for bundles: $(distd "${_bundles}")"
-            enable_sofin_env "${_bundles}"
-            finalize_shell_reload
-            ;;
-
-
-        disable)
-            shift
-            _bundles="${*}"
-            debug "Disabling Sofin env for bundles: $(distd "${_bundles}")"
-            disable_sofin_env "${_bundles}"
-            finalize_shell_reload
             ;;
 
 
