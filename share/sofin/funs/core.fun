@@ -168,6 +168,7 @@ try () {
     else
         error "Specified an empty command to try()!"
     fi
+    check_result "1" "${_try_params}"
     unset _try_aname _try_params
     return 1
 }
