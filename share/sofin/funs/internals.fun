@@ -98,11 +98,21 @@ get_shell_vars () {
 
     if [ -f "${SOFIN_ENV_ENABLED_INDICATOR_FILE}" ]; then
         for _enabled in $(${CAT_BIN} "${SOFIN_ENV_ENABLED_INDICATOR_FILE}" 2>/dev/null); do
-            _path="${SOFTWARE_DIR}/${_enabled}/exports:${_path}"
-            _cflags="-I${SOFTWARE_DIR}/${_enabled}/include ${_cflags}"
-            _cxxflags="-I${SOFTWARE_DIR}/${_enabled}/include ${_cxxflags}"
-            _ldflags="-L${SOFTWARE_DIR}/${_enabled}/lib ${_ldflags}"
-            _pkg_config_path="${SOFTWARE_DIR}/${_enabled}/lib/pkgconfig:${_pkg_config_path}"
+            if [ -d "${SOFTWARE_DIR}/${_enabled}/exports" ]; then
+                _path="${SOFTWARE_DIR}/${_enabled}/exports:${_path}"
+            fi
+            if [ -d "${SOFTWARE_DIR}/${_enabled}/include" ]; then
+                _cflags="-I${SOFTWARE_DIR}/${_enabled}/include ${_cflags}"
+            fi
+            if [ -d "${SOFTWARE_DIR}/${_enabled}/include" ]; then
+                _cxxflags="-I${SOFTWARE_DIR}/${_enabled}/include ${_cxxflags}"
+            fi
+            if [ -d "${SOFTWARE_DIR}/${_enabled}/lib" ]; then
+                _ldflags="-L${SOFTWARE_DIR}/${_enabled}/lib ${_ldflags}"
+            fi
+            if [ -d "${SOFTWARE_DIR}/${_enabled}/lib/pkgconfig" ]; then
+                _pkg_config_path="${SOFTWARE_DIR}/${_enabled}/lib/pkgconfig:${_pkg_config_path}"
+            fi
         done
     else
         for _exp in $(${FIND_BIN} "${SOFTWARE_DIR}" -mindepth 2 -maxdepth 2 -name 'exports' -type d 2>/dev/null); do

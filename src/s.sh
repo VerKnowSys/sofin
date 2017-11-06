@@ -139,6 +139,45 @@ if [ -n "${SOFIN_COMMAND_ARG}" ]; then
 
                     env_status
                     ;;
+                *)
+                    _bundles="${*}"
+                    if [ -z "${_bundles}" ]; then
+                        ${PRINTF_BIN} "${REPLAY_PREVIOUS_LINE}"
+                        get_shell_vars
+                    else
+                        _pkgp="."
+                        _ldfl="${DEFAULT_LINKER_FLAGS}"
+                        _cfl="${DEFAULT_COMPILER_FLAGS}"
+                        _cxxfl="-std=c++11 ${_cfl}"
+                        _pth="${DEFAULT_PATH}"
+                        for _abundle in $(echo "${_bundles}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
+                            if [ -d "${SOFTWARE_DIR}/${_abundle}/exports" ]; then
+                                _pth="${SOFTWARE_DIR}/${_abundle}/exports:${_pth}"
+                            fi
+                            if [ -d "${SOFTWARE_DIR}/${_abundle}/include" ]; then
+                                _cfl="-I${SOFTWARE_DIR}/${_abundle}/include ${_cfl}"
+                            fi
+                            if [ -d "${SOFTWARE_DIR}/${_abundle}/include" ]; then
+                                _cxxfl="-I${SOFTWARE_DIR}/${_abundle}/include ${_cxxfl}"
+                            fi
+                            if [ -d "${SOFTWARE_DIR}/${_abundle}/lib" ]; then
+                                _ldfl="-L${SOFTWARE_DIR}/${_abundle}/lib ${_ldfl}"
+                            fi
+                            if [ -d "${SOFTWARE_DIR}/${_abundle}/lib/pkgconfig" ]; then
+                                _pkgp="${SOFTWARE_DIR}/${_abundle}/lib/pkgconfig:${_pkgp}"
+                            fi
+                        done
+                        _cfl="$(echo "${_cfl}" | ${SED_BIN} 's/ *$//g; s/  //g' 2>/dev/null)"
+                        _cxxfl="$(echo "${_cxxfl}" | ${SED_BIN} 's/ *$//g; s/  //g' 2>/dev/null)"
+                        _ldfl="$(echo "${_ldfl}" | ${SED_BIN} 's/ *$//g; s/  //g' 2>/dev/null)"
+                        _pkgp="$(echo "${_pkgp}" | ${SED_BIN} 's/ *$//g; s/  //g' 2>/dev/null)"
+                        ${PRINTF_BIN} "${REPLAY_PREVIOUS_LINE}%s\n" "export CFLAGS=\"${_cfl}\""
+                        ${PRINTF_BIN} "%s\n" "export CXXFLAGS=\"${_cxxfl}\""
+                        ${PRINTF_BIN} "%s\n" "export LDFLAGS=\"${_ldfl}\""
+                        ${PRINTF_BIN} "%s\n" "export PKG_CONFIG_PATH=\"${_pkgp}\""
+                        unset _pth _cfl _cxxfl _ldfl _pkgp _abundle
+                    fi
+                    ;;
             esac
             ;;
 
