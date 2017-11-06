@@ -16,7 +16,7 @@ if [ "${#}" -gt "0" ]; then
     _args="  args[$(distd "${#}")]: $(distd "${SOFIN_ARGS}"),"
 fi
 
-debug "Sofin (cmd: $(distd "${SOFIN_COMMAND}"),${_args}  sofin_pid=$(distd "${SOFIN_PID}"),  sofin_root=$(distd "${SOFIN_ROOT}"))"
+debug "Sofin (CMD='$(distd "${SOFIN_COMMAND}")',${_args}  SOFIN_PID=$(distd "${SOFIN_PID}"),  SOFIN_PPID=$(distd "${PPID}"),  SOFIN_ROOT='$(distd "${SOFIN_ROOT}")')"
 
 # NOTE: magic echo since we play with ANSI lines management bit too much ;)
 echo
@@ -264,21 +264,21 @@ if [ -n "${SOFIN_COMMAND}" ]; then
 
         b|build)
             initialize
-            _to_be_built="${SOFIN_ARGS}"
-            permnote "Requested build of bundle(s): $(distn "${_to_be_built}")"
-            fail_on_bg_job "${_to_be_built}"
+            permnote "Requested build of bundle(s): $(distn "${SOFIN_ARGS}")"
+            fail_on_bg_job "${SOFIN_ARGS}"
             USE_UPDATE=NO
             USE_BINBUILD=NO
             for _b in $(echo "${_to_be_built}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
                 build "${_b}"
             done
-            unset _to_be_built _b
+            unset _b
             finalize
             ;;
 
 
         d|deploy)
             initialize
+            permnote "Requested build of bundle(s): $(distn "${SOFIN_ARGS}")"
             fail_on_bg_job "${SOFIN_ARGS}"
             deploy_binbuild "${SOFIN_ARGS}"
             finalize
@@ -286,6 +286,7 @@ if [ -n "${SOFIN_COMMAND}" ]; then
 
 
         reset)
+            initialize
             fail_on_bg_job "${SOFIN_ARGS}"
             reset_defs
             update_defs

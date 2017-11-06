@@ -25,8 +25,7 @@ validate_env () {
 
 fail_on_bg_job () {
     _deps="${*}"
-    debug "deps=$(distd "$(${PRINTF_BIN} '%s\n' "${_deps}" | eval "${NEWLINES_TO_SPACES_GUARD}")")"
-    create_dirs
+    debug "bgJobs => $(distd "$(${PRINTF_BIN} '%s\n' "${_deps}" | eval "${NEWLINES_TO_SPACES_GUARD}")")"
     acquire_lock_for "${_deps}"
     unset _deps
 }

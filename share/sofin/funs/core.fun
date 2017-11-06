@@ -313,20 +313,20 @@ untrap_signals () {
     trap - TERM
     trap - USR2
 
-    if [ -x "${BEADM_BIN}" ]; then
+    if [ "YES" = "${CAP_SYS_ZFS}" ] && [ -x "${BEADM_BIN}" ]; then
         debug "Beadm found, turning off readonly mode for default boot environment"
         _active_boot_env="$(${BEADM_BIN} list -H 2>/dev/null | ${EGREP_BIN} -i "R" 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)"
-
+        _boot_dataset="${DEFAULT_ZPOOL}/ROOT/${_active_boot_env}"
         if [ -n "${CAP_SYS_PRODUCTION}" ]; then
-            debug "Production mode disabling readonly for /"
-            run "${ZFS_BIN} set readonly=off '${DEFAULT_ZPOOL}/ROOT/${_active_boot_env}'"
+            debug "Production mode disabling readonly for dataset: '$(distd "${_boot_dataset}")'"
+            run "${ZFS_BIN} set readonly=off '${_boot_dataset}'"
         else
             _sp="$(processes_all_sofin)"
             if [ -z "${_sp}" ]; then
-                debug "No Sofin processes in background! Turning off readonly mode for: ${DEFAULT_ZPOOL}/ROOT/${_active_boot_env}"
-                run "${ZFS_BIN} set readonly=off '${DEFAULT_ZPOOL}/ROOT/${_active_boot_env}'"
+                debug "No Sofin processes in background! Turning off readonly mode for dataset: '$(distd "${_boot_dataset}")'"
+                run "${ZFS_BIN} set readonly=off '${_boot_dataset}'"
             else
-                debug "Background Sofin jobs are still around! Leaving readonly mode for ROOT."
+                debug "Background Sofin jobs are still around! Leaving readonly mode for dataset: '$(distd "${_boot_dataset}")'"
             fi
         fi
     fi

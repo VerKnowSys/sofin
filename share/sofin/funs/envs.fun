@@ -462,7 +462,7 @@ reload_shell () {
         try "${KILL_BIN} -SIGUSR2 ${PPID}" && \
             debug "Reload signal sent to parent pid: $(distd "${PPID}")"
     else
-        debug "Unset PPID on reload_shell()!"
+        debug "Skipped reload_shell() for no $(distd PPID)"
     fi
 }
 
