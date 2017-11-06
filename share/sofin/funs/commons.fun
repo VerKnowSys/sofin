@@ -2,9 +2,11 @@ check_result () {
     if [ "${1}" = "0" ]; then
         shift
         debug "$(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "${@}")"
+        return 0
     else
         shift
-        error "$(diste "${FAIL_CHAR}" "${ColorRed}") $(diste "${@}")"
+        debug "$(distd "${FAIL_CHAR}" "${ColorRed}") $(distd "${@}")"
+        return 1
     fi
 }
 
