@@ -131,8 +131,8 @@ run () {
     else
         error "Specified an empty command to run()!"
     fi
-    unset _rnm _run_params
-    return 1
+    unset _rnm
+    error "Failed: run( $(diste "${_run_params}") )!"
 }
 
 
