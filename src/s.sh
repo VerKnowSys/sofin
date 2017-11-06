@@ -1,21 +1,25 @@
 #!/usr/bin/env sh
 # @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
 
-SOFIN_PID="$$"
-SOFIN_ARGS_FULL="${@}"
-SOFIN_ROOT="${SOFIN_ROOT:-/Software/Sofin}"
-
-. "${SOFIN_ROOT}/share/loader"
-
-SOFIN_COMMAND_ARG="${1}"
-SOFIN_ARGS="$(${PRINTF_BIN} '%s\n' "${SOFIN_ARGS_FULL}" | ${CUT_BIN} -d' ' -f2- 2>/dev/null)"
-
-debug "Sofin args: $(distd "${SOFIN_ARGS_FULL}"), sub_args: $(distd "${SOFIN_ARGS}")"
-echo
 
 # publish core values:
+SOFIN_PID="$$"
+SOFIN_ROOT="${SOFIN_ROOT:-/Software/Sofin}"
+. "${SOFIN_ROOT}/share/loader"
 
-export SOFIN_PID SOFIN_ROOT SOFIN_ARGS SOFIN_ARGS_FULL SOFIN_COMMAND_ARG
+
+# divide arguments:
+SOFIN_COMMAND="${1}"
+if [ "${#}" -gt "0" ]; then
+    shift
+    SOFIN_ARGS="${*}"
+    _args="  args[$(distd "${#}")]: $(distd "${SOFIN_ARGS}"),"
+fi
+
+debug "Sofin (cmd: $(distd "${SOFIN_COMMAND}"),${_args}  sofin_pid=$(distd "${SOFIN_PID}"),  sofin_root=$(distd "${SOFIN_ROOT}"))"
+
+# NOTE: magic echo since we play with ANSI lines management bit too much ;)
+echo
 
 # Set explicit +e for Sofin shell:
 env_forgivable
@@ -49,8 +53,8 @@ fi
 # this is internal version check for defaults.def
 unset COMPLIANCE_CHECK
 
-if [ -n "${SOFIN_COMMAND_ARG}" ]; then
-    case ${SOFIN_COMMAND_ARG} in
+if [ -n "${SOFIN_COMMAND}" ]; then
+    case ${SOFIN_COMMAND} in
 
         dev)
             develop "${SOFIN_ARGS}"
@@ -68,12 +72,12 @@ if [ -n "${SOFIN_COMMAND_ARG}" ]; then
 
 
         log)
-            show_logs "${SOFIN_ARGS%${SOFIN_COMMAND_ARG}}"
+            show_logs "${SOFIN_ARGS%${SOFIN_COMMAND}}"
             ;;
 
 
         less|les|show)
-            less_logs "${SOFIN_ARGS%${SOFIN_COMMAND_ARG}}"
+            less_logs "${SOFIN_ARGS%${SOFIN_COMMAND}}"
             ;;
 
 
@@ -193,6 +197,7 @@ if [ -n "${SOFIN_COMMAND_ARG}" ]; then
             ;;
 
 
+        # deprecated. Use: `s env` instead
         getshellvars|shellvars|vars)
             get_shell_vars
             ;;
@@ -200,7 +205,7 @@ if [ -n "${SOFIN_COMMAND_ARG}" ]; then
 
         i|install|get|pick|choose|use|switch)
             initialize
-            _list_maybe="$(lowercase "${2}")"
+            _list_maybe="$(lowercase "${1}")"
             if [ -z "${_list_maybe}" ]; then
                 error "Second argument, with at least one application (or list) name is required!"
             fi
@@ -304,6 +309,7 @@ if [ -n "${SOFIN_COMMAND_ARG}" ]; then
             ;;
 
 
+        # deprecated. Use: `s env reset`
         reload|rehash)
             finalize_shell_reload
             ;;
@@ -321,7 +327,7 @@ if [ -n "${SOFIN_COMMAND_ARG}" ]; then
 
         exportapp|export|exp)
             initialize
-            make_exports "${2}" "${3}"
+            make_exports "${1}" "${2}"
             finalize
             ;;
 
@@ -340,6 +346,6 @@ else
     usage_howto
 fi
 
-unset SOFIN_ARGS_FULL SOFIN_ARGS SOFIN_COMMAND_ARG SOFIN_PID
+unset sofin_args_FULL SOFIN_ARGS SOFIN_COMMAND SOFIN_PID
 
 exit
