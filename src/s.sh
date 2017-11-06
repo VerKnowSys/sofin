@@ -221,7 +221,6 @@ if [ -n "${SOFIN_COMMAND}" ]; then
                 _pickd_bundls="${SOFIN_ARGS}"
             fi
             for _b in $(echo "${_pickd_bundls}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
-                debug "Buiding software: $(distd "${_b}") for: $(distd "${OS_TRIPPLE}")"
                 build "${_b}"
             done
             unset _pickd_bundls _b
@@ -264,7 +263,7 @@ if [ -n "${SOFIN_COMMAND}" ]; then
         b|build)
             initialize
             _to_be_built="${SOFIN_ARGS}"
-            note "Requested build of: $(distn "${_to_be_built}")"
+            permnote "Requested build of bundle(s): $(distn "${_to_be_built}")"
             fail_on_bg_job "${_to_be_built}"
             USE_UPDATE=NO
             USE_BINBUILD=NO
