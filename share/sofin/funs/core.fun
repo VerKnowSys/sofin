@@ -399,25 +399,6 @@ create_dirs () {
 }
 
 
-# summary () {
-    # Sofin performance counters:
-    # SOFIN_END="${SOFIN_END:-$(${SOFIN_TIMER_BIN} 2>/dev/null)}"
-    # SOFIN_RUNTIME="$(calculate_bc "(${SOFIN_END} - ${SOFIN_START:-${SOFIN_END}}) / 1000")"
-
-    # ${PRINTF_BIN} "%b%s%b\n" "${ColorExample}" "$(fill "${SEPARATOR_CHAR2}")" "${ColorReset}" >> "${LOG:-/var/log/sofin}"
-    # ${PRINTF_BIN} "%bargs.head: ${ColorYellow}%s\n" "${ColorExample}" "${SOFIN_COMMAND_ARG:-''}" >> "${LOG:-/var/log/sofin}"
-    # ${PRINTF_BIN} "%bargs.tail: ${ColorYellow}%s\n" "${ColorExample}" "${SOFIN_ARGS:-''}" >> "${LOG:-/var/log/sofin}"
-    # ${PRINTF_BIN} "%bpid: ${ColorYellow}%d${ColorExample}\n" "${ColorExample}" "${SOFIN_PID:-'-1'}" >> "${LOG:-/var/log/sofin}"
-    # ${PRINTF_BIN} "%bruntime: ${ColorYellow}%d${ColorExample} ms.\n" "${ColorExample}" "${SOFIN_RUNTIME:-'-1'}" >> "${LOG:-/var/log/sofin}"
-
-    # Show "times" stats from shell:
-    # ${PRINTF_BIN} "%bshell times: %b\n" "${ColorExample}" "${ColorReset}" >> "${LOG:-/var/log/sofin}"
-    # times >> "${LOG:-/var/log/sofin}"
-
-    # ${PRINTF_BIN} "%b%s%b\n" "${ColorExample}" "$(fill "${SEPARATOR_CHAR2}")" >> "${LOG:-/var/log/sofin}"
-# }
-
-
 initialize () {
     check_os
     create_dirs

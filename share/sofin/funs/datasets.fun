@@ -538,7 +538,7 @@ install_software_from_binbuild () {
     else
         try "${TAR_BIN} -xJf ${FILE_CACHE_DIR}${_isfb_archive} --directory ${SOFTWARE_DIR}"
         if [ "${?}" = "0" ]; then
-            note "Installed bin-build: $(distn "${_isfb_fullname}")"
+            note "Installed binary build: $(distn "${_isfb_fullname}")"
             DONT_BUILD_BUT_DO_EXPORTS=YES
         else
             debug "No binary bundle available for: $(distd "${_isfb_fullname}")"

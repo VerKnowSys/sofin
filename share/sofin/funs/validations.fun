@@ -84,7 +84,7 @@ validate_archive_sha1 () {
     _sha1_value="$(${CAT_BIN} "${_current_sha_file}" 2>/dev/null)"
     if [ ! -f "${_current_sha_file}" ] || \
                [ -z "${_sha1_value}" ]; then
-        debug "No sha1 file available for archive, or sha1 value is empty! Removing local bin-builds of: $(distd "${_archive_name}")"
+        debug "No sha1 file available for archive, or sha1 value is empty! Removing local binary build(s) of: $(distd "${_archive_name}")"
         try "${RM_BIN} -fv ${_archive_name} ${_current_sha_file}"
     fi
     if [ "${_current_archive_sha1}" != "${_sha1_value}" ]; then

@@ -1,5 +1,6 @@
 usage_howto () {
     permnote "Built in tasks:"
+    permnote
     permnote "  $(distn "install | get | pick | choose | use  ") installs software from list or from definition and switches exports for it ($(distn "example: "${SOFIN_BIN_SHORT}" install Rubinius" "${ColorExample}"))"
     permnote "  $(distn "dependencies | deps | local          ") installs software from list defined in '$(distn "${DEFAULT_PROJECT_DEPS_LIST_FILE}")' file in current directory"
     permnote "  $(distn "uninstall | remove | delete          ") removes an application or list ($(distn "example: "${SOFIN_BIN_SHORT}" uninstall Rubinius" "${ColorExample}"))"
@@ -7,12 +8,13 @@ usage_howto () {
     permnote "  $(distn "full | fulllist | fullinstalled      ") gives detailed list with installed software including requirements"
     permnote "  $(distn "available | avail                    ") lists available software"
     permnote "  $(distn "export | exp | exportapp             ") adds given command to application exports ($(distn "example: "${SOFIN_BIN_SHORT}" export rails Rubinius" "${ColorExample}"))"
-    permnote "  $(distn "getshellvars | shellvars | vars      ") returns shell variables for installed software"
+    permnote
     permnote "  $(distn "log                                  ") shows tail of all logs (for debug messages and verbose info)"
+    permnote "  $(distn "log @                                ") shows tail of all Sofin logs"
     permnote "  $(distn "log -                                ") shows tail of Sofin internal log only"
     permnote "  $(distn "log +                                ") shows and watches all recently modified files"
     permnote "  $(distn "log any-part-of-def-name             ") shows and watches log(s) which name matches pattern"
-    permnote "  $(distn "reload | rehash                      ") recreates shell vars and reloads current shell"
+    permnote
     permnote "  $(distn "up | update                          ") only update definitions from remote repository and exit"
     permnote "  $(distn "ver | version                        ") shows "${SOFIN_BIN_SHORT}" script version"
     permnote "  $(distn "clean                                ") cleans binbuilds cache, unpacked source content and logs"
@@ -23,16 +25,22 @@ usage_howto () {
     permnote "  $(distn "deploy                               ") build + push"
     permnote "  $(distn "push | binpush | send                ") creates binary build from prebuilt software bundles name given as params ($(distn "example: "${SOFIN_BIN_SHORT}" push Rubinius Vifm Curl" "${ColorExample}"))"
     permnote "  $(distn "wipe                                 ") wipes binary builds (matching given name) from binary respositories ($(distn "example: "${SOFIN_BIN_SHORT}" wipe Rubinius Vifm" "${ColorExample}"))"
-    permnote "  $(distn "enable BundleNam                      ") tells Sofin to set environment only from enabled bundle(s)."
-    permnote "  $(distn "disable BundleNam                     ") tells Sofin to disable Bundle(s)."
-    permnote "  $(distn "disable @                             ") tells Sofin to disable all bundles."
-    permnote "  $(distn "status                               ") shows Sofin status - list of enabled Bundle(s)"
+
+    permnote
+    permnote "  $(distn "env                                  ") reads current Sofin environment."
+    permnote "  $(distn "env Bundle1 BundleN                  ") builds env for given bundles only (no persistence)."
+    permnote "  $(distn "env + Bundle1 BundleN                ") adds given Bundle(s) to current env profile."
+    permnote "  $(distn "env - @                              ") resets Sofin env to defaults."
+    permnote "  $(distn "env ! MyProjectX                     ") saves Sofin env profile with given name."
+    permnote "  $(distn "env ^ MyProjectX                     ") loads Sofin env profile with given name (no persistence)."
+    permnote "  $(distn "env status                           ") shows Sofin status - list of Bundle(s) enabled for currently loaded profile."
+    permnote "  $(distn "env reload | rehash                  ") recreates and reloads Sofin shell environment"
+
+    permnote
     permnote "  $(distn "dev                                  ") puts definition content on the fly. Second argument is (lowercase) definition name (no extension). ($(distn "example: "${SOFIN_BIN_SHORT}" dev rubinius" "${ColorExample}"))"
     permnote "  $(distn "rebuild                              ") rebuilds and pushes each software bundle that depends on definition given as a param. ($(distn "example: "${SOFIN_BIN_SHORT}" rebuild openssl - will rebuild all bundles that have 'openssl' dependency" "${ColorExample}"))"
     permnote "  $(distn "reset                               ") resets local definitions repository"
     permnote "  $(distn "diff                                ") displays changes in current definitions cache. Accepts any part of definition name"
-    # TODO: fix-hack
-    # note "  $(distn "hack                                ") hack through build dirs matching pattern given as param"
 }
 
 
@@ -130,7 +138,6 @@ get_shell_vars () {
     fi
 
     # Store values to environment file:
-
     ${PRINTF_BIN} "# ${ColorParams}%s${ColorReset}:\n" "MANPATH"
     ${PRINTF_BIN} "%s\n" "export MANPATH=\"${_manpath}\""
 
@@ -204,7 +211,7 @@ show_diff () {
 
     cd "${DEFINITIONS_DIR}"
     if [ -f "./${_sddefname}" ]; then
-        debug "Checking status for untracked files.."
+        debug "Checking status for untracked files of: $(distd "${_sddefname}")"
         ${GIT_BIN} status --short "${_sddefname}" 2>/dev/null | ${EGREP_BIN} '\?\?' >/dev/null 2>&1
         if [ "${?}" = "0" ]; then # found "??" which means file is untracked..
             note "No diff available for definition: ${_beauty_defn} (currently untracked)"
