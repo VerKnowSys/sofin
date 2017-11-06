@@ -310,7 +310,7 @@ make_exports () {
             note "Exporting binary: $(distn "${SOFTWARE_DIR}/${_bundle_name}${_bindir}${_export_bin}")"
             _cdir="$(${PWD_BIN} 2>/dev/null)"
             cd "${SOFTWARE_DIR}/${_bundle_name}${_bindir}"
-            try "${LN_BIN} -vfs ..${_bindir}/${_export_bin} ../exports/${_export_bin}"
+            try "${LN_BIN} -fs ..${_bindir}/${_export_bin} ../exports/${_export_bin}"
             cd "${_cdir}"
             unset _cdir _bindir _bundle_name _export_bin
             return 0
@@ -630,7 +630,7 @@ export_binaries () {
                     if [ -x "${_afile_to_exp}" ]; then # and it's executable'
                         _acurrdir="$(${PWD_BIN} 2>/dev/null)"
                         cd "${PREFIX}${dir}"
-                        run "${LN_BIN} -vfs ..${dir}${_xp} ../exports/${_xp}"
+                        run "${LN_BIN} -fs ..${dir}${_xp} ../exports/${_xp}"
                         cd "${_acurrdir}"
                         _expo_elem="${_afile_to_exp##*/}"
                         _expolist="${_expolist} ${_expo_elem}"
