@@ -64,7 +64,7 @@ push_dset_zfs_stream () {
     debug "push_dset_zfs_stream file: $(distd "${_psfin_snapfile}")"
     if [ -f "${FILE_CACHE_DIR}${_psfin_snapfile}" ]; then
         # create required dirs and stuff:
-        try "${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_SSH_PORT} ${SOFIN_NAME}@${_psmirror} \"${MKDIR_BIN} -vp '${COMMON_BINARY_REMOTE}'; ${CHMOD_BIN} -v 0755 '${COMMON_BINARY_REMOTE}'\""
+        try "${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_SSH_PORT} ${SOFIN_NAME}@${_psmirror} \"${MKDIR_BIN} -p '${COMMON_BINARY_REMOTE}'; ${CHMOD_BIN} -v 0755 '${COMMON_BINARY_REMOTE}'\""
 
         # NOTE: check if service dataset bundle isn't already pushed. ZFS streams cannot be overwritten!
         try "${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_SSH_PORT} ${SOFIN_NAME}@${_psmirror} \"${FILE_BIN} ${COMMON_BINARY_REMOTE}/${_psfin_snapfile}\""
@@ -127,7 +127,7 @@ build_service_dataset () {
                 fi
                 _snap_size="$(file_size "${FILE_CACHE_DIR}${_ps_snap_file}")"
                 if [ "${_snap_size}" = "0" ]; then
-                    try "${RM_BIN} -vf ${FILE_CACHE_DIR}${_ps_snap_file}"
+                    try "${RM_BIN} -f ${FILE_CACHE_DIR}${_ps_snap_file}"
                     debug "Service dataset dump is empty for bundle: $(distd "${_ps_elem}-${_ps_ver_elem}")"
                 else
                     debug "Snapshot of size: $(distd "${_snap_size}") is ready for bundle: $(distd "${_ps_elem}")"
@@ -157,11 +157,11 @@ build_service_dataset () {
                 debug "Service origin available!"
             else
                 debug "Service origin unavailable! Creating new one."
-                ${MKDIR_BIN} -p "${SERVICES_DIR}/${_ps_elem}"
+                try "${MKDIR_BIN} -p ${SERVICES_DIR}/${_ps_elem}"
                 run "${TAR_BIN} cJf ${FILE_CACHE_DIR}${_ps_snap_file} ${SERVICES_DIR}/${_ps_elem}"
                 _snap_size="$(file_size "${FILE_CACHE_DIR}${_ps_snap_file}")"
                 if [ "${_snap_size}" = "0" ]; then
-                    try "${RM_BIN} -vf ${FILE_CACHE_DIR}${_ps_snap_file}"
+                    try "${RM_BIN} -f ${FILE_CACHE_DIR}${_ps_snap_file}"
                     debug "Service tarball dump is empty for bundle: $(distd "${_ps_elem}-${_ps_ver_elem}")"
                 else
                     debug "Snapshot of size: $(distd "${_snap_size}") is ready for bundle: $(distd "${_ps_elem}")"
@@ -336,6 +336,7 @@ receive_origin () {
             debug "Origin fetched successfully: $(distd "${_origin_name}")"
     fi
     if [ -f "${_origin_file}" ]; then
+        debug "_dname: $(distd "${_dname}")"
         # NOTE: each user dataset is made of same origin, hence you can apply snapshots amongst them..
         run "${XZCAT_BIN} "${_origin_file}" | ${ZFS_BIN} receive ${ZFS_RECEIVE_OPTS} '${_dname}' | ${TAIL_BIN} -n1 2>/dev/null" && \
             debug "Origin received successfully: $(distd "${_origin_name}")"
@@ -542,7 +543,7 @@ install_software_from_binbuild () {
             DONT_BUILD_BUT_DO_EXPORTS=YES
         else
             debug "No binary bundle available for: $(distd "${_isfb_fullname}")"
-            try "${RM_BIN} -vf ${FILE_CACHE_DIR}${_isfb_archive} ${FILE_CACHE_DIR}${_isfb_archive}${DEFAULT_CHKSUM_EXT}"
+            try "${RM_BIN} -f ${FILE_CACHE_DIR}${_isfb_archive} ${FILE_CACHE_DIR}${_isfb_archive}${DEFAULT_CHKSUM_EXT}"
         fi
     fi
 }

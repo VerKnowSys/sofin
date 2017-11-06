@@ -255,7 +255,7 @@ if [ -n "${SOFIN_COMMAND}" ]; then
             initialize
             fail_on_bg_job "${SOFIN_ARGS}"
             debug "Removing any dangling src dirs of prefix: $(distd "${PREFIX}/${DEFAULT_SRC_EXT}*")"
-            try "${RM_BIN} -vfr ${PREFIX}/${DEFAULT_SRC_EXT}*"
+            try "${RM_BIN} -fr ${PREFIX}/${DEFAULT_SRC_EXT}*"
             note "Pushing local binary builds: $(distn "${SOFIN_ARGS}")"
             push_binbuilds "${SOFIN_ARGS}"
             finalize

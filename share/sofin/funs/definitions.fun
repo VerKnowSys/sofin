@@ -412,8 +412,8 @@ wipe_remote_archives () {
 #         done
 
 #         # if symlink exists, remove it.
-#         try "${RM_BIN} -vf ${DEF_BUNDLE_NAME}/lib"
-#         try "${LN_BIN} -vs ${DEF_BUNDLE_NAME}/libs ${DEF_BUNDLE_NAME}/lib"
+#         try "${RM_BIN} -f ${DEF_BUNDLE_NAME}/lib"
+#         try "${LN_BIN} -s ${DEF_BUNDLE_NAME}/libs ${DEF_BUNDLE_NAME}/lib"
 
 #         # move data, and support files from origin:
 #         try "${CP_BIN} -vR ${PREFIX}/share/${_aname} ${DEF_BUNDLE_NAME}/share/"

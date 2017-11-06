@@ -21,7 +21,7 @@ clean_all_bdirs_leftovers () {
         done
     else
         for i in $(${FIND_BIN} "${SOFTWARE_DIR}" -mindepth 2 -maxdepth 2 -name "${DEFAULT_SRC_EXT}*" -type d 2>/dev/null); do
-            try "${RM_BIN} -vf '${i}'" && \
+            try "${RM_BIN} -f '${i}'" && \
                 debug "Empty dir removed using <slow-file-IO>: $(distd "${i}")"
         done
         debug "Done cleaning of build-dir leftovers."

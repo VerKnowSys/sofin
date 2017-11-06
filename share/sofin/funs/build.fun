@@ -19,13 +19,13 @@ build_bundle () {
     else
         if [ ! -f "${FILE_CACHE_DIR}${_bsbelement}" ]; then
             debug "Found incomplete or damaged bundle file. Rebuilding: $(distd "${_bsbelement}")"
-            try "${RM_BIN} -vf ${FILE_CACHE_DIR}${_bsbelement}"
+            try "${RM_BIN} -f ${FILE_CACHE_DIR}${_bsbelement}"
             create_software_bundle_archive "${_bsbname}" "${_bsbelement}" "${_bsversion}"
         else
             debug "Found already existing bundle stream in file-cache: $(distd "${FILE_CACHE_DIR}${_bsbelement}")"
 
             # NOTE: Let's move old one, make a shasum difference, if different => overwrite
-            try "${MV_BIN} -v ${FILE_CACHE_DIR}${_bsbelement} ${FILE_CACHE_DIR}${_bsbelement}.old ; ${MV_BIN} -v ${FILE_CACHE_DIR}${_bsbelement}${DEFAULT_CHKSUM_EXT} ${FILE_CACHE_DIR}${_bsbelement}${DEFAULT_CHKSUM_EXT}.old" && \
+            try "${MV_BIN} ${FILE_CACHE_DIR}${_bsbelement} ${FILE_CACHE_DIR}${_bsbelement}.old ; ${MV_BIN} ${FILE_CACHE_DIR}${_bsbelement}${DEFAULT_CHKSUM_EXT} ${FILE_CACHE_DIR}${_bsbelement}${DEFAULT_CHKSUM_EXT}.old" && \
                 debug "Old bundle stream, was temporarely moved."
             create_software_bundle_archive "${_bsbname}" "${_bsbelement}" "${_bsversion}"
             if [ -f "${FILE_CACHE_DIR}${_bsbelement}" ]; then
@@ -392,7 +392,7 @@ process_flat () {
                         else
                             warn "   ${WARN_CHAR} Source checksum mismatch: $(distw "${_a_file_checksum}") vs $(distw "${DEF_SHA}")"
                             _bname="${_dest_file##*/}"
-                            try "${RM_BIN} -vf ${_dest_file}" && \
+                            try "${RM_BIN} -f ${_dest_file}" && \
                                 debug "Removed corrupted cache file: $(distd "${_bname}") and retrying.."
                             process_flat "${_app_param}" "${_prefix}" "${_bundlnm}"
                         fi
