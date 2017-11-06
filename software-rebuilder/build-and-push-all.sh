@@ -33,15 +33,8 @@ for software in $(${CAT_BIN} ${_working_state_file} 2>/dev/null); do
     fi
     note "________________________________"
 
-    # if [ "FreeBSD" = "${SYSTEM_NAME}" -a \
-    #      -z "${DEVEL}" ]; then
-    #     ${SOFIN_BIN} reset && \
-    #         note "Sofin definitions reset for production host type with undefined $(distn "DEVEL")"
-    # fi
-
     _indicator="/Software/${software}/$(lowercase "${software}")${DEFAULT_INST_MARK_EXT}"
-    if [ -d "/Software/${software}" -a \
-         -f "${_indicator}" ]; then
+    if [ -d "/Software/${software}" ] && [ -f "${_indicator}" ]; then
         warn "Found already prebuilt version of software: $(distw "${software}"). Leaving untouched with version: $(distw "$(${CAT_BIN} "${_indicator}" 2>/dev/null)")"
         ${SED_BIN} -i '' -e "/${software}/d" ${_working_state_file}
     else

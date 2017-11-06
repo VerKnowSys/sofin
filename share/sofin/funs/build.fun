@@ -369,8 +369,7 @@ process_flat () {
             note "   ${NOTE_CHAR2} Meta bundle detected."
         else
             _cwd="$(${PWD_BIN} 2>/dev/null)"
-            if [ -n "${BUILD_DIR}" -a \
-                 -n "${BUILD_NAMESUM}" ]; then
+            if [ -n "${BUILD_DIR}" ] && [ -n "${BUILD_NAMESUM}" ]; then
                 cd "${BUILD_DIR}"
                 if [ -z "${DEF_GIT_CHECKOUT}" ]; then # Standard "fetch source archive" method
                     _base="${DEF_SOURCE_PATH##*/}"
