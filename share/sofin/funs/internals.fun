@@ -93,7 +93,18 @@ processes_all_sofin () {
 }
 
 
-get_shell_vars () {
+print_local_env_vars () {
+    _s_env_file="${PWD}/.${SOFIN_NAME}.env"
+    if [ -f "${_s_env_file}" ]; then
+        ${PRINTF_BIN} '\n# Loaded from local environment: %s\n' \
+            "${_s_env_file}" 2>/dev/null
+        ${CAT_BIN} "${_s_env_file}" 2>/dev/null
+    fi
+    unset _s_env_file
+}
+
+
+print_shell_vars () {
     _pkg_config_path="."
     _ldflags="${DEFAULT_LINKER_FLAGS}"
     _cflags="${DEFAULT_COMPILER_FLAGS}"

@@ -451,7 +451,8 @@ destroy_dead_locks () {
 
 
 update_shell_vars () {
-    get_shell_vars > "${SOFIN_PROFILE}"
+    print_shell_vars > "${SOFIN_PROFILE}"
+    print_local_env_vars >> "${SOFIN_PROFILE}"
 }
 
 

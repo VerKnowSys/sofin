@@ -148,7 +148,8 @@ if [ -n "${SOFIN_COMMAND}" ]; then
                     _bundles="${*}"
                     if [ -z "${_bundles}" ]; then
                         ${PRINTF_BIN} "${REPLAY_PREVIOUS_LINE}"
-                        get_shell_vars
+                        print_shell_vars
+                        print_local_env_vars
                     else
                         _pkgp="."
                         _ldfl="${DEFAULT_LINKER_FLAGS}"
@@ -181,6 +182,8 @@ if [ -n "${SOFIN_COMMAND}" ]; then
                         ${PRINTF_BIN} "%s\n" "export LDFLAGS=\"${_ldfl}\""
                         ${PRINTF_BIN} "%s\n" "export PKG_CONFIG_PATH=\"${_pkgp}\""
                         unset _pth _cfl _cxxfl _ldfl _pkgp _abundle
+
+                        print_local_env_vars
                     fi
                     ;;
             esac
@@ -199,7 +202,8 @@ if [ -n "${SOFIN_COMMAND}" ]; then
 
         # deprecated. Use: `s env` instead
         getshellvars|shellvars|vars)
-            get_shell_vars
+            print_shell_vars
+            print_local_env_vars
             ;;
 
 
