@@ -199,6 +199,7 @@ retry () {
         debug "Remaining attempts: $(distd "${_ammo}")"
     done
     debug "All available ammo exhausted to invoke a command: $(distd "${_targets}")"
+    check_result "1" "${_targets}"
     unset _ammo _targets
     return 1
 }
