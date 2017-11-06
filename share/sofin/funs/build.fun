@@ -221,7 +221,7 @@ build () {
 
                 # NOTE: standalone definition has own SERVICES_DIR/Bundlename/ prefix
                 if [ -n "${DEF_STANDALONE}" ]; then
-                    debug "DEF_STANDALONE: ${DEF_STANDALONE}"
+                    debug "DEF_STANDALONE: $(distd "${DEF_STANDALONE}")"
                     try_fetch_service_dir "${_bundl_name}" "${DEF_VERSION}"
                 fi
 
@@ -534,7 +534,7 @@ process_flat () {
 
                 # configuration log:
                 _configure_log="config.log"
-                _configure_options_log="${LOGS_DIR}${SOFIN_NAME}-${DEF_NAME}${DEF_SUFFIX}.configure-help.log"
+                _configure_options_log="${LOGS_DIR}${SOFIN_NAME}-${DEF_NAME}${DEF_SUFFIX}.config.help"
                 _configure_status_log="${LOGS_DIR}${SOFIN_NAME}-${DEF_NAME}${DEF_SUFFIX}.${_configure_log}"
 
                 note "   ${NOTE_CHAR} Configuring: $(distn "${_app_param}"), version: $(distn "${DEF_VERSION}")"
@@ -566,8 +566,7 @@ process_flat () {
                         ;;
 
                     cmake)
-                        try "${RM_BIN} -rf build"
-                        try "${MKDIR_BIN} -p build"
+                        try "${RM_BIN} -rf build; ${MKDIR_BIN} -p build"
                         _pwd="${_pwd}/build"
                         cd "${_pwd}"
                         _cmake_cmdline="${DEF_CONFIGURE_METHOD} ../ -LH -DCMAKE_INSTALL_RPATH=\"${_prefix}/lib;${_prefix}/libexec\" -DCMAKE_INSTALL_PREFIX=${_prefix} -DCMAKE_BUILD_TYPE=Release -DSYSCONFDIR=${SERVICE_DIR}/etc -DMAN_INSTALLDIR=${_prefix}/share/man -DDOCDIR=${_prefix}/share/doc -DJOB_POOL_COMPILE=${CPUS} -DJOB_POOL_LINK=${CPUS} -DCMAKE_C_FLAGS=\"${CFLAGS}\" -DCMAKE_CXX_FLAGS=\"${CXXFLAGS}\" ${DEF_CONFIGURE_ARGS}"
