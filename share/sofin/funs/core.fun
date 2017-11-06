@@ -66,8 +66,8 @@ error () {
     ${PRINTF_BIN} "%b\n  %s %s\n    %b %b\n\n" "${ColorRed}" "${NOTE_CHAR2}" "Task crashed!" "${0}: ${1}${2}${3}${4}${5}" "${ColorReset}"
     if [ "error" = "${0}" ]; then
         ${PRINTF_BIN} "%b  %s Try: %b%b\n\n" "${ColorRed}" "${NOTE_CHAR2}" "$(diste "s log ${DEF_NAME}${DEF_SUFFIX}") to see the build log." "${ColorReset}"
-        finalize_interrupt
     fi
+    finalize_interrupt
     exit "${ERRORCODE_TASK_FAILURE}"
 }
 
@@ -104,68 +104,71 @@ run () {
     _run_params="${*}"
     if [ -n "${_run_params}" ]; then
         touch_logsdir_and_logfile
-        # debug "$(distd "$(${DATE_BIN} ${DEFAULT_DATE_TRYRUN_OPTS} 2>/dev/null)" ${ColorDarkgray}): $(distd "${RUN_CHAR}" ${ColorWhite}): $(distd "${_run_params}" ${ColorParams}) $(distd "[show-blueout:${_run_shw_prgr:-NO}]" "${ColorBlue}")"
-        if [ -z "${DEF_NAME}${DEF_SUFFIX}" ]; then
+        _rnm="${DEF_NAME}${DEF_SUFFIX}"
+        if [ -z "${_rnm}" ]; then
             if [ -z "${DEBUG}" ]; then
-                eval "PATH=${PATH}${GIT_EXPORTS} ${_run_params}" >> "${LOG}" 2>> "${LOG}"
-                check_result ${?} "${_run_params}"
+                eval "PATH=${PATH}${GIT_EXPORTS} ${_run_params}" >> "${LOG}" 2>> "${LOG}" \
+                    && check_result ${?} "${_run_params}" \
+                    && return 0
             else
                 ${PRINTF_BIN} "%b" "${ColorBlue}"
-                eval "PATH=${PATH}${GIT_EXPORTS} ${_run_params}" >> "${LOG}"
-                check_result ${?} "${_run_params}"
+                eval "PATH=${PATH}${GIT_EXPORTS} ${_run_params}" \
+                    && check_result ${?} "${_run_params}" \
+                    && return 0
             fi
         else
-            _rnm="${DEF_NAME}${DEF_SUFFIX}"
             if [ -z "${DEBUG}" ]; then
-                eval "PATH=${PATH}${GIT_EXPORTS} ${_run_params}" >> "${LOG}-${_rnm}" 2>> "${LOG}-${_rnm}"
-                check_result ${?} "${_run_params}"
+                eval "PATH=${PATH}${GIT_EXPORTS} ${_run_params}" >/dev/null 2>> "${LOG}-${_rnm}" \
+                    && check_result ${?} "${_run_params}" \
+                    && return 0
             else
                 ${PRINTF_BIN} "%b" "${ColorBlue}"
-                eval "PATH=${PATH}${GIT_EXPORTS} ${_run_params}" >> "${LOG}-${_rnm}"
-                check_result ${?} "${_run_params}"
+                eval "PATH=${PATH}${GIT_EXPORTS} ${_run_params}" \
+                    && check_result ${?} "${_run_params}" \
+                    && return 0
             fi
         fi
     else
         error "Specified an empty command to run()!"
     fi
-    unset _rnm _run_shw_prgr _run_params _dt
+    unset _rnm _run_params
+    return 1
 }
 
 
 try () {
     _try_params="${*}"
-    if [ -z "${TRY_LOUD}" ] && [ -z "${DEVEL}" ]; then
-        eval "PATH=${PATH}${GIT_EXPORTS} ${_try_params}" >/dev/null 2>&1 \
-            && return 0
-        return 1
-    fi
     if [ -n "${_try_params}" ]; then
         touch_logsdir_and_logfile
         _try_aname="${DEF_NAME}${DEF_SUFFIX}"
         if [ -z "${_try_aname}" ]; then
             if [ -z "${DEBUG}" ]; then
-                eval "PATH=${PATH}${GIT_EXPORTS} ${_try_params}" >> "${LOG}" 2>> "${LOG}" && \
-                    return 0
+                eval "PATH=${PATH}${GIT_EXPORTS} ${_try_params}" >> "${LOG}" 2>> "${LOG}" \
+                    && check_result ${?} "${_try_params}" \
+                    && return 0
             else
-                # show progress on stderr
+                # show all progress on stdout.stderr
                 ${PRINTF_BIN} "%b" "${ColorBlue}"
-                eval "PATH=${PATH}${GIT_EXPORTS} ${_try_params}" >> "${LOG}" && \
-                    return 0
+                eval "PATH=${PATH}${GIT_EXPORTS} ${_try_params}" \
+                    && check_result ${?} "${_try_params}" \
+                    && return 0
             fi
         else
             if [ -z "${DEBUG}" ]; then
-                eval "PATH=${PATH}${GIT_EXPORTS} ${_try_params}" >> "${LOG}-${_try_aname}" 2>> "${LOG}-${_try_aname}" && \
-                    return 0
+                eval "PATH=${PATH}${GIT_EXPORTS} ${_try_params}" >/dev/null 2>> "${LOG}-${_try_aname}" \
+                    && check_result ${?} "${_try_params}" \
+                    && return 0
             else
                 ${PRINTF_BIN} "%b" "${ColorBlue}"
-                eval "PATH=${PATH}${GIT_EXPORTS} ${_try_params}" >> "${LOG}-${_try_aname}" && \
-                    return 0
+                eval "PATH=${PATH}${GIT_EXPORTS} ${_try_params}" \
+                    && check_result ${?} "${_try_params}" \
+                    && return 0
             fi
         fi
     else
         error "Specified an empty command to try()!"
     fi
-    unset _dt _try_aname _try_params
+    unset _try_aname _try_params
     return 1
 }
 
@@ -177,17 +180,19 @@ retry () {
     while [ -n "${_ammo}" ]; do
         if [ -n "${_targets}" ]; then
             if [ -z "${DEBUG}" ]; then
-                eval "PATH=${DEFAULT_PATH}${GIT_EXPORTS} ${_targets}" >> "${LOG}" 2>> "${LOG}" && \
-                    unset _ammo _targets && \
-                        return 0
+                eval "PATH=${DEFAULT_PATH}${GIT_EXPORTS} ${_targets}" >> "${LOG}" 2>> "${LOG}" \
+                    && check_result ${?} "${_targets}" \
+                    && unset _ammo _targets \
+                    && return 0
             else
                 ${PRINTF_BIN} "%b" "${ColorBlue}"
-                eval "PATH=${DEFAULT_PATH}${GIT_EXPORTS} ${_targets}" >> "${LOG}" && \
-                    unset _ammo _targets && \
-                        return 0
+                eval "PATH=${DEFAULT_PATH}${GIT_EXPORTS} ${_targets}" \
+                    && check_result ${?} "${_targets}" \
+                    && unset _ammo _targets \
+                    && return 0
             fi
         else
-            error "Given an empty command to evaluate!"
+            error "Given an empty command to evaluate with retry()!"
         fi
         _ammo="$(${PRINTF_BIN} '%s\n' "${_ammo}" 2>/dev/null | ${SED_BIN} 's/O//' 2>/dev/null)"
         debug "Remaining attempts: $(distd "${_ammo}")"
