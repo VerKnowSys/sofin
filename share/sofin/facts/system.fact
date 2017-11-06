@@ -96,21 +96,6 @@ if [ -e "\${HOME}/.profile" ]; then
     source "\${HOME}/.profile"
 fi
 
-# Load .sofin.env if exists in PWD:
-load_sofin_env () {
-    if [ -r "\$PWD/.sofin.env" ]; then
-        source "\$PWD/.sofin.env"
-    fi
-}
-
-# Load local environment when the current working directory changes (zsh):
-chpwd() {
-    load_sofin_env
-}
-
-# Load with shell loads:
-load_sofin_env
-
 EOF
 )
 
