@@ -87,7 +87,7 @@ install_sofin_files () {
     _okch="$(distn "${SUCCESS_CHAR}" "${ColorParams}")"
     for _prov in ${SOFIN_PROVIDES}; do
         if [ -f "bin/${_prov}" ]; then
-            run "${INSTALL_BIN} -v bin/${_prov} ${SOFIN_ROOT}/bin"
+            run "${INSTALL_BIN} bin/${_prov} ${SOFIN_ROOT}/bin"
             run "${RM_BIN} -f bin/${_prov}"
         fi
     done && \
@@ -96,7 +96,7 @@ install_sofin_files () {
     run "${CP_BIN} -vfR share/sofin/* ${SOFIN_ROOT}/share/" && \
         echo "  ${_okch} facts and functions"
 
-    run "${INSTALL_BIN} -v src/s.sh ${SOFIN_ROOT}/bin/s" && \
+    run "${INSTALL_BIN} src/s.sh ${SOFIN_ROOT}/bin/s" && \
         echo "  ${_okch} sofin launcher" && \
         echo "Type: $(distn "s usage") for help." && \
         echo "Read: $(distn "https://github.com/VerKnowSys/sofin") for more details." && \

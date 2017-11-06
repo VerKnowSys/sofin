@@ -121,7 +121,7 @@ if [ -n "${SOFIN_COMMAND}" ]; then
                     shift
                     _fname="${SOFIN_ENV_ENABLED_INDICATOR_FILE}.${1}"
                     note "Storing new environment profile: $(distn "${_fname}")"
-                    run "${INSTALL_BIN} -v ${SOFIN_ENV_ENABLED_INDICATOR_FILE} ${_fname}"
+                    run "${INSTALL_BIN} ${SOFIN_ENV_ENABLED_INDICATOR_FILE} ${_fname}"
                     ;;
 
                 ^) # load
@@ -130,7 +130,7 @@ if [ -n "${SOFIN_COMMAND}" ]; then
                     _fname="${SOFIN_ENV_ENABLED_INDICATOR_FILE}.${_name}"
                     if [ -f "${_fname}" ]; then
                         note "Loading environment profile: $(distn "${_fname}")"
-                        run "${INSTALL_BIN} -v ${_fname} ${SOFIN_ENV_ENABLED_INDICATOR_FILE}"
+                        run "${INSTALL_BIN} ${_fname} ${SOFIN_ENV_ENABLED_INDICATOR_FILE}"
                     else
                         error "No such profile: $(diste "${_name}")"
                     fi
