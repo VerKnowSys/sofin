@@ -643,8 +643,7 @@ process_flat () {
                         _this_test_skipped=1
             fi
 
-            if [ -z "${USE_NO_TEST}" -a \
-                 -z "${_this_test_skipped}" ]; then
+            if [ -z "${USE_NO_TEST}" ] && [ -z "${_this_test_skipped}" ]; then
                 note "   ${NOTE_CHAR} Testing requirement: $(distn "${_app_param}"), version: $(distn "${DEF_VERSION}")"
                 cd "${_pwd}"
 
