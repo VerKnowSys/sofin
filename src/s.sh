@@ -96,22 +96,20 @@ if [ -n "${SOFIN_COMMAND_ARG}" ]; then
             ;;
 
 
-        env)
-            shift
-            debug "Sofin-env mode: $(distd "${env}")"
+        e|env)
             case "${1}" in
 
                 +) # add
                     shift
                     _bundles="${*}"
-                    note "Enabling bundles: $(distn "${_bundles}")"
+                    note "Added bundles: $(distn "${_bundles}") to current profile."
                     enable_sofin_env "${_bundles}"
                     ;;
 
                 -) # remove
                     shift
                     _bundles="${*}"
-                    note "Disabling bundles: $(distn "${_bundles}")"
+                    note "Removed bundles: $(distn "${_bundles}") from current profile."
                     disable_sofin_env "${_bundles}"
                     ;;
 
@@ -122,7 +120,7 @@ if [ -n "${SOFIN_COMMAND_ARG}" ]; then
                     run "${INSTALL_BIN} -v ${SOFIN_ENV_ENABLED_INDICATOR_FILE} ${_fname}"
                     ;;
 
-                @) # load
+                ^) # load
                     shift
                     _name="${1}"
                     _fname="${SOFIN_ENV_ENABLED_INDICATOR_FILE}.${_name}"
@@ -134,11 +132,14 @@ if [ -n "${SOFIN_COMMAND_ARG}" ]; then
                     fi
                     ;;
 
-                *)
-                    shift
-
+                @|show|h|s|S|stat|status) # all status
                     env_status
                     ;;
+
+                r|reload|rehash)
+                    finalize_shell_reload
+                    ;;
+
                 *)
                     _bundles="${*}"
                     if [ -z "${_bundles}" ]; then
@@ -244,7 +245,7 @@ if [ -n "${SOFIN_COMMAND_ARG}" ]; then
             initialize
             fail_on_bg_job "${SOFIN_ARGS}"
             debug "Removing any dangling src dirs of prefix: $(distd "${PREFIX}/${DEFAULT_SRC_EXT}*")"
-            eval "${RM_BIN} -vfr ${PREFIX}/${DEFAULT_SRC_EXT}*" >> "${LOG}" 2>> "${LOG}"
+            try "${RM_BIN} -vfr ${PREFIX}/${DEFAULT_SRC_EXT}*"
             note "Pushing local binary builds: $(distn "${SOFIN_ARGS}")"
             push_binbuilds "${SOFIN_ARGS}"
             finalize
