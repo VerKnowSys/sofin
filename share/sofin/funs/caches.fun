@@ -148,7 +148,7 @@ cache_conf_scrpt_hlp_opts () {
         # Store all options per definition from configure scripts
         try "${MKDIR_BIN} -p \"$(${DIRNAME_BIN} ${_config_log})\" 2>/dev/null" && \
             try "${DEF_CONFIGURE_METHOD} -h > \"${_config_log}\" 2>/dev/null" && \
-            debug "[N] Configure script output: $(distd "$(${CAT_BIN} "${_config_log}" 2>/dev/null)")"
+            debug "[N] Configure script output: $(distd "$(${CAT_BIN} "${_config_log}" 2>/dev/null)" "${ColorBlue}")"
     fi
     return 0
 }

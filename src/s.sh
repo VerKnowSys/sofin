@@ -9,7 +9,10 @@ SOFIN_ROOT="${SOFIN_ROOT:-/Software/Sofin}"
 
 SOFIN_COMMAND_ARG="${1}"
 SOFIN_ARGS="$(${PRINTF_BIN} '%s\n' "${SOFIN_ARGS_FULL}" | ${CUT_BIN} -d' ' -f2- 2>/dev/null)"
-debug "Sofin args full: ${SOFIN_ARGS_FULL}, sub_args: ${SOFIN_ARGS}"
+
+debug "Sofin args: $(distd "${SOFIN_ARGS_FULL}"), sub_args: $(distd "${SOFIN_ARGS}")"
+echo
+
 # publish core values:
 
 export SOFIN_PID SOFIN_ROOT SOFIN_ARGS SOFIN_ARGS_FULL SOFIN_COMMAND_ARG
@@ -185,7 +188,7 @@ if [ -n "${SOFIN_COMMAND_ARG}" ]; then
             fail_on_bg_job "${SOFIN_ARGS}"
             debug "Removing any dangling src dirs of prefix: $(distd "${PREFIX}/${DEFAULT_SRC_EXT}*")"
             eval "${RM_BIN} -vfr ${PREFIX}/${DEFAULT_SRC_EXT}*" >> "${LOG}" 2>> "${LOG}"
-            debug "Pushing binary build. Sofin args: $(distd "${SOFIN_ARGS}")"
+            note "Pushing local binary builds: $(distn "${SOFIN_ARGS}")"
             push_binbuilds "${SOFIN_ARGS}"
             finalize
             ;;
