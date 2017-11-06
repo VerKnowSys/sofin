@@ -330,7 +330,7 @@ dump_debug_info () {
 process_flat () {
     _app_param="${1}"
     _prefix="${2}"
-    _bundlnm="${3}"
+    _bundlnm="$(capitalize "${_app_param}")"
     if [ -z "${_app_param}" ]; then
         error "First argument with $(diste "requirement-name") is required!"
     fi
@@ -634,6 +634,8 @@ process_flat () {
             cd "${_pwd}"
             after_make_snapshot
 
+            create_service_dataset "${_bundlnm}"
+
             # OTE: after successful make, invoke "make test" by default:
             unset _this_test_skipped
             if [ -n "${DEF_SKIPPED_DEFINITION_TEST}" ]; then
@@ -664,18 +666,6 @@ process_flat () {
                     try "${RM_BIN} -rf '${_prefix}/${place}'"
                 fi
             done
-
-            _bund="$(capitalize "${_bundlnm}")"
-            _dsname="${DEFAULT_ZPOOL}${SERVICES_DIR}/${USER}/${_bund}"
-            if [ -n "${DEF_STANDALONE}" ] && [ -n "${CAP_SYS_ZFS}" ]; then
-                debug "Creating service dir for standalone bundle: $(distd "${_dsname}")"
-                try "${ZFS_BIN} list -H -t filesystem '${_dsname}'"
-                if [ "0" != "$?" ]; then
-                    debug "No Service origin file available! Creating new ZFS service-dataset: $(distd "${_dsname}")"
-                    try "${ZFS_BIN} create -p -o mountpoint=${SERVICES_DIR}/${_bund} '${_dsname}'" || \
-                        try "${ZFS_BIN} mount '${_dsname}'" || :
-                fi
-            fi
 
             cd "${_pwd}"
             note "   ${NOTE_CHAR} Installing requirement: $(distn "${_app_param}"), version: $(distn "${DEF_VERSION}")"

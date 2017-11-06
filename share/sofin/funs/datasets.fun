@@ -175,20 +175,25 @@ build_service_dataset () {
 }
 
 
-# create_service_dataset () {
-#     _bund_name="${1}"
-#     if [ -z "${_bund_name}" ]; then
-#         error "First argument with: $(diste dataset_name) required!"
-#     fi
-#     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
-#         debug "Initial service dataset unavailable for: $(distd "${_bund_name}")"
-#         _dataset_name="${DEFAULT_ZPOOL}${SERVICES_DIR}/${USER}/${_bund_name}"
-#         try "${ZFS_BIN} create -p ${_dataset_name}"
-#     else
-#         debug "ZFS feature disabled"
-#     fi
-#     unset _bund_name _final_snap_file _commons_path
-# }
+create_service_dataset () {
+    _bund_name="${1}"
+    if [ -z "${_bund_name}" ]; then
+        error "First argument with: $(diste dataset_name) required!"
+    fi
+    if [ "YES" = "${CAP_SYS_ZFS}" ]; then
+        _dataset_name="${DEFAULT_ZPOOL}${SERVICES_DIR}/${USER}/${_bund_name}"
+        try "${ZFS_BIN} list -H -o name -t filesystem ${_dataset_name}"
+        if [ "0" = "${?}" ]; then
+            debug "Service dataset already exists: $(distd "${_dataset_name}")"
+        else
+            debug "Creating initial service dataset: $(distd "${_dataset_name}") for: $(distd "${_bund_name}")."
+            run "${ZFS_BIN} create -p '${_dataset_name}'"
+        fi
+    else
+        debug "ZFS feature disabled"
+    fi
+    unset _bund_name
+}
 
 
 fetch_dset_zfs_stream () {
