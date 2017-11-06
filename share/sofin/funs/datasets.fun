@@ -612,7 +612,7 @@ do_prefix_snapshot () {
             _pr_snp="${DEFAULT_ZPOOL}${SOFTWARE_DIR}/${USER}/${_pr_name}"
             # Build dir:
             _pr_bdir_snp="${DEFAULT_ZPOOL}${SOFTWARE_DIR}/${USER}/${_pr_name}/${DEFAULT_SRC_EXT}${BUILD_NAMESUM}"
-            debug "_pr_name: $(distd "${_pr_name}"), _pr_snp: $(distd "${_pr_snp}"), _pr_bdir_snp: $(distd "${_pr_bdir_snp}")"
+            debug "Prefix name: $(distd "${_pr_name}"), Main dir: $(distd "${_pr_snp}"), Build dir: $(distd "${_pr_bdir_snp}")"
 
             # # Try removing existing snaps:
             # try "${ZFS_BIN} destroy ${_pr_snp}@${_snap_name} > /dev/null" && \
