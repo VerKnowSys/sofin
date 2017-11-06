@@ -85,57 +85,45 @@ processes_all_sofin () {
 
 
 get_shell_vars () {
-    # PATH:
+    _pkg_config_path="."
+    _ldflags="${LDFLAGS} ${DEFAULT_LINKER_FLAGS}"
+    _cflags="${DEFAULT_COMPILER_FLAGS}"
+    _cxxflags="-std=c++11 ${_cflags}"
     _path="${DEFAULT_PATH}"
-    gsv_int_path () {
+    _manpath="${DEFAULT_MANPATH}"
+    for _exp in $(${FIND_BIN} "${SOFTWARE_DIR}" -mindepth 2 -maxdepth 3 -name 'man' -type d 2>/dev/null); do
+        _manpath="${_exp}:${_manpath}"
+    done
+
+    if [ -f "${SOFIN_ENV_ENABLED_INDICATOR_FILE}" ]; then
+        for _enabled in $(${CAT_BIN} "${SOFIN_ENV_ENABLED_INDICATOR_FILE}" 2>/dev/null); do
+            _path="${SOFTWARE_DIR}/${_enabled}/exports:${_path}"
+            _cflags="-I${SOFTWARE_DIR}/${_enabled}/include ${_cflags}"
+            _cxxflags="-I${SOFTWARE_DIR}/${_enabled}/include ${_cxxflags}"
+            _ldflags="-L${SOFTWARE_DIR}/${_enabled}/lib ${_ldflags}"
+            _pkg_config_path="${SOFTWARE_DIR}/${_enabled}/lib/pkgconfig:${_pkg_config_path}"
+        done
+    else
         for _exp in $(${FIND_BIN} "${SOFTWARE_DIR}" -mindepth 2 -maxdepth 2 -name 'exports' -type d 2>/dev/null); do
             _path="${_exp}:${_path}"
         done
-    }
-    gsv_int_path
-
-    # LDFLAGS, PKG_CONFIG_PATH:
-    _pkg_config_path="."
-    _ldflags="${LDFLAGS} ${DEFAULT_LINKER_FLAGS}"
-    gsv_int_ldflags () {
         for _exp in $(${FIND_BIN} "${SOFTWARE_DIR}" -mindepth 2 -maxdepth 2 -name 'lib' -or -name 'libexec' -type d 2>/dev/null); do
             _ldflags="-L${_exp} ${_ldflags}"
         done
         for _exp in $(${FIND_BIN} "${SOFTWARE_DIR}" -mindepth 2 -maxdepth 3 -name 'pkgconfig' -type d 2>/dev/null); do
             _pkg_config_path="${_exp}:${_pkg_config_path}"
         done
-    }
-    gsv_int_ldflags "${SOFTWARE_DIR}"
-
-    # CFLAGS, CXXFLAGS:
-    _cflags="${DEFAULT_COMPILER_FLAGS}"
-    gsv_int_cflags () {
         for _exp in $(${FIND_BIN} "${SOFTWARE_DIR}" -mindepth 2 -maxdepth 2 -name 'include' -type d 2>/dev/null); do
             _cflags="-I${_exp} ${_cflags}"
         done
-    }
-    gsv_int_cflags "${SOFTWARE_DIR}"
-    _cxxflags="-std=c++11 ${_cflags}"
+    fi
 
-    # MANPATH
-    _manpath="${DEFAULT_MANPATH}"
-    gsv_int_manpath () {
-        for _exp in $(${FIND_BIN} "${SOFTWARE_DIR}" -mindepth 2 -maxdepth 3 -name 'man' -type d 2>/dev/null); do
-            _manpath="${_exp}:${_manpath}"
-        done
-    }
-    gsv_int_manpath "${SOFTWARE_DIR}"
+    # Store values to environment file:
 
-    if [ -f "${SOFIN_ENV_DISABLED_INDICATOR_FILE}" ]; then # sofin disabled. Default system environment
-        ${PRINTF_BIN} "# ${ColorParams}%s${ColorReset}:\n" "CFLAGS"
-        ${PRINTF_BIN} "%s\n" "export CFLAGS=\"\""
-        ${PRINTF_BIN} "# ${ColorParams}%s${ColorReset}:\n" "CXXFLAGS"
-        ${PRINTF_BIN} "%s\n" "export CXXFLAGS=\"\""
-        ${PRINTF_BIN} "# ${ColorParams}%s${ColorReset}:\n" "LDFLAGS"
-        ${PRINTF_BIN} "%s\n" "export LDFLAGS=\"\""
-        ${PRINTF_BIN} "# ${ColorParams}%s${ColorReset}:\n" "PKG_CONFIG_PATH"
-        ${PRINTF_BIN} "%s\n" "export PKG_CONFIG_PATH=\"\""
-    else # sofin environment override enabled, Default behavior:
+    ${PRINTF_BIN} "# ${ColorParams}%s${ColorReset}:\n" "MANPATH"
+    ${PRINTF_BIN} "%s\n" "export MANPATH=\"${_manpath}\""
+
+    if [ -f "${SOFIN_ENV_ENABLED_INDICATOR_FILE}" ]; then # sofin disabled. Default system environment
         _cflags="$(echo "${_cflags}" | ${SED_BIN} 's/ *$//g; s/  //g' 2>/dev/null)"
         _cxxflags="$(echo "${_cxxflags}" | ${SED_BIN} 's/ *$//g; s/  //g' 2>/dev/null)"
         _ldflags="$(echo "${_ldflags}" | ${SED_BIN} 's/ *$//g; s/  //g' 2>/dev/null)"
@@ -148,6 +136,15 @@ get_shell_vars () {
         ${PRINTF_BIN} "%s\n" "export LDFLAGS=\"${_ldflags}\""
         ${PRINTF_BIN} "# ${ColorParams}%s${ColorReset}:\n" "PKG_CONFIG_PATH"
         ${PRINTF_BIN} "%s\n" "export PKG_CONFIG_PATH=\"${_pkg_config_path}\""
+    else # sofin environment override enabled, Default behavior:
+        ${PRINTF_BIN} "# ${ColorParams}%s${ColorReset}:\n" "CFLAGS"
+        ${PRINTF_BIN} "%s\n" "export CFLAGS=\"\""
+        ${PRINTF_BIN} "# ${ColorParams}%s${ColorReset}:\n" "CXXFLAGS"
+        ${PRINTF_BIN} "%s\n" "export CXXFLAGS=\"\""
+        ${PRINTF_BIN} "# ${ColorParams}%s${ColorReset}:\n" "LDFLAGS"
+        ${PRINTF_BIN} "%s\n" "export LDFLAGS=\"\""
+        ${PRINTF_BIN} "# ${ColorParams}%s${ColorReset}:\n" "PKG_CONFIG_PATH"
+        ${PRINTF_BIN} "%s\n" "export PKG_CONFIG_PATH=\"\""
     fi
 
     # common
@@ -159,8 +156,6 @@ get_shell_vars () {
     ${PRINTF_BIN} "%s\n" "export CXX=\"${CXX_NAME}\""
     ${PRINTF_BIN} "# ${ColorParams}%s${ColorReset}:\n" "CPP"
     ${PRINTF_BIN} "%s\n" "export CPP=\"${CPP}\""
-    ${PRINTF_BIN} "# ${ColorParams}%s${ColorReset}:\n" "MANPATH"
-    ${PRINTF_BIN} "%s\n" "export MANPATH=\"${_manpath}\""
 
     unset _cflags _cxxflags _ldflags _pkg_config_path _manpath _app _exp
 }
@@ -229,10 +224,10 @@ develop () {
 
 
 sofin_status () {
-    if [ -f "${SOFIN_ENV_DISABLED_INDICATOR_FILE}" ]; then
-        note "Sofin shell environment is: $(distn "disabled" "${ColorRed}")"
+    if [ -f "${SOFIN_ENV_ENABLED_INDICATOR_FILE}" ]; then
+        note "Sofin Shell environment enabled for: $(distn "$(${CAT_BIN} "${SOFIN_ENV_ENABLED_INDICATOR_FILE}" | ${TR_BIN} '\n' ' ' 2>/dev/null)")"
     else
-        note "Sofin shell environment is: $(distn "enabled" "${ColorParams}")"
+        note "Sofin shell environment is: $(distn "disabled" "${ColorRed}")"
     fi
 }
 
