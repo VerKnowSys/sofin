@@ -534,6 +534,9 @@ process_flat () {
 
                 # configuration log:
                 _configure_log="config.log"
+                _cmake_out_log="CMakeFiles/CMakeOutput.log"
+                _cmake_error_log="CMakeFiles/CMakeError.log"
+                _cmake_config_log="${LOGS_DIR}${SOFIN_NAME}-${DEF_NAME}${DEF_SUFFIX}.cmake.log"
                 _configure_options_log="${LOGS_DIR}${SOFIN_NAME}-${DEF_NAME}${DEF_SUFFIX}.config.help"
                 _configure_status_log="${LOGS_DIR}${SOFIN_NAME}-${DEF_NAME}${DEF_SUFFIX}.${_configure_log}"
 
@@ -647,9 +650,13 @@ process_flat () {
                                 run "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS}"
                             fi
                         fi
-                        try "${INSTALL_BIN} -v \"${_configure_log}\" \"${_configure_status_log}\""
                         ;;
                 esac
+
+                debug "Gathering configuration output logs…"
+                try "${INSTALL_BIN} -v \"${_configure_log}\" \"${_configure_status_log}\""
+                try "${INSTALL_BIN} -v \"${_cmake_out_log}\" \"${_cmake_config_log}\""
+                try "${INSTALL_BIN} -v \"${_cmake_error_log}\" \"${_cmake_config_log}.error\""
 
                 cd "${_pwd}"
                 after_configure_callback
