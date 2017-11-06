@@ -42,7 +42,6 @@ install_sofin () {
             echo "${SOFIN_BUNDLE_NAME} v$(distn "${SOFIN_VERSION}") was installed successfully!"
     fi
 
-    disable_sofin_env
     update_system_shell_env_files
     return 0
 }
