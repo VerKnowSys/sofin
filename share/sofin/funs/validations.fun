@@ -24,7 +24,7 @@ validate_env () {
 
 
 fail_on_bg_job () {
-    _deps="${@}"
+    _deps="${*}"
     debug "deps=$(distd "$(${PRINTF_BIN} '%s\n' "${_deps}" | eval "${NEWLINES_TO_SPACES_GUARD}")")"
     create_dirs
     acquire_lock_for "${_deps}"
@@ -156,7 +156,7 @@ validate_definition_disabled () {
 
 
 validate_pie_on_exports () {
-    _bundz="${@}"
+    _bundz="${*}"
     if [ -z "${_bundz}" ]; then
         error "At least single bundle name has to be specified for pie validation."
     fi

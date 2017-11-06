@@ -75,7 +75,7 @@ push_binbuilds () {
 
 
 deploy_binbuild () {
-    _dbbundles="${@}"
+    _dbbundles="${*}"
     for _dbbundle in $(echo "${_dbbundles}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
         USE_BINBUILD=NO
         build "${_dbbundle}"
@@ -130,7 +130,7 @@ fetch_binbuild () {
 
 # NOTE: build() works incorrectly now - when specified multiple arguments the post tasks fail
 build () {
-    _build_list="${@}"
+    _build_list="${*}"
 
     # Update definitions and perform more checks
     validate_reqs

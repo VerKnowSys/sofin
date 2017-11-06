@@ -63,7 +63,7 @@ disable_sofin_env () {
 
 
 set_c_and_cxx_flags () {
-    _flagz="${@}"
+    _flagz="${*}"
     CFLAGS="$(${PRINTF_BIN} '%s\n' "${_flagz} ${DEFAULT_COMPILER_FLAGS} -I${PREFIX}/include ${DEF_COMPILER_FLAGS}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
     CXXFLAGS="$(${PRINTF_BIN} '%s\n' "${_flagz} ${DEFAULT_COMPILER_FLAGS} -I${PREFIX}/include ${DEF_COMPILER_FLAGS}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
     LDFLAGS="$(${PRINTF_BIN} '%s\n' "${DEFAULT_LINKER_FLAGS} -L${PREFIX}/lib ${DEF_LINKER_FLAGS}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
@@ -389,7 +389,7 @@ create_lock () {
 
 
 acquire_lock_for () {
-    _bundles="${@}"
+    _bundles="${*}"
     for _bundle in $(echo "${_bundles}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
         debug "Acquiring lock for bundle: [$(distd "${_bundle}")]"
         if [ -f "${LOCKS_DIR}${_bundle}${DEFAULT_LOCK_EXT}" ]; then

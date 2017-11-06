@@ -81,7 +81,7 @@ show_logs () {
 
 
 pretouch_logs () {
-    _params="${@}"
+    _params="${*}"
     if [ -z "${CAP_SYS_PRODUCTION}" ]; then
         debug "Logs pretouch called with params: $(distd "${_params}")"
         unset _pret_list
