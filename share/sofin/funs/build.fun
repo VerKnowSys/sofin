@@ -185,8 +185,10 @@ build () {
 
                 # NOTE: standalone definition has own SERVICES_DIR/Bundlename/ prefix
                 if [ -n "${DEF_STANDALONE}" ]; then
-                    debug "DEF_STANDALONE: $(distd "${DEF_STANDALONE}")"
+                    debug "$(distd "try_fetch_service_dir()") for bundle: $(distd "${_bundl_name}") v$(distd "${DEF_VERSION}")"
                     try_fetch_service_dir "${_bundl_name}" "${DEF_VERSION}"
+                    debug "$(distd "create_service_dataset()") for bundle: $(distd "${_bundl_name}")"
+                    create_service_dataset "${_bundl_name}"
                 fi
 
                 try "${MKDIR_BIN} -p ${FILE_CACHE_DIR}"
@@ -623,8 +625,6 @@ process_flat () {
                 error "These values cannot be empty: BUILD_DIR, BUILD_NAMESUM"
             fi
 
-            create_service_dataset "${_bundlnm}"
-
             # and common part between normal and continue modes:
             cd "${_pwd}"
             note "   ${NOTE_CHAR} Building requirement: $(distn "${_app_param}"), version: $(distn "${DEF_VERSION}")"
@@ -675,14 +675,6 @@ process_flat () {
             after_install_callback
             cd "${_pwd}"
             after_install_snapshot
-
-            if [ -n "${DEF_STANDALONE}" ] && [ -n "${CAP_SYS_ZFS}" ]; then
-                debug "Creating origin snapshot for service dataset: $(distd "${_bund}")"
-                try "${ZFS_BIN} snapshot '${_dsname}@${ORIGIN_ZFS_SNAP_NAME}'"
-                if [ "0" != "$?" ]; then
-                    run "${ZFS_BIN} destroy -r '${_dsname}@${ORIGIN_ZFS_SNAP_NAME}' && ${ZFS_BIN} snapshot '${_dsname}@${ORIGIN_ZFS_SNAP_NAME}'"
-                fi
-            fi
 
             cd "${_pwd}"
             run "${PRINTF_BIN} '%s' \"${DEF_VERSION}\" > ${_prefix}/${_app_param}${DEFAULT_INST_MARK_EXT}" && \
