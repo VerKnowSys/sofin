@@ -533,7 +533,9 @@ process_flat () {
                 cd "${_pwd}"
 
                 # configuration log:
-                _config_log="${LOGS_DIR}${DEF_NAME}${DEF_SUFFIX}.src-configure-options"
+                _configure_log="config.log"
+                _configure_options_log="${LOGS_DIR}${SOFIN_NAME}-${DEF_NAME}${DEF_SUFFIX}.configure-help.log"
+                _configure_status_log="${LOGS_DIR}${SOFIN_NAME}-${DEF_NAME}${DEF_SUFFIX}.${_configure_log}"
 
                 note "   ${NOTE_CHAR} Configuring: $(distn "${_app_param}"), version: $(distn "${DEF_VERSION}")"
                 case "${DEF_CONFIGURE_METHOD}" in
@@ -555,10 +557,12 @@ process_flat () {
                         ;;
 
                     posix)
-                        try "cache_conf_scrpt_hlp_opts ${_config_log}"
+                        cache_conf_scrpt_hlp_opts "${_configure_options_log}"
                         try "./configure -prefix ${_prefix} -cc '${CC_NAME} ${CFLAGS}' -libs '-L${PREFIX}/lib ${LDFLAGS}' -mandir ${PREFIX}/share/man -libdir ${PREFIX}/lib -aspp '${CC_NAME} ${CFLAGS} -c' ${DEF_CONFIGURE_ARGS}" || \
                         try "./configure -prefix ${_prefix} -cc '${CC_NAME} ${CFLAGS}' -libs '-L${PREFIX}/lib ${LDFLAGS}' -libdir ${PREFIX}/lib -aspp '${CC_NAME} ${CFLAGS} -c' ${DEF_CONFIGURE_ARGS}" || \
                         run "./configure -prefix ${_prefix} -cc '${CC_NAME} ${CFLAGS}' -libs '-L${PREFIX}/lib ${LDFLAGS}' -aspp '${CC_NAME} ${CFLAGS} -c' ${DEF_CONFIGURE_ARGS}"
+
+                        try "${INSTALL_BIN} -v \"${_configure_log}\" \"${_configure_status_log}\""
                         ;;
 
                     cmake)
@@ -590,7 +594,7 @@ process_flat () {
                         _addon="CFLAGS='${CFLAGS}' CXXFLAGS='${CXXFLAGS}' LDFLAGS='${LDFLAGS}'"
 
                         # NOTE: Store `configure --help` outputs per definition (useful):
-                        try "cache_conf_scrpt_hlp_opts ${_config_log}"
+                        cache_conf_scrpt_hlp_opts "${_configure_options_log}"
 
                         if [ "${SYSTEM_NAME}" = "Linux" ]; then
                             # NOTE: No /Services feature implemented for Linux.
@@ -644,8 +648,8 @@ process_flat () {
                                 run "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS}"
                             fi
                         fi
+                        try "${INSTALL_BIN} -v \"${_configure_log}\" \"${_configure_status_log}\""
                         ;;
-
                 esac
 
                 cd "${_pwd}"
