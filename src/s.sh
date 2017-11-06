@@ -132,6 +132,7 @@ if [ -n "${SOFIN_COMMAND}" ]; then
                         note "Loading environment profile: $(distn "${_fname}")"
                         run "${INSTALL_BIN} ${_fname} ${SOFIN_ENV_ENABLED_INDICATOR_FILE}"
                         update_shell_vars
+                        reload_shell
                     else
                         error "No such profile: $(diste "${_name}")"
                     fi
