@@ -30,11 +30,11 @@ env_forgivable () {
 enable_sofin_env () {
     _envs="${*}"
     if [ -z "${_envs}" ]; then
-        error "No bundles to enable provided!"
+        _envs="Doas Git Mc Vim Sofin Zsh"
     fi
     debug "Enabling Sofin env for: $(distd "${_envs}")"
     for _env in $(echo "${_envs}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
-        ${GREP_BIN} -F "${_env}" "${SOFIN_ENV_ENABLED_INDICATOR_FILE}" 2>/dev/null || \
+        ${GREP_BIN} -F "${_env}" "${SOFIN_ENV_ENABLED_INDICATOR_FILE}" >/dev/null 2>&1 || \
             ${PRINTF_BIN} "%s\n" "${_env}" >> "${SOFIN_ENV_ENABLED_INDICATOR_FILE}"
     done
     note "Enabled Sofin environment for bundles: $(distn "${_envs}")"
