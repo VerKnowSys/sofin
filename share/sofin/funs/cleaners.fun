@@ -16,7 +16,7 @@ clean_filecache () {
 clean_all_bdirs_leftovers () {
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
         for i in $(${ZFS_BIN} list -H -o name -t filesystem 2>/dev/null | ${EGREP_BIN} "${DEFAULT_SRC_EXT}" 2>/dev/null); do
-            try "${ZFS_BIN} destroy -vfR '${i}'" && \
+            try "${ZFS_BIN} destroy -fR '${i}'" && \
                 debug "Dataset destroyed: $(distd "${i}")"
         done
     else

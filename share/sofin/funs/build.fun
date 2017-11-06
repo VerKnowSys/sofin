@@ -690,7 +690,7 @@ process_flat () {
                 debug "Creating origin snapshot for service dataset: $(distd "${_bund}")"
                 try "${ZFS_BIN} snapshot '${_dsname}@${ORIGIN_ZFS_SNAP_NAME}'"
                 if [ "0" != "$?" ]; then
-                    run "${ZFS_BIN} destroy '${_dsname}@${ORIGIN_ZFS_SNAP_NAME}' && ${ZFS_BIN} snapshot '${_dsname}@${ORIGIN_ZFS_SNAP_NAME}'"
+                    run "${ZFS_BIN} destroy -r '${_dsname}@${ORIGIN_ZFS_SNAP_NAME}' && ${ZFS_BIN} snapshot '${_dsname}@${ORIGIN_ZFS_SNAP_NAME}'"
                 fi
             fi
 
