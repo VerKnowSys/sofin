@@ -644,52 +644,6 @@ export_binaries () {
 }
 
 
-# hack_def () {
-#     if [ -z "${1}" ]; then
-#         error "No name of pattern to hack given!"
-#     fi
-#     _hack_pattern="${1}"
-#     _abeauty_pat="$(distn "*${_hack_pattern}*")"
-#     _all_hackdirs=$(${FIND_BIN} "${FILE_CACHE_DIR%/}" -type d -mindepth 2 -maxdepth 2 -iname "*${_hack_pattern}*" 2>/dev/null)
-#     _all_am="$(${PRINTF_BIN} '%s\n' "${_all_hackdirs}" | ${WC_BIN} -l 2>/dev/null | ${TR_BIN} -d '\t|\r|\ ' 2>/dev/null)"
-#     try "${TEST_BIN} -z ${_all_am}" && _all_am="0"
-#     if [ -z "${_all_hackdirs}" ]; then
-#         warn "No matching build dirs found for pattern: $(diste "${_abeauty_pat}")"
-#     else
-#         note "Sofin will now walk through: $(distn "${_all_am}") build dirs in: $(distn "${FILE_CACHE_DIR}"), that matches pattern: $(distn "${_abeauty_pat}")"
-#     fi
-#     for _a_dir in ${_all_hackdirs}; do
-#         note
-#         warn "$(fill)"
-#         warn "Quit viever/ Exit that shell, to continue with next build dir"
-#         warn "Sofin will now traverse through build logs, looking for errors.."
-#         _currdir="$(${PWD_BIN} 2>/dev/null)"
-#         cd "${_a_dir}"
-#         _found_any=""
-#         _log_viewer="${LESS_BIN} ${DEFAULT_LESS_OPTIONS} +/error:"
-#         for _logfile in config.log build.log CMakeFiles/CMakeError.log CMakeFiles/CMakeOutput.log; do
-#             if [ -f "${_logfile}" ]; then
-#                 _found_any="yes"
-#                 if [ -n "${DEVEL}" ]; then
-#                     eval "cd ${_a_dir} && ${ZSH_BIN} --login -c '${_log_viewer} ${_logfile}'"
-#                 else
-#                     debug "No DEVEL set - only entering BUILD_DIR"
-#                     eval "cd ${_a_dir} && ${ZSH_BIN} --login"
-#                 fi
-#             fi
-#         done
-#         if [ -z "${_found_any}" ]; then
-#             note "Entering build dir.."
-#             eval "cd ${_a_dir} && ${ZSH_BIN} --login"
-#         fi
-#         cd "${_currdir}"
-#         warn "---------------------------------------------------------"
-#     done
-#     debug "Hack process finished for pattern: $(distd "${_abeauty_pat}")"
-#     unset _abeauty_pat _currdir _a_dir _logfile _all_hackdirs _all_am _hack_pattern
-# }
-
-
 after_unpack_callback () {
     if [ -n "${DEF_AFTER_UNPACK_METHOD}" ]; then
         debug "Evaluating callback DEF_AFTER_UNPACK_METHOD: $(distd "${DEF_AFTER_UNPACK_METHOD}")"
