@@ -199,8 +199,7 @@ create_service_dataset () {
 fetch_dset_zfs_stream () {
     _fdz_bund_name="${1}"
     _fdz_out_file="${2}"
-    if [ -z "${_fdz_bund_name}" -o \
-         -z "${_fdz_out_file}" ]; then
+    if [ -z "${_fdz_bund_name}" ] || [ -z "${_fdz_out_file}" ]; then
         error "Expected two arguments: $(diste "bundle-name") and $(diste "name-out-file")."
     fi
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
