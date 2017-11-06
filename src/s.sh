@@ -100,13 +100,19 @@ if [ -n "${SOFIN_COMMAND_ARG}" ]; then
 
 
         enable)
-            enable_sofin_env
+            shift
+            _bundles="${*}"
+            debug "Enabling Sofin env for bundles: $(distd "${_bundles}")"
+            enable_sofin_env "${_bundles}"
             finalize_shell_reload
             ;;
 
 
         disable)
-            disable_sofin_env
+            shift
+            _bundles="${*}"
+            debug "Disabling Sofin env for bundles: $(distd "${_bundles}")"
+            disable_sofin_env "${_bundles}"
             finalize_shell_reload
             ;;
 
