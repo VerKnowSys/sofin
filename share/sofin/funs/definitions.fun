@@ -472,7 +472,7 @@ strip_bundle () {
             done
         fi
     done
-    _sbresult="$(${PRINTF_BIN} '%s\n' "${_counter}" 2>/dev/null | ${BC_BIN} 2>/dev/null)"
+    _sbresult="$(calculate_bc "${_counter}")"
     if [ "${_sbresult}" -lt "0" ] || \
        [ -z "${_sbresult}" ]; then
         _sbresult="0"
