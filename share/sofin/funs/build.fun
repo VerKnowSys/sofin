@@ -624,6 +624,8 @@ process_flat () {
                 error "These values cannot be empty: BUILD_DIR, BUILD_NAMESUM"
             fi
 
+            create_service_dataset "${_bundlnm}"
+
             # and common part between normal and continue modes:
             cd "${_pwd}"
             note "   ${NOTE_CHAR} Building requirement: $(distn "${_app_param}"), version: $(distn "${DEF_VERSION}")"
@@ -634,7 +636,6 @@ process_flat () {
             cd "${_pwd}"
             after_make_snapshot
 
-            create_service_dataset "${_bundlnm}"
 
             # OTE: after successful make, invoke "make test" by default:
             unset _this_test_skipped
