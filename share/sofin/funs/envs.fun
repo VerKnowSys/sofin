@@ -168,20 +168,20 @@ dump_compiler_setup () {
     else
         debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "fast-math" "${ColorGray}")"
     fi
-    debug "-------------- COMPILER FEATURES DUMP ENDS --------------"
+    debug "Compiler features dump eof"
 }
 
 
 dump_system_capabilities () {
-    debug "---------------- SYSTEM CAPABILITIES DUMP ---------------"
     # NOTE: make sure that this is not the way with IFS instead of echoing on tr in for loops;
+    debug "System capabilities dump:"
     IFS=\n set 2>/dev/null | ${EGREP_BIN} -i 'CAP_SYS_' 2>/dev/null | while IFS= read -r _envv
     do
         if [ -n "${_envv}" ]; then
             debug "$(distd "${_envv}")"
         fi
     done
-    debug "------------- SYSTEM CAPABILITIES DUMP ENDS -------------"
+    debug "System capabilities dump eof"
     unset _envv
 }
 
