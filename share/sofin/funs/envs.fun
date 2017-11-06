@@ -37,7 +37,7 @@ enable_sofin_env () {
         ${GREP_BIN} -F "${_env}" "${SOFIN_ENV_ENABLED_INDICATOR_FILE}" 2>/dev/null || \
             ${PRINTF_BIN} "%s\n" "${_env}" >> "${SOFIN_ENV_ENABLED_INDICATOR_FILE}"
     done
-    note "Disabled Sofin environment for bundles: $(distn "${_envs}")"
+    note "Enabled Sofin environment for bundles: $(distn "${_envs}")"
     update_shell_vars
     reload_shell
 }
