@@ -404,7 +404,7 @@ create_builddir () {
         case "${SYSTEM_NAME}" in
             Darwin)
                 destroy_ramdisk_device
-                _ramfs_size_mb=2048
+                _ramfs_size_mb=4096
                 _ramfs_sectors=$((${_ramfs_size_mb}*1024*1024/512))
                 RAMDISK_DEV="$(${HDID_BIN} -nomount ram://${_ramfs_sectors} 2>/dev/null)"
 
