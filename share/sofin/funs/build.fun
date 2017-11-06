@@ -276,6 +276,11 @@ build () {
         track_useful_and_useless_files
         # After exports - track useless files:
         finalize_afterbuild "${_bund_lcase}"
+
+        if [ -n "${CAP_SYS_ZFS}" ]; then
+            debug "Creating post build '$(distd "@${ORIGIN_ZFS_SNAP_NAME}")' snapshots…"
+            create_origin_snaphots
+        fi
     fi
 
     unset _build_list _bund_lcase _req_all _req
