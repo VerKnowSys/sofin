@@ -644,7 +644,7 @@ export_binaries () {
         note "Defined no exports of prefix: $(distn "${PREFIX}")"
     else
         _an_amount="$(${PRINTF_BIN} '%s\n' "${DEF_EXPORTS}" | ${WC_BIN} -w 2>/dev/null | ${TR_BIN} -d '\t|\r|\ ' 2>/dev/null)"
-        debug "Exporting $(distd "${_an_amount}") binaries of prefix: $(distd "${PREFIX}")"
+        debug "Exporting $(distd "${_an_amount}") binaries of prefixes: $(distd "${PREFIX}") + $(distd "${SERVICE_DIR}")"
         try "${MKDIR_BIN} -p ${PREFIX}/exports ${SERVICE_DIR}/exports"
         unset _expolist
         for _xp in $(to_iter "${DEF_EXPORTS}"); do
