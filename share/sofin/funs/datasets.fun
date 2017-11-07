@@ -274,7 +274,7 @@ try_fetch_service_dir () {
         fi
         if [ -f "${_svce_org_file}" ]; then
             if [ -d "${SERVICES_DIR}/${_dset_create}" ]; then
-                debug "Service dir: $(distw "${SERVICES_DIR}/${_dset_create}") already exists. Leaving untouched!"
+                debug "Service dir: $(distd "${SERVICES_DIR}/${_dset_create}") already exists. Leaving untouched!"
             else
                 run "${TAR_BIN} xJf \"${_svce_org_file}\" --directory \"${SERVICES_DIR}\"" && \
                     debug "Service origin received successfully: $(distd "${_svce_origin}")"
