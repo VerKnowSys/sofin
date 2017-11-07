@@ -32,7 +32,7 @@ push_to_all_mirrors () {
         push_software_archive "${_ptelm_file_name}" "${_ptmirror}" "${_ptaddress}"
 
         build_service_dataset "${_pbto_bundle_name}" "${_pversion_element}"
-        _pfin_svc_name="${_ptelm_service_name}${DEFAULT_SERVICE_SNAPSHOT_EXT}"
+        _pfin_svc_name="${_ptelm_service_name}-${SYSTEM_NAME}${DEFAULT_SERVICE_SNAPSHOT_EXT}"
         if [ "YES" != "${CAP_SYS_ZFS}" ]; then
             # Fallback to tarball extension for service datadir:
             _pfin_svc_name="${_ptelm_service_name}${DEFAULT_ARCHIVE_EXT}"
@@ -103,7 +103,7 @@ build_service_dataset () {
             error "Second argument with env value for: $(diste "USER") is required!"
         fi
         _full_dataset_name="${DEFAULT_ZPOOL}${SERVICES_DIR}/${USER}/${_ps_elem}"
-        _ps_snap_file="${_ps_elem}-${_ps_ver_elem}${DEFAULT_SERVICE_SNAPSHOT_EXT}"
+        _ps_snap_file="${_ps_elem}-${_ps_ver_elem}-${SYSTEM_NAME}${DEFAULT_SERVICE_SNAPSHOT_EXT}"
         debug "Dataset name: $(distd "${_full_dataset_name}"), snapshot-file: $(distd "${_ps_snap_file}")"
         if [ ! -f "${FILE_CACHE_DIR}${_ps_snap_file}" ]; then
             fetch_dset_zfs_stream "${_ps_elem}" "${_ps_snap_file}"
@@ -244,7 +244,7 @@ try_fetch_service_dir () {
         error "Second argument with $(diste "version") is required!"
     fi
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
-        _svce_origin="${_dset_create}-${_dset_version}${DEFAULT_SERVICE_SNAPSHOT_EXT}"
+        _svce_origin="${_dset_create}-${_dset_version}-${SYSTEM_NAME}${DEFAULT_SERVICE_SNAPSHOT_EXT}"
         _svce_org_file="${FILE_CACHE_DIR}${_svce_origin}"
         if [ ! -f "${_svce_org_file}" ]; then
             retry "${FETCH_BIN} -o ${_svce_org_file} ${FETCH_OPTS} ${MAIN_COMMON_REPOSITORY}/${_svce_origin}" && \
