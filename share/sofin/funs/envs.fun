@@ -88,7 +88,7 @@ dump_compiler_setup () {
         debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "ccache" "${ColorGray}")"
     fi
 
-    if [ -z "${DEF_NO_SAFE_STACK}" ]; then
+    if [ -n "${DEF_USE_SAFE_STACK}" ]; then
         debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "safe-stack" "${ColorGreen}")"
     else
         debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "safe-stack" "${ColorGray}")"
@@ -332,7 +332,7 @@ compiler_setup () {
         CXXFLAGS="${CXXFLAGS} ${HARDEN_OFLOW_CFLAGS}"
     fi
 
-    if [ -z "${DEF_NO_SAFE_STACK}" ]; then
+    if [ -n "${DEF_USE_SAFE_STACK}" ]; then
         CFLAGS="${CFLAGS} ${HARDEN_SAFE_STACK_FLAGS}"
         CXXFLAGS="${CXXFLAGS} ${HARDEN_SAFE_STACK_FLAGS}"
         LDFLAGS="${LDFLAGS} ${HARDEN_SAFE_STACK_FLAGS}"
