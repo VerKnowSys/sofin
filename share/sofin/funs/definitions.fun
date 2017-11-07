@@ -595,14 +595,15 @@ track_useful_and_useless_files () {
 
 conflict_resolve () {
     if [ -n "${DEF_CONFLICTS_WITH}" ]; then
+        _appname="$(capitalize "${DEF_NAME}${DEF_SUFFIX}")"
         debug "Seeking possible bundle conflicts: $(distd "${DEF_CONFLICTS_WITH}")"
         for _app in $(to_iter "${DEF_CONFLICTS_WITH}"); do
             for _soft in $(${FIND_BIN} "${SOFTWARE_DIR}" -maxdepth 1 -type d -iname "${_app}*" 2>/dev/null); do
                 _soft_name="${_soft##*/}"
                 if [ -d "${_soft}/exports" ]; then
-                    debug "conflict_resolve(name=$(distd "${_soft_name}"), def_name=$(distd "${DEF_NAME}${DEF_SUFFIX}")):"
-                    if [ "${_soft_name}" = "${DEF_NAME}${DEF_SUFFIX}" ]; then
-                        debug "Disabling bundle exports of: $(distd "${_soft_name}") -> in conflict with: $(distd "${DEF_NAME}${DEF_SUFFIX}")"
+                    debug "conflict_resolve(name=$(distd "${_soft_name}"), def_name=$(distd "${_appname}")):"
+                    if [ "${_soft_name}" != "${_appname}" ]; then
+                        debug "Disabling bundle exports of: $(distd "${_soft_name}") -> in conflict with: $(distd "${_appname}")"
                         try "${MV_BIN} ${_soft}/exports ${_soft}/exports-disabled"
                     fi
                 fi
@@ -610,9 +611,9 @@ conflict_resolve () {
             for _service in $(${FIND_BIN} "${SERVICES_DIR}" -maxdepth 1 -type d -iname "${_app}*" 2>/dev/null); do
                 _sv_name="${_service##*/}"
                 if [ -d "${_service}/exports" ]; then
-                    debug "conflict_resolve(name=$(distd "${_sv_name}"), def_name=$(distd "${DEF_NAME}${DEF_SUFFIX}")):"
-                    if [ "${_sv_name}" = "${DEF_NAME}${DEF_SUFFIX}" ]; then
-                        debug "Disabling bundle exports of: $(distd "${_service}") -> in conflict with: $(distd "${DEF_NAME}${DEF_SUFFIX}")"
+                    debug "conflict_resolve(name=$(distd "${_sv_name}"), def_name=$(distd "${_appname}")):"
+                    if [ "${_sv_name}" != "${_appname}" ]; then
+                        debug "Disabling bundle exports of: $(distd "${_service}") -> in conflict with: $(distd "${_appname}")"
                         try "${MV_BIN} '${_service}/exports' '${_service}/exports-disabled'"
                     fi
                 fi
