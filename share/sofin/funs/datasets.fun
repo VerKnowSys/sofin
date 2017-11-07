@@ -638,9 +638,11 @@ do_prefix_snapshot () {
 
             do_snaps_destroy \
                 && do_snaps \
+                && check_result 0 "@${_snap_name}" \
                 && return 0
 
             debug "Failed to make a snapshot: @$(distd "${_snap_name}") of bundle: '$(distd "${_pr_name}")'. Software dataset: '$(distd "${_pr_soft}")'. Services dataset: '$(distd "${_pr_serv}")'"
+            check_result 1 "@${_snap_name}"
             return 1
         fi
     else
