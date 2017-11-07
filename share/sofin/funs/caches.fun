@@ -1,37 +1,4 @@
 
-log_helper () {
-    _log_h_pattern="${1}"
-    if [ -z "${_log_h_pattern}" ]; then
-        _log_files="$(find_most_recent "${LOGS_DIR}" "${SOFIN_NAME}*")"
-    else
-        _log_files="$(find_most_recent "${LOGS_DIR}" "${SOFIN_NAME}*${_log_h_pattern}*")"
-    fi
-    _lognum_f="$(${PRINTF_BIN} '%s\n' "${_log_files}" | eval "${FILES_COUNT_GUARD}")"
-    if [ -z "${_lognum_f}" ]; then
-        _lognum_f="0"
-    else
-        debug "Found: $(distd "${_lognum_f}") recent log files matching pattern: $(distd "${_log_h_pattern}")"
-    fi
-
-    _log_h_pattern="$(echo "${_log_h_pattern}" | ${CUT_BIN} -f1-${LOG_LAST_FILES} -d' ' 2>/dev/null)"
-    case ${_lognum_f} in
-        0)
-            ${TAIL_BIN} -n ${LOG_LINES_AMOUNT} ${LOGS_DIR}${SOFIN_NAME}-* 2>/dev/null
-            ;;
-
-        1)
-            ${LESS_BIN} ${DEFAULT_LESS_OPTIONS} ${LOGS_DIR}/${SOFIN_NAME}-*${_log_h_pattern}* 2>/dev/null
-            ;;
-
-        *)
-            note "Found $(distn "${_lognum_f}") log files, that match pattern: $(distn "${_log_h_pattern}"). Attaching to all available files.."
-            ${TAIL_BIN} -n "${LOG_LINES_AMOUNT}" -F ${LOGS_DIR}${SOFIN_NAME}-*${_log_h_pattern}* 2>/dev/null
-            ;;
-    esac
-    unset _log_h_pattern _log_files _lognum_f
-}
-
-
 less_logs () {
     ${LESS_BIN} ${DEFAULT_LESS_OPTIONS} ${LOGS_DIR}/${SOFIN_NAME}-*${1}* 2>/dev/null
     return 0
@@ -73,10 +40,13 @@ show_logs () {
         fi
 
     else
-        debug "Seeking log files that match pattern: '$(distd "${_logf_pattern}")' (check intervals: $(distn "${LOG_CHECK_INTERVAL:-1}")s)" && \
-            note "Waiting for logs"
-        ${SLEEP_BIN} "${LOG_CHECK_INTERVAL:-1}" 2>/dev/null
-        log_helper "${_logf_pattern}"
+        if [ -d "${LOGS_DIR}" ]; then
+            _patie="${LOGS_DIR}${SOFIN_NAME}-${_logf_pattern}"
+            note "Show long log + tail, with using pattern: $(distd "${_patie}")"
+            ${TAIL_BIN} -F -n "$(calculate_bc "50 + ${LOG_LINES_AMOUNT}")" ${_patie}* 2>&1
+        else
+            note "No log match='$(distn "${_logf_pattern}")' contains no pattern or name."
+        fi
     fi
     unset _files_x_min _logf_minutes _logf_pattern _files_list _files_count _files_blist _mod_f_names _all_count
 }
