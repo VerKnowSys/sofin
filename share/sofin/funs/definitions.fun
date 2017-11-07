@@ -662,7 +662,7 @@ export_binaries () {
                 _service_to_exp="${SERVICE_DIR}${dir}${_xp}"
                 if [ -x "${_service_to_exp}" ]; then
                     _acurrdir="$(${PWD_BIN} 2>/dev/null)"
-                    cd "${PREFIX}${dir}"
+                    cd "${SERVICE_DIR}${dir}"
                     run "${LN_BIN} -fs ..${dir}${_xp} ../exports/${_xp}"
                     cd "${_acurrdir}"
                     _expo_elem="${_service_to_exp##*/}"
