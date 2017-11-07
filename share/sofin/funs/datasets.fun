@@ -143,7 +143,7 @@ build_service_dataset () {
             error "Second argument with env value for: $(diste "USER") is required!"
         fi
         _full_svc_dirname="${SERVICES_DIR}/${_ps_elem}"
-        _ps_snap_file="${_ps_elem}-${_ps_ver_elem}-${SYSTEM_NAME}${DEFAULT_ARCHIVE_TARBALL_EXT}" # XXX: use DEFAULT_ARCHIVE_TARBALL_EXT
+        _ps_snap_file="${_ps_elem}-${_ps_ver_elem}-${SYSTEM_NAME}${DEFAULT_ARCHIVE_TARBALL_EXT}"
         debug "Dir name: $(distd "${_full_svc_dirname}"), snapshot-file: $(distd "${_ps_snap_file}")"
         if [ ! -f "${FILE_CACHE_DIR}${_ps_snap_file}" ]; then
             fetch_dset_zfs_stream "${_ps_elem}" "${_ps_snap_file}"
@@ -189,6 +189,9 @@ create_service_dataset () {
         fi
     else
         debug "ZFS feature disabled"
+        debug "Creating regular service-directory: $(distd "${SERVICES_DIR}/${_bund_name}")"
+        try "${MKDIR_BIN} -p '${SERVICES_DIR}/${_bund_name}'"
+        try "${CHMOD_BIN} -v 0711 '${SERVICES_DIR}/${_bund_name}'"
     fi
     unset _bund_name _dataset_name
 }
@@ -257,7 +260,7 @@ try_fetch_service_dir () {
                     debug "Service origin received successfully: $(distd "${_svce_origin}")"
             fi
         else
-            debug "No Service origin file available! Skipped."
+            debug "No Service origin file: '$(distd "${_svce_org_file}")' available! Skipped."
         fi
     else
         # Only fetch service tarball, but don't create new one
