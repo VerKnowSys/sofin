@@ -1,15 +1,15 @@
 clean_purge () {
-    ${RM_BIN} -rf "${CACHE_DIR}"
+    try "${RM_BIN} -rf \"${CACHE_DIR}\""
 }
 
 
 clean_logs () {
-    ${RM_BIN} -rf "${LOGS_DIR}"
+    try "${RM_BIN} -rf \"${LOGS_DIR}\""
 }
 
 
 clean_filecache () {
-    ${RM_BIN} -rf "${FILE_CACHE_DIR}"
+    try "${RM_BIN} -rf \"${FILE_CACHE_DIR}\""
 }
 
 
