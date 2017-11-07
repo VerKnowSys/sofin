@@ -410,3 +410,9 @@ initialize () {
         ${STTY_BIN} -echo
     fi
 }
+
+
+# Converts space-separated argument list to newline separated "Shell POSIX-Array"
+to_iter () {
+    ${PRINTF_BIN} '%s\n' "${@}" | eval "${SPACES_TO_NEWLINES_GUARD}"
+}
