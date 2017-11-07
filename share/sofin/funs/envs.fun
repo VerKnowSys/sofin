@@ -332,7 +332,11 @@ compiler_setup () {
         CXXFLAGS="${CXXFLAGS} ${HARDEN_OFLOW_CFLAGS}"
     fi
 
-    if [ -n "${DEF_USE_SAFE_STACK}" ]; then
+    # Don't enable safe-stack on unsupported platforms:
+    if [ -n "${DEF_USE_SAFE_STACK}" ] \
+    && [ "Darwin" != "${SYSTEM_NAME}" ] \
+    && [ "Linux" != "${SYSTEM_NAME}" ] \
+    && [ "Minix" != "${SYSTEM_NAME}" ]; then
         CFLAGS="${CFLAGS} ${HARDEN_SAFE_STACK_FLAGS}"
         CXXFLAGS="${CXXFLAGS} ${HARDEN_SAFE_STACK_FLAGS}"
         LDFLAGS="${LDFLAGS} ${HARDEN_SAFE_STACK_FLAGS}"
