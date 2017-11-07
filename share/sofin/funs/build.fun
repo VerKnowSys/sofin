@@ -253,13 +253,12 @@ build () {
                         else
                             permnote "  $(distn "${_bund_lcase}") ($(distn 1) of $(distn "${_req_all}"))"
                             show_done "${DEF_NAME}${DEF_SUFFIX}"
-                            debug "${SUCCESS_CHAR} $(distd "${_bund_lcase}") current: $(distd "${_version_element}"), definition: [$(distd "${DEF_VERSION}")] Ok."
                         fi
                     else
                         permnote "  $(distn "${_bund_lcase}") ($(distn 1) of $(distn "${_req_all}"))"
                         process_flat "${_bund_lcase}" "${PREFIX}"
                         mark_installed "${DEF_NAME}${DEF_SUFFIX}" "${DEF_VERSION}"
-                        permnote "$(distn "${SUCCESS_CHAR}") $(distn "${_bund_name}") [$(distn "${DEF_VERSION}")]"
+                        permnote "$(distn "${SUCCESS_CHAR}") $(distn "${_anm}") [$(distn "${DEF_VERSION}" "${ColorCyan}")]"
                     fi
                 fi
             done
@@ -292,7 +291,7 @@ dump_debug_info () {
     debug "Build settings dump:"
     debug "CPUS: (inUse/Total): ($(distd "${CPUS}")/$(distd "${ALL_CPUS}"))"
     debug "PREFIX: '$(distd "${PREFIX}"),  PATH: '$(distd "${PATH}")'"
-    debug "SERVICE_DIR: '$(distd "${SERVICE_DIR}"),  CURRENT_DIR: '$(distd $(${PWD_BIN} 2>/dev/null))'"
+    debug "SERVICE_DIR: '$(distd "${SERVICE_DIR}"),  CURRENT_DIR: '$(distd "$(${PWD_BIN} 2>/dev/null)")'"
     debug "BUILD_DIR: '$(distd "${BUILD_DIR}"),  BUILD_NAMESUM: '$(distd "${BUILD_NAMESUM}")'"
     debug "FETCH_BIN: '$(distd "${FETCH_BIN}"),  FETCH_OPTS: '$(distd "${FETCH_OPTS}")'"
     if [ "Darwin" = "${SYSTEM_NAME}" ]; then
