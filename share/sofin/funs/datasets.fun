@@ -260,11 +260,27 @@ try_fetch_service_dir () {
             debug "No Service origin file available! Skipped."
         fi
     else
-        debug "Creating regular service-directory: $(distd "${SERVICES_DIR}/${_dset_create}")"
-        try "${MKDIR_BIN} -p '${SERVICES_DIR}/${_dset_create}'"
-        try "${CHMOD_BIN} -v 0710 '${SERVICES_DIR}/${_dset_create}'"
+        # Only fetch service tarball, but don't create new one
+        _svce_origin="${_dset_create}-${_dset_version}-${SYSTEM_NAME}${DEFAULT_ARCHIVE_TARBALL_EXT}"
+        _svce_org_file="${FILE_CACHE_DIR}${_svce_origin}"
+        if [ -f "${_svce_org_file}" ]; then
+            debug "Service origin file: '$(distd "${_svce_org_file}")' is present in local file-cache."
+        else
+            retry "${FETCH_BIN} -o ${_svce_org_file} ${FETCH_OPTS} ${MAIN_COMMON_REPOSITORY}/${_svce_origin}" && \
+                debug "Service origin fetched successfully: $(distd "${_svce_origin}")"
+        fi
+        if [ -f "${_svce_org_file}" ]; then
+            if [ -d "${SERVICES_DIR}/${_dset_create}" ]; then
+                debug "Service dir: $(distw "${SERVICES_DIR}/${_dset_create}") already exists. Leaving untouched!"
+            else
+                run "${TAR_BIN} xJf \"${_svce_org_file}\" --directory \"${SERVICES_DIR}\"" && \
+                    debug "Service origin received successfully: $(distd "${_svce_origin}")"
+            fi
+        else
+            debug "No Service origin file: '$(distd "${_svce_org_file}")' available! Skipped."
+        fi
     fi
-    unset _dset_create
+    unset _dset_create _svce_origin _svce_org_file _dset_version
 }
 
 
