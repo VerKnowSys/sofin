@@ -619,7 +619,7 @@ do_prefix_snapshot () {
             _pr_name="${PREFIX##*/}"
             _pr_soft="${DEFAULT_ZPOOL}${SOFTWARE_DIR}/${USER}/${_pr_name}"
             _pr_serv="${DEFAULT_ZPOOL}${SERVICES_DIR}/${USER}/${_pr_name}"
-            debug "Name: $(distd "${_pr_name}"), Software dir: $(distd "${_pr_soft}"), Service dir: $(distd "${_pr_serv}")"
+            debug "Prefix: $(distd "${_pr_name}"). Software dataset: $(distd "${_pr_soft}"). Service dataset: $(distd "${_pr_serv}")"
 
             # # Try removing existing snaps:
             do_snaps_destroy () {
@@ -640,11 +640,11 @@ do_prefix_snapshot () {
                 && do_snaps \
                 && return 0
 
-            debug "Failed snapshot? 1. $(distd "${_snap_name}_${TIMESTAMP}@${_snap_name}");  2. $(distd "${_pr_serv}@${_snap_name}")"
+            debug "Failed to make a snapshot: @$(distd "${_snap_name}") of bundle: '$(distd "${_pr_name}")'. Software dataset: '$(distd "${_pr_soft}")'. Services dataset: '$(distd "${_pr_serv}")'"
             return 1
         fi
     else
-        debug "Value of USER unset!"
+        debug "Empty value of '$(distd "USER")'!"
     fi
 }
 
