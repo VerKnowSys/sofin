@@ -444,7 +444,7 @@ strip_bundle () {
     fi
 
     DEF_STRIP="${DEF_STRIP:-NO}" # unset DEF_STRIP to say "NO", but don't allow no value further
-    _dirs_to_strip=""
+    unset _dirs_to_strip
     case "${DEF_STRIP}" in
         no|NO)
             permnote "$(distn "${_sbfdefinition_name}"): No symbols will be stripped from bundle"
@@ -452,17 +452,17 @@ strip_bundle () {
 
         all|ALL)
             debug "$(distd "${_sbfdefinition_name}"): Strip both binaries and libraries."
-            _dirs_to_strip="${PREFIX}/bin ${PREFIX}/sbin ${PREFIX}/lib ${PREFIX}/libexec"
+            _dirs_to_strip="${SERVICE_DIR}/bin ${SERVICE_DIR}/sbin ${SERVICE_DIR}/lib ${SERVICE_DIR}/libexec ${PREFIX}/bin ${PREFIX}/sbin ${PREFIX}/lib ${PREFIX}/libexec"
             ;;
 
         exports|export|bins|binaries|bin|BIN|BINS)
             debug "$(distd "${_sbfdefinition_name}"): Strip exported binaries only"
-            _dirs_to_strip="${PREFIX}/bin ${PREFIX}/sbin ${PREFIX}/libexec"
+            _dirs_to_strip="${SERVICE_DIR}/bin ${SERVICE_DIR}/sbin ${SERVICE_DIR}/libexec ${PREFIX}/bin ${PREFIX}/sbin ${PREFIX}/libexec"
             ;;
 
         libs|lib|libexec|LIB|LIBS)
             debug "$(distd "${_sbfdefinition_name}"): Strip libraries only"
-            _dirs_to_strip="${PREFIX}/lib"
+            _dirs_to_strip="${SERVICE_DIR}/lib ${PREFIX}/lib"
             ;;
     esac
 
