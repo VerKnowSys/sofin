@@ -35,7 +35,7 @@ push_to_all_mirrors () {
         _pfin_svc_name="${_ptelm_service_name}-${SYSTEM_NAME}${DEFAULT_SERVICE_SNAPSHOT_EXT}"
         if [ "YES" != "${CAP_SYS_ZFS}" ]; then
             # Fallback to tarball extension for service datadir:
-            _pfin_svc_name="${_ptelm_service_name}${DEFAULT_ARCHIVE_EXT}"
+            _pfin_svc_name="${_ptelm_service_name}-${SYSTEM_NAME}${DEFAULT_ARCHIVE_EXT}"
         fi
         push_dset_zfs_stream "${_pfin_svc_name}" "${_pbto_bundle_name}" "${_ptmirror}" "${_pversion_element}"
     done
