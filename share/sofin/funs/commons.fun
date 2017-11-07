@@ -207,7 +207,6 @@ file_checksum () {
     if [ -z "${_fcsmname}" ]; then
         error "Empty file name given for function: $(diste "file_checksum()")"
     fi
-    ${MKDIR_BIN} -p "${LOGS_DIR}"
     case ${SYSTEM_NAME} in
         Minix|Darwin|Linux)
             ${PRINTF_BIN} '%s' "$(${SHA_BIN} "${_fcsmname}" 2>/dev/null | ${CUT_BIN} -d' ' -f1 2>/dev/null)" 2>> "${LOG}"
