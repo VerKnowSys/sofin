@@ -466,7 +466,29 @@ strip_bundle () {
             ;;
     esac
 
+    #
+    # NOTE: Currently unhandled file types:
+    # _data="data"
+    # _text="ASCII text executable"
+    # _link="symbolic link to"
+    # _script="script text executable"
+    #
     _counter="0"
+    unset _universal_ft
+    unset _strip_list
+    case "${SYSTEM_NAME}" in
+        Darwin)
+            _exec_ft="Mach-O 64-bit executable x86_64"
+            _lib_ft="Mach-O 64-bit dynamically linked shared library x86_64"
+            _universal_ft="Mach-O universal binary"
+            ;;
+
+        FreeBSD)
+            _exec_ft="ELF 64-bit LSB"
+            _lib_ft="ELF 64-bit LSB shared object"
+            ;;
+    esac
+
     for _stripdir in $(to_iter "${_dirs_to_strip}"); do
         if [ -d "${_stripdir}" ]; then
             for _file in $(${FIND_BIN} "${_stripdir}" -maxdepth 1 -type f 2>/dev/null); do
