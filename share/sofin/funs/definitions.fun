@@ -340,17 +340,16 @@ show_outdated () {
     load_defaults
     if [ -d "${SOFTWARE_DIR}" ]; then
         for _prefix in $(${FIND_BIN} "${SOFTWARE_DIR%/}" -mindepth 1 -maxdepth 1 -type d -not -name ".*" 2>/dev/null); do
-            _bundle="$(lowercase "${_prefix##*/}")"
-            debug "Bundle name: ${_bundle}, Prefix: ${_prefix}"
-
+            _bundle_cap="${_prefix##*/}"
+            _bundle="$(lowercase "${_bundle_cap}")"
             if [ ! -f "${_prefix}/${_bundle}${DEFAULT_INST_MARK_EXT}" ]; then
-                warn "Bundle: $(distw $(capitalize "${_bundle}")) is not yet installed or damaged."
+                warn "Bundle: $(distw "${_bundle_cap}") is not yet installed or damaged."
                 continue
             fi
             _bund_vers="$(${CAT_BIN} "${_prefix}/${_bundle}${DEFAULT_INST_MARK_EXT}" 2>/dev/null)"
             if [ ! -f "${DEFINITIONS_DIR}/${_bundle}${DEFAULT_DEF_EXT}" ]; then
                 if [ "${_bundle}" != "${SOFIN_NAME}" ]; then
-                    warn "No such bundle found: $(distw $(capitalize "${_bundle}"))"
+                    warn "No such bundle: '$(distw "${_bundle_cap}")' of prefix: '$(distw "${_prefix##*/}")' found!"
                 fi
                 continue
             fi
