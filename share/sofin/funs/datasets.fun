@@ -188,11 +188,12 @@ create_service_dataset () {
         else
             debug "Creating initial service dataset: $(distd "${_dataset_name}") for: $(distd "${_bund_name}")."
             run "${ZFS_BIN} create -p '${_dataset_name}'"
+            run "${ZFS_BIN} set mountpoint=${SERVICES_DIR}/${_bund_name} '${_dataset_name}'"
         fi
     else
         debug "ZFS feature disabled"
     fi
-    unset _bund_name
+    unset _bund_name _dataset_name
 }
 
 
