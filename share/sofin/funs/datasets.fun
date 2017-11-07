@@ -149,7 +149,7 @@ build_service_dataset () {
             error "Second argument with env value for: $(diste "USER") is required!"
         fi
         _full_svc_dirname="${SERVICES_DIR}/${_ps_elem}"
-        _ps_snap_file="${_ps_elem}-${_ps_ver_elem}${DEFAULT_ARCHIVE_TARBALL_EXT}" # XXX: use DEFAULT_ARCHIVE_TARBALL_EXT
+        _ps_snap_file="${_ps_elem}-${_ps_ver_elem}-${SYSTEM_NAME}${DEFAULT_ARCHIVE_TARBALL_EXT}" # XXX: use DEFAULT_ARCHIVE_TARBALL_EXT
         debug "Dir name: $(distd "${_full_svc_dirname}"), snapshot-file: $(distd "${_ps_snap_file}")"
         if [ ! -f "${FILE_CACHE_DIR}${_ps_snap_file}" ]; then
             fetch_dset_zfs_stream "${_ps_elem}" "${_ps_snap_file}"
