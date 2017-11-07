@@ -56,7 +56,7 @@ show_logs () {
             debug "@ Loading tail of $(distd "${_all_count}") log files"
             eval "${TAIL_BIN} -F ${_all_files}" 2>&1
         else
-            note "@ No logs to attach to. LOGS_DIR=($(distn "${LOGS_DIR}")) contain no log files?"
+            note "@ No logs to attach to. LOGS_DIR=$(distn "${LOGS_DIR}") contain no log files?"
         fi
 
     elif [ "+" = "${_logf_pattern}" ]; then
@@ -69,7 +69,7 @@ show_logs () {
             debug "+ Loading tail of $(distd "${_all_count}") log files"
             eval "${TAIL_BIN} -n ${LOG_LINES_AMOUNT} -F ${_all_files}" 2>&1
         else
-            note "+ No logs to attach to. LOGS_DIR=($(distn "${LOGS_DIR}")) contain no log files?"
+            note "+ No logs to attach to. LOGS_DIR=$(distn "${LOGS_DIR}") contain no log files?"
         fi
 
     else
