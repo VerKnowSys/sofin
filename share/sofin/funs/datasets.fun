@@ -83,7 +83,7 @@ push_dset_zfs_stream () {
             fi
         fi
     else
-        warn "No service stream available for bundle: $(distw "${_pselement}")"
+        debug "No service stream available for bundle: $(distd "${_pselement}")"
     fi
     unset _psmirror _pselement _psfin_snapfile _psfin_snapfile _psversion_element
 }
