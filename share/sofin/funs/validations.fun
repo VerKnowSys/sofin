@@ -84,11 +84,11 @@ validate_archive_sha1 () {
     if [ ! -f "${_current_sha_file}" ] || \
                [ -z "${_sha1_value}" ]; then
         debug "No sha1 file available for archive, or sha1 value is empty! Removing local binary build(s) of: $(distd "${_archive_name}")"
-        try "${RM_BIN} -fv ${_archive_name} ${_current_sha_file}"
+        try "${RM_BIN} -f ${_archive_name} ${_current_sha_file}"
     fi
     if [ "${_current_archive_sha1}" != "${_sha1_value}" ]; then
-        debug "Bundle archive checksum doesn't match ($(distd "${_current_archive_sha1}") vs $(distd "${_sha1_value}")), removing binary builds and proceeding into build phase"
-        try "${RM_BIN} -fv ${_archive_name} ${_current_sha_file}"
+        debug "Bundle archive checksum doesn't match (is: $(distd "${_current_archive_sha1}") but got: $(distd "${_sha1_value}"), removing binary builds and proceeding into build phase"
+        try "${RM_BIN} -f ${_archive_name} ${_current_sha_file}"
     else
         note "Found correct prebuilt binary archive: $(distn "${_archive_name}")"
     fi

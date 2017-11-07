@@ -13,7 +13,7 @@ ${GIT_BIN} push --all "${SOFIN_ORIGIN}" >/dev/null && \
 ${GIT_BIN} push --tags "${SOFIN_ORIGIN}" >/dev/null
 
 note "Cleaning natives"
-${RM_BIN} -fv bin/s-* src/.*.o
+${RM_BIN} -f bin/s-* src/.*.o
 ${MKDIR_BIN} -p releases
 
 base_name="${SOFIN_NAME}-${SOFIN_VERSION}"

@@ -36,7 +36,7 @@ build_bundle () {
                     try "${MV_BIN} -fv ${FILE_CACHE_DIR}${_bsbelement}.old ${FILE_CACHE_DIR}${_bsbelement}.old ; ${MV_BIN} -fv ${FILE_CACHE_DIR}${_bsbelement}${DEFAULT_CHKSUM_EXT}.old ${FILE_CACHE_DIR}${_bsbelement}${DEFAULT_CHKSUM_EXT}" && \
                         debug "Checksums match! Upload unnecessary! Previous cache stream file was restored."
                 else
-                    try "${RM_BIN} -fv ${FILE_CACHE_DIR}${_bsbelement}.old ${FILE_CACHE_DIR}${_bsbelement}${DEFAULT_CHKSUM_EXT}.old" && \
+                    try "${RM_BIN} -f ${FILE_CACHE_DIR}${_bsbelement}.old ${FILE_CACHE_DIR}${_bsbelement}${DEFAULT_CHKSUM_EXT}.old" && \
                         debug "Checksum didn't match. New stream will be used to upload bundle stream. Previous cache stream file was removed."
                 fi
             fi

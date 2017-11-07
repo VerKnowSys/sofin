@@ -210,7 +210,7 @@ reset_defs () {
         unset _add_opt
         try "${PRINTF_BIN} '%s' \"${line}\" 2>/dev/null | ${EGREP_BIN} \"patches/\"" && \
             _add_opt="r"
-        try "${RM_BIN} -fv${_add_opt} '${line}'" && \
+        try "${RM_BIN} -f${_add_opt} '${line}'" && \
             debug "Removed untracked file${_add_opt:-/dir} from definition repository: $(distd "${line}")"
     done
     cd "${_cwd}"
