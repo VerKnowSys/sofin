@@ -6,7 +6,6 @@ Bash
 Bison
 Bison27
 Boost
-Boost-minimal
 Boost-static
 Cdrtools
 Clamav
@@ -36,11 +35,9 @@ Httpd
 Httpd22
 Icecast
 ImageMagick
-Influxdb
 Jam
 Krb
 Lame
-Libgs
 Libressl
 Libgit2
 Lua51
@@ -54,7 +51,7 @@ Most
 Mosh
 Mpc
 Mpg123
-Mysql
+Mariadb
 Nasm
 Nano
 Ncmpcpp
@@ -87,7 +84,7 @@ Pure-ftpd
 Putty
 Python27
 Python35
-Redis3
+Redis
 Riak
 Ruby23
 Ruby24
