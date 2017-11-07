@@ -267,7 +267,7 @@ build () {
     done
 
     export_binaries "${_bund_lcase}"
-    after_export_callback
+    try after_export_callback
     after_export_snapshot
     validate_pie_on_exports "${_build_list}"
 
@@ -482,7 +482,7 @@ process_flat () {
                 debug "Definition-build-dir: $(distd "${_pwd}")"
 
                 cd "${_pwd}"
-                after_unpack_callback
+                try after_unpack_callback
                 cd "${_pwd}"
                 after_unpack_snapshot
 
@@ -491,7 +491,7 @@ process_flat () {
                 apply_definition_patches "${DEF_NAME}${DEF_SUFFIX}"
 
                 cd "${_pwd}"
-                after_patch_callback
+                try after_patch_callback
                 cd "${_pwd}"
                 after_patch_snapshot
                 cd "${_pwd}"
@@ -623,7 +623,7 @@ process_flat () {
                 try "${INSTALL_BIN} \"${_cmake_error_log}\" \"${_cmake_config_log}.error\""
 
                 cd "${_pwd}"
-                after_configure_callback
+                try after_configure_callback
                 cd "${_pwd}"
                 after_configure_snapshot
             else
@@ -636,7 +636,7 @@ process_flat () {
             run "${DEF_MAKE_METHOD}"
 
             cd "${_pwd}"
-            after_make_callback
+            try after_make_callback
             cd "${_pwd}"
             after_make_snapshot
 
@@ -661,7 +661,7 @@ process_flat () {
                 note "   ${WARN_CHAR} Tests for definition: $(distn "${_app_param}") skipped on demand"
             fi
             cd "${_pwd}"
-            after_test_callback
+            try after_test_callback
             cd "${_pwd}"
             after_test_snapshot
 
@@ -677,7 +677,7 @@ process_flat () {
             run "${DEF_INSTALL_METHOD}"
 
             cd "${_pwd}"
-            after_install_callback
+            try after_install_callback
             cd "${_pwd}"
             after_install_snapshot
 
