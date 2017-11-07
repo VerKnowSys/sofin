@@ -620,39 +620,49 @@ export_binaries () {
     load_defs "${_ebdef_name}"
     conflict_resolve
 
-    if [ -z "${PREFIX}" ]; then
-        PREFIX="${SOFTWARE_DIR}/$(capitalize "${DEF_NAME}${DEF_SUFFIX}")"
-        debug "An empty prefix in export_binaries() for $(distd "${_ebdef_name}"). Resetting to: $(distd "${PREFIX}")"
-    fi
     if [ -d "${PREFIX}/exports-disabled" ]; then # just bring back disabled exports
-        debug "Moving $(distd "${PREFIX}/exports-disabled") to $(distd "${PREFIX}/exports")"
-        run "${MV_BIN} -v ${PREFIX}/exports-disabled ${PREFIX}/exports"
+        debug "Exporting back previously disabled exports dir from: '$(distd "${PREFIX}/exports-disabled")' to '$(distd "${PREFIX}/exports")'"
+        run "${MV_BIN} ${PREFIX}/exports-disabled ${PREFIX}/exports"
+    fi
+    if [ -d "${SERVICE_DIR}/exports-disabled" ]; then # just bring back disabled exports
+        debug "Exporting back previously disabled exports dir from: '$(distd "${SERVICE_DIR}/exports-disabled")' to '$(distd "${SERVICE_DIR}/exports")'"
+        run "${MV_BIN} ${SERVICE_DIR}/exports-disabled ${SERVICE_DIR}/exports"
     fi
     if [ -z "${DEF_EXPORTS}" ]; then
         note "Defined no exports of prefix: $(distn "${PREFIX}")"
     else
         _an_amount="$(${PRINTF_BIN} '%s\n' "${DEF_EXPORTS}" | ${WC_BIN} -w 2>/dev/null | ${TR_BIN} -d '\t|\r|\ ' 2>/dev/null)"
         debug "Exporting $(distd "${_an_amount}") binaries of prefix: $(distd "${PREFIX}")"
-        try "${MKDIR_BIN} -p ${PREFIX}/exports"
-        _expolist=""
+        try "${MKDIR_BIN} -p ${PREFIX}/exports ${SERVICE_DIR}/exports"
+        unset _expolist
         for _xp in $(to_iter "${DEF_EXPORTS}"); do
             for dir in "/bin/" "/sbin/" "/libexec/"; do
-                _afile_to_exp="${PREFIX}${dir}${_xp}"
-                if [ -f "${_afile_to_exp}" ]; then # a file
-                    if [ -x "${_afile_to_exp}" ]; then # and it's executable'
-                        _acurrdir="$(${PWD_BIN} 2>/dev/null)"
-                        cd "${PREFIX}${dir}"
-                        run "${LN_BIN} -fs ..${dir}${_xp} ../exports/${_xp}"
-                        cd "${_acurrdir}"
-                        _expo_elem="${_afile_to_exp##*/}"
-                        _expolist="${_expolist} ${_expo_elem}"
-                    fi
+
+                _soft_to_exp="${PREFIX}${dir}${_xp}"
+                if [ -x "${_soft_to_exp}" ]; then
+                    _acurrdir="$(${PWD_BIN} 2>/dev/null)"
+                    cd "${PREFIX}${dir}"
+                    run "${LN_BIN} -fs ..${dir}${_xp} ../exports/${_xp}"
+                    cd "${_acurrdir}"
+                    _expo_elem="${_soft_to_exp##*/}"
+                    _expolist="${_expolist} ${_expo_elem}"
                 fi
+
+                _service_to_exp="${SERVICE_DIR}${dir}${_xp}"
+                if [ -x "${_service_to_exp}" ]; then
+                    _acurrdir="$(${PWD_BIN} 2>/dev/null)"
+                    cd "${PREFIX}${dir}"
+                    run "${LN_BIN} -fs ..${dir}${_xp} ../exports/${_xp}"
+                    cd "${_acurrdir}"
+                    _expo_elem="${_service_to_exp##*/}"
+                    _expolist="${_expolist} ${_expo_elem}"
+                fi
+
             done
         done
         debug "List of exports: $(distd "${_expolist}")"
     fi
-    unset _expo_elem _acurrdir _afile_to_exp _an_amount _expolist _ebdef_name
+    unset _expo_elem _acurrdir _an_amount _expolist _ebdef_name _soft_to_exp _service_to_exp
 }
 
 
