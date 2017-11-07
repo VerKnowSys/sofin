@@ -492,17 +492,15 @@ strip_bundle () {
     for _stripdir in $(to_iter "${_dirs_to_strip}"); do
         if [ -d "${_stripdir}" ]; then
             for _file in $(${FIND_BIN} "${_stripdir}" -maxdepth 1 -type f 2>/dev/null); do
-                _bundlower="$(lowercase "${DEF_NAME}${DEF_SUFFIX}")"
-                if [ -n "${_bundlower}" ]; then
-                    try "${STRIP_BIN} ${DEFAULT_STRIP_OPTS} ${_file} > /dev/null 2>&1"
-                else
-                    try "${STRIP_BIN} ${DEFAULT_STRIP_OPTS} ${_file} > /dev/null 2>&1"
-                fi
-                if [ "${?}" = "0" ]; then
-                    _counter="${_counter} + 1"
-                else
-                    _counter="${_counter} - 1"
-                fi
+                _file_type="$(${FILE_BIN} -b "${_file}" 2>/dev/null)"
+                for _type in "${_exec_ft}" "${_lib_ft}" "${_universal_ft}"; do
+                    echo "'${_file_type}'" | ${GREP_BIN} -F "${_type}" >/dev/null 2>&1
+                    if [ "0" = "${?}" ]; then
+                        _counter="${_counter} + 1"
+                        _strip_list="${_file} ${_strip_list}"
+                        debug "strip( file=$(distd "${_file}"), type=$(distd "${_type}"), full_type=$(distd "${_file_type}") )"
+                    fi
+                done
             done
         fi
     done
