@@ -505,14 +505,16 @@ strip_bundle () {
         fi
     done
     _sbresult="$(calculate_bc "${_counter}")"
-    if [ "${_sbresult}" -lt "0" ] || \
-       [ -z "${_sbresult}" ]; then
+    if [ "${_sbresult}" -lt "0" ] || [ -z "${_sbresult}" ]; then
         _sbresult="0"
+    else
+        debug "Found: $(distd "${_sbresult}") files to strip."
+        if [ -n "${_strip_list}" ]; then
+            try "${STRIP_BIN} ${DEFAULT_STRIP_OPTS} ${_strip_list} > /dev/null"
+        fi
+        run "${TOUCH_BIN} ${PREFIX}/${_sbfdefinition_name}${DEFAULT_STRIPPED_MARK_EXT}"
     fi
-    run "${TOUCH_BIN} ${PREFIX}/${_sbfdefinition_name}${DEFAULT_STRIPPED_MARK_EXT}" && \
-        debug "$(distd "${_sbresult}") files were stripped. Strip indicator touched!"
-
-    unset _sbfdefinition_name _dirs_to_strip _sbresult _counter _files _stripdir _bundlower
+    unset _sbfdefinition_name _dirs_to_strip _sbresult _counter _files _stripdir _bundlower _strip_list
 }
 
 
