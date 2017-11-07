@@ -259,7 +259,7 @@ build () {
                         permnote "  $(distn "${_bund_lcase}") ($(distn 1) of $(distn "${_req_all}"))"
                         process_flat "${_bund_lcase}" "${PREFIX}" "${_bund_name}"
                         mark_installed "${DEF_NAME}${DEF_SUFFIX}" "${DEF_VERSION}"
-                        permnote "$(distn "${SUCCESS_CHAR}") $(distn "${_bund_lcase}") [$(distn "${DEF_VERSION}")]"
+                        permnote "$(distn "${SUCCESS_CHAR}") $(distn "${_bund_name}") [$(distn "${DEF_VERSION}")]"
                     fi
                 fi
             done
