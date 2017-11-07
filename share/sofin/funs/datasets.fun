@@ -152,7 +152,10 @@ build_service_dataset () {
             else
                 debug "Service origin unavailable! Creating new one."
                 try "${MKDIR_BIN} -p ${SERVICES_DIR}/${_ps_elem}"
-                run "${TAR_BIN} cJf ${FILE_CACHE_DIR}${_ps_snap_file} ${SERVICES_DIR}/${_ps_elem}"
+                _pwd="$(${PWD_BIN} 2>/dev/null)"
+                cd "${SERVICES_DIR}"
+                run "${TAR_BIN} cJf ${FILE_CACHE_DIR}${_ps_snap_file} ${_ps_elem}"
+                cd "${_pwd}"
                 _snap_size="$(file_size "${FILE_CACHE_DIR}${_ps_snap_file}")"
                 if [ "${_snap_size}" = "0" ]; then
                     try "${RM_BIN} -f ${FILE_CACHE_DIR}${_ps_snap_file}"
