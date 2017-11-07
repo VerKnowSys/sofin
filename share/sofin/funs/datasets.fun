@@ -337,14 +337,14 @@ receive_origin () {
     _origin_name="${_head}-${ORIGIN_ZFS_SNAP_NAME}${DEFAULT_SOFTWARE_SNAPSHOT_EXT}"
     _origin_file="${FILE_CACHE_DIR}/${_origin_name}"
     if [ ! -f "${_origin_file}" ]; then
-        run "${FETCH_BIN} -o ${_origin_file} ${FETCH_OPTS} ${MAIN_COMMON_REPOSITORY}/${_origin_name}" && \
-            debug "Origin fetched successfully: $(distd "${_origin_name}")"
+        run "${FETCH_BIN} -o ${_origin_file} ${FETCH_OPTS} ${MAIN_COMMON_REPOSITORY}/${_origin_name}" \
+            && debug "Origin fetched successfully: $(distd "${_origin_name}")"
     fi
     if [ -f "${_origin_file}" ]; then
-        debug "_dname: $(distd "${_dname}")"
+        debug "DataSet: $(distd "${_dname}")"
         # NOTE: each user dataset is made of same origin, hence you can apply snapshots amongst them..
-        run "${XZCAT_BIN} "${_origin_file}" | ${ZFS_BIN} receive ${ZFS_RECEIVE_OPTS} '${_dname}' | ${TAIL_BIN} -n1 2>/dev/null" && \
-            debug "Origin received successfully: $(distd "${_origin_name}")"
+        run "${XZCAT_BIN} \"${_origin_file}\" | ${ZFS_BIN} receive ${ZFS_RECEIVE_OPTS} '${_dname}' | ${TAIL_BIN} -n1 2>/dev/null" \
+            && debug "Origin received successfully: $(distd "${_origin_name}")"
     else
         error "No origin file available! That's mandatory to have this file: $(diste "${_origin_file}")"
     fi
