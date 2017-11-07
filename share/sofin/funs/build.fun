@@ -234,7 +234,7 @@ build () {
                             permnote "  $(distn "${_req}") ($(distn "${_req_amount}") of $(distn "${_req_all}") remaining)"
                             if [ ! -f "${PREFIX}/${_req}${DEFAULT_INST_MARK_EXT}" ]; then
                                 CHANGED=YES
-                                process_flat "${_req}" "${PREFIX}" "${_bund_name}"
+                                process_flat "${_req}" "${PREFIX}"
                             fi
                         fi
                         _req_amount="$(calculate_bc "${_req_amount} - 1")"
@@ -246,7 +246,7 @@ build () {
                         if [ "${CHANGED}" = "YES" ]; then
                             permnote "  $(distn "${_bund_lcase}") ($(distn 1) of $(distn "${_req_all}"))"
                             note "   ${NOTE_CHAR} Definition dependencies has changed. Rebuilding: $(distn "${_bund_lcase}")"
-                            process_flat "${_bund_lcase}" "${PREFIX}" "${_bund_name}"
+                            process_flat "${_bund_lcase}" "${PREFIX}"
                             unset CHANGED
                             mark_installed "${DEF_NAME}${DEF_SUFFIX}" "${DEF_VERSION}"
                             show_done "${DEF_NAME}${DEF_SUFFIX}"
@@ -257,7 +257,7 @@ build () {
                         fi
                     else
                         permnote "  $(distn "${_bund_lcase}") ($(distn 1) of $(distn "${_req_all}"))"
-                        process_flat "${_bund_lcase}" "${PREFIX}" "${_bund_name}"
+                        process_flat "${_bund_lcase}" "${PREFIX}"
                         mark_installed "${DEF_NAME}${DEF_SUFFIX}" "${DEF_VERSION}"
                         permnote "$(distn "${SUCCESS_CHAR}") $(distn "${_bund_name}") [$(distn "${DEF_VERSION}")]"
                     fi
@@ -400,7 +400,7 @@ process_flat () {
                             _bname="${_dest_file##*/}"
                             try "${RM_BIN} -f ${_dest_file}" && \
                                 debug "Removed corrupted cache file: $(distd "${_bname}") and retrying.."
-                            process_flat "${_app_param}" "${_prefix}" "${_bundlnm}"
+                            process_flat "${_app_param}" "${_prefix}"
                         fi
                         unset _bname _a_file_checksum
                     fi
