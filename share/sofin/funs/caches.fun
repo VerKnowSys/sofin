@@ -23,7 +23,7 @@ show_logs () {
             debug "@ Loading tail of $(distd "${_all_count}") log files"
             eval "${TAIL_BIN} -F ${_all_files}" 2>&1
         else
-            note "@ No logs to attach to. LOGS_DIR=$(distn "${LOGS_DIR}") contain no log files?"
+            note "@ No logs to attach to. LOGS_DIR='$(distn "${LOGS_DIR}")' contain no log files?"
         fi
 
     elif [ "+" = "${_logf_pattern}" ]; then
@@ -36,13 +36,13 @@ show_logs () {
             debug "+ Loading tail of $(distd "${_all_count}") log files"
             eval "${TAIL_BIN} -n ${LOG_LINES_AMOUNT} -F ${_all_files}" 2>&1
         else
-            note "+ No logs to attach to. LOGS_DIR=$(distn "${LOGS_DIR}") contain no log files?"
+            note "+ No logs to attach to. LOGS_DIR='$(distn "${LOGS_DIR}")' contain no log files?"
         fi
 
     else
         if [ -d "${LOGS_DIR}" ]; then
             _patie="${LOGS_DIR}${SOFIN_NAME}-${_logf_pattern}"
-            note "Show long log + tail, with using pattern: $(distd "${_patie}")"
+            note "Show long tail with file pattern: '$(distd "${_patie}")'"
             ${TAIL_BIN} -F -n "$(calculate_bc "50 + ${LOG_LINES_AMOUNT}")" ${_patie}* 2>&1
         else
             note "No log match='$(distn "${_logf_pattern}")' contains no pattern or name."
