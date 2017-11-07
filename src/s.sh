@@ -225,6 +225,7 @@ if [ -n "${SOFIN_COMMAND}" ]; then
             for _b in $(to_iter "${_pickd_bundls}"); do
                 build "${_b}"
             done
+            note "Installed: $(distn "${_pickd_bundls}")"
             unset _pickd_bundls _b
             finalize
             ;;
@@ -311,6 +312,14 @@ if [ -n "${SOFIN_COMMAND}" ]; then
             initialize
             fail_on_bg_job "${SOFIN_ARGS}"
             remove_bundles "${SOFIN_ARGS}"
+            for _arg in $(to_iter "${SOFIN_ARGS}"); do
+                _caparg="$(capitalize "${_arg}")"
+                debug "Removing bundle from: $(distd "${SERVICES_DIR}/${_caparg}")"
+                if [ -d "${SERVICES_DIR}/${_caparg}" ]; then
+                    permnote "Service dir present for: $(distn "${_caparg}")"
+                fi
+            done
+            note "Removed software: $(distn "${SOFIN_ARGS}")"
             finalize
             ;;
 

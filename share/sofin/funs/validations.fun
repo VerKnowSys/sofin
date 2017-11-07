@@ -90,7 +90,7 @@ validate_archive_sha1 () {
         debug "Bundle archive checksum doesn't match (is: $(distd "${_current_archive_sha1}") but got: $(distd "${_sha1_value}"), removing binary builds and proceeding into build phase"
         try "${RM_BIN} -f ${_archive_name} ${_current_sha_file}"
     else
-        permnote "Found correct prebuilt binary archive: $(distn "${_archive_name##*/}")"
+        permnote "Cached archive found: $(distn "${_archive_name##*/}")"
     fi
     unset _sha1_value _current_sha_file _current_archive_sha1 _archive_name
 }
