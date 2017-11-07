@@ -33,7 +33,7 @@ enable_sofin_env () {
         _envs="Doas Git Mc Vim Sofin Zsh"
     fi
     debug "Enabling Sofin env for: $(distd "${_envs}")"
-    for _env in $(echo "${_envs}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
+    for _env in $(to_iter "${_envs}"); do
         ${GREP_BIN} -F "${_env}" "${SOFIN_ENV_ENABLED_INDICATOR_FILE}" >/dev/null 2>&1 || \
             ${PRINTF_BIN} "%s\n" "${_env}" >> "${SOFIN_ENV_ENABLED_INDICATOR_FILE}"
     done
@@ -52,7 +52,7 @@ disable_sofin_env () {
         debug "Wiping out environment for @!"
         ${RM_BIN} -f "${SOFIN_ENV_ENABLED_INDICATOR_FILE}"
     else
-        for _env in $(echo "${_envs}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
+        for _env in $(to_iter "${_envs}"); do
             ${SED_BIN} -i '' -e "/^.*${_env}.*$/ d" "${SOFIN_ENV_ENABLED_INDICATOR_FILE}" 2>/dev/null
         done
         note "Disabled Sofin environment for bundles: $(distn "${_envs}")"
@@ -390,7 +390,7 @@ create_lock () {
 
 acquire_lock_for () {
     _bundles="${*}"
-    for _bundle in $(echo "${_bundles}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
+    for _bundle in $(to_iter "${_bundles}"); do
         debug "Acquiring lock for bundle: [$(distd "${_bundle}")]"
         if [ -f "${LOCKS_DIR}${_bundle}${DEFAULT_LOCK_EXT}" ]; then
             _lock_pid="$(${CAT_BIN} "${LOCKS_DIR}${_bundle}${DEFAULT_LOCK_EXT}" 2>/dev/null)"

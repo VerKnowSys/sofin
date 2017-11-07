@@ -144,7 +144,7 @@ validate_definition_disabled () {
     unset DEF_DISABLED_ON
     # check requirement for disabled state:
     if [ -n "${_ch_dis_name}" ]; then
-        for _def_disabled in $(echo "${_ch_dis_name}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
+        for _def_disabled in $(to_iter "${_ch_dis_name}"); do
             if [ "${SYSTEM_NAME}" = "${_def_disabled}" ]; then
                 debug "Disabled: $(distd "${_def_disabled}") on $(distd "${SYSTEM_NAME}")"
                 DEF_DISABLED_ON=YES
@@ -161,7 +161,7 @@ validate_pie_on_exports () {
     fi
     if [ "YES" = "${CAP_SYS_HARDENED}" ]; then
         debug "Checking PIE on exports: $(distd "${_bundz}")"
-        for _bun in $(echo "${_bundz}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
+        for _bun in $(to_iter "${_bundz}"); do
             if [ -d "${SOFTWARE_DIR}/${_bun}/exports" ]; then
                 _a_dir="${SOFTWARE_DIR}/${_bun}/exports"
             elif [ -d "${SOFTWARE_DIR}/${_bun}/exports-disabled" ]; then

@@ -87,7 +87,7 @@ pretouch_logs () {
     if [ -z "${CAP_SYS_PRODUCTION}" ]; then
         debug "Logs pretouch called with params: $(distd "${_params}")"
         unset _pret_list
-        for _app in $(echo "${_params}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
+        for _app in $(to_iter "${_params}"); do
             if [ -z "${_app}" ]; then
                 debug "Empty app given out of params: $(distd "${_params}")?"
             else

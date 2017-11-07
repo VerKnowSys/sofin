@@ -158,7 +158,7 @@ if [ -n "${SOFIN_COMMAND}" ]; then
                         _cfl="${DEFAULT_COMPILER_FLAGS}"
                         _cxxfl="-std=c++11 ${_cfl}"
                         _pth="${DEFAULT_PATH}"
-                        for _abundle in $(echo "${_bundles}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
+                        for _abundle in $(to_iter "${_bundles}"); do
                             if [ -d "${SOFTWARE_DIR}/${_abundle}/exports" ]; then
                                 _pth="${SOFTWARE_DIR}/${_abundle}/exports:${_pth}"
                             fi
@@ -222,7 +222,7 @@ if [ -n "${SOFIN_COMMAND}" ]; then
             else
                 _pickd_bundls="${SOFIN_ARGS}"
             fi
-            for _b in $(echo "${_pickd_bundls}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
+            for _b in $(to_iter "${_pickd_bundls}"); do
                 build "${_b}"
             done
             unset _pickd_bundls _b
@@ -242,7 +242,7 @@ if [ -n "${SOFIN_COMMAND}" ]; then
             _pickd_bundls="$(${CAT_BIN} "${DEFAULT_PROJECT_DEPS_LIST_FILE}" 2>/dev/null | eval "${NEWLINES_TO_SPACES_GUARD}")"
             _bundls_amount="$(${PRINTF_BIN} '%s\n' "${_pickd_bundls}" | eval "${WORDS_COUNT_GUARD}")"
             note "Dependencies list file found with $(distn "${_bundls_amount}") elements in order: $(distn "${_pickd_bundls}")"
-            for _b in $(echo "${_pickd_bundls}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
+            for _b in $(to_iter "${_pickd_bundls}"); do
                 debug "Buiding software: $(distd "${_b}") for: $(distd "${OS_TRIPPLE}")"
                 build "${_b}"
             done
@@ -268,7 +268,7 @@ if [ -n "${SOFIN_COMMAND}" ]; then
             fail_on_bg_job "${SOFIN_ARGS}"
             USE_UPDATE=NO
             USE_BINBUILD=NO
-            for _b in $(echo "${_to_be_built}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
+            for _b in $(to_iter "${SOFIN_ARGS}"); do
                 build "${_b}"
             done
             unset _b

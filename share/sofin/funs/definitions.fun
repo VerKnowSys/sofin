@@ -3,7 +3,7 @@ load_defs () {
     if [ -z "${_definitions}" ]; then
         error "No definition name specified!"
     else
-        for _given_def in $(echo "${_definitions}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
+        for _given_def in $(to_iter "${_definitions}"); do
             #echo "# L: ${_given_def}"
             _name_base="${_given_def##*/}"
             _def="$(lowercase "${_name_base}")"
@@ -247,7 +247,7 @@ remove_bundles () {
     fi
 
     load_defaults
-    for _def in $(echo "${_picked_bundles}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
+    for _def in $(to_iter "${_picked_bundles}"); do
         _given_name="$(capitalize "${_def}")"
         if [ -z "${_given_name}" ]; then
             error "Empty bundle name given as first param!"
@@ -377,7 +377,7 @@ wipe_remote_archives () {
     fi
     if [ "${_ans}" = "YES" ]; then
         cd "${SOFTWARE_DIR}"
-        for _wr_element in $(echo "${_bund_names}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
+        for _wr_element in $(to_iter "${_bund_names}"); do
             _lowercase_element="$(lowercase "${_wr_element}")"
             _remote_ar_name="${_wr_element}-"
             _wr_dig="$(${HOST_BIN} A "${MAIN_SOFTWARE_ADDRESS}" 2>/dev/null | ${GREP_BIN} 'Address:' 2>/dev/null | eval "${HOST_ADDRESS_GUARD}")"
@@ -385,7 +385,7 @@ wipe_remote_archives () {
                 error "No mirrors found in address: $(diste "${MAIN_SOFTWARE_ADDRESS}")"
             fi
             debug "Using defined mirror(s): $(distd "${_wr_dig}")"
-            for _wr_mirr in $(echo "${_wr_dig}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
+            for _wr_mirr in $(to_iter "${_wr_dig}"); do
                 note "Wiping out remote: $(distn "${_wr_mirr}") binary archives: $(distn "${_remote_ar_name}")"
                 retry "${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_SSH_PORT} ${SOFIN_NAME}@${_wr_mirr} \"${FIND_BIN} ${MAIN_BINARY_PREFIX}/${SYS_SPECIFIC_BINARY_REMOTE} -iname '${_remote_ar_name}' -delete\""
             done
@@ -468,7 +468,7 @@ strip_bundle () {
     esac
 
     _counter="0"
-    for _stripdir in $(echo "${_dirs_to_strip}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
+    for _stripdir in $(to_iter "${_dirs_to_strip}"); do
         if [ -d "${_stripdir}" ]; then
             for _file in $(${FIND_BIN} "${_stripdir}" -maxdepth 1 -type f 2>/dev/null); do
                 _bundlower="$(lowercase "${DEF_NAME}${DEF_SUFFIX}")"
@@ -505,7 +505,7 @@ track_useful_and_useless_files () {
             # step 0: clean defaults side DEF_DEFAULT_USELESS entries only if DEF_USEFUL is empty
             if [ -n "${DEF_DEFAULT_USELESS}" ] && \
                [ -z "${DEF_USEFUL}" ]; then
-                for _cu_pattern in $(echo "${DEF_DEFAULT_USELESS}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
+                for _cu_pattern in $(to_iter "${DEF_DEFAULT_USELESS}"); do
                     if [ -e "${PREFIX}/${_cu_pattern}" ]; then
                         if [ -z "${_fordel}" ]; then
                             _fordel="${PREFIX}/${_cu_pattern}"
@@ -520,7 +520,7 @@ track_useful_and_useless_files () {
 
             # step 1: clean definition side DEF_USELESS entries only if DEF_USEFUL is empty
             if [ -n "${DEF_USELESS}" ]; then
-                for _cu_pattern in $(echo "${DEF_USELESS}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
+                for _cu_pattern in $(to_iter "${DEF_USELESS}"); do
                     if [ -n "${_cu_pattern}" ]; then
                         if [ -z "${_fordel}" ]; then
                             _fordel="${PREFIX}/${_cu_pattern}"
@@ -548,7 +548,7 @@ track_useful_and_useless_files () {
                         fi
                     else
                         # traverse through DEF_USEFUL for _cufile patterns required by software but not exported
-                        for _is_useful in $(echo "${DEF_USEFUL}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
+                        for _is_useful in $(to_iter "${DEF_USEFUL}"); do
                             # NOTE: split each by /, first argument will be subpath for instance: "bin"; second one - file pattern
                             # NOTE: legacy shell string ops sneak peak below:
                             #   ${var#*SubStr}  # will drop begin of string upto first occur of `SubStr`
@@ -597,7 +597,7 @@ track_useful_and_useless_files () {
 conflict_resolve () {
     if [ -n "${DEF_CONFLICTS_WITH}" ]; then
         debug "Seeking possible bundle conflicts: $(distd "${DEF_CONFLICTS_WITH}")"
-        for _cr_app in $(echo "${DEF_CONFLICTS_WITH}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
+        for _cr_app in $(to_iter "${DEF_CONFLICTS_WITH}"); do
             for _cr_name in $(${FIND_BIN} "${SOFTWARE_DIR}" -maxdepth 1 -type d -iname "${_cr_app}*" 2>/dev/null); do
                 _crn="${_cr_name##*/}"
                 if [ -d "${_cr_name}/exports" ]; then
@@ -636,7 +636,7 @@ export_binaries () {
         debug "Exporting $(distd "${_an_amount}") binaries of prefix: $(distd "${PREFIX}")"
         try "${MKDIR_BIN} -p ${PREFIX}/exports"
         _expolist=""
-        for _xp in $(echo "${DEF_EXPORTS}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
+        for _xp in $(to_iter "${DEF_EXPORTS}"); do
             for dir in "/bin/" "/sbin/" "/libexec/"; do
                 _afile_to_exp="${PREFIX}${dir}${_xp}"
                 if [ -f "${_afile_to_exp}" ]; then # a file
@@ -715,7 +715,7 @@ after_install_callback () {
 
 traverse_patchlevels () {
     _trav_patches="${*}"
-    for _patch in $(echo "${_trav_patches}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
+    for _patch in $(to_iter "${_trav_patches}"); do
         for _level in $(${SEQ_BIN} 0 3); do # Up to: -p3
             try "${PATCH_BIN} -p${_level} -N -f -i ${_patch}" && \
                 debug "Patch applied: $(distd "${_patch##*/}") (level: $(distd "${_level}"))" && \

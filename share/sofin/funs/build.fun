@@ -51,7 +51,7 @@ push_binbuilds () {
     if [ -z "${_push_bundles}" ]; then
         error "At least single argument with $(diste "BundleName") to push is required!"
     fi
-    for _pbelement in $(echo "${_push_bundles}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
+    for _pbelement in $(to_iter "${_push_bundles}"); do
         _pblowercase_element="$(lowercase "${_pbelement}")"
         if [ -z "${_pblowercase_element}" ]; then
             error "Lowercase bundle name is empty!"
@@ -76,7 +76,7 @@ push_binbuilds () {
 
 deploy_binbuild () {
     _dbbundles="${*}"
-    for _dbbundle in $(echo "${_dbbundles}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
+    for _dbbundle in $(to_iter "${_dbbundles}"); do
         USE_BINBUILD=NO
         build "${_dbbundle}"
         push_binbuilds "${_dbbundle}"
@@ -142,7 +142,7 @@ build () {
 
     debug "Sofin v$(distd "${SOFIN_VERSION}"): New build started for bundles: $(distd "${_build_list}")"
     PATH="${DEFAULT_PATH}"
-    for _bund_name in $(echo "${_build_list}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
+    for _bund_name in $(to_iter "${_build_list}"); do
         _bund_name="$(lowercase "${_bund_name}")"
         _anm="$(capitalize "${_bund_name}")"
         load_defaults
@@ -223,7 +223,7 @@ build () {
                     _req_amount="$(${PRINTF_BIN} '%s\n' "${DEF_REQUIREMENTS}" | ${WC_BIN} -w 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)"
                     _req_amount="$(calculate_bc "${_req_amount} + 1")"
                     _req_all="${_req_amount}"
-                    for _req in $(echo "${DEF_REQUIREMENTS}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
+                    for _req in $(to_iter "${DEF_REQUIREMENTS}"); do
                         if [ -n "${DEF_USER_INFO}" ]; then
                             warn "${DEF_USER_INFO}"
                         fi
@@ -457,7 +457,7 @@ process_flat () {
                     if [ -z "${_inherited}" ]; then
                         error "No source dir found for definition: $(diste "${_app_param}")?"
                     else
-                        for _inh in $(echo "${_inherited}" | ${TR_BIN} ' ' '\n' 2>/dev/null); do
+                        for _inh in $(to_iter "${_inherited}"); do
                             debug "Trying inherited value: $(distd "${_inh}")"
                             _fd="$(${FIND_BIN} "${BUILD_DIR}" -maxdepth 1 -mindepth 1 -type d -iname "*${_inh}*${DEF_VERSION}*" 2>/dev/null | ${HEAD_BIN} -n1 2>/dev/null)"
                             if [ -n "${_fd}" ]; then
