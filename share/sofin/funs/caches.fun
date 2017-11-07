@@ -49,7 +49,7 @@ show_logs () {
     elif [ "@" = "${_logf_pattern}" ]; then
         if [ -d "${LOGS_DIR}" ]; then
             unset _all_files
-            for _mr in $(${FIND_BIN} "${LOGS_DIR%/}" -name "${SOFIN_NAME}*" -not -name "*.log.*" -type f 2>/dev/null); do
+            for _mr in $(${FIND_BIN} "${LOGS_DIR%/}" -name "${SOFIN_NAME}*" -not -name "*.log" -not -name "*.help" -type f 2>/dev/null); do
                 _all_files="${_mr} ${_all_files}"
             done
             _all_count="$(echo "${_all_files}" | env "${WORDS_COUNT_GUARD}")"

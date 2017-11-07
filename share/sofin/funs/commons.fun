@@ -148,7 +148,8 @@ find_most_recent () {
                 -type "${_frtype}" \
                 -name "${_frmatcher}" \
                 -not -name "*.strip" \
-                -not -name "*.log.*" \
+                -not -name "*.log" \
+                -not -name "*.help" \
                 -exec "${STAT_BIN}" -f '%m %N' {} \; \
                 2>> "${LOG}" | \
                 ${SORT_BIN} -nr 2>/dev/null | \
