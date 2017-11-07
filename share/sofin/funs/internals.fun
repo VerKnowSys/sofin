@@ -116,6 +116,7 @@ print_shell_vars () {
     done
 
     if [ -f "${SOFIN_ENV_ENABLED_INDICATOR_FILE}" ]; then
+        # /Software
         for _enabled in $(${CAT_BIN} "${SOFIN_ENV_ENABLED_INDICATOR_FILE}" 2>/dev/null); do
             if [ -d "${SOFTWARE_DIR}/${_enabled}/exports" ]; then
                 _path="${SOFTWARE_DIR}/${_enabled}/exports:${_path}"
@@ -133,7 +134,28 @@ print_shell_vars () {
                 _pkg_config_path="${SOFTWARE_DIR}/${_enabled}/lib/pkgconfig:${_pkg_config_path}"
             fi
         done
+
+        # /Services
+        for _enabled in $(${CAT_BIN} "${SOFIN_ENV_ENABLED_INDICATOR_FILE}" 2>/dev/null); do
+            if [ -d "${SERVICES_DIR}/${_enabled}/exports" ]; then
+                _path="${SERVICES_DIR}/${_enabled}/exports:${_path}"
+            fi
+            if [ -d "${SERVICES_DIR}/${_enabled}/include" ]; then
+                _cflags="-I${SERVICES_DIR}/${_enabled}/include ${_cflags}"
+            fi
+            if [ -d "${SERVICES_DIR}/${_enabled}/include" ]; then
+                _cxxflags="-I${SERVICES_DIR}/${_enabled}/include ${_cxxflags}"
+            fi
+            if [ -d "${SERVICES_DIR}/${_enabled}/lib" ]; then
+                _ldflags="-L${SERVICES_DIR}/${_enabled}/lib ${_ldflags}"
+            fi
+            if [ -d "${SERVICES_DIR}/${_enabled}/lib/pkgconfig" ]; then
+                _pkg_config_path="${SERVICES_DIR}/${_enabled}/lib/pkgconfig:${_pkg_config_path}"
+            fi
+        done
+
     else
+        # /Software
         for _exp in $(${FIND_BIN} "${SOFTWARE_DIR}" -mindepth 2 -maxdepth 2 -name 'exports' -type d 2>/dev/null); do
             _path="${_exp}:${_path}"
         done
@@ -144,6 +166,20 @@ print_shell_vars () {
             _pkg_config_path="${_exp}:${_pkg_config_path}"
         done
         for _exp in $(${FIND_BIN} "${SOFTWARE_DIR}" -mindepth 2 -maxdepth 2 -name 'include' -type d 2>/dev/null); do
+            _cflags="-I${_exp} ${_cflags}"
+        done
+
+        # /Services
+        for _exp in $(${FIND_BIN} "${SERVICES_DIR}" -mindepth 2 -maxdepth 2 -name 'exports' -type d 2>/dev/null); do
+            _path="${_exp}:${_path}"
+        done
+        for _exp in $(${FIND_BIN} "${SERVICES_DIR}" -mindepth 2 -maxdepth 2 -name 'lib' -or -name 'libexec' -type d 2>/dev/null); do
+            _ldflags="-L${_exp} ${_ldflags}"
+        done
+        for _exp in $(${FIND_BIN} "${SERVICES_DIR}" -mindepth 2 -maxdepth 3 -name 'pkgconfig' -type d 2>/dev/null); do
+            _pkg_config_path="${_exp}:${_pkg_config_path}"
+        done
+        for _exp in $(${FIND_BIN} "${SERVICES_DIR}" -mindepth 2 -maxdepth 2 -name 'include' -type d 2>/dev/null); do
             _cflags="-I${_exp} ${_cflags}"
         done
     fi
