@@ -255,7 +255,7 @@ remove_bundles () {
         if [ -d "${SOFTWARE_DIR}/${_given_name}" ]; then
             _aname="$(lowercase "${_given_name}")"
             destroy_software_dir "${_given_name}" && \
-                permnote "Removed bundle: $(distn "${_given_name}")"
+                permnote "Destroyed software dataset of: $(distn "${_given_name}")"
 
             # if removing a single bundle, then look for alternatives. Otherwise, just remove bundle..
             if [ "${_picked_bundles}" = "${_given_name}" ]; then
