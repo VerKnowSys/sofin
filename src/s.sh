@@ -311,15 +311,14 @@ if [ -n "${SOFIN_COMMAND}" ]; then
         delete|remove|uninstall|rm)
             initialize
             fail_on_bg_job "${SOFIN_ARGS}"
-            remove_bundles "${SOFIN_ARGS}"
             for _arg in $(to_iter "${SOFIN_ARGS}"); do
                 _caparg="$(capitalize "${_arg}")"
-                debug "Removing bundle from: $(distd "${SERVICES_DIR}/${_caparg}")"
-                if [ -d "${SERVICES_DIR}/${_caparg}" ]; then
-                    permnote "Service dir present for: $(distn "${_caparg}")"
+                if [ -z "${_caparg}" ]; then
+                    error "No software bundle names given?"
                 fi
             done
-            note "Removed software: $(distn "${SOFIN_ARGS}")"
+            remove_bundles "${SOFIN_ARGS}"
+            note "Removed bundle(s): $(distn "${SOFIN_ARGS}")"
             finalize
             ;;
 

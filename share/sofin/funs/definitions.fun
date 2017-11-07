@@ -247,6 +247,7 @@ remove_bundles () {
     fi
 
     load_defaults
+    unset _destroyed
     for _def in $(to_iter "${_picked_bundles}"); do
         _given_name="$(capitalize "${_def}")"
         if [ -z "${_given_name}" ]; then
@@ -254,8 +255,8 @@ remove_bundles () {
         fi
         if [ -d "${SOFTWARE_DIR}/${_given_name}" ]; then
             _aname="$(lowercase "${_given_name}")"
-            destroy_software_dir "${_given_name}" && \
-                permnote "Destroyed software dataset of: $(distn "${_given_name}")"
+            destroy_software_dir "${_given_name}" \
+                && _destroyed="${_given_name} ${_destroyed}"
 
             # if removing a single bundle, then look for alternatives. Otherwise, just remove bundle..
             if [ "${_picked_bundles}" = "${_given_name}" ]; then
@@ -277,7 +278,10 @@ remove_bundles () {
             fi
         fi
     done
-    unset _given_name _inname _alternative _aname _def _picked_bundles _bundle_name _bundle_nam
+    if [ -n "${_destroyed}" ]; then
+        permnote "Software dataset(s) destroyed: $(distn "${_destroyed}")"
+    fi
+    unset _given_name _inname _alternative _aname _def _picked_bundles _bundle_name _bundle_nam _destroyed
 }
 
 
