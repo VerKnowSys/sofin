@@ -103,36 +103,52 @@ if [ -n "${SOFIN_COMMAND}" ]; then
         e|env)
             case "${1}" in
 
-                +) # add
-                    shift
-                    _bundles="${*}"
-                    note "Added bundles: $(distn "${_bundles}") to current profile."
+                +*) # add N elements
+                    unset _bundles
+                    _all="${*}"
+                    for _in in $(to_iter "${_all}"); do
+                        _bundle="$(capitalize "${_in#+}")"
+                        if [ -e "${SOFTWARE_DIR}/${_bundle}" ]; then
+                            _bundles="${_bundle} ${_bundles}"
+                        fi
+                    done
+                    if [ -z "${_bundles}" ]; then
+                        return 0
+                    fi
                     enable_sofin_env "${_bundles}"
+                    note "Updated profile with new bundles: $(distn "${_bundles}")"
                     ;;
 
-                -) # remove
-                    shift
-                    _bundles="${*}"
-                    note "Removed bundles: $(distn "${_bundles}") from current profile."
+                -*) # remove N elements
+                    unset _bundles
+                    _all="${*}"
+                    for _in in $(to_iter "${_all}"); do
+                        _bundle="$(capitalize "${_in#-}")"
+                        if [ -e "${SOFTWARE_DIR}/${_bundle}" ]; then
+                            _bundles="${_bundle} ${_bundles}"
+                        fi
+                    done
+                    if [ -z "${_bundles}" ]; then
+                        return 0
+                    fi
                     disable_sofin_env "${_bundles}"
+                    note "Updated profile without bundles: $(distn "${_bundles}")"
                     ;;
 
-                !) # save
+                !) # save profile
                     shift
                     _fname="${SOFIN_ENV_ENABLED_INDICATOR_FILE}.${1}"
                     note "Storing new environment profile: $(distn "${_fname}")"
                     run "${INSTALL_BIN} ${SOFIN_ENV_ENABLED_INDICATOR_FILE} ${_fname}"
                     ;;
 
-                ^) # load
+                ^) # load profile
                     shift
                     _name="${1}"
                     _fname="${SOFIN_ENV_ENABLED_INDICATOR_FILE}.${_name}"
                     if [ -f "${_fname}" ]; then
                         note "Loading environment profile: $(distn "${_fname}")"
                         run "${INSTALL_BIN} ${_fname} ${SOFIN_ENV_ENABLED_INDICATOR_FILE}"
-                        update_shell_vars
-                        reload_shell
                     else
                         error "No such profile: $(diste "${_name}")"
                     fi
@@ -142,8 +158,7 @@ if [ -n "${SOFIN_COMMAND}" ]; then
                     env_status
                     ;;
 
-                r|reload|rehash)
-                    finalize_shell_reload
+                r|reload|rehash) # NOTE: always done implicitly later
                     ;;
 
                 *)
@@ -186,9 +201,13 @@ if [ -n "${SOFIN_COMMAND}" ]; then
                         unset _pth _cfl _cxxfl _ldfl _pkgp _abundle
 
                         print_local_env_vars
+                        return 0
                     fi
                     ;;
             esac
+
+            # implicit reload:
+            finalize_shell_reload
             ;;
 
 
