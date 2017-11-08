@@ -350,8 +350,18 @@ receive_origin () {
         # NOOP:
         return 0
     fi
+
+    # NOTE:  origin snapshots bundled with Sofin since v1.4.12:
+    unset _origin_file
     _origin_name="${_head}-${ORIGIN_ZFS_SNAP_NAME}${DEFAULT_SOFTWARE_SNAPSHOT_EXT}"
-    _origin_file="${FILE_CACHE_DIR}/${_origin_name}"
+    _origin_file="${SOFIN_ROOT}/share/origins/${_origin_name}"
+    # Try origin files from local Sofin installation:
+    if [ -f "${_origin_file}" ]; then
+        debug "Local origin found: '$(distd "${_origin_file}")'"
+    else
+        _origin_file="${FILE_CACHE_DIR}/${_origin_name}"
+    fi
+
     if [ ! -f "${_origin_file}" ]; then
         run "${FETCH_BIN} -o ${_origin_file} ${FETCH_OPTS} ${MAIN_COMMON_REPOSITORY}/${_origin_name}" \
             && debug "Origin fetched successfully: $(distd "${_origin_name}")"
