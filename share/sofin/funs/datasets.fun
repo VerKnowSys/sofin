@@ -375,13 +375,14 @@ create_software_dir () {
     fi
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
         _dsname="${DEFAULT_ZPOOL}${SOFTWARE_DIR}/${USER}/${_dset_create}"
+        debug "Create software dataset: '$(distd "${_dsname}")'"
         receive_orig () {
             receive_origin "${_dsname}" "Software" "user" \
                 && debug "Received ZFS software-dataset: $(distd "${_dsname}")"
         }
         try "${ZFS_BIN} list -H -t filesystem '${_dsname}'" \
-            || receive_orig
-        run "${ZFS_BIN} set mountpoint=${SOFTWARE_DIR}/${_dset_create} '${_dsname}'"
+            || { receive_orig; return 0; }
+
         try "${ZFS_BIN} mount '${_dsname}'" || :
         unset _dsname
     else
