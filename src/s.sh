@@ -255,9 +255,26 @@ if [ -n "${SOFIN_COMMAND}" ]; then
         p|push|binpush|send)
             initialize
             fail_on_bg_job "${SOFIN_ARGS}"
-            debug "Removing any dangling src dirs of prefix: $(distd "${PREFIX}/${DEFAULT_SRC_EXT}*")"
-            try "${RM_BIN} -fr ${PREFIX}/${DEFAULT_SRC_EXT}*"
-            note "Pushing local binary builds: $(distn "${SOFIN_ARGS}")"
+            for _bundle in $(to_iter "${SOFIN_ARGS}"); do
+
+                PREFIX="${SOFTWARE_DIR}/${_bundle}"
+                debug "Cleaning up src dirs of prefix: $(distd "${PREFIX}/${DEFAULT_SRC_EXT}*")"
+
+                # NOTE: Load details from Sofin definitions:
+                load_defaults
+
+                _req_definition="${DEFINITIONS_DIR}/$(lowercase "${_bundle}")${DEFAULT_DEF_EXT}"
+                if [ ! -e "${_req_definition}" ]; then
+                    error "Cannot read definition file: $(diste "${_req_definition}")!"
+                fi
+                load_defs "${_req_definition}"
+
+                _full_version="$(lowercase "${DEF_NAME}${DEF_SUFFIX}-${DEF_VERSION}")"
+                BUILD_NAMESUM="$(firstn "$(text_checksum "${_full_version}")")"
+                debug "Calling destroy on prefix=$(distd "${PREFIX##*/}") _full_version=$(distd "${_full_version}") BUILD_NAMESUM=$(distd "${BUILD_NAMESUM}")"
+                destroy_builddir "${PREFIX##*/}" "${BUILD_NAMESUM}"
+            done
+            permnote "Push locally built binary build(s): $(distn "${SOFIN_ARGS}")"
             push_binbuilds "${SOFIN_ARGS}"
             finalize
             ;;
@@ -265,7 +282,7 @@ if [ -n "${SOFIN_COMMAND}" ]; then
 
         b|build)
             initialize
-            permnote "Requested build of bundle(s): $(distn "${SOFIN_ARGS}")"
+            permnote "Build bundle(s): $(distn "${SOFIN_ARGS}")"
             fail_on_bg_job "${SOFIN_ARGS}"
             USE_UPDATE=NO
             USE_BINBUILD=NO
@@ -279,7 +296,7 @@ if [ -n "${SOFIN_COMMAND}" ]; then
 
         d|deploy)
             initialize
-            permnote "Requested build of bundle(s): $(distn "${SOFIN_ARGS}")"
+            permnote "Deploy bundle(s): $(distn "${SOFIN_ARGS}")"
             fail_on_bg_job "${SOFIN_ARGS}"
             deploy_binbuild "${SOFIN_ARGS}"
             finalize
