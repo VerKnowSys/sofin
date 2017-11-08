@@ -38,8 +38,6 @@ enable_sofin_env () {
             ${PRINTF_BIN} "%s\n" "${_env}" >> "${SOFIN_ENV_ENABLED_INDICATOR_FILE}"
     done
     note "Enabled Sofin environment for bundles: $(distn "${_envs}")"
-    update_shell_vars
-    reload_shell
 }
 
 
@@ -57,8 +55,6 @@ disable_sofin_env () {
         done
         note "Disabled Sofin environment for bundles: $(distn "${_envs}")"
     fi
-    update_shell_vars
-    reload_shell
 }
 
 
