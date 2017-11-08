@@ -502,7 +502,7 @@ strip_bundle () {
                     if [ "0" = "${?}" ]; then
                         _counter="${_counter} + 1"
                         _strip_list="${_file} ${_strip_list}"
-                        debug "strip( file=$(distd "${_file}"), type=$(distd "${_type}"), full_type=$(distd "${_file_type}") )"
+                        # debug "strip( file=$(distd "${_file}"), type=$(distd "${_type}"), full_type=$(distd "${_file_type}") )"
                     fi
                 done
             done
@@ -512,11 +512,11 @@ strip_bundle () {
     if [ "${_sbresult}" -lt "0" ] || [ -z "${_sbresult}" ]; then
         _sbresult="0"
     else
-        debug "Found: $(distd "${_sbresult}") files to strip."
         if [ -n "${_strip_list}" ]; then
-            try "${STRIP_BIN} ${DEFAULT_STRIP_OPTS} ${_strip_list} > /dev/null"
+            debug "Found: $(distd "${_sbresult}") files to strip in parallel."
+            echo "${_strip_list}" | ${XARGS_BIN} -n 1 -P 8 -I {} sh -c "${STRIP_BIN} ${DEFAULT_STRIP_OPTS} {}"
+            run "${TOUCH_BIN} ${PREFIX}/${_sbfdefinition_name}${DEFAULT_STRIPPED_MARK_EXT}"
         fi
-        run "${TOUCH_BIN} ${PREFIX}/${_sbfdefinition_name}${DEFAULT_STRIPPED_MARK_EXT}"
     fi
     unset _sbfdefinition_name _dirs_to_strip _sbresult _counter _files _stripdir _bundlower _strip_list
 }
