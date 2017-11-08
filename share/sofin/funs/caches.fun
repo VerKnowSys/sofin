@@ -6,53 +6,37 @@ less_logs () {
 
 
 show_logs () {
-    clear
     _logf_pattern="${1:-+}"
+    debug "Show logs pattern: '$(distd "${_logf_pattern}")'"
     touch_logsdir_and_logfile
     if [ "-" = "${_logf_pattern}" ] || \
        [ "${SOFIN_NAME}" = "${_logf_pattern}" ]; then
-        ${TAIL_BIN} -n "${LOG_LINES_AMOUNT}" "${LOG}" 2>&1
+        ${TAIL_BIN} -n "${LOG_LINES_AMOUNT}" "${LOG}"
 
     elif [ "@" = "${_logf_pattern}" ]; then
-        if [ -d "${LOGS_DIR}" ]; then
-            unset _all_files
-            for _mr in $(${FIND_BIN} "${LOGS_DIR%/}" -name "${SOFIN_NAME}*" -not -name "*.log" -not -name "*.help" -not -name "*.strip" -type f 2>/dev/null); do
-                _all_files="${_mr} ${_all_files}"
-            done
-            _all_count="$(echo "${_all_files}" | env "${WORDS_COUNT_GUARD}")"
-            clear
-            permnote "@ Loading tail of: $(distn "${_all_count}") log files"
-            eval "${TAIL_BIN} -n1 -F ${_all_files}" 2>&1
-        else
-            note "@ No logs to attach to. LOGS_DIR='$(distn "${LOGS_DIR}")' contain no log files?"
-        fi
+        unset _all_files
+        for _mr in $(${FIND_BIN} "${LOGS_DIR%/}" -name "${SOFIN_NAME}*" -not -name "*.log" -not -name "*.help" -not -name "*.strip" -type f 2>/dev/null); do
+            _all_files="${_mr} ${_all_files}"
+        done
+        eval "${TAIL_BIN} -n1 -F ${_all_files}"
 
     elif [ "+" = "${_logf_pattern}" ]; then
-        if [ -d "${LOGS_DIR}" ]; then
-            unset _all_files
-            for _mr in $(find_most_recent "${LOGS_DIR%/}" "${SOFIN_NAME}*" | ${HEAD_BIN} -n "${LOG_LAST_FILES}" 2>/dev/null); do
-                _all_files="${_mr} ${_all_files}"
-            done
-            _all_count="$(echo "${_all_files}" | env "${WORDS_COUNT_GUARD}")"
-            clear
-            permnote "+ Loading tail of $(distn "${_all_count}") log files"
-            eval "${TAIL_BIN} -n ${LOG_LINES_AMOUNT} -F ${_all_files}" 2>&1
-        else
-            note "+ No logs to attach to. LOGS_DIR='$(distn "${LOGS_DIR}")' contain no log files?"
-        fi
+        unset _all_files
+        for _mr in $(find_most_recent "${LOGS_DIR%/}" "${SOFIN_NAME}*" | ${HEAD_BIN} -n "${LOG_LAST_FILES}" 2>/dev/null); do
+            _all_files="${_mr} ${_all_files}"
+        done
+        eval "${TAIL_BIN} -n ${LOG_LINES_AMOUNT} -F ${_all_files}"
 
     else
-        if [ -d "${LOGS_DIR}" ]; then
-            unset _all_files
-            for _mr in $(${FIND_BIN} "${LOGS_DIR%/}" -name "${SOFIN_NAME}-*${_logf_pattern}*" -not -name "*.log" -not -name "*.help" -not -name "*.strip" -type f 2>/dev/null); do
-                _all_files="${_mr} ${_all_files}"
-            done
-            _all_count="$(echo "${_all_files}" | env "${WORDS_COUNT_GUARD}")"
-            clear
-            permnote "@ Loading tail of: $(distn "${_all_count}") log files"
-            ${TAIL_BIN} -F -n "$(calculate_bc "2 * ${LOG_LINES_AMOUNT}")" "${_all_files}" 2>&1
+        unset _all_files
+        for _mr in $(${FIND_BIN} "${LOGS_DIR%/}" -name "${SOFIN_NAME}*${_logf_pattern}*" -not -name "*.log" -not -name "*.help" -not -name "*.strip" -type f 2>/dev/null); do
+            _all_files="${_mr} ${_all_files}"
+        done
+        if [ -n "${_all_files}" ]; then
+            _2x_more_lines="$(calculate_bc "2 * ${LOG_LINES_AMOUNT}")"
+            eval "${TAIL_BIN} -F -n ${_2x_more_lines} ${_all_files}"
         else
-            note "No log match='$(distn "${_logf_pattern}")' contains no pattern or name."
+            return 1
         fi
     fi
     unset _files_x_min _logf_minutes _logf_pattern _files_list _files_count _files_blist _mod_f_names _all_count
