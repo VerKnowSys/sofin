@@ -391,8 +391,9 @@ create_software_dir () {
                 && debug "Received ZFS software-dataset: $(distd "${_dsname}")"
         }
         try "${ZFS_BIN} list -H -t filesystem '${_dsname}'" \
-            || { receive_orig; return 0; }
+            || receive_orig
 
+        try "${ZFS_BIN} set mountpoint=${SOFTWARE_DIR}/${_dset_create} '${_dsname}'"
         try "${ZFS_BIN} mount '${_dsname}'" || :
         unset _dsname
     else
