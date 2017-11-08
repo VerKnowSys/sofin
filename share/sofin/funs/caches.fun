@@ -20,8 +20,9 @@ show_logs () {
                 _all_files="${_mr} ${_all_files}"
             done
             _all_count="$(echo "${_all_files}" | env "${WORDS_COUNT_GUARD}")"
-            debug "@ Loading tail of $(distd "${_all_count}") log files"
-            eval "${TAIL_BIN} -F ${_all_files}" 2>&1
+            clear
+            permnote "@ Loading tail of: $(distn "${_all_count}") log files"
+            eval "${TAIL_BIN} -n1 -F ${_all_files}" 2>&1
         else
             note "@ No logs to attach to. LOGS_DIR='$(distn "${LOGS_DIR}")' contain no log files?"
         fi
@@ -33,7 +34,8 @@ show_logs () {
                 _all_files="${_mr} ${_all_files}"
             done
             _all_count="$(echo "${_all_files}" | env "${WORDS_COUNT_GUARD}")"
-            debug "+ Loading tail of $(distd "${_all_count}") log files"
+            clear
+            permnote "+ Loading tail of $(distn "${_all_count}") log files"
             eval "${TAIL_BIN} -n ${LOG_LINES_AMOUNT} -F ${_all_files}" 2>&1
         else
             note "+ No logs to attach to. LOGS_DIR='$(distn "${LOGS_DIR}")' contain no log files?"
@@ -41,9 +43,14 @@ show_logs () {
 
     else
         if [ -d "${LOGS_DIR}" ]; then
-            _patie="${LOGS_DIR}${SOFIN_NAME}-${_logf_pattern}"
-            note "Show long tail with file pattern: '$(distd "${_patie}")'"
-            ${TAIL_BIN} -F -n "$(calculate_bc "50 + ${LOG_LINES_AMOUNT}")" ${_patie}* 2>&1
+            unset _all_files
+            for _mr in $(${FIND_BIN} "${LOGS_DIR%/}" -name "${SOFIN_NAME}-*${_logf_pattern}*" -not -name "*.log" -not -name "*.help" -not -name "*.strip" -type f 2>/dev/null); do
+                _all_files="${_mr} ${_all_files}"
+            done
+            _all_count="$(echo "${_all_files}" | env "${WORDS_COUNT_GUARD}")"
+            clear
+            permnote "@ Loading tail of: $(distn "${_all_count}") log files"
+            ${TAIL_BIN} -F -n "$(calculate_bc "2 * ${LOG_LINES_AMOUNT}")" "${_all_files}" 2>&1
         else
             note "No log match='$(distn "${_logf_pattern}")' contains no pattern or name."
         fi
