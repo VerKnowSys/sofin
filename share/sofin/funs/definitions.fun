@@ -219,36 +219,12 @@ reset_defs () {
 
 
 remove_bundles () {
-    _bundle_name="${*}"
-    if [ -z "${_bundle_name}" ]; then
-        error "Second argument with at least one bundle name is required!"
+    _bundles="${*}"
+    if [ -z "${_bundles}" ]; then
+        error "Argument with at least one bundle name is required!"
     fi
-    # replace + with *
-    _bundle_nam="$(${PRINTF_BIN} '%s' "${_bundle_name}" | ${SED_BIN} -e 's#+#*#' 2>/dev/null)"
-
-    # first look for a list with that name:
-    if [ -e "${DEFINITIONS_LISTS_DIR}${_bundle_nam}" ]; then
-        _picked_bundles="$(${CAT_BIN} "${DEFINITIONS_LISTS_DIR}${_bundle_nam}" 2>/dev/null | eval "${NEWLINES_TO_SPACES_GUARD}")"
-    else
-        _picked_bundles="${_bundle_nam}"
-    fi
-    if [ "${_bundle_nam}" != "${_bundle_name}" ]; then
-        # Specified + - a wildcard
-        _picked_bundles="" # to remove first entry with *
-        for _bund in $(${FIND_BIN} "${SOFTWARE_DIR}" -mindepth 1 -maxdepth 1 -iname "${_bundle_nam}" -type d 2>/dev/null); do
-            _bname="${_bund##*/}"
-            _picked_bundles="${_picked_bundles} ${_bname}"
-        done
-        if [ -z "${_picked_bundles}" ]; then
-            debug "No bundles picked? Maybe there's a '+' in definition name? Let's try: $(distd "${_bundle_name}")"
-            _picked_bundles="${_bundle_name}" # original name, with + in it
-        fi
-        unset _found _bund _bname
-    fi
-
-    load_defaults
     unset _destroyed
-    for _def in $(to_iter "${_picked_bundles}"); do
+    for _def in $(to_iter "${_bundles}"); do
         _given_name="$(capitalize "${_def}")"
         if [ -z "${_given_name}" ]; then
             error "Empty bundle name given as first param!"
@@ -259,28 +235,50 @@ remove_bundles () {
                 && _destroyed="${_given_name} ${_destroyed}"
 
             # if removing a single bundle, then look for alternatives. Otherwise, just remove bundle..
-            if [ "${_picked_bundles}" = "${_given_name}" ]; then
-                debug "Looking for other installed versions of: $(distd "${_given_name}"), that might be exported automatically.."
-                _inname="$(${PRINTF_BIN} '%s\n' "${_given_name}" | ${SED_BIN} 's/[0-9]*//g' 2>/dev/null)"
-                _alternative="$(${FIND_BIN} "${SOFTWARE_DIR%/}" -mindepth 1 -maxdepth 1 -type d -iname "${_inname}*" -not -name "${_given_name}" 2>/dev/null | ${SED_BIN} 's/^.*\///g' 2>/dev/null | ${HEAD_BIN} -n1 2>/dev/null)"
-            fi
-
-            if [ -n "${_alternative}" ] && \
-               [ -f "${SOFTWARE_DIR}/${_alternative}/$(lowercase "${_alternative}")${DEFAULT_INST_MARK_EXT}" ]; then
-                permnote "Updating environment for installed alternative: $(distn "${_alternative}")"
-                export_binaries "${_alternative}"
-                finalize
-                unset _given_name _inname _alternative _aname _def
-                return 0 # Just pick first available alternative bundle
-
-            elif [ -z "${_alternative}" ]; then
-                debug "No alternative: $(distd "${_alternative}") != $(distd "${_given_name}")"
-            fi
+            # if [ "${_picked_bundles}" = "${_given_name}" ]; then
+            #     debug "Looking for other installed versions of: $(distd "${_given_name}"), that might be exported automatically.."
+            #     _inname="$(${PRINTF_BIN} '%s\n' "${_given_name}" | ${SED_BIN} 's/[0-9]*//g' 2>/dev/null)"
+            #     _alternative="$(${FIND_BIN} "${SOFTWARE_DIR%/}" -mindepth 1 -maxdepth 1 -type d -iname "${_inname}*" -not -name "${_given_name}" 2>/dev/null | ${SED_BIN} 's/^.*\///g' 2>/dev/null | ${HEAD_BIN} -n1 2>/dev/null)"
+            # fi
+            # if [ -n "${_alternative}" ] && \
+            #    [ -f "${SOFTWARE_DIR}/${_alternative}/$(lowercase "${_alternative}")${DEFAULT_INST_MARK_EXT}" ]; then
+            #     permnote "Updating environment for installed alternative: $(distn "${_alternative}")"
+            #     export_binaries "${_alternative}"
+            #     finalize
+            #     unset _given_name _inname _alternative _aname _def
+            #     return 0 # Just pick first available alternative bundle
+            # elif [ -z "${_alternative}" ]; then
+            #     debug "No alternative: $(distd "${_alternative}") != $(distd "${_given_name}")"
+            # fi
         fi
     done
     if [ -n "${_destroyed}" ]; then
         permnote "Software dataset(s) destroyed: $(distn "${_destroyed}")"
     fi
+    # for _bundle_name in $(to_iter "${_bundles}"); do
+        # replace + with *
+        # _bundle_nam="$(${PRINTF_BIN} '%s' "${_bundle_name}" | ${SED_BIN} -e 's#+#*#' 2>/dev/null)"
+        # # first look for a list with that name:
+        # if [ -e "${DEFINITIONS_LISTS_DIR}${_bundle_nam}" ]; then
+        #     _picked_bundles="$(${CAT_BIN} "${DEFINITIONS_LISTS_DIR}${_bundle_nam}" 2>/dev/null | eval "${NEWLINES_TO_SPACES_GUARD}")"
+        # else
+        #     _picked_bundles="${_bundle_nam}"
+        # fi
+        # if [ "${_bundle_nam}" != "${_bundle_name}" ]; then
+        #     # Specified + - a wildcard
+        #     _picked_bundles="" # to remove first entry with *
+        #     for _bund in $(${FIND_BIN} "${SOFTWARE_DIR}" -mindepth 1 -maxdepth 1 -iname "${_bundle_nam}" -type d 2>/dev/null); do
+        #         _bname="${_bund##*/}"
+        #         _picked_bundles="${_picked_bundles} ${_bname}"
+        #     done
+        #     if [ -z "${_picked_bundles}" ]; then
+        #         debug "No bundles picked? Maybe there's a '+' in definition name? Let's try: $(distd "${_bundle_name}")"
+        #         _picked_bundles="${_bundle_name}" # original name, with + in it
+        #     fi
+        #     unset _found _bund _bname
+        # fi
+        # load_defaults
+    # done
     unset _given_name _inname _alternative _aname _def _picked_bundles _bundle_name _bundle_nam _destroyed
 }
 
@@ -449,6 +447,7 @@ strip_bundle () {
 
     DEF_STRIP="${DEF_STRIP:-NO}" # unset DEF_STRIP to say "NO", but don't allow no value further
     unset _dirs_to_strip
+    # TODO: chdir to SERVICE_DIR/ PREFIX to save up 4096 max input length for args
     case "${DEF_STRIP}" in
         no|NO)
             permnote "$(distn "${_sbfdefinition_name}"): No symbols will be stripped from bundle"
