@@ -654,8 +654,7 @@ process_flat () {
                 cd "${_pwd}"
 
                 # NOTE: mandatory on production machines:
-                # XXX: in future it should throw an error here..
-                try "test_and_rate_def ${_app_param} '${DEF_TEST_METHOD}'"
+                run "test_and_rate_def ${_app_param} '${DEF_TEST_METHOD}'"
             else
                 note "   ${WARN_CHAR} Tests for definition: $(distn "${_app_param}") skipped on demand"
             fi
@@ -743,7 +742,8 @@ test_and_rate_def () {
                 eval "\
                     PATH=\"${PREFIX}/bin:${PREFIX}/sbin:${PREFIX}/libexec:/bin:/usr/bin\" \
                     ${_ld_prefix_name}LD_LIBRARY_PATH=\"${PREFIX}/lib:${PREFIX}/libexec\" \
-                    eval '${_cmdline}';" >> "${PREFIX}/${_name}.test.log" 2>> "${PREFIX}/${_name}.test.log"
+                    eval '${_cmdline}' >> \"${PREFIX}/${_name}.test.log\" 2>> \"${PREFIX}/${_name}.test.log\" \
+                "
                 _result="${?}"
                 ${PRINTF_BIN} "Test for ${_name} finished at: ${TIMESTAMP}\n" >> "${PREFIX}/${_name}.test.log" 2>> "${PREFIX}/${_name}.test.log"
                 return ${_result}
