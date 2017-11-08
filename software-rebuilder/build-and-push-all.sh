@@ -22,26 +22,29 @@ unset USE_NO_TEST
 
 _working_state_file="/var/software.list.processing"
 if [ ! -f "${_working_state_file}" ]; then
-    note "Creating new file: $(distn "${_working_state_file}")"
+    permnote "Creating new work-state file: $(distn "${_working_state_file}")"
     run "${CP_BIN} -v software.list ${_working_state_file}"
 fi
 
 for software in $(${CAT_BIN} ${_working_state_file} 2>/dev/null); do
     if [ "${software}" = "------" ]; then
-        note "Finished task."
+        note "All tasks finished!"
         exit
     fi
-    note "________________________________"
+    permnote "________________________________"
 
     _indicator="/Software/${software}/$(lowercase "${software}")${DEFAULT_INST_MARK_EXT}"
     if [ -d "/Software/${software}" ] && [ -f "${_indicator}" ]; then
         warn "Found already prebuilt version of software: $(distw "${software}"). Leaving untouched with version: $(distw "$(${CAT_BIN} "${_indicator}" 2>/dev/null)")"
         ${SED_BIN} -i '' -e "/${software}/d" ${_working_state_file}
     else
-        note "Processing software: $(distn "${software}")"
-        ${SOFIN_BIN} rm ${software}
-        ${SOFIN_BIN} deploy ${software} && \
-        ${SED_BIN} -i '' -e "/${software}/d" ${_working_state_file}
+        note "Removing software: $(distn "${software}")"
+        try "${SOFIN_BIN} rm ${software}"
+
+        note "Deploying software: $(distn "${software}")"
+        ${SOFIN_BIN} deploy ${software} \
+            && try "${SED_BIN} -i '' -e \"/${software}/d\" ${_working_state_file}"
+
     fi
-    note "--------------------------------"
+    permnote "--------------------------------"
 done
