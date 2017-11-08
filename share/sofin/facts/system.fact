@@ -122,7 +122,7 @@ fallback_nonzfs_setup () {
 
 
 determine_system_capabilites () {
-    try "${ZPOOL_BIN} list -H"
+    try "${ZPOOL_BIN} list -H >/dev/null 2>&1"
     if [ "${?}" = "0" ]; then
         CAP_SYS_ZFS=YES
         if [ "${SYSTEM_NAME}" = "Darwin" ]; then
@@ -134,26 +134,26 @@ determine_system_capabilites () {
         fallback_nonzfs_setup
     fi
 
-    try "${SYSCTL_BIN} hardening.pax"
+    try "${SYSCTL_BIN} hardening.pax >/dev/null 2>&1"
     if [ "${?}" = "0" ]; then
         CAP_SYS_HARDENED=YES
     else
         unset CAP_SYS_HARDENED
     fi
 
-    try "${SYSCTL_BIN} kern.dtrace"
+    try "${SYSCTL_BIN} kern.dtrace >/dev/null 2>&1"
     if [ "${?}" = "0" ]; then
         CAP_SYS_DTRACE=YES
-        try "${KLDLOAD_BIN} dtrace >/dev/null"
-        try "${KLDLOAD_BIN} dtraceall >/dev/null"
+        try "${KLDLOAD_BIN} dtrace >/dev/null 2>&1"
+        try "${KLDLOAD_BIN} dtraceall >/dev/null 2>&1"
     else
         unset CAP_SYS_DTRACE
     fi
 
-    try "${SYSCTL_BIN} kern.features.linux64"
+    try "${SYSCTL_BIN} kern.features.linux64 >/dev/null 2>&1"
     if [ "${?}" = "0" ]; then
         CAP_SYS_LINUX64_ABI=YES
-        try "${KLDLOAD_BIN} linux64 >/dev/null"
+        try "${KLDLOAD_BIN} linux64 >/dev/null 2>&1"
     else
         unset CAP_SYS_LINUX64_ABI
     fi
