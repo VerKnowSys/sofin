@@ -654,7 +654,7 @@ process_flat () {
                 cd "${_pwd}"
 
                 # NOTE: mandatory on production machines:
-                run "test_and_rate_def ${_app_param} '${DEF_TEST_METHOD}'"
+                test_and_rate_def "${_app_param}" "${DEF_TEST_METHOD}"
             else
                 note "   ${WARN_CHAR} Tests for definition: $(distn "${_app_param}") skipped on demand"
             fi
