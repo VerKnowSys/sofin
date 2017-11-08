@@ -655,7 +655,7 @@ process_flat () {
 
                 # NOTE: mandatory on production machines:
                 # XXX: in future it should throw an error here..
-                test_and_rate_def "${_app_param}" "${DEF_TEST_METHOD}"
+                try "test_and_rate_def ${_app_param} '${DEF_TEST_METHOD}'"
             else
                 note "   ${WARN_CHAR} Tests for definition: $(distn "${_app_param}") skipped on demand"
             fi
@@ -706,19 +706,56 @@ test_and_rate_def () {
     # $1 => name of definition
     _name="${1}"
     shift
-    # $@ => test command invocation
+    _cmdline="${*}"
 
-    unset _anadd
-    if [ "Darwin" = "${SYSTEM_NAME}" ]; then
-        _anadd="DY"
-    fi
-    debug "Invoking test of definition: $(distd "${_name}") [$(distd "${@}")]"
-    try "${_anadd}LD_LIBRARY_PATH=\"${PREFIX}/lib:${PREFIX}/libexec\" \
-TEST_JOBS=\"${CPUS}\" \
-TEST_ENV=\"${DEF_TEST_ENV}\" \
-${*} >> ${PREFIX}/${_name}.test.results 2>> ${PREFIX}/${_name}.test.results && \
-${TOUCH_BIN} ${PREFIX}/${_name}.test.passed || ${TOUCH_BIN} ${PREFIX}/${_name}.test.failed"
-    debug "Test of definition: $(distd "${_name}") has ended."
-    unset _name _an
-    return 0
+    case "${_cmdline}" in
+        :|true|false|disable|disabled|skip|no|NO|off|OFF)
+            return 0
+            ;;
+
+        *)
+            if [ -z "${_name}" ]; then
+                return 0
+            fi
+
+            debug "Initializing test for: $(distd "${_name}")"
+            local_test_result () {
+                case "${1}" in
+                    passed)
+                        try "${TOUCH_BIN} '${PREFIX}/${_name}.test.passed' && ${RM_BIN} -f '${PREFIX}/${_name}.test.failed'"
+                        ;;
+
+                    failed)
+                        try "${TOUCH_BIN} '${PREFIX}/${_name}.test.failed' && ${RM_BIN} -f '${PREFIX}/${_name}.test.passed'"
+                        ;;
+                esac
+            }
+
+            local_test_env_dispatch () {
+                export TEST_JOBS="${CPUS:-4}"
+                export TEST_ENV="${DEF_TEST_ENV:-test}"
+                if [ "Darwin" = "${SYSTEM_NAME}" ]; then
+                    _ld_prefix_name="DY"
+                else
+                    unset _ld_prefix_name
+                fi
+                ${PRINTF_BIN} "Test for ${_name} started at: ${TIMESTAMP}\n" >> "${PREFIX}/${_name}.test.log" 2>> "${PREFIX}/${_name}.test.log"
+                eval "\
+                    PATH=\"${PREFIX}/bin:${PREFIX}/sbin:${PREFIX}/libexec:/bin:/usr/bin\" \
+                    ${_ld_prefix_name}LD_LIBRARY_PATH=\"${PREFIX}/lib:${PREFIX}/libexec\" \
+                    eval '${_cmdline}';" >> "${PREFIX}/${_name}.test.log" 2>> "${PREFIX}/${_name}.test.log"
+                _result="${?}"
+                ${PRINTF_BIN} "Test for ${_name} finished at: ${TIMESTAMP}\n" >> "${PREFIX}/${_name}.test.log" 2>> "${PREFIX}/${_name}.test.log"
+                return ${_result}
+            }
+            ;;
+    esac
+
+    debug "Invoking software check/test: $(distd "${_name}") [DEF_TEST_METHOD='$(distd "${_cmdline}")']"
+    local_test_env_dispatch \
+        && local_test_result passed \
+        && return 0
+
+    local_test_result failed
+    return 1
 }
