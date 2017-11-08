@@ -29,7 +29,10 @@ usage_howto () {
     permnote
     permnote "  $(distn "env                                  ") reads current Sofin environment."
     permnote "  $(distn "env Bundle1 BundleN                  ") builds env for given bundles only (no persistence)."
-    permnote "  $(distn "env + Bundle1 BundleN                ") adds given Bundle(s) to current env profile."
+    permnote "  $(distn "env +Bundle1 +BundleN +Bund8 Any1    ") add given Bundle(s) to current env profile."
+    permnote "  $(distn "env +Bundle1 BundleN                 ") add given Bundle(s) to current env profile."
+    permnote "  $(distn "env -Bundle1 -Sup2 -BundleN          ") remove given Bundle(s) from current env profile."
+    permnote "  $(distn "env -Bundle1 Sup2 -BundleN           ") remove given Bundle(s) from current env profile."
     permnote "  $(distn "env - @                              ") resets Sofin env to defaults."
     permnote "  $(distn "env ! MyProjectX                     ") saves Sofin env profile with given name."
     permnote "  $(distn "env ^ MyProjectX                     ") loads Sofin env profile with given name (no persistence)."
