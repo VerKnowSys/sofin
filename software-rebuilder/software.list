@@ -1,3 +1,16 @@
+Ekg2
+Ffmpeg
+Glib
+Glusterfs
+Mc
+Mpd
+Ncmpc
+Qemu
+Racket
+Rrdtool
+Rspamd
+Sox
+Syslog-ng
 Atop
 Arping
 Automake
@@ -18,6 +31,7 @@ Db
 Db47
 Dhcp
 Dmidecode
+Doas
 Dovecot
 Dropbear
 Elixir
