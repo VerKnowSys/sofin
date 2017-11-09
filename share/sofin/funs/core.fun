@@ -377,7 +377,7 @@ disable_security_features () {
             debug "Disabling all security features (this host is NOT production).."
             try "${RM_BIN} -f ${DEFAULT_SECURITY_STATE_FILE}"
             for _key in ${DEFAULT_HARDEN_KEYS}; do
-                try "${SYSCTL_BIN} ${_key}=0"
+                try "${SYSCTL_BIN} ${_key}=0 >/dev/null"
             done
             unset _key _dsf_name
         else

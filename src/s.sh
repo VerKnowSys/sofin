@@ -230,11 +230,9 @@ if [ -n "${SOFIN_COMMAND}" ]; then
 
         tool|mkutil|util) # `s tool`
             _utils="${*}"
-
             if [ -n "${_utils}" ]; then
-                debug "Building utils…"
+                initialize
 
-                # error "At least a single name of bundle utility has to be provided as argument!"
                 for _util in $(to_iter "${_utils}"); do
                     debug "Starting util build of: $(distd "${_util}")"
 
@@ -244,7 +242,6 @@ if [ -n "${SOFIN_COMMAND}" ]; then
                     export DEF_UTILITY_BUNDLE=YES
                     export USE_BINBUILD=NO
 
-                    initialize
                     load_sofin # yea, reload from 0 after altering the core parts
                     load_defaults
                     load_defs "$(lowercase "${_util}")"
@@ -259,9 +256,8 @@ if [ -n "${SOFIN_COMMAND}" ]; then
 
                 done
                 note "Installed utilities: $(distn "${_utils}")"
+                finalize
             fi
-
-            finalize
             ;;
 
 
