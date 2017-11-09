@@ -76,7 +76,6 @@ determine_term_capabilites () {
 
         # Use legacy ANSI definitions:
         ColorGray="\033[39m" # default color of terminal
-        ColorReset="${ColorGray}"
         ColorDarkgray="\033[90m"
         ColorRed="\033[31m"
         ColorGreen="\033[32m"
@@ -85,41 +84,32 @@ determine_term_capabilites () {
         ColorBlue="\033[34m"
         ColorMagenta="\033[35m"
         ColorCyan="\033[36m"
-        ColorDistinct="${ColorCyan}"
         ColorWhite="\033[97m"
         ColorParams="\033[38;5;12m"
         ColorViolet="\033[38;5;97m"
-        ColorDebug="${ColorViolet}"
-        ColorNote="${ColorGreen}"
-        ColorWarning="${ColorYellow}"
-        ColorError="${ColorRed}"
-        ColorExample="${ColorOrange}"
         ColorFunction="\033[38;5;163m"
     else
         CAP_TERM_TPUT=YES
 
-        # Use tput by default for terminal color management:
-        # setaf => foreground
-        # setab => background
-        ColorGray="$(${TPUT_BIN} setaf 7)" # default color of terminal
-        ColorReset="${ColorGray}"
-        ColorDarkgray="$(${TPUT_BIN} setaf 0)"
         ColorRed="$(${TPUT_BIN} setaf 1)"
         ColorGreen="$(${TPUT_BIN} setaf 2)"
         ColorYellow="$(${TPUT_BIN} setaf 3)"
-        ColorOrange="$(${TPUT_BIN} setaf 172)"
         ColorBlue="$(${TPUT_BIN} setaf 4)"
         ColorMagenta="$(${TPUT_BIN} setaf 5)"
         ColorCyan="$(${TPUT_BIN} setaf 6)"
-        ColorDistinct="${ColorCyan}"
+        ColorGray="$(${TPUT_BIN} setaf 7)" # default color of terminal
         ColorWhite="$(${TPUT_BIN} setaf 15)"
+        ColorOrange="$(${TPUT_BIN} setaf 172)"
         ColorParams="$(${TPUT_BIN} setaf 12)"
         ColorViolet="$(${TPUT_BIN} setaf 97)"
-        ColorDebug="${ColorViolet}"
-        ColorNote="${ColorGreen}"
-        ColorWarning="${ColorYellow}"
-        ColorError="${ColorRed}"
-        ColorExample="${ColorOrange}"
         ColorFunction="$(${TPUT_BIN} setaf 163)"
     fi
+
+    ColorReset="${ColorGray}"
+    ColorExample="${ColorOrange}"
+    ColorDistinct="${ColorCyan}"
+    ColorDebug="${ColorViolet}"
+    ColorNote="${ColorGreen}"
+    ColorWarning="${ColorYellow}"
+    ColorError="${ColorRed}"
 }
