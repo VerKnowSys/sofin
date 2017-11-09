@@ -427,7 +427,6 @@ process_flat () {
                     fi
 
                     note "   ${NOTE_CHAR} Unpacking source of: $(distn "${DEF_NAME}${DEF_SUFFIX}"), version: $(distn "${DEF_VERSION}")"
-                    debug "Build dir: $(distd "${BUILD_DIR}")"
 
                     _possible_old_build_dir="$(${TAR_BIN} -t --list --file "${_dest_file}" 2>/dev/null | ${HEAD_BIN} -n1 2>/dev/null | ${AWK_BIN} '{print $9;}' 2>/dev/null)"
                     _pbd_basename="${_possible_old_build_dir##*/}"
@@ -500,7 +499,6 @@ process_flat () {
                     ${MKDIR_BIN} -p "${_fd}/${DEF_BUILD_DIR_SUFFIX}"
                     _pwd="${_fd}/${DEF_BUILD_DIR_SUFFIX}"
                 fi
-                debug "Definition-build-dir: $(distd "${_pwd}")"
 
                 cd "${_pwd}"
                 try after_unpack_callback
