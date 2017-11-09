@@ -173,10 +173,16 @@ build () {
                     fi
                 fi
 
-                PREFIX="${SOFTWARE_DIR}/${_bundl_name}"
-                SERVICE_DIR="${SERVICES_DIR}/${_bundl_name}"
-                BUILD_NAMESUM="$(firstn "$(text_checksum "${_bund_lcase}-${DEF_VERSION}")")"
-                BUILD_DIR="${PREFIX}/${DEFAULT_SRC_EXT}${BUILD_NAMESUM}"
+                # normally definition is NOT Sofin internal utility:
+                if [ -z "${DEF_UTILITY_BUNDLE}" ]; then
+                    PREFIX="${SOFTWARE_DIR}/${_bundl_name}"
+                    SERVICE_DIR="${SERVICES_DIR}/${_bundl_name}"
+                    BUILD_NAMESUM="$(firstn "$(text_checksum "${_bund_lcase}-${DEF_VERSION}")")"
+                    BUILD_DIR="${PREFIX}/${DEFAULT_SRC_EXT}${BUILD_NAMESUM}"
+
+                else # Sofin private utility build:
+                    debug "Bundle: $(distd "${_bundl_name}") is to be built as Sofin private prefix: $(distd "${PREFIX}")!"
+                fi
 
                 # These values has to be exported because external build mechanisms
                 # has to be able to reach these values to find dependencies and utilities
@@ -184,33 +190,35 @@ build () {
                 export PKG_CONFIG_PATH="${PREFIX}/lib/pkgconfig"
                 export PREFIX
 
-                # NOTE: standalone definition has own SERVICES_DIR/Bundlename/ prefix
-                if [ -n "${DEF_STANDALONE}" ]; then
-                    debug "$(distd "try_fetch_service_dir()") for bundle: $(distd "${_bundl_name}") v$(distd "${DEF_VERSION}")"
-                    try_fetch_service_dir "${_bundl_name}" "${DEF_VERSION}"
-                    debug "$(distd "create_service_dataset()") for bundle: $(distd "${_bundl_name}")"
-                    create_service_dataset "${_bundl_name}"
-                fi
-
-                try "${MKDIR_BIN} -p ${FILE_CACHE_DIR}"
-                _an_archive="${_bundl_name}-${DEF_VERSION}-${OS_TRIPPLE}${DEFAULT_ARCHIVE_EXT}"
-                _installed_indicator="${PREFIX}/${_bund_lcase}${DEFAULT_INST_MARK_EXT}"
-                if [ ! -e "${_installed_indicator}" ]; then
-                    fetch_binbuild "${_bundl_name}" "${_an_archive}"
-                else
-                    _already_installed_version="$(${CAT_BIN} "${_installed_indicator}" 2>/dev/null)"
-                    if [ "${DEF_VERSION}" = "${_already_installed_version}" ]; then
-                        debug "$(capitalize "$(distd "${_bund_lcase}")") bundle is installed with version: $(distd "${_already_installed_version}")"
-                    else
-                        error "$(capitalize "$(diste "${_bund_lcase}")") bundle is installed with version: $(diste "${_already_installed_version}"), different from found in definition: $(diste "${DEF_VERSION}"). Aborting!"
+                if [ -z "${DEF_UTILITY_BUNDLE}" ]; then
+                    # NOTE: standalone definition has own SERVICES_DIR/Bundlename/ prefix
+                    if [ -n "${DEF_STANDALONE}" ]; then
+                        debug "$(distd "try_fetch_service_dir()") for bundle: $(distd "${_bundl_name}") v$(distd "${DEF_VERSION}")"
+                        try_fetch_service_dir "${_bundl_name}" "${DEF_VERSION}"
+                        debug "$(distd "create_service_dataset()") for bundle: $(distd "${_bundl_name}")"
+                        create_service_dataset "${_bundl_name}"
                     fi
-                    DONT_BUILD_BUT_DO_EXPORTS=YES
-                    unset _already_installed_version
-                fi
 
-                if [ -n "${CAP_SYS_PRODUCTION}" ]; then
-                    debug "Production mode enabled. Skipping build by setting DONT_BUILD_BUT_DO_EXPORTS=YES"
-                    DONT_BUILD_BUT_DO_EXPORTS=YES
+                    try "${MKDIR_BIN} -p ${FILE_CACHE_DIR}"
+                    _an_archive="${_bundl_name}-${DEF_VERSION}-${OS_TRIPPLE}${DEFAULT_ARCHIVE_EXT}"
+                    _installed_indicator="${PREFIX}/${_bund_lcase}${DEFAULT_INST_MARK_EXT}"
+                    if [ ! -e "${_installed_indicator}" ]; then
+                        fetch_binbuild "${_bundl_name}" "${_an_archive}"
+                    else
+                        _already_installed_version="$(${CAT_BIN} "${_installed_indicator}" 2>/dev/null)"
+                        if [ "${DEF_VERSION}" = "${_already_installed_version}" ]; then
+                            debug "$(capitalize "$(distd "${_bund_lcase}")") bundle is installed with version: $(distd "${_already_installed_version}")"
+                        else
+                            error "$(capitalize "$(diste "${_bund_lcase}")") bundle is installed with version: $(diste "${_already_installed_version}"), different from found in definition: $(diste "${DEF_VERSION}"). Aborting!"
+                        fi
+                        DONT_BUILD_BUT_DO_EXPORTS=YES
+                        unset _already_installed_version
+                    fi
+
+                    if [ -n "${CAP_SYS_PRODUCTION}" ]; then
+                        debug "Production mode enabled. Skipping build by setting DONT_BUILD_BUT_DO_EXPORTS=YES"
+                        DONT_BUILD_BUT_DO_EXPORTS=YES
+                    fi
                 fi
 
                 if [ -z "${DONT_BUILD_BUT_DO_EXPORTS}" ]; then
@@ -270,6 +278,19 @@ build () {
     try after_export_callback
     after_export_snapshot
     validate_pie_on_exports "${_build_list}"
+
+    if [ -n "${DEF_UTILITY_BUNDLE}" ]; then
+        try "${RM_BIN} -rf '${PREFIX}/${_anm}' '${PREFIX}/include' '${PREFIX}/doc'"
+        debug "Utility bundle: $(distd "${_anm}") build completed!"
+        link_utilities
+
+        debug "Stripping utilities…"
+        strip_bundle "${_bund_lcase}"
+
+        finalize_afterbuild "${_bund_lcase}"
+        env_reset
+        return 0
+    fi
 
     if [ -z "${CAP_SYS_PRODUCTION}" ]; then
         strip_bundle "${_bund_lcase}"
