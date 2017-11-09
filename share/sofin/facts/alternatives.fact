@@ -141,8 +141,8 @@ else
 fi
 
 # Ccache
-if [ -x "/Software/Ccache/exports/ccache" ]; then
-    CCACHE_BIN="/Software/Ccache/exports/ccache"
+if [ -x "${SERVICES_DIR}/${SOFIN_BUNDLE_NAME}/exports/ccache" ]; then
+    CCACHE_BIN="${SERVICES_DIR}/${SOFIN_BUNDLE_NAME}/exports/ccache"
 elif [ -x "/usr/bin/ccache" ]; then
     CCACHE_BIN="/usr/bin/ccache"
 elif [ -x "/usr/pkg/bin/ccache" ]; then
