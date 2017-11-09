@@ -228,6 +228,43 @@ if [ -n "${SOFIN_COMMAND}" ]; then
             ;;
 
 
+        tool|mkutil|util) # `s tool`
+            _utils="${*}"
+
+            if [ -n "${_utils}" ]; then
+                debug "Building utils…"
+
+                # error "At least a single name of bundle utility has to be provided as argument!"
+                for _util in $(to_iter "${_utils}"); do
+                    debug "Starting util build of: $(distd "${_util}")"
+
+                    export SOFTWARE_DIR="${SERVICES_DIR}/${SOFIN_BUNDLE_NAME}/${_util}"
+                    export SERVICE_DIR="${SOFTWARE_DIR}"
+                    export PREFIX="${SOFTWARE_DIR}"
+                    export DEF_UTILITY_BUNDLE=YES
+                    export USE_BINBUILD=NO
+
+                    initialize
+                    load_sofin # yea, reload from 0 after altering the core parts
+                    load_defaults
+                    load_defs "$(lowercase "${_util}")"
+
+                    BUILD_NAMESUM="$(firstn "$(text_checksum "${_util}-${DEF_VERSION}")")"
+                    BUILD_DIR="${PREFIX}/${DEFAULT_SRC_EXT}${BUILD_NAMESUM}"
+                    try "${MKDIR_BIN} -p ${BUILD_DIR}"
+
+                    note "Buiding an utility: $(distn "${_util}") for: $(distn "${OS_TRIPPLE}")"
+                    build "${_util}"
+                    link_utilities
+
+                done
+                note "Installed utilities: $(distn "${_utils}")"
+            fi
+
+            finalize
+            ;;
+
+
         i|install|get|pick|choose|use|switch)
             initialize
             _list_maybe="$(lowercase "${1}")"
