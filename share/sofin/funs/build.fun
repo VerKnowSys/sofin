@@ -528,7 +528,7 @@ process_flat () {
                         try "./configure -prefix ${_prefix} -cc '${CC_NAME} ${CFLAGS}' -libs '-L${PREFIX}/lib ${LDFLAGS}' -libdir ${PREFIX}/lib -aspp '${CC_NAME} ${CFLAGS} -c' ${DEF_CONFIGURE_ARGS}" || \
                         run "./configure -prefix ${_prefix} -cc '${CC_NAME} ${CFLAGS}' -libs '-L${PREFIX}/lib ${LDFLAGS}' -aspp '${CC_NAME} ${CFLAGS} -c' ${DEF_CONFIGURE_ARGS}"
 
-                        try "${INSTALL_BIN} \"${_configure_log}\" \"${_configure_status_log}\""
+                        try "${INSTALL_BIN} \"${_configure_log}\" \"${_configure_status_log}\" >/dev/null"
                         ;;
 
                     cmake)
@@ -617,9 +617,9 @@ process_flat () {
                 esac
 
                 debug "Gathering configuration output logs…"
-                try "${INSTALL_BIN} \"${_configure_log}\" \"${_configure_status_log}\""
-                try "${INSTALL_BIN} \"${_cmake_out_log}\" \"${_cmake_config_log}\""
-                try "${INSTALL_BIN} \"${_cmake_error_log}\" \"${_cmake_config_log}.error\""
+                try "${INSTALL_BIN} \"${_configure_log}\" \"${_configure_status_log}\" >/dev/null"
+                try "${INSTALL_BIN} \"${_cmake_out_log}\" \"${_cmake_config_log}\" >/dev/null"
+                try "${INSTALL_BIN} \"${_cmake_error_log}\" \"${_cmake_config_log}.error\" >/dev/null"
 
                 cd "${_pwd}"
                 try after_configure_callback
