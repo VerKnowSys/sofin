@@ -90,7 +90,7 @@ install_sofin_files () {
     done && \
         echo "  ${_okch} native utils"
 
-    run "${CP_BIN} -vfR share/sofin/* ${SOFIN_ROOT}/share/" && \
+    run "${CP_BIN} -fR share/sofin/* ${SOFIN_ROOT}/share/" && \
         echo "  ${_okch} facts and functions"
 
     run "${INSTALL_BIN} src/s.sh ${SOFIN_ROOT}/bin/s" && \

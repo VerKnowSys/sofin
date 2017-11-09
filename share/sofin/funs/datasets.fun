@@ -647,19 +647,18 @@ do_prefix_snapshot () {
             _pr_name="${PREFIX##*/}"
             _pr_soft="${DEFAULT_ZPOOL}${SOFTWARE_DIR}/${USER}/${_pr_name}"
             _pr_serv="${DEFAULT_ZPOOL}${SERVICES_DIR}/${USER}/${_pr_name}"
-            debug "Prefix: $(distd "${_pr_name}"). Software dataset: $(distd "${_pr_soft}"). Service dataset: $(distd "${_pr_serv}")"
+            debug "Ensure presence of origin snapshot under prefix='$(distd "${SOFTWARE_DIR}/${_pr_name}")' of software dataset='$(distd "${_pr_soft}")' with service dataset='$(distd "${_pr_serv}")'"
 
             # # Try removing existing snaps:
             do_snaps_destroy () {
-                try "${ZFS_BIN} destroy -r '${_pr_soft}@${_snap_name}'"
-                try "${ZFS_BIN} destroy -r '${_pr_serv}@${_snap_name}'"
+                try "${ZFS_BIN} destroy -r '${_pr_soft}@${_snap_name}' >/dev/null; ${ZFS_BIN} destroy -r '${_pr_serv}@${_snap_name}' >/dev/null;"
                 return 0
             }
 
             # # Do snapshots:
             do_snaps () {
-                try "${ZFS_BIN} snapshot '${_pr_soft}@${_snap_name}'" \
-                    && try "${ZFS_BIN} snapshot '${_pr_serv}@${_snap_name}'" \
+                try "${ZFS_BIN} snapshot '${_pr_soft}@${_snap_name}' >/dev/null" \
+                    && try "${ZFS_BIN} snapshot '${_pr_serv}@${_snap_name}' >/dev/null" \
                     && return 0
                 return 1
             }
