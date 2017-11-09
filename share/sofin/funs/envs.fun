@@ -487,7 +487,7 @@ update_system_shell_env_files () {
 
 set_normal_security () {
     debug "Setting security sysctls to normal. No background Sofin jobs found!"
-    run "${SYSCTL_BIN} hardening.pax.segvguard.status=1 hardening.pax.mprotect.status=2 hardening.pax.pageexec.status=2 hardening.pax.disallow_map32bit.status=1 hardening.pax.aslr.status=3"
+    try "${SYSCTL_BIN} hardening.pax.segvguard.status=1 hardening.pax.mprotect.status=2 hardening.pax.pageexec.status=2 hardening.pax.disallow_map32bit.status=1 hardening.pax.aslr.status=3 >/dev/null"
 }
 
 
@@ -511,8 +511,8 @@ security_set_normal () {
 security_set_build () {
     if [ -n "${CAP_SYS_HARDENED}" ]; then
         if [ -z "${CAP_SYS_PRODUCTION}" ]; then
-            debug "Setting security sysctls to build (lower)"
-            run "${SYSCTL_BIN} hardening.pax.segvguard.status=0 hardening.pax.mprotect.status=0 hardening.pax.pageexec.status=0 hardening.pax.disallow_map32bit.status=0 hardening.pax.aslr.status=0"
+            debug "Setting security sysctls to build (lowest)"
+            try "${SYSCTL_BIN} hardening.pax.segvguard.status=0 hardening.pax.mprotect.status=0 hardening.pax.pageexec.status=0 hardening.pax.disallow_map32bit.status=0 hardening.pax.aslr.status=0 >/dev/null"
         fi
     fi
 }
