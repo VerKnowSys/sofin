@@ -234,7 +234,8 @@ if [ -n "${SOFIN_COMMAND}" ]; then
                 initialize
 
                 for _util in $(to_iter "${_utils}"); do
-                    debug "Starting util build of: $(distd "${_util}")"
+                    _util="$(capitalize "${_util}")"
+                    debug "Starting utility build: $(distd "${_util}")"
 
                     export SOFTWARE_DIR="${SERVICES_DIR}/${SOFIN_BUNDLE_NAME}/${_util}"
                     export SERVICE_DIR="${SOFTWARE_DIR}"
