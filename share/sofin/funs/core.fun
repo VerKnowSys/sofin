@@ -416,3 +416,17 @@ initialize () {
 to_iter () {
     ${PRINTF_BIN} '%s\n' "${@}" | eval "${SPACES_TO_NEWLINES_GUARD}"
 }
+
+
+link_utilities () {
+    debug "Linking all utilities…" # simple exports for utils
+    _sofin_svc_dir="${SERVICES_DIR}/${SOFIN_BUNDLE_NAME}"
+    try "${MKDIR_BIN} -p '${_sofin_svc_dir}/exports'"
+    for _tool_bundle in $(${FIND_BIN} "${_sofin_svc_dir}" -mindepth 1 -maxdepth 1 -type d -name '[A-Z0-9]*' 2>/dev/null); do
+        for _export in $(${LS_BIN} "${_tool_bundle}/exports" 2>/dev/null); do
+            debug "Link: '$(distd "${_tool_bundle}/exports/${_export##*/}")' => '$(distd "${_sofin_svc_dir}/exports/${_export##*/}'")"
+            run "${LN_BIN} -fs '${_tool_bundle}/exports/${_export##*/}' '${_sofin_svc_dir}/exports/${_export##*/}'"
+        done
+    done
+    unset _sofin_svc_dir _tool_bundle _export
+}
