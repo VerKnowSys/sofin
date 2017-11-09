@@ -199,18 +199,12 @@ validate_pie_on_exports () {
 }
 
 
-validate_dtrace () {
+validate_kern_loaded_dtrace () {
     if [ -n "${CAP_SYS_DTRACE}" ]; then
         case "${SYSTEM_NAME}" in
-            Darwin|Minix)
-                ;;
-
-            Linux)
-                try "${KLDLOAD_BIN} dtrace >/dev/null 2>&1"
-                ;;
-
             FreeBSD)
-                try "${KLDLOAD_BIN} dtraceall >/dev/null 2>&1"
+                ${KLDSTAT_BIN} 2>/dev/null | ${GREP_BIN} -F 'dtrace.ko' >/dev/null 2>&1 \
+                    || try "${KLDLOAD_BIN} dtraceall >/dev/null"
                 ;;
         esac
     fi

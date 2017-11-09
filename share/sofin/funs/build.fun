@@ -135,7 +135,7 @@ build () {
     # Update definitions and perform more checks
     validate_reqs
     security_set_build
-    validate_dtrace
+    validate_kern_loaded_dtrace
     validate_sys_limits
 
     # store_security_state
