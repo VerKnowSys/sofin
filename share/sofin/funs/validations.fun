@@ -199,6 +199,24 @@ validate_pie_on_exports () {
 }
 
 
+validate_dtrace () {
+    if [ -n "${CAP_SYS_DTRACE}" ]; then
+        case "${SYSTEM_NAME}" in
+            Darwin|Minix)
+                ;;
+
+            Linux)
+                try "${KLDLOAD_BIN} dtrace >/dev/null 2>&1"
+                ;;
+
+            FreeBSD)
+                try "${KLDLOAD_BIN} dtraceall >/dev/null 2>&1"
+                ;;
+        esac
+    fi
+}
+
+
 validate_sys_limits () {
 
     # Limits for production CAP_SYS_HARDENED environment:
