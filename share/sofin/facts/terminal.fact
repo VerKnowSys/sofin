@@ -37,7 +37,7 @@ REPLAY_PREVIOUS_LINE="\033[A\33[2K\r"
 determine_term_capabilites () {
     env_forgivable
     # setopt >/dev/null 2>/dev/null # zsh only command
-    if [ "${SYSTEM_NAME}" = "FreeBSD" ]; then
+    if [ "${SHELL}" = "${ZSH_BIN}" ]; then
         # if Zsh is still running as sh, so we want to load Zsh fancy features:
         zmodload zsh/parameter 2>/dev/null
 
