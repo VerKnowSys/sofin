@@ -16,6 +16,7 @@ usage_howto () {
     permnote "  $(distn "log any-part-of-def-name             ") shows and watches log(s) which name matches pattern"
     permnote
     permnote "  $(distn "up | update                          ") only update definitions from remote repository and exit"
+    permnote "  $(distn "upgrade defname srcurl               ") upgrade given definition using url as source archive"
     permnote "  $(distn "ver | version                        ") shows "${SOFIN_BIN_SHORT}" script version"
     permnote "  $(distn "clean                                ") cleans binbuilds cache, unpacked source content and logs"
     permnote "  $(distn "distclean                            ") cleans binbuilds cache, unpacked source content, logs and definitions"

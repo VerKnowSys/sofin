@@ -228,6 +228,46 @@ if [ -n "${SOFIN_COMMAND}" ]; then
             ;;
 
 
+        upgrade|ug)
+            _definition="${1}"
+            _url="${2}"
+            _archive_name="${_url##*/}"
+
+            case "${SYSTEM_NAME}" in
+                FreeBSD)
+                    _sha="sha1 -q ${_archive_name} 2>/dev/null"
+                    ;;
+                *)
+                    _sha="openssl sha1 ${_archive_name} 2>/dev/null | ${AWK_BIN} '{print \$2;}' 2>/dev/null"
+                    ;;
+            esac
+
+            debug "Synchronizing archive: $(distd "${_archive_name}") to: $(distd "${MAIN_SOFTWARE_ADDRESS}")"
+            _new_sha="$(${SSH_BIN} -p "${SOFIN_SSH_PORT}" "${SOFIN_NAME}@${MAIN_SOFTWARE_ADDRESS}" " \
+                cd ${MAIN_SOURCE_PREFIX} \
+                && test -f ${_archive_name} || curl -4 --progress-bar -C - -k -L -O '${_url}' > /tmp/sofin.sync.log 2>&1 \
+                && ${_sha} \
+                && return 0; \
+                echo; ${CAT_BIN} /tmp/sofin.sync.log; \
+                return 1; \
+                ")" || error "Failed to sync archive: $(diste "${_archive_name}")"
+            _version="$(echo "${_archive_name}" | ${SED_BIN} -e 's#^.*-##; s#\.t[agx][rz]\..*$##;' 2>/dev/null)"
+
+            note "Url archive of: $(distn "${_definition}") version: $(distn "${_version}") synchronized: $(distn "${_url}") ($(distn "${_new_sha}"))"
+
+            debug "Updating local definition: $(distd "${_definition}") with version: $(distd "${_version}")"
+            ${SED_BIN} -i '' -e "s#^DEF_VERSION=.*\$#DEF_VERSION=\"${_version}\"#" "${DEFINITIONS_DIR}/${_definition}${DEFAULT_DEF_EXT}"
+            ${SED_BIN} -i '' -e "s#^DEF_SHA=.*\$#DEF_SHA=\"${_new_sha}\"#" "${DEFINITIONS_DIR}/${_definition}${DEFAULT_DEF_EXT}"
+
+            _local="/Projects/Sofin-definitions/definitions" # XXX: hardcoded.
+            if [ -d "${_local}" ]; then
+                debug "Projects definition: $(distd "${_definition}") with version: $(distd "${_version}")"
+                ${SED_BIN} -i '' -e "s#^DEF_VERSION=.*\$#DEF_VERSION=\"${_version}\"#" "${_local}/${_definition}${DEFAULT_DEF_EXT}"
+                ${SED_BIN} -i '' -e "s#^DEF_SHA=.*\$#DEF_SHA=\"${_new_sha}\"#" "${_local}/${_definition}${DEFAULT_DEF_EXT}"
+            fi
+            ;;
+
+
         tool|mkutil|util) # `s tool`
             _utils="${*}"
             if [ -n "${_utils}" ]; then
