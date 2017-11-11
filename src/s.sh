@@ -291,10 +291,13 @@ if [ -n "${SOFIN_COMMAND}" ]; then
                     BUILD_DIR="${PREFIX}/${DEFAULT_SRC_EXT}${BUILD_NAMESUM}"
                     try "${MKDIR_BIN} -p ${BUILD_DIR}"
 
-                    note "Buiding an utility: $(distn "${_util}") for: $(distn "${OS_TRIPPLE}")"
-                    build "${_util}"
-                    link_utilities
-
+                    if [ ! -f "${PREFIX}/${_util}${DEFAULT_INST_MARK_EXT}" ]; then
+                        note "Buiding an utility: $(distn "${_util}") for: $(distn "${OS_TRIPPLE}")"
+                        build "${_util}"
+                    else
+                        note "Linking prebuilt utility: $(distn "${_util}") for: $(distn "${OS_TRIPPLE}")"
+                        link_utilities
+                    fi
                 done
                 note "Installed utilities: $(distn "${_utils}")"
                 finalize
