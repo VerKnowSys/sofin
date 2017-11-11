@@ -142,7 +142,6 @@ build () {
     # disable_security_features
 
     debug "Sofin v$(distd "${SOFIN_VERSION}"): New build started for bundles: $(distd "${_build_list}")"
-    PATH="${DEFAULT_PATH}"
     for _bund_name in $(to_iter "${_build_list}"); do
         _bund_name="$(lowercase "${_bund_name}")"
         _anm="$(capitalize "${_bund_name}")"
@@ -190,7 +189,7 @@ build () {
                 export PKG_CONFIG_PATH="${PREFIX}/lib/pkgconfig"
                 export PATH="${DEFAULT_SHELL_EXPORTS}:${PREFIX}/bin:${PREFIX}/sbin:${DEFAULT_PATH}"
                 if [ -n "${DEF_USE_TOOLS}" ]; then
-                    export PATH="${SOFIN_UTILS_PATH}:${PATH}"
+                    export PATH="${PATH}:${SOFIN_UTILS_PATH}"
                     debug "Using tools: $(distd "yes"). Path=$(distd "${PATH}")"
                 else
                     debug "Using tools: $(distd "no" "${ColorRed}")"
@@ -393,11 +392,17 @@ process_flat () {
     # NOTE: ..load definition again, because each definition can also alter
     #       it's build environment values (flexibility, KISS)
     load_defs "${_req_definition}"
+
+    PATH="${DEFAULT_SHELL_EXPORTS}:${_prefix}/bin:${_prefix}/sbin:${DEFAULT_PATH}"
+    if [ -n "${DEF_USE_TOOLS}" ]; then
+        debug "Suffixing path: $(distd "${SOFIN_UTILS_PATH}") to local build path!"
+        PATH="${PATH}:${SOFIN_UTILS_PATH}"
+    fi
+
     dump_system_capabilities
     dump_debug_info
     dump_compiler_setup
 
-    PATH="${DEFAULT_SHELL_EXPORTS}:${_prefix}/bin:${_prefix}/sbin:${DEFAULT_PATH}"
     if [ -z "${DEF_DISABLED_ON}" ]; then
         if [ "${DEF_TYPE}" = "meta" ]; then
             note "   ${NOTE_CHAR2} Meta bundle detected."
@@ -766,7 +771,7 @@ test_and_rate_def () {
                 fi
                 ${PRINTF_BIN} "Test for ${_name} started at: ${TIMESTAMP}\n" >> "${PREFIX}/${_name}.test.log" 2>> "${PREFIX}/${_name}.test.log"
                 eval "\
-                    PATH=\"${PREFIX}/bin:${PREFIX}/sbin:${PREFIX}/libexec:/bin:/usr/bin\" \
+                    PATH=\"${PREFIX}/bin:${PREFIX}/sbin:${PREFIX}/libexec:/bin:/usr/bin:${SOFIN_UTILS_PATH}\" \
                     ${_ld_prefix_name}LD_LIBRARY_PATH=\"${PREFIX}/lib:${PREFIX}/libexec\" \
                     eval '${_cmdline}' >> \"${PREFIX}/${_name}.test.log\" 2>> \"${PREFIX}/${_name}.test.log\" \
                 "
