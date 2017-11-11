@@ -513,7 +513,7 @@ strip_bundle () {
     else
         if [ -n "${_strip_list}" ]; then
             debug "Found: $(distd "${_sbresult}") files to strip in parallel."
-            echo "${_strip_list}" | ${XARGS_BIN} -n 1 -P 8 -I {} "${ZSH_BIN}" -c "${STRIP_BIN} ${DEFAULT_STRIP_OPTS} {} >/dev/null 2>&1"
+            echo "${_strip_list}" | ${XARGS_BIN} -n 1 -P "${CPUS}" -I {} "${ZSH_BIN}" -c "${STRIP_BIN} ${DEFAULT_STRIP_OPTS} {} >/dev/null 2>&1"
             run "${TOUCH_BIN} ${PREFIX}/${_sbfdefinition_name}${DEFAULT_STRIPPED_MARK_EXT}"
         fi
     fi
