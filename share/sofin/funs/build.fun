@@ -189,7 +189,7 @@ build () {
                 export PKG_CONFIG_PATH="${PREFIX}/lib/pkgconfig"
                 export PATH="${DEFAULT_SHELL_EXPORTS}:${PREFIX}/bin:${PREFIX}/sbin:${DEFAULT_PATH}"
                 if [ -n "${DEF_USE_TOOLS}" ]; then
-                    export PATH="${PATH}:${SOFIN_UTILS_PATH}"
+                    export PATH="${DEFAULT_SHELL_EXPORTS}:${PREFIX}/bin:${PREFIX}/sbin:${SOFIN_UTILS_PATH}:${DEFAULT_PATH}"
                     debug "Using tools: $(distd "yes"). Path=$(distd "${PATH}")"
                 else
                     debug "Using tools: $(distd "no" "${ColorRed}")"
@@ -396,7 +396,7 @@ process_flat () {
     PATH="${DEFAULT_SHELL_EXPORTS}:${_prefix}/bin:${_prefix}/sbin:${DEFAULT_PATH}"
     if [ -n "${DEF_USE_TOOLS}" ]; then
         debug "Suffixing path: $(distd "${SOFIN_UTILS_PATH}") to local build path!"
-        PATH="${PATH}:${SOFIN_UTILS_PATH}"
+        PATH="${DEFAULT_SHELL_EXPORTS}:${_prefix}/bin:${_prefix}/sbin:${SOFIN_UTILS_PATH}:${DEFAULT_PATH}"
     fi
 
     dump_system_capabilities
@@ -771,7 +771,7 @@ test_and_rate_def () {
                 fi
                 ${PRINTF_BIN} "Test for ${_name} started at: ${TIMESTAMP}\n" >> "${PREFIX}/${_name}.test.log" 2>> "${PREFIX}/${_name}.test.log"
                 eval "\
-                    PATH=\"${PREFIX}/bin:${PREFIX}/sbin:${PREFIX}/libexec:/bin:/usr/bin:${SOFIN_UTILS_PATH}\" \
+                    PATH=\"${PREFIX}/bin:${PREFIX}/sbin:${PREFIX}/libexec:${SOFIN_UTILS_PATH}:/bin:/usr/bin\" \
                     ${_ld_prefix_name}LD_LIBRARY_PATH=\"${PREFIX}/lib:${PREFIX}/libexec\" \
                     eval '${_cmdline}' >> \"${PREFIX}/${_name}.test.log\" 2>> \"${PREFIX}/${_name}.test.log\" \
                 "
