@@ -4,7 +4,7 @@
 . share/sofin/loader
 
 if [ "Darwin" = "${SYSTEM_NAME}" ]; then
-    "${SOFIN_ROOT}/bin/s" util Ccache Bash Make Pkgconf Perl Python27 Cmake Zip M4 Ninja Wget Yasm Nasm Gawk Scons Automake Automake14 Automake18
+    "${SOFIN_ROOT}/bin/s" util Ccache Xz Bash Make Pkgconf Perl Python27 Cmake Zip M4 Ninja Wget Yasm Nasm Gawk Scons Automake Automake14 Automake18 Texinfo
 else
-    "${SOFIN_ROOT}/bin/s" util Ccache Doas M4 Bash Make Pkgconf Perl Python27 Cmake Zip M4 Ninja Wget Yasm Nasm Gawk Scons Automake Automake14 Automake18
+    "${SOFIN_ROOT}/bin/s" util Ccache Bzip2 Xz Doas M4 Bash Make Pkgconf Perl Python27 Cmake Zip M4 Ninja Wget Yasm Nasm Gawk Scons Automake Automake14 Automake18 Texinfo
 fi
