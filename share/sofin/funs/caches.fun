@@ -107,6 +107,6 @@ cache_conf_scrpt_hlp_opts () {
         try "${MKDIR_BIN} -p \"$(${DIRNAME_BIN} "${_config_log}" 2>/dev/null)\" 2>/dev/null" \
             && try "${DEF_CONFIGURE_METHOD} -h | ${GREP_BIN} -E '\-\-\s*' 2>/dev/null > \"${_config_log}\""
     fi
-    debug "Configure options: $(distd "$(${CAT_BIN} "${_config_log}" 2>/dev/null)" "${ColorExample}")"
+    debug "Configure options: $(distd "$(${CAT_BIN} "${_config_log}" 2>/dev/null)" "${ColorBlue}")"
     return 0
 }
