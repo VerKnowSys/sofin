@@ -39,6 +39,7 @@ SOFIN_OS_VER_BIN="${SOFIN_ROOT}/bin/s-osver"
 SOFIN_TIMER_BIN="${SOFIN_ROOT}/bin/s-usec"
 DEFAULT_SHELL_EXPORTS="${SOFTWARE_DIR}/Zsh/exports"
 DEFAULT_PATH="${DEFAULT_SHELL_EXPORTS}:/bin:/usr/bin:/sbin:/usr/sbin:/usr/pkg/bin:/usr/pkg/sbin"
+SOFIN_UTILS_PATH="${SERVICES_DIR}/${SOFIN_BUNDLE_NAME}/exports"
 
 FUNS_LOCAL_DIR="share/funs/"
 FACTS_LOCAL_DIR="share/facts/"

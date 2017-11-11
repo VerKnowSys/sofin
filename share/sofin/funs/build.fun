@@ -186,9 +186,15 @@ build () {
 
                 # These values has to be exported because external build mechanisms
                 # has to be able to reach these values to find dependencies and utilities
-                export PATH="${DEFAULT_SHELL_EXPORTS}:${PREFIX}/bin:${PREFIX}/sbin:${DEFAULT_PATH}"
-                export PKG_CONFIG_PATH="${PREFIX}/lib/pkgconfig"
                 export PREFIX
+                export PKG_CONFIG_PATH="${PREFIX}/lib/pkgconfig"
+                export PATH="${DEFAULT_SHELL_EXPORTS}:${PREFIX}/bin:${PREFIX}/sbin:${DEFAULT_PATH}"
+                if [ -n "${DEF_USE_TOOLS}" ]; then
+                    export PATH="${SOFIN_UTILS_PATH}:${PATH}"
+                    debug "Using tools: $(distd "yes"). Path=$(distd "${PATH}")"
+                else
+                    debug "Using tools: $(distd "no" "${ColorRed}")"
+                fi
 
                 if [ -z "${DEF_UTILITY_BUNDLE}" ]; then
                     # NOTE: standalone definition has own SERVICES_DIR/Bundlename/ prefix
