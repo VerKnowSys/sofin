@@ -388,7 +388,7 @@ wipe_remote_archives () {
             debug "Using defined mirror(s): $(distd "${_wr_dig}")"
             for _wr_mirr in $(to_iter "${_wr_dig}"); do
                 note "Wiping out remote: $(distn "${_wr_mirr}") binary archives: $(distn "${_remote_ar_name}")"
-                retry "${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${MAIN_SSH_PORT} ${SOFIN_NAME}@${_wr_mirr} \"${FIND_BIN} ${MAIN_BINARY_PREFIX}/${SYS_SPECIFIC_BINARY_REMOTE} -iname '${_remote_ar_name}' -delete\""
+                retry "${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${SOFIN_SSH_PORT} ${SOFIN_NAME}@${_wr_mirr} \"${FIND_BIN} ${MAIN_BINARY_PREFIX}/${SYS_SPECIFIC_BINARY_REMOTE} -iname '${_remote_ar_name}' -delete\""
             done
         done
     else
