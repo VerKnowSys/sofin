@@ -315,7 +315,7 @@ make_exports () {
             note "Exporting binary: $(distn "${SOFTWARE_DIR}/${_bundle_name}${_bindir}${_export_bin}")"
             _cdir="$(${PWD_BIN} 2>/dev/null)"
             cd "${SOFTWARE_DIR}/${_bundle_name}${_bindir}"
-            try "${LN_BIN} -fs ..${_bindir}/${_export_bin} ../exports/${_export_bin}"
+            try "${RM_BIN} -f ../exports/${_export_bin}; ${LN_BIN} -s ..${_bindir}/${_export_bin} ../exports/${_export_bin}"
             cd "${_cdir}"
             unset _cdir _bindir _bundle_name _export_bin
             return 0
@@ -328,7 +328,7 @@ make_exports () {
             note "Exporting binary: $(distn "${SERVICES_DIR}/${_bundle_name}${_bindir}${_export_bin}")"
             _cdir="$(${PWD_BIN} 2>/dev/null)"
             cd "${SERVICES_DIR}/${_bundle_name}${_bindir}"
-            try "${LN_BIN} -fs ..${_bindir}/${_export_bin} ../exports/${_export_bin}"
+            try "${RM_BIN} -f ../exports/${_export_bin}; ${LN_BIN} -s ..${_bindir}/${_export_bin} ../exports/${_export_bin}"
             cd "${_cdir}"
             unset _cdir _bindir _bundle_name _export_bin
             return 0
@@ -675,13 +675,13 @@ export_binaries () {
         try "${MKDIR_BIN} -p ${PREFIX}/exports ${SERVICE_DIR}/exports"
         unset _expolist
         for _xp in $(to_iter "${DEF_EXPORTS}"); do
-            for dir in "/bin/" "/sbin/" "/libexec/"; do
+            for dir in "/libexec/" "/bin/" "/sbin/"; do
 
                 _soft_to_exp="${PREFIX}${dir}${_xp}"
                 if [ -x "${_soft_to_exp}" ]; then
                     _acurrdir="$(${PWD_BIN} 2>/dev/null)"
                     cd "${PREFIX}${dir}"
-                    run "${LN_BIN} -fs ..${dir}${_xp} ../exports/${_xp}"
+                    run "${RM_BIN} -f ../exports/${_xp}; ${LN_BIN} -s ..${dir}${_xp} ../exports/${_xp}"
                     cd "${_acurrdir}"
                     _expo_elem="${_soft_to_exp##*/}"
                     _expolist="${_expolist} ${_expo_elem}"
@@ -691,7 +691,7 @@ export_binaries () {
                 if [ -x "${_service_to_exp}" ]; then
                     _acurrdir="$(${PWD_BIN} 2>/dev/null)"
                     cd "${SERVICE_DIR}${dir}"
-                    run "${LN_BIN} -fs ..${dir}${_xp} ../exports/${_xp}"
+                    run "${RM_BIN} -f ../exports/${_xp}; ${LN_BIN} -s ..${dir}${_xp} ../exports/${_xp}"
                     cd "${_acurrdir}"
                     _expo_elem="${_service_to_exp##*/}"
                     _expolist="${_expolist} ${_expo_elem}"

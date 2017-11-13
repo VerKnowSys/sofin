@@ -424,7 +424,7 @@ link_utilities () {
     try "${MKDIR_BIN} -p '${_sofin_svc_dir}/exports'"
     for _tool_bundle in $(${FIND_BIN} "${_sofin_svc_dir}" -mindepth 1 -maxdepth 1 -type d -name '[A-Z0-9]*' 2>/dev/null); do
         for _export in $(${LS_BIN} "${_tool_bundle}/exports" 2>/dev/null); do
-            run "${LN_BIN} -fs '${_tool_bundle}/exports/${_export##*/}' '${_sofin_svc_dir}/exports/${_export##*/}'"
+            run "${RM_BIN} -f '${_sofin_svc_dir}/exports/${_export##*/}'; ${LN_BIN} -s '${_tool_bundle}/exports/${_export##*/}' '${_sofin_svc_dir}/exports/${_export##*/}'"
         done
     done
     unset _sofin_svc_dir _tool_bundle _export
