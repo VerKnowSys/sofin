@@ -29,6 +29,7 @@ load_defs () {
 
             # check disabled definition state
             validate_definition_disabled "${DEF_DISABLE_ON}"
+            validate_util_availability "${DEF_NAME}${DEF_SUFFIX}"
 
         done
     fi

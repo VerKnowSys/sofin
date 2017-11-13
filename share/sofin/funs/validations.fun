@@ -150,6 +150,15 @@ validate_definition_disabled () {
                 DEF_DISABLED_ON=YES
             fi
         done
+
+
+validate_util_availability () {
+    _req_name="$(lowercase "${1}")"
+    _req_util_indicator="${SOFIN_UTILS_DIR}/$(capitalize "${_req_name}")/${_req_name}${DEFAULT_INST_MARK_EXT}"
+    debug "Checking req name: $(distd "${_req_name}") with installing indicator: $(distd "${_req_util_indicator}")"
+    if [ -f "${_req_util_indicator}" ]; then
+        debug "Utility available for: $(distd "${_req_name}"). Disabling"
+        DEF_DISABLED_ON=YES
     fi
 }
 
