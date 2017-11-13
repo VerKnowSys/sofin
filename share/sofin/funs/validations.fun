@@ -140,16 +140,14 @@ validate_def_postfix () {
 
 
 validate_definition_disabled () {
-    _ch_dis_name="${1}"
-    unset DEF_DISABLED_ON
     # check requirement for disabled state:
-    if [ -n "${_ch_dis_name}" ]; then
-        for _def_disabled in $(to_iter "${_ch_dis_name}"); do
-            if [ "${SYSTEM_NAME}" = "${_def_disabled}" ]; then
-                debug "Disabled: $(distd "${_def_disabled}") on $(distd "${SYSTEM_NAME}")"
-                DEF_DISABLED_ON=YES
-            fi
-        done
+    for _def_disable_on in $(to_iter "${DEF_DISABLE_ON}"); do
+        if [ "${SYSTEM_NAME}" = "${_def_disable_on}" ]; then
+            debug "Disabled: $(distd "${_def_disable_on}") on $(distd "${SYSTEM_NAME}")"
+            DEF_DISABLED_ON=YES
+        fi
+    done
+}
 
 
 validate_util_availability () {

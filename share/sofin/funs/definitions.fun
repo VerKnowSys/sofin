@@ -28,7 +28,8 @@ load_defs () {
             validate_def_postfix "${_given_def}" "${DEF_NAME}"
 
             # check disabled definition state
-            validate_definition_disabled "${DEF_DISABLE_ON}"
+            unset DEF_DISABLED_ON
+            validate_definition_disabled
             validate_util_availability "${DEF_NAME}${DEF_SUFFIX}"
 
         done
