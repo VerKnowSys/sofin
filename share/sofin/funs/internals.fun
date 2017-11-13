@@ -18,6 +18,7 @@ usage_howto () {
     permnote "  $(distn "up | update                          ") only update definitions from remote repository and exit"
     permnote "  $(distn "upgrade defname srcurl               ") upgrade given definition using url as source archive"
     permnote "  $(distn "ver | version                        ") shows "${SOFIN_BIN_SHORT}" script version"
+    permnote "  $(distn "util Bundle1 B2 BundleN              ") build given definitions as Sofin utilities."
     permnote "  $(distn "clean                                ") cleans binbuilds cache, unpacked source content and logs"
     permnote "  $(distn "distclean                            ") cleans binbuilds cache, unpacked source content, logs and definitions"
     permnote "  $(distn "purge                                ") cleans binbuilds cache, unpacked source content, logs, definitions, source cache and possible states"
