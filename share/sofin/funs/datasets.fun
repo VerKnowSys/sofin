@@ -412,6 +412,7 @@ destroy_software_dir () {
     fi
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
         _dsname="${DEFAULT_ZPOOL}${SOFTWARE_DIR}/${USER}/${_dset_destroy}"
+        try "${ZFS_BIN} set sharenfs=off '${_dsname}'"
         try "${ZFS_BIN} umount -f '${_dsname}'"
         try "${ZFS_BIN} destroy -fr '${_dsname}'" && \
             debug "Destroyed software-dataset: $(distd "${_dsname}")"
@@ -571,7 +572,7 @@ install_software_from_binbuild () {
         run "${XZCAT_BIN} '${FILE_CACHE_DIR}${_isfb_archive}' | ${ZFS_BIN} receive -F ${ZFS_RECEIVE_OPTS} '${_isfb_dataset}' | ${TAIL_BIN} -n1 2>/dev/null" && \
                 note "Installed: $(distn "${_isfb_fullname}")" && \
                     DONT_BUILD_BUT_DO_EXPORTS=YES
-        # fi
+        try "${ZFS_BIN} set sharenfs=off '${_isfb_dataset}'"
     else
         try "${TAR_BIN} -xJf ${FILE_CACHE_DIR}${_isfb_archive} --directory ${SOFTWARE_DIR}"
         if [ "${?}" = "0" ]; then
