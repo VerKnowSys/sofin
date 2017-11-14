@@ -285,7 +285,7 @@ build () {
     validate_pie_on_exports "${_build_list}"
 
     if [ -n "${DEF_UTILITY_BUNDLE}" ]; then
-        try "${RM_BIN} -rf '${PREFIX}/${_anm}' '${PREFIX}/include' '${PREFIX}/doc'"
+        try "${RM_BIN} -rf '${PREFIX}/${_anm}' '${PREFIX}/include' '${PREFIX}/doc' ${PREFIX}/${DEFAULT_SRC_EXT}*"
         debug "Utility bundle: $(distd "${_anm}") build completed!"
         link_utilities
 
