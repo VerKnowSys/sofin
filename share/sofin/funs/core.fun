@@ -291,7 +291,7 @@ trap_signals () {
         if [ -n "${CAP_SYS_PRODUCTION}" ]; then
             debug "Production mode, skipping readonly mode for /"
         else
-            _active_boot_env="$(${BEADM_BIN} list -H | ${EGREP_BIN} -i "R" 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)"
+            _active_boot_env="$(${BEADM_BIN} list -H | ${EGREP_BIN} "R" 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)"
             debug "Turn on readonly mode for: $(distd "${DEFAULT_ZPOOL}/ROOT/${_active_boot_env}")"
             try "${ZFS_BIN} set readonly=on '${DEFAULT_ZPOOL}/ROOT/${_active_boot_env}'"
         fi
@@ -315,7 +315,7 @@ untrap_signals () {
 
     if [ "YES" = "${CAP_SYS_ZFS}" ] && [ -x "${BEADM_BIN}" ]; then
         debug "Beadm found, turning off readonly mode for default boot environment"
-        _active_boot_env="$(${BEADM_BIN} list -H 2>/dev/null | ${EGREP_BIN} -i "R" 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)"
+        _active_boot_env="$(${BEADM_BIN} list -H 2>/dev/null | ${EGREP_BIN} "R" 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)"
         _boot_dataset="${DEFAULT_ZPOOL}/ROOT/${_active_boot_env}"
         if [ -n "${CAP_SYS_PRODUCTION}" ]; then
             debug "Production mode disabling readonly for dataset: '$(distd "${_boot_dataset}")'"
