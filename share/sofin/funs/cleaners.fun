@@ -53,7 +53,6 @@ perform_clean () {
 
 finalize () {
     # restore_security_state
-    untrap_signals
     destroy_dead_locks
     finalize_shell_reload
 }
@@ -67,8 +66,8 @@ finalize_shell_reload () {
 
 
 finalize_onquit () {
-    security_set_normal
-    # summary
+    # security_set_normal
+    destroy_ramdisk_device
     if [ "${TTY}" = "YES" ]; then
         # Bring back echo
         ${STTY_BIN} echo
@@ -77,15 +76,7 @@ finalize_onquit () {
 
 
 destroy_ramdisk_device () {
-    if [ -n "${RAMDISK_DEV}" ] && [ -n "${CAP_SYS_BUILDHOST}" ]; then
-        umount_ramdisk
-        unset RAMDISK_DEV
-    fi
-}
-
-
-umount_ramdisk () {
-    if [ -z "${DEVEL}" ]; then
+    if [ -n "${RAMDISK_DEV}" ]; then
         case "${SYSTEM_NAME}" in
             Darwin)
                 if [ -n "${RAMDISK_DEV}" ]; then
@@ -96,6 +87,7 @@ umount_ramdisk () {
         esac
         try "${UMOUNT_BIN} -f ${RAMDISK_DEV}" && \
             debug "Tmp ramdisk force-unmounted: $(distd "${RAMDISK_DEV}")"
+        unset RAMDISK_DEV
     fi
 }
 
@@ -103,7 +95,7 @@ umount_ramdisk () {
 # NOTE: C-c is handled differently, not full finalize is running. f.e. build dir isn't wiped out
 finalize_interrupt () {
     untrap_signals
-    umount_ramdisk
+    destroy_ramdisk_device
     destroy_dead_locks
     finalize_onquit
 }
