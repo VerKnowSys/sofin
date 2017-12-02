@@ -456,14 +456,13 @@ update_shell_vars () {
 
 
 reload_shell () {
-    eval "$(${CAT_BIN} "${SOFIN_PROFILE}" 2>/dev/null)"
     # NOTE: PPID contains pid of parent shell of Sofin
-    # if [ -n "${PPID}" ]; then # NOTE: skip reload when legacy sh is parent shell
-    #     try "${KILL_BIN} -SIGUSR2 ${PPID}" && \
-    #         debug "Reload signal sent to parent pid: $(distd "${PPID}")"
-    # else
-    #     debug "Skipped reload_shell() for no $(distd PPID)"
-    # fi
+    if [ -n "${PPID}" ]; then # NOTE: skip reload when legacy sh is parent shell
+        try "${KILL_BIN} -SIGUSR2 ${PPID}" && \
+            debug "Reload signal sent to parent pid: $(distd "${PPID}")"
+    else
+        debug "Skipped reload_shell() for no $(distd PPID)"
+    fi
 }
 
 
