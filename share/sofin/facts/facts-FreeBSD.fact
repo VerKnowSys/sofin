@@ -28,7 +28,7 @@ GEOM_BIN="/sbin/geom"
 BEADM_BIN="/usr/sbin/beadm"
 
 # ServeD governor, FreeBSD specific:
-GVR_BIN="/usr/bin/gvr"
+# GVR_BIN="/usr/bin/gvr"
 
 # set core parameters:
 CPUS="$(${SYSCTL_BIN} -e kern.smp.cpus 2>/dev/null | ${CUT_BIN} -d'=' -f2 2>/dev/null)"
