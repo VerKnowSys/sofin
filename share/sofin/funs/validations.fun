@@ -12,10 +12,9 @@ check_version () { # $1 => installed version, $2 => available version
 
 # validate environment availability or crash
 validate_env () {
-    set | ${GREP_BIN} -E "^[A-Z]+_BIN=\"\/.*\"" 2>/dev/null | while IFS= read -r _envvar
+    set | ${GREP_BIN} -E "^[A-Z]+_BIN=" 2>/dev/null | while IFS= read -r _envvar
     do
         _var_value="${_envvar#*=}"
-        debug "Validating: $(distd "${_var_value}")"
         if [ ! -x "${_var_value}" ]; then
             error "Required binary is unavailable: $(diste "${_envvar}")"
         fi

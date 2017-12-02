@@ -457,7 +457,7 @@ update_shell_vars () {
 
 reload_shell () {
     # NOTE: PPID contains pid of parent shell of Sofin
-    if [ -n "${PPID}" ]; then # NOTE: skip reload when legacy sh is parent shell
+    if [ -n "${PPID}" ]; then
         try "${KILL_BIN} -SIGUSR2 ${PPID}" && \
             debug "Reload signal sent to parent pid: $(distd "${PPID}")"
     else
