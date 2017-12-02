@@ -23,6 +23,7 @@ echo
 
 # Set explicit +e for Sofin shell:
 env_forgivable
+validate_env
 
 # Tracing of Sofin itself:
 if [ -n "${SOFIN_TRACE}" ]; then
