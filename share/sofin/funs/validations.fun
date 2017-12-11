@@ -12,7 +12,7 @@ check_version () { # $1 => installed version, $2 => available version
 
 # validate environment availability or crash
 validate_env () {
-    set | ${GREP_BIN} -E "^[A-Z]+_BIN=" 2>/dev/null | while IFS= read -r _envvar
+    for _envvar in $(set | ${GREP_BIN} -EI "^[A-Z]+_BIN=" 2>/dev/null)
     do
         _var_value="${_envvar#*=}"
         if [ ! -x "${_var_value}" ]; then
