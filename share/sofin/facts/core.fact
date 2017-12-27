@@ -109,13 +109,12 @@ LANG="${LANG:-${DEFAULT_LOCALE}}"
 LANGUAGE="${LANGUAGE:-${DEFAULT_LOCALE}}"
 
 # Determine CACHE_DIR and related core settings:
-if [ -d "${DEFAULT_HOME}/.${SOFIN_NAME}" ] || [ -d "${DEFAULT_HOME}" ]; then
-    # ServeD-OS support:
-    CACHE_DIR="${DEFAULT_HOME}/.${SOFIN_NAME}/"
-
-elif [ -d "${HOME}/.${SOFIN_NAME}" ] || [ -d "${HOME}" ]; then
+if [ -d "${HOME}/.${SOFIN_NAME}" ] || [ -d "${HOME}" ]; then
     # Use POSIX-like HOME dir support:
     CACHE_DIR="${HOME}/.${SOFIN_NAME}/"
+elif [ -d "${DEFAULT_HOME}/.${SOFIN_NAME}" ] || [ -d "${DEFAULT_HOME}" ]; then
+    # ServeD-OS support:
+    CACHE_DIR="${DEFAULT_HOME}/.${SOFIN_NAME}/"
 else
     # any POSIX-legacy system support:
     CACHE_DIR="${DEFAULT_SYSTEM_CACHE_DIR}/${SOFIN_NAME}/"
