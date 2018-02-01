@@ -93,7 +93,7 @@ checksum_filecache_element () {
         error "No such file found in file-cache: $(diste "${FILE_CACHE_DIR}${_file_to_checksum}")"
     else
         _chksum_file="${FILE_CACHE_DIR}${_file_to_checksum}${DEFAULT_CHKSUM_EXT}"
-        ${PRINTF_BIN} '%s' "${_file_chksum}" > "${_chksum_file}" && \
+        printf '%s' "${_file_chksum}" > "${_chksum_file}" && \
             debug "Stored chksum: $(distd "${_file_chksum}") of file: $(distd "${_file_to_checksum}") in path: $(distd "${FILE_CACHE_DIR}${_file_to_checksum}")"
     fi
     unset _file_chksum _file_to_checksum _chksum_file

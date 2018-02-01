@@ -50,7 +50,7 @@ usage_howto () {
 
 
 sofin_header () {
-    ${PRINTF_BIN} '\r\n     %s\n%s\n\n  %s\n  %s\n  %s\n\n  %s\n\n' \
+    printf '\r\n     %s\n%s\n\n  %s\n  %s\n  %s\n\n  %s\n\n' \
         "$(distn 'Sof' "${ColorWhite}")$(distn 'tware' "${ColorGray}") $(distn 'In' "${ColorWhite}")$(distn 'staller v' "${ColorGray}")$(distn "${SOFIN_VERSION}" "${ColorWhite}")" \
         "$(distn "____________________________________" "${ColorGreen}")" \
         "design, implementation: $(distn "@dmilith")" \
@@ -58,26 +58,26 @@ sofin_header () {
         "released under: $(distn "MIT/BSD")" \
         "running os: $(distn "${OS_TRIPPLE}")"
 
-    ${PRINTF_BIN} '  %s\n' "system capabilities:"
+    printf '  %s\n' "system capabilities:"
     IFS=\n set 2>/dev/null | ${EGREP_BIN} -I 'CAP_SYS_' 2>/dev/null | while IFS= read -r _envv; do
         if [ -n "${_envv}" ]; then
-            ${PRINTF_BIN} '   %s %s\n' \
+            printf '   %s %s\n' \
                 "$(distn "${SUCCESS_CHAR}" "${ColorGreen}")" \
                 "$(distn "$(lowercase "${_envv%=YES}")")"
         fi
     done
 
-    ${PRINTF_BIN} '\r\n  %s\n' "terminal capabilities:"
+    printf '\r\n  %s\n' "terminal capabilities:"
     IFS=\n set 2>/dev/null | ${EGREP_BIN} -I 'CAP_TERM_' 2>/dev/null | while IFS= read -r _envv; do
         if [ -n "${_envv}" ]; then
-            ${PRINTF_BIN} '   %s %s\n' \
+            printf '   %s %s\n' \
                 "$(distn "${SUCCESS_CHAR}" "${ColorGreen}")" \
                 "$(distn "$(lowercase "${_envv%=YES}")")"
         fi
     done
     unset _envv
 
-    ${PRINTF_BIN} "%b\n" "${ColorReset}"
+    printf "%b\n" "${ColorReset}"
 }
 
 
@@ -101,7 +101,7 @@ processes_all_sofin () {
 print_local_env_vars () {
     _s_env_file="${PWD}/.${SOFIN_NAME}.env"
     if [ -f "${_s_env_file}" ]; then
-        ${PRINTF_BIN} '\n# Loaded from local environment: %s\n' \
+        printf '\n# Loaded from local environment: %s\n' \
             "${_s_env_file}" 2>/dev/null
         ${CAT_BIN} "${_s_env_file}" 2>/dev/null
     fi
@@ -190,42 +190,42 @@ print_shell_vars () {
     fi
 
     # Store values to environment file:
-    ${PRINTF_BIN} "# ${ColorParams}%s${ColorReset}:\n" "MANPATH"
-    ${PRINTF_BIN} "%s\n" "export MANPATH=\"${_manpath}\""
+    printf "# ${ColorParams}%s${ColorReset}:\n" "MANPATH"
+    printf "%s\n" "export MANPATH=\"${_manpath}\""
 
     if [ -f "${SOFIN_ENV_ENABLED_INDICATOR_FILE}" ]; then # sofin disabled. Default system environment
         _cflags="$(echo "${_cflags}" | ${SED_BIN} 's/ *$//g; s/  //g' 2>/dev/null)"
         _cxxflags="$(echo "${_cxxflags}" | ${SED_BIN} 's/ *$//g; s/  //g' 2>/dev/null)"
         _ldflags="$(echo "${_ldflags}" | ${SED_BIN} 's/ *$//g; s/  //g' 2>/dev/null)"
         _pkg_config_path="$(echo "${_pkg_config_path}" | ${SED_BIN} 's/ *$//g; s/  //g' 2>/dev/null)"
-        ${PRINTF_BIN} "# ${ColorParams}%s${ColorReset}:\n" "CFLAGS"
-        ${PRINTF_BIN} "%s\n" "export CFLAGS=\"${_cflags}\""
-        ${PRINTF_BIN} "# ${ColorParams}%s${ColorReset}:\n" "CXXFLAGS"
-        ${PRINTF_BIN} "%s\n" "export CXXFLAGS=\"${_cxxflags}\""
-        ${PRINTF_BIN} "# ${ColorParams}%s${ColorReset}:\n" "LDFLAGS"
-        ${PRINTF_BIN} "%s\n" "export LDFLAGS=\"${_ldflags}\""
-        ${PRINTF_BIN} "# ${ColorParams}%s${ColorReset}:\n" "PKG_CONFIG_PATH"
-        ${PRINTF_BIN} "%s\n" "export PKG_CONFIG_PATH=\"${_pkg_config_path}\""
+        printf "# ${ColorParams}%s${ColorReset}:\n" "CFLAGS"
+        printf "%s\n" "export CFLAGS=\"${_cflags}\""
+        printf "# ${ColorParams}%s${ColorReset}:\n" "CXXFLAGS"
+        printf "%s\n" "export CXXFLAGS=\"${_cxxflags}\""
+        printf "# ${ColorParams}%s${ColorReset}:\n" "LDFLAGS"
+        printf "%s\n" "export LDFLAGS=\"${_ldflags}\""
+        printf "# ${ColorParams}%s${ColorReset}:\n" "PKG_CONFIG_PATH"
+        printf "%s\n" "export PKG_CONFIG_PATH=\"${_pkg_config_path}\""
     else # sofin environment override enabled, Default behavior:
-        ${PRINTF_BIN} "# ${ColorParams}%s${ColorReset}:\n" "CFLAGS"
-        ${PRINTF_BIN} "%s\n" "export CFLAGS=\"\""
-        ${PRINTF_BIN} "# ${ColorParams}%s${ColorReset}:\n" "CXXFLAGS"
-        ${PRINTF_BIN} "%s\n" "export CXXFLAGS=\"\""
-        ${PRINTF_BIN} "# ${ColorParams}%s${ColorReset}:\n" "LDFLAGS"
-        ${PRINTF_BIN} "%s\n" "export LDFLAGS=\"\""
-        ${PRINTF_BIN} "# ${ColorParams}%s${ColorReset}:\n" "PKG_CONFIG_PATH"
-        ${PRINTF_BIN} "%s\n" "export PKG_CONFIG_PATH=\"\""
+        printf "# ${ColorParams}%s${ColorReset}:\n" "CFLAGS"
+        printf "%s\n" "export CFLAGS=\"\""
+        printf "# ${ColorParams}%s${ColorReset}:\n" "CXXFLAGS"
+        printf "%s\n" "export CXXFLAGS=\"\""
+        printf "# ${ColorParams}%s${ColorReset}:\n" "LDFLAGS"
+        printf "%s\n" "export LDFLAGS=\"\""
+        printf "# ${ColorParams}%s${ColorReset}:\n" "PKG_CONFIG_PATH"
+        printf "%s\n" "export PKG_CONFIG_PATH=\"\""
     fi
 
     # common
-    ${PRINTF_BIN} "# ${ColorParams}%s${ColorReset}:\n" "PATH"
-    ${PRINTF_BIN} "%s\n" "export PATH=\"${_path}\""
-    ${PRINTF_BIN} "# ${ColorParams}%s${ColorReset}:\n" "CC"
-    ${PRINTF_BIN} "%s\n" "export CC=\"${CC_NAME}\""
-    ${PRINTF_BIN} "# ${ColorParams}%s${ColorReset}:\n" "CXX"
-    ${PRINTF_BIN} "%s\n" "export CXX=\"${CXX_NAME}\""
-    ${PRINTF_BIN} "# ${ColorParams}%s${ColorReset}:\n" "CPP"
-    ${PRINTF_BIN} "%s\n" "export CPP=\"${CPP}\""
+    printf "# ${ColorParams}%s${ColorReset}:\n" "PATH"
+    printf "%s\n" "export PATH=\"${_path}\""
+    printf "# ${ColorParams}%s${ColorReset}:\n" "CC"
+    printf "%s\n" "export CC=\"${CC_NAME}\""
+    printf "# ${ColorParams}%s${ColorReset}:\n" "CXX"
+    printf "%s\n" "export CXX=\"${CXX_NAME}\""
+    printf "# ${ColorParams}%s${ColorReset}:\n" "CPP"
+    printf "%s\n" "export CPP=\"${CPP}\""
 
     unset _cflags _cxxflags _ldflags _pkg_config_path _manpath _app _exp
 }
@@ -244,7 +244,7 @@ list_bundles_full () {
                 permnote "$(distn "${FAIL_CHAR}" "${ColorRed}") ${_lbfapp_name} $(distn "[!]" "${ColorRed}")"
             fi
             for _lbfreq in $(${FIND_BIN} "${_lbfapp}" -mindepth 1 -maxdepth 1 -iname "*${DEFAULT_INST_MARK_EXT}" 2>/dev/null | ${SORT_BIN} 2>/dev/null); do
-                _lbpp="$(${PRINTF_BIN} '%s' "${_lbfreq##*/}" | ${SED_BIN} "s/${DEFAULT_INST_MARK_EXT}//" 2>/dev/null)"
+                _lbpp="$(printf '%s' "${_lbfreq##*/}" | ${SED_BIN} "s/${DEFAULT_INST_MARK_EXT}//" 2>/dev/null)"
                 permnote "   ${NOTE_CHAR} ${_lbpp} $(distn "[" "${ColorGray}")$(distn "$(${CAT_BIN} "${_lbfreq}" 2>/dev/null)")$(distn "]" "${ColorGray}")"
             done
         done
@@ -282,7 +282,7 @@ show_diff () {
 develop () {
     _defname_input="${*}"
     create_dirs
-    _defname_no_ext="$(${PRINTF_BIN} '%s\n' "${_defname_input}" | ${SED_BIN} -e "s#\.${DEFAULT_DEF_EXT}##" 2>/dev/null)"
+    _defname_no_ext="$(printf '%s\n' "${_defname_input}" | ${SED_BIN} -e "s#\.${DEFAULT_DEF_EXT}##" 2>/dev/null)"
     _devname="$(lowercase "${_defname_no_ext##*/}")"
     if [ -z "${_defname_input}" ]; then
         error "No definition file name specified as first param!"
@@ -321,7 +321,7 @@ mark_installed () {
         error "Failed with an empty _verfile!"
     fi
     _softfile="$(lowercase "${_softname}")"
-    run "${PRINTF_BIN} '%s' \"${_verfile}\" > ${PREFIX}/${_softfile}${DEFAULT_INST_MARK_EXT}" && \
+    run "printf '%s' \"${_verfile}\" > ${PREFIX}/${_softfile}${DEFAULT_INST_MARK_EXT}" && \
         debug "Stored version: $(distd "${_verfile}") of software: $(distd "${_softfile}") installed in: $(distd "${PREFIX}")"
     unset _softname _verfile _softfile
 }
@@ -355,7 +355,7 @@ show_alt_definitions_and_exit () {
     if [ ! -f "${DEFINITIONS_DIR}/${_an_app}${DEFAULT_DEF_EXT}" ]; then
         unset _contents
         for _maybe in $(${FIND_BIN} "${DEFINITIONS_DIR}" -maxdepth 1 -name "${_an_app}*${DEFAULT_DEF_EXT}" 2>/dev/null); do
-            _contents="${_contents}$(${PRINTF_BIN} '%s\n' "$(capitalize "${_maybe##*/}")" | ${SED_BIN} 's/\..*//' 2>/dev/null) "
+            _contents="${_contents}$(printf '%s\n' "$(capitalize "${_maybe##*/}")" | ${SED_BIN} 's/\..*//' 2>/dev/null) "
         done
         if [ -z "${_contents}" ]; then
             warn "No such definition found: $(distw "${_an_app}"). No alternatives found."

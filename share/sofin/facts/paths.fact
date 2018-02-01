@@ -1,5 +1,4 @@
 # POSIX base system binaries used internally by Sofin:
-PRINTF_BIN="/usr/bin/printf"
 KILL_BIN="/bin/kill"
 KILLALL_BIN="/usr/bin/killall"
 PWD_BIN="/bin/pwd"

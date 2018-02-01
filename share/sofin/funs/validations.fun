@@ -25,7 +25,7 @@ validate_env () {
 
 fail_on_bg_job () {
     _deps="${*}"
-    debug "bgJobs => $(distd "$(${PRINTF_BIN} '%s\n' "${_deps}" | eval "${NEWLINES_TO_SPACES_GUARD}")")"
+    debug "bgJobs => $(distd "$(printf '%s\n' "${_deps}" | eval "${NEWLINES_TO_SPACES_GUARD}")")"
     acquire_lock_for "${_deps}"
     unset _deps
 }
@@ -97,8 +97,8 @@ validate_archive_sha1 () {
 
 
 validate_def_postfix () {
-    _arg1="$(${PRINTF_BIN} '%s' "$(lowercase "${1}")" | eval "${CUTOFF_DEF_EXT_GUARD}")"
-    _arg2="$(${PRINTF_BIN} '%s' "$(lowercase "${2}")" | eval "${CUTOFF_DEF_EXT_GUARD}")"
+    _arg1="$(printf '%s' "$(lowercase "${1}")" | eval "${CUTOFF_DEF_EXT_GUARD}")"
+    _arg2="$(printf '%s' "$(lowercase "${2}")" | eval "${CUTOFF_DEF_EXT_GUARD}")"
     _cigiven_name="${_arg1##*/}" # basename
     _cidefinition_name="${_arg2##*/}"
     # case when DEF_SUFFIX was ommited => use definition file name difference as POSTFIX:
@@ -187,7 +187,7 @@ validate_pie_on_exports () {
                     if [ "$?" = "0" ]; then # it's ELF binary/library:
                         big_fat_warn () {
                             warn "Security - Exported ELF binary: $(distw "${_bin}"), is not a $(distw "${PIE_TYPE_ENTRY}") (not-PIE)!"
-                            ${PRINTF_BIN} "SECURITY: ELF binary: '${_bin}', is not a '${PIE_TYPE_ENTRY}' (not-PIE)!\n" >> "${_pie_indicator}.warn"
+                            printf "SECURITY: ELF binary: '${_bin}', is not a '${PIE_TYPE_ENTRY}' (not-PIE)!\n" >> "${_pie_indicator}.warn"
                         }
                         try "${FILE_BIN} '${_bin}' 2>/dev/null | ${GREP_BIN} 'ELF' 2>/dev/null | ${EGREP_BIN} '${PIE_TYPE_ENTRY}' 2>/dev/null" || big_fat_warn
                     else

@@ -17,7 +17,7 @@ load_defs () {
                 . "${DEFINITIONS_DIR}/${_def}"
                 env_forgivable
 
-                _given_def="$(${PRINTF_BIN} '%s' "${_def}" | eval "${CUTOFF_DEF_EXT_GUARD}")"
+                _given_def="$(printf '%s' "${_def}" | eval "${CUTOFF_DEF_EXT_GUARD}")"
             else
                 # validate available alternatives and quit no matter the result
                 show_alt_definitions_and_exit "${_given_def}"
@@ -87,7 +87,7 @@ load_defaults () {
     env_forgivable
     if [ -z "${COMPLIANCE_CHECK}" ]; then
         # check definition/defaults compliance version
-        ${PRINTF_BIN} "${SOFIN_VERSION}" | eval "${EGREP_BIN} '${DEF_COMPLIANCE}'" >/dev/null 2>&1
+        printf "${SOFIN_VERSION}" | eval "${EGREP_BIN} '${DEF_COMPLIANCE}'" >/dev/null 2>&1
         if [ "${?}" = "0" ]; then
             COMPLIANCE_CHECK="passed"
         else
@@ -98,7 +98,7 @@ load_defaults () {
 
 
 inherit () {
-    _inhnm="$(${PRINTF_BIN} '%s' "${1}" | eval "${CUTOFF_DEF_EXT_GUARD}")"
+    _inhnm="$(printf '%s' "${1}" | eval "${CUTOFF_DEF_EXT_GUARD}")"
     _def_inherit="${DEFINITIONS_DIR}/${_inhnm}${DEFAULT_DEF_EXT}"
 
     env_pedantic && \
@@ -152,7 +152,7 @@ update_defs () {
                 note "Branch: $(distn "${_def_cur_branch}") is now at: $(distn "${_def_head}")" && \
                 return
 
-            ${PRINTF_BIN} "%b%s%b\n$(fill)\n" "${ColorRed}" "Error occured: Update from branch: $(diste "${BRANCH}") of repository: $(diste "${REPOSITORY}") wasn't possible. Log's below:" "${ColorReset}"
+            printf "%b%s%b\n$(fill)\n" "${ColorRed}" "Error occured: Update from branch: $(diste "${BRANCH}") of repository: $(diste "${REPOSITORY}") wasn't possible. Log's below:" "${ColorReset}"
             show_log_if_available
             return
 
@@ -167,7 +167,7 @@ update_defs () {
                 note "Branch: $(distn "${BRANCH}") is at: $(distn "${_def_head}")" && \
                     return
 
-            ${PRINTF_BIN} "${ColorRed}%s${ColorReset}\n$(fill)\n" "Error occured: Update from branch: $(diste "${BRANCH}") of repository: $(diste "${REPOSITORY}") wasn't possible. Log's below:"
+            printf "${ColorRed}%s${ColorReset}\n$(fill)\n" "Error occured: Update from branch: $(diste "${BRANCH}") of repository: $(diste "${REPOSITORY}") wasn't possible. Log's below:"
             show_log_if_available
             return
         fi
@@ -210,7 +210,7 @@ reset_defs () {
     note "Definitions repository reset to: $(distn "${_rdefs_branch}")"
     for line in $(${GIT_BIN} status --short 2>/dev/null | ${CUT_BIN} -f2 -d' ' 2>/dev/null); do
         unset _add_opt
-        try "${PRINTF_BIN} '%s' \"${line}\" 2>/dev/null | ${EGREP_BIN} \"patches/\"" && \
+        try "printf '%s' \"${line}\" 2>/dev/null | ${EGREP_BIN} \"patches/\"" && \
             _add_opt="r"
         try "${RM_BIN} -f${_add_opt} '${line}'" && \
             debug "Removed untracked file${_add_opt:-/dir} from definition repository: $(distd "${line}")"
@@ -239,7 +239,7 @@ remove_bundles () {
             # if removing a single bundle, then look for alternatives. Otherwise, just remove bundle..
             # if [ "${_picked_bundles}" = "${_given_name}" ]; then
             #     debug "Looking for other installed versions of: $(distd "${_given_name}"), that might be exported automatically.."
-            #     _inname="$(${PRINTF_BIN} '%s\n' "${_given_name}" | ${SED_BIN} 's/[0-9]*//g' 2>/dev/null)"
+            #     _inname="$(printf '%s\n' "${_given_name}" | ${SED_BIN} 's/[0-9]*//g' 2>/dev/null)"
             #     _alternative="$(${FIND_BIN} "${SOFTWARE_DIR%/}" -mindepth 1 -maxdepth 1 -type d -iname "${_inname}*" -not -name "${_given_name}" 2>/dev/null | ${SED_BIN} 's/^.*\///g' 2>/dev/null | ${HEAD_BIN} -n1 2>/dev/null)"
             # fi
             # if [ -n "${_alternative}" ] && \
@@ -259,7 +259,7 @@ remove_bundles () {
     fi
     # for _bundle_name in $(to_iter "${_bundles}"); do
         # replace + with *
-        # _bundle_nam="$(${PRINTF_BIN} '%s' "${_bundle_name}" | ${SED_BIN} -e 's#+#*#' 2>/dev/null)"
+        # _bundle_nam="$(printf '%s' "${_bundle_name}" | ${SED_BIN} -e 's#+#*#' 2>/dev/null)"
         # # first look for a list with that name:
         # if [ -e "${DEFINITIONS_LISTS_DIR}${_bundle_nam}" ]; then
         #     _picked_bundles="$(${CAT_BIN} "${DEFINITIONS_LISTS_DIR}${_bundle_nam}" 2>/dev/null | eval "${NEWLINES_TO_SPACES_GUARD}")"
@@ -295,7 +295,7 @@ available_definitions () {
         cd "${DEFINITIONS_LISTS_DIR}"
         permnote "Available lists: $(distn "$(${LS_BIN} -m 2>/dev/null | ${SED_BIN} "s/${DEFAULT_DEF_EXT}//g" 2>/dev/null)" "${ColorReset}")"
     fi
-    note "Definitions count: $(distn "$(${PRINTF_BIN} '%s' "${_alldefs:-0}" | eval "${FILES_COUNT_GUARD}")")"
+    note "Definitions count: $(distn "$(printf '%s' "${_alldefs:-0}" | eval "${FILES_COUNT_GUARD}")")"
 }
 
 
@@ -403,7 +403,7 @@ wipe_remote_archives () {
 # create_apple_bundle_if_necessary () { # XXXXXX
 #     if [ -n "${DEF_APPLE_BUNDLE}" ] && [ "Darwin" = "${SYSTEM_NAME}" ]; then
 #         _aname="$(lowercase "${DEF_NAME}${DEF_SUFFIX}")"
-#         DEF_NAME="$(${PRINTF_BIN} '%s' "${DEF_NAME}" | ${CUT_BIN} -c1 2>/dev/null | ${TR_BIN} '[a-z]' '[A-Z]' 2>/dev/null)$(${PRINTF_BIN} '%s' "${DEF_NAME}" | ${SED_BIN} 's/^[a-zA-Z]//' 2>/dev/null)"
+#         DEF_NAME="$(printf '%s' "${DEF_NAME}" | ${CUT_BIN} -c1 2>/dev/null | ${TR_BIN} '[a-z]' '[A-Z]' 2>/dev/null)$(printf '%s' "${DEF_NAME}" | ${SED_BIN} 's/^[a-zA-Z]//' 2>/dev/null)"
 #         DEF_BUNDLE_NAME="${PREFIX}.app"
 #         note "Creating Apple bundle: $(distn "${DEF_NAME}") in: $(distn "${DEF_BUNDLE_NAME}")"
 #         ${MKDIR_BIN} -p "${DEF_BUNDLE_NAME}/libs" "${DEF_BUNDLE_NAME}/Contents" "${DEF_BUNDLE_NAME}/Contents/Resources/${_aname}" "${DEF_BUNDLE_NAME}/exports" "${DEF_BUNDLE_NAME}/share"
@@ -585,7 +585,7 @@ track_useful_and_useless_files () {
                             _pattern="${_is_useful#*/}"
                             # if subdir matches current prefix subdir and pattern..
                             if [ "${_cu_dir}" = "${_subdir}" ]; then
-                                ${PRINTF_BIN} '%s\n' "${_cufile}" 2>/dev/null | ${EGREP_BIN} ".*(.${_pattern}).*" >/dev/null 2>&1
+                                printf '%s\n' "${_cufile}" 2>/dev/null | ${EGREP_BIN} ".*(.${_pattern}).*" >/dev/null 2>&1
                                 if [ "${?}" = "0" ]; then
                                     debug "got: '$(distd "${_cufile}")' match with: $(distd "${_subdir}") ~= '$(distd ".*(.${_pattern}).*")'"
                                     _cu_commit_removal=NO
@@ -670,7 +670,7 @@ export_binaries () {
     if [ -z "${DEF_EXPORTS}" ]; then
         note "Defined no exports of prefix: $(distn "${PREFIX}")"
     else
-        _an_amount="$(${PRINTF_BIN} '%s\n' "${DEF_EXPORTS}" | ${WC_BIN} -w 2>/dev/null | ${TR_BIN} -d '\t|\r|\ ' 2>/dev/null)"
+        _an_amount="$(printf '%s\n' "${DEF_EXPORTS}" | ${WC_BIN} -w 2>/dev/null | ${TR_BIN} -d '\t|\r|\ ' 2>/dev/null)"
         debug "Exporting $(distd "${_an_amount}") binaries of prefixes: $(distd "${PREFIX}") + $(distd "${SERVICE_DIR}")"
         try "${MKDIR_BIN} -p ${PREFIX}/exports ${SERVICE_DIR}/exports"
         unset _expolist

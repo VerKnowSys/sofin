@@ -38,7 +38,7 @@ if [ -n "${SOFIN_TRACE}" ]; then
         set -o xtrace
     fi
     set -x
-    ${PRINTF_BIN} "Enabled trace mode\n"
+    printf "Enabled trace mode\n"
 fi
 
 if [ -n "${SOFIN_VERBOSE}" ]; then
@@ -48,7 +48,7 @@ if [ -n "${SOFIN_VERBOSE}" ]; then
     else
         set -v
     fi
-    ${PRINTF_BIN} "Enabled verbose mode\n"
+    printf "Enabled verbose mode\n"
 fi
 
 # this is internal version check for defaults.def
@@ -165,7 +165,7 @@ if [ -n "${SOFIN_COMMAND}" ]; then
                 *)
                     _bundles="${*}"
                     if [ -z "${_bundles}" ]; then
-                        ${PRINTF_BIN} "${REPLAY_PREVIOUS_LINE}"
+                        printf "${REPLAY_PREVIOUS_LINE}"
                         print_shell_vars
                         print_local_env_vars
                     else
@@ -195,10 +195,10 @@ if [ -n "${SOFIN_COMMAND}" ]; then
                         _cxxfl="$(echo "${_cxxfl}" | ${SED_BIN} 's/ *$//g; s/  //g' 2>/dev/null)"
                         _ldfl="$(echo "${_ldfl}" | ${SED_BIN} 's/ *$//g; s/  //g' 2>/dev/null)"
                         _pkgp="$(echo "${_pkgp}" | ${SED_BIN} 's/ *$//g; s/  //g' 2>/dev/null)"
-                        ${PRINTF_BIN} "${REPLAY_PREVIOUS_LINE}%s\n" "export CFLAGS=\"${_cfl}\""
-                        ${PRINTF_BIN} "%s\n" "export CXXFLAGS=\"${_cxxfl}\""
-                        ${PRINTF_BIN} "%s\n" "export LDFLAGS=\"${_ldfl}\""
-                        ${PRINTF_BIN} "%s\n" "export PKG_CONFIG_PATH=\"${_pkgp}\""
+                        printf "${REPLAY_PREVIOUS_LINE}%s\n" "export CFLAGS=\"${_cfl}\""
+                        printf "%s\n" "export CXXFLAGS=\"${_cxxfl}\""
+                        printf "%s\n" "export LDFLAGS=\"${_ldfl}\""
+                        printf "%s\n" "export PKG_CONFIG_PATH=\"${_pkgp}\""
                         unset _pth _cfl _cxxfl _ldfl _pkgp _abundle
 
                         print_local_env_vars
@@ -338,7 +338,7 @@ if [ -n "${SOFIN_COMMAND}" ]; then
                 error "Dependencies file not found! Expected file: $(diste "${DEFAULT_PROJECT_DEPS_LIST_FILE}") in current directory!"
             fi
             _pickd_bundls="$(${CAT_BIN} "${DEFAULT_PROJECT_DEPS_LIST_FILE}" 2>/dev/null | eval "${NEWLINES_TO_SPACES_GUARD}")"
-            _bundls_amount="$(${PRINTF_BIN} '%s\n' "${_pickd_bundls}" | eval "${WORDS_COUNT_GUARD}")"
+            _bundls_amount="$(printf '%s\n' "${_pickd_bundls}" | eval "${WORDS_COUNT_GUARD}")"
             note "Dependencies list file found with $(distn "${_bundls_amount}") elements in order: $(distn "${_pickd_bundls}")"
             for _b in $(to_iter "${_pickd_bundls}"); do
                 debug "Buiding software: $(distd "${_b}") for: $(distd "${OS_TRIPPLE}")"

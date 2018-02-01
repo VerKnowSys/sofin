@@ -35,7 +35,7 @@ enable_sofin_env () {
     debug "Enabling Sofin env for: $(distd "${_envs}")"
     for _env in $(to_iter "${_envs}"); do
         ${GREP_BIN} -F "${_env}" "${SOFIN_ENV_ENABLED_INDICATOR_FILE}" >/dev/null 2>&1 || \
-            ${PRINTF_BIN} "%s\n" "${_env}" >> "${SOFIN_ENV_ENABLED_INDICATOR_FILE}"
+            printf "%s\n" "${_env}" >> "${SOFIN_ENV_ENABLED_INDICATOR_FILE}"
     done
     note "Enabled Sofin environment for bundles: $(distn "${_envs}")"
 }
@@ -60,9 +60,9 @@ disable_sofin_env () {
 
 set_c_and_cxx_flags () {
     _flagz="${*}"
-    CFLAGS="$(${PRINTF_BIN} '%s\n' "${_flagz} ${DEFAULT_COMPILER_FLAGS} -I${PREFIX}/include ${DEF_COMPILER_FLAGS}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
-    CXXFLAGS="$(${PRINTF_BIN} '%s\n' "${_flagz} ${DEFAULT_COMPILER_FLAGS} -I${PREFIX}/include ${DEF_COMPILER_FLAGS}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
-    LDFLAGS="$(${PRINTF_BIN} '%s\n' "${DEFAULT_LINKER_FLAGS} -L${PREFIX}/lib ${DEF_LINKER_FLAGS}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
+    CFLAGS="$(printf '%s\n' "${_flagz} ${DEFAULT_COMPILER_FLAGS} -I${PREFIX}/include ${DEF_COMPILER_FLAGS}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
+    CXXFLAGS="$(printf '%s\n' "${_flagz} ${DEFAULT_COMPILER_FLAGS} -I${PREFIX}/include ${DEF_COMPILER_FLAGS}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
+    LDFLAGS="$(printf '%s\n' "${DEFAULT_LINKER_FLAGS} -L${PREFIX}/lib ${DEF_LINKER_FLAGS}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
     unset _flagz
     export CFLAGS CXXFLAGS LDFLAGS
 }
@@ -383,7 +383,7 @@ create_lock () {
     debug "Pid of current Sofin session: $(distd "${SOFIN_PID}")"
     _bundle="$(capitalize "${_bundle_name}")"
     try "${MKDIR_BIN} -p ${LOCKS_DIR} 2>/dev/null"
-    ${PRINTF_BIN} '%s\n' "${SOFIN_PID}" > "${LOCKS_DIR}${_bundle}${DEFAULT_LOCK_EXT}"
+    printf '%s\n' "${SOFIN_PID}" > "${LOCKS_DIR}${_bundle}${DEFAULT_LOCK_EXT}"
     unset _bundle _bundle_name
 }
 
@@ -473,11 +473,11 @@ update_system_shell_env_files () {
             if [ "${?}" = "0" ]; then
                 continue
             else
-                ${PRINTF_BIN} '\n\n%s\n' "${SOFIN_SHELL_BLOCK}" >> "${_env_file}" && \
+                printf '\n\n%s\n' "${SOFIN_SHELL_BLOCK}" >> "${_env_file}" && \
                     debug "Environment block appended to file: $(distd "${_env_file}")"
             fi
         else
-            ${PRINTF_BIN} '\n\n%s\n' "${SOFIN_SHELL_BLOCK}" >> "${_env_file}" && \
+            printf '\n\n%s\n' "${SOFIN_SHELL_BLOCK}" >> "${_env_file}" && \
                 debug "Environment block written to file: $(distd "${_env_file}")"
         fi
     done

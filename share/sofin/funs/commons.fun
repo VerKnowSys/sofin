@@ -42,12 +42,12 @@ check_os () {
 file_size () {
     _file="${1}"
     if [ -z "${_file}" ]; then
-        ${PRINTF_BIN} '%d' "0" 2>/dev/null
+        printf '%d' "0" 2>/dev/null
         unset _file
         return 0
     fi
     if [ ! -f "${_file}" ]; then
-        ${PRINTF_BIN} '%d' "0" 2>/dev/null
+        printf '%d' "0" 2>/dev/null
         unset _file
         return 0
     fi
@@ -61,18 +61,18 @@ file_size () {
             ;;
     esac
 
-    ${PRINTF_BIN} '%d' "${_size}" 2>/dev/null
+    printf '%d' "${_size}" 2>/dev/null
     unset _file _size
 }
 
 
 capitalize () {
-    ${PRINTF_BIN} '%s' "${@}" 2>/dev/null | ${AWK_BIN} '{for(i=1;i<=NF;i++){ $i=toupper(substr($i,1,1)) substr($i,2) }}1' 2>/dev/null
+    printf '%s' "${@}" 2>/dev/null | ${AWK_BIN} '{for(i=1;i<=NF;i++){ $i=toupper(substr($i,1,1)) substr($i,2) }}1' 2>/dev/null
 }
 
 
 lowercase () {
-    ${PRINTF_BIN} '%s' "${@}" 2>/dev/null | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null
+    printf '%s' "${@}" 2>/dev/null | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null
 }
 
 
@@ -89,7 +89,7 @@ fill () {
     for i in $(${SEQ_BIN} 1 "${_times}" 2>/dev/null); do
         _buf="${_buf}${_char}"
     done
-    ${PRINTF_BIN} '%s' "${_buf}" 2>/dev/null
+    printf '%s' "${_buf}" 2>/dev/null
     unset _times _buf _char
 }
 
@@ -116,7 +116,7 @@ find_all () {
                 -name "${_famatcher}" \
                 2>/dev/null)"
             if [ -n "${_fafind_results}" ]; then
-                ${PRINTF_BIN} '%s\n' "${_fafind_results}" 2>/dev/null
+                printf '%s\n' "${_fafind_results}" 2>/dev/null
             fi
         else
             error "Directory $(diste "${_fapath}") doesn't exist!"
@@ -155,10 +155,10 @@ find_most_recent () {
                 ${SORT_BIN} -nr 2>/dev/null | \
                 ${HEAD_BIN} -n "${MAX_OPEN_TAIL_LOGS}" 2>/dev/null | \
                 ${CUT_BIN} -d' ' -f2 2>/dev/null)"
-            # _frres_singleline="$(${PRINTF_BIN} '%s\n' "${_frfind_results}" | eval "${NEWLINES_TO_SPACES_GUARD}")"
+            # _frres_singleline="$(printf '%s\n' "${_frfind_results}" | eval "${NEWLINES_TO_SPACES_GUARD}")"
             # debug "Find results: $(distd "${_frres_singleline}")"
             if [ -n "${_frfind_results}" ]; then
-                ${PRINTF_BIN} '%s\n' "${_frfind_results}" 2>/dev/null
+                printf '%s\n' "${_frfind_results}" 2>/dev/null
             fi
         else
             error "Directory $(diste "${_frpath}") doesn't exist!"
@@ -171,7 +171,7 @@ find_most_recent () {
 difftext () {
     _text_input="${1}"
     _text_match="${2}"
-    ${PRINTF_BIN} '%s' "$(${PRINTF_BIN} '%s' "${_text_input}" | ${SED_BIN} -e "s#${_text_match}##" 2>/dev/null)"
+    printf '%s' "$(printf '%s' "${_text_input}" | ${SED_BIN} -e "s#${_text_match}##" 2>/dev/null)"
 }
 
 
@@ -182,11 +182,11 @@ text_checksum () {
     fi
     case ${SYSTEM_NAME} in
         Minix|Darwin|Linux)
-            ${PRINTF_BIN} '%s' "${_fcsmname}" | ${SHA_BIN} 2>/dev/null | ${CUT_BIN} -d' ' -f1 2>/dev/null
+            printf '%s' "${_fcsmname}" | ${SHA_BIN} 2>/dev/null | ${CUT_BIN} -d' ' -f1 2>/dev/null
             ;;
 
         FreeBSD)
-            ${PRINTF_BIN} '%s' "${_fcsmname}" | ${SHA_BIN} 2>/dev/null
+            printf '%s' "${_fcsmname}" | ${SHA_BIN} 2>/dev/null
             ;;
     esac
     unset _fcsmname
@@ -197,7 +197,7 @@ text_checksum () {
 firstn () {
     _contents=${1:-""}
     _length=${2:-16}
-    ${PRINTF_BIN} \
+    printf \
         "%.${_length}s" \
         "${_contents}"
 }
@@ -210,11 +210,11 @@ file_checksum () {
     fi
     case ${SYSTEM_NAME} in
         Minix|Darwin|Linux)
-            ${PRINTF_BIN} '%s' "$(${SHA_BIN} "${_fcsmname}" 2>/dev/null | ${CUT_BIN} -d' ' -f1 2>/dev/null)" 2>> "${LOG}"
+            printf '%s' "$(${SHA_BIN} "${_fcsmname}" 2>/dev/null | ${CUT_BIN} -d' ' -f1 2>/dev/null)" 2>> "${LOG}"
             ;;
 
         FreeBSD)
-            ${PRINTF_BIN} '%s' "$(${SHA_BIN} -q "${_fcsmname}" 2>/dev/null)" 2>> "${LOG}"
+            printf '%s' "$(${SHA_BIN} -q "${_fcsmname}" 2>/dev/null)" 2>> "${LOG}"
             ;;
     esac
     unset _fcsmname
@@ -223,14 +223,14 @@ file_checksum () {
 
 # give any input to pass it through bc:
 calculate_bc () {
-    ${PRINTF_BIN} '%s\n' "${@}" 2>/dev/null | ${BC_BIN} 2>/dev/null
+    printf '%s\n' "${@}" 2>/dev/null | ${BC_BIN} 2>/dev/null
 }
 
 
 print_rainbow () {
-    ${PRINTF_BIN} "${ColorReset}ColorReset${ColorRed}ColorRed${ColorGreen}ColorGreen${ColorYellow}ColorYellow${ColorBlue}ColorBlue${ColorMagenta}ColorMagenta${ColorCyan}ColorCyan${ColorGray}ColorGray${ColorWhite}ColorWhite"
+    printf "${ColorReset}ColorReset${ColorRed}ColorRed${ColorGreen}ColorGreen${ColorYellow}ColorYellow${ColorBlue}ColorBlue${ColorMagenta}ColorMagenta${ColorCyan}ColorCyan${ColorGray}ColorGray${ColorWhite}ColorWhite"
 
     for i in $(seq 0 $(${TPUT_BIN} colors)); do
-        ${PRINTF_BIN} "$(${TPUT_BIN} setaf ${i}):${i}:TEXT-COLORFUL${ColorReset}\t"
+        printf "$(${TPUT_BIN} setaf ${i}):${i}:TEXT-COLORFUL${ColorReset}\t"
     done
 }

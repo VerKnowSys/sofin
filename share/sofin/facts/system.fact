@@ -28,14 +28,14 @@ USER="${USER:-$(${ID_BIN} ${DEFAULT_ID_USER_NAME_OPTS} 2>/dev/null)}"
 SYSTEM_NAME="${SYSTEM_NAME:-$(uname -s 2>/dev/null)}"
 SYSTEM_ARCH="${SYSTEM_ARCH:-$(uname -m 2>/dev/null)}"
 if [ -z "${SYSTEM_NAME}" ] || [ -z "${SYSTEM_ARCH}" ]; then
-    ${PRINTF_BIN} "%b%s\n" "${ColorRed}" "FATAL: Both SYSTEM_NAME and SYSTEM_ARCH environment variables, require a value!"
+    printf "%b%s\n" "${ColorRed}" "FATAL: Both SYSTEM_NAME and SYSTEM_ARCH environment variables, require a value!"
     exit "${ERRORCODE_TASK_FAILURE}"
 fi
 
 if [ -x "${SOFIN_OS_VER_BIN}" ]; then
     SYSTEM_VERSION="$(${SOFIN_OS_VER_BIN} 2>/dev/null)"
     if [ -z "${SYSTEM_VERSION}" ]; then
-        ${PRINTF_BIN} "%b%s\n" "${ColorRed}" "FATAL: SYSTEM_VERSION environment variable, requires a value!"
+        printf "%b%s\n" "${ColorRed}" "FATAL: SYSTEM_VERSION environment variable, requires a value!"
         exit "${ERRORCODE_TASK_FAILURE}"
     fi
     # NOTE: MINIMAL_MAJOR_OS_VERSION is important here!

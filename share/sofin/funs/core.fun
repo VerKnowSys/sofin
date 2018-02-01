@@ -8,23 +8,23 @@ debug () {
     fi
     if [ -n "${CAP_SYS_PRODUCTION}" ]; then
         if [ -n "${DEBUG}" ]; then
-            ${PRINTF_BIN} "# (%s) λ %b%s%b\n" "${SHLVL}" "${ColorDebug}" "${_in}" "${ColorReset}"
+            printf "# (%s) λ %b%s%b\n" "${SHLVL}" "${ColorDebug}" "${_in}" "${ColorReset}"
         fi
         return 0
-        # ${PRINTF_BIN} "# (%s) λ %b%s%b\n" "${SHLVL}" "${ColorDebug}" "${_in}" "${ColorReset}" >> "${LOG}" 2>> "${LOG}"
+        # printf "# (%s) λ %b%s%b\n" "${SHLVL}" "${ColorDebug}" "${_in}" "${ColorReset}" >> "${LOG}" 2>> "${LOG}"
     else
         touch_logsdir_and_logfile
         _dbfn=" "
         if [ -z "${DEBUG}" ]; then
             if [ -n "${DEF_NAME}${DEF_SUFFIX}" ]; then
                 # Definition log
-                ${PRINTF_BIN} "#%b%s%s%b" "${ColorDebug}" "${_dbfn}" "${_in}" "${ColorReset}${_permdbg}" 2>> "${LOG}-${DEF_NAME}${DEF_SUFFIX}" >> "${LOG}-${DEF_NAME}${DEF_SUFFIX}"
+                printf "#%b%s%s%b" "${ColorDebug}" "${_dbfn}" "${_in}" "${ColorReset}${_permdbg}" 2>> "${LOG}-${DEF_NAME}${DEF_SUFFIX}" >> "${LOG}-${DEF_NAME}${DEF_SUFFIX}"
             else
                 # Main log
-                ${PRINTF_BIN} "#%b%s%s%b" "${ColorDebug}" "${_dbfn}" "${_in}" "${ColorReset}${_permdbg}" 2>> "${LOG}" >> "${LOG}"
+                printf "#%b%s%s%b" "${ColorDebug}" "${_dbfn}" "${_in}" "${ColorReset}${_permdbg}" 2>> "${LOG}" >> "${LOG}"
             fi
         else # DEBUG is set. Print to stdout
-            ${PRINTF_BIN} "#%b%s%s%b\n" "${ColorDebug}" "${_dbfn}" "${_in}" "${ColorReset}" 2>/dev/null
+            printf "#%b%s%s%b\n" "${ColorDebug}" "${_dbfn}" "${_in}" "${ColorReset}" 2>/dev/null
         fi
         unset _dbgnme _in _dbfn
     fi
@@ -34,9 +34,9 @@ debug () {
 
 warn () {
     if [ "${TTY}" = "YES" ]; then
-        ${PRINTF_BIN} "${REPLAY_PREVIOUS_LINE}%b%s%b\n\n" "${ColorYellow}" "${@}" "${ColorReset}"
+        printf "${REPLAY_PREVIOUS_LINE}%b%s%b\n\n" "${ColorYellow}" "${@}" "${ColorReset}"
     else
-        ${PRINTF_BIN} "%b%s%b\n" "${ColorYellow}" "${@}" "${ColorReset}"
+        printf "%b%s%b\n" "${ColorYellow}" "${@}" "${ColorReset}"
     fi
     return 0
 }
@@ -44,9 +44,9 @@ warn () {
 
 note () {
     if [ "${TTY}" = "YES" ]; then
-        ${PRINTF_BIN} "${REPLAY_PREVIOUS_LINE}%b%s%b\n" "${ColorGreen}" "${@}" "${ColorReset}"
+        printf "${REPLAY_PREVIOUS_LINE}%b%s%b\n" "${ColorGreen}" "${@}" "${ColorReset}"
     else
-        ${PRINTF_BIN} "%b%s%b\n" "${ColorGreen}" "${@}" "${ColorReset}"
+        printf "%b%s%b\n" "${ColorGreen}" "${@}" "${ColorReset}"
     fi
     return 0
 }
@@ -54,18 +54,18 @@ note () {
 
 permnote () {
     if [ "${TTY}" = "YES" ]; then
-        ${PRINTF_BIN} "${REPLAY_PREVIOUS_LINE}%b%s%b\n\n" "${ColorGreen}" "${@}" "${ColorReset}"
+        printf "${REPLAY_PREVIOUS_LINE}%b%s%b\n\n" "${ColorGreen}" "${@}" "${ColorReset}"
     else
-        ${PRINTF_BIN} "%b%s%b\n" "${ColorGreen}" "${@}" "${ColorReset}"
+        printf "%b%s%b\n" "${ColorGreen}" "${@}" "${ColorReset}"
     fi
     return 0
 }
 
 
 error () {
-    ${PRINTF_BIN} "%b\n  %s %s\n    %b %b\n\n" "${ColorRed}" "${NOTE_CHAR2}" "Task crashed!" "${0}: ${1}${2}${3}${4}${5}" "${ColorReset}"
+    printf "%b\n  %s %s\n    %b %b\n\n" "${ColorRed}" "${NOTE_CHAR2}" "Task crashed!" "${0}: ${1}${2}${3}${4}${5}" "${ColorReset}"
     if [ "error" = "${0}" ]; then
-        ${PRINTF_BIN} "%b  %s Try: %b%b\n\n" "${ColorRed}" "${NOTE_CHAR2}" "$(diste "s log ${DEF_NAME}${DEF_SUFFIX}") to see the build log." "${ColorReset}"
+        printf "%b  %s Try: %b%b\n\n" "${ColorRed}" "${NOTE_CHAR2}" "$(diste "s log ${DEF_NAME}${DEF_SUFFIX}") to see the build log." "${ColorReset}"
     fi
     finalize_interrupt
     exit "${ERRORCODE_TASK_FAILURE}"
@@ -74,28 +74,28 @@ error () {
 
 # distdebug
 distd () {
-    ${PRINTF_BIN} "%b%s%b" "${2:-${ColorDistinct}}" "${1}" "${3:-${ColorDebug}}" 2>/dev/null
+    printf "%b%s%b" "${2:-${ColorDistinct}}" "${1}" "${3:-${ColorDebug}}" 2>/dev/null
     return 0
 }
 
 
 # distnote
 distn () {
-    ${PRINTF_BIN} "%b%s%b" "${2:-${ColorDistinct}}" "${1}" "${3:-${ColorNote}}" 2>/dev/null
+    printf "%b%s%b" "${2:-${ColorDistinct}}" "${1}" "${3:-${ColorNote}}" 2>/dev/null
     return 0
 }
 
 
 # distwarn
 distw () {
-    ${PRINTF_BIN} "%b%s%b" "${2:-${ColorDistinct}}" "${1}" "${3:-${ColorWarning}}" 2>/dev/null
+    printf "%b%s%b" "${2:-${ColorDistinct}}" "${1}" "${3:-${ColorWarning}}" 2>/dev/null
     return 0
 }
 
 
 # disterror
 diste () {
-    ${PRINTF_BIN} "%b%s%b" "${2:-${ColorDistinct}}" "${1}" "${3:-${ColorError}}" 2>/dev/null
+    printf "%b%s%b" "${2:-${ColorDistinct}}" "${1}" "${3:-${ColorError}}" 2>/dev/null
     return 0
 }
 
@@ -111,7 +111,7 @@ run () {
                     && check_result ${?} "${_run_params}" \
                     && return 0
             else
-                ${PRINTF_BIN} "%b" "${ColorBlue}"
+                printf "%b" "${ColorBlue}"
                 eval "PATH=${PATH}${GIT_EXPORTS} ${_run_params}" \
                     && check_result ${?} "${_run_params}" \
                     && return 0
@@ -122,7 +122,7 @@ run () {
                     && check_result ${?} "${_run_params}" \
                     && return 0
             else
-                ${PRINTF_BIN} "%b" "${ColorBlue}"
+                printf "%b" "${ColorBlue}"
                 eval "PATH=${PATH}${GIT_EXPORTS} ${_run_params}" \
                     && check_result ${?} "${_run_params}" \
                     && return 0
@@ -148,7 +148,7 @@ try () {
                     && return 0
             else
                 # show all progress on stdout.stderr
-                ${PRINTF_BIN} "%b" "${ColorBlue}"
+                printf "%b" "${ColorBlue}"
                 eval "PATH=${PATH}${GIT_EXPORTS} ${_try_params}" \
                     && check_result ${?} "${_try_params}" \
                     && return 0
@@ -159,7 +159,7 @@ try () {
                     && check_result ${?} "${_try_params}" \
                     && return 0
             else
-                ${PRINTF_BIN} "%b" "${ColorBlue}"
+                printf "%b" "${ColorBlue}"
                 eval "PATH=${PATH}${GIT_EXPORTS} ${_try_params}" \
                     && check_result ${?} "${_try_params}" \
                     && return 0
@@ -186,7 +186,7 @@ retry () {
                     && unset _ammo _targets \
                     && return 0
             else
-                ${PRINTF_BIN} "%b" "${ColorBlue}"
+                printf "%b" "${ColorBlue}"
                 eval "PATH=${DEFAULT_PATH}${GIT_EXPORTS} ${_targets}" \
                     && check_result ${?} "${_targets}" \
                     && unset _ammo _targets \
@@ -195,7 +195,7 @@ retry () {
         else
             error "Given an empty command to evaluate with retry()!"
         fi
-        _ammo="$(${PRINTF_BIN} '%s\n' "${_ammo}" 2>/dev/null | ${SED_BIN} 's/O//' 2>/dev/null)"
+        _ammo="$(printf '%s\n' "${_ammo}" 2>/dev/null | ${SED_BIN} 's/O//' 2>/dev/null)"
         debug "Remaining attempts: $(distd "${_ammo}")"
     done
     debug "All available ammo exhausted to invoke a command: $(distd "${_targets}")"
@@ -359,7 +359,7 @@ store_security_state () {
             for _key in ${DEFAULT_HARDEN_KEYS}; do
                 _sss_value="$(${SYSCTL_BIN} -n "${_key}" 2>/dev/null)"
                 _sss_cntnt="${SYSCTL_BIN} ${_key}=${_sss_value}"
-                ${PRINTF_BIN} "%s\n" "${_sss_cntnt}" >> "${DEFAULT_SECURITY_STATE_FILE}" 2>/dev/null
+                printf "%s\n" "${_sss_cntnt}" >> "${DEFAULT_SECURITY_STATE_FILE}" 2>/dev/null
             done
             unset _key _sss_cntnt _sss_value
         else
@@ -414,7 +414,7 @@ initialize () {
 
 # Converts space-separated argument list to newline separated "Shell POSIX-Array"
 to_iter () {
-    ${PRINTF_BIN} '%s\n' "${@}" | eval "${SPACES_TO_NEWLINES_GUARD}"
+    printf '%s\n' "${@}" | eval "${SPACES_TO_NEWLINES_GUARD}"
 }
 
 
