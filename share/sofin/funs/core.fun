@@ -195,7 +195,7 @@ retry () {
         else
             error "Given an empty command to evaluate with retry()!"
         fi
-        _ammo="$(printf '%s\n' "${_ammo}" 2>/dev/null | ${SED_BIN} 's/O//' 2>/dev/null)"
+        _ammo="$(printf "%s\n" "${_ammo}" 2>/dev/null | ${SED_BIN} 's/O//' 2>/dev/null)"
         debug "Remaining attempts: $(distd "${_ammo}")"
     done
     debug "All available ammo exhausted to invoke a command: $(distd "${_targets}")"
@@ -414,7 +414,7 @@ initialize () {
 
 # Converts space-separated argument list to newline separated "Shell POSIX-Array"
 to_iter () {
-    printf '%s\n' "${@}" | eval "${SPACES_TO_NEWLINES_GUARD}"
+    printf "%s\n" "${@}" | eval "${SPACES_TO_NEWLINES_GUARD}"
 }
 
 

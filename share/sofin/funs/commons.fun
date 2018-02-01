@@ -116,7 +116,7 @@ find_all () {
                 -name "${_famatcher}" \
                 2>/dev/null)"
             if [ -n "${_fafind_results}" ]; then
-                printf '%s\n' "${_fafind_results}" 2>/dev/null
+                printf "%s\n" "${_fafind_results}" 2>/dev/null
             fi
         else
             error "Directory $(diste "${_fapath}") doesn't exist!"
@@ -155,10 +155,10 @@ find_most_recent () {
                 ${SORT_BIN} -nr 2>/dev/null | \
                 ${HEAD_BIN} -n "${MAX_OPEN_TAIL_LOGS}" 2>/dev/null | \
                 ${CUT_BIN} -d' ' -f2 2>/dev/null)"
-            # _frres_singleline="$(printf '%s\n' "${_frfind_results}" | eval "${NEWLINES_TO_SPACES_GUARD}")"
+            # _frres_singleline="$(printf "%s\n" "${_frfind_results}" | eval "${NEWLINES_TO_SPACES_GUARD}")"
             # debug "Find results: $(distd "${_frres_singleline}")"
             if [ -n "${_frfind_results}" ]; then
-                printf '%s\n' "${_frfind_results}" 2>/dev/null
+                printf "%s\n" "${_frfind_results}" 2>/dev/null
             fi
         else
             error "Directory $(diste "${_frpath}") doesn't exist!"
@@ -223,7 +223,7 @@ file_checksum () {
 
 # give any input to pass it through bc:
 calculate_bc () {
-    printf '%s\n' "${@}" 2>/dev/null | ${BC_BIN} 2>/dev/null
+    printf "%s\n" "${@}" 2>/dev/null | ${BC_BIN} 2>/dev/null
 }
 
 

@@ -282,7 +282,7 @@ show_diff () {
 develop () {
     _defname_input="${*}"
     create_dirs
-    _defname_no_ext="$(printf '%s\n' "${_defname_input}" | ${SED_BIN} -e "s#\.${DEFAULT_DEF_EXT}##" 2>/dev/null)"
+    _defname_no_ext="$(printf "%s\n" "${_defname_input}" | ${SED_BIN} -e "s#\.${DEFAULT_DEF_EXT}##" 2>/dev/null)"
     _devname="$(lowercase "${_defname_no_ext##*/}")"
     if [ -z "${_defname_input}" ]; then
         error "No definition file name specified as first param!"
@@ -355,7 +355,7 @@ show_alt_definitions_and_exit () {
     if [ ! -f "${DEFINITIONS_DIR}/${_an_app}${DEFAULT_DEF_EXT}" ]; then
         unset _contents
         for _maybe in $(${FIND_BIN} "${DEFINITIONS_DIR}" -maxdepth 1 -name "${_an_app}*${DEFAULT_DEF_EXT}" 2>/dev/null); do
-            _contents="${_contents}$(printf '%s\n' "$(capitalize "${_maybe##*/}")" | ${SED_BIN} 's/\..*//' 2>/dev/null) "
+            _contents="${_contents}$(printf "%s\n" "$(capitalize "${_maybe##*/}")" | ${SED_BIN} 's/\..*//' 2>/dev/null) "
         done
         if [ -z "${_contents}" ]; then
             warn "No such definition found: $(distw "${_an_app}"). No alternatives found."

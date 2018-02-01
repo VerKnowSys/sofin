@@ -234,7 +234,7 @@ build () {
                     else
                         permnote "Installing: $(distn "${DEF_FULL_NAME:-${DEF_NAME}${DEF_SUFFIX}}"), version: $(distn "${DEF_VERSION}"), with requirements: $(distn "${DEF_REQUIREMENTS}")"
                     fi
-                    _req_amount="$(printf '%s\n' "${DEF_REQUIREMENTS}" | ${WC_BIN} -w 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)"
+                    _req_amount="$(printf "%s\n" "${DEF_REQUIREMENTS}" | ${WC_BIN} -w 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)"
                     _req_amount="$(calculate_bc "${_req_amount} + 1")"
                     _req_all="${_req_amount}"
                     for _req in $(to_iter "${DEF_REQUIREMENTS}"); do
@@ -377,7 +377,7 @@ process_flat () {
     if [ ! -e "${_req_definition}" ]; then
         error "Cannot read definition file: $(diste "${_req_definition}")!"
     fi
-    _req_defname="$(printf '%s\n' "${_req_definition##*/}" | ${SED_BIN} -e 's/\..*$//g' 2>/dev/null)"
+    _req_defname="$(printf "%s\n" "${_req_definition##*/}" | ${SED_BIN} -e 's/\..*$//g' 2>/dev/null)"
     debug "Bundle: $(distd "${_bundlnm}"), requirement: $(distd "${_app_param}"), PREFIX: $(distd "${_prefix}") file: $(distd "${_req_definition}"), req-name: $(distd "${_req_defname}")"
 
     # XXX: FIXME: OPTIMIZE: Each definition read twice... log bloat & shit
@@ -461,8 +461,8 @@ process_flat () {
                 fi
 
                 unset _fd
-                _prm_nolib="$(printf '%s\n' "${_app_param}" | ${SED_BIN} 's/lib//' 2>/dev/null)"
-                _prm_no_undrlne_and_minus="$(printf '%s\n' "${_app_param}" | ${SED_BIN} 's/[-_].*$//' 2>/dev/null)"
+                _prm_nolib="$(printf "%s\n" "${_app_param}" | ${SED_BIN} 's/lib//' 2>/dev/null)"
+                _prm_no_undrlne_and_minus="$(printf "%s\n" "${_app_param}" | ${SED_BIN} 's/[-_].*$//' 2>/dev/null)"
                 # debug "Requirement: ${_app_param} short: ${_prm_nolib}, nafter-: ${_prm_no_undrlne_and_minus}, DEF_NAME: ${DEF_NAME}, BUILD_DIR: ${BUILD_DIR}"
                 # NOTE: patterns sorted by safety
                 for _pati in    "*${_app_param}*${DEF_VERSION}" \
@@ -594,7 +594,7 @@ process_flat () {
 
                         if [ "${SYSTEM_NAME}" = "Linux" ]; then
                             # NOTE: No /Services feature implemented for Linux.
-                            try "printf '%s\n' \"${DEF_CONFIGURE_METHOD}\" | ${GREP_BIN} \"configure\" >/dev/null 2>&1"
+                            try "printf "%s\n" \"${DEF_CONFIGURE_METHOD}\" | ${GREP_BIN} \"configure\" >/dev/null 2>&1"
                             if [ "${?}" = "0" ]; then
                                 # NOTE: by defaultautoconf configure accepts influencing variables as configure script params
                                 try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} ${_pic_optional} ${_addon}" || \
@@ -610,7 +610,7 @@ process_flat () {
                         else
                             # do a simple check for "configure" in DEF_CONFIGURE_METHOD definition
                             # this way we can tell if we want to put configure options as params
-                            printf '%s\n' "${DEF_CONFIGURE_METHOD}" | ${GREP_BIN} "configure" >/dev/null 2>&1
+                            printf "%s\n" "${DEF_CONFIGURE_METHOD}" | ${GREP_BIN} "configure" >/dev/null 2>&1
                             if [ "${?}" = "0" ]; then
                                 # TODO: add --docdir=${_prefix}/docs
                                 # NOTE: By default try to configure software with these options:
@@ -675,7 +675,7 @@ process_flat () {
             unset _this_test_skipped
             if [ -n "${DEF_SKIPPED_DEFINITION_TEST}" ]; then
                 debug "Defined DEF_SKIPPED_DEFINITION_TEST: $(distd "${DEF_SKIPPED_DEFINITION_TEST}")"
-                printf '%s\n' " ${DEF_SKIPPED_DEFINITION_TEST} " 2>/dev/null | ${EGREP_BIN} " ${_app_param} " >/dev/null 2>/dev/null && \
+                printf "%s\n" " ${DEF_SKIPPED_DEFINITION_TEST} " 2>/dev/null | ${EGREP_BIN} " ${_app_param} " >/dev/null 2>/dev/null && \
                     note "   ${NOTE_CHAR} Skipped tests for definition of: $(distn "${_app_param}")" && \
                         _this_test_skipped=1
             fi

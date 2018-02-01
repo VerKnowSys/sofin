@@ -338,7 +338,7 @@ if [ -n "${SOFIN_COMMAND}" ]; then
                 error "Dependencies file not found! Expected file: $(diste "${DEFAULT_PROJECT_DEPS_LIST_FILE}") in current directory!"
             fi
             _pickd_bundls="$(${CAT_BIN} "${DEFAULT_PROJECT_DEPS_LIST_FILE}" 2>/dev/null | eval "${NEWLINES_TO_SPACES_GUARD}")"
-            _bundls_amount="$(printf '%s\n' "${_pickd_bundls}" | eval "${WORDS_COUNT_GUARD}")"
+            _bundls_amount="$(printf "%s\n" "${_pickd_bundls}" | eval "${WORDS_COUNT_GUARD}")"
             note "Dependencies list file found with $(distn "${_bundls_amount}") elements in order: $(distn "${_pickd_bundls}")"
             for _b in $(to_iter "${_pickd_bundls}"); do
                 debug "Buiding software: $(distd "${_b}") for: $(distd "${OS_TRIPPLE}")"

@@ -542,12 +542,12 @@ boot_device_name () {
         if [ "YES" = "${CAP_SYS_ZFS}" ]; then
             ${ZPOOL_BIN} status "${DEFAULT_ZPOOL}" 2>/dev/null | \
                 ${EGREP_BIN} -i "${_dsk}p[0-9]+" >/dev/null 2>&1 && \
-                printf '%s\n' "${_dsk}" && \
+                printf "%s\n" "${_dsk}" && \
                 return 0
         else
             ${MOUNT_BIN} 2>/dev/null | \
                 ${EGREP_BIN} -i "/dev/${_dsk}" >/dev/null 2>&1 && \
-                printf '%s\n' "${_dsk}" && \
+                printf "%s\n" "${_dsk}" && \
                 return 0
         fi
     done

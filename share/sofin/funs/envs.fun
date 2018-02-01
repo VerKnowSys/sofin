@@ -60,9 +60,9 @@ disable_sofin_env () {
 
 set_c_and_cxx_flags () {
     _flagz="${*}"
-    CFLAGS="$(printf '%s\n' "${_flagz} ${DEFAULT_COMPILER_FLAGS} -I${PREFIX}/include ${DEF_COMPILER_FLAGS}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
-    CXXFLAGS="$(printf '%s\n' "${_flagz} ${DEFAULT_COMPILER_FLAGS} -I${PREFIX}/include ${DEF_COMPILER_FLAGS}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
-    LDFLAGS="$(printf '%s\n' "${DEFAULT_LINKER_FLAGS} -L${PREFIX}/lib ${DEF_LINKER_FLAGS}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
+    CFLAGS="$(printf "%s\n" "${_flagz} ${DEFAULT_COMPILER_FLAGS} -I${PREFIX}/include ${DEF_COMPILER_FLAGS}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
+    CXXFLAGS="$(printf "%s\n" "${_flagz} ${DEFAULT_COMPILER_FLAGS} -I${PREFIX}/include ${DEF_COMPILER_FLAGS}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
+    LDFLAGS="$(printf "%s\n" "${DEFAULT_LINKER_FLAGS} -L${PREFIX}/lib ${DEF_LINKER_FLAGS}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
     unset _flagz
     export CFLAGS CXXFLAGS LDFLAGS
 }
@@ -383,7 +383,7 @@ create_lock () {
     debug "Pid of current Sofin session: $(distd "${SOFIN_PID}")"
     _bundle="$(capitalize "${_bundle_name}")"
     try "${MKDIR_BIN} -p ${LOCKS_DIR} 2>/dev/null"
-    printf '%s\n' "${SOFIN_PID}" > "${LOCKS_DIR}${_bundle}${DEFAULT_LOCK_EXT}"
+    printf "%s\n" "${SOFIN_PID}" > "${LOCKS_DIR}${_bundle}${DEFAULT_LOCK_EXT}"
     unset _bundle _bundle_name
 }
 

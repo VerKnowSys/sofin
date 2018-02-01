@@ -239,7 +239,7 @@ remove_bundles () {
             # if removing a single bundle, then look for alternatives. Otherwise, just remove bundle..
             # if [ "${_picked_bundles}" = "${_given_name}" ]; then
             #     debug "Looking for other installed versions of: $(distd "${_given_name}"), that might be exported automatically.."
-            #     _inname="$(printf '%s\n' "${_given_name}" | ${SED_BIN} 's/[0-9]*//g' 2>/dev/null)"
+            #     _inname="$(printf "%s\n" "${_given_name}" | ${SED_BIN} 's/[0-9]*//g' 2>/dev/null)"
             #     _alternative="$(${FIND_BIN} "${SOFTWARE_DIR%/}" -mindepth 1 -maxdepth 1 -type d -iname "${_inname}*" -not -name "${_given_name}" 2>/dev/null | ${SED_BIN} 's/^.*\///g' 2>/dev/null | ${HEAD_BIN} -n1 2>/dev/null)"
             # fi
             # if [ -n "${_alternative}" ] && \
@@ -585,7 +585,7 @@ track_useful_and_useless_files () {
                             _pattern="${_is_useful#*/}"
                             # if subdir matches current prefix subdir and pattern..
                             if [ "${_cu_dir}" = "${_subdir}" ]; then
-                                printf '%s\n' "${_cufile}" 2>/dev/null | ${EGREP_BIN} ".*(.${_pattern}).*" >/dev/null 2>&1
+                                printf "%s\n" "${_cufile}" 2>/dev/null | ${EGREP_BIN} ".*(.${_pattern}).*" >/dev/null 2>&1
                                 if [ "${?}" = "0" ]; then
                                     debug "got: '$(distd "${_cufile}")' match with: $(distd "${_subdir}") ~= '$(distd ".*(.${_pattern}).*")'"
                                     _cu_commit_removal=NO
@@ -670,7 +670,7 @@ export_binaries () {
     if [ -z "${DEF_EXPORTS}" ]; then
         note "Defined no exports of prefix: $(distn "${PREFIX}")"
     else
-        _an_amount="$(printf '%s\n' "${DEF_EXPORTS}" | ${WC_BIN} -w 2>/dev/null | ${TR_BIN} -d '\t|\r|\ ' 2>/dev/null)"
+        _an_amount="$(printf "%s\n" "${DEF_EXPORTS}" | ${WC_BIN} -w 2>/dev/null | ${TR_BIN} -d '\t|\r|\ ' 2>/dev/null)"
         debug "Exporting $(distd "${_an_amount}") binaries of prefixes: $(distd "${PREFIX}") + $(distd "${SERVICE_DIR}")"
         try "${MKDIR_BIN} -p ${PREFIX}/exports ${SERVICE_DIR}/exports"
         unset _expolist
