@@ -367,20 +367,17 @@ receive_origin () {
             && debug "Origin fetched successfully: $(distd "${_origin_name}")"
     fi
 
-    set_mountpoint () {
+    if [ -f "${_origin_file}" ]; then
         echo "${_dname}" | ${GREP_BIN} -F "${SOFTWARE_DIR}" >/dev/null 2>&1
         if [ "0" = "${?}" ]; then
-            try "${ZFS_BIN} set mountpoint=${SOFTWARE_DIR}/${_dname##*/} ${_dname}"
+            _mountpoint="${SOFTWARE_DIR}/${_dname##*/}"
         else
-            try "${ZFS_BIN} set mountpoint=${SERVICES_DIR}/${_dname##*/} ${_dname}"
+            _mountpoint="${SERVICES_DIR}/${_dname##*/}"
         fi
-    }
 
-    if [ -f "${_origin_file}" ]; then
-        debug "DataSet: $(distd "${_dname}")"
         # NOTE: each user dataset is made of same origin, hence you can apply snapshots amongst them..
-        run "${XZCAT_BIN} \"${_origin_file}\" | ${ZFS_BIN} receive ${ZFS_RECEIVE_OPTS} '${_dname}' | ${TAIL_BIN} -n1 2>/dev/null" \
-            && set_mountpoint \
+        debug "DataSet: $(distd "${_dname}")"
+        run "${XZCAT_BIN} \"${_origin_file}\" | ${ZFS_BIN} receive -o mountpoint=${_mountpoint} ${ZFS_RECEIVE_OPTS} '${_dname}' | ${TAIL_BIN} -n1 2>/dev/null" \
             && debug "Origin received successfully: $(distd "${_origin_name}")"
     else
         error "No origin file available! That's mandatory to have this file: $(diste "${_origin_file}")"
