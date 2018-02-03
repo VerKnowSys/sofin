@@ -187,9 +187,9 @@ build () {
                 # has to be able to reach these values to find dependencies and utilities
                 export PREFIX
                 export PKG_CONFIG_PATH="${PREFIX}/lib/pkgconfig"
-                export PATH="${DEFAULT_SHELL_EXPORTS}:${PREFIX}/bin:${PREFIX}/sbin:${DEFAULT_PATH}"
+                export PATH="${DEFAULT_SHELL_EXPORTS}:${SERVICE_DIR}/bin:${PREFIX}/bin:${PREFIX}/sbin:${SERVICE_DIR}/sbin:${DEFAULT_PATH}"
                 if [ -n "${DEF_USE_TOOLS}" ]; then
-                    export PATH="${DEFAULT_SHELL_EXPORTS}:${PREFIX}/bin:${PREFIX}/sbin:${SOFIN_UTILS_PATH}:${DEFAULT_PATH}"
+                    export PATH="${DEFAULT_SHELL_EXPORTS}:${SERVICE_DIR}/bin:${PREFIX}/bin:${PREFIX}/sbin:${SOFIN_UTILS_PATH}:${SERVICE_DIR}/sbin:${DEFAULT_PATH}"
                     debug "Using tools: $(distd "yes"). Path=$(distd "${PATH}")"
                 else
                     debug "Using tools: $(distd "no" "${ColorRed}")"
@@ -393,10 +393,10 @@ process_flat () {
     #       it's build environment values (flexibility, KISS)
     load_defs "${_req_definition}"
 
-    PATH="${DEFAULT_SHELL_EXPORTS}:${_prefix}/bin:${_prefix}/sbin:${DEFAULT_PATH}"
+    PATH="${DEFAULT_SHELL_EXPORTS}:${SERVICE_DIR}/bin:${SERVICE_DIR}/sbin:${_prefix}/bin:${_prefix}/sbin:${DEFAULT_PATH}"
     if [ -n "${DEF_USE_TOOLS}" ]; then
         debug "Suffixing path: $(distd "${SOFIN_UTILS_PATH}") to local build path!"
-        PATH="${DEFAULT_SHELL_EXPORTS}:${_prefix}/bin:${_prefix}/sbin:${SOFIN_UTILS_PATH}:${DEFAULT_PATH}"
+        PATH="${DEFAULT_SHELL_EXPORTS}:${SERVICE_DIR}/bin:${SERVICE_DIR}/sbin:${_prefix}/bin:${_prefix}/sbin:${SOFIN_UTILS_PATH}:${DEFAULT_PATH}"
     fi
 
     dump_system_capabilities
@@ -771,8 +771,8 @@ test_and_rate_def () {
                 fi
                 printf "Test for ${_name} started at: ${TIMESTAMP}\n" >> "${PREFIX}/${_name}.test.log" 2>> "${PREFIX}/${_name}.test.log"
                 eval "\
-                    PATH=\"${PREFIX}/bin:${PREFIX}/sbin:${PREFIX}/libexec:${SOFIN_UTILS_PATH}:/bin:/usr/bin\" \
-                    ${_ld_prefix_name}LD_LIBRARY_PATH=\"${PREFIX}/lib:${PREFIX}/libexec\" \
+                    PATH=\"${SERVICE_DIR}/bin:${PREFIX}/bin:${PREFIX}/sbin:${SERVICE_DIR}/sbin:${PREFIX}/libexec:${SOFIN_UTILS_PATH}:/bin:/usr/bin\" \
+                    ${_ld_prefix_name}LD_LIBRARY_PATH=\"${PREFIX}/lib:${PREFIX}/libexec:${SERVICE_DIR}/lib\" \
                     eval '${_cmdline}' >> \"${PREFIX}/${_name}.test.log\" 2>> \"${PREFIX}/${_name}.test.log\" \
                 "
                 _result="${?}"
