@@ -518,6 +518,10 @@ create_software_bundle_archive () {
             try "${ZFS_BIN} send ${ZFS_SEND_OPTS} '${_csbd_dataset}@${ORIGIN_ZFS_SNAP_NAME}' | ${XZ_BIN} ${DEFAULT_XZ_OPTS} > ${_cddestfile}" && \
                 note "Created bin-bundle from dataset: $(distd "${_csbd_dataset}")"
             cd "${_cdir}"
+
+            # set mountpoint for dataset explicitly:
+            _dsname="${DEFAULT_ZPOOL}${SOFTWARE_DIR}/${USER}/${_csbname}"
+            try "${ZFS_BIN} set mountpoint=${SOFTWARE_DIR}/${_csbname} '${_dsname}'"
             try "${ZFS_BIN} mount '${_csbd_dataset}'" || :
         else
             error "Can't build snapshot from broken/empty bundle dir: $(diste "${SOFTWARE_DIR}/${_inst_ind}")"
