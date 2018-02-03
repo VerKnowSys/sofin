@@ -14,6 +14,7 @@ MOUNT_BIN="/sbin/mount"
 UMOUNT_BIN="/sbin/umount"
 HDID_BIN="/usr/bin/hdid"
 NEWFS_HFS_BIN="/sbin/newfs_hfs"
+CHFLAGS_BIN="/usr/bin/chflags"
 
 # set core parameters:
 ALL_CPUS="$(${SYSCTL_BIN} -e machdep.cpu.thread_count 2>/dev/null | ${CUT_BIN} -d'=' -f2 2>/dev/null)"
