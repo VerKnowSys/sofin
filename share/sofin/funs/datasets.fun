@@ -370,10 +370,12 @@ receive_origin () {
     set_mountpoint_and_mount () {
         echo "${_dname}" | ${GREP_BIN} -F "${SOFTWARE_DIR}" >/dev/null 2>&1
         if [ "0" = "${?}" ]; then
-            try "${ZFS_BIN} set mountpoint=${SOFTWARE_DIR}/${_dname##*/} ${_dname}"
+            _mountpoint="${SOFTWARE_DIR}/${_dname##*/}"
         else
-            try "${ZFS_BIN} set mountpoint=${SERVICES_DIR}/${_dname##*/} ${_dname}"
+            _mountpoint="${SERVICES_DIR}/${_dname##*/}"
         fi
+        try "${ZFS_BIN} set sharenfs=off '${_dname}'"
+        try "${ZFS_BIN} set mountpoint=${_mountpoint} '${_dname}'"
         try "${ZFS_BIN} mount '${_dname}'"
     }
 
@@ -386,7 +388,7 @@ receive_origin () {
     else
         error "No origin file available! That's mandatory to have this file: $(diste "${_origin_file}")"
     fi
-    unset _dname _origin_file
+    unset _dname _origin_file _mountpoint
 }
 
 
