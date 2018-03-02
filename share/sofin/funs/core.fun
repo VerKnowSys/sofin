@@ -11,20 +11,20 @@ debug () {
             printf "# (%s) λ %b%s%b\n" "${SHLVL}" "${ColorDebug}" "${_in}" "${ColorReset}"
         fi
         return 0
-        # printf "# (%s) λ %b%s%b\n" "${SHLVL}" "${ColorDebug}" "${_in}" "${ColorReset}" >> "${LOG}" 2>> "${LOG}"
+        # printf "# (%s) λ %b%s%b\n" "${SHLVL}" "${ColorDebug}" "${_in}" "${ColorReset}"  >&2 2>> "${LOG}"
     else
         touch_logsdir_and_logfile
         _dbfn=" "
         if [ -z "${DEBUG}" ]; then
             if [ -n "${DEF_NAME}${DEF_SUFFIX}" ]; then
-                # Definition log
-                printf "#%b%s%s%b" "${ColorDebug}" "${_dbfn}" "${_in}" "${ColorReset}${_permdbg}" 2>> "${LOG}-${DEF_NAME}${DEF_SUFFIX}" >> "${LOG}-${DEF_NAME}${DEF_SUFFIX}"
+                # Definition log, log to stderr only
+                printf "#%b%s%s%b" "${ColorDebug}" "${_dbfn}" "${_in}" "${ColorReset}${_permdbg}" 2>> "${LOG}-${DEF_NAME}${DEF_SUFFIX}" >&2
             else
-                # Main log
-                printf "#%b%s%s%b" "${ColorDebug}" "${_dbfn}" "${_in}" "${ColorReset}${_permdbg}" 2>> "${LOG}" >> "${LOG}"
+                # Main log, all to stderr
+                printf "#%b%s%s%b" "${ColorDebug}" "${_dbfn}" "${_in}" "${ColorReset}${_permdbg}" 2>> "${LOG}" >&2
             fi
-        else # DEBUG is set. Print to stdout
-            printf "#%b%s%s%b\n" "${ColorDebug}" "${_dbfn}" "${_in}" "${ColorReset}" 2>/dev/null
+        else # DEBUG is set. Print to stderr
+            printf "#%b%s%s%b\n" "${ColorDebug}" "${_dbfn}" "${_in}" "${ColorReset}" >&2
         fi
         unset _dbgnme _in _dbfn
     fi
@@ -34,9 +34,9 @@ debug () {
 
 warn () {
     if [ "${TTY}" = "YES" ]; then
-        printf "${REPLAY_PREVIOUS_LINE}%b%s%b\n\n" "${ColorYellow}" "${@}" "${ColorReset}"
+        printf "${REPLAY_PREVIOUS_LINE}%b%s%b\n\n" "${ColorYellow}" "${@}" "${ColorReset}" >&2
     else
-        printf "%b%s%b\n" "${ColorYellow}" "${@}" "${ColorReset}"
+        printf "%b%s%b\n" "${ColorYellow}" "${@}" "${ColorReset}" >&2
     fi
     return 0
 }
@@ -44,9 +44,9 @@ warn () {
 
 note () {
     if [ "${TTY}" = "YES" ]; then
-        printf "${REPLAY_PREVIOUS_LINE}%b%s%b\n" "${ColorGreen}" "${@}" "${ColorReset}"
+        printf "${REPLAY_PREVIOUS_LINE}%b%s%b\n" "${ColorGreen}" "${@}" "${ColorReset}" >&2
     else
-        printf "%b%s%b\n" "${ColorGreen}" "${@}" "${ColorReset}"
+        printf "%b%s%b\n" "${ColorGreen}" "${@}" "${ColorReset}" >&2
     fi
     return 0
 }
@@ -54,18 +54,18 @@ note () {
 
 permnote () {
     if [ "${TTY}" = "YES" ]; then
-        printf "${REPLAY_PREVIOUS_LINE}%b%s%b\n\n" "${ColorGreen}" "${@}" "${ColorReset}"
+        printf "${REPLAY_PREVIOUS_LINE}%b%s%b\n\n" "${ColorGreen}" "${@}" "${ColorReset}" >&2
     else
-        printf "%b%s%b\n" "${ColorGreen}" "${@}" "${ColorReset}"
+        printf "%b%s%b\n" "${ColorGreen}" "${@}" "${ColorReset}" >&2
     fi
     return 0
 }
 
 
 error () {
-    printf "%b\n  %s %s\n    %b %b\n\n" "${ColorRed}" "${NOTE_CHAR2}" "Task crashed!" "${0}: ${1}${2}${3}${4}${5}" "${ColorReset}"
+    printf "%b\n  %s %s\n    %b %b\n\n" "${ColorRed}" "${NOTE_CHAR2}" "Task crashed!" "${0}: ${1}${2}${3}${4}${5}" "${ColorReset}" >&2
     if [ "error" = "${0}" ]; then
-        printf "%b  %s Try: %b%b\n\n" "${ColorRed}" "${NOTE_CHAR2}" "$(diste "s log ${DEF_NAME}${DEF_SUFFIX}") to see the build log." "${ColorReset}"
+        printf "%b  %s Try: %b%b\n\n" "${ColorRed}" "${NOTE_CHAR2}" "$(diste "s log ${DEF_NAME}${DEF_SUFFIX}") to see the build log." "${ColorReset}" >&2
     fi
     finalize_interrupt
     exit "${ERRORCODE_TASK_FAILURE}"
@@ -107,11 +107,11 @@ run () {
         _rnm="${DEF_NAME}${DEF_SUFFIX}"
         if [ -z "${_rnm}" ]; then
             if [ -z "${DEBUG}" ]; then
-                eval "PATH=${PATH}${GIT_EXPORTS} ${_run_params}" >> "${LOG}" 2>> "${LOG}" \
+                eval "PATH=${PATH}${GIT_EXPORTS} ${_run_params}" >/dev/null 2>> "${LOG}" \
                     && check_result ${?} "${_run_params}" \
                     && return 0
             else
-                printf "%b" "${ColorBlue}"
+                printf "%b" "${ColorBlue}" >&2
                 eval "PATH=${PATH}${GIT_EXPORTS} ${_run_params}" \
                     && check_result ${?} "${_run_params}" \
                     && return 0
@@ -122,7 +122,7 @@ run () {
                     && check_result ${?} "${_run_params}" \
                     && return 0
             else
-                printf "%b" "${ColorBlue}"
+                printf "%b" "${ColorBlue}" >&2
                 eval "PATH=${PATH}${GIT_EXPORTS} ${_run_params}" \
                     && check_result ${?} "${_run_params}" \
                     && return 0
@@ -143,13 +143,13 @@ try () {
         _try_aname="${DEF_NAME}${DEF_SUFFIX}"
         if [ -z "${_try_aname}" ]; then
             if [ -z "${DEBUG}" ]; then
-                eval "PATH=${PATH}${GIT_EXPORTS} ${_try_params}" >> "${LOG}" 2>> "${LOG}" \
+                eval "PATH=${PATH}${GIT_EXPORTS} ${_try_params}" >&2 2>> "${LOG}" \
                     && check_result ${?} "${_try_params}" \
                     && return 0
             else
-                # show all progress on stdout.stderr
+                # show all progress on stderr
                 printf "%b" "${ColorBlue}"
-                eval "PATH=${PATH}${GIT_EXPORTS} ${_try_params}" \
+                eval "PATH=${PATH}${GIT_EXPORTS} ${_try_params}" >&2 2>> "${LOG}" \
                     && check_result ${?} "${_try_params}" \
                     && return 0
             fi
@@ -159,7 +159,7 @@ try () {
                     && check_result ${?} "${_try_params}" \
                     && return 0
             else
-                printf "%b" "${ColorBlue}"
+                printf "%b" "${ColorBlue}" >&2
                 eval "PATH=${PATH}${GIT_EXPORTS} ${_try_params}" \
                     && check_result ${?} "${_try_params}" \
                     && return 0
@@ -181,13 +181,13 @@ retry () {
     while [ -n "${_ammo}" ]; do
         if [ -n "${_targets}" ]; then
             if [ -z "${DEBUG}" ]; then
-                eval "PATH=${DEFAULT_PATH}${GIT_EXPORTS} ${_targets}" >> "${LOG}" 2>> "${LOG}" \
+                eval "PATH=${DEFAULT_PATH}${GIT_EXPORTS} ${_targets}" >&2 2>> "${LOG}" \
                     && check_result ${?} "${_targets}" \
                     && unset _ammo _targets \
                     && return 0
             else
-                printf "%b" "${ColorBlue}"
-                eval "PATH=${DEFAULT_PATH}${GIT_EXPORTS} ${_targets}" \
+                printf "%b" "${ColorBlue}" >&2
+                eval "PATH=${DEFAULT_PATH}${GIT_EXPORTS} ${_targets}" >&2 \
                     && check_result ${?} "${_targets}" \
                     && unset _ammo _targets \
                     && return 0
@@ -195,7 +195,7 @@ retry () {
         else
             error "Given an empty command to evaluate with retry()!"
         fi
-        _ammo="$(printf "%s\n" "${_ammo}" 2>/dev/null | ${SED_BIN} 's/O//' 2>/dev/null)"
+        _ammo="$(printf "%s\n" "${_ammo}" | ${SED_BIN} 's/O//' 2>/dev/null)"
         debug "Remaining attempts: $(distd "${_ammo}")"
     done
     debug "All available ammo exhausted to invoke a command: $(distd "${_targets}")"
