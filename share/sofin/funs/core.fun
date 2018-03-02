@@ -143,7 +143,7 @@ try () {
         _try_aname="${DEF_NAME}${DEF_SUFFIX}"
         if [ -z "${_try_aname}" ]; then
             if [ -z "${DEBUG}" ]; then
-                eval "PATH=${PATH}${GIT_EXPORTS} ${_try_params}" >&2 2>> "${LOG}" \
+                eval "PATH=${PATH}${GIT_EXPORTS} ${_try_params}" >/dev/null 2>> "${LOG}" \
                     && check_result ${?} "${_try_params}" \
                     && return 0
             else
