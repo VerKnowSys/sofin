@@ -832,7 +832,7 @@ clone_or_fetch_git_bare_repo () {
     _dest_repo="${_build_dir}/${_bare_name}-${_chk_branch}"
     try "${RM_BIN} -rf '${_dest_repo}'"
     debug "Attempting to clone from cached repository: $(distd "${_git_cached}").."
-    run "${GIT_BIN} clone ${DEFAULT_GIT_CLONE_OPTS} -b ${_chk_branch} ${_git_cached} ${_dest_repo}" && \
+    run "${GIT_BIN} clone --progress --recursive --jobs=3 -b ${_chk_branch} ${_git_cached} ${_dest_repo}" && \
         debug "Cloned branch: $(distd "${_chk_branch}") from cached repository: $(distd "${_git_cached}")"
     unset _git_cached _bare_name _chk_branch _build_dir _dest_repo
 }
