@@ -180,7 +180,7 @@ update_defs () {
         cd "${CACHE_DIR}"
         debug "Cloning repository: $(distd "${REPOSITORY}") from branch: $(distd "${BRANCH}"); LOGS_DIR: $(distd "${LOGS_DIR}"), CACHE_DIR: $(distd "${CACHE_DIR}")"
         try "${RM_BIN} -vrf ${DEFINITIONS_BASE}"
-        try "${GIT_BIN} clone ${DEFAULT_GIT_CLONE_OPTS} ${REPOSITORY} ${DEFINITIONS_BASE}" || \
+        try "${GIT_BIN} clone --depth 1 ${DEFAULT_GIT_CLONE_OPTS} ${REPOSITORY} ${DEFINITIONS_BASE}" || \
             error "Error cloning branch: $(diste "${BRANCH}") of repository: $(diste "${REPOSITORY}"). Please make sure that given repository and branch are valid!"
         cd "${CACHE_DIR}${DEFINITIONS_BASE}"
         _def_cur_branch="$(${GIT_BIN} rev-parse --abbrev-ref HEAD 2>/dev/null)"
@@ -190,7 +190,7 @@ update_defs () {
                     warn "Can't checkout branch: $(distw "${BRANCH}")"
         fi
         _def_head="HEAD"
-        try "${GIT_BIN} pull --progress origin ${BRANCH}" && \
+        try "${GIT_BIN} pull --depth 1 --progress origin ${BRANCH}" && \
             _def_head="$(${CAT_BIN} "${CACHE_DIR}${DEFINITIONS_BASE}/${DEFAULT_GIT_DIR_NAME}/refs/heads/${_def_cur_branch}" 2>/dev/null)"
 
         note "Branch: $(distn "${BRANCH}") is currenly at: $(distn "${_def_head}") in repository: $(distn "${REPOSITORY}")"
@@ -812,8 +812,8 @@ clone_or_fetch_git_bare_repo () {
     _git_cached="${GIT_CACHE_DIR}${_bare_name}${DEFAULT_GIT_DIR_NAME}"
     try "${MKDIR_BIN} -p ${GIT_CACHE_DIR}"
     note "   ${NOTE_CHAR} Fetching source repository: $(distn "${_source_path}")"
-    try "${GIT_BIN} clone --jobs=3 --recursive --mirror ${_source_path} ${_git_cached} 2> /dev/null" || \
-        try "${GIT_BIN} clone --jobs=3 --mirror ${_source_path} ${_git_cached} 2> /dev/null"
+    try "${GIT_BIN} clone --depth 1 --jobs=3 --recursive --mirror ${_source_path} ${_git_cached} 2> /dev/null" || \
+        try "${GIT_BIN} clone --depth 1 --jobs=3 --mirror ${_source_path} ${_git_cached} 2> /dev/null"
     if [ "${?}" = "0" ]; then
         debug "Cloned bare repository: $(distd "${_bare_name}")"
     elif [ -d "${_git_cached}" ]; then
