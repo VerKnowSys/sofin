@@ -30,7 +30,11 @@ load_defs () {
             # check disabled definition state
             unset DEF_DISABLED_ON
             validate_definition_disabled
-            validate_util_availability "${DEF_NAME}${DEF_SUFFIX}"
+
+            if [ -z "${NO_UTILS}" ]; then
+                debug "NO_UTILS environment value is unset! Using available utilities!"
+                validate_util_availability "${DEF_NAME}${DEF_SUFFIX}"
+            fi
 
         done
     fi
