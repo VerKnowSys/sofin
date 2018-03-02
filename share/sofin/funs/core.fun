@@ -1,6 +1,10 @@
 
 debug () {
     _in="${*}"
+    if [ -z "${_in}" ]; then
+        printf "\n" >&2
+        return 0
+    fi
     if [ "${TTY}" = "YES" ]; then
         _permdbg="\n"
     else
@@ -33,42 +37,59 @@ debug () {
 
 
 warn () {
-    if [ "${TTY}" = "YES" ]; then
-        printf "${REPLAY_PREVIOUS_LINE}%b%s%b\n\n" "${ColorYellow}" "${@}" "${ColorReset}" >&2
+    if [ -n "${*}" ]; then
+        if [ "${TTY}" = "YES" ]; then
+            printf "${REPLAY_PREVIOUS_LINE}%b%s%b\n\n" "${ColorYellow}" "${@}" "${ColorReset}" >&2
+        else
+            printf "%b%s%b\n" "${ColorYellow}" "${@}" "${ColorReset}" >&2
+        fi
     else
-        printf "%b%s%b\n" "${ColorYellow}" "${@}" "${ColorReset}" >&2
+        printf "\n" >&2
     fi
     return 0
 }
 
 
 note () {
-    if [ "${TTY}" = "YES" ]; then
-        printf "${REPLAY_PREVIOUS_LINE}%b%s%b\n" "${ColorGreen}" "${@}" "${ColorReset}" >&2
+    if [ -n "${*}" ]; then
+        if [ "${TTY}" = "YES" ]; then
+            printf "${REPLAY_PREVIOUS_LINE}%b%s%b\n" "${ColorGreen}" "${@}" "${ColorReset}" >&2
+        else
+            printf "%b%s%b\n" "${ColorGreen}" "${@}" "${ColorReset}" >&2
+        fi
     else
-        printf "%b%s%b\n" "${ColorGreen}" "${@}" "${ColorReset}" >&2
+        printf "\n" >&2
     fi
     return 0
 }
 
 
 permnote () {
-    if [ "${TTY}" = "YES" ]; then
-        printf "${REPLAY_PREVIOUS_LINE}%b%s%b\n\n" "${ColorGreen}" "${@}" "${ColorReset}" >&2
+    if [ -n "${*}" ]; then
+        if [ "${TTY}" = "YES" ]; then
+            printf "${REPLAY_PREVIOUS_LINE}%b%s%b\n\n" "${ColorGreen}" "${@}" "${ColorReset}" >&2
+        else
+            printf "%b%s%b\n" "${ColorGreen}" "${@}" "${ColorReset}" >&2
+        fi
     else
-        printf "%b%s%b\n" "${ColorGreen}" "${@}" "${ColorReset}" >&2
+        printf "\n" >&2
     fi
     return 0
 }
 
 
 error () {
-    printf "%b\n  %s %s\n    %b %b\n\n" "${ColorRed}" "${NOTE_CHAR2}" "Task crashed!" "${0}: ${1}${2}${3}${4}${5}" "${ColorReset}" >&2
-    if [ "error" = "${0}" ]; then
-        printf "%b  %s Try: %b%b\n\n" "${ColorRed}" "${NOTE_CHAR2}" "$(diste "s log ${DEF_NAME}${DEF_SUFFIX}") to see the build log." "${ColorReset}" >&2
+    if [ -n "${*}" ]; then
+        printf "%b\n  %s %s\n    %b %b\n\n" "${ColorRed}" "${NOTE_CHAR2}" "Task crashed!" "${0}: ${1}${2}${3}${4}${5}" "${ColorReset}" >&2
+        if [ "error" = "${0}" ]; then
+            printf "%b  %s Try: %b%b\n\n" "${ColorRed}" "${NOTE_CHAR2}" "$(diste "s log ${DEF_NAME}${DEF_SUFFIX}") to see the build log." "${ColorReset}" >&2
+        fi
+        finalize_interrupt
+        exit "${ERRORCODE_TASK_FAILURE}"
+    else
+        printf "Unknown error without any content!\n" >&2
     fi
-    finalize_interrupt
-    exit "${ERRORCODE_TASK_FAILURE}"
+    return 0
 }
 
 
