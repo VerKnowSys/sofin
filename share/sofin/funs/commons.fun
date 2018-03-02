@@ -11,6 +11,13 @@ check_result () {
 }
 
 
+check_definitions_availability () {
+    if [ ! -d "${DEFINITIONS_DIR}" ]; then
+        update_defs
+    fi
+}
+
+
 check_os () {
     case "${SYSTEM_NAME}" in
         FreeBSD)

@@ -403,6 +403,7 @@ initialize () {
     check_os
     create_dirs
     create_base_datasets
+    check_definitions_availability
     trap_signals
 
     if [ "${TTY}" = "YES" ]; then
