@@ -8,7 +8,7 @@ debug () {
     fi
     if [ -n "${CAP_SYS_PRODUCTION}" ]; then
         if [ -n "${DEBUG}" ]; then
-            printf "# (%s) λ %b%s%b\n" "${SHLVL}" "${ColorDebug}" "${_in}" "${ColorReset}"
+            printf "# (%s) λ %b%s%b\n" "${SHLVL}" "${ColorDebug}" "${_in}" "${ColorReset}" >&2
         fi
         return 0
         # printf "# (%s) λ %b%s%b\n" "${SHLVL}" "${ColorDebug}" "${_in}" "${ColorReset}"  >&2 2>> "${LOG}"
@@ -112,7 +112,7 @@ run () {
                     && return 0
             else
                 printf "%b" "${ColorBlue}" >&2
-                eval "PATH=${PATH}${GIT_EXPORTS} ${_run_params}" \
+                eval "PATH=${PATH}${GIT_EXPORTS} ${_run_params}" 2>> "${LOG}" \
                     && check_result ${?} "${_run_params}" \
                     && return 0
             fi
@@ -123,7 +123,7 @@ run () {
                     && return 0
             else
                 printf "%b" "${ColorBlue}" >&2
-                eval "PATH=${PATH}${GIT_EXPORTS} ${_run_params}" \
+                eval "PATH=${PATH}${GIT_EXPORTS} ${_run_params}" >&2 2>> "${LOG}-${_rnm}" \
                     && check_result ${?} "${_run_params}" \
                     && return 0
             fi
@@ -148,7 +148,7 @@ try () {
                     && return 0
             else
                 # show all progress on stderr
-                printf "%b" "${ColorBlue}"
+                printf "%b" "${ColorBlue}" >&2
                 eval "PATH=${PATH}${GIT_EXPORTS} ${_try_params}" >&2 2>> "${LOG}" \
                     && check_result ${?} "${_try_params}" \
                     && return 0
@@ -160,7 +160,7 @@ try () {
                     && return 0
             else
                 printf "%b" "${ColorBlue}" >&2
-                eval "PATH=${PATH}${GIT_EXPORTS} ${_try_params}" \
+                eval "PATH=${PATH}${GIT_EXPORTS} ${_try_params}" >&2 2>> "${LOG}-${_try_aname}" \
                     && check_result ${?} "${_try_params}" \
                     && return 0
             fi
@@ -187,7 +187,7 @@ retry () {
                     && return 0
             else
                 printf "%b" "${ColorBlue}" >&2
-                eval "PATH=${DEFAULT_PATH}${GIT_EXPORTS} ${_targets}" >&2 \
+                eval "PATH=${DEFAULT_PATH}${GIT_EXPORTS} ${_targets}" >&2 2>> "${LOG}" \
                     && check_result ${?} "${_targets}" \
                     && unset _ammo _targets \
                     && return 0
