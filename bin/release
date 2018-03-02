@@ -42,7 +42,7 @@ else
     ${SSH_BIN} "${SOFIN_NAME}@${DEFAULT_RELEASE_HOST}" "source ~/.functions.sh && gather-source ${DEFAULT_RELEASE_PATH}/${DEST_NAME}"
 
     note "Preparing initial snapshot from repository: ${DEFAULT_DEFINITIONS_REPOSITORY}"
-    ${GIT_BIN} clone "${DEFAULT_DEFINITIONS_REPOSITORY}" "${SOFIN_DEFINITIONS_DIR}" >/dev/null
+    ${GIT_BIN} clone --depth 1 "${DEFAULT_DEFINITIONS_REPOSITORY}" "${SOFIN_DEFINITIONS_DIR}" >/dev/null
     cd "./${SOFIN_DEFINITIONS_DIR}"
     # ${GIT_BIN} push --all "${DEFAULT_DEFINITIONS_REPOSITORY_ALT}" >/dev/null
     # ${GIT_BIN} push --tags "${DEFAULT_DEFINITIONS_REPOSITORY_ALT}" >/dev/null
