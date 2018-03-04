@@ -172,7 +172,7 @@ if [ -n "${SOFIN_COMMAND}" ]; then
                         _pkgp="."
                         _ldfl="${DEFAULT_LINKER_FLAGS}"
                         _cfl="${DEFAULT_COMPILER_FLAGS}"
-                        _cxxfl="-std=c++11 ${_cfl}"
+                        _cxxfl="${CXX11_CXXFLAGS} ${_cfl}"
                         _pth="${DEFAULT_PATH}"
                         for _abundle in $(to_iter "${_bundles}"); do
                             if [ -d "${SOFTWARE_DIR}/${_abundle}/exports" ]; then
