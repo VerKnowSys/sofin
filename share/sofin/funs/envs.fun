@@ -349,6 +349,10 @@ compiler_setup () {
         CXXFLAGS="${CXXFLAGS} ${SSP_BUFFER_OVERRIDE}"
     fi
 
+    if [ -z "${DEF_NO_CXX11}" ]; then
+        CXXFLAGS="${CXXFLAGS} ${CXX11_CXXFLAGS}"
+    fi
+
     # If DEF_LINKER_FLAGS is set on definition side, append it's content to LDFLAGS:
     # if [ -n "${DEF_LINKER_FLAGS}" ]; then
     #     LDFLAGS="${LDFLAGS} ${DEF_LINKER_FLAGS}"
