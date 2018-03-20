@@ -90,6 +90,12 @@ dump_compiler_setup () {
         debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "safe-stack" "${ColorGray}")"
     fi
 
+    if [ -z "${DEF_NO_RETPOLINE}" ]; then
+        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "retpoline" "${ColorGreen}")"
+    else
+        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "retpoline" "${ColorGray}")"
+    fi
+
     if [ -z "${DEF_NO_LTO}" ]; then
         debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "link-time-optimization" "${ColorGreen}")"
     else
