@@ -356,6 +356,7 @@ compiler_setup () {
     if [ -z "${DEF_NO_RETPOLINE}" ]; then
         CFLAGS="${CFLAGS} ${RETPOLINE_CFLAGS}"
         CXXFLAGS="${CXXFLAGS} ${RETPOLINE_CFLAGS}"
+        LDFLAGS="${LDFLAGS} -z retpolineplt"
     fi
 
     # If DEF_LINKER_FLAGS is set on definition side, append it's content to LDFLAGS:
