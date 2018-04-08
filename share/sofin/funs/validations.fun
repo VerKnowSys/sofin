@@ -49,13 +49,10 @@ fail_any_bg_jobs () {
 
 validate_reqs () {
     if [ "${SYSTEM_NAME}" != "Darwin" ]; then
-        if [ -d "/usr/local" ]; then
-            _a_files="$(${FIND_BIN} /usr/local -maxdepth 2 -type f 2>/dev/null | ${WC_BIN} -l 2>/dev/null | ${SED_BIN} -e 's/^ *//g;s/ *$//g' 2>/dev/null)"
+        if [ -d "/usr/local/lib" ]; then
+            _a_files="$(${FIND_BIN} /usr/local/lib -name '*.so' -or -name '*.o' -or -name '*.la' -or -name '*.a' -maxdepth 5 -type f 2>/dev/null | ${WC_BIN} -l 2>/dev/null | ${SED_BIN} -e 's/^ *//g;s/ *$//g' 2>/dev/null)"
             if [ "${_a_files}" != "0" ]; then
-                if [ "${_a_files}" != "1" ]; then
-                    _pstfix="s"
-                fi
-                warn "$(distw "/usr/local") has been found, which contains: $(distw "${_a_files}+") file${_pstfix}."
+                warn "$(distw "/usr/local/lib") has been found with: $(distw "${_a_files}+") $(distw "possibly unfriendly") libraries!"
             fi
         fi
         unset _a_files _pstfix
