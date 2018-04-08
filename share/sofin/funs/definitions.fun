@@ -765,17 +765,27 @@ after_install_callback () {
 }
 
 
+apply_patch () {
+    # $1 => definition name, $2 => patch abs path
+    for _level in $(${SEQ_BIN} 0 5); do # From p0 to-p5
+        try "${PATCH_BIN} -p${_level} -N -f -i ${2} >> ${LOG}-${1} 2>> ${LOG}-${1}" && \
+            debug "Patch applied: $(distd "${2##*/}") (level: $(distd "${_level}"))" && \
+            return 0
+    done
+    unset _level
+    return 1
+}
+
+
 traverse_patchlevels () {
+    _trav_name="${1}"
+    shift
     _trav_patches="${*}"
     for _patch in $(to_iter "${_trav_patches}"); do
-        for _level in $(${SEQ_BIN} 0 3); do # Up to: -p3
-            try "${PATCH_BIN} -p${_level} -N -f -i ${_patch}" && \
-                debug "Patch applied: $(distd "${_patch##*/}") (level: $(distd "${_level}"))" && \
-                break
-            # debug "Patch: $(distd "patches${_patch##*patches}") failed for level: ${_level}!"
-        done
+        apply_patch "${_trav_name}" "${_patch}" || \
+            warn "   ${WARN_CHAR} Failed to apply patch: $(distw "${_patch}") for: $(distw "${_trav_name}")"
     done
-    unset _trav_patches _patch _level
+    unset _trav_patches _patch _trav_name
 }
 
 
@@ -787,16 +797,18 @@ apply_definition_patches () {
     _common_patches_dir="${DEFINITIONS_DIR}/patches/${_pcpaname}"
     _platform_patches_dir="${_common_patches_dir}/${SYSTEM_NAME}"
     if [ -d "${_common_patches_dir}/" ]; then
+        debug "Applying available patches for definition: $(distd "${_pcpaname}")"
+
         _ps_patches="$(${FIND_BIN} "${_common_patches_dir}/" -mindepth 1 -maxdepth 1 -type f 2>/dev/null)"
         if [ -n "${_ps_patches}" ]; then
             note "   ${NOTE_CHAR} Applying common patches for: $(distn "${_pcpaname}")"
-            traverse_patchlevels "${_ps_patches}"
+            traverse_patchlevels "${_pcpaname}" "${_ps_patches}"
         fi
         if [ -d "${_platform_patches_dir}/" ]; then
             _ps_patches="$(${FIND_BIN} "${_platform_patches_dir}/" -mindepth 1 -maxdepth 1 -type f 2>/dev/null)"
             if [ -n "${_ps_patches}" ]; then
                 note "   ${NOTE_CHAR} Applying platform specific patches for: $(distn "${_pcpaname}/${SYSTEM_NAME}")"
-                traverse_patchlevels "${_ps_patches}"
+                traverse_patchlevels "${_pcpaname}" "${_ps_patches}"
             fi
         fi
     fi
