@@ -35,9 +35,9 @@ usage_howto () {
     permnote "  $(distn "env +Bundle1 BundleN                 ") add given Bundle(s) to current env profile."
     permnote "  $(distn "env -Bundle1 -Sup2 -BundleN          ") remove given Bundle(s) from current env profile."
     permnote "  $(distn "env -Bundle1 Sup2 -BundleN           ") remove given Bundle(s) from current env profile."
-    permnote "  $(distn "env - @                              ") resets Sofin env to defaults."
-    permnote "  $(distn "env ! MyProjectX                     ") saves Sofin env profile with given name."
-    permnote "  $(distn "env ^ MyProjectX                     ") loads Sofin env profile with given name (no persistence)."
+    permnote "  $(distn "env reset                            ") resets Sofin env to defaults."
+    permnote "  $(distn "env save MyProjectX                  ") saves Sofin env profile with given name."
+    permnote "  $(distn "env load MyProjectX                  ") loads Sofin env profile with given name (no persistence)."
     permnote "  $(distn "env status                           ") shows Sofin status - list of Bundle(s) enabled for currently loaded profile."
     permnote "  $(distn "env reload | rehash                  ") recreates and reloads Sofin shell environment"
 

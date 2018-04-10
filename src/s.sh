@@ -159,6 +159,11 @@ if [ -n "${SOFIN_COMMAND}" ]; then
                     env_status
                     ;;
 
+                reset)
+                    note "Resetting Sofin envrionment"
+                    ${RM_BIN} -f "${SOFIN_ENV_ENABLED_INDICATOR_FILE}"
+                    ;;
+
                 r|reload|rehash) # NOTE: always done implicitly later
                     ;;
 
