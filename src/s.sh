@@ -136,14 +136,14 @@ if [ -n "${SOFIN_COMMAND}" ]; then
                     note "Updated profile without bundles: $(distn "${_bundles}")"
                     ;;
 
-                !) # save profile
+                !|store|save) # save profile
                     shift
                     _fname="${SOFIN_ENV_ENABLED_INDICATOR_FILE}.${1}"
                     note "Storing new environment profile: $(distn "${_fname}")"
                     run "${INSTALL_BIN} ${SOFIN_ENV_ENABLED_INDICATOR_FILE} ${_fname}"
                     ;;
 
-                ^) # load profile
+                ^|load|ld) # load profile
                     shift
                     _name="${1}"
                     _fname="${SOFIN_ENV_ENABLED_INDICATOR_FILE}.${_name}"
