@@ -502,8 +502,8 @@ update_system_shell_env_files () {
 
 
 set_normal_security () {
-    debug "NO-OP: Setting security sysctls to normal. No background Sofin jobs found!"
-    # try "${SYSCTL_BIN} hardening.pax.segvguard.status=1 hardening.pax.mprotect.status=2 hardening.pax.pageexec.status=2 hardening.pax.disallow_map32bit.status=1 hardening.pax.aslr.status=3 >/dev/null"
+    debug "Setting security sysctls to normal. No background Sofin jobs found!"
+    try "${SYSCTL_BIN} -f /etc/sysctl.conf"
 }
 
 
