@@ -68,6 +68,7 @@ finalize_shell_reload () {
 finalize_onquit () {
     security_set_normal
     destroy_ramdisk_device
+    set_software_root_readonly
     if [ "${TTY}" = "YES" ]; then
         # Bring back echo
         ${STTY_BIN} echo
