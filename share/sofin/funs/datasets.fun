@@ -697,6 +697,20 @@ do_prefix_snapshot () {
 }
 
 
+set_software_root_readonly () {
+    if [ "YES" = "${CAP_SYS_ZFS}" ]; then
+        ${ZFS_BIN} set readonly=on "${DEFAULT_ZPOOL}/Software/root"
+    fi
+}
+
+
+set_software_root_writable () {
+    if [ "YES" = "${CAP_SYS_ZFS}" ]; then
+        ${ZFS_BIN} set readonly=off "${DEFAULT_ZPOOL}/Software/root"
+    fi
+}
+
+
 after_unpack_snapshot () {
     do_prefix_snapshot "after_unpack"
 }
