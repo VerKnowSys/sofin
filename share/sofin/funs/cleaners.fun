@@ -66,7 +66,7 @@ finalize_shell_reload () {
 
 
 finalize_onquit () {
-    # security_set_normal
+    security_set_normal
     destroy_ramdisk_device
     if [ "${TTY}" = "YES" ]; then
         # Bring back echo
