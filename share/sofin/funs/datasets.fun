@@ -383,7 +383,7 @@ receive_origin () {
     if [ -f "${_origin_file}" ]; then
         debug "DataSet: $(distd "${_dname}")"
         # NOTE: each user dataset is made of same origin, hence you can apply snapshots amongst them..
-        run "${LZ4CAT_BIN} '${_origin_file}' | ${ZFS_BIN} receive -u ${ZFS_RECEIVE_OPTS} '${_dname}' | ${TAIL_BIN} -n1 2>/dev/null" \
+        run "${LZ4CAT_BIN} '${_origin_file}' | ${ZFS_BIN} receive -u ${ZFS_RECEIVE_OPTS} '${_dname}'" \
             && set_mountpoint_and_mount \
             && debug "Origin received successfully: $(distd "${_dname}")"
     else
@@ -584,7 +584,7 @@ install_software_from_binbuild () {
         debug "isfb: $(distd "${_isfb_archive}"), isff: $(distd "${_isfb_fullname}"), isfbdset: $(distd "${_isfb_dataset}")"
         try "${ZFS_BIN} list -H -t filesystem ${_isfb_dataset} >> ${LOG} 2>/dev/null"
         if [ "${?}" = "0" ]; then
-            note "Software dataset: $(distn "${_isfb_fullname}") already present. Will be destroyed!"
+            # note "Software dataset: $(distn "${_isfb_fullname}") already present. Will be destroyed!"
             run "${ZFS_BIN} destroy -r '${_isfb_dataset}'"
         fi
         debug "Installing ZFS based binary build to dataset: $(distd "${_isfb_dataset}")"
