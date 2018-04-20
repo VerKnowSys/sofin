@@ -100,3 +100,9 @@ install_sofin_files () {
             return 0
     return 1
 }
+
+
+set_software_root_readonly () {
+    # no-op
+    return 0
+}
