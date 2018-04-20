@@ -60,6 +60,9 @@ validate_reqs () {
     if [ -n "${DEBUGBUILD}" ]; then
         warn "Debug build is enabled."
     fi
+    if [ -z "${LZ4_BIN}" ] || [ -z "${LZ4CAT_BIN}" ]; then
+        error "No $(diste Lz4) installed. It's required for long-term/ safe binary builds"
+    fi
 }
 
 
