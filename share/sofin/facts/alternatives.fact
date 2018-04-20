@@ -150,9 +150,6 @@ if [ -x "${SOFTWARE_DIR}/Lz4/exports/lz4" ]; then
     LZ4_BIN="${SOFTWARE_DIR}/Lz4/exports/lz4"
 elif [ -x "/usr/bin/lz4" ]; then
     LZ4_BIN="/usr/bin/lz4"
-elif [ -x "/usr/bin/xz" ]; then
-    # Fallback to xz if lz4 is not available
-    LZ4_BIN="/usr/bin/xz"
 else
     unset LZ4_BIN
 fi
@@ -162,9 +159,6 @@ if [ -x "${SOFTWARE_DIR}/Lz4/exports/lz4cat" ]; then
     LZ4CAT_BIN="${SOFTWARE_DIR}/Lz4/exports/lz4cat"
 elif [ -x "/usr/bin/lz4cat" ]; then
     LZ4CAT_BIN="/usr/bin/lz4cat"
-elif [ -x "/usr/bin/xzcat" ]; then
-    # Fallback to xzcat if lz4cat is not available
-    LZ4CAT_BIN="/usr/bin/xzcat"
 else
     unset LZ4CAT_BIN
 fi
