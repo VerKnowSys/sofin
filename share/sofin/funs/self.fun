@@ -103,6 +103,9 @@ install_sofin_files () {
 
 
 set_software_root_readonly () {
-    # no-op
+    # for installation, we want to set Software dataset writable instead:
+    if [ "YES" = "${CAP_SYS_ZFS}" ]; then
+        ${ZFS_BIN} set readonly=off "${DEFAULT_ZPOOL}/Software/root"
+    fi
     return 0
 }
