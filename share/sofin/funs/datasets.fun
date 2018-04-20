@@ -257,7 +257,7 @@ try_fetch_service_dir () {
             if [ "0" = "$?" ]; then
                 debug "Service origin is already present for: $(distd "${_svce_origin}")"
             else
-                run "${LZ4CAT_BIN} "${_svce_org_file}" | ${ZFS_BIN} receive ${ZFS_RECEIVE_OPTS} '${DEFAULT_ZPOOL}${SERVICES_DIR}/${USER}/${_dset_create}' | ${TAIL_BIN} -n1 2>/dev/null" && \
+                run "${LZ4CAT_BIN} '${_svce_org_file}' | ${ZFS_BIN} receive ${ZFS_RECEIVE_OPTS} '${DEFAULT_ZPOOL}${SERVICES_DIR}/${USER}/${_dset_create}' | ${TAIL_BIN} -n1 2>/dev/null" && \
                     debug "Service origin received successfully: $(distd "${_svce_origin}")"
             fi
         else
@@ -383,7 +383,7 @@ receive_origin () {
     if [ -f "${_origin_file}" ]; then
         debug "DataSet: $(distd "${_dname}")"
         # NOTE: each user dataset is made of same origin, hence you can apply snapshots amongst them..
-        run "${LZ4CAT_BIN} \"${_origin_file}\" | ${ZFS_BIN} receive -u ${ZFS_RECEIVE_OPTS} '${_dname}' | ${TAIL_BIN} -n1 2>/dev/null" \
+        run "${LZ4CAT_BIN} '${_origin_file}' | ${ZFS_BIN} receive -u ${ZFS_RECEIVE_OPTS} '${_dname}' | ${TAIL_BIN} -n1 2>/dev/null" \
             && set_mountpoint_and_mount \
             && debug "Origin received successfully: $(distd "${_dname}")"
     else
