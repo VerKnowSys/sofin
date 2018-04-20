@@ -24,14 +24,6 @@ elif [ -x "/usr/local/bin/basename" ]; then
     BASENAME_BIN="/usr/local/bin/basename"
 fi
 
-# NOTE: Darwin is a UNIX unicorn..Requires special threatment:
-#       We have to replace original linker with LLVM one.
-#       On this system it has to be: /usr/bin/ld
-if [ -x "/Software/Lld/exports/ld" ]; then
-    LLD_BIN="/Software/Lld/exports/ld"
-elif [ -x "/usr/local/bin/ld" ]; then
-    LLD_BIN="/usr/local/bin/ld"
-fi
 
 # NOTE: under UNIXes linker has to be: /usr/bin/ld.lld
 # WARN: /usr/bin/ld.lld must not exists in /usr/bin under Darwins!
