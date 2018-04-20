@@ -7,7 +7,6 @@ unset DEFAULT_STRIP_OPTS # strip doesn't accept params under Darwin
 SHA_BIN="/usr/bin/shasum"
 SYSCTL_BIN="/usr/sbin/sysctl"
 KLDLOAD_BIN="/sbin/kextload"
-XZCAT_BIN="/bin/cat"
 PGREP_BIN="/usr/bin/pgrep"
 DTRACE_BIN="/usr/sbin/dtrace"
 MOUNT_BIN="/sbin/mount"
