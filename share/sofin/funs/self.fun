@@ -21,6 +21,7 @@ load_requirements () {
 
 install_sofin () {
     load_requirements
+    set_software_root_writable
     create_dirs
 
     echo "Installing ${SOFIN_BUNDLE_NAME} to prefix: $(distn "${SOFIN_ROOT}")"
@@ -39,6 +40,7 @@ install_sofin () {
 
     update_system_shell_env_files
     update_shell_vars
+    set_software_root_readonly
     reload_shell
     return 0
 }
@@ -103,9 +105,14 @@ install_sofin_files () {
 
 
 set_software_root_readonly () {
-    # for installation, we want to set Software dataset writable instead:
-    if [ "YES" = "${CAP_SYS_ZFS}" ]; then
-        ${ZFS_BIN} set readonly=off "${DEFAULT_ZPOOL}/Software/root"
+    if [ "${USER}" = "root" ]; then
+        ${ZFS_BIN} set readonly=on "${DEFAULT_ZPOOL}/Software/root" || :
     fi
-    return 0
+}
+
+
+set_software_root_writable () {
+    if [ "${USER}" = "root" ]; then
+        ${ZFS_BIN} set readonly=off "${DEFAULT_ZPOOL}/Software/root" || :
+    fi
 }
