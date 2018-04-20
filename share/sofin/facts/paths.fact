@@ -76,6 +76,8 @@ NM_BIN="/usr/bin/nm"
 AR_BIN="/usr/bin/ar"
 AS_BIN="/usr/bin/as"
 OPENSSL_BIN="/usr/bin/openssl"
+LZ4_BIN="/usr/bin/lz4"
+LZ4CAT_BIN="/usr/bin/lz4cat"
 
 # Pick best utilities available:
 if [ -f "${DEFAULT_FACTS_DIR}alternatives.fact" ]; then
