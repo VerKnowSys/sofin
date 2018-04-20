@@ -530,7 +530,7 @@ create_software_bundle_archive () {
             try "${RM_BIN} -rf ${SOFTWARE_DIR}/${_csbname}/${DEFAULT_SRC_EXT}*"
             try "${ZFS_BIN} snapshot '${_csbd_dataset}@${ORIGIN_ZFS_SNAP_NAME}'"
             try "${ZFS_BIN} umount -f '${_csbd_dataset}'"
-            try "${ZFS_BIN} send ${ZFS_SEND_OPTS} '${_csbd_dataset}@${ORIGIN_ZFS_SNAP_NAME}' | ${LZ4_BIN} ${DEFAULT_LZ4_OPTS} > ${_cddestfile}" && \
+            run "${ZFS_BIN} send ${ZFS_SEND_OPTS} '${_csbd_dataset}@${ORIGIN_ZFS_SNAP_NAME}' | ${LZ4_BIN} ${DEFAULT_LZ4_OPTS} > ${_cddestfile}" && \
                 note "Created bin-bundle from dataset: $(distd "${_csbd_dataset}")"
             cd "${_cdir}"
 
