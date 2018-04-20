@@ -281,6 +281,7 @@ if [ -n "${SOFIN_COMMAND}" ]; then
             _utils="${*}"
             if [ -n "${_utils}" ]; then
                 initialize
+                validate_reqs
 
                 for _util in $(to_iter "${_utils}"); do
                     _util="$(capitalize "${_util}")"
@@ -316,6 +317,7 @@ if [ -n "${SOFIN_COMMAND}" ]; then
 
         i|install|get|pick|choose|use|switch)
             initialize
+            validate_reqs
             _list_maybe="$(lowercase "${1}")"
             if [ -z "${_list_maybe}" ]; then
                 error "Second argument, with at least one application (or list) name is required!"
@@ -338,6 +340,7 @@ if [ -n "${SOFIN_COMMAND}" ]; then
 
         deps|dependencies|local)
             initialize
+            validate_reqs
             if [ "${USER}" = "root" ]; then
                 warn "Installation of project dependencies as root is immoral"
             fi
@@ -359,6 +362,7 @@ if [ -n "${SOFIN_COMMAND}" ]; then
 
         p|push|binpush|send)
             initialize
+            validate_reqs
             fail_on_bg_job "${SOFIN_ARGS}"
             for _bundle in $(to_iter "${SOFIN_ARGS}"); do
 
@@ -387,6 +391,7 @@ if [ -n "${SOFIN_COMMAND}" ]; then
 
         b|build)
             initialize
+            validate_reqs
             permnote "Build bundle(s): $(distn "${SOFIN_ARGS}")"
             fail_on_bg_job "${SOFIN_ARGS}"
             USE_UPDATE=NO
@@ -401,6 +406,7 @@ if [ -n "${SOFIN_COMMAND}" ]; then
 
         d|deploy)
             initialize
+            validate_reqs
             permnote "Deploy bundle(s): $(distn "${SOFIN_ARGS}")"
             fail_on_bg_job "${SOFIN_ARGS}"
             deploy_binbuild "${SOFIN_ARGS}"
@@ -419,6 +425,7 @@ if [ -n "${SOFIN_COMMAND}" ]; then
 
         rebuild)
             initialize
+            validate_reqs
             fail_on_bg_job "${SOFIN_ARGS}"
             rebuild_bundle "${SOFIN_ARGS}"
             finalize

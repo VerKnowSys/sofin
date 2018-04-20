@@ -133,7 +133,6 @@ build () {
     _build_list="${*}"
 
     # Update definitions and perform more checks
-    validate_reqs
     security_set_build
     validate_kern_loaded_dtrace
     validate_sys_limits
