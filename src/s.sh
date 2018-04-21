@@ -279,6 +279,8 @@ if [ -n "${SOFIN_COMMAND}" ]; then
 
         tool|mkutil|util) # `s tool`
             _utils="${*}"
+            unset CAP_SYS_ZFS
+
             if [ -n "${_utils}" ]; then
                 initialize
                 validate_reqs
