@@ -78,6 +78,7 @@ AS_BIN="/usr/bin/as"
 OPENSSL_BIN="/usr/bin/openssl"
 LZ4_BIN="/usr/bin/lz4"
 LZ4CAT_BIN="/usr/bin/lz4cat"
+DTRACE_BIN="/usr/sbin/dtrace"
 
 # Pick best utilities available:
 if [ -f "${DEFAULT_FACTS_DIR}alternatives.fact" ]; then
