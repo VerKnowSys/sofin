@@ -210,8 +210,9 @@ validate_kern_loaded_dtrace () {
     if [ -n "${CAP_SYS_DTRACE}" ]; then
         case "${SYSTEM_NAME}" in
             FreeBSD)
-                ${KLDSTAT_BIN} 2>/dev/null | ${GREP_BIN} -F 'dtrace.ko' >/dev/null 2>&1 \
-                    || try "${KLDLOAD_BIN} dtraceall >/dev/null"
+                debug "Making sure dtrace kernel module is loaded"
+                ${KLDSTAT_BIN} 2>/dev/null | ${GREP_BIN} -F 'dtraceall' >/dev/null 2>&1 \
+                    || try "${KLDLOAD_BIN} dtraceall"
                 ;;
         esac
     fi
