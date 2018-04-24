@@ -13,6 +13,8 @@ SOFIN_ROOT="${SOFIN_ROOT:-/Software/Sofin}"
 # ${TEST_BIN} -f /.build-host && export DEVEL=YES
 ${TEST_BIN} ! -x /Software/Ccache/bin/ccache || ${SOFIN_BIN} i Ccache
 
+# NO_UTILS=YES s d Pkgconf Make Cmake Bison Zip
+
 note "Checking remote machine connection (shouldn't take more than a second).."
 run "${SSH_BIN} sofin@git.verknowsys.com uname -a"
 
@@ -38,12 +40,17 @@ for software in $(${CAT_BIN} ${_working_state_file} 2>/dev/null); do
         warn "Found already prebuilt version of software: $(distw "${software}"). Leaving untouched with version: $(distw "$(${CAT_BIN} "${_indicator}" 2>/dev/null)")"
         ${SED_BIN} -i '' -e "/${software}/d" ${_working_state_file}
     else
+        remove_from_list_and_destroy () {
+            try "${SED_BIN} -i '' -e \"/${software}/d\" ${_working_state_file}"
+            try "${SOFIN_BIN} rm ${software}"
+        }
+
         note "Removing software: $(distn "${software}")"
         try "${SOFIN_BIN} rm ${software}"
 
         note "Deploying software: $(distn "${software}")"
-        ${SOFIN_BIN} deploy ${software} \
-            && try "${SED_BIN} -i '' -e \"/${software}/d\" ${_working_state_file}"
+        NO_UTILS=YES ${SOFIN_BIN} deploy ${software} \
+            && remove_from_list_and_destroy
 
     fi
     permnote "--------------------------------"
