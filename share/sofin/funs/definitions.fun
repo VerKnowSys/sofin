@@ -348,33 +348,40 @@ make_exports () {
 
 
 show_outdated () {
+    _raw="${1}"
     load_defaults
     if [ -d "${SOFTWARE_DIR}" ]; then
         for _prefix in $(${FIND_BIN} "${SOFTWARE_DIR%/}" -mindepth 1 -maxdepth 1 -type d -not -name ".*" 2>/dev/null); do
             _bundle_cap="${_prefix##*/}"
             _bundle="$(lowercase "${_bundle_cap}")"
             if [ ! -f "${_prefix}/${_bundle}${DEFAULT_INST_MARK_EXT}" ]; then
-                warn "Bundle: $(distw "${_bundle_cap}") is not yet installed or damaged."
+                if [ -z "${_raw}" ]; then
+                    warn "Bundle: $(distw "${_bundle_cap}") is not yet installed or damaged."
+                fi
                 continue
             fi
             _bund_vers="$(${CAT_BIN} "${_prefix}/${_bundle}${DEFAULT_INST_MARK_EXT}" 2>/dev/null)"
             if [ ! -f "${DEFINITIONS_DIR}/${_bundle}${DEFAULT_DEF_EXT}" ]; then
                 if [ "${_bundle}" != "${SOFIN_NAME}" ]; then
-                    warn "No such bundle: '$(distw "${_bundle_cap}")' of prefix: '$(distw "${_prefix##*/}")' found!"
+                    if [ -z "${_raw}" ]; then
+                        warn "No such bundle: '$(distw "${_bundle_cap}")' of prefix: '$(distw "${_prefix##*/}")' found!"
+                    fi
                 fi
                 continue
             fi
             load_defs "${_bundle}"
-            check_version "${_bund_vers}" "${DEF_VERSION}" "${_bundle}"
+            check_version "${_bund_vers}" "${DEF_VERSION}" "${_bundle}" "${_raw}"
         done
     fi
 
-    if [ "${FOUND_OUTDATED}" = "YES" ]; then
-        exit "${ERRORCODE_TASK_FAILURE}"
-    else
-        note "Installed bundles seems to be recent"
+    if [ -z "${_raw}" ]; then
+        if [ "${FOUND_OUTDATED}" = "YES" ]; then
+            exit "${ERRORCODE_TASK_FAILURE}"
+        else
+            note "Installed bundles seems to be recent"
+        fi
     fi
-    unset _bund_vers
+    unset _bund_vers _raw
 }
 
 

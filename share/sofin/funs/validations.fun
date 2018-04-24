@@ -1,8 +1,12 @@
 check_version () { # $1 => installed version, $2 => available version
-    if [ ! "${1}" = "" ]; then
-        if [ ! "${2}" = "" ]; then
-            if [ ! "${1}" = "${2}" ]; then
-                warn "Bundle: $(distw "$(capitalize "${3}")"), version: $(distw "${2}") is definied, but installed version is: $(distw "${1}")"
+    if [ -n "${1}" ]; then
+        if [ -n "${2}" ]; then
+            if [ "${1}" != "${2}" ]; then
+                if [ -z "${4}" ]; then
+                    warn "Bundle: $(distw "$(capitalize "${3}")"), version: $(distw "${2}") is definied, but installed version is: $(distw "${1}")"
+                else
+                    echo "$(capitalize ${3})"
+                fi
                 FOUND_OUTDATED=YES
             fi
         fi

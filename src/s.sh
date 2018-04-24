@@ -477,9 +477,14 @@ if [ -n "${SOFIN_COMMAND}" ]; then
             ;;
 
 
-        old|out|outdated|rusk)
+        old|rusk)
             fail_on_bg_job "${SOFIN_ARGS}"
             show_outdated
+            ;;
+
+        out|outdated)
+            fail_on_bg_job "${SOFIN_ARGS}"
+            show_outdated RAW
             ;;
 
 
