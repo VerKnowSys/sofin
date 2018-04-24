@@ -365,24 +365,6 @@ set_system_writable () {
 }
 
 
-restore_security_state () {
-    if [ "YES" = "${CAP_SYS_HARDENED}" ]; then
-        if [ -z "${CAP_SYS_PRODUCTION}" ]; then
-            if [ -f "${DEFAULT_SECURITY_STATE_FILE}" ]; then
-                note "Restoring pre-build security state"
-                . "${DEFAULT_SECURITY_STATE_FILE}" #>> "${LOG}" 2>> "${LOG}"
-            else
-                debug "No security state file found: $(distd "${DEFAULT_SECURITY_STATE_FILE}")"
-            fi
-        else
-            debug "Restore disabled in production mode"
-        fi
-    else
-        debug "No hardening capabilities in system"
-    fi
-}
-
-
 store_security_state () {
     if [ "YES" = "${CAP_SYS_HARDENED}" ]; then
         if [ -z "${CAP_SYS_PRODUCTION}" ]; then

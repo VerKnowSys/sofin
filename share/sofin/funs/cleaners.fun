@@ -52,7 +52,6 @@ perform_clean () {
 
 
 finalize () {
-    # restore_security_state
     destroy_dead_locks
     finalize_shell_reload
 }
