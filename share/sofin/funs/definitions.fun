@@ -230,6 +230,7 @@ remove_bundles () {
         error "Argument with at least one bundle name is required!"
     fi
     unset _destroyed
+    security_set_build
     for _def in $(to_iter "${_bundles}"); do
         _given_name="$(capitalize "${_def}")"
         if [ -z "${_given_name}" ]; then
@@ -258,6 +259,8 @@ remove_bundles () {
             # fi
         fi
     done
+    security_set_normal
+
     if [ -n "${_destroyed}" ]; then
         permnote "Software dataset(s) destroyed: $(distn "${_destroyed}")"
     fi
