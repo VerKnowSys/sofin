@@ -427,7 +427,9 @@ destroy_software_dir () {
     fi
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
         set_system_writable
-        _dsname="${DEFAULT_ZPOOL}${SOFTWARE_DIR}/${USER}/${_dset_destroy}"
+        _dsbase="${DEFAULT_ZPOOL}${SOFTWARE_DIR}/${USER}"
+        _dsname="${_dsbase}/${_dset_destroy}"
+        try "${ZFS_BIN} set readonly=off '${_dsbase}'"
         try "${ZFS_BIN} set readonly=off '${_dsname}'"
         try "${ZFS_BIN} set sharenfs=off '${_dsname}'"
         try "${ZFS_BIN} umount -f '${_dsname}'"
@@ -435,7 +437,7 @@ destroy_software_dir () {
             debug "Destroyed software-dataset: $(distd "${_dsname}")"
         try "${RM_BIN} -rf '${SOFTWARE_DIR}/${_dset_destroy}'"
         set_system_readonly
-        unset _dsname
+        unset _dsname _dsbase
     else
         debug "Removing regular software-directory: $(distd "${SOFTWARE_DIR}/${_dset_destroy}")"
         try "${RM_BIN} -rf '${SOFTWARE_DIR}/${_dset_destroy}'"
