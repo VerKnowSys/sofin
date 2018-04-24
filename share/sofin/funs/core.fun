@@ -308,15 +308,7 @@ trap_signals () {
     trap 'terminate_handler' TERM
     trap 'noop_handler' USR2 # This signal is used to "reload shell"-feature. Sofin should ignore it
 
-    if [ -x "${BEADM_BIN}" ]; then
-        if [ -n "${CAP_SYS_PRODUCTION}" ]; then
-            debug "Production mode, skipping readonly mode for /"
-        else
-            _active_boot_env="$(${BEADM_BIN} list -H | ${EGREP_BIN} "R" 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)"
-            debug "Turn on readonly mode for: $(distd "${DEFAULT_ZPOOL}/ROOT/${_active_boot_env}")"
-            try "${ZFS_BIN} set readonly=on '${DEFAULT_ZPOOL}/ROOT/${_active_boot_env}'"
-        fi
-    fi
+    set_system_writable
     return 0
 }
 
@@ -334,6 +326,12 @@ untrap_signals () {
     trap - TERM
     trap - USR2
 
+    set_system_readonly
+    return 0
+}
+
+
+set_system_readonly () {
     if [ "YES" = "${CAP_SYS_ZFS}" ] && [ -x "${BEADM_BIN}" ]; then
         debug "Beadm found, turning off readonly mode for default boot environment"
         _active_boot_env="$(${BEADM_BIN} list -H 2>/dev/null | ${EGREP_BIN} "R" 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)"
@@ -349,6 +347,19 @@ untrap_signals () {
             else
                 debug "Background Sofin jobs are still around! Leaving readonly mode for dataset: '$(distd "${_boot_dataset}")'"
             fi
+        fi
+    fi
+}
+
+
+set_system_writable () {
+    if [ -x "${BEADM_BIN}" ]; then
+        if [ -n "${CAP_SYS_PRODUCTION}" ]; then
+            debug "Production mode, skipping readonly mode for /"
+        else
+            _active_boot_env="$(${BEADM_BIN} list -H | ${EGREP_BIN} "R" 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)"
+            debug "Turn on readonly mode for: $(distd "${DEFAULT_ZPOOL}/ROOT/${_active_boot_env}")"
+            try "${ZFS_BIN} set readonly=on '${DEFAULT_ZPOOL}/ROOT/${_active_boot_env}'"
         fi
     fi
 }
