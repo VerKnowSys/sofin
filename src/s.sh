@@ -441,6 +441,7 @@ if [ -n "${SOFIN_COMMAND}" ]; then
 
         delete|remove|uninstall|rm)
             initialize
+            security_set_build
             fail_on_bg_job "${SOFIN_ARGS}"
             for _arg in $(to_iter "${SOFIN_ARGS}"); do
                 _caparg="$(capitalize "${_arg}")"
@@ -450,6 +451,7 @@ if [ -n "${SOFIN_COMMAND}" ]; then
             done
             remove_bundles "${SOFIN_ARGS}"
             note "Removed bundle(s): $(distn "${SOFIN_ARGS}")"
+            security_set_normal
             finalize
             ;;
 
