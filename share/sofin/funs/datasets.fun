@@ -426,7 +426,9 @@ destroy_software_dir () {
         error "First argument with $(diste "BundleName") to destroy is required!"
     fi
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
-        _dsname="${DEFAULT_ZPOOL}${SOFTWARE_DIR}/${USER}/${_dset_destroy}"
+        _dsbase="${DEFAULT_ZPOOL}${SOFTWARE_DIR}/${USER}"
+        _dsname="${_dsbase}/${_dset_destroy}"
+        try "${ZFS_BIN} set readonly=off '${_dsbase}'"
         try "${ZFS_BIN} set readonly=off '${_dsname}'"
         try "${ZFS_BIN} set sharenfs=off '${_dsname}'"
         try "${ZFS_BIN} umount -f '${_dsname}'"
