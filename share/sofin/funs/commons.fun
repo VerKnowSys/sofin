@@ -188,15 +188,11 @@ text_checksum () {
         error "Empty content string given for function: $(diste "text_checksum()")"
     fi
     case ${SYSTEM_NAME} in
-        NetBSD|OpenBSD|Minix)
-            printf '%s' "$(${SHA_BIN} -n "${_fcsmname}" 2>/dev/null | ${CUT_BIN} -d' ' -f1 2>/dev/null)" 2>> "${LOG}"
-            ;;
-
         Darwin|Linux)
             printf '%s' "${_fcsmname}" | ${SHA_BIN} 2>/dev/null | ${CUT_BIN} -d' ' -f1 2>/dev/null
             ;;
 
-        FreeBSD)
+        FreeBSD|NetBSD|OpenBSD|Minix)
             printf '%s' "${_fcsmname}" | ${SHA_BIN} 2>/dev/null
             ;;
     esac
