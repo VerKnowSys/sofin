@@ -311,8 +311,13 @@ compiler_setup () {
             DEFAULT_COMPILER_FLAGS="${HARDEN_CFLAGS} ${CMACROS}"
             ;;
 
-        Linux|Minix)
+        Linux)
             DEFAULT_COMPILER_FLAGS="${HARDEN_CFLAGS} ${CMACROS}"
+            ;;
+
+        Minix)
+            # Disabled -fstack-protector-strong - not supported on clang 3.4
+            DEFAULT_COMPILER_FLAGS="-fstack-protector -fstack-protector-all -fno-strict-overflow -Wformat -Wformat-security ${CMACROS}"
             ;;
     esac
 
