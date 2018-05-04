@@ -223,7 +223,7 @@ fetch_dset_zfs_stream () {
         debug "Fetch service stream-tarball: $(distd "${FILE_CACHE_DIR}${_fdz_out_file}")"
         retry "${FETCH_BIN} -o ${FILE_CACHE_DIR}${_fdz_out_file} ${FETCH_OPTS} '${_commons_path}'"
         if [ "${?}" = "0" ]; then
-            try "${TAR_BIN} xf ${FILE_CACHE_DIR}${_fdz_out_file} --directory ${SERVICES_DIR}" && \
+            try "${TAR_BIN} -xf ${FILE_CACHE_DIR}${_fdz_out_file} --directory ${SERVICES_DIR}" && \
                 note "Received service tarball for service: $(distn "${_fdz_bund_name}")"
             unset _tarball_name
         else
@@ -277,7 +277,7 @@ try_fetch_service_dir () {
             if [ -d "${SERVICES_DIR}/${_dset_create}" ]; then
                 debug "Service dir: $(distd "${SERVICES_DIR}/${_dset_create}") already exists. Leaving untouched!"
             else
-                run "${TAR_BIN} xf \"${_svce_org_file}\" --directory \"${SERVICES_DIR}\"" && \
+                run "${TAR_BIN} -xf \"${_svce_org_file}\" --directory \"${SERVICES_DIR}\"" && \
                     debug "Service origin received successfully: $(distd "${_svce_origin}")"
             fi
         else
