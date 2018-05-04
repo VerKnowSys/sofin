@@ -4,13 +4,31 @@
 SHA_BIN="/usr/bin/sha1"
 
 # installed from pkgin:
+DD_BIN="/usr/bin/dd"
 TAR_BIN="/usr/pkg/bin/gtar"
 BC_BIN="/usr/pkg/bin/bc"
 SSH_BIN="/usr/pkg/bin/ssh"
 SCP_BIN="/usr/pkg/bin/scp"
+AR_BIN="/usr/pkg/bin/ar"
+AS_BIN="/usr/pkg/bin/as"
+NM_BIN="/usr/pkg/bin/nm"
+RANLIB_BIN="/usr/pkg/bin/ranlib"
+LD_BIN="/usr/pkg/bin/ld"
+OPENSSL_BIN="/usr/pkg/bin/openssl"
+IFCONFIG_BIN="/usr/bin/ifconfig"
+PGREP_BIN="${GREP_BIN}"
+PS_BIN="/usr/bin/ps"
+SERVICE_BIN="/bin/service"
+STRIP_BIN="/usr/pkg/bin/strip"
+GIT_BIN="/usr/pkg/bin/git"
+
+unset CHFLAGS_BIN DTRACE_BIN KILLALL_BIN SYSCTL_BIN
 
 # set core parameters:
-CPUS="${CPUS:-${DEFAULT_CPUS}}" # XXX: hardcoded
-ALL_CPUS="${CPUS:-${DEFAULT_CPUS}}"
-MAKE_OPTS="-s -j${CPUS:-${DEFAULT_CPUS}}"
-MINIMAL_MAJOR_OS_VERSION="3.4"
+CPUS="1"
+ALL_CPUS="1"
+MAKE_OPTS="-s"
+MINIMAL_MAJOR_OS_VERSION="3.3"
+
+# override setup with incompatible software switches
+DEFAULT_GIT_CLONE_OPTS="--depth 1 --progress --recursive"
