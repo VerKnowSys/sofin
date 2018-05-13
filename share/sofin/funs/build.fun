@@ -220,7 +220,7 @@ build () {
                     fi
 
                     if [ -n "${CAP_SYS_PRODUCTION}" ]; then
-                        debug "Production mode enabled. Skipping build by setting DONT_BUILD_BUT_DO_EXPORTS=YES"
+                        permnote "Production mode enabled. Software build skipped!"
                         DONT_BUILD_BUT_DO_EXPORTS=YES
                     fi
                 fi
