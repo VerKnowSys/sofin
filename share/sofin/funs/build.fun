@@ -133,7 +133,7 @@ load_pax_file () {
         _paxfile="${PREFIX}/.pax"
         if [ -f "${_paxfile}" ]; then
             debug "Loading .pax file: $(distd "${_paxfile}")"
-            . "${_paxfile}" || true
+            try ". ${_paxfile}"
         fi
         unset _paxfile
     fi
