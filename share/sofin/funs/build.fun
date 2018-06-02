@@ -279,6 +279,11 @@ build () {
     done
 
     export_binaries "${_bund_lcase}"
+    _paxfile="${PREFIX}/.pax"
+    if [ -f "${_paxfile}" ]; then
+        debug "Loading .pax file: $(distd "${_paxfile}")"
+        . "${_paxfile}"
+    fi
     try after_export_callback
     after_export_snapshot
     validate_pie_on_exports "${_build_list}"
