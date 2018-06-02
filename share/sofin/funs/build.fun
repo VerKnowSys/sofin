@@ -295,7 +295,11 @@ build () {
         strip_bundle "${_bund_lcase}"
 
         if [ "YES" = "${CAP_SYS_HARDENED}" ]; then
-            try "${ZFS_BIN} set readonly=off '${DEFAULT_ZPOOL}/Software/root/${_anm}'"
+            if [ "YES" = "${CAP_SYS_ZFS}" ]; then
+                _dataset="${DEFAULT_ZPOOL}/Software/root/${_anm}"
+                debug "Explicitly disabling readonly mode on dataset: $(distd "${_dataset}")"
+                try "${ZFS_BIN} set readonly=off '${_dataset}'"
+            fi
             _disable=""
             if [ -n "${DEF_NO_ASLR}" ]; then
                 _disable="${_disable}aslr "
@@ -333,7 +337,7 @@ build () {
     fi
 
     finalize_afterbuild "${_bund_lcase}"
-    unset _build_list _bund_lcase _req_all _req _disable _feature _file _files _anm
+    unset _build_list _bund_lcase _req_all _req _disable _feature _file _files _anm _dataset
     env_reset
     return 0
 }
