@@ -465,7 +465,7 @@ strip_bundle () {
     unset _dirs_to_strip
     # TODO: chdir to SERVICE_DIR/ PREFIX to save up 4096 max input length for args
     case "${DEF_STRIP}" in
-        no|NO)
+        no|NO|none|NONE|nothing|NOTHING)
             permnote "$(distn "${_sbfdefinition_name}"): No symbols will be stripped from bundle"
             ;;
 
