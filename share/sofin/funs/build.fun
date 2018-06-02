@@ -284,6 +284,7 @@ build () {
     validate_pie_on_exports "${_build_list}"
 
     if [ "YES" = "${CAP_SYS_HARDENED}" ]; then
+        try "${ZFS_BIN} set readonly=off '${DEFAULT_ZPOOL}/Software/root/${_anm}'"
         _disable=""
         if [ -n "${DEF_NO_ASLR}" ]; then
             _disable="${_disable}aslr "
