@@ -328,12 +328,14 @@ build () {
                 for _feature in $(to_iter "${_disable}"); do
                     _files="$(${FIND_BIN} "${PREFIX}/" -name "${_lower_security_binary}" -type f 2>/dev/null)"
                     for _file in $(to_iter "${_files}"); do
-                        ${FILE_BIN} "${_file}" 2>/dev/null | ${GREP_BIN} -F 'ELF 64-bit' >/dev/null 2>&1
-                        if [ "0" = "${?}" ]; then
-                            try "sh \"${SOFIN_HBSDCONTROL_BIN}\" system \"${_feature}\" disable \"${_file}\"" && \
-                                debug "Lowered security on requested binary: $(distd "${_file}")"
-                            # Storing command to .pax file to be sure to apply on each boot:
-                            echo "sh \"${SOFIN_HBSDCONTROL_BIN}\" system \"${_feature}\" disable \"${_file}\"" >> "${_paxfile}"
+                        if [ -x "${_file}" ]; then
+                            ${FILE_BIN} "${_file}" 2>/dev/null | ${GREP_BIN} -F 'ELF 64-bit' >/dev/null 2>&1
+                            if [ "0" = "${?}" ]; then
+                                try "sh \"${SOFIN_HBSDCONTROL_BIN}\" system \"${_feature}\" disable \"${_file}\"" && \
+                                    debug "Lowered security on requested binary: $(distd "${_file}")"
+                                # Storing command to .pax file to be sure to apply on each boot:
+                                echo "sh \"${SOFIN_HBSDCONTROL_BIN}\" system \"${_feature}\" disable \"${_file}\"" >> "${_paxfile}"
+                            fi
                         fi
                     done
                 done
