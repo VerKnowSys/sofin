@@ -297,8 +297,7 @@ build () {
          if [ -n "${DEF_NO_MPROTECT}" ]; then
             _disable="${_disable}mprotect "
         fi
-        debug "Writing HardenedBSD feature override capability file: .pax with disabled features: $(distd "${_disable}")"
-        debug "Lower security for binaries: $(distd "${DEF_APPLY_LOWER_SECURITY_ON}")"
+        debug "Writing HardenedBSD feature override capability file: $(distd "${PREFIX}/.pax") with disabled features: $(distd "${_disable}"), for binaries: $(distd "${DEF_APPLY_LOWER_SECURITY_ON}")"
         for _lower_security_binary in $(to_iter "${DEF_APPLY_LOWER_SECURITY_ON}"); do
             for _feature in $(to_iter "${_disable}"); do
                 _files="$(${FIND_BIN} "${PREFIX}/" -name "${_lower_security_binary}" -type f 2>/dev/null)"
@@ -308,8 +307,7 @@ build () {
                         run "sh \"${SOFIN_HBSDCONTROL_BIN}\" disable \"${_feature}\" \"${_file}\"" && \
                             debug "Lowered security on requested binary: $(distd "${_file}")"
                         # Storing command to .pax file to be sure to apply on each boot:
-                        echo "\"${SOFIN_HBSDCONTROL_BIN}\" disable \"${_feature}\" \"${_file}\"" >> \
-                            "${PREFIX}/.pax"
+                        echo "sh \"${SOFIN_HBSDCONTROL_BIN}\" disable \"${_feature}\" \"${_file}\"" >> "${PREFIX}/.pax"
                     fi
                 done
             done
