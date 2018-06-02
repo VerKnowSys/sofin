@@ -290,16 +290,23 @@ build () {
     fi
 
     if [ -z "${CAP_SYS_PRODUCTION}" ]; then
-        debug "Development mode, hence tracking useful/useless files, stripping bundles and creating bundle snapshot!"
+        debug "Non production mode, hence tracking useful/useless files, stripping bundles and creating bundle snapshot!"
         track_useful_and_useless_files
         strip_bundle "${_bund_lcase}"
 
         if [ "YES" = "${CAP_SYS_HARDENED}" ]; then
+            _paxfile="${PREFIX}/.pax"
+            printf "%s\n\n" '#!/bin/sh' > "${_paxfile}"
+
             if [ "YES" = "${CAP_SYS_ZFS}" ]; then
                 _dataset="${DEFAULT_ZPOOL}/Software/root/${_anm}"
                 debug "Explicitly disabling readonly mode on dataset: $(distd "${_dataset}")"
                 try "${ZFS_BIN} set readonly=off '${_dataset}'"
+
+                # NOTE: Make sure readonly is put down to the .pax file!
+                echo "${ZFS_BIN} set readonly=off '${_dataset}'" > "${_paxfile}"
             fi
+
             _disable=""
             if [ -n "${DEF_NO_ASLR}" ]; then
                 _disable="${_disable}aslr "
@@ -313,7 +320,7 @@ build () {
             if [ -n "${DEF_NO_MPROTECT}" ]; then
                 _disable="${_disable}mprotect "
             fi
-            debug "Writing HardenedBSD feature override capability file: $(distd "${PREFIX}/.pax") with disabled features: $(distd "${_disable}"), for binaries: $(distd "${DEF_APPLY_LOWER_SECURITY_ON}")"
+            debug "Writing HardenedBSD feature override capability file: $(distd "${_paxfile}") with disabled features: $(distd "${_disable}"), for binaries: $(distd "${DEF_APPLY_LOWER_SECURITY_ON}")"
             for _lower_security_binary in $(to_iter "${DEF_APPLY_LOWER_SECURITY_ON}"); do
                 for _feature in $(to_iter "${_disable}"); do
                     _files="$(${FIND_BIN} "${PREFIX}/" -name "${_lower_security_binary}" -type f 2>/dev/null)"
@@ -323,7 +330,7 @@ build () {
                             run "sh \"${SOFIN_HBSDCONTROL_BIN}\" system \"${_feature}\" disable \"${_file}\"" && \
                                 debug "Lowered security on requested binary: $(distd "${_file}")"
                             # Storing command to .pax file to be sure to apply on each boot:
-                            echo "sh \"${SOFIN_HBSDCONTROL_BIN}\" system \"${_feature}\" disable \"${_file}\"" >> "${PREFIX}/.pax"
+                            echo "sh \"${SOFIN_HBSDCONTROL_BIN}\" system \"${_feature}\" disable \"${_file}\"" >> "${_paxfile}"
                         fi
                     done
                 done
