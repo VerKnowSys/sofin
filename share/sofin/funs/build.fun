@@ -323,6 +323,7 @@ build () {
     fi
 
     if [ -z "${CAP_SYS_PRODUCTION}" ]; then
+        debug "Development mode, hence tracking useful/useless files, stripping bundles and creating bundle snapshot!"
         track_useful_and_useless_files
         strip_bundle "${_bund_lcase}"
 
