@@ -95,7 +95,8 @@ install_sofin_files () {
     run "${CP_BIN} -fR share/sofin/* ${SOFIN_ROOT}/share/" && \
         echo "  ${_okch} facts and functions"
 
-    run "${INSTALL_BIN} src/s.sh ${SOFIN_ROOT}/bin/s" && \
+    run "${INSTALL_BIN} -m 755 src/s-hbsdcontrol.sh ${SOFIN_ROOT}/bin/s-hbsdcontrol" && \
+    run "${INSTALL_BIN} -m 755 src/s.sh ${SOFIN_ROOT}/bin/s" && \
         echo "  ${_okch} sofin launcher" && \
         echo "Type: $(distn "s usage") for help." && \
         echo "Read: $(distn "https://github.com/VerKnowSys/sofin") for more details." && \
