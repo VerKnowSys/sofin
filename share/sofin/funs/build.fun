@@ -326,7 +326,7 @@ build () {
             debug "Writing HardenedBSD feature override capability file: $(distd "${_paxfile}") with disabled features: $(distd "${_disable}"), for binaries: $(distd "${DEF_APPLY_LOWER_SECURITY_ON}")"
             for _lower_security_binary in $(to_iter "${DEF_APPLY_LOWER_SECURITY_ON}"); do
                 for _feature in $(to_iter "${_disable}"); do
-                    _files="$(${FIND_BIN} "${PREFIX}/" -name "${_lower_security_binary}" -not -name '*.src_*' -type f 2>/dev/null)"
+                    _files="$(${FIND_BIN} "${PREFIX}/" -name "${_lower_security_binary}" -not -name '.*' -type f 2>/dev/null)"
                     for _file in $(to_iter "${_files}"); do
                         if [ -x "${_file}" ]; then
                             ${FILE_BIN} "${_file}" 2>/dev/null | ${GREP_BIN} -F 'ELF 64-bit' >/dev/null 2>&1
