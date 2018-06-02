@@ -299,9 +299,9 @@ build () {
         fi
         debug "Writing HardenedBSD feature override capability file: .pax with disabled features: $(distd "${_disable}")"
         debug "Lower security for binaries: $(distd "${DEF_APPLY_LOWER_SECURITY_ON}")"
-        for lower_security_binary in $(to_iter "${DEF_APPLY_LOWER_SECURITY_ON}"); do
+        for _lower_security_binary in $(to_iter "${DEF_APPLY_LOWER_SECURITY_ON}"); do
             for _feature in $(to_iter "${_disable}"); do
-                _files="$(${FIND_BIN} "${PREFIX}/" -name "${lower_security_binary}" -type f 2>/dev/null)"
+                _files="$(${FIND_BIN} "${PREFIX}/" -name "${_lower_security_binary}" -type f 2>/dev/null)"
                 for _file in $(to_iter "${_files}"); do
                     ${FILE_BIN} "${_file}" 2>/dev/null | ${GREP_BIN} -F 'ELF 64-bit' >/dev/null 2>&1
                     if [ "0" = "${?}" ]; then
@@ -333,7 +333,7 @@ build () {
     fi
 
     finalize_afterbuild "${_bund_lcase}"
-    unset _build_list _bund_lcase _req_all _req
+    unset _build_list _bund_lcase _req_all _req _disable _feature _file _files _anm
     env_reset
     return 0
 }
