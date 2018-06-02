@@ -305,10 +305,10 @@ build () {
                 for _file in $(to_iter "${_files}"); do
                     ${FILE_BIN} "${_file}" 2>/dev/null | ${GREP_BIN} -F 'ELF 64-bit' >/dev/null 2>&1
                     if [ "0" = "${?}" ]; then
-                        run "sh \"${SOFIN_HBSDCONTROL_BIN}\" system disable \"${_feature}\" \"${_file}\"" && \
+                        run "sh \"${SOFIN_HBSDCONTROL_BIN}\" system \"${_feature}\" disable \"${_file}\"" && \
                             debug "Lowered security on requested binary: $(distd "${_file}")"
                         # Storing command to .pax file to be sure to apply on each boot:
-                        echo "sh \"${SOFIN_HBSDCONTROL_BIN}\" system disable \"${_feature}\" \"${_file}\"" >> "${PREFIX}/.pax"
+                        echo "sh \"${SOFIN_HBSDCONTROL_BIN}\" system \"${_feature}\" disable \"${_file}\"" >> "${PREFIX}/.pax"
                     fi
                 done
             done
