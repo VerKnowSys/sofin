@@ -311,6 +311,9 @@ build () {
             if [ -n "${DEF_NO_ASLR}" ]; then
                 _disable="${_disable}aslr "
             fi
+            if [ -n "${DEF_NO_PAGEEXEC}" ]; then
+                _disable="${_disable}pageexec "
+            fi
             if [ -n "${DEF_NO_SEGVGUARD}" ]; then
                 _disable="${_disable}segvguard "
             fi
