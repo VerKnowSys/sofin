@@ -283,38 +283,6 @@ build () {
     after_export_snapshot
     validate_pie_on_exports "${_build_list}"
 
-    if [ "YES" = "${CAP_SYS_HARDENED}" ]; then
-        try "${ZFS_BIN} set readonly=off '${DEFAULT_ZPOOL}/Software/root/${_anm}'"
-        _disable=""
-        if [ -n "${DEF_NO_ASLR}" ]; then
-            _disable="${_disable}aslr "
-        fi
-        if [ -n "${DEF_NO_SEGVGUARD}" ]; then
-            _disable="${_disable}segvguard "
-        fi
-        if [ -n "${DEF_NO_DISALLOW_MAP32BIT}" ]; then
-            _disable="${_disable}disallow_map32bit "
-        fi
-        if [ -n "${DEF_NO_MPROTECT}" ]; then
-            _disable="${_disable}mprotect "
-        fi
-        debug "Writing HardenedBSD feature override capability file: $(distd "${PREFIX}/.pax") with disabled features: $(distd "${_disable}"), for binaries: $(distd "${DEF_APPLY_LOWER_SECURITY_ON}")"
-        for _lower_security_binary in $(to_iter "${DEF_APPLY_LOWER_SECURITY_ON}"); do
-            for _feature in $(to_iter "${_disable}"); do
-                _files="$(${FIND_BIN} "${PREFIX}/" -name "${_lower_security_binary}" -type f 2>/dev/null)"
-                for _file in $(to_iter "${_files}"); do
-                    ${FILE_BIN} "${_file}" 2>/dev/null | ${GREP_BIN} -F 'ELF 64-bit' >/dev/null 2>&1
-                    if [ "0" = "${?}" ]; then
-                        run "sh \"${SOFIN_HBSDCONTROL_BIN}\" system \"${_feature}\" disable \"${_file}\"" && \
-                            debug "Lowered security on requested binary: $(distd "${_file}")"
-                        # Storing command to .pax file to be sure to apply on each boot:
-                        echo "sh \"${SOFIN_HBSDCONTROL_BIN}\" system \"${_feature}\" disable \"${_file}\"" >> "${PREFIX}/.pax"
-                    fi
-                done
-            done
-        done
-    fi
-
     if [ -n "${DEF_UTILITY_BUNDLE}" ]; then
         try "${RM_BIN} -rf '${PREFIX}/${_anm}' '${PREFIX}/include' '${PREFIX}/doc' ${PREFIX}/${DEFAULT_SRC_EXT}*"
         debug "Utility bundle: $(distd "${_anm}") build completed!"
@@ -325,6 +293,38 @@ build () {
         debug "Development mode, hence tracking useful/useless files, stripping bundles and creating bundle snapshot!"
         track_useful_and_useless_files
         strip_bundle "${_bund_lcase}"
+
+        if [ "YES" = "${CAP_SYS_HARDENED}" ]; then
+            try "${ZFS_BIN} set readonly=off '${DEFAULT_ZPOOL}/Software/root/${_anm}'"
+            _disable=""
+            if [ -n "${DEF_NO_ASLR}" ]; then
+                _disable="${_disable}aslr "
+            fi
+            if [ -n "${DEF_NO_SEGVGUARD}" ]; then
+                _disable="${_disable}segvguard "
+            fi
+            if [ -n "${DEF_NO_DISALLOW_MAP32BIT}" ]; then
+                _disable="${_disable}disallow_map32bit "
+            fi
+            if [ -n "${DEF_NO_MPROTECT}" ]; then
+                _disable="${_disable}mprotect "
+            fi
+            debug "Writing HardenedBSD feature override capability file: $(distd "${PREFIX}/.pax") with disabled features: $(distd "${_disable}"), for binaries: $(distd "${DEF_APPLY_LOWER_SECURITY_ON}")"
+            for _lower_security_binary in $(to_iter "${DEF_APPLY_LOWER_SECURITY_ON}"); do
+                for _feature in $(to_iter "${_disable}"); do
+                    _files="$(${FIND_BIN} "${PREFIX}/" -name "${_lower_security_binary}" -type f 2>/dev/null)"
+                    for _file in $(to_iter "${_files}"); do
+                        ${FILE_BIN} "${_file}" 2>/dev/null | ${GREP_BIN} -F 'ELF 64-bit' >/dev/null 2>&1
+                        if [ "0" = "${?}" ]; then
+                            run "sh \"${SOFIN_HBSDCONTROL_BIN}\" system \"${_feature}\" disable \"${_file}\"" && \
+                                debug "Lowered security on requested binary: $(distd "${_file}")"
+                            # Storing command to .pax file to be sure to apply on each boot:
+                            echo "sh \"${SOFIN_HBSDCONTROL_BIN}\" system \"${_feature}\" disable \"${_file}\"" >> "${PREFIX}/.pax"
+                        fi
+                    done
+                done
+            done
+        fi
 
         if [ -n "${CAP_SYS_ZFS}" ]; then
             debug "Creating post build '$(distd "@${ORIGIN_ZFS_SNAP_NAME}")' snapshots…"
