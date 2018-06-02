@@ -12,7 +12,7 @@ debug () {
     fi
     if [ -n "${CAP_SYS_PRODUCTION}" ]; then
         if [ -n "${DEBUG}" ]; then
-            printf "# (%s) λ %b%s%b\n" "${SHLVL}" "${ColorDebug}" "${_in}" "${ColorReset}" >&2
+            printf "# λ %b%s%b\n" "${ColorDebug}" "${_in}" "${ColorReset}" >&2
         fi
         return 0
         # printf "# (%s) λ %b%s%b\n" "${SHLVL}" "${ColorDebug}" "${_in}" "${ColorReset}"  >&2 2>> "${LOG}"
