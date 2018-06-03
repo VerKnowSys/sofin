@@ -338,7 +338,7 @@ build () {
                     _disable="${_disable}shlibrandom "
                 fi
 
-                if [ -n "${disable}" ]; then
+                if [ -n "${_disable}" ]; then
                     # Write .pax file:
                     _paxfile="${PREFIX}/.pax"
                     printf "%s\n\n" '#!/bin/sh' > "${_paxfile}"
