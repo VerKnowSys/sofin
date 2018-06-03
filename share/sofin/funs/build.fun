@@ -292,8 +292,8 @@ build () {
 
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
         _dataset="${DEFAULT_ZPOOL}/Software/${USER}/${_anm}"
-        debug "Enabling read+write mode on dataset: $(distd "${_dataset}")"
-        try "${ZFS_BIN} set readonly=off '${_dataset}'"
+        debug "Setting dataset: $(distd "${_dataset}") to inherit 'readonly' attribute from parent."
+        try "${ZFS_BIN} inherit readonly '${_dataset}'"
     fi
 
     export_binaries "${_bund_lcase}"
@@ -322,10 +322,10 @@ build () {
             if [ "YES" = "${CAP_SYS_ZFS}" ]; then
                 _dataset="${DEFAULT_ZPOOL}/Software/root/${_anm}"
                 debug "Explicitly disabling readonly mode on dataset: $(distd "${_dataset}")"
-                try "${ZFS_BIN} set readonly=off '${_dataset}'"
+                try "${ZFS_BIN} inherit readonly '${_dataset}'"
 
                 # NOTE: Make sure readonly is put down to the .pax file!
-                echo "${ZFS_BIN} set readonly=off '${_dataset}'" > "${_paxfile}"
+                echo "${ZFS_BIN} inherit readonly '${_dataset}'" > "${_paxfile}"
             fi
 
             _disable=""
