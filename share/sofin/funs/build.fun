@@ -324,8 +324,6 @@ build () {
                 if [ "YES" = "${CAP_SYS_ZFS}" ]; then
                     _dataset_parent="${DEFAULT_ZPOOL}/Software/${USER}"
                     _dataset="${_dataset_parent}/${_anm}"
-                    debug "Explicitly disabling readonly mode on dataset: $(distd "${_dataset}")"
-                    try "${ZFS_BIN} inherit readonly '${_dataset}'"
 
                     # NOTE: Make sure readonly is put down to the .pax file!
                     {
@@ -370,6 +368,10 @@ build () {
                         done
                     done
                 done
+
+                if [ "YES" = "${CAP_SYS_ZFS}" ]; then
+                    echo "${ZFS_BIN} set readonly=on '${_dataset_parent}'" >> "${_paxfile}"
+                fi
             fi
 
             if [ -n "${CAP_SYS_ZFS}" ]; then
