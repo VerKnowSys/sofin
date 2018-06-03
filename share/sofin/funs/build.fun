@@ -290,8 +290,10 @@ build () {
         fi
 
         if [ "YES" = "${CAP_SYS_ZFS}" ]; then
-            _dataset="${DEFAULT_ZPOOL}/Software/${USER}/${_anm}"
-            debug "Setting dataset: $(distd "${_dataset}") to inherit 'readonly' attribute from parent."
+            _dataset_parent="${DEFAULT_ZPOOL}/Software/${USER}"
+            _dataset="${_dataset_parent}/${_anm}"
+            debug "Setting dataset: $(distd "${_dataset}") to inherit 'readonly' attribute from readonly parent: $(distd "${_dataset_parent}")"
+            try "${ZFS_BIN} set readonly=off '${_dataset_parent}'"
             try "${ZFS_BIN} inherit readonly '${_dataset}'"
         fi
 
@@ -320,12 +322,16 @@ build () {
                 printf "%s\n\n" '#!/bin/sh' > "${_paxfile}"
 
                 if [ "YES" = "${CAP_SYS_ZFS}" ]; then
-                    _dataset="${DEFAULT_ZPOOL}/Software/root/${_anm}"
+                    _dataset_parent="${DEFAULT_ZPOOL}/Software/${USER}"
+                    _dataset="${_dataset_parent}/${_anm}"
                     debug "Explicitly disabling readonly mode on dataset: $(distd "${_dataset}")"
                     try "${ZFS_BIN} inherit readonly '${_dataset}'"
 
                     # NOTE: Make sure readonly is put down to the .pax file!
-                    echo "${ZFS_BIN} inherit readonly '${_dataset}'" > "${_paxfile}"
+                    {
+                        echo "${ZFS_BIN} set readonly=off '${_dataset_parent}'";
+                        echo "${ZFS_BIN} inherit readonly '${_dataset}'";
+                    } >> "${_paxfile}"
                 fi
 
                 _disable=""
