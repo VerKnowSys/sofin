@@ -709,7 +709,7 @@ set_software_root_readonly () {
             _sofin_processes="$(processes_all_sofin)"
             if [ -z "${_sofin_processes}" ]; then
                 debug "No Sofin processes in background! Turning off readonly mode for dataset: '$(distd "${_boot_dataset}")'"
-                run "${ZFS_BIN} set readonly=on '${DEFAULT_ZPOOL}/Software/root'"
+                run "${ZFS_BIN} set readonly=on '${DEFAULT_ZPOOL}/Software/${USER}'"
             else
                 debug "Background Sofin jobs are still around! Leaving readonly mode for dataset: '$(distd "${_boot_dataset}")'"
             fi
@@ -722,7 +722,7 @@ set_software_root_readonly () {
 set_software_root_writable () {
     if [ "${USER}" = "root" ]; then
         if [ "YES" = "${CAP_SYS_ZFS}" ]; then
-            ${ZFS_BIN} set readonly=off "${DEFAULT_ZPOOL}/Software/root"
+            ${ZFS_BIN} set readonly=off "${DEFAULT_ZPOOL}/Software/${USER}"
         fi
     fi
 }
