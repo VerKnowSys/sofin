@@ -318,20 +318,6 @@ build () {
             strip_bundle "${_anm}"
 
             if [ "YES" = "${CAP_SYS_HARDENED}" ]; then
-                _paxfile="${PREFIX}/.pax"
-                printf "%s\n\n" '#!/bin/sh' > "${_paxfile}"
-
-                if [ "YES" = "${CAP_SYS_ZFS}" ]; then
-                    _dataset_parent="${DEFAULT_ZPOOL}/Software/${USER}"
-                    _dataset="${_dataset_parent}/${_anm}"
-
-                    # NOTE: Make sure readonly is put down to the .pax file!
-                    {
-                        echo "${ZFS_BIN} set readonly=off '${_dataset_parent}'";
-                        echo "${ZFS_BIN} inherit readonly '${_dataset}'";
-                    } >> "${_paxfile}"
-                fi
-
                 _disable=""
                 if [ -n "${DEF_NO_ASLR}" ]; then
                     _disable="${_disable}aslr "
@@ -351,26 +337,43 @@ build () {
                 if [ -n "${DEF_NO_SHLIBRANDOM}" ]; then
                     _disable="${_disable}shlibrandom "
                 fi
-                debug "Writing HardenedBSD feature override capability file: $(distd "${_paxfile}") with disabled features: $(distd "${_disable}"), for binaries: $(distd "${DEF_APPLY_LOWER_SECURITY_ON}")"
-                for _lower_security_binary in $(to_iter "${DEF_APPLY_LOWER_SECURITY_ON}"); do
-                    for _feature in $(to_iter "${_disable}"); do
-                        _files="$(${FIND_BIN} "${PREFIX}/" -name "${_lower_security_binary}" -type f 2>/dev/null)"
-                        for _file in $(to_iter "${_files}"); do
-                            if [ -x "${_file}" ]; then
-                                ${FILE_BIN} "${_file}" 2>/dev/null | ${GREP_BIN} -F 'ELF 64-bit' >/dev/null 2>&1
-                                if [ "0" = "${?}" ]; then
-                                    try "sh \"${SOFIN_HBSDCONTROL_BIN}\" system \"${_feature}\" disable \"${_file}\"" && \
-                                        debug "Lowered security on requested binary: $(distd "${_file}")"
-                                    # Storing command to .pax file to be sure to apply on each boot:
-                                    echo "sh \"${SOFIN_HBSDCONTROL_BIN}\" system \"${_feature}\" disable \"${_file}\"" >> "${_paxfile}"
+
+                if [ -n "${disable}" ]; then
+                    # Write .pax file:
+                    _paxfile="${PREFIX}/.pax"
+                    printf "%s\n\n" '#!/bin/sh' > "${_paxfile}"
+                    if [ "YES" = "${CAP_SYS_ZFS}" ]; then
+                        _dataset_parent="${DEFAULT_ZPOOL}/Software/${USER}"
+                        _dataset="${_dataset_parent}/${_anm}"
+
+                        # NOTE: Make sure readonly is put down to the .pax file!
+                        {
+                            echo "${ZFS_BIN} set readonly=off '${_dataset_parent}'";
+                            echo "${ZFS_BIN} inherit readonly '${_dataset}'";
+                        } >> "${_paxfile}"
+                    fi
+
+                    debug "Write HardenedBSD feature override capability file: $(distd "${_paxfile}") with disabled features: $(distd "${_disable}"), for binaries: $(distd "${DEF_APPLY_LOWER_SECURITY_ON}")"
+                    for _lower_security_binary in $(to_iter "${DEF_APPLY_LOWER_SECURITY_ON}"); do
+                        for _feature in $(to_iter "${_disable}"); do
+                            _files="$(${FIND_BIN} "${PREFIX}/" -name "${_lower_security_binary}" -type f 2>/dev/null)"
+                            for _file in $(to_iter "${_files}"); do
+                                if [ -x "${_file}" ]; then
+                                    ${FILE_BIN} "${_file}" 2>/dev/null | ${GREP_BIN} -F 'ELF 64-bit' >/dev/null 2>&1
+                                    if [ "0" = "${?}" ]; then
+                                        try "sh \"${SOFIN_HBSDCONTROL_BIN}\" system \"${_feature}\" disable \"${_file}\"" && \
+                                            debug "Lowered security on requested binary: $(distd "${_file}")"
+                                        # Storing command to .pax file to be sure to apply on each boot:
+                                        echo "sh \"${SOFIN_HBSDCONTROL_BIN}\" system \"${_feature}\" disable \"${_file}\"" >> "${_paxfile}"
+                                    fi
                                 fi
-                            fi
+                            done
                         done
                     done
-                done
 
-                if [ "YES" = "${CAP_SYS_ZFS}" ]; then
-                    echo "${ZFS_BIN} set readonly=on '${_dataset_parent}'" >> "${_paxfile}"
+                    if [ "YES" = "${CAP_SYS_ZFS}" ]; then
+                        echo "${ZFS_BIN} set readonly=on '${_dataset_parent}'" >> "${_paxfile}"
+                    fi
                 fi
             fi
 
