@@ -302,6 +302,8 @@ build () {
         link_utilities
     fi
 
+    finalize_afterbuild "${_bund_lcase}"
+
     if [ -z "${CAP_SYS_PRODUCTION}" ]; then
         debug "Non production mode, hence tracking useful/useless files, stripping bundles and creating bundle snapshot!"
         track_useful_and_useless_files
@@ -364,7 +366,6 @@ build () {
         fi
     fi
 
-    finalize_afterbuild "${_bund_lcase}"
     unset _build_list _bund_lcase _req_all _req _disable _feature _file _files _anm _dataset
     env_reset
     return 0
