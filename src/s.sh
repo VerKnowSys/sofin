@@ -26,7 +26,7 @@ env_forgivable
 validate_env
 
 # On supported systems make sure that ZFS /Software/root dataset is set writable
-set_software_root_writable
+set_software_dataset_writable
 
 # Tracing of Sofin itself:
 if [ -n "${SOFIN_TRACE}" ]; then
