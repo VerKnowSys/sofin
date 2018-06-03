@@ -290,6 +290,12 @@ build () {
         fi
     done
 
+    if [ "YES" = "${CAP_SYS_ZFS}" ]; then
+        _dataset="${DEFAULT_ZPOOL}/Software/${USER}/${_anm}"
+        debug "Enabling read+write mode on dataset: $(distd "${_dataset}")"
+        try "${ZFS_BIN} set readonly=off '${_dataset}'"
+    fi
+
     export_binaries "${_bund_lcase}"
     load_pax_file
     try after_export_callback
