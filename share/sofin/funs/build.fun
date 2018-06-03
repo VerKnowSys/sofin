@@ -288,98 +288,100 @@ build () {
                 fi
             done
         fi
-    done
 
-    if [ "YES" = "${CAP_SYS_ZFS}" ]; then
-        _dataset="${DEFAULT_ZPOOL}/Software/${USER}/${_anm}"
-        debug "Setting dataset: $(distd "${_dataset}") to inherit 'readonly' attribute from parent."
-        try "${ZFS_BIN} inherit readonly '${_dataset}'"
-    fi
+        if [ "YES" = "${CAP_SYS_ZFS}" ]; then
+            _dataset="${DEFAULT_ZPOOL}/Software/${USER}/${_anm}"
+            debug "Setting dataset: $(distd "${_dataset}") to inherit 'readonly' attribute from parent."
+            try "${ZFS_BIN} inherit readonly '${_dataset}'"
+        fi
 
-    export_binaries "${_bund_lcase}"
-    load_pax_file
-    try after_export_callback
-    after_export_snapshot
-    validate_pie_on_exports "${_build_list}"
+        export_binaries "${_bund_lcase}"
+        load_pax_file
+        try after_export_callback
+        after_export_snapshot
+        validate_pie_on_exports "${_build_list}"
 
-    if [ -n "${DEF_UTILITY_BUNDLE}" ]; then
-        try "${RM_BIN} -rf '${PREFIX}/${_anm}' '${PREFIX}/include' '${PREFIX}/doc' ${PREFIX}/${DEFAULT_SRC_EXT}*"
-        debug "Utility bundle: $(distd "${_anm}") build completed!"
-        link_utilities
-    fi
-
-    finalize_afterbuild "${_bund_lcase}"
-
-    if [ -z "${CAP_SYS_PRODUCTION}" ]; then
-        debug "Non production mode, hence tracking useful/useless files, stripping bundles and creating bundle snapshot!"
-        track_useful_and_useless_files
-        strip_bundle "${_bund_lcase}"
-
-        if [ "YES" = "${CAP_SYS_HARDENED}" ]; then
-            _paxfile="${PREFIX}/.pax"
-            printf "%s\n\n" '#!/bin/sh' > "${_paxfile}"
-
-            if [ "YES" = "${CAP_SYS_ZFS}" ]; then
-                _dataset="${DEFAULT_ZPOOL}/Software/root/${_anm}"
-                debug "Explicitly disabling readonly mode on dataset: $(distd "${_dataset}")"
-                try "${ZFS_BIN} inherit readonly '${_dataset}'"
-
-                # NOTE: Make sure readonly is put down to the .pax file!
-                echo "${ZFS_BIN} inherit readonly '${_dataset}'" > "${_paxfile}"
+        if [ -z "${CAP_SYS_PRODUCTION}" ]; then
+            if [ -n "${DEF_UTILITY_BUNDLE}" ]; then
+                try "${RM_BIN} -rf '${PREFIX}/include' '${PREFIX}/doc' ${PREFIX}/${DEFAULT_SRC_EXT}*"
+                debug "Utility bundle: $(distd "${_anm}") build completed!"
+                link_utilities
             fi
 
-            _disable=""
-            if [ -n "${DEF_NO_ASLR}" ]; then
-                _disable="${_disable}aslr "
-            fi
-            if [ -n "${DEF_NO_PAGEEXEC}" ]; then
-                _disable="${_disable}pageexec "
-            fi
-            if [ -n "${DEF_NO_SEGVGUARD}" ]; then
-                _disable="${_disable}segvguard "
-            fi
-            if [ -n "${DEF_NO_DISALLOW_MAP32BIT}" ]; then
-                _disable="${_disable}disallow_map32bit "
-            fi
-            if [ -n "${DEF_NO_MPROTECT}" ]; then
-                _disable="${_disable}mprotect "
-            fi
-            if [ -n "${DEF_NO_SHLIBRANDOM}" ]; then
-                _disable="${_disable}shlibrandom "
-            fi
-            debug "Writing HardenedBSD feature override capability file: $(distd "${_paxfile}") with disabled features: $(distd "${_disable}"), for binaries: $(distd "${DEF_APPLY_LOWER_SECURITY_ON}")"
-            for _lower_security_binary in $(to_iter "${DEF_APPLY_LOWER_SECURITY_ON}"); do
-                for _feature in $(to_iter "${_disable}"); do
-                    _files="$(${FIND_BIN} "${PREFIX}/" -name "${_lower_security_binary}" -type f 2>/dev/null)"
-                    for _file in $(to_iter "${_files}"); do
-                        if [ -x "${_file}" ]; then
-                            ${FILE_BIN} "${_file}" 2>/dev/null | ${GREP_BIN} -F 'ELF 64-bit' >/dev/null 2>&1
-                            if [ "0" = "${?}" ]; then
-                                try "sh \"${SOFIN_HBSDCONTROL_BIN}\" system \"${_feature}\" disable \"${_file}\"" && \
-                                    debug "Lowered security on requested binary: $(distd "${_file}")"
-                                # Storing command to .pax file to be sure to apply on each boot:
-                                echo "sh \"${SOFIN_HBSDCONTROL_BIN}\" system \"${_feature}\" disable \"${_file}\"" >> "${_paxfile}"
+            debug "Afterbuild for bundle: $(distd "${_anm}")"
+            finalize_afterbuild "${_anm}"
+
+            debug "Non production mode, hence tracking useful/useless files, stripping bundles and creating bundle snapshot!"
+            track_useful_and_useless_files
+            strip_bundle "${_anm}"
+
+            if [ "YES" = "${CAP_SYS_HARDENED}" ]; then
+                _paxfile="${PREFIX}/.pax"
+                printf "%s\n\n" '#!/bin/sh' > "${_paxfile}"
+
+                if [ "YES" = "${CAP_SYS_ZFS}" ]; then
+                    _dataset="${DEFAULT_ZPOOL}/Software/root/${_anm}"
+                    debug "Explicitly disabling readonly mode on dataset: $(distd "${_dataset}")"
+                    try "${ZFS_BIN} inherit readonly '${_dataset}'"
+
+                    # NOTE: Make sure readonly is put down to the .pax file!
+                    echo "${ZFS_BIN} inherit readonly '${_dataset}'" > "${_paxfile}"
+                fi
+
+                _disable=""
+                if [ -n "${DEF_NO_ASLR}" ]; then
+                    _disable="${_disable}aslr "
+                fi
+                if [ -n "${DEF_NO_PAGEEXEC}" ]; then
+                    _disable="${_disable}pageexec "
+                fi
+                if [ -n "${DEF_NO_SEGVGUARD}" ]; then
+                    _disable="${_disable}segvguard "
+                fi
+                if [ -n "${DEF_NO_DISALLOW_MAP32BIT}" ]; then
+                    _disable="${_disable}disallow_map32bit "
+                fi
+                if [ -n "${DEF_NO_MPROTECT}" ]; then
+                    _disable="${_disable}mprotect "
+                fi
+                if [ -n "${DEF_NO_SHLIBRANDOM}" ]; then
+                    _disable="${_disable}shlibrandom "
+                fi
+                debug "Writing HardenedBSD feature override capability file: $(distd "${_paxfile}") with disabled features: $(distd "${_disable}"), for binaries: $(distd "${DEF_APPLY_LOWER_SECURITY_ON}")"
+                for _lower_security_binary in $(to_iter "${DEF_APPLY_LOWER_SECURITY_ON}"); do
+                    for _feature in $(to_iter "${_disable}"); do
+                        _files="$(${FIND_BIN} "${PREFIX}/" -name "${_lower_security_binary}" -type f 2>/dev/null)"
+                        for _file in $(to_iter "${_files}"); do
+                            if [ -x "${_file}" ]; then
+                                ${FILE_BIN} "${_file}" 2>/dev/null | ${GREP_BIN} -F 'ELF 64-bit' >/dev/null 2>&1
+                                if [ "0" = "${?}" ]; then
+                                    try "sh \"${SOFIN_HBSDCONTROL_BIN}\" system \"${_feature}\" disable \"${_file}\"" && \
+                                        debug "Lowered security on requested binary: $(distd "${_file}")"
+                                    # Storing command to .pax file to be sure to apply on each boot:
+                                    echo "sh \"${SOFIN_HBSDCONTROL_BIN}\" system \"${_feature}\" disable \"${_file}\"" >> "${_paxfile}"
+                                fi
                             fi
-                        fi
+                        done
                     done
                 done
-            done
 
-            if [ "YES" = "${CAP_SYS_ZFS}" ]; then
-                _dataset="${DEFAULT_ZPOOL}/Software/root/${_anm}"
-                debug "Explicitly enabling readonly mode on dataset: $(distd "${_dataset}")"
-                try "${ZFS_BIN} set readonly=on '${_dataset}'"
+                if [ "YES" = "${CAP_SYS_ZFS}" ]; then
+                    _dataset="${DEFAULT_ZPOOL}/Software/root/${_anm}"
+                    debug "Explicitly enabling readonly mode on dataset: $(distd "${_dataset}")"
+                    try "${ZFS_BIN} set readonly=on '${_dataset}'"
 
-                # NOTE: Make sure readonly is put back up in the .pax file!
-                echo "${ZFS_BIN} set readonly=on '${_dataset}'" >> "${_paxfile}"
+                    # NOTE: Make sure readonly is put back up in the .pax file!
+                    echo "${ZFS_BIN} set readonly=on '${_dataset}'" >> "${_paxfile}"
+                fi
+            fi
+
+            if [ -n "${CAP_SYS_ZFS}" ]; then
+                debug "Creating post build '$(distd "@${ORIGIN_ZFS_SNAP_NAME}")' snapshots…"
+                create_origin_snaphots
             fi
         fi
 
-        if [ -n "${CAP_SYS_ZFS}" ]; then
-            debug "Creating post build '$(distd "@${ORIGIN_ZFS_SNAP_NAME}")' snapshots…"
-            create_origin_snaphots
-        fi
-    fi
+    done
 
     unset _build_list _bund_lcase _req_all _req _disable _feature _file _files _anm _dataset
     env_reset
