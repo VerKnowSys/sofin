@@ -332,7 +332,7 @@ untrap_signals () {
 
 
 set_system_readonly () {
-    if [ "YES" = "${CAP_SYS_ZFS}" ] && [ -x "${BEADM_BIN}" ]; then
+    if [ "YES" = "${CAP_SYS_ZFS}" ] && [ -x "${BEADM_BIN}" ] && [ "root" = "${USER}" ]; then
         debug "Beadm found, turning off readonly mode for default boot environment"
         _active_boot_env="$(${BEADM_BIN} list -H 2>/dev/null | ${EGREP_BIN} "R" 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)"
         _boot_dataset="${DEFAULT_ZPOOL}/ROOT/${_active_boot_env}"
@@ -353,7 +353,7 @@ set_system_readonly () {
 
 
 set_system_writable () {
-    if [ -x "${BEADM_BIN}" ]; then
+    if [ -x "${BEADM_BIN}" ] && [ "root" = "${USER}" ]; then
         if [ -n "${CAP_SYS_PRODUCTION}" ]; then
             debug "Production mode, skipping readonly mode for /"
         else
