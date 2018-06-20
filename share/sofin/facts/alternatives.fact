@@ -144,3 +144,8 @@ elif [ -x "/bin/ccache" ]; then
 else
     unset CCACHE_BIN
 fi
+
+# Lz4 default
+if [ -x "/usr/bin/lz4" ]; then
+    SOFIN_LZ4_BIN="/usr/bin/lz4"
+fi
