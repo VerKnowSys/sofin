@@ -144,21 +144,3 @@ elif [ -x "/bin/ccache" ]; then
 else
     unset CCACHE_BIN
 fi
-
-# Lz4 - required for build host only
-if [ -x "${SOFTWARE_DIR}/Lz4/exports/lz4" ]; then
-    LZ4_BIN="${SOFTWARE_DIR}/Lz4/exports/lz4"
-elif [ -x "/usr/bin/lz4" ]; then
-    LZ4_BIN="/usr/bin/lz4"
-else
-    unset LZ4_BIN
-fi
-
-# Lz4cat - required for system installers
-if [ -x "${SOFTWARE_DIR}/Lz4/exports/lz4cat" ]; then
-    LZ4CAT_BIN="${SOFTWARE_DIR}/Lz4/exports/lz4cat"
-elif [ -x "/usr/bin/lz4cat" ]; then
-    LZ4CAT_BIN="/usr/bin/lz4cat"
-else
-    unset LZ4CAT_BIN
-fi

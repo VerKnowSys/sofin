@@ -116,7 +116,7 @@ build_service_dataset () {
                 if [ "${?}" = "0" ]; then
                     note "Preparing to send service dataset: $(distn "${_full_dataset_name}"), for bundle: $(distn "${_ps_elem}")"
                     try "${ZFS_BIN} umount -f '${_full_dataset_name}'"
-                    run "${ZFS_BIN} send ${ZFS_SEND_OPTS} '${_full_dataset_name}@${ORIGIN_ZFS_SNAP_NAME}' | ${LZ4_BIN} ${DEFAULT_LZ4_OPTS} > ${FILE_CACHE_DIR}${_ps_snap_file}"
+                    run "${ZFS_BIN} send ${ZFS_SEND_OPTS} '${_full_dataset_name}@${ORIGIN_ZFS_SNAP_NAME}' | ${SOFIN_LZ4_BIN} ${DEFAULT_LZ4_OPTS} > ${FILE_CACHE_DIR}${_ps_snap_file}"
                     try "${ZFS_BIN} mount '${_full_dataset_name}'" || :
                 fi
                 _snap_size="$(file_size "${FILE_CACHE_DIR}${_ps_snap_file}")"
@@ -210,7 +210,7 @@ fetch_dset_zfs_stream () {
         retry "${FETCH_BIN} -o ${FILE_CACHE_DIR}${_fdz_out_file} ${FETCH_OPTS} '${_commons_path}'"
         if [ "${?}" = "0" ]; then
             _dataset_name="${DEFAULT_ZPOOL}${SERVICES_DIR}/${USER}/${_fdz_bund_name}"
-            try "${LZ4CAT_BIN} '${FILE_CACHE_DIR}${_fdz_out_file}' | ${ZFS_BIN} receive ${ZFS_RECEIVE_OPTS} '${_dataset_name}' | ${TAIL_BIN} -n1 2>/dev/null" && \
+            try "${SOFIN_LZ4CAT_BIN} '${FILE_CACHE_DIR}${_fdz_out_file}' | ${ZFS_BIN} receive ${ZFS_RECEIVE_OPTS} '${_dataset_name}' | ${TAIL_BIN} -n1 2>/dev/null" && \
                     note "Received service dataset: $(distn "${_dataset_name}")"
             unset _dataset_name
         else
@@ -257,7 +257,7 @@ try_fetch_service_dir () {
             if [ "0" = "$?" ]; then
                 debug "Service origin is already present for: $(distd "${_svce_origin}")"
             else
-                run "${LZ4CAT_BIN} '${_svce_org_file}' | ${ZFS_BIN} receive ${ZFS_RECEIVE_OPTS} '${DEFAULT_ZPOOL}${SERVICES_DIR}/${USER}/${_dset_create}' | ${TAIL_BIN} -n1 2>/dev/null" && \
+                run "${SOFIN_LZ4CAT_BIN} '${_svce_org_file}' | ${ZFS_BIN} receive ${ZFS_RECEIVE_OPTS} '${DEFAULT_ZPOOL}${SERVICES_DIR}/${USER}/${_dset_create}' | ${TAIL_BIN} -n1 2>/dev/null" && \
                     debug "Service origin received successfully: $(distd "${_svce_origin}")"
             fi
         else
@@ -383,7 +383,7 @@ receive_origin () {
     if [ -f "${_origin_file}" ]; then
         debug "DataSet: $(distd "${_dname}")"
         # NOTE: each user dataset is made of same origin, hence you can apply snapshots amongst them..
-        run "${LZ4CAT_BIN} '${_origin_file}' | ${ZFS_BIN} receive -u ${ZFS_RECEIVE_OPTS} '${_dname}'" \
+        run "${SOFIN_LZ4CAT_BIN} '${_origin_file}' | ${ZFS_BIN} receive -u ${ZFS_RECEIVE_OPTS} '${_dname}'" \
             && set_mountpoint_and_mount \
             && debug "Origin received successfully: $(distd "${_dname}")"
     else
@@ -535,7 +535,7 @@ create_software_bundle_archive () {
             try "${RM_BIN} -rf ${SOFTWARE_DIR}/${_csbname}/${DEFAULT_SRC_EXT}*"
             try "${ZFS_BIN} snapshot '${_csbd_dataset}@${ORIGIN_ZFS_SNAP_NAME}'"
             try "${ZFS_BIN} umount -f '${_csbd_dataset}'"
-            run "${ZFS_BIN} send ${ZFS_SEND_OPTS} '${_csbd_dataset}@${ORIGIN_ZFS_SNAP_NAME}' | ${LZ4_BIN} ${DEFAULT_LZ4_OPTS} > ${_cddestfile}" && \
+            run "${ZFS_BIN} send ${ZFS_SEND_OPTS} '${_csbd_dataset}@${ORIGIN_ZFS_SNAP_NAME}' | ${SOFIN_LZ4_BIN} ${DEFAULT_LZ4_OPTS} > ${_cddestfile}" && \
                 note "Created bin-bundle from dataset: $(distd "${_csbd_dataset}")"
             cd "${_cdir}"
 
@@ -593,7 +593,7 @@ install_software_from_binbuild () {
             run "${ZFS_BIN} destroy -r '${_isfb_dataset}'"
         fi
         debug "Installing ZFS based binary build to dataset: $(distd "${_isfb_dataset}")"
-        run "${LZ4CAT_BIN} '${FILE_CACHE_DIR}${_isfb_archive}' | ${ZFS_BIN} receive -F ${ZFS_RECEIVE_OPTS} '${_isfb_dataset}' | ${TAIL_BIN} -n1 2>/dev/null" && \
+        run "${SOFIN_LZ4CAT_BIN} '${FILE_CACHE_DIR}${_isfb_archive}' | ${ZFS_BIN} receive -F ${ZFS_RECEIVE_OPTS} '${_isfb_dataset}' | ${TAIL_BIN} -n1 2>/dev/null" && \
                 note "Installed: $(distn "${_isfb_fullname}")" && \
                     DONT_BUILD_BUT_DO_EXPORTS=YES
         try "${ZFS_BIN} set sharenfs=off '${_isfb_dataset}'"

@@ -4,7 +4,7 @@
 #   s        -> Sofin main and the only script
 #   s-osver  -> system version printer
 #   s-usec   -> time counted in ųs since 1970
-SOFIN_PROVIDES="s s-osver s-usec"
+SOFIN_PROVIDES="s s-osver s-usec s-lz4 s-lz4cat"
 
 # Base values:
 SOFIN_RREPO="https://github.com"
@@ -78,7 +78,7 @@ DEFAULT_MANPATH="/usr/share/man"
 DEFAULT_SSH_OPTS="" #-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
 DEFAULT_SCP_OPTS="-C -B"
 DEFAULT_PS_OPTS="-axS"
-DEFAULT_LZ4_OPTS="-BD -BX -5 -f"
+DEFAULT_LZ4_OPTS="-f -5" # orig: "-BD -BX -5 -f"
 DEFAULT_LESS_OPTIONS="-g -K -N -M -f -c -s -r -F"
 DEFAULT_GIT_CLONE_OPTS="--depth 1 --progress --recursive --jobs=3"
 DEFAULT_GIT_PULL_FETCH_OPTS="--jobs=3"
