@@ -10,6 +10,7 @@
 
 ## Thanks:
 * Tymon (teamon) Tobolski (ideas of improvements)
+* Stephan Brumme (Small-Lz4)
 
 
 ## About:
