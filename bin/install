@@ -15,6 +15,7 @@ fi
 
 # NOTE: don't send reload signal after installing (returns non 0 exit code)
 export NO_SIGNAL=1
+export HOST="${HOST:-$(hostname)}"
 
 load_requirements
 create_dirs
