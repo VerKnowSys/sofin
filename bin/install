@@ -13,6 +13,9 @@ fi
 
 . share/sofin/funs/self.fun
 
+# NOTE: don't send reload signal after installing (returns non 0 exit code)
+export NO_SIGNAL=1
+
 load_requirements
 create_dirs
 install_sofin
