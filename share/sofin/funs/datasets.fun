@@ -705,8 +705,12 @@ do_prefix_snapshot () {
 
 set_software_dataset_readonly () {
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
+        if [ "YES" = "${CAP_SYS_JAILED}" ]; then
+            _datas="${DEFAULT_ZPOOL}/Software/${HOST}"
+        else
+            _datas="${DEFAULT_ZPOOL}/Software/${USER}"
+        fi
         _sofin_processes="$(processes_all_sofin)"
-        _datas="${DEFAULT_ZPOOL}/Software/${USER}"
         if [ -z "${_sofin_processes}" ]; then
             debug "No Sofin processes in background! Turning off readonly mode for dataset: '$(distd "${_datas}")'"
             run "${ZFS_BIN} set readonly=on '${_datas}'"
@@ -720,7 +724,11 @@ set_software_dataset_readonly () {
 
 set_software_dataset_writable () {
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
-        ${ZFS_BIN} set readonly=off "${DEFAULT_ZPOOL}/Software/${USER}"
+        if [ "YES" = "${CAP_SYS_JAILED}" ]; then
+            ${ZFS_BIN} set readonly=off "${DEFAULT_ZPOOL}/Software/${HOST}"
+        else
+            ${ZFS_BIN} set readonly=off "${DEFAULT_ZPOOL}/Software/${USER}"
+        fi
     fi
 }
 
