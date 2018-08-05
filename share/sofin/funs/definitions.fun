@@ -80,6 +80,11 @@ load_defs () {
                     fi
                 done
         done
+
+    if [ -z "${SYSTEM_DATASET}" ]; then
+        error "No SYSTEM_DATASET is set! Either HOST=${HOST} or USER=${USER} is not set!"
+    fi
+
     debug "Necessary values were validated: $(distd "${_valid_checks}")"
     unset _def _definitions _check _required_field _name_base _given_def _valid_checks
 }
