@@ -290,7 +290,7 @@ build () {
         fi
 
         if [ "YES" = "${CAP_SYS_ZFS}" ]; then
-            _dataset_parent="${DEFAULT_ZPOOL}/Software/${USER}"
+            _dataset_parent="${DEFAULT_ZPOOL}/Software/${SYSTEM_DATASET}"
             _dataset="${_dataset_parent}/${_anm}"
             debug "Setting dataset: $(distd "${_dataset}") to inherit 'readonly' attribute from readonly parent: $(distd "${_dataset_parent}")"
             try "${ZFS_BIN} set readonly=off '${_dataset_parent}'"
@@ -343,7 +343,7 @@ build () {
                     _paxfile="${PREFIX}/.pax"
                     printf "%s\n\n" '#!/bin/sh' > "${_paxfile}"
                     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
-                        _dataset_parent="${DEFAULT_ZPOOL}/Software/${USER}"
+                        _dataset_parent="${DEFAULT_ZPOOL}/Software/${SYSTEM_DATASET}"
                         _dataset="${_dataset_parent}/${_anm}"
 
                         # NOTE: Make sure readonly is put down to the .pax file!

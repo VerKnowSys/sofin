@@ -99,10 +99,7 @@ build_service_dataset () {
         if [ -z "${_ps_ver_elem}" ]; then
             error "Second argument with a $(diste "version-string") is required!"
         fi
-        if [ -z "${USER}" ]; then
-            error "Second argument with env value for: $(diste "USER") is required!"
-        fi
-        _full_dataset_name="${DEFAULT_ZPOOL}${SERVICES_DIR}/${USER}/${_ps_elem}"
+        _full_dataset_name="${DEFAULT_ZPOOL}${SERVICES_DIR}/${SYSTEM_DATASET}/${_ps_elem}"
         _ps_snap_file="${_ps_elem}-${_ps_ver_elem}-${SYSTEM_NAME}${DEFAULT_SERVICE_SNAPSHOT_EXT}"
         debug "Dataset name: $(distd "${_full_dataset_name}"), snapshot-file: $(distd "${_ps_snap_file}")"
         if [ ! -f "${FILE_CACHE_DIR}${_ps_snap_file}" ]; then
@@ -138,9 +135,6 @@ build_service_dataset () {
         fi
         if [ -z "${_ps_ver_elem}" ]; then
             error "Second argument with a $(diste "version-string") is required!"
-        fi
-        if [ -z "${USER}" ]; then
-            error "Second argument with env value for: $(diste "USER") is required!"
         fi
         _full_svc_dirname="${SERVICES_DIR}/${_ps_elem}"
         _ps_snap_file="${_ps_elem}-${_ps_ver_elem}-${SYSTEM_NAME}${DEFAULT_ARCHIVE_TARBALL_EXT}"
@@ -179,7 +173,7 @@ create_service_dataset () {
         error "First argument with: $(diste dataset_name) required!"
     fi
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
-        _dataset_name="${DEFAULT_ZPOOL}${SERVICES_DIR}/${USER}/${_bund_name}"
+        _dataset_name="${DEFAULT_ZPOOL}${SERVICES_DIR}/${SYSTEM_DATASET}/${_bund_name}"
         try "${ZFS_BIN} list -H -o name -t filesystem ${_dataset_name}"
         if [ "0" = "${?}" ]; then
             debug "Service dataset already exists: $(distd "${_dataset_name}")"
@@ -209,7 +203,7 @@ fetch_dset_zfs_stream () {
         debug "Fetch service stream-dataset: $(distd "${FILE_CACHE_DIR}${_fdz_out_file}")"
         retry "${FETCH_BIN} -o ${FILE_CACHE_DIR}${_fdz_out_file} ${FETCH_OPTS} '${_commons_path}'"
         if [ "${?}" = "0" ]; then
-            _dataset_name="${DEFAULT_ZPOOL}${SERVICES_DIR}/${USER}/${_fdz_bund_name}"
+            _dataset_name="${DEFAULT_ZPOOL}${SERVICES_DIR}/${SYSTEM_DATASET}/${_fdz_bund_name}"
             try "${SOFIN_LZ4CAT_BIN} '${FILE_CACHE_DIR}${_fdz_out_file}' | ${ZFS_BIN} receive ${ZFS_RECEIVE_OPTS} '${_dataset_name}' | ${TAIL_BIN} -n1 2>/dev/null" && \
                     note "Received service dataset: $(distn "${_dataset_name}")"
             unset _dataset_name
@@ -253,11 +247,11 @@ try_fetch_service_dir () {
         fi
         if [ -f "${_svce_org_file}" ]; then
             # NOTE: each user dataset is made of same origin, hence you can apply snapshots amongst them..
-            try "${ZFS_BIN} list '${DEFAULT_ZPOOL}${SERVICES_DIR}/${USER}/${_dset_create}'"
+            try "${ZFS_BIN} list '${DEFAULT_ZPOOL}${SERVICES_DIR}/${SYSTEM_DATASET}/${_dset_create}'"
             if [ "0" = "$?" ]; then
                 debug "Service origin is already present for: $(distd "${_svce_origin}")"
             else
-                run "${SOFIN_LZ4CAT_BIN} '${_svce_org_file}' | ${ZFS_BIN} receive ${ZFS_RECEIVE_OPTS} '${DEFAULT_ZPOOL}${SERVICES_DIR}/${USER}/${_dset_create}' | ${TAIL_BIN} -n1 2>/dev/null" && \
+                run "${SOFIN_LZ4CAT_BIN} '${_svce_org_file}' | ${ZFS_BIN} receive ${ZFS_RECEIVE_OPTS} '${DEFAULT_ZPOOL}${SERVICES_DIR}/${SYSTEM_DATASET}/${_dset_create}' | ${TAIL_BIN} -n1 2>/dev/null" && \
                     debug "Service origin received successfully: $(distd "${_svce_origin}")"
             fi
         else
@@ -310,7 +304,7 @@ destroy_service_dir () {
         error "First argument with $(diste "BundleName") to destroy is required!"
     fi
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
-        unmount_and_destroy "${DEFAULT_ZPOOL}${SERVICES_DIR}/${USER}/${_dset_destroy}"
+        unmount_and_destroy "${DEFAULT_ZPOOL}${SERVICES_DIR}/${SYSTEM_DATASET}/${_dset_destroy}"
     else
         try "${RM_BIN} -rf '${SERVICES_DIR}/${_dset_destroy}'" && \
             debug "Removed regular software-directory: $(distd "${SERVICES_DIR}/${_dset_destroy}")"
@@ -345,7 +339,7 @@ receive_origin () {
         error "No dataset bae given! Should be one of 'Services' or 'Software'"
     fi
     if [ -n "${_dtype}" ]; then
-        # _dname="/${USER}/${_dname}"
+        # _dname="/${SYSTEM_DATASET}/${_dname}"
         _head="${_dorigin_base}-user"
     else
         # NOOP:
@@ -399,7 +393,7 @@ create_software_dir () {
         error "First argument with $(diste "BundleName") is required!"
     fi
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
-        _dsname="${DEFAULT_ZPOOL}${SOFTWARE_DIR}/${USER}/${_dset_create}"
+        _dsname="${DEFAULT_ZPOOL}${SOFTWARE_DIR}/${SYSTEM_DATASET}/${_dset_create}"
         debug "Create software dataset: '$(distd "${_dsname}")'"
         receive_orig () {
             receive_origin "${_dsname}" "Software" "user" \
@@ -427,7 +421,7 @@ destroy_software_dir () {
     fi
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
         set_system_writable
-        _dsbase="${DEFAULT_ZPOOL}${SOFTWARE_DIR}/${USER}"
+        _dsbase="${DEFAULT_ZPOOL}${SOFTWARE_DIR}/${SYSTEM_DATASET}"
         _dsname="${_dsbase}/${_dset_destroy}"
         try "${ZFS_BIN} set readonly=off '${_dsbase}'"
         try "${ZFS_BIN} set readonly=off '${_dsname}'"
@@ -528,7 +522,7 @@ create_software_bundle_archive () {
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
         _inst_ind="${_csbname}/$(lowercase "${_csbname}")${DEFAULT_INST_MARK_EXT}"
         if [ -f "${SOFTWARE_DIR}/${_inst_ind}" ]; then
-            _csbd_dataset="${DEFAULT_ZPOOL}${SOFTWARE_DIR}/${USER}/${_csbname}"
+            _csbd_dataset="${DEFAULT_ZPOOL}${SOFTWARE_DIR}/${SYSTEM_DATASET}/${_csbname}"
             debug "Creating archive from snapshot: $(distd "${ORIGIN_ZFS_SNAP_NAME}") dataset: $(distd "${_csbd_dataset}") to file: $(distd "${_cddestfile}")"
             _cdir="$(${PWD_BIN} 2>/dev/null)"
             cd /tmp
@@ -540,7 +534,7 @@ create_software_bundle_archive () {
             cd "${_cdir}"
 
             # set mountpoint for dataset explicitly:
-            _dsname="${DEFAULT_ZPOOL}${SOFTWARE_DIR}/${USER}/${_csbname}"
+            _dsname="${DEFAULT_ZPOOL}${SOFTWARE_DIR}/${SYSTEM_DATASET}/${_csbname}"
             try "${ZFS_BIN} set mountpoint=${SOFTWARE_DIR}/${_csbname} '${_dsname}'"
             try "${ZFS_BIN} mount '${_csbd_dataset}'" || :
         else
@@ -585,7 +579,7 @@ install_software_from_binbuild () {
     _isfb_fullname="${2}"
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
         # On systems with ZFS capability, we use zfs receive instead of tarballing:
-        _isfb_dataset="${DEFAULT_ZPOOL}${SOFTWARE_DIR}/${USER}/${_isfb_fullname}"
+        _isfb_dataset="${DEFAULT_ZPOOL}${SOFTWARE_DIR}/${SYSTEM_DATASET}/${_isfb_fullname}"
         debug "isfb: $(distd "${_isfb_archive}"), isff: $(distd "${_isfb_fullname}"), isfbdset: $(distd "${_isfb_dataset}")"
         try "${ZFS_BIN} list -H -t filesystem ${_isfb_dataset} >> ${LOG} 2>/dev/null"
         if [ "${?}" = "0" ]; then
@@ -665,13 +659,13 @@ do_prefix_snapshot () {
     if [ -z "${_snap_name}" ]; then
         error "Snapshot name can't be empty!"
     fi
-    if [ -n "${USER}" ]; then
+    if [ -n "${SYSTEM_DATASET}" ]; then
         require_prefix_set
         require_namesum_set
         if [ "YES" = "${CAP_SYS_ZFS}" ]; then
             _pr_name="${PREFIX##*/}"
-            _pr_soft="${DEFAULT_ZPOOL}${SOFTWARE_DIR}/${USER}/${_pr_name}"
-            _pr_serv="${DEFAULT_ZPOOL}${SERVICES_DIR}/${USER}/${_pr_name}"
+            _pr_soft="${DEFAULT_ZPOOL}${SOFTWARE_DIR}/${SYSTEM_DATASET}/${_pr_name}"
+            _pr_serv="${DEFAULT_ZPOOL}${SERVICES_DIR}/${SYSTEM_DATASET}/${_pr_name}"
             debug "Ensure presence of origin snapshot under prefix='$(distd "${SOFTWARE_DIR}/${_pr_name}")' of software dataset='$(distd "${_pr_soft}")' with service dataset='$(distd "${_pr_serv}")'"
 
             # # Try removing existing snaps:
@@ -698,18 +692,14 @@ do_prefix_snapshot () {
             return 1
         fi
     else
-        debug "Empty value of '$(distd "USER")'!"
+        debug "Empty value of '$(distd "SYSTEM_DATASET")'!"
     fi
 }
 
 
 set_software_dataset_readonly () {
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
-        if [ "YES" = "${CAP_SYS_JAILED}" ]; then
-            _datas="${DEFAULT_ZPOOL}/Software/${HOST}"
-        else
-            _datas="${DEFAULT_ZPOOL}/Software/${USER}"
-        fi
+        _datas="${DEFAULT_ZPOOL}/Software/${SYSTEM_DATASET}"
         _sofin_processes="$(processes_all_sofin)"
         if [ -z "${_sofin_processes}" ]; then
             debug "No Sofin processes in background! Turning off readonly mode for dataset: '$(distd "${_datas}")'"
@@ -724,11 +714,7 @@ set_software_dataset_readonly () {
 
 set_software_dataset_writable () {
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
-        if [ "YES" = "${CAP_SYS_JAILED}" ]; then
-            ${ZFS_BIN} set readonly=off "${DEFAULT_ZPOOL}/Software/${HOST}"
-        else
-            ${ZFS_BIN} set readonly=off "${DEFAULT_ZPOOL}/Software/${USER}"
-        fi
+        ${ZFS_BIN} set readonly=off "${DEFAULT_ZPOOL}/Software/${SYSTEM_DATASET}"
     fi
 }
 
