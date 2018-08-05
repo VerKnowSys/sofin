@@ -228,7 +228,7 @@ validate_sys_limits () {
     _ulimit_core="0"
     _ulimit_nofile="6000"
     _ulimit_stackkb="131070"
-    _ulimit_up_max_ps="8192"
+    _ulimit_up_max_ps="4096"
 
     if [ "YES" = "${CAP_SYS_WORKSTATION}" ]; then
         _ulimit_nofile="6000"
