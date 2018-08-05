@@ -84,6 +84,7 @@ install_sofin_files () {
 
     debug "${DEFAULT_ZPOOL}${SOFIN_ROOT}"
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
+        ${ZFS_BIN} destroy "${DEFAULT_ZPOOL}${SOFIN_ROOT}@origin" 2>/dev/null
         ${ZFS_BIN} list "${DEFAULT_ZPOOL}${SOFIN_ROOT}" >/dev/null 2>&1 || \
             ${ZFS_BIN} create -o mountpoint="${SOFIN_ROOT}" "${DEFAULT_ZPOOL}${SOFIN_ROOT}"
     fi
@@ -105,11 +106,15 @@ install_sofin_files () {
 
     run "${INSTALL_BIN} -m 755 src/s-hbsdcontrol.sh ${SOFIN_ROOT}/bin/s-hbsdcontrol" && \
     run "${INSTALL_BIN} -m 755 src/s.sh ${SOFIN_ROOT}/bin/s" && \
-        echo "  ${_okch} sofin launcher" && \
-        echo "Type: $(distn "s usage") for help." && \
-        echo "Read: $(distn "https://github.com/VerKnowSys/sofin") for more details." && \
-            return 0
-    return 1
+        echo "  ${_okch} sofin launcher"
+
+    if [ "YES" = "${CAP_SYS_ZFS}" ]; then
+        ${ZFS_BIN} snapshot "${DEFAULT_ZPOOL}${SOFIN_ROOT}@origin" && \
+            echo "  ${_okch} sofin origin snapshot"
+    fi
+    echo "Read: $(distn "https://github.com/VerKnowSys/sofin") for more details."
+    echo "Type: $(distn "s usage") for quick help."
+    return 0
 }
 
 
