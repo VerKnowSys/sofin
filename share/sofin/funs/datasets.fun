@@ -369,7 +369,6 @@ receive_origin () {
         else
             _mountpoint="${SERVICES_DIR}/${_dname##*/}"
         fi
-        try "${ZFS_BIN} set sharenfs=off '${_dname}'"
         try "${ZFS_BIN} set mountpoint=${_mountpoint} '${_dname}'"
         try "${ZFS_BIN} mount '${_dname}'"
     }
@@ -425,7 +424,6 @@ destroy_software_dir () {
         _dsname="${_dsbase}/${_dset_destroy}"
         try "${ZFS_BIN} set readonly=off '${_dsbase}'"
         try "${ZFS_BIN} set readonly=off '${_dsname}'"
-        try "${ZFS_BIN} set sharenfs=off '${_dsname}'"
         try "${ZFS_BIN} umount -f '${_dsname}'"
         try "${ZFS_BIN} destroy -fr '${_dsname}'" && \
             debug "Destroyed software-dataset: $(distd "${_dsname}")"
@@ -590,7 +588,6 @@ install_software_from_binbuild () {
         run "${SOFIN_LZ4CAT_BIN} '${FILE_CACHE_DIR}${_isfb_archive}' | ${ZFS_BIN} receive -F ${ZFS_RECEIVE_OPTS} '${_isfb_dataset}' | ${TAIL_BIN} -n1 2>/dev/null" && \
                 note "Installed: $(distn "${_isfb_fullname}")" && \
                     DONT_BUILD_BUT_DO_EXPORTS=YES
-        try "${ZFS_BIN} set sharenfs=off '${_isfb_dataset}'"
     else
         try "${TAR_BIN} -xf ${FILE_CACHE_DIR}${_isfb_archive} --directory ${SOFTWARE_DIR}"
         if [ "${?}" = "0" ]; then
