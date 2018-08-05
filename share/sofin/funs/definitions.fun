@@ -705,7 +705,7 @@ export_binaries () {
                 if [ -x "${_soft_to_exp}" ]; then
                     _acurrdir="$(${PWD_BIN} 2>/dev/null)"
                     cd "${PREFIX}${dir}"
-                    run "${RM_BIN} -f ../exports/${_xp}; ${LN_BIN} -s ..${dir}${_xp} ../exports/${_xp}"
+                    try "${RM_BIN} -f ../exports/${_xp}; ${LN_BIN} -s ..${dir}${_xp} ../exports/${_xp}"
                     cd "${_acurrdir}"
                     _expo_elem="${_soft_to_exp##*/}"
                     _expolist="${_expolist} ${_expo_elem}"
@@ -715,7 +715,7 @@ export_binaries () {
                 if [ -x "${_service_to_exp}" ]; then
                     _acurrdir="$(${PWD_BIN} 2>/dev/null)"
                     cd "${SERVICE_DIR}${dir}"
-                    run "${RM_BIN} -f ../exports/${_xp}; ${LN_BIN} -s ..${dir}${_xp} ../exports/${_xp}"
+                    try "${RM_BIN} -f ../exports/${_xp}; ${LN_BIN} -s ..${dir}${_xp} ../exports/${_xp}"
                     cd "${_acurrdir}"
                     _expo_elem="${_service_to_exp##*/}"
                     _expolist="${_expolist} ${_expo_elem}"
