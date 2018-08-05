@@ -144,6 +144,13 @@ determine_system_capabilites () {
         unset CAP_SYS_HARDENED
     fi
 
+    try "${SYSCTL_BIN} security.jail.jailed >/dev/null 2>&1 | ${GREP_BIN} 'security.jail.jailed: 1'"
+    if [ "${?}" = "0" ]; then
+        CAP_SYS_JAILED=YES
+    else
+        unset CAP_SYS_JAILED
+    fi
+
     try "${SYSCTL_BIN} kern.dtrace >/dev/null 2>&1"
     if [ "${?}" = "0" ]; then
         CAP_SYS_DTRACE=YES
