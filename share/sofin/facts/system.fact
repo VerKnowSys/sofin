@@ -144,7 +144,7 @@ determine_system_capabilites () {
         unset CAP_SYS_HARDENED
     fi
 
-    try "${SYSCTL_BIN} security.jail.jailed >/dev/null 2>&1 | ${GREP_BIN} 'security.jail.jailed: 1'"
+    try "${SYSCTL_BIN} security.jail.jailed 2>/dev/null | ${GREP_BIN} 'security.jail.jailed: 1' 2>/dev/null"
     if [ "${?}" = "0" ]; then
         CAP_SYS_JAILED=YES
     else
