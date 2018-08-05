@@ -81,6 +81,13 @@ install_sofin_files () {
     if [ -z "${SOFTWARE_DIR}" ] || [ -z "${SOFIN_ROOT}" ]; then
         exit 67
     fi
+
+    debug "${DEFAULT_ZPOOL}${SOFIN_ROOT}"
+    if [ "YES" = "${CAP_SYS_ZFS}" ]; then
+        ${ZFS_BIN} list "${DEFAULT_ZPOOL}${SOFIN_ROOT}" >/dev/null 2>&1 || \
+            ${ZFS_BIN} create -o mountpoint="${SOFIN_ROOT}" "${DEFAULT_ZPOOL}${SOFIN_ROOT}"
+    fi
+
     ${MKDIR_BIN} -p "${SOFTWARE_DIR}" "${SERVICES_DIR}" "${SOFIN_ROOT}/bin" "${SOFIN_ROOT}/exports" "${SOFIN_ROOT}/share" || \
         try_sudo_installation
 
