@@ -21,6 +21,7 @@ load_requirements () {
 
 install_sofin () {
     load_requirements
+    determine_system_capabilites
     set_software_root_writable
     create_dirs
 
