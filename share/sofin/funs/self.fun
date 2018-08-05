@@ -84,9 +84,9 @@ install_sofin_files () {
 
     debug "${DEFAULT_ZPOOL}${SOFIN_ROOT}"
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
-        ${ZFS_BIN} destroy "${DEFAULT_ZPOOL}${SOFIN_ROOT}/root@origin" 2>/dev/null
-        ${ZFS_BIN} list "${DEFAULT_ZPOOL}${SOFIN_ROOT}/root" >/dev/null 2>&1 || \
-            ${ZFS_BIN} create -o mountpoint="${SOFIN_ROOT}" "${DEFAULT_ZPOOL}${SOFIN_ROOT}/root"
+        ${ZFS_BIN} destroy "${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/Sofin@origin" >/dev/null 2>&1
+        ${ZFS_BIN} list "${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/Sofin" >/dev/null 2>&1 || \
+            ${ZFS_BIN} create -o mountpoint="${SOFIN_ROOT}" "${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/Sofin"
     fi
 
     ${MKDIR_BIN} -p "${SOFTWARE_DIR}" "${SERVICES_DIR}" "${SOFIN_ROOT}/bin" "${SOFIN_ROOT}/exports" "${SOFIN_ROOT}/share" || \
@@ -109,7 +109,7 @@ install_sofin_files () {
         echo "  ${_okch} sofin launcher"
 
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
-        ${ZFS_BIN} snapshot "${DEFAULT_ZPOOL}${SOFIN_ROOT}/root@origin" && \
+        ${ZFS_BIN} snapshot "${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/Sofin@origin" && \
             echo "  ${_okch} sofin origin snapshot"
     fi
     echo "Read: $(distn "https://github.com/VerKnowSys/sofin") for more details."
