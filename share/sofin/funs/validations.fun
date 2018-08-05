@@ -226,12 +226,12 @@ validate_sys_limits () {
 
     # Limits for production CAP_SYS_HARDENED environment:
     _ulimit_core="0"
-    _ulimit_nofile="16384"
+    _ulimit_nofile="6000"
     _ulimit_stackkb="131070"
     _ulimit_up_max_ps="8192"
 
     if [ "YES" = "${CAP_SYS_WORKSTATION}" ]; then
-        _ulimit_nofile="16384"
+        _ulimit_nofile="6000"
         _ulimit_stackkb="16384"
         _ulimit_up_max_ps="512"
         debug "Initialised limits for Darwin workstation"
