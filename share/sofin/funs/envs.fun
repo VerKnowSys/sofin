@@ -477,12 +477,16 @@ update_shell_vars () {
 
 
 reload_shell () {
-    # NOTE: PPID contains pid of parent shell of Sofin
-    if [ -n "${PPID}" ]; then
-        try "${KILL_BIN} -SIGUSR2 ${PPID}" && \
-            debug "Reload signal sent to parent pid: $(distd "${PPID}")"
+    if [ -z "${NO_SIGNAL}" ]; then
+        # NOTE: PPID contains pid of parent shell of Sofin
+        if [ -n "${PPID}" ]; then
+            try "${KILL_BIN} -SIGUSR2 ${PPID}" && \
+                debug "Reload signal sent to parent pid: $(distd "${PPID}")"
+        else
+            debug "Skipped reload_shell() for no $(distd PPID)"
+        fi
     else
-        debug "Skipped reload_shell() for no $(distd PPID)"
+        debug "Signal handler skipped on demand: $(distd "NO_SIGNAL=${NO_SIGNAL}")"
     fi
 }
 
