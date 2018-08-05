@@ -108,8 +108,8 @@ install_sofin_files () {
 set_software_root_readonly () {
     if [ "YES" = "${CAP_SYS_JAILED}" ]; then
         ${ZFS_BIN} set readonly=on "${DEFAULT_ZPOOL}/Software/${HOST}" || :
-    elif [ "${USER}" = "root" ]; then
-        ${ZFS_BIN} set readonly=on "${DEFAULT_ZPOOL}/Software/root" || :
+    else
+        ${ZFS_BIN} set readonly=on "${DEFAULT_ZPOOL}/Software/${USER}" || :
     fi
 }
 
@@ -117,7 +117,7 @@ set_software_root_readonly () {
 set_software_root_writable () {
     if [ "YES" = "${CAP_SYS_JAILED}" ]; then
         ${ZFS_BIN} set readonly=off "${DEFAULT_ZPOOL}/Software/${HOST}" || :
-    elif [ "${USER}" = "root" ]; then
-        ${ZFS_BIN} set readonly=off "${DEFAULT_ZPOOL}/Software/root" || :
+    else
+        ${ZFS_BIN} set readonly=off "${DEFAULT_ZPOOL}/Software/${USER}" || :
     fi
 }
