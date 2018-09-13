@@ -248,3 +248,10 @@ validate_sys_limits () {
 
     return 0
 }
+
+
+crash_if_mission_critical () {
+    if [ -n "${DEF_CRITICAL}" ]; then
+        error "Bundle: $(diste "${1}") is marked as \"Mission-Critical\" and cannot be easily removed! You have to manually destroy M-C software dataset/ dir!"
+    fi
+}
