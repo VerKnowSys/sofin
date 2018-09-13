@@ -241,6 +241,9 @@ remove_bundles () {
         if [ -z "${_given_name}" ]; then
             error "Empty bundle name given as first param!"
         fi
+        load_defaults
+        load_defs "${_def}"
+        crash_if_mission_critical "${_given_name}"
         if [ -d "${SOFTWARE_DIR}/${_given_name}" ]; then
             _aname="$(lowercase "${_given_name}")"
             destroy_software_dir "${_given_name}" \
