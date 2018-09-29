@@ -1,13 +1,13 @@
 usage_howto () {
     permnote "Built in tasks:"
     permnote
-    permnote "  $(distn "install | get | pick | choose | use  ") installs software from list or from definition and switches exports for it ($(distn "example: "${SOFIN_BIN_SHORT}" install Rubinius" "${ColorExample}"))"
+    permnote "  $(distn "install | get | pick | choose | use  ") installs software from list or from definition and switches exports for it ($(distn "example: "${SOFIN_BIN_SHORT}" install Rust" "${ColorExample}"))"
     permnote "  $(distn "dependencies | deps | local          ") installs software from list defined in '$(distn "${DEFAULT_PROJECT_DEPS_LIST_FILE}")' file in current directory"
-    permnote "  $(distn "uninstall | remove | delete          ") removes an application or list ($(distn "example: "${SOFIN_BIN_SHORT}" uninstall Rubinius" "${ColorExample}"))"
+    permnote "  $(distn "uninstall | remove | delete          ") removes an application or list ($(distn "example: "${SOFIN_BIN_SHORT}" uninstall Rust" "${ColorExample}"))"
     permnote "  $(distn "list | installed                     ") gives short list of installed software"
     permnote "  $(distn "full | fulllist | fullinstalled      ") gives detailed list with installed software including requirements"
     permnote "  $(distn "available | avail                    ") lists available software"
-    permnote "  $(distn "export | exp | exportapp             ") adds given command to application exports ($(distn "example: "${SOFIN_BIN_SHORT}" export rails Rubinius" "${ColorExample}"))"
+    permnote "  $(distn "export | exp | exportapp             ") adds given command to application exports ($(distn "example: "${SOFIN_BIN_SHORT}" export rails Rust" "${ColorExample}"))"
     permnote
     permnote "  $(distn "log                                  ") shows tail of all logs (for debug messages and verbose info)"
     permnote "  $(distn "log @                                ") shows tail of all Sofin logs"
@@ -25,8 +25,8 @@ usage_howto () {
     permnote "  $(distn "out | outdated                       ") lists outdated software"
     permnote "  $(distn "build                                ") does binary build from source for software specified as params"
     permnote "  $(distn "deploy                               ") build + push"
-    permnote "  $(distn "push | binpush | send                ") creates binary build from prebuilt software bundles name given as params ($(distn "example: "${SOFIN_BIN_SHORT}" push Rubinius Vifm Curl" "${ColorExample}"))"
-    permnote "  $(distn "wipe                                 ") wipes binary builds (matching given name) from binary respositories ($(distn "example: "${SOFIN_BIN_SHORT}" wipe Rubinius Vifm" "${ColorExample}"))"
+    permnote "  $(distn "push | binpush | send                ") creates binary build from prebuilt software bundles name given as params ($(distn "example: "${SOFIN_BIN_SHORT}" push Rust Vifm Curl" "${ColorExample}"))"
+    permnote "  $(distn "wipe                                 ") wipes binary builds (matching given name) from binary respositories ($(distn "example: "${SOFIN_BIN_SHORT}" wipe Rust Vifm" "${ColorExample}"))"
 
     permnote
     permnote "  $(distn "env                                  ") reads current Sofin environment."

@@ -125,9 +125,9 @@ s export ruby Passenger
 s remove SomeBundle
 ```
 
-* Create own list called "databases", with definitions: "Postgresql" and "Rubinius", and get it with Sofin:
+* Create own list called "databases", with definitions: "Postgresql" and "Rust", and get it with Sofin:
 ```bash
-echo "Postgresql\nRubinius" > ~/.cache/definitions/lists/databases
+echo "Postgresql\nRust" > ~/.cache/definitions/lists/databases
 s get databases
 ```
 
