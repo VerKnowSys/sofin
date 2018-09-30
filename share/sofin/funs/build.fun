@@ -838,7 +838,7 @@ test_and_rate_def () {
             }
 
             local_test_env_dispatch () {
-                export TEST_JOBS="${CPUS:-4}"
+                export TEST_JOBS="${CPUS:-6}"
                 export TEST_ENV="${DEF_TEST_ENV:-test}"
                 if [ "Darwin" = "${SYSTEM_NAME}" ]; then
                     _ld_prefix_name="DY"
