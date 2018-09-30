@@ -847,10 +847,11 @@ test_and_rate_def () {
                 fi
                 printf "Test for ${_name} started at: ${TIMESTAMP}\n" >> "${PREFIX}/${_name}.test.log" 2>> "${PREFIX}/${_name}.test.log"
                 run_tests () {
-                    PATH=\"${SERVICE_DIR}/bin:${PREFIX}/bin:${PREFIX}/sbin:${SERVICE_DIR}/sbin:${PREFIX}/libexec:${SOFIN_UTILS_PATH}:/bin:/usr/bin\" \
+                    eval \
+                        "PATH=\"${SERVICE_DIR}/bin:${PREFIX}/bin:${PREFIX}/sbin:${SERVICE_DIR}/bin:${SERVICE_DIR}/sbin:${PREFIX}/libexec:${SOFIN_UTILS_PATH}:/bin:/usr/bin\" \
                         LD_LIBRARY_PATH=\"${PREFIX}/lib:${PREFIX}/libexec:${SERVICE_DIR}/lib\" \
                         DYLD_LIBRARY_PATH=\"${PREFIX}/lib:${PREFIX}/libexec:${SERVICE_DIR}/lib\" \
-                        eval "'${_cmdline}'" >> "${PREFIX}/${_name}.test.log" 2>> "${PREFIX}/${_name}.test.log"
+                        ${_cmdline} >> \"${PREFIX}/${_name}.test.log\" 2>> \"${PREFIX}/${_name}.test.log\""
                 }
 
                 run_tests
