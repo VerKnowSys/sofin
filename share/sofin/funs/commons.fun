@@ -1,3 +1,17 @@
+# Parse version string to list of 3 arguments.
+# f.e.: parse_version "1.2.41" will return 1 2 41
+parse_version () {
+    _version="${1}"
+    IFS=. read _major _minor _micro <<EOF
+${_version##*-}
+EOF
+    printf "%s %s %s\n" \
+        "${_major}" \
+        "${_minor}" \
+        "${_micro}" 2>/dev/null
+}
+
+
 check_result () {
     if [ "${1}" = "0" ]; then
         shift
