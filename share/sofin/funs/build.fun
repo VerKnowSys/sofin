@@ -842,19 +842,20 @@ test_and_rate_def () {
                 printf "%s\n" \
                     "Test for ${_name} started at: ${_start_time}" >> "${PREFIX}/${_name}.test.log" 2>> "${PREFIX}/${_name}.test.log"
 
-                _test_command="$( \
-export TEST_JOBS="${CPUS:-6}" && \
-export TEST_ENV="${DEF_TEST_ENV:-test}" && \
-export PATH="${SERVICE_DIR}/bin:${SERVICE_DIR}/sbin:${PREFIX}/bin:${PREFIX}/sbin:${PREFIX}/libexec:${SOFIN_UTILS_PATH}:/bin:/usr/bin:/sbin:/usr/sbin" && \
-export LD_LIBRARY_PATH="${PREFIX}/lib:${PREFIX}/libexec:${SERVICE_DIR}/lib" && \
-export DYLD_LIBRARY_PATH="${PREFIX}/lib:${PREFIX}/libexec:${SERVICE_DIR}/lib" && \
-${SHELL} -c "${_cmdline}" >> "${PREFIX}/${_name}.test.log" 2>> "${PREFIX}/${_name}.test.log")"
-
-                eval "${_test_command}"
+                eval "\
+                    export TEST_JOBS=${CPUS:-6} && \
+                    export TEST_ENV=${DEF_TEST_ENV:-test} && \
+                    export PATH=${SERVICE_DIR}/bin:${SERVICE_DIR}/sbin:${PREFIX}/bin:${PREFIX}/sbin:${PREFIX}/libexec:${SOFIN_UTILS_PATH}:/bin:/usr/bin:/sbin:/usr/sbin && \
+                    export LD_LIBRARY_PATH=${PREFIX}/lib:${PREFIX}/libexec:${SERVICE_DIR}/lib && \
+                    export DYLD_LIBRARY_PATH=${PREFIX}/lib:${PREFIX}/libexec:${SERVICE_DIR}/lib && \
+                    ${SHELL} -c ${_cmdline} \
+                        >> ${PREFIX}/${_name}.test.log \
+                        2>> ${PREFIX}/${_name}.test.log \
+                "
                 _result=${?}
-                debug "Test result for: $(distd "${_name}") is: $(distd "${_result}")"
-
                 _end_time="$(${DATE_BIN} +%F-%H%M-%s 2>/dev/null)"
+
+                debug "Test result for: $(distd "${_name}") is: $(distd "${_result}")"
                 printf "%s\n" \
                     "Test for ${_name} finished at: ${_end_time}" >> "${PREFIX}/${_name}.test.log" 2>> "${PREFIX}/${_name}.test.log"
 
