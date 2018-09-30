@@ -333,6 +333,10 @@ if [ -n "${SOFIN_COMMAND}" ]; then
             fi
             for _b in $(to_iter "${_pickd_bundls}"); do
                 build "${_b}"
+                if [ "${USER}" != "root" ]; then
+                    try "${CHOWN_BIN} -R ${USER} '${SERVICES_DIR}/${_b}'" && \
+                        debug "OK: $(distd "chown -R ${USER} '${SERVICES_DIR}/${_b}'")."
+                fi
             done
             note "Installed: $(distn "${_pickd_bundls}")"
             unset _pickd_bundls _b
