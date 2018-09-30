@@ -109,8 +109,10 @@ install_sofin_files () {
 
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
         {
-            ${ZFS_BIN} destroy "${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/${SOFIN_BUNDLE_NAME}@${ORIGIN_ZFS_SNAP_NAME}";
+            _origin_timestamp="$(${DATE_BIN} +%F_%s 2>/dev/null)"
+            ${ZFS_BIN} rename "${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/${SOFIN_BUNDLE_NAME}@${ORIGIN_ZFS_SNAP_NAME}" "@origin_${_origin_timestamp}";
             ${ZFS_BIN} snapshot "${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/${SOFIN_BUNDLE_NAME}@${ORIGIN_ZFS_SNAP_NAME}";
+            unset _origin_timestamp
         } >/dev/null 2>&1 && \
             echo "  ${_okch} sofin ${ORIGIN_ZFS_SNAP_NAME} snapshot"
     fi
