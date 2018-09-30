@@ -840,21 +840,19 @@ test_and_rate_def () {
             local_test_env_dispatch () {
                 _start_time="$(${DATE_BIN} +%F-%H%M-%s 2>/dev/null)"
                 printf "%s\n" \
-                    "Test for ${_name} started at: ${TIMESTAMP}" >> "${PREFIX}/${_name}.test.log" 2>> "${PREFIX}/${_name}.test.log"
-                run_tests () {
-                    eval "\
-                        TEST_JOBS=\"${CPUS:-6}\" \
-                        TEST_ENV=\"${DEF_TEST_ENV:-test}\" \
-                        PATH=\"${SERVICE_DIR}/bin:${PREFIX}/bin:${PREFIX}/sbin:${SERVICE_DIR}/bin:${SERVICE_DIR}/sbin:${PREFIX}/libexec:${SOFIN_UTILS_PATH}:/bin:/usr/bin\" \
-                        LD_LIBRARY_PATH=\"${PREFIX}/lib:${PREFIX}/libexec:${SERVICE_DIR}/lib\" \
-                        DYLD_LIBRARY_PATH=\"${PREFIX}/lib:${PREFIX}/libexec:${SERVICE_DIR}/lib\" \
-                        ${_cmdline}" \
-                            >> "${PREFIX}/${_name}.test.log" \
-                            2>> "${PREFIX}/${_name}.test.log"
-                }
+                    "Test for ${_name} started at: ${_start_time}" >> "${PREFIX}/${_name}.test.log" 2>> "${PREFIX}/${_name}.test.log"
 
-                run_tests
-                _tests_result_errcode="${?}"
+                _test_command="$( \
+export TEST_JOBS="${CPUS:-6}" && \
+export TEST_ENV="${DEF_TEST_ENV:-test}" && \
+export PATH="${SERVICE_DIR}/bin:${SERVICE_DIR}/sbin:${PREFIX}/bin:${PREFIX}/sbin:${PREFIX}/libexec:${SOFIN_UTILS_PATH}:/bin:/usr/bin:/sbin:/usr/sbin" && \
+export LD_LIBRARY_PATH="${PREFIX}/lib:${PREFIX}/libexec:${SERVICE_DIR}/lib" && \
+export DYLD_LIBRARY_PATH="${PREFIX}/lib:${PREFIX}/libexec:${SERVICE_DIR}/lib" && \
+${SHELL} -c "${_cmdline}" >> "${PREFIX}/${_name}.test.log" 2>> "${PREFIX}/${_name}.test.log")"
+
+                eval "${_test_command}"
+                _result=${?}
+                debug "Test result for: $(distd "${_name}") is: $(distd "${_result}")"
 
                 _end_time="$(${DATE_BIN} +%F-%H%M-%s 2>/dev/null)"
                 printf "%s\n" \
