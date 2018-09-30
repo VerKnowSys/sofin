@@ -831,7 +831,7 @@ test_and_rate_def () {
                         run "${TOUCH_BIN} '${PREFIX}/${_name}.test.passed' && ${RM_BIN} -f '${PREFIX}/${_name}.test.failed'"
                         ;;
 
-                    failed)
+                    *)
                         run "${TOUCH_BIN} '${PREFIX}/${_name}.test.failed' && ${RM_BIN} -f '${PREFIX}/${_name}.test.passed'"
                         ;;
                 esac
