@@ -828,11 +828,11 @@ test_and_rate_def () {
             local_test_result () {
                 case "${1}" in
                     passed)
-                        try "${TOUCH_BIN} '${PREFIX}/${_name}.test.passed' && ${RM_BIN} -f '${PREFIX}/${_name}.test.failed'"
+                        run "${TOUCH_BIN} '${PREFIX}/${_name}.test.passed' && ${RM_BIN} -f '${PREFIX}/${_name}.test.failed'"
                         ;;
 
                     failed)
-                        try "${TOUCH_BIN} '${PREFIX}/${_name}.test.failed' && ${RM_BIN} -f '${PREFIX}/${_name}.test.passed'"
+                        run "${TOUCH_BIN} '${PREFIX}/${_name}.test.failed' && ${RM_BIN} -f '${PREFIX}/${_name}.test.passed'"
                         ;;
                 esac
             }
