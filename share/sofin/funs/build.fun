@@ -845,7 +845,8 @@ test_and_rate_def () {
                 else
                     unset _ld_prefix_name
                 fi
-                printf "Test for ${_name} started at: ${TIMESTAMP}\n" >> "${PREFIX}/${_name}.test.log" 2>> "${PREFIX}/${_name}.test.log"
+                printf "%s\n" \
+                    "Test for ${_name} started at: ${TIMESTAMP}" >> "${PREFIX}/${_name}.test.log" 2>> "${PREFIX}/${_name}.test.log"
                 run_tests () {
                     eval \
                         "PATH=\"${SERVICE_DIR}/bin:${PREFIX}/bin:${PREFIX}/sbin:${SERVICE_DIR}/bin:${SERVICE_DIR}/sbin:${PREFIX}/libexec:${SOFIN_UTILS_PATH}:/bin:/usr/bin\" \
@@ -857,7 +858,8 @@ test_and_rate_def () {
                 run_tests
                 _tests_result_errcode="${?}"
 
-                printf "%s\n" "Test for ${_name} finished at: ${TIMESTAMP}" >> "${PREFIX}/${_name}.test.log" 2>> "${PREFIX}/${_name}.test.log"
+                printf "%s\n" \
+                    "Test for ${_name} finished at: ${TIMESTAMP}" >> "${PREFIX}/${_name}.test.log" 2>> "${PREFIX}/${_name}.test.log"
                 return ${_tests_result_errcode}
             }
             ;;
