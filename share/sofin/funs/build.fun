@@ -838,18 +838,13 @@ test_and_rate_def () {
             }
 
             local_test_env_dispatch () {
-                export TEST_JOBS="${CPUS:-6}"
-                export TEST_ENV="${DEF_TEST_ENV:-test}"
-                if [ "Darwin" = "${SYSTEM_NAME}" ]; then
-                    _ld_prefix_name="DY"
-                else
-                    unset _ld_prefix_name
-                fi
                 printf "%s\n" \
                     "Test for ${_name} started at: ${TIMESTAMP}" >> "${PREFIX}/${_name}.test.log" 2>> "${PREFIX}/${_name}.test.log"
                 run_tests () {
-                    eval \
-                        "PATH=\"${SERVICE_DIR}/bin:${PREFIX}/bin:${PREFIX}/sbin:${SERVICE_DIR}/bin:${SERVICE_DIR}/sbin:${PREFIX}/libexec:${SOFIN_UTILS_PATH}:/bin:/usr/bin\" \
+                    eval "\
+                        TEST_JOBS=\"${CPUS:-6}\" \
+                        TEST_ENV=\"${DEF_TEST_ENV:-test}\" \
+                        PATH=\"${SERVICE_DIR}/bin:${PREFIX}/bin:${PREFIX}/sbin:${SERVICE_DIR}/bin:${SERVICE_DIR}/sbin:${PREFIX}/libexec:${SOFIN_UTILS_PATH}:/bin:/usr/bin\" \
                         LD_LIBRARY_PATH=\"${PREFIX}/lib:${PREFIX}/libexec:${SERVICE_DIR}/lib\" \
                         DYLD_LIBRARY_PATH=\"${PREFIX}/lib:${PREFIX}/libexec:${SERVICE_DIR}/lib\" \
                         ${_cmdline}" \
