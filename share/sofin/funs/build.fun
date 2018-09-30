@@ -846,14 +846,17 @@ test_and_rate_def () {
                     unset _ld_prefix_name
                 fi
                 printf "Test for ${_name} started at: ${TIMESTAMP}\n" >> "${PREFIX}/${_name}.test.log" 2>> "${PREFIX}/${_name}.test.log"
-                eval "\
+                run_tests () {
                     PATH=\"${SERVICE_DIR}/bin:${PREFIX}/bin:${PREFIX}/sbin:${SERVICE_DIR}/sbin:${PREFIX}/libexec:${SOFIN_UTILS_PATH}:/bin:/usr/bin\" \
-                    ${_ld_prefix_name}LD_LIBRARY_PATH=\"${PREFIX}/lib:${PREFIX}/libexec:${SERVICE_DIR}/lib\" \
-                    eval '${_cmdline}' >> \"${PREFIX}/${_name}.test.log\" 2>> \"${PREFIX}/${_name}.test.log\" \
-                "
-                _result="${?}"
-                printf "Test for ${_name} finished at: ${TIMESTAMP}\n" >> "${PREFIX}/${_name}.test.log" 2>> "${PREFIX}/${_name}.test.log"
-                return ${_result}
+                        ${_ld_prefix_name}LD_LIBRARY_PATH=\"${PREFIX}/lib:${PREFIX}/libexec:${SERVICE_DIR}/lib\" \
+                        eval "'${_cmdline}'" >> "${PREFIX}/${_name}.test.log" 2>> "${PREFIX}/${_name}.test.log"
+                }
+
+                run_tests
+                _tests_result_errcode="${?}"
+
+                printf "%s\n" "Test for ${_name} finished at: ${TIMESTAMP}" >> "${PREFIX}/${_name}.test.log" 2>> "${PREFIX}/${_name}.test.log"
+                return ${_tests_result_errcode}
             }
             ;;
     esac
