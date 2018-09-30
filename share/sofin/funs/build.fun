@@ -838,6 +838,7 @@ test_and_rate_def () {
             }
 
             local_test_env_dispatch () {
+                _start_time="$(${DATE_BIN} +%F-%H%M-%s 2>/dev/null)"
                 printf "%s\n" \
                     "Test for ${_name} started at: ${TIMESTAMP}" >> "${PREFIX}/${_name}.test.log" 2>> "${PREFIX}/${_name}.test.log"
                 run_tests () {
@@ -855,9 +856,12 @@ test_and_rate_def () {
                 run_tests
                 _tests_result_errcode="${?}"
 
+                _end_time="$(${DATE_BIN} +%F-%H%M-%s 2>/dev/null)"
                 printf "%s\n" \
-                    "Test for ${_name} finished at: ${TIMESTAMP}" >> "${PREFIX}/${_name}.test.log" 2>> "${PREFIX}/${_name}.test.log"
-                return ${_tests_result_errcode}
+                    "Test for ${_name} finished at: ${_end_time}" >> "${PREFIX}/${_name}.test.log" 2>> "${PREFIX}/${_name}.test.log"
+
+                unset _test_command _end_time _start_time
+                return ${_result}
             }
             ;;
     esac
