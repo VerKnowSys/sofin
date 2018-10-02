@@ -228,12 +228,12 @@ validate_sys_limits () {
     _ulimit_core="0"
     _ulimit_nofile="6000"
     _ulimit_stackkb="131070"
-    _ulimit_up_max_ps="4096"
+    _ulimit_up_max_ps="512"
 
     if [ "YES" = "${CAP_SYS_WORKSTATION}" ]; then
         _ulimit_nofile="6000"
         _ulimit_stackkb="16384"
-        _ulimit_up_max_ps="512"
+        _ulimit_up_max_ps="1024"
         debug "Initialised limits for Darwin workstation"
     fi
 
