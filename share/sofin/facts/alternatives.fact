@@ -151,6 +151,6 @@ if [ -x "/usr/bin/lz4" ]; then
 fi
 
 # hbsdcontrol
-if [ -x "${HBSDCONTROL_BIN}" ]; then
+if [ ! -x "${HBSDCONTROL_BIN}" ]; then
     HBSDCONTROL_BIN="${SOFIN_HBSDCONTROL_BIN}"
 fi
