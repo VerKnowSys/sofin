@@ -149,3 +149,8 @@ fi
 if [ -x "/usr/bin/lz4" ]; then
     SOFIN_LZ4_BIN="/usr/bin/lz4"
 fi
+
+# hbsdcontrol
+if [ -x "${HBSDCONTROL_BIN}" ]; then
+    HBSDCONTROL_BIN="${SOFIN_HBSDCONTROL_BIN}"
+fi
