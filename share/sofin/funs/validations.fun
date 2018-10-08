@@ -241,8 +241,8 @@ validate_sys_limits () {
         warn "Sofin has failed to set reasonable environment limit of open files: $(distw "${_ulimit_nofile}"). Local limit is: "$(ulimit -n)". Troubles may follow!"
     try "ulimit -s ${_ulimit_stackkb}" || \
         warn "Sofin has failed to set reasonable environment limit of stack (in kb) to value: $(distw "${_ulimit_stackkb}"). Local limit is: "$(ulimit -s)". Troubles may follow!"
-    try "ulimit -u ${_ulimit_up_max_ps}" || \
-        warn "Sofin has failed to set reasonable environment limit of running processes to: $(distw "${_ulimit_up_max_ps}"). Local limit is: "$(ulimit -u)". Troubles may follow!"
+    # try "ulimit -u ${_ulimit_up_max_ps}" || \
+    #     warn "Sofin has failed to set reasonable environment limit of running processes to: $(distw "${_ulimit_up_max_ps}"). Local limit is: "$(ulimit -u)". Troubles may follow!"
     try "ulimit -c ${_ulimit_core}" || \
         warn "Sofin has failed to set core size limit to: $(distw "${_ulimit_core}"). Local limit is: "$(ulimit -c)".!"
 
