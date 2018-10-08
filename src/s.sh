@@ -41,7 +41,7 @@ if [ -n "${SOFIN_TRACE}" ]; then
         set -o xtrace
     fi
     set -x
-    printf "Enabled trace mode\n"
+    printf "%s\n" "Enabled trace mode"
 fi
 
 if [ -n "${SOFIN_VERBOSE}" ]; then
@@ -51,7 +51,7 @@ if [ -n "${SOFIN_VERBOSE}" ]; then
     else
         set -v
     fi
-    printf "Enabled verbose mode\n"
+    printf "%s\n" "Enabled verbose mode"
 fi
 
 # this is internal version check for defaults.def
