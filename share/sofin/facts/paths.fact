@@ -82,6 +82,8 @@ AR_BIN="/usr/bin/ar"
 AS_BIN="/usr/bin/as"
 OPENSSL_BIN="/usr/bin/openssl"
 DTRACE_BIN="/usr/sbin/dtrace"
+JOT_BIN="/usr/bin/jot"
+SH_BIN="/bin/sh"
 
 # Pick best utilities available:
 if [ -f "${DEFAULT_FACTS_DIR}alternatives.fact" ]; then
