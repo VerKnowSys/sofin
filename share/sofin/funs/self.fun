@@ -25,6 +25,13 @@ install_sofin () {
     set_software_root_writable
     create_dirs
 
+    if [ -n "${CAP_SYS_ZFS}" ]; then
+        debug "Renaming current @origin for Sofin dataset."
+        # Rename old @origin:
+        _timestamp_now="$(date +%F-%H%M-%s 2>/dev/null)"
+        try "zfs rename \"${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/Sofin@origin\" \"@origin-${_timestamp_now}\""
+    fi
+
     echo "Installing ${SOFIN_BUNDLE_NAME} to prefix: $(distn "${SOFIN_ROOT}")"
 
     compiler_setup && \
@@ -37,6 +44,12 @@ install_sofin () {
             "${SOFIN_ROOT}/bin/s" \
             "${SOFIN_ROOT}/share/loader" && \
             echo "${SOFIN_BUNDLE_NAME} v$(distn "${SOFIN_VERSION}") was installed successfully!"
+    fi
+
+    if [ -n "${CAP_SYS_ZFS}" ]; then
+        debug "Snapshotting current @origin for freshed Sofin dataset."
+        # # Create new @origin for Sofin software dataset:
+        try "zfs snapshot \"${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/Sofin@origin\""
     fi
 
     update_system_shell_env_files
