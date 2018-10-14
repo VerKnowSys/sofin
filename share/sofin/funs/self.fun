@@ -125,15 +125,6 @@ install_sofin_files () {
     run "${INSTALL_BIN} -m 755 src/s.sh ${SOFIN_ROOT}/bin/s" && \
         echo "  ${_okch} sofin launcher"
 
-    if [ "YES" = "${CAP_SYS_ZFS}" ]; then
-        {
-            _origin_timestamp="$(${DATE_BIN} +%F-%s 2>/dev/null)"
-            ${ZFS_BIN} rename "${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/${SOFIN_BUNDLE_NAME}@${ORIGIN_ZFS_SNAP_NAME}" "@${ORIGIN_ZFS_SNAP_NAME}_${_origin_timestamp}";
-            ${ZFS_BIN} snapshot "${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/${SOFIN_BUNDLE_NAME}@${ORIGIN_ZFS_SNAP_NAME}";
-            unset _origin_timestamp
-        } >/dev/null 2>&1 && \
-            echo "  ${_okch} sofin ${ORIGIN_ZFS_SNAP_NAME} snapshot"
-    fi
     echo "Read: $(distn "https://github.com/VerKnowSys/sofin") for more details."
     echo "Type: $(distn "s usage") for quick help."
     return 0
