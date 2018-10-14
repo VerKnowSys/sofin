@@ -19,12 +19,7 @@ load_requirements () {
 }
 
 
-install_sofin () {
-    load_requirements
-    determine_system_capabilites
-    set_software_root_writable
-    create_dirs
-
+prepare_and_manage_origin () {
     if [ -n "${CAP_SYS_ZFS}" ]; then
         _any_snap="$(zfs list -H -r -t snapshot -o name "${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/${SOFIN_BUNDLE_NAME}" 2>/dev/null)"
         if [ -z "${_any_snap}" ]; then
@@ -32,13 +27,32 @@ install_sofin () {
             note "New $(distn "@${ORIGIN_ZFS_SNAP_NAME}") snapshot created."
         fi
         _timestamp_now="$(date +%F-%H%M-%s 2>/dev/null)"
-        note "Rename current @${ORIGIN_ZFS_SNAP_NAME} for ${SOFIN_BUNDLE_NAME} dataset."
-        try "zfs set readonly=off \"${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/${SOFIN_BUNDLE_NAME}\""
-        try "zfs rename \"${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/${SOFIN_BUNDLE_NAME}@${ORIGIN_ZFS_SNAP_NAME}\" \"@${ORIGIN_ZFS_SNAP_NAME}-${_timestamp_now}\""
+        try "zfs set readonly=off '${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/${SOFIN_BUNDLE_NAME}'"
+        try "zfs rename '${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/${SOFIN_BUNDLE_NAME}@${ORIGIN_ZFS_SNAP_NAME}' '@${ORIGIN_ZFS_SNAP_NAME}-${_timestamp_now}'" && \
+            permnote "Renamed current @${ORIGIN_ZFS_SNAP_NAME} for ${SOFIN_BUNDLE_NAME} dataset."
     fi
+}
 
-    echo "Install ${SOFIN_BUNDLE_NAME} to prefix: $(distn "${SOFIN_ROOT}")"
 
+commit_origin () {
+    if [ -n "${CAP_SYS_ZFS}" ]; then
+        note "Created $(distn "@${ORIGIN_ZFS_SNAP_NAME}") snapshot of: $(distn "${SOFIN_BUNDLE_NAME}") bundle."
+        try "zfs snapshot ${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/${SOFIN_BUNDLE_NAME}@${ORIGIN_ZFS_SNAP_NAME}"
+        try "zfs set readonly=on ${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/${SOFIN_BUNDLE_NAME}"
+    fi
+}
+
+
+install_sofin () {
+    echo
+    load_requirements
+    determine_system_capabilites
+    set_software_root_writable
+    create_dirs
+
+    prepare_and_manage_origin
+
+    permnote "Install $(distn "${SOFIN_BUNDLE_NAME}") to prefix: $(distn "${SOFIN_ROOT}")"
     compiler_setup && \
         build_sofin_natives && \
         install_sofin_files && \
@@ -48,14 +62,10 @@ install_sofin () {
         ${SED_BIN} -i '' -e "s#/usr/bin/env sh#${DEFAULT_SHELL_EXPORTS}/zsh#" \
             "${SOFIN_ROOT}/bin/s" \
             "${SOFIN_ROOT}/share/loader" && \
-            echo "${SOFIN_BUNDLE_NAME} v$(distn "${SOFIN_VERSION}") was installed successfully!"
+            permnote "${SOFIN_BUNDLE_NAME} v$(distn "${SOFIN_VERSION}") was installed successfully!"
     fi
 
-    if [ -n "${CAP_SYS_ZFS}" ]; then
-        note "New $(distn "@${ORIGIN_ZFS_SNAP_NAME}") bundle snapshot: $(distn "${SOFIN_BUNDLE_NAME}")."
-        try "zfs snapshot \"${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/${SOFIN_BUNDLE_NAME}@${ORIGIN_ZFS_SNAP_NAME}\""
-        try "zfs set readonly=on \"${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/${SOFIN_BUNDLE_NAME}\""
-    fi
+    commit_origin
 
     update_system_shell_env_files
     update_shell_vars
@@ -78,7 +88,7 @@ build_sofin_natives () {
         if [ -f "src/${_prov}.cc" ]; then
             debug "${SOFIN_BUNDLE_NAME}: Build: ${CXX_NAME} -o bin/${_prov} ${CFLAGS} src/${_prov}.cc"
             run "${CXX_NAME} ${DEFAULT_COMPILER_FLAGS} ${DEFAULT_LINKER_FLAGS} src/${_prov}.cc -o bin/${_prov}" && \
-                echo "  ${_okch} cc: src/${_prov}.cc"
+                permnote "  ${_okch} cc: src/${_prov}.cc"
 
             continue
         fi
@@ -88,7 +98,7 @@ build_sofin_natives () {
 
 try_sudo_installation () {
     _cmds="sudo ${MKDIR_BIN} -vp ${SOFTWARE_DIR} ${SERVICES_DIR} && sudo ${CHOWN_BIN} -R ${USER} ${SOFTWARE_DIR} ${SERVICES_DIR}"
-    echo "Please provide password for commands: $(distn "${_cmds}")"
+    permnote "Please provide password for commands: $(distn "${_cmds}")"
     eval "${_cmds}" || \
         exit 66
     unset _cmds
@@ -116,17 +126,17 @@ install_sofin_files () {
             run "${RM_BIN} -f bin/${_prov}"
         fi
     done && \
-        echo "  ${_okch} native utils"
+        permnote "  ${_okch} native utils"
 
     run "${CP_BIN} -fR share/sofin/* ${SOFIN_ROOT}/share/" && \
-        echo "  ${_okch} facts and functions"
+        permnote "  ${_okch} facts and functions"
 
     run "${INSTALL_BIN} -m 755 src/s-hbsdcontrol.sh ${SOFIN_ROOT}/bin/s-hbsdcontrol" && \
     run "${INSTALL_BIN} -m 755 src/s.sh ${SOFIN_ROOT}/bin/s" && \
-        echo "  ${_okch} sofin launcher"
+        permnote "  ${_okch} sofin launcher"
 
-    echo "Read: $(distn "https://github.com/VerKnowSys/sofin") for more details."
-    echo "Type: $(distn "s usage") for quick help."
+    permnote "Read: $(distn "https://github.com/VerKnowSys/sofin") for more details."
+    permnote "Type: $(distn "s usage") for quick help."
     return 0
 }
 
