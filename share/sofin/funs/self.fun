@@ -53,7 +53,7 @@ prepare_and_manage_origin () {
 commit_origin () {
     if [ -n "${CAP_SYS_ZFS}" ]; then
         run "zfs snapshot ${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/${SOFIN_BUNDLE_NAME}@${ORIGIN_ZFS_SNAP_NAME}" && \
-            permnote "New $(distn "@${ORIGIN_ZFS_SNAP_NAME}") snapshot of: $(distn "${SOFIN_BUNDLE_NAME}") bundle was created."
+            permnote "Created new $(distn "@${ORIGIN_ZFS_SNAP_NAME}") snapshot of bundle: $(distn "${SOFIN_BUNDLE_NAME}")."
 
         try "zfs set readonly=on ${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/${SOFIN_BUNDLE_NAME}"
     fi
