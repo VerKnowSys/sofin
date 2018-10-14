@@ -26,7 +26,7 @@ install_sofin () {
     create_dirs
 
     if [ -n "${CAP_SYS_ZFS}" ]; then
-        _any_snap="$(zfs list -H -r -t snapshot "${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/${SOFIN_BUNDLE_NAME}" 2>/dev/null)"
+        _any_snap="$(zfs list -H -r -t snapshot -o name "${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/${SOFIN_BUNDLE_NAME}" 2>/dev/null)"
         if [ -z "${_any_snap}" ]; then
             run "zfs snapshot ${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/${SOFIN_BUNDLE_NAME}@${ORIGIN_ZFS_SNAP_NAME}"
             note "New $(distn "@${ORIGIN_ZFS_SNAP_NAME}") snapshot created."
