@@ -26,8 +26,11 @@ install_sofin () {
     create_dirs
 
     if [ -n "${CAP_SYS_ZFS}" ]; then
-        debug "Renaming current @origin for Sofin dataset."
-        # Rename old @origin:
+        _any_snap="$(zfs list -H -r -t snapshot "${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/${SOFIN_BUNDLE_NAME}" 2>/dev/null)"
+        if [ -z "${_any_snap}" ]; then
+            run "zfs snapshot ${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/${SOFIN_BUNDLE_NAME}@${ORIGIN_ZFS_SNAP_NAME}"
+            note "New $(distn "@${ORIGIN_ZFS_SNAP_NAME}") snapshot created."
+        fi
         _timestamp_now="$(date +%F-%H%M-%s 2>/dev/null)"
         try "zfs rename \"${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/Sofin@origin\" \"@origin-${_timestamp_now}\""
         try "zfs set readonly=off \"${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/Sofin\""
