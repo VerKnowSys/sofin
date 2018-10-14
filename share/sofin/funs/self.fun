@@ -24,7 +24,20 @@ prepare_and_manage_origin () {
         _any_snap="$(zfs list -H -r -t snapshot -o name "${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/${SOFIN_BUNDLE_NAME}" 2>/dev/null)"
         if [ -z "${_any_snap}" ]; then
             run "zfs snapshot ${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/${SOFIN_BUNDLE_NAME}@${ORIGIN_ZFS_SNAP_NAME}"
-            note "New $(distn "@${ORIGIN_ZFS_SNAP_NAME}") snapshot created."
+            permnote "Created snapshot: $(distn "@${ORIGIN_ZFS_SNAP_NAME}")."
+        else
+            _snaps="$(printf "%b\n" "${_any_snap}" | ${WC_BIN} -l 2>/dev/null)"
+            _snap_amount="${_snaps##* }"
+            # NOTE: handle potential problem with huge amount of snapshots later on. Keep max of N most recent snapshots:
+            if [ "${_snap_amount}" -gt "${DEFAULT_ZFS_MAX_SNAPSHOT_COUNT}" ]; then
+                debug "Old snapshots count: $(distd "${_snap_amount}")"
+                for _a_snap in $(printf "%b\n" "${_any_snap}" | ${HEAD_BIN} -n1 2>/dev/null); do
+                    try "zfs destroy '${_a_snap}'" && \
+                        permnote "Destroyed the oldest $(distn "@${ORIGIN_ZFS_SNAP_NAME}") snapshot: $(distn "${_a_snap}")."
+                done
+            else
+                debug "Old ${SOFIN_BUNDLE_NAME} snapshots count: $(distd "${_snap_amount}")"
+            fi
         fi
         _timestamp_now="$(date +%F-%H%M-%s 2>/dev/null)"
         try "zfs set readonly=off '${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/${SOFIN_BUNDLE_NAME}'"
