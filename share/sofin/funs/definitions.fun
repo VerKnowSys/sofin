@@ -198,7 +198,7 @@ update_defs () {
         try "${GIT_BIN} pull --depth 1 --progress origin ${BRANCH}" && \
             _def_head="$(${CAT_BIN} "${CACHE_DIR}${DEFINITIONS_BASE}/${DEFAULT_GIT_DIR_NAME}/refs/heads/${_def_cur_branch}" 2>/dev/null)"
 
-        note "Branch: $(distn "${BRANCH}") is currenly at: $(distn "${_def_head}") in repository: $(distn "${REPOSITORY}")"
+        note "Repository: $(distn "${REPOSITORY}"), on branch: $(distn "${BRANCH}"). Commit HEAD: $(distn "${_def_head}")."
     fi
     cd "${_cwd}"
     unset _def_head _def_branch _def_cur_branch _out_file _cwd
