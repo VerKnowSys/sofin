@@ -33,7 +33,7 @@ prepare_and_manage_origin () {
             # NOTE: handle potential problem with huge amount of snapshots later on. Keep max of N most recent snapshots:
             if [ "${_snap_amount}" -gt "${DEFAULT_ZFS_MAX_SNAPSHOT_COUNT}" ]; then
                 debug "Old snapshots count: $(distd "${_snap_amount}")"
-                for _a_snap in $(printf "%b\n" "${_any_snap}" | ${HEAD_BIN} -n1 2>/dev/null); do
+                for _a_snap in $(to_iter "${_any_snap}"); do
                     try "zfs destroy '${_a_snap}'" && \
                         permnote "Destroyed the oldest $(distn "@${ORIGIN_ZFS_SNAP_NAME}") snapshot: $(distn "${_a_snap}")."
                 done
