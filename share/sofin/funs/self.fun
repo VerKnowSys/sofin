@@ -32,11 +32,12 @@ install_sofin () {
             note "New $(distn "@${ORIGIN_ZFS_SNAP_NAME}") snapshot created."
         fi
         _timestamp_now="$(date +%F-%H%M-%s 2>/dev/null)"
-        try "zfs rename \"${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/Sofin@origin\" \"@origin-${_timestamp_now}\""
-        try "zfs set readonly=off \"${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/Sofin\""
+        note "Rename current @${ORIGIN_ZFS_SNAP_NAME} for ${SOFIN_BUNDLE_NAME} dataset."
+        try "zfs set readonly=off \"${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/${SOFIN_BUNDLE_NAME}\""
+        try "zfs rename \"${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/${SOFIN_BUNDLE_NAME}@${ORIGIN_ZFS_SNAP_NAME}\" \"@${ORIGIN_ZFS_SNAP_NAME}-${_timestamp_now}\""
     fi
 
-    echo "Installing ${SOFIN_BUNDLE_NAME} to prefix: $(distn "${SOFIN_ROOT}")"
+    echo "Install ${SOFIN_BUNDLE_NAME} to prefix: $(distn "${SOFIN_ROOT}")"
 
     compiler_setup && \
         build_sofin_natives && \
@@ -51,10 +52,9 @@ install_sofin () {
     fi
 
     if [ -n "${CAP_SYS_ZFS}" ]; then
-        debug "Snapshotting current @origin for freshed Sofin dataset."
-        # # Create new @origin for Sofin software dataset:
-        try "zfs set readonly=on \"${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/Sofin\""
-        try "zfs snapshot \"${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/Sofin@origin\""
+        note "New $(distn "@${ORIGIN_ZFS_SNAP_NAME}") bundle snapshot: $(distn "${SOFIN_BUNDLE_NAME}")."
+        try "zfs snapshot \"${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/${SOFIN_BUNDLE_NAME}@${ORIGIN_ZFS_SNAP_NAME}\""
+        try "zfs set readonly=on \"${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/${SOFIN_BUNDLE_NAME}\""
     fi
 
     update_system_shell_env_files
@@ -67,7 +67,7 @@ install_sofin () {
 
 # No-Op one for installer:
 update_defs () {
-    debug "Skipping definitions update in installation process."
+    debug "Skipped definitions update in installation process."
 }
 
 
