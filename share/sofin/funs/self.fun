@@ -35,7 +35,8 @@ prepare_and_manage_origin () {
                 debug "Old snapshots count: $(distd "${_snap_amount}")"
                 for _a_snap in $(to_iter "${_any_snap}"); do
                     try "zfs destroy '${_a_snap}'" && \
-                        permnote "Destroyed the oldest $(distn "@${ORIGIN_ZFS_SNAP_NAME}") snapshot: $(distn "${_a_snap}")."
+                        permnote "Destroyed the oldest $(distn "@${ORIGIN_ZFS_SNAP_NAME}") snapshot: $(distn "${_a_snap}")." && \
+                            break # - we want to remove at least one snapshot
                 done
             else
                 debug "Old ${SOFIN_BUNDLE_NAME} snapshots count: $(distd "${_snap_amount}")"
