@@ -40,11 +40,12 @@ prepare_and_manage_origin () {
             else
                 debug "Old ${SOFIN_BUNDLE_NAME} snapshots count: $(distd "${_snap_amount}")"
             fi
+
+            _timestamp_now="$(date +%F-%H%M-%s 2>/dev/null)"
+            try "zfs set readonly=off '${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/${SOFIN_BUNDLE_NAME}'"
+            try "zfs rename '${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/${SOFIN_BUNDLE_NAME}@${ORIGIN_ZFS_SNAP_NAME}' '@${ORIGIN_ZFS_SNAP_NAME}-${_timestamp_now}'" && \
+                permnote "Renamed current @${ORIGIN_ZFS_SNAP_NAME} for ${SOFIN_BUNDLE_NAME} dataset."
         fi
-        _timestamp_now="$(date +%F-%H%M-%s 2>/dev/null)"
-        try "zfs set readonly=off '${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/${SOFIN_BUNDLE_NAME}'"
-        try "zfs rename '${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/${SOFIN_BUNDLE_NAME}@${ORIGIN_ZFS_SNAP_NAME}' '@${ORIGIN_ZFS_SNAP_NAME}-${_timestamp_now}'" && \
-            permnote "Renamed current @${ORIGIN_ZFS_SNAP_NAME} for ${SOFIN_BUNDLE_NAME} dataset."
     fi
 }
 
