@@ -27,10 +27,7 @@ prepare_and_manage_origin () {
                 "${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/${SOFIN_BUNDLE_NAME}"
 
         _any_snap="$(zfs list -H -r -t snapshot -o name "${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/${SOFIN_BUNDLE_NAME}" 2>/dev/null)"
-        if [ -z "${_any_snap}" ]; then
-            run "zfs snapshot ${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/${SOFIN_BUNDLE_NAME}@${ORIGIN_ZFS_SNAP_NAME}"
-            permnote "Created snapshot: $(distn "@${ORIGIN_ZFS_SNAP_NAME}")."
-        else
+        if [ -n "${_any_snap}" ]; then
             _snaps="$(printf "%b\n" "${_any_snap}" | ${WC_BIN} -l 2>/dev/null)"
             _snap_amount="${_snaps##* }"
             # NOTE: handle potential problem with huge amount of snapshots later on. Keep max of N most recent snapshots:
