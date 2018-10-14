@@ -21,6 +21,11 @@ load_requirements () {
 
 prepare_and_manage_origin () {
     if [ -n "${CAP_SYS_ZFS}" ]; then
+        # Create "root" Sofin dataset:
+        zfs list "${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/${SOFIN_BUNDLE_NAME}" >/dev/null 2>&1 || \
+            zfs create -o mountpoint="${SOFTWARE_DIR}/${SOFIN_BUNDLE_NAME}" \
+                "${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/${SOFIN_BUNDLE_NAME}"
+
         _any_snap="$(zfs list -H -r -t snapshot -o name "${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/${SOFIN_BUNDLE_NAME}" 2>/dev/null)"
         if [ -z "${_any_snap}" ]; then
             run "zfs snapshot ${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/${SOFIN_BUNDLE_NAME}@${ORIGIN_ZFS_SNAP_NAME}"
