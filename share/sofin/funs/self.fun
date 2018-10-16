@@ -22,6 +22,8 @@ load_requirements () {
 
 prepare_and_manage_origin () {
     if [ -n "${CAP_SYS_ZFS}" ]; then
+        try "zfs set readonly=off '${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/${SOFIN_BUNDLE_NAME}'"
+
         # Create "root" Sofin dataset:
         zfs list "${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/${SOFIN_BUNDLE_NAME}" >/dev/null 2>&1 || \
             zfs create -o mountpoint="${SOFTWARE_DIR}/${SOFIN_BUNDLE_NAME}" \
@@ -44,7 +46,6 @@ prepare_and_manage_origin () {
             fi
 
             _timestamp_now="$(date +%F-%H%M-%s 2>/dev/null)"
-            try "zfs set readonly=off '${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/${SOFIN_BUNDLE_NAME}'"
             try "zfs rename '${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/${SOFIN_BUNDLE_NAME}@${ORIGIN_ZFS_SNAP_NAME}' '@${ORIGIN_ZFS_SNAP_NAME}-${_timestamp_now}'" && \
                 permnote "Renamed current @${ORIGIN_ZFS_SNAP_NAME} for ${SOFIN_BUNDLE_NAME} dataset."
         fi
