@@ -582,7 +582,7 @@ install_software_from_binbuild () {
         try "${ZFS_BIN} list -H -t filesystem ${_isfb_dataset} >> ${LOG} 2>/dev/null"
         if [ "${?}" = "0" ]; then
             # note "Software dataset: $(distn "${_isfb_fullname}") already present. Will be destroyed!"
-            run "${ZFS_BIN} destroy -r '${_isfb_dataset}'"
+            try "${ZFS_BIN} destroy -fr '${_isfb_dataset}'"
         fi
         debug "Installing ZFS based binary build to dataset: $(distd "${_isfb_dataset}")"
         run "${SOFIN_LZ4CAT_BIN} '${FILE_CACHE_DIR}${_isfb_archive}' | ${ZFS_BIN} receive -F ${ZFS_RECEIVE_OPTS} '${_isfb_dataset}' | ${TAIL_BIN} -n1 2>/dev/null" && \
