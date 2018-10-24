@@ -667,7 +667,7 @@ do_prefix_snapshot () {
 
             # # Try removing existing snaps:
             do_snaps_destroy () {
-                try "${ZFS_BIN} destroy -r '${_pr_soft}@${_snap_name}' >/dev/null; ${ZFS_BIN} destroy -r '${_pr_serv}@${_snap_name}' >/dev/null;"
+                try "${ZFS_BIN} destroy -fr '${_pr_soft}@${_snap_name}' >/dev/null; ${ZFS_BIN} destroy -fr '${_pr_serv}@${_snap_name}' >/dev/null;"
                 return 0
             }
 
