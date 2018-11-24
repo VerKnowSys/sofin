@@ -323,18 +323,28 @@ compiler_setup () {
     if [ -z "${DEF_NO_FORTIFY_SOURCE}" ]; then
         CMACROS="${HARDEN_CMACROS}"
     fi
+    if [ -z "${DEF_NO_PIC}" ]; then
+        PIC_CFLAGS="-fPIC"
+        PIC_LDFLAGS="-fPIC"
+    fi
+    if [ -z "${DEF_NO_PIE}" ]; then
+        PIE_CFLAGS="-fPIE"
+        PIE_LDFLAGS="-pie"
+    fi
     case "${SYSTEM_NAME}" in
         FreeBSD)
-            DEFAULT_COMPILER_FLAGS="${HARDEN_CFLAGS} ${HARDEN_CFLAGS_PRODUCTION} ${CMACROS}"
-            DEFAULT_LINKER_FLAGS="${HARDEN_LDFLAGS_PRODUCTION}"
+            DEFAULT_COMPILER_FLAGS="${PIC_CFLAGS} ${PIE_CFLAGS} ${HARDEN_CFLAGS} ${HARDEN_CFLAGS_PRODUCTION} ${CMACROS}"
+            DEFAULT_LINKER_FLAGS="${PIC_LDFLAGS} ${PIE_LDFLAGS} ${HARDEN_LDFLAGS_PRODUCTION}"
             ;;
 
         Darwin)
-            DEFAULT_COMPILER_FLAGS="${HARDEN_CFLAGS} ${CMACROS}"
+            DEFAULT_COMPILER_FLAGS="${HARDEN_CFLAGS} ${PIC_CFLAGS} ${CMACROS}"
+            DEFAULT_LINKER_FLAGS="${PIC_LDFLAGS}"
             ;;
 
         Linux)
-            DEFAULT_COMPILER_FLAGS="${HARDEN_CFLAGS} ${CMACROS}"
+            DEFAULT_COMPILER_FLAGS="${PIC_CFLAGS} ${PIE_CFLAGS} ${HARDEN_CFLAGS} ${CMACROS}"
+            DEFAULT_LINKER_FLAGS="${PIC_LDFLAGS} ${PIE_LDFLAGS}"
             ;;
 
         Minix)
