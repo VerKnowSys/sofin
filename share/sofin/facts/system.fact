@@ -83,8 +83,8 @@ HARDEN_CFLAGS="-fstack-protector -fstack-protector-strong -fstack-protector-all 
 HARDEN_OFLOW_CFLAGS="-ftrapv"
 HARDEN_SAFE_STACK_FLAGS="-fsanitize=safe-stack"
 HARDEN_CMACROS="-D_FORTIFY_SOURCE=2"
-HARDEN_CFLAGS_PRODUCTION="-fPIE -Wl,-z,relro,-z,now"
-HARDEN_LDFLAGS_PRODUCTION="-pie -z relro -z now"
+HARDEN_CFLAGS_PRODUCTION="-Wl,-z,relro,-z,now"
+HARDEN_LDFLAGS_PRODUCTION="-z relro -z now"
 
 
 SOFIN_SHELL_BLOCK=$(${CAT_BIN} <<EOF
