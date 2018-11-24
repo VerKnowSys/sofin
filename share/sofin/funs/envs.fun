@@ -229,27 +229,49 @@ compiler_setup () {
     unset _compiler_use_linker_flags
     if [ -z "${DEF_NO_LLVM_LINKER}" ] && [ "YES" = "${CAP_SYS_LLVM_LD}" ]; then
         #
-        # NOTE: possible values for LLVM (LLD) linker emulation values (-m XYZ):
+        # NOTE: 64bit hardware architectures supported by LLVM (ld.lld) linker:
         #
         #       aarch64     =>          aarch64elf
         #       amd64       =>          elf_x86_64_fbsd
-        #       arm         =>          armelf_fbsd
-        #       armeb       =>          armelf_fbsd
-        #       armv6       =>          armelf_fbsd
-        #       i386        =>          elf_i386_fbsd
-        #       mips        =>          elf32btsmip_fbsd
         #       mips64      =>          elf64btsmip_fbsd
-        #       mipsel      =>          elf32ltsmip_fbsd
         #       mips64el    =>          elf64ltsmip_fbsd
-        #       mipsn32     =>          elf32btsmipn32_fbsd
-        #       powerpc     =>          elf32ppc_fbsd
         #       powerpc64   =>          elf64ppc_fbsd
         #       riscv       =>          elf64riscv
         #       sparc64     =>          elf64_sparc_fbsd
         #
 
+        case "${SYSTEM_ARCH}" in
+            aarch64)
+                LD="ld.lld -m aarch64elf"
+                ;;
+
+            amd64|x86_64)
+                LD="ld.lld -m elf_x86_64_fbsd"
+                ;;
+
+            mips64)
+                LD="ld.lld -m elf64btsmip_fbsd"
+                ;;
+
+            mips64el)
+                LD="ld.lld -m elf64ltsmip_fbsd"
+                ;;
+
+            powerpc64)
+                LD="ld.lld -m elf64ppc_fbsd"
+                ;;
+
+            riscv)
+                LD="ld.lld -m elf64riscv"
+                ;;
+
+            sparc64)
+                LD="ld.lld -m elf64_sparc_fbsd"
+                ;;
+         esac
+
         _compiler_use_linker_flags="-fuse-ld=lld"
-        LD="ld.lld -m elf_x86_64_fbsd"
+
 
     elif [ -z "${DEF_NO_GOLDEN_LINKER}" ] && \
          [ "YES" = "${CAP_SYS_GOLD_LD}" ]; then
