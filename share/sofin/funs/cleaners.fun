@@ -125,7 +125,7 @@ finalize_afterbuild () {
 remove_useless () {
     _rufiles="${*}"
     if [ -n "${_rufiles}" ]; then
-        echo "${_rufiles}" | ${XARGS_BIN} -n 1 -P "${CPUS}" -I {} "${ZSH_BIN}" -c "${RM_BIN} -rf {} >/dev/null 2>&1" >> "${LOG}" 2>> "${LOG}" \
+        echo "${_rufiles}" | ${XARGS_BIN} -n 1 -P "${CPUS}" -I {} "${SH_BIN}" -c "${RM_BIN} -rf {} >/dev/null 2>&1" >> "${LOG}" 2>> "${LOG}" \
             && debug "Useless files wiped out: $(distd "${_rufiles}")" \
                 && return 0
     fi
