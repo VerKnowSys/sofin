@@ -131,6 +131,21 @@ echo "Postgresql\nRust" > ~/.cache/definitions/lists/databases
 s get databases
 ```
 
+## Usage examples (screenshots are worth more than 1000 words):
+
+
+![pic.1](http://s.verknowsys.com/98d1e3cee9c63bd391522820928a58da.png)
+> pic.1: Example of how to override/ create a software definition. Command was: `s dev node11 && s deploy Node11`
+
+
+![pic.2](http://s.verknowsys.com/92d7ddf5703a3ab789663606cd993303.png)
+> pic.2: Example of build + deploy task in progress. Command was: `s d Node` (same as: `s deploy Node`).
+
+
+![pic.3](http://s.verknowsys.com/52ce884956e2373fb3e4be609d97a5b0.png)
+> pic.3: Example of software installation from binary bundle (if available). Command was: `s up` and `s i Node` (same as: `s install Node` or `s get Node` or `s pick Node` or `s use Node`).
+
+
 
 ## Differences from [POSIX](https://en.wikipedia.org/wiki/POSIX) and [FHS](https://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard) standards:
 * Sofin provides a slightly different approach to shell PATH variable. By default user PATH variable is overriden to include APP-PREFIX/exports instead of default APP-PREFIX/(s)bin. After each successful software installation sofin will populate APP-PREFIX/exports with relative symlinks to existing binaries of bundle. Application exports are defined in "DEF_EXPORTS" variable (available for any definition).
