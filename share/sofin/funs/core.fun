@@ -79,13 +79,27 @@ permnote () {
 
 
 error () {
-    if [ -n "${*}" ]; then
-        printf "%b\n  %s %s\n    %b %b\n\n" "${ColorRed}" "${NOTE_CHAR2}" "Task crashed!" "${0}: ${1}${2}${3}${4}${5}" "${ColorReset}" >&2
-        if [ "error" = "${0}" ]; then
-            printf "%b  %s Try: %b%b\n\n" "${ColorRed}" "${NOTE_CHAR2}" "$(diste "s log ${DEF_NAME}${DEF_SUFFIX}") to see the build log." "${ColorReset}" >&2
+    _err_root="${0}"
+    _err_msg="${*}"
+    if [ -n "${_err_msg}" ]; then
+        printf "%b\n  %s %s\n    %b %b\n\n" \
+            "${ColorRed}" \
+            "${NOTE_CHAR2}" \
+            "Task crashed!" \
+            "${_err_root}: ${_err_msg}" \
+            "${ColorReset}" >&2
+        if [ "error" = "${_err_root}" ]; then
+            printf "%b  %s Try: %b%b\n\n" \
+                "${ColorRed}" \
+                "${NOTE_CHAR2}" \
+                "$(diste "s log ${DEF_NAME}${DEF_SUFFIX}"), to read the task log." \
+                "${ColorReset}" >&2
         fi
     else
-        printf "Unknown error without any content!\n" >&2
+        printf "%s: %s\n\n" \
+            "General Error" \
+            "*" \
+            >&2
     fi
     finalize_interrupt
     exit "${ERRORCODE_TASK_FAILURE}"
