@@ -1,15 +1,18 @@
 clean_purge () {
-    try "${RM_BIN} -rf \"${CACHE_DIR}\""
+    try "${RM_BIN} -rf '${CACHE_DIR}'" \
+        && debug "Clean: Purged everything."
 }
 
 
 clean_logs () {
-    try "${RM_BIN} -rf \"${LOGS_DIR}\""
+    try "${RM_BIN} -rf '${LOGS_DIR}'" \
+        && debug "Clean: Logs wiped out."
 }
 
 
 clean_filecache () {
-    try "${RM_BIN} -rf \"${FILE_CACHE_DIR}\""
+    try "${RM_BIN} -rf '${FILE_CACHE_DIR}'" \
+        && debug "Clean: Files-cache wiped out."
 }
 
 
