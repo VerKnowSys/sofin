@@ -29,12 +29,12 @@ if [ -t 1 ]; then
     SEPARATOR_CHAR2="─"
 fi
 
-if [ "TTY" != "NO" ]; then
-    CAP_TERM_INTERACTIVE=YES
-    unset CAP_TERM_NON_INTERACTIVE
-else
+if [ "NO" = "${TTY}" ]; then
     CAP_TERM_NON_INTERACTIVE=YES
     unset CAP_TERM_INTERACTIVE
+else
+    CAP_TERM_INTERACTIVE=YES
+    unset CAP_TERM_NON_INTERACTIVE
 fi
 
 # Line replay ANSI codes:
