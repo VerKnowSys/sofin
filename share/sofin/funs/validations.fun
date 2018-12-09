@@ -252,6 +252,6 @@ validate_sys_limits () {
 
 crash_if_mission_critical () {
     if [ -n "${DEF_CRITICAL}" ]; then
-        error "Bundle: $(diste "${1}") is marked as $(diste "Mission-Critical") and cannot be destroyed automatically. Mission-Critical-Datasets have to be managed manually."
+        error "Bundle: $(diste "${1}") is marked as $(diste "Mission-Critical") and cannot be destroyed automatically. It has to be done manually."
     fi
 }
