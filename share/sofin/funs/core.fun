@@ -37,43 +37,73 @@ debug () {
 
 
 warn () {
-    if [ -n "${*}" ]; then
-        if [ "${TTY}" = "YES" ]; then
-            printf "${REPLAY_PREVIOUS_LINE}%b%s%b\n\n" "${ColorYellow}" "${@}" "${ColorReset}" >&2
+    _wrn_msgs="${*}"
+    if [ -n "${_wrn_msgs}" ]; then
+        if [ "YES" = "${TTY}" ]; then
+            printf "${REPLAY_PREVIOUS_LINE}%b%s%b\n\n" \
+                "${ColorYellow}" \
+                "${_wrn_msgs}" \
+                "${ColorReset}" \
+                >&2
         else
-            printf "%b%s%b\n" "${ColorYellow}" "${@}" "${ColorReset}" >&2
+            printf "%b%s%b\n" \
+                "${ColorYellow}" \
+                "${_wrn_msgs}" \
+                "${ColorReset}" \
+                >&2
         fi
     else
         printf "\n" >&2
     fi
+    unset _wrn_msgs
     return 0
 }
 
 
 note () {
-    if [ -n "${*}" ]; then
-        if [ "${TTY}" = "YES" ]; then
-            printf "${REPLAY_PREVIOUS_LINE}%b%s%b\n" "${ColorGreen}" "${@}" "${ColorReset}" >&2
+    _nte_msgs="${*}"
+    if [ -n "${_nte_msgs}" ]; then
+        if [ "YES" = "${TTY}" ]; then
+            printf "${REPLAY_PREVIOUS_LINE}%b%s%b\n" \
+                "${ColorGreen}" \
+                "${_nte_msgs}" \
+                "${ColorReset}" \
+                >&2
         else
-            printf "%b%s%b\n" "${ColorGreen}" "${@}" "${ColorReset}" >&2
+            printf "%b%s%b\n" \
+                "${ColorGreen}" \
+                "${_nte_msgs}" \
+                "${ColorReset}" \
+                >&2
         fi
     else
         printf "\n" >&2
     fi
+    unset _nte_msgs
     return 0
 }
 
 
 permnote () {
-    if [ -n "${*}" ]; then
-        if [ "${TTY}" = "YES" ]; then
-            printf "${REPLAY_PREVIOUS_LINE}%b%s%b\n\n" "${ColorGreen}" "${@}" "${ColorReset}" >&2
+    _prm_note="${*}"
+    if [ -n "${_prm_note}" ]; then
+        if [ "YES" = "${TTY}" ]; then
+            printf "${REPLAY_PREVIOUS_LINE}%b%s%b\n\n" \
+                "${ColorGreen}" \
+                "${_prm_note}" \
+                "${ColorReset}" \
+                >&2
         else
-            printf "%b%s%b\n" "${ColorGreen}" "${@}" "${ColorReset}" >&2
+            printf "%b%s%b\n" \
+                "${ColorGreen}" \
+                "${_prm_note}" \
+                "${ColorReset}" \
+                >&2
         fi
     else
         printf "\n" >&2
     fi
+    unset _prm_note
     return 0
 }
 
