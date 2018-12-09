@@ -56,15 +56,15 @@ determine_term_capabilites () {
         unsetopt monitor 2>/dev/null
 
         CAP_TERM_ZSH=YES
-        unset CAP_TERM_BASH
+        unset CAP_TERM_BASH CAP_TERM_SH
 
     elif [ -n "${BASH_VERSION}" ]; then
         CAP_TERM_BASH=YES
-        unset CAP_TERM_ZSH
+        unset CAP_TERM_ZSH CAP_TERM_SH
 
     else # fallback to most limited "/bin/sh" legacy-shell:
-        unset CAP_TERM_ZSH
-        unset CAP_TERM_BASH
+        CAP_TERM_SH=YES
+        unset CAP_TERM_ZSH CAP_TERM_BASH
     fi
 
     echo "${LANG}" | ${GREP_BIN} -F ".UTF-8" >/dev/null 2>&1
