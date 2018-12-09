@@ -84,12 +84,11 @@ error () {
         if [ "error" = "${0}" ]; then
             printf "%b  %s Try: %b%b\n\n" "${ColorRed}" "${NOTE_CHAR2}" "$(diste "s log ${DEF_NAME}${DEF_SUFFIX}") to see the build log." "${ColorReset}" >&2
         fi
-        finalize_interrupt
-        exit "${ERRORCODE_TASK_FAILURE}"
     else
         printf "Unknown error without any content!\n" >&2
     fi
-    return 0
+    finalize_interrupt
+    exit "${ERRORCODE_TASK_FAILURE}"
 }
 
 
