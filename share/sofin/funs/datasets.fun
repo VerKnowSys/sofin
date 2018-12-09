@@ -1,3 +1,10 @@
+unshare_all_zfs_datasets () {
+    if [ "YES" = "${CAP_SYS_ZFS}" ]; then
+        try "${ZFS_BIN} unshare -a" \
+            && debug "Successfully unshared all NFS-shared datasets."
+    fi
+}
+
 
 push_to_all_mirrors () {
     _pbto_bundle_name="${1}"

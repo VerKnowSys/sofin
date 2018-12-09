@@ -149,6 +149,9 @@ build () {
     validate_kern_loaded_dtrace
     validate_sys_limits
 
+    # unshare any NFS shares before build:
+    unshare_all_zfs_datasets
+
     # store_security_state
     # disable_security_features
 
