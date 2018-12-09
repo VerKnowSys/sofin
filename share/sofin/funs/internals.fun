@@ -61,7 +61,7 @@ sofin_header () {
     printf '  %s\n' "system capabilities:"
     IFS=\n set 2>/dev/null | ${EGREP_BIN} -I 'CAP_SYS_' 2>/dev/null | while IFS= read -r _envv; do
         if [ -n "${_envv}" ]; then
-            printf '   %s %s\n' \
+            printf '         %s %s\n' \
                 "$(distn "${SUCCESS_CHAR}" "${ColorGreen}")" \
                 "$(distn "$(lowercase "${_envv%=YES}")")"
         fi
@@ -70,7 +70,7 @@ sofin_header () {
     printf '\r\n  %s\n' "terminal capabilities:"
     IFS=\n set 2>/dev/null | ${EGREP_BIN} -I 'CAP_TERM_' 2>/dev/null | while IFS= read -r _envv; do
         if [ -n "${_envv}" ]; then
-            printf '   %s %s\n' \
+            printf '         %s %s\n' \
                 "$(distn "${SUCCESS_CHAR}" "${ColorGreen}")" \
                 "$(distn "$(lowercase "${_envv%=YES}")")"
         fi
