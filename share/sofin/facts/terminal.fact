@@ -67,6 +67,15 @@ determine_term_capabilites () {
         unset CAP_TERM_BASH
     fi
 
+    locale 2>/dev/null | ${GREP_BIN} -F ".UTF-8" >/dev/null 2>&1
+    if [ "0" = "${?}" ]; then
+        CAP_TERM_UNICODE=YES
+        unset CAP_TERM_ASCII
+    else
+        CAP_TERM_ASCII=YES
+        unset CAP_TERM_UNICODE
+    fi
+
     ${TPUT_BIN} setaf 0 >/dev/null 2>/dev/null
     if [ "${?}" != "0" ]; then # broken with tput under FreeBSD, related bug: https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=210858
         unset CAP_TERM_TPUT
