@@ -145,6 +145,15 @@ determine_system_capabilites () {
         unset CAP_SYS_HARDENED
     fi
 
+    if [ -f "/usr/include/kvm.h" ] \
+    && [ -f "/usr/lib/libkvm.so" ] \
+    && [ -f "/usr/lib/libprocstat.so" ]; then
+        CAP_SYS_KERNEL_KVM=YES
+        CAP_SYS_KERNEL_PROCSTAT=YES
+    else
+        unset CAP_SYS_KERNEL_KVM CAP_SYS_KERNEL_PROCSTAT
+    fi
+
     ${SYSCTL_BIN} security.jail.jailed 2>/dev/null | ${GREP_BIN} 'security.jail.jailed: 1' 2>/dev/null
     if [ "${?}" = "0" ]; then
         # NOTE: For jails, use jail hostname as dataset prefixed user:
