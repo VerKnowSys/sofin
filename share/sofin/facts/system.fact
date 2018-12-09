@@ -126,7 +126,7 @@ fallback_nonzfs_setup () {
 
 determine_system_capabilites () {
     env_forgivable
-    try "${ZPOOL_BIN} list -H >/dev/null 2>&1"
+    ${ZPOOL_BIN} list -H >/dev/null 2>&1
     if [ "${?}" = "0" ]; then
         CAP_SYS_ZFS=YES
         if [ "${SYSTEM_NAME}" = "Darwin" ]; then
@@ -138,14 +138,14 @@ determine_system_capabilites () {
         fallback_nonzfs_setup
     fi
 
-    try "${SYSCTL_BIN} hardening.pax >/dev/null 2>&1"
+    ${SYSCTL_BIN} hardening.pax >/dev/null 2>&1
     if [ "${?}" = "0" ]; then
         CAP_SYS_HARDENED=YES
     else
         unset CAP_SYS_HARDENED
     fi
 
-    try "${SYSCTL_BIN} security.jail.jailed 2>/dev/null | ${GREP_BIN} 'security.jail.jailed: 1' 2>/dev/null"
+    ${SYSCTL_BIN} security.jail.jailed 2>/dev/null | ${GREP_BIN} 'security.jail.jailed: 1' 2>/dev/null
     if [ "${?}" = "0" ]; then
         # NOTE: For jails, use jail hostname as dataset prefixed user:
         SYSTEM_DATASET="${HOST:-$(hostname)}"
@@ -156,7 +156,7 @@ determine_system_capabilites () {
         unset CAP_SYS_JAILED
     fi
 
-    try "${SYSCTL_BIN} kern.dtrace >/dev/null 2>&1"
+    ${SYSCTL_BIN} kern.dtrace >/dev/null 2>&1
     if [ "${?}" = "0" ]; then
         CAP_SYS_DTRACE=YES
     else
@@ -167,7 +167,7 @@ determine_system_capabilites () {
         fi
     fi
 
-    try "${SYSCTL_BIN} kern.features.linux64 >/dev/null 2>&1"
+    ${SYSCTL_BIN} kern.features.linux64 >/dev/null 2>&1
     if [ "${?}" = "0" ]; then
         CAP_SYS_LINUX64_ABI=YES
         # try "${KLDLOAD_BIN} linux64 >/dev/null 2>&1"
