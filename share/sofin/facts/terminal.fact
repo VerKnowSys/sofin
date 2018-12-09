@@ -29,6 +29,12 @@ if [ -t 1 ]; then
     SEPARATOR_CHAR2="─"
 fi
 
+if [ "TTY" != "NO" ]; then
+    CAP_TERM_TTY=YES
+else
+    unset CAP_TERM_TTY
+fi
+
 # Line replay ANSI codes:
 REPLAY_CURRENT_LINE="\33[2K\r"
 REPLAY_PREVIOUS_LINE="\033[A\33[2K\r"
