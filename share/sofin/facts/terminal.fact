@@ -36,38 +36,29 @@ REPLAY_PREVIOUS_LINE="\033[A\33[2K\r"
 # determine TERM capabilities:
 determine_term_capabilites () {
     env_forgivable
-    # setopt >/dev/null 2>/dev/null # zsh only command
-    if [ "${SHELL}" = "${ZSH_BIN}" ]; then
-        # if Zsh is still running as sh, so we want to load Zsh fancy features:
+    if [ -n "${ZSH_VERSION}" ]; then
+        # if Zsh is still running as sh, so we want to load some Zsh fancy features:
         zmodload zsh/parameter 2>/dev/null
-
         setopt debugbeforecmd 2>/dev/null
         setopt appendhistory 2>/dev/null
         setopt extendedhistory 2>/dev/null
-
         # NOTE: don't send HUP on shell exit:
         unsetopt hup 2>/dev/null
-
         # NOTE: required for funcstack to work:
         setopt evallineno 2>/dev/null
-
         # NOTE: don't do notification on signal handling:
         unsetopt monitor 2>/dev/null
 
         CAP_TERM_ZSH=YES
         unset CAP_TERM_BASH
-    else
-        # Check bash specific command (but also available in zsh):
-        declare -f >/dev/null 2>/dev/null
-        if [ "${?}" = "0" ]; then
-            # let's assume that if shell has support for "declare -f"
-            # then it also supports bashismed "arrays[*]":
-            CAP_TERM_BASH=YES
-            unset CAP_TERM_ZSH
-        else # fallback to most limited shell:
-            unset CAP_TERM_ZSH
-            unset CAP_TERM_BASH
-        fi
+
+    elif [ -n "${BASH_VERSION}" ]; then
+        CAP_TERM_BASH=YES
+        unset CAP_TERM_ZSH
+
+    else # fallback to most limited "/bin/sh" legacy-shell:
+        unset CAP_TERM_ZSH
+        unset CAP_TERM_BASH
     fi
 
     ${TPUT_BIN} setaf 0 >/dev/null 2>/dev/null
