@@ -158,7 +158,7 @@ update_defs () {
                     warn "Can't checkout branch: $(distw "${_def_cur_branch}")"
 
             try "${GIT_BIN} pull ${DEFAULT_GIT_PULL_FETCH_OPTS} origin ${_def_cur_branch}" && \
-                note "Branch: $(distn "${_def_cur_branch}") is now at: $(distn "${_def_head}")" && \
+                note "Definitions branch: $(distn "${_def_cur_branch}") is now at: $(distn "${_def_head}")" && \
                 return
 
             printf "%b%s%b\n$(fill)\n" "${ColorRed}" "Error occured: Update from branch: $(diste "${BRANCH}") of repository: $(diste "${REPOSITORY}") wasn't possible. Log's below:" "${ColorReset}"
@@ -173,7 +173,7 @@ update_defs () {
                         warn "Can't checkout branch: $(distw "${BRANCH}")"
             fi
             try "${GIT_BIN} pull ${DEFAULT_GIT_PULL_FETCH_OPTS} origin ${BRANCH}" && \
-                note "Branch: $(distn "${BRANCH}") is at: $(distn "${_def_head}")" && \
+                note "Definitions branch: $(distn "${BRANCH}") is at: $(distn "${_def_head}")" && \
                     return
 
             printf "${ColorRed}%s${ColorReset}\n$(fill)\n" "Error occured: Update from branch: $(diste "${BRANCH}") of repository: $(diste "${REPOSITORY}") wasn't possible. Log's below:"
