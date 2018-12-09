@@ -67,7 +67,7 @@ determine_term_capabilites () {
         unset CAP_TERM_BASH
     fi
 
-    locale 2>/dev/null | ${GREP_BIN} -F ".UTF-8" >/dev/null 2>&1
+    echo "${LANG}" | ${GREP_BIN} -F ".UTF-8" >/dev/null 2>&1
     if [ "0" = "${?}" ]; then
         CAP_TERM_UNICODE=YES
         unset CAP_TERM_ASCII
