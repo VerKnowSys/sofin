@@ -96,7 +96,7 @@ dump_compiler_setup () {
         debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "retpoline" "${ColorGray}")"
     fi
 
-    if [ -z "${DEF_NO_LTO}" ]; then
+    if [ -n "${DEF_USE_LTO}" ]; then
         debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "link-time-optimization" "${ColorGreen}")"
     else
         debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "link-time-optimization" "${ColorGray}")"
@@ -398,7 +398,7 @@ compiler_setup () {
         LDFLAGS="${LDFLAGS} ${HARDEN_SAFE_STACK_FLAGS}"
     fi
 
-    if [ -z "${DEF_NO_LTO}" ]; then
+    if [ -n "${DEF_USE_LTO}" ]; then
         CFLAGS="${CFLAGS} ${LTO_CFLAGS}"
         CXXFLAGS="${CXXFLAGS} ${LTO_CFLAGS}"
         LDFLAGS="${LDFLAGS} ${LTO_CFLAGS}"
