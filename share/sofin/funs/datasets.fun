@@ -430,10 +430,10 @@ destroy_software_dir () {
         set_system_writable
         _dsbase="${DEFAULT_ZPOOL}${SOFTWARE_DIR}/${SYSTEM_DATASET}"
         _dsname="${_dsbase}/${_dset_destroy}"
-        try "${ZFS_BIN} set sharenfs=off '${_dsbase}'"
-        try "${ZFS_BIN} set sharenfs=off '${_dsname}'"
         try "${ZFS_BIN} set readonly=off '${_dsbase}'"
         try "${ZFS_BIN} set readonly=off '${_dsname}'"
+        try "${ZFS_BIN} set sharenfs=off '${_dsbase}'"
+        try "${ZFS_BIN} set sharenfs=off '${_dsname}'"
         try "${ZFS_BIN} umount -f '${_dsname}'"
         try "${ZFS_BIN} destroy -fr '${_dsname}'" && \
             debug "Destroyed software-dataset: $(distd "${_dsname}")"
