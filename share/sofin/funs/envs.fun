@@ -129,17 +129,17 @@ dump_compiler_setup () {
     fi
 
     # C++ standard used:
-    if [ -n "${CXX11_CXXFLAGS}" ]; then
+    if [ -n "${DEF_USE_CXX11}" ]; then
         debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "std-c++11" "${ColorGreen}")"
     else
         debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "std-c++11" "${ColorGray}")"
     fi
-    if [ -n "${CXX14_CXXFLAGS}" ]; then
+    if [ -n "${DEF_USE_CXX14}" ]; then
         debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "std-c++14" "${ColorGreen}")"
     else
         debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "std-c++14" "${ColorGray}")"
     fi
-    if [ -n "${CXX17_CXXFLAGS}" ]; then
+    if [ -n "${DEF_USE_CXX17}" ]; then
         debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "std-c++17" "${ColorGreen}")"
     else
         debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "std-c++17" "${ColorGray}")"
