@@ -727,48 +727,48 @@ set_software_dataset_writable () {
 
 
 after_unpack_snapshot () {
-    debug "after_unpack_snapshot(): Feature disabled for now because unused"
+    debug "after_unpack_snapshot(): Partial feature disabled: NIY"
     # do_prefix_snapshot "after_unpack"
 }
 
 
 after_patch_snapshot () {
-    debug "after_patch_snapshot(): Feature disabled for now because unused"
+    debug "after_patch_snapshot(): Partial feature disabled: NIY"
     # do_prefix_snapshot "after_patch"
 }
 
 
 after_configure_snapshot () {
-    debug "after_configure_snapshot(): Feature disabled for now because unused"
+    debug "after_configure_snapshot(): Partial feature disabled: NIY"
     # do_prefix_snapshot "after_configure"
 }
 
 
 after_make_snapshot () {
-    debug "after_make_snapshot(): Feature disabled for now because unused"
+    debug "after_make_snapshot(): Partial feature disabled: NIY"
     # do_prefix_snapshot "after_make"
 }
 
 
 after_test_snapshot () {
-    debug "after_test_snapshot(): Feature disabled for now because unused"
+    debug "after_test_snapshot(): Partial feature disabled: NIY"
     # do_prefix_snapshot "after_test"
 }
 
 
 after_install_snapshot () {
-    debug "after_install_snapshot(): Feature disabled for now because unused"
+    debug "after_install_snapshot(): Partial feature disabled: NIY"
     # do_prefix_snapshot "after_install"
 }
 
 
 after_export_snapshot () {
-    debug "after_export_snapshot(): Feature disabled for now because unused"
+    debug "after_export_snapshot(): Partial feature disabled: NIY"
     # do_prefix_snapshot "after_export"
 }
 
 
 create_origin_snaphots () {
-    debug "create_origin_snaphots(): Feature disabled for now because unused"
+    debug "create_origin_snaphots(): Partial feature disabled: NIY"
     # do_prefix_snapshot "origin"
 }
