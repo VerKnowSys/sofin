@@ -402,6 +402,12 @@ compiler_setup () {
     if [ -n "${DEF_USE_CXX17}" ]; then
         CXXFLAGS="${CXXFLAGS} ${CXX17_CXXFLAGS}"
     fi
+    if [ -z "${DEF_USE_CXX11}" ] \
+    && [ -z "${DEF_USE_CXX14}" ] \
+    && [ -z "${DEF_USE_CXX17}" ]; then
+        debug "Using $(distd "C++14") as C++ default standard."
+        CXXFLAGS="${CXXFLAGS} ${CXX14_CXXFLAGS}"
+    fi
 
     if [ -z "${DEF_NO_RETPOLINE}" ]; then
         CFLAGS="${CFLAGS} ${RETPOLINE_CFLAGS}"
