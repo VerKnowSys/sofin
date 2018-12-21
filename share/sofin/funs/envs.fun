@@ -423,6 +423,7 @@ compiler_setup () {
     && [ -z "${DEF_USE_CXX14}" ] \
     && [ -z "${DEF_USE_CXX17}" ]; then
         debug "Using $(distd "C++14") as C++ default standard."
+        DEF_USE_CXX14=YES
         CXXFLAGS="${CXXFLAGS} ${CXX14_CXXFLAGS}"
     fi
 
