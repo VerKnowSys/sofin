@@ -399,6 +399,9 @@ compiler_setup () {
     fi
 
     if [ -n "${DEF_USE_LTO}" ]; then
+        # NOTE: On 11-stable, this command has to be invoked on build-host for LTO to work:
+        #       `mv /usr/bin/ld /usr/bin/ld.original && ln -s /usr/bin/ld.lld /usr/bin/ld`
+        #
         CFLAGS="${CFLAGS} ${LTO_CFLAGS}"
         CXXFLAGS="${CXXFLAGS} ${LTO_CFLAGS}"
         LD="${CXX_NAME} ${CXXFLAGS} ${LTO_CFLAGS}"
