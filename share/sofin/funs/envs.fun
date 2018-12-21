@@ -399,12 +399,23 @@ compiler_setup () {
     fi
 
     if [ -n "${DEF_USE_LTO}" ]; then
-        # NOTE: On 11-stable, this command has to be invoked on build-host for LTO to work:
-        #       `mv /usr/bin/ld /usr/bin/ld.original && ln -s /usr/bin/ld.lld /usr/bin/ld`
-        #
         CFLAGS="${CFLAGS} ${LTO_CFLAGS}"
         CXXFLAGS="${CXXFLAGS} ${LTO_CFLAGS}"
-        LD="${CXX_NAME} ${CXXFLAGS} ${LTO_CFLAGS}"
+
+        if [ -n "${CAP_SYS_BUILDHOST}" ]; then
+            warn_about_non_llvm_ld_on_buildhosts () {
+                warn " + Definition: $(distw "${DEF_NAME}${DEF_SUFFIX}") requested build-feature: $(distw "DEF_USE_LTO=YES")."
+                warn " + System linker LD=$(distw "${LD_BIN}") is NOT a modern $(distw "LLVM Linker")."
+                warn " ! LLVM linker $(distw "v6+") is required for $(distw "link-time-optimization") build-feature!"
+                warn " = If your Build-Host is built on top of the $(distw "11-stable") base-system, try quick workaround shown below and retry failed build process."
+                warn ""
+                warn " \$ '$(distw "mv /usr/bin/ld /usr/bin/ld.original && ln -s /usr/bin/ld.lld /usr/bin/ld")'"
+                warn ""
+            }
+            # determine if LD is LLD. If not - throw a fat warning with workaround for 11-stable-based build-hosts
+            ${LD_BIN} --version 2>/dev/null | ${GREP_BIN} -E 'LLD \d*.\d*.\d*' 2>/dev/null \
+                || warn_about_non_llvm_ld_on_buildhosts
+        fi
     fi
 
     if [ -z "${DEF_NO_SSP_BUFFER_OVERRIDE}" ]; then
