@@ -408,6 +408,7 @@ create_software_dir () {
         try "${ZFS_BIN} list -H -t filesystem '${_dsname}'" \
             || receive_orig
 
+        try "${ZFS_BIN} set sharenfs=off '${_dsname}'"
         try "${ZFS_BIN} set mountpoint=${SOFTWARE_DIR}/${_dset_create} '${_dsname}'"
         try "${ZFS_BIN} mount '${_dsname}'" || :
         unset _dsname
