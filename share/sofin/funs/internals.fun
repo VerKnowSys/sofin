@@ -113,7 +113,7 @@ print_shell_vars () {
     _pkg_config_path="."
     _ldflags="${DEFAULT_LINKER_FLAGS}"
     _cflags="${DEFAULT_COMPILER_FLAGS}"
-    _cxxflags="${CXX11_CXXFLAGS} ${_cflags}"
+    _cxxflags="${CXX14_CXXFLAGS} ${_cflags}"
     _path="${DEFAULT_PATH}"
     _manpath="${DEFAULT_MANPATH}"
     for _exp in $(${FIND_BIN} "${SOFTWARE_DIR}" -mindepth 2 -maxdepth 3 -name 'man' -type d 2>/dev/null); do
