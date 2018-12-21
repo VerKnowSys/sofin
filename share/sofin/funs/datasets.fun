@@ -724,40 +724,48 @@ set_software_dataset_writable () {
 
 
 after_unpack_snapshot () {
-    do_prefix_snapshot "after_unpack"
+    debug "after_unpack_snapshot(): Feature disabled for now because unused"
+    # do_prefix_snapshot "after_unpack"
 }
 
 
 after_patch_snapshot () {
-    do_prefix_snapshot "after_patch"
+    debug "after_patch_snapshot(): Feature disabled for now because unused"
+    # do_prefix_snapshot "after_patch"
 }
 
 
 after_configure_snapshot () {
-    do_prefix_snapshot "after_configure"
+    debug "after_configure_snapshot(): Feature disabled for now because unused"
+    # do_prefix_snapshot "after_configure"
 }
 
 
 after_make_snapshot () {
-    do_prefix_snapshot "after_make"
+    debug "after_make_snapshot(): Feature disabled for now because unused"
+    # do_prefix_snapshot "after_make"
 }
 
 
 after_test_snapshot () {
-    do_prefix_snapshot "after_test"
+    debug "after_test_snapshot(): Feature disabled for now because unused"
+    # do_prefix_snapshot "after_test"
 }
 
 
 after_install_snapshot () {
-    do_prefix_snapshot "after_install"
+    debug "after_install_snapshot(): Feature disabled for now because unused"
+    # do_prefix_snapshot "after_install"
 }
 
 
 after_export_snapshot () {
-    do_prefix_snapshot "after_export"
+    debug "after_export_snapshot(): Feature disabled for now because unused"
+    # do_prefix_snapshot "after_export"
 }
 
 
 create_origin_snaphots () {
-    do_prefix_snapshot "origin"
+    debug "create_origin_snaphots(): Feature disabled for now because unused"
+    # do_prefix_snapshot "origin"
 }
