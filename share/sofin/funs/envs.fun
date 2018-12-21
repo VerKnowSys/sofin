@@ -401,7 +401,7 @@ compiler_setup () {
     if [ -n "${DEF_USE_LTO}" ]; then
         CFLAGS="${CFLAGS} ${LTO_CFLAGS}"
         CXXFLAGS="${CXXFLAGS} ${LTO_CFLAGS}"
-        LDFLAGS="${LDFLAGS} ${LTO_CFLAGS}"
+        LD="${CXX_NAME} ${CXXFLAGS} ${LTO_CFLAGS}"
     fi
 
     if [ -z "${DEF_NO_SSP_BUFFER_OVERRIDE}" ]; then
