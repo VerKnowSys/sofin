@@ -128,6 +128,23 @@ dump_compiler_setup () {
         debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "system-linker" "${ColorGreen}")"
     fi
 
+    # C++ standard used:
+    if [ -n "${CXX11_CXXFLAGS}" ]; then
+        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "std-c++11" "${ColorGreen}")"
+    else
+        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "std-c++11" "${ColorGray}")"
+    fi
+    if [ -n "${CXX14_CXXFLAGS}" ]; then
+        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "std-c++14" "${ColorGreen}")"
+    else
+        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "std-c++14" "${ColorGray}")"
+    fi
+    if [ -n "${CXX17_CXXFLAGS}" ]; then
+        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "std-c++17" "${ColorGreen}")"
+    else
+        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "std-c++17" "${ColorGray}")"
+    fi
+
     # -fPIC check:
     echo "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'f[Pp][Ii][Cc]' >/dev/null 2>/dev/null && ( \
         debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "position-independent-code" "${ColorGreen}")" || \
