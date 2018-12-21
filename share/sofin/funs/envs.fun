@@ -392,8 +392,15 @@ compiler_setup () {
         CXXFLAGS="${CXXFLAGS} ${SSP_BUFFER_OVERRIDE}"
     fi
 
-    if [ -z "${DEF_NO_CXX11}" ]; then
+    # C++ standard:
+    if [ -n "${DEF_USE_CXX11}" ]; then
         CXXFLAGS="${CXXFLAGS} ${CXX11_CXXFLAGS}"
+    fi
+    if [ -n "${DEF_USE_CXX14}" ]; then
+        CXXFLAGS="${CXXFLAGS} ${CXX14_CXXFLAGS}"
+    fi
+    if [ -n "${DEF_USE_CXX17}" ]; then
+        CXXFLAGS="${CXXFLAGS} ${CXX17_CXXFLAGS}"
     fi
 
     if [ -z "${DEF_NO_RETPOLINE}" ]; then
