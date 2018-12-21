@@ -24,7 +24,7 @@ DEFAULT_SECURITY_STATE_FILE="${SOFTWARE_DIR}/.sys-security-state.${TIMESTAMP}"
 # System specific configuration
 
 # Handle default value for USER:
-HOST="${HOST:-$(${HOSTNAME_BIN})}"
+HOST="${HOST:-$(${HOSTNAME_BIN} 2>/dev/null)}"
 USER="${USER:-$(${ID_BIN} ${DEFAULT_ID_USER_NAME_OPTS} 2>/dev/null)}"
 SYSTEM_NAME="${SYSTEM_NAME:-$(uname -s 2>/dev/null)}"
 SYSTEM_ARCH="${SYSTEM_ARCH:-$(uname -m 2>/dev/null)}"
