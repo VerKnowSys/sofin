@@ -28,6 +28,10 @@ validate_env
 # On supported systems make sure that ZFS /Software/root dataset is set writable
 set_software_dataset_writable
 
+# unshare any resource between: (ZFS)<-+->(NFS)
+unshare_all_zfs_datasets
+
+
 # Tracing of Sofin itself:
 if [ -n "${SOFIN_TRACE}" ]; then
     # NOTE: may be useful later:
