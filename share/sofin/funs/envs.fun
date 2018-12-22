@@ -527,28 +527,29 @@ acquire_lock_for () {
 }
 
 
-destroy_dead_locks () {
+destroy_dead_locks_of_bundle () {
     _pattern="${1}"
-    test -z "${_pattern}" && return 0
+    if [ -n "${_pattern}" ]; then
+        debug "destroy_dead_locks_of_bundle(): With pattern: '$(distd "${_pattern}")'"
+        _pid="${SOFIN_PID}"
+        for _dlf in $(${FIND_BIN} "${LOCKS_DIR%/}" -mindepth 1 -maxdepth 1 -name "*${_pattern}*${DEFAULT_LOCK_EXT}" -print 2>/dev/null); do
+            try "${EGREP_BIN} '^${_pid}$' ${_dlf} >/dev/null 2>&1" \
+                && try "${RM_BIN} -f '${_dlf}'" \
+                    && debug "Removed currently owned pid lock: $(distd "${_dlf}")"
 
-    _pid="${SOFIN_PID}"
-    for _dlf in $(${FIND_BIN} "${LOCKS_DIR%/}" -mindepth 1 -maxdepth 1 -name "*${_pattern}*${DEFAULT_LOCK_EXT}" -print 2>/dev/null); do
-        try "${EGREP_BIN} '^${_pid}$' ${_dlf}" \
-            && try "${RM_BIN} -f ${_dlf}" \
-                && debug "Removed currently owned pid lock: $(distd "${_dlf}")"
-
-        _possiblepid="$(${CAT_BIN} "${_dlf}" 2>/dev/null)"
-        if [ -n "${_possiblepid}" ]; then
-            if [ "${?}" != "0" ]; then
-                try "${RM_BIN} -f '${_dlf}'" \
-                    && debug "Pid: $(distd "${_pid}") appears to be already dead. Removed lock file: $(distd "${_dlf}")"
-            else
-                debug "Pid: $(distd "${_pid}") is alive. Leaving lock untouched."
+            _possiblepid="$(${CAT_BIN} "${_dlf}" 2>/dev/null)"
+            if [ -n "${_possiblepid}" ]; then
                 try "${KILL_BIN} -0 ${_possiblepid} >/dev/null 2>&1"
+                if [ "${?}" != "0" ]; then
+                    try "${RM_BIN} -f '${_dlf}'" \
+                        && debug "Pid: $(distd "${_pid}") appears to be already dead. Removed lock file: $(distd "${_dlf}")"
+                else
+                    debug "Pid: $(distd "${_pid}") is alive. Leaving lock untouched."
+                fi
             fi
-        fi
-    done \
-        && debug "Finished locks cleanup using pattern: $(distd "${_pattern:-''}") that belong to pid: $(distd "${_pid}")"
+        done \
+            && debug "Finished locks cleanup using pattern: $(distd "${_pattern:-''}") that belong to pid: $(distd "${_pid}")"
+    fi
     unset _dlf _pid _possiblepid _pattern
 }
 
@@ -593,34 +594,44 @@ update_system_shell_env_files () {
 }
 
 
-set_normal_security () {
-    debug "Setting security sysctls to normal. No background Sofin jobs found!"
-    try "${SYSCTL_BIN} -f /etc/sysctl.conf"
+load_sysctl_system_defaults () {
+    try "${SYSCTL_BIN} -f '${DEFAULT_SYSCTL_CONF}' >/dev/null 2>&1" \
+        && debug "Restored sysctl system-defaults from: $(distd "${DEFAULT_SYSCTL_CONF}")."
 }
 
 
-security_set_normal () {
+load_sysctl_system_production_hardening () {
     if [ -n "${CAP_SYS_HARDENED}" ]; then
         if [ -n "${CAP_SYS_PRODUCTION}" ]; then
-            debug "Leaving security setting intact on production host."
+            load_sysctl_system_defaults # Simply read sysctl configuration from: sysctl.conf
         else
-            _sp="$(processes_all_sofin)"
+            _sp="$(processes_all_sofin)" # Make sure there are no Sofin processes running in background
             if [ -z "${_sp}" ]; then
-                debug "No Sofin processes in background! Setting normal security"
-                set_normal_security
+                load_sysctl_system_defaults
             else
-                debug "Security sysctls untouched, Background Sofin jobs are still around!"
+                debug "System security sysctls left intact, since Sofin background tasks were found…"
             fi
         fi
     fi
 }
 
 
-security_set_build () {
+load_sysctl_buildhost_hardening () {
     if [ -n "${CAP_SYS_HARDENED}" ]; then
         if [ -z "${CAP_SYS_PRODUCTION}" ]; then
-            debug "Setting security sysctls to build (lowest)"
-            try "${SYSCTL_BIN} hardening.pax.segvguard.status=0 hardening.pax.mprotect.status=0 hardening.pax.pageexec.status=0 hardening.pax.disallow_map32bit.status=0 hardening.pax.aslr.status=0 >/dev/null"
+            try "${SYSCTL_BIN} \
+                hardening.pax.segvguard.status=1 \
+                hardening.pax.mprotect.status=1 \
+                hardening.pax.pageexec.status=1 \
+                hardening.pax.disallow_map32bit.status=1 \
+                hardening.pax.aslr.status=1 \
+                >/dev/null" \
+                    && debug "load_sysctl_buildhost_hardening(): System-hardening features are DISABLED now! (not enforced by kernel)!"
+        else
+            debug "load_sysctl_buildhost_hardening(): called on production-system! Build-feature is available only for Build-Hosts, not for productions!"
+            load_sysctl_system_defaults \
+                && debug "Loaded sysctl system defaults"
         fi
     fi
 }
+
