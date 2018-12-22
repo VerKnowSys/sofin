@@ -238,13 +238,13 @@ validate_sys_limits () {
         debug "Initialised limits for Darwin workstation"
     fi
 
-    try "ulimit -n ${_ulimit_nofile}" \
+    ulimit -n "${_ulimit_nofile}" >/dev/null 2>&1 \
         || warn "Sofin has failed to set reasonable environment limit of open files: $(distw "${_ulimit_nofile}"). Local limit is: "$(ulimit -n 2>/dev/null)". Troubles may follow!"
 
-    try "ulimit -s ${_ulimit_stackkb}" \
+    ulimit -s "${_ulimit_stackkb}" >/dev/null 2>&1 \
         || warn "Sofin has failed to set reasonable environment limit of stack (in kb) to value: $(distw "${_ulimit_stackkb}"). Local limit is: "$(ulimit -s 2>/dev/null)". Troubles may follow!"
 
-    try "ulimit -c ${_ulimit_core}" \
+    ulimit -c "${_ulimit_core}" >/dev/null 2>&1 \
         || warn "Sofin has failed to set core size limit to: $(distw "${_ulimit_core}"). Local limit is: "$(ulimit -c 2>/dev/null)".!"
 
     # try "ulimit -u ${_ulimit_up_max_ps}" \
