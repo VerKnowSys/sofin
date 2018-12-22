@@ -69,7 +69,7 @@ determine_term_capabilites () {
         unset CAP_TERM_ZSH CAP_TERM_BASH
     fi
 
-    echo "${LANG}" | ${GREP_BIN} -F ".UTF-8" >/dev/null 2>&1
+    printf "%b\n" "${LANG}" | ${GREP_BIN} -F ".UTF-8" >/dev/null 2>&1
     if [ "0" = "${?}" ]; then
         CAP_TERM_UNICODE=YES
         unset CAP_TERM_ASCII
@@ -78,7 +78,7 @@ determine_term_capabilites () {
         unset CAP_TERM_UNICODE
     fi
 
-    echo "${TERM}" | ${GREP_BIN} -F "256color" >/dev/null 2>&1
+    printf "%b\n" "${TERM}" | ${GREP_BIN} -F "256color" >/dev/null 2>&1
     if [ "0" = "${?}" ]; then
         CAP_TERM_ANSI_COLORS=YES
         unset CAP_TERM_NO_COLORS

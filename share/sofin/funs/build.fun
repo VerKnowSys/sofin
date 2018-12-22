@@ -348,8 +348,8 @@ build () {
 
                         # NOTE: Make sure readonly is put down to the .pax file!
                         {
-                            echo "${ZFS_BIN} set readonly=off '${_dataset_parent}'";
-                            echo "${ZFS_BIN} inherit readonly '${_dataset}'";
+                            printf "%b\n" "${ZFS_BIN} set readonly=off '${_dataset_parent}'";
+                            printf "%b\n" "${ZFS_BIN} inherit readonly '${_dataset}'";
                         } >> "${_paxfile}"
                     fi
 
@@ -372,7 +372,7 @@ build () {
                     done
 
                     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
-                        echo "${ZFS_BIN} set readonly=on '${_dataset_parent}'" >> "${_paxfile}"
+                        printf "%b\n" "${ZFS_BIN} set readonly=on '${_dataset_parent}'" >> "${_paxfile}"
                     fi
                 fi
             fi
@@ -670,7 +670,7 @@ process_flat () {
 
                         if [ "${SYSTEM_NAME}" = "Linux" ]; then
                             # NOTE: No /Services feature implemented for Linux.
-                            try "printf '%b\n' '${DEF_CONFIGURE_METHOD}' | ${GREP_BIN} -F 'configure' >/dev/null 2>&1"
+                            printf "%b\n" "${DEF_CONFIGURE_METHOD}" | ${GREP_BIN} -F 'configure' >/dev/null 2>&1
                             if [ "${?}" = "0" ]; then
                                 # NOTE: by defaultautoconf configure accepts influencing variables as configure script params
                                 try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} ${_pic_optional} ${_addon}" \
@@ -686,7 +686,7 @@ process_flat () {
                         else
                             # do a simple check for "configure" in DEF_CONFIGURE_METHOD definition
                             # this way we can tell if we want to put configure options as params
-                            try "printf '%b\n' '${DEF_CONFIGURE_METHOD}' | ${GREP_BIN} -F 'configure' >/dev/null 2>&1"
+                            printf "%b\n" "${DEF_CONFIGURE_METHOD}" | ${GREP_BIN} -F 'configure' >/dev/null 2>&1
                             if [ "${?}" = "0" ]; then
                                 # TODO: add --docdir=${_prefix}/docs
                                 # NOTE: By default try to configure software with these options:
@@ -800,7 +800,7 @@ process_flat () {
             try after_install_snapshot
 
             cd "${_pwd}"
-            run "printf '%b\n' '${DEF_VERSION}' > '${_prefix}/${_app_param}${DEFAULT_INST_MARK_EXT}'" \
+            printf "%b\n" "${DEF_VERSION}" > "${_prefix}/${_app_param}${DEFAULT_INST_MARK_EXT}" \
                 && debug "Stored version: $(distd "${DEF_VERSION}") of software bundle: $(distd "${DEF_NAME}${DEF_SUFFIX}"). Bundle installation prefix: $(distd "${_prefix}")"
 
             cd "${_cwd}" 2>/dev/null
@@ -813,7 +813,7 @@ process_flat () {
             create_software_dir "${_prefix##*/}"
         fi
         _dis_def="${_prefix}/${_req_defname}${DEFAULT_INST_MARK_EXT}"
-        run "printf '%b\n' '${DEFAULT_REQ_OS_PROVIDED}' > '${_dis_def}'"
+        printf "%b\n" "${DEFAULT_REQ_OS_PROVIDED}" > "${_dis_def}"
     fi
     unset _current_branch _dis_def _req_defname _app_param _prefix _bundlnm
 
@@ -852,8 +852,7 @@ test_and_rate_def () {
 
             local_test_env_dispatch () {
                 _start_time="$(${DATE_BIN} +%F-%H%M-%s 2>/dev/null)"
-                printf "%b\n" \
-                    "Test for ${_name} started at: ${_start_time}" >> "${PREFIX}/${_name}.test.log" 2>> "${PREFIX}/${_name}.test.log"
+                printf "%b\n" "Test for ${_name} started at: ${_start_time}" >> "${PREFIX}/${_name}.test.log" 2>> "${PREFIX}/${_name}.test.log"
 
                 eval "\
                     export TEST_JOBS=${CPUS} \
@@ -861,14 +860,13 @@ test_and_rate_def () {
                         && export PATH=${SERVICE_DIR}/bin:${SERVICE_DIR}/sbin:${PREFIX}/bin:${PREFIX}/sbin:${PREFIX}/libexec:${SOFIN_UTILS_PATH}:/bin:/usr/bin:/sbin:/usr/sbin && \
                         && export LD_LIBRARY_PATH=${PREFIX}/lib:${PREFIX}/libexec:${SERVICE_DIR}/lib \
                         && export DYLD_LIBRARY_PATH=${PREFIX}/lib:${PREFIX}/libexec:${SERVICE_DIR}/lib \
-                        && ${SHELL} -c ${_cmdline} >> '${PREFIX}/${_name}.test.log' 2>> '${PREFIX}/${_name}.test.log' \
+                        && ${SHELL} -c \"${_cmdline}\" >> '${PREFIX}/${_name}.test.log' 2>> '${PREFIX}/${_name}.test.log' \
                 "
-                _result=${?}
+                _result="${?}"
                 _end_time="$(${DATE_BIN} +%F-%H%M-%s 2>/dev/null)"
 
                 debug "Test result for: $(distd "${_name}") is: $(distd "${_result}")"
-                printf "%b\n" \
-                    "Test for ${_name} finished at: ${_end_time}" >> "${PREFIX}/${_name}.test.log" 2>> "${PREFIX}/${_name}.test.log"
+                printf "%b\n" "Test for ${_name} finished at: ${_end_time}" >> "${PREFIX}/${_name}.test.log" 2>> "${PREFIX}/${_name}.test.log"
 
                 unset _test_command _end_time _start_time
                 return ${_result}

@@ -16,10 +16,7 @@ if [ "${#}" -gt "0" ]; then
     _args="  args[$(distd "${#}")]: $(distd "${SOFIN_ARGS}"),"
 fi
 
-debug "Sofin (CMD='$(distd "${SOFIN_COMMAND}")',${_args}  SOFIN_PID=$(distd "${SOFIN_PID}"),  SOFIN_PPID=$(distd "${PPID}"),  SOFIN_ROOT='$(distd "${SOFIN_ROOT}")')"
-
-# NOTE: magic echo since we play with ANSI lines management bit too much ;)
-echo
+debug "Sofin (CMD=$(distd "${SOFIN_COMMAND}"),${_args}  SOFIN_PID=$(distd "${SOFIN_PID}"),  SOFIN_PPID=$(distd "${PPID}"),  SOFIN_ROOT=$(distd "${SOFIN_ROOT}"))"
 
 # Set explicit +e for Sofin shell:
 env_forgivable
@@ -197,11 +194,11 @@ if [ -n "${SOFIN_COMMAND}" ]; then
                                 _pkgp="${SOFTWARE_DIR}/${_abundle}/lib/pkgconfig:${_pkgp}"
                             fi
                         done
-                        _cfl="$(echo "${_cfl}" | ${SED_BIN} 's/ *$//g; s/  //g' 2>/dev/null)"
-                        _cxxfl="$(echo "${_cxxfl}" | ${SED_BIN} 's/ *$//g; s/  //g' 2>/dev/null)"
-                        _ldfl="$(echo "${_ldfl}" | ${SED_BIN} 's/ *$//g; s/  //g' 2>/dev/null)"
-                        _pkgp="$(echo "${_pkgp}" | ${SED_BIN} 's/ *$//g; s/  //g' 2>/dev/null)"
-                        printf "%b%b\n" "${REPLAY_PREVIOUS_LINE}" "export CFLAGS=\"${_cfl}\""
+                        _cfl="$(printf "%b\n" "${_cfl}" | ${SED_BIN} 's/ *$//g; s/  //g' 2>/dev/null)"
+                        _cxxfl="$(printf "%b\n" "${_cxxfl}" | ${SED_BIN} 's/ *$//g; s/  //g' 2>/dev/null)"
+                        _ldfl="$(printf "%b\n" "${_ldfl}" | ${SED_BIN} 's/ *$//g; s/  //g' 2>/dev/null)"
+                        _pkgp="$(printf "%b\n" "${_pkgp}" | ${SED_BIN} 's/ *$//g; s/  //g' 2>/dev/null)"
+                        printf "%b\n" "export CFLAGS=\"${_cfl}\""
                         printf "%b\n" "export CXXFLAGS=\"${_cxxfl}\""
                         printf "%b\n" "export LDFLAGS=\"${_ldfl}\""
                         printf "%b\n" "export PKG_CONFIG_PATH=\"${_pkgp}\""
@@ -258,7 +255,7 @@ if [ -n "${SOFIN_COMMAND}" ]; then
                 echo; ${CAT_BIN} /tmp/sofin.sync.log; \
                 return 1; \
                 ")" || error "Failed to sync archive: $(diste "${_archive_name}")"
-            _version="$(echo "${_archive_name}" | ${SED_BIN} -e 's#^.*-##; s#\.t[agx][rz]\..*$##;' 2>/dev/null)"
+            _version="$(printf "%b\n" "${_archive_name}" | ${SED_BIN} -e 's#^.*-##; s#\.t[agx][rz]\..*$##;' 2>/dev/null)"
 
             note "Url archive of: $(distn "${_definition}") version: $(distn "${_version}") synchronized: $(distn "${_url}") ($(distn "${_new_sha}"))"
 

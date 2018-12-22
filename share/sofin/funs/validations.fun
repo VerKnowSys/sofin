@@ -5,7 +5,7 @@ check_version () { # $1 => installed version, $2 => available version
                 if [ -z "${4}" ]; then
                     warn "Bundle: $(distw "$(capitalize "${3}")"), version: $(distw "${2}") is definied, but installed version is: $(distw "${1}")"
                 else
-                    echo "$(capitalize ${3})"
+                    printf "%b\n" "$(capitalize "${3}")"
                 fi
                 FOUND_OUTDATED=YES
             fi
@@ -100,8 +100,8 @@ validate_archive_sha1 () {
 
 
 validate_def_postfix () {
-    _arg1="$(printf '%s' "$(lowercase "${1}")" | eval "${CUTOFF_DEF_EXT_GUARD}")"
-    _arg2="$(printf '%s' "$(lowercase "${2}")" | eval "${CUTOFF_DEF_EXT_GUARD}")"
+    _arg1="$(printf "%b\n" "$(lowercase "${1}")" | eval "${CUTOFF_DEF_EXT_GUARD}")"
+    _arg2="$(printf "%b\n" "$(lowercase "${2}")" | eval "${CUTOFF_DEF_EXT_GUARD}")"
     _cigiven_name="${_arg1##*/}" # basename
     _cidefinition_name="${_arg2##*/}"
     # case when DEF_SUFFIX was ommited => use definition file name difference as POSTFIX:
@@ -186,12 +186,11 @@ validate_pie_on_exports () {
                 continue
             else
                 for _bin in $(${FIND_BIN} "${_a_dir}" -mindepth 1 -maxdepth 1 -type l 2>/dev/null | ${XARGS_BIN} "${READLINK_BIN}" -f 2>/dev/null); do
-                    try "${FILE_BIN} '${_bin}' 2>/dev/null | ${GREP_BIN} -F 'ELF' >/dev/null 2>&1"
+                    ${FILE_BIN} "${_bin}" 2>/dev/null | ${GREP_BIN} -F 'ELF' >/dev/null 2>&1
                     if [ "$?" = "0" ]; then # it's ELF binary/library:
                         big_fat_warn () {
                             warn "Security - Exported ELF binary: $(distw "${_bin}"), is not a $(distw "${PIE_TYPE_ENTRY}") (not-PIE)!"
-                            printf "SECURITY: ELF binary: '%s', is not a '%s' (not-PIE)!\n" "${_bin}" "${PIE_TYPE_ENTRY}" \
-                                >> "${_pie_indicator}.warn"
+                            printf "SECURITY: ELF binary: '%b', is not a '%b' (not-PIE)!\n" "${_bin}" "${PIE_TYPE_ENTRY}" >> "${_pie_indicator}.warn"
                         }
                         try "${FILE_BIN} '${_bin}' 2>/dev/null | ${GREP_BIN} -F 'ELF' 2>/dev/null | ${EGREP_BIN} -F '${PIE_TYPE_ENTRY}' 2>/dev/null" \
                             || big_fat_warn
@@ -199,7 +198,7 @@ validate_pie_on_exports () {
                         debug "Executable, but not an ELF: $(distd "${_bin}")"
                     fi
                 done
-                run "${TOUCH_BIN} ${_pie_indicator}" \
+                run "${TOUCH_BIN} '${_pie_indicator}'" \
                     && debug "PIE check done for bundle: $(distd "${_bun}")"
             fi
         done

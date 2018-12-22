@@ -56,12 +56,12 @@ check_definitions_availability () {
 file_size () {
     _file="${1}"
     if [ -z "${_file}" ]; then
-        printf '%d' "0" 2>/dev/null
+        printf "%d\n" "0" 2>/dev/null
         unset _file
         return 0
     fi
     if [ ! -f "${_file}" ]; then
-        printf '%d' "0" 2>/dev/null
+        printf "%d\n" "0" 2>/dev/null
         unset _file
         return 0
     fi
@@ -75,18 +75,18 @@ file_size () {
             ;;
     esac
 
-    printf '%d' "${_size}" 2>/dev/null
+    printf "%d\n" "${_size}" 2>/dev/null
     unset _file _size
 }
 
 
 capitalize () {
-    printf '%s' "${@}" 2>/dev/null | ${AWK_BIN} '{for(i=1;i<=NF;i++){ $i=toupper(substr($i,1,1)) substr($i,2) }}1' 2>/dev/null
+    printf "%b\n" "${@}" 2>/dev/null | ${AWK_BIN} '{for(i=1;i<=NF;i++){ $i=toupper(substr($i,1,1)) substr($i,2) }}1' 2>/dev/null
 }
 
 
 lowercase () {
-    printf '%s' "${@}" 2>/dev/null | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null
+    printf "%b\n" "${@}" 2>/dev/null | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null
 }
 
 
@@ -103,7 +103,7 @@ fill () {
     for i in $(${SEQ_BIN} 1 "${_times}" 2>/dev/null); do
         _buf="${_buf}${_char}"
     done
-    printf '%s' "${_buf}" 2>/dev/null
+    printf "%b\n" "${_buf}" 2>/dev/null
     unset _times _buf _char
 }
 
@@ -185,7 +185,7 @@ find_most_recent () {
 difftext () {
     _text_input="${1}"
     _text_match="${2}"
-    printf '%b' "$(printf '%b' "${_text_input}" | ${SED_BIN} -e "s#${_text_match}##" 2>/dev/null)"
+    printf "%b\n" "${_text_input}" | ${SED_BIN} -e "s#${_text_match}##" 2>/dev/null
 }
 
 
@@ -194,13 +194,13 @@ text_checksum () {
     if [ -z "${_fcsmname}" ]; then
         error "Empty content string given for function: $(diste "text_checksum()")"
     fi
-    case ${SYSTEM_NAME} in
+    case "${SYSTEM_NAME}" in
         Darwin|Linux)
-            printf '%b' "${_fcsmname}" | ${SHA_BIN} 2>/dev/null | ${CUT_BIN} -d' ' -f1 2>/dev/null
+            printf "%b\n" "${_fcsmname}" | ${SHA_BIN} 2>/dev/null | ${CUT_BIN} -d' ' -f1 2>/dev/null
             ;;
 
         FreeBSD|NetBSD|OpenBSD|Minix)
-            printf '%b' "${_fcsmname}" | ${SHA_BIN} 2>/dev/null
+            printf "%b\n" "${_fcsmname}" | ${SHA_BIN} 2>/dev/null
             ;;
     esac
     unset _fcsmname
@@ -211,7 +211,7 @@ text_checksum () {
 firstn () {
     _contents=${1:-""}
     _length=${2:-16}
-    printf \
+    printf "%b%b\n" \
         "%.${_length}s" \
         "${_contents}"
 }
@@ -222,18 +222,19 @@ file_checksum () {
     if [ -z "${_fcsmname}" ]; then
         error "Empty file name given for function: $(diste "file_checksum()")"
     fi
-    case ${SYSTEM_NAME} in
+    case "${SYSTEM_NAME}" in
         NetBSD|OpenBSD|Minix)
-            printf '%s' "$(${SHA_BIN} -n "${_fcsmname}" 2>/dev/null | ${CUT_BIN} -d' ' -f1 2>/dev/null)" 2>> "${LOG}"
+            ${SHA_BIN} -n "${_fcsmname}" 2>/dev/null | ${CUT_BIN} -d' ' -f1 2>/dev/null
             ;;
 
         Darwin|Linux)
-            printf '%s' "$(${SHA_BIN} "${_fcsmname}" 2>/dev/null | ${CUT_BIN} -d' ' -f1 2>/dev/null)" 2>> "${LOG}"
+            ${SHA_BIN} "${_fcsmname}" 2>/dev/null | ${CUT_BIN} -d' ' -f1 2>/dev/null
             ;;
 
         FreeBSD)
-            printf '%s' "$(${SHA_BIN} -q "${_fcsmname}" 2>/dev/null)" 2>> "${LOG}"
+            ${SHA_BIN} -q "${_fcsmname}" 2>/dev/null
             ;;
+
     esac
     unset _fcsmname
 }

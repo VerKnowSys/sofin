@@ -17,7 +17,7 @@ load_defs () {
                 . "${DEFINITIONS_DIR}/${_def}"
                 env_forgivable
 
-                _given_def="$(printf '%s' "${_def}" | eval "${CUTOFF_DEF_EXT_GUARD}")"
+                _given_def="$(printf "%b\n" "${_def}" | eval "${CUTOFF_DEF_EXT_GUARD}")"
             else
                 # validate available alternatives and quit no matter the result
                 show_alt_definitions_and_exit "${_given_def}"
@@ -96,8 +96,8 @@ load_defaults () {
     env_forgivable
     if [ -z "${COMPLIANCE_CHECK}" ]; then
         # check definition/defaults compliance version
-        printf "${SOFIN_VERSION}" | eval "${EGREP_BIN} '${DEF_COMPLIANCE}'" >/dev/null 2>&1
-        if [ "${?}" = "0" ]; then
+        printf "%b\n" "${SOFIN_VERSION}" | ${EGREP_BIN} "${DEF_COMPLIANCE}" >/dev/null 2>&1
+        if [ "0" = "${?}" ]; then
             COMPLIANCE_CHECK="passed"
         else
             error "Versions mismatch!. DEF_COMPILIANCE='$(diste "${DEF_COMPLIANCE}")' and SOFIN_VERSION='$(diste "${SOFIN_VERSION}")' should match.\n  Hint: Update your definitions repository to latest version!"
@@ -107,7 +107,7 @@ load_defaults () {
 
 
 inherit () {
-    _inhnm="$(printf '%b' "${1}" | eval "${CUTOFF_DEF_EXT_GUARD}")"
+    _inhnm="$(printf "%b\n" "${1}" | eval "${CUTOFF_DEF_EXT_GUARD}")"
     _def_inherit="${DEFINITIONS_DIR}/${_inhnm}${DEFAULT_DEF_EXT}"
 
     env_pedantic \
@@ -207,7 +207,7 @@ update_defs () {
 reset_defs () {
     _cwd="$(${PWD_BIN} 2>/dev/null)"
     cd "${DEFINITIONS_DIR}"
-    try "${GIT_BIN} reset --hard HEAD"
+    try "${GIT_BIN} reset --hard HEAD" >> "${LOG}"
     if [ -z "${BRANCH}" ]; then
         BRANCH="stable"
     fi
@@ -216,12 +216,12 @@ reset_defs () {
         _rdefs_branch="HEAD"
     fi
     note "Definitions repository reset to: $(distn "${_rdefs_branch}")"
-    for line in $(${GIT_BIN} status --short 2>/dev/null | ${CUT_BIN} -f2 -d' ' 2>/dev/null); do
+    for _def_line in $(${GIT_BIN} status --short 2>/dev/null | ${CUT_BIN} -f2 -d' ' 2>/dev/null); do
         unset _add_opt
-        try "printf '%b' '${line}' 2>/dev/null | ${EGREP_BIN} -F 'patches/'" \
+        printf "%b\n" "${_def_line}" | ${EGREP_BIN} -F 'patches/' >/dev/null 2>&1 \
             && _add_opt="r"
-        try "${RM_BIN} -f${_add_opt} '${line}'" \
-            && debug "Removed untracked file${_add_opt:-/dir} from definition repository: $(distd "${line}")"
+        try "${RM_BIN} -f${_add_opt} '${_def_line}'" \
+            && debug "Removed untracked file${_add_opt:-/dir} from definition repository: $(distd "${_def_line}")"
     done
     cd "${_cwd}"
     unset _rdefs_branch _cwd
@@ -273,7 +273,7 @@ remove_bundles () {
     fi
     # for _bundle_name in $(to_iter "${_bundles}"); do
         # replace + with *
-        # _bundle_nam="$(printf '%s' "${_bundle_name}" | ${SED_BIN} -e 's#+#*#' 2>/dev/null)"
+        # _bundle_nam="$(printf "%b\n" "${_bundle_name}" | ${SED_BIN} -e 's#+#*#' 2>/dev/null)"
         # # first look for a list with that name:
         # if [ -e "${DEFINITIONS_LISTS_DIR}${_bundle_nam}" ]; then
         #     _picked_bundles="$(${CAT_BIN} "${DEFINITIONS_LISTS_DIR}${_bundle_nam}" 2>/dev/null | eval "${NEWLINES_TO_SPACES_GUARD}")"
@@ -307,9 +307,9 @@ available_definitions () {
     fi
     if [ -d "${DEFINITIONS_LISTS_DIR}" ]; then
         cd "${DEFINITIONS_LISTS_DIR}"
-        permnote "Available lists: $(distn "$(${LS_BIN} -m 2>/dev/null | ${SED_BIN} "s/${DEFAULT_DEF_EXT}//g" 2>/dev/null)" "${ColorReset}")"
+        permnote "Available lists: $(distn "$(${LS_BIN} -m 2>/dev/null | ${SED_BIN} "s/${DEFAULT_DEF_EXT}//g" 2>/dev/null)")"
     fi
-    note "Definitions count: $(distn "$(printf '%s' "${_alldefs:-0}" | eval "${FILES_COUNT_GUARD}")")"
+    note "Definitions count: $(distn "$(printf "%b\n" "${_alldefs}" | eval "${FILES_COUNT_GUARD}")")"
 }
 
 
@@ -358,20 +358,20 @@ show_outdated () {
     _raw="${1}"
     load_defaults
     if [ -d "${SOFTWARE_DIR}" ]; then
-        for _prefix in $(${FIND_BIN} "${SOFTWARE_DIR%/}" -mindepth 1 -maxdepth 1 -type d -not -name ".*" 2>/dev/null); do
-            _bundle_cap="${_prefix##*/}"
+        for _old_prefix in $(${FIND_BIN} "${SOFTWARE_DIR%/}" -mindepth 1 -maxdepth 1 -type d -not -name ".*" 2>/dev/null); do
+            _bundle_cap="${_old_prefix##*/}"
             _bundle="$(lowercase "${_bundle_cap}")"
-            if [ ! -f "${_prefix}/${_bundle}${DEFAULT_INST_MARK_EXT}" ]; then
+            if [ ! -f "${_old_prefix}/${_bundle}${DEFAULT_INST_MARK_EXT}" ]; then
                 if [ -z "${_raw}" ]; then
                     warn "Bundle: $(distw "${_bundle_cap}") is not yet installed or damaged."
                 fi
                 continue
             fi
-            _bund_vers="$(${CAT_BIN} "${_prefix}/${_bundle}${DEFAULT_INST_MARK_EXT}" 2>/dev/null)"
+            _bund_vers="$(${CAT_BIN} "${_old_prefix}/${_bundle}${DEFAULT_INST_MARK_EXT}" 2>/dev/null)"
             if [ ! -f "${DEFINITIONS_DIR}/${_bundle}${DEFAULT_DEF_EXT}" ]; then
                 if [ "${_bundle}" != "${SOFIN_NAME}" ]; then
                     if [ -z "${_raw}" ]; then
-                        warn "No such bundle: '$(distw "${_bundle_cap}")' of prefix: '$(distw "${_prefix##*/}")' found!"
+                        warn "No such bundle: '$(distw "${_bundle_cap}")' of prefix: '$(distw "${_old_prefix##*/}")' found!"
                     fi
                 fi
                 continue
@@ -424,7 +424,7 @@ wipe_remote_archives () {
 # create_apple_bundle_if_necessary () { # XXXXXX
 #     if [ -n "${DEF_APPLE_BUNDLE}" ] && [ "Darwin" = "${SYSTEM_NAME}" ]; then
 #         _aname="$(lowercase "${DEF_NAME}${DEF_SUFFIX}")"
-#         DEF_NAME="$(printf '%s' "${DEF_NAME}" | ${CUT_BIN} -c1 2>/dev/null | ${TR_BIN} '[a-z]' '[A-Z]' 2>/dev/null)$(printf '%s' "${DEF_NAME}" | ${SED_BIN} 's/^[a-zA-Z]//' 2>/dev/null)"
+#         DEF_NAME="$(printf "%b\n" "${DEF_NAME}" | ${CUT_BIN} -c1 2>/dev/null | ${TR_BIN} '[a-z]' '[A-Z]' 2>/dev/null)$(printf "%b\n" "${DEF_NAME}" | ${SED_BIN} 's/^[a-zA-Z]//' 2>/dev/null)"
 #         DEF_BUNDLE_NAME="${PREFIX}.app"
 #         note "Creating Apple bundle: $(distn "${DEF_NAME}") in: $(distn "${DEF_BUNDLE_NAME}")"
 #         ${MKDIR_BIN} -p "${DEF_BUNDLE_NAME}/libs" "${DEF_BUNDLE_NAME}/Contents" "${DEF_BUNDLE_NAME}/Contents/Resources/${_aname}" "${DEF_BUNDLE_NAME}/exports" "${DEF_BUNDLE_NAME}/share"
