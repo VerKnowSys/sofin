@@ -66,9 +66,9 @@ load_defs () {
                             "OS_TRIPPLE" \
                             "SYS_SPECIFIC_BINARY_REMOTE";
                 do
-                    if [ "${_check}=" = "${_required_field}" ] || \
-                       [ "${_check}=." = "${_required_field}" ] || \
-                       [ "${_check}=${DEFAULT_DEF_EXT}" = "${_required_field}" ]; then
+                    if [ "${_check}=" = "${_required_field}" ] \
+                    || [ "${_check}=." = "${_required_field}" ] \
+                    || [ "${_check}=${DEFAULT_DEF_EXT}" = "${_required_field}" ]; then
                         error "Empty or wrong value for required field: $(diste "${_check}") from definition: $(diste "${_def}")."
                     else
                         # gather passed checks, but print it only once..
@@ -107,14 +107,14 @@ load_defaults () {
 
 
 inherit () {
-    _inhnm="$(printf '%s' "${1}" | eval "${CUTOFF_DEF_EXT_GUARD}")"
+    _inhnm="$(printf '%b' "${1}" | eval "${CUTOFF_DEF_EXT_GUARD}")"
     _def_inherit="${DEFINITIONS_DIR}/${_inhnm}${DEFAULT_DEF_EXT}"
 
-    env_pedantic && \
-        . "${_def_inherit}" && \
-        env_forgivable && \
-        debug "Loaded parent definition: $(distd "${_def_inherit}")" && \
-        return 0
+    env_pedantic \
+        && . "${_def_inherit}" \
+            && env_forgivable \
+                && debug "Loaded parent definition: $(distd "${_def_inherit}")" \
+                    && return 0
 
     debug "NOT loaded parent definition: $(distd "${_def_inherit}")"
     return 0 # don't throw anything using this function?
@@ -132,18 +132,17 @@ update_defs () {
     _cwd="$(${PWD_BIN} 2>/dev/null)"
     if [ ! -x "${GIT_BIN}" ]; then
         note "Installing initial definition list from tarball to cache dir: $(distn "${CACHE_DIR}")"
-        try "${RM_BIN} -rf ${CACHE_DIR}${DEFINITIONS_BASE}"
-        try "${MKDIR_BIN} -p ${LOGS_DIR} ${CACHE_DIR}${DEFINITIONS_BASE}"
+        try "${RM_BIN} -rf ${CACHE_DIR}${DEFINITIONS_BASE}; ${MKDIR_BIN} -p ${LOGS_DIR} ${CACHE_DIR}${DEFINITIONS_BASE}"
         _initial_defs="${MAIN_SOURCE_REPOSITORY}${DEFINITIONS_INITIAL_FILE_NAME}${DEFAULT_ARCHIVE_TARBALL_EXT}"
         debug "Fetching latest tarball with initial definitions from: $(distd "${_initial_defs}")"
         _out_file="${FILE_CACHE_DIR}${DEFINITIONS_INITIAL_FILE_NAME}${DEFAULT_ARCHIVE_TARBALL_EXT}"
-        retry "${FETCH_BIN} -o ${_out_file} ${FETCH_OPTS} '${_initial_defs}'" && \
-            try "${TAR_BIN} -xf ${_out_file} --directory ${CACHE_DIR}${DEFINITIONS_BASE}" && \
-                try "${RM_BIN} -vrf ${_initial_defs}" && \
-                    return
+        retry "${FETCH_BIN} -o ${_out_file} ${FETCH_OPTS} '${_initial_defs}'" \
+            && try "${TAR_BIN} -xf ${_out_file} --directory ${CACHE_DIR}${DEFINITIONS_BASE}" \
+                && try "${RM_BIN} -vrf ${_initial_defs}" \
+                    && return
     fi
-    if [ -d "${CACHE_DIR}${DEFINITIONS_BASE}/${DEFAULT_GIT_DIR_NAME}" ] && \
-       [ -f "${DEFINITIONS_DEFAULTS}" ]; then
+    if [ -d "${CACHE_DIR}${DEFINITIONS_BASE}/${DEFAULT_GIT_DIR_NAME}" ] \
+    && [ -f "${DEFINITIONS_DEFAULTS}" ]; then
         cd "${CACHE_DIR}${DEFINITIONS_BASE}"
         _def_cur_branch="$(${GIT_BIN} rev-parse --abbrev-ref HEAD 2>/dev/null)"
         _def_head="$(${CAT_BIN} "${CACHE_DIR}${DEFINITIONS_BASE}/${DEFAULT_GIT_DIR_NAME}/refs/heads/${_def_cur_branch}" 2>/dev/null)"
@@ -153,13 +152,13 @@ update_defs () {
         debug "State of definitions repository was re-set to: $(distd "${_def_head}")"
         if [ "${_def_cur_branch}" != "${BRANCH}" ]; then # use _def_cur_branch value if branch isn't matching default branch
             debug "Checking out branch: $(distd "${_def_cur_branch}")"
-            try "${GIT_BIN} checkout -b ${_def_cur_branch}" || \
-                try "${GIT_BIN} checkout ${_def_cur_branch}" || \
-                    warn "Can't checkout branch: $(distw "${_def_cur_branch}")"
+            try "${GIT_BIN} checkout -b ${_def_cur_branch}" \
+                || try "${GIT_BIN} checkout ${_def_cur_branch}" \
+                    || warn "Can't checkout branch: $(distw "${_def_cur_branch}")"
 
-            try "${GIT_BIN} pull ${DEFAULT_GIT_PULL_FETCH_OPTS} origin ${_def_cur_branch}" && \
-                note "Definitions branch: $(distn "${_def_cur_branch}") is now at: $(distn "${_def_head}")" && \
-                return
+            try "${GIT_BIN} pull ${DEFAULT_GIT_PULL_FETCH_OPTS} origin ${_def_cur_branch} >> ${LOG}" \
+                && note "Definitions branch: $(distn "${_def_cur_branch}") is now at: $(distn "${_def_head}")" \
+                    && return
 
             printf "%b%s%b\n$(fill)\n" "${ColorRed}" "Error occured: Update from branch: $(diste "${BRANCH}") of repository: $(diste "${REPOSITORY}") wasn't possible. Log's below:" "${ColorReset}"
             show_log_if_available
@@ -168,13 +167,13 @@ update_defs () {
         else # else use default branch
             debug "Using default branch: $(distd "${BRANCH}")"
             if [ "${_def_cur_branch}" != "${BRANCH}" ]; then
-                try "${GIT_BIN} checkout -b ${BRANCH}" || \
-                    try "${GIT_BIN} checkout ${BRANCH}" || \
-                        warn "Can't checkout branch: $(distw "${BRANCH}")"
+                try "${GIT_BIN} checkout -b ${BRANCH}" \
+                    || try "${GIT_BIN} checkout ${BRANCH}" \
+                        || warn "Can't checkout branch: $(distw "${BRANCH}")"
             fi
-            try "${GIT_BIN} pull ${DEFAULT_GIT_PULL_FETCH_OPTS} origin ${BRANCH}" && \
-                note "Definitions branch: $(distn "${BRANCH}") is at: $(distn "${_def_head}")" && \
-                    return
+            try "${GIT_BIN} pull ${DEFAULT_GIT_PULL_FETCH_OPTS} origin ${BRANCH} >> ${LOG}" \
+                && note "Definitions branch: $(distn "${BRANCH}") is at: $(distn "${_def_head}")" \
+                    && return
 
             printf "${ColorRed}%s${ColorReset}\n$(fill)\n" "Error occured: Update from branch: $(diste "${BRANCH}") of repository: $(diste "${REPOSITORY}") wasn't possible. Log's below:"
             show_log_if_available
@@ -184,19 +183,19 @@ update_defs () {
         # create cache; clone definitions repository:
         cd "${CACHE_DIR}"
         debug "Cloning repository: $(distd "${REPOSITORY}") from branch: $(distd "${BRANCH}"); LOGS_DIR: $(distd "${LOGS_DIR}"), CACHE_DIR: $(distd "${CACHE_DIR}")"
-        try "${RM_BIN} -vrf ${DEFINITIONS_BASE}"
-        try "${GIT_BIN} clone --depth 1 ${DEFAULT_GIT_CLONE_OPTS} ${REPOSITORY} ${DEFINITIONS_BASE}" || \
-            error "Error cloning branch: $(diste "${BRANCH}") of repository: $(diste "${REPOSITORY}"). Please make sure that given repository and branch are valid!"
+        try "${RM_BIN} -rf '${DEFINITIONS_BASE}' && ${GIT_BIN} clone --depth 1 ${DEFAULT_GIT_CLONE_OPTS} ${REPOSITORY} ${DEFINITIONS_BASE}" \
+            || error "Error cloning branch: $(diste "${BRANCH}") of repository: $(diste "${REPOSITORY}"). Please make sure that given repository and branch are valid!"
+
         cd "${CACHE_DIR}${DEFINITIONS_BASE}"
         _def_cur_branch="$(${GIT_BIN} rev-parse --abbrev-ref HEAD 2>/dev/null)"
         if [ "${BRANCH}" != "${_def_cur_branch}" ]; then
-            try "${GIT_BIN} checkout -b ${BRANCH}" || \
-                try "${GIT_BIN} checkout ${BRANCH}" || \
-                    warn "Can't checkout branch: $(distw "${BRANCH}")"
+            try "${GIT_BIN} checkout -b ${BRANCH}" \
+                || try "${GIT_BIN} checkout ${BRANCH}" \
+                    || warn "Can't checkout branch: $(distw "${BRANCH}")"
         fi
         _def_head="HEAD"
-        try "${GIT_BIN} pull --depth 1 --progress origin ${BRANCH}" && \
-            _def_head="$(${CAT_BIN} "${CACHE_DIR}${DEFINITIONS_BASE}/${DEFAULT_GIT_DIR_NAME}/refs/heads/${_def_cur_branch}" 2>/dev/null)"
+        try "${GIT_BIN} pull --depth 1 --progress origin ${BRANCH}" \
+            && _def_head="$(${CAT_BIN} "${CACHE_DIR}${DEFINITIONS_BASE}/${DEFAULT_GIT_DIR_NAME}/refs/heads/${_def_cur_branch}" 2>/dev/null)"
 
         note "Repository: $(distn "${REPOSITORY}"), on branch: $(distn "${BRANCH}"). Commit HEAD: $(distn "${_def_head}")."
     fi
@@ -219,10 +218,10 @@ reset_defs () {
     note "Definitions repository reset to: $(distn "${_rdefs_branch}")"
     for line in $(${GIT_BIN} status --short 2>/dev/null | ${CUT_BIN} -f2 -d' ' 2>/dev/null); do
         unset _add_opt
-        try "printf '%s' \"${line}\" 2>/dev/null | ${EGREP_BIN} \"patches/\"" && \
-            _add_opt="r"
-        try "${RM_BIN} -f${_add_opt} '${line}'" && \
-            debug "Removed untracked file${_add_opt:-/dir} from definition repository: $(distd "${line}")"
+        try "printf '%b' '${line}' 2>/dev/null | ${EGREP_BIN} -F 'patches/'" \
+            && _add_opt="r"
+        try "${RM_BIN} -f${_add_opt} '${line}'" \
+            && debug "Removed untracked file${_add_opt:-/dir} from definition repository: $(distd "${line}")"
     done
     cd "${_cwd}"
     unset _rdefs_branch _cwd
@@ -551,8 +550,8 @@ track_useful_and_useless_files () {
         # we shall clean the bundle, from useless files..
         if [ -d "${PREFIX}" ]; then
             # step 0: clean defaults side DEF_DEFAULT_USELESS entries only if DEF_USEFUL is empty
-            if [ -n "${DEF_DEFAULT_USELESS}" ] && \
-               [ -z "${DEF_USEFUL}" ]; then
+            if [ -n "${DEF_DEFAULT_USELESS}" ] \
+            && [ -z "${DEF_USEFUL}" ]; then
                 for _cu_pattern in $(to_iter "${DEF_DEFAULT_USELESS}"); do
                     if [ -e "${PREFIX}/${_cu_pattern}" ]; then
                         if [ -z "${_fordel}" ]; then
@@ -790,10 +789,10 @@ after_install_callback () {
 
 apply_patch () {
     # $1 => definition name, $2 => patch abs path
-    for _level in $(${SEQ_BIN} 0 5); do # From p0 to-p5
-        try "${PATCH_BIN} -p${_level} -N -f -i ${2} >> ${LOG}-${1} 2>> ${LOG}-${1}" && \
-            debug "Patch applied: $(distd "${2##*/}") (level: $(distd "${_level}"))" && \
-            return 0
+    for _level in $(${SEQ_BIN} 0 5 2>/dev/null); do # From p0 to-p5
+        try "${PATCH_BIN} -p${_level} -N -f -i ${2} >> ${LOG}-${1} 2>> ${LOG}-${1}" \
+            && debug "Patch applied: $(distd "${2##*/}") (level: $(distd "${_level}"))" \
+                && return 0
     done
     unset _level
     return 1
@@ -805,8 +804,8 @@ traverse_patchlevels () {
     shift
     _trav_patches="${*}"
     for _patch in $(to_iter "${_trav_patches}"); do
-        apply_patch "${_trav_name}" "${_patch}" || \
-            warn "   ${WARN_CHAR} Failed to apply patch: $(distw "${_patch}") for: $(distw "${_trav_name}")"
+        apply_patch "${_trav_name}" "${_patch}" \
+            || warn "   ${WARN_CHAR} Failed to apply patch: $(distw "${_patch}") for: $(distw "${_trav_name}")"
     done
     unset _trav_patches _patch _trav_name
 }
@@ -847,19 +846,19 @@ clone_or_fetch_git_bare_repo () {
     _git_cached="${GIT_CACHE_DIR}${_bare_name}${DEFAULT_GIT_DIR_NAME}"
     try "${MKDIR_BIN} -p ${GIT_CACHE_DIR}"
     note "   ${NOTE_CHAR} Fetching source repository: $(distn "${_source_path}")"
-    try "${GIT_BIN} clone --depth 1 --jobs=3 --recursive --mirror ${_source_path} ${_git_cached} 2> /dev/null" || \
-        try "${GIT_BIN} clone --depth 1 --jobs=3 --mirror ${_source_path} ${_git_cached} 2> /dev/null"
+    try "${GIT_BIN} clone --depth 1 --jobs=3 --recursive --mirror ${_source_path} ${_git_cached} 2> /dev/null" \
+        || try "${GIT_BIN} clone --depth 1 --jobs=3 --mirror ${_source_path} ${_git_cached} 2> /dev/null"
     if [ "${?}" = "0" ]; then
         debug "Cloned bare repository: $(distd "${_bare_name}")"
     elif [ -d "${_git_cached}" ]; then
         _cwddd="$(${PWD_BIN} 2>/dev/null)"
         debug "Trying to update existing bare repository cache in: $(distd "${_git_cached}")"
         cd "${_git_cached}"
-        try "${GIT_BIN} fetch ${DEFAULT_GIT_PULL_FETCH_OPTS} origin ${_chk_branch} > /dev/null" || \
-            warn "   ${WARN_CHAR} Failed to fetch an update from bare repository: $(distw "${_git_cached}") [branch: $(distw "${_chk_branch}")]"
+        try "${GIT_BIN} fetch ${DEFAULT_GIT_PULL_FETCH_OPTS} origin ${_chk_branch} >> ${LOG}" \
+            || warn "   ${WARN_CHAR} Failed to fetch an update from bare repository: $(distw "${_git_cached}") [branch: $(distw "${_chk_branch}")]"
         cd "${_cwddd}"
-    elif [ ! -d "${_git_cached}/branches" ] && \
-         [ ! -f "${_git_cached}/config" ]; then
+    elif [ ! -d "${_git_cached}/branches" ] \
+      && [ ! -f "${_git_cached}/config" ]; then
         error "Failed to fetch source repository: $(diste "${_source_path}") [branch: $(diste "${_chk_branch}")]"
     fi
 
@@ -867,7 +866,7 @@ clone_or_fetch_git_bare_repo () {
     _dest_repo="${_build_dir}/${_bare_name}-${_chk_branch}"
     try "${RM_BIN} -rf '${_dest_repo}'"
     debug "Attempting to clone from cached repository: $(distd "${_git_cached}").."
-    run "${GIT_BIN} clone --progress --recursive --jobs=3 -b ${_chk_branch} ${_git_cached} ${_dest_repo}" && \
-        debug "Cloned branch: $(distd "${_chk_branch}") from cached repository: $(distd "${_git_cached}")"
+    run "${GIT_BIN} clone --progress --recursive --jobs=3 -b ${_chk_branch} ${_git_cached} ${_dest_repo}" \
+        && debug "Cloned branch: $(distd "${_chk_branch}") from cached repository: $(distd "${_git_cached}")"
     unset _git_cached _bare_name _chk_branch _build_dir _dest_repo
 }
