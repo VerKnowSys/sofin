@@ -5,7 +5,7 @@ parse_version () {
     IFS=. read _major _minor _micro <<EOF
 ${_version##*-}
 EOF
-    printf "%s %s %s\n" \
+    printf "%b %b %b\n" \
         "${_major}" \
         "${_minor}" \
         "${_micro}" 2>/dev/null
@@ -137,7 +137,7 @@ find_all () {
                 -name "${_famatcher}" \
                 2>/dev/null)"
             if [ -n "${_fafind_results}" ]; then
-                printf "%s\n" "${_fafind_results}" 2>/dev/null
+                printf "%b\n" "${_fafind_results}" 2>/dev/null
             fi
         else
             error "Directory $(diste "${_fapath}") doesn't exist!"
@@ -176,10 +176,10 @@ find_most_recent () {
                 ${SORT_BIN} -nr 2>/dev/null | \
                 ${HEAD_BIN} -n "${MAX_OPEN_TAIL_LOGS}" 2>/dev/null | \
                 ${CUT_BIN} -d' ' -f2 2>/dev/null)"
-            # _frres_singleline="$(printf "%s\n" "${_frfind_results}" | eval "${NEWLINES_TO_SPACES_GUARD}")"
+            # _frres_singleline="$(printf "%b\n" "${_frfind_results}" | eval "${NEWLINES_TO_SPACES_GUARD}")"
             # debug "Find results: $(distd "${_frres_singleline}")"
             if [ -n "${_frfind_results}" ]; then
-                printf "%s\n" "${_frfind_results}" 2>/dev/null
+                printf "%b\n" "${_frfind_results}" 2>/dev/null
             fi
         else
             error "Directory $(diste "${_frpath}") doesn't exist!"
@@ -192,7 +192,7 @@ find_most_recent () {
 difftext () {
     _text_input="${1}"
     _text_match="${2}"
-    printf '%s' "$(printf '%s' "${_text_input}" | ${SED_BIN} -e "s#${_text_match}##" 2>/dev/null)"
+    printf '%b' "$(printf '%b' "${_text_input}" | ${SED_BIN} -e "s#${_text_match}##" 2>/dev/null)"
 }
 
 
@@ -203,11 +203,11 @@ text_checksum () {
     fi
     case ${SYSTEM_NAME} in
         Darwin|Linux)
-            printf '%s' "${_fcsmname}" | ${SHA_BIN} 2>/dev/null | ${CUT_BIN} -d' ' -f1 2>/dev/null
+            printf '%b' "${_fcsmname}" | ${SHA_BIN} 2>/dev/null | ${CUT_BIN} -d' ' -f1 2>/dev/null
             ;;
 
         FreeBSD|NetBSD|OpenBSD|Minix)
-            printf '%s' "${_fcsmname}" | ${SHA_BIN} 2>/dev/null
+            printf '%b' "${_fcsmname}" | ${SHA_BIN} 2>/dev/null
             ;;
     esac
     unset _fcsmname
@@ -248,7 +248,7 @@ file_checksum () {
 
 # give any input to pass it through bc:
 calculate_bc () {
-    printf "%s\n" "${@}" 2>/dev/null | ${BC_BIN} 2>/dev/null
+    printf "%b\n" "${@}" 2>/dev/null | ${BC_BIN} 2>/dev/null
 }
 
 

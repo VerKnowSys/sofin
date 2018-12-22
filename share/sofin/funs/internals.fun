@@ -191,41 +191,41 @@ print_shell_vars () {
 
     # Store values to environment file:
     printf "# ${ColorParams}%s${ColorReset}:\n" "MANPATH"
-    printf "%s\n" "export MANPATH=\"${_manpath}\""
+    printf "%b\n" "export MANPATH=\"${_manpath}\""
 
     if [ -f "${SOFIN_ENV_ENABLED_INDICATOR_FILE}" ]; then # sofin disabled. Default system environment
-        _cflags="$(echo "${_cflags}" | ${SED_BIN} 's/ *$//g; s/  //g' 2>/dev/null)"
-        _cxxflags="$(echo "${_cxxflags}" | ${SED_BIN} 's/ *$//g; s/  //g' 2>/dev/null)"
-        _ldflags="$(echo "${_ldflags}" | ${SED_BIN} 's/ *$//g; s/  //g' 2>/dev/null)"
-        _pkg_config_path="$(echo "${_pkg_config_path}" | ${SED_BIN} 's/ *$//g; s/  //g' 2>/dev/null)"
+        _cflags="$(printf "%b\n" "${_cflags}" | ${SED_BIN} 's/ *$//g; s/  //g' 2>/dev/null)"
+        _cxxflags="$(printf "%b\n" "${_cxxflags}" | ${SED_BIN} 's/ *$//g; s/  //g' 2>/dev/null)"
+        _ldflags="$(printf "%b\n" "${_ldflags}" | ${SED_BIN} 's/ *$//g; s/  //g' 2>/dev/null)"
+        _pkg_config_path="$(printf "%b\n" "${_pkg_config_path}" | ${SED_BIN} 's/ *$//g; s/  //g' 2>/dev/null)"
         printf "# ${ColorParams}%s${ColorReset}:\n" "CFLAGS"
-        printf "%s\n" "export CFLAGS=\"${_cflags}\""
+        printf "%b\n" "export CFLAGS=\"${_cflags}\""
         printf "# ${ColorParams}%s${ColorReset}:\n" "CXXFLAGS"
-        printf "%s\n" "export CXXFLAGS=\"${_cxxflags}\""
+        printf "%b\n" "export CXXFLAGS=\"${_cxxflags}\""
         printf "# ${ColorParams}%s${ColorReset}:\n" "LDFLAGS"
-        printf "%s\n" "export LDFLAGS=\"${_ldflags}\""
+        printf "%b\n" "export LDFLAGS=\"${_ldflags}\""
         printf "# ${ColorParams}%s${ColorReset}:\n" "PKG_CONFIG_PATH"
-        printf "%s\n" "export PKG_CONFIG_PATH=\"${_pkg_config_path}\""
+        printf "%b\n" "export PKG_CONFIG_PATH=\"${_pkg_config_path}\""
     else # sofin environment override enabled, Default behavior:
         printf "# ${ColorParams}%s${ColorReset}:\n" "CFLAGS"
-        printf "%s\n" "export CFLAGS=\"\""
+        printf "%b\n" "export CFLAGS=\"\""
         printf "# ${ColorParams}%s${ColorReset}:\n" "CXXFLAGS"
-        printf "%s\n" "export CXXFLAGS=\"\""
+        printf "%b\n" "export CXXFLAGS=\"\""
         printf "# ${ColorParams}%s${ColorReset}:\n" "LDFLAGS"
-        printf "%s\n" "export LDFLAGS=\"\""
+        printf "%b\n" "export LDFLAGS=\"\""
         printf "# ${ColorParams}%s${ColorReset}:\n" "PKG_CONFIG_PATH"
-        printf "%s\n" "export PKG_CONFIG_PATH=\"\""
+        printf "%b\n" "export PKG_CONFIG_PATH=\"\""
     fi
 
     # common
     printf "# ${ColorParams}%s${ColorReset}:\n" "PATH"
-    printf "%s\n" "export PATH=\"${_path}\""
+    printf "%b\n" "export PATH=\"${_path}\""
     printf "# ${ColorParams}%s${ColorReset}:\n" "CC"
-    printf "%s\n" "export CC=\"${CC_NAME}\""
+    printf "%b\n" "export CC=\"${CC_NAME}\""
     printf "# ${ColorParams}%s${ColorReset}:\n" "CXX"
-    printf "%s\n" "export CXX=\"${CXX_NAME}\""
+    printf "%b\n" "export CXX=\"${CXX_NAME}\""
     printf "# ${ColorParams}%s${ColorReset}:\n" "CPP"
-    printf "%s\n" "export CPP=\"${CPP}\""
+    printf "%b\n" "export CPP=\"${CPP}\""
 
     unset _cflags _cxxflags _ldflags _pkg_config_path _manpath _app _exp
 }
@@ -282,7 +282,7 @@ show_diff () {
 develop () {
     _defname_input="${*}"
     create_dirs
-    _defname_no_ext="$(printf "%s\n" "${_defname_input}" | ${SED_BIN} -e "s#\.${DEFAULT_DEF_EXT}##" 2>/dev/null)"
+    _defname_no_ext="$(printf "%b\n" "${_defname_input}" | ${SED_BIN} -e "s#\.${DEFAULT_DEF_EXT}##" 2>/dev/null)"
     _devname="$(lowercase "${_defname_no_ext##*/}")"
     if [ -z "${_defname_input}" ]; then
         error "No definition file name specified as first param!"
@@ -357,7 +357,7 @@ show_alt_definitions_and_exit () {
     if [ ! -f "${DEFINITIONS_DIR}/${_an_app}${DEFAULT_DEF_EXT}" ]; then
         unset _contents
         for _maybe in $(${FIND_BIN} "${DEFINITIONS_DIR}" -maxdepth 1 -name "${_an_app}*${DEFAULT_DEF_EXT}" 2>/dev/null); do
-            _contents="${_contents}$(printf "%s\n" "$(capitalize "${_maybe##*/}")" | ${SED_BIN} 's/\..*//' 2>/dev/null) "
+            _contents="${_contents}$(printf "%b\n" "$(capitalize "${_maybe##*/}")" | ${SED_BIN} 's/\..*//' 2>/dev/null) "
         done
         if [ -z "${_contents}" ]; then
             warn "No such definition found: $(distw "${_an_app}"). No alternatives found."

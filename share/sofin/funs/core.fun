@@ -126,7 +126,7 @@ error () {
                 "${ColorReset}" >&2
         fi
     else
-        printf "%s: %s\n\n" \
+        printf "%b: %b\n\n" \
             "General Error" \
             "*" \
             >&2
@@ -259,7 +259,7 @@ retry () {
         else
             error "Given an empty command to evaluate with retry()!"
         fi
-        _ammo="$(printf "%s\n" "${_ammo}" | ${SED_BIN} 's/O//' 2>/dev/null)"
+        _ammo="$(printf "%b\n" "${_ammo}" | ${SED_BIN} 's/O//' 2>/dev/null)"
         debug "Remaining attempts: $(distd "${_ammo}")"
     done
     debug "All available ammo exhausted to invoke a command: $(distd "${_targets}")"
@@ -421,7 +421,7 @@ store_security_state () {
             for _key in ${DEFAULT_HARDEN_KEYS}; do
                 _sss_value="$(${SYSCTL_BIN} -n "${_key}" 2>/dev/null)"
                 _sss_cntnt="${SYSCTL_BIN} ${_key}=${_sss_value}"
-                printf "%s\n" "${_sss_cntnt}" >> "${DEFAULT_SECURITY_STATE_FILE}" 2>/dev/null
+                printf "%b\n" "${_sss_cntnt}" >> "${DEFAULT_SECURITY_STATE_FILE}" 2>/dev/null
             done
             unset _key _sss_cntnt _sss_value
         else
@@ -477,7 +477,7 @@ initialize () {
 
 # Converts space-separated argument list to newline separated "Shell POSIX-Array"
 to_iter () {
-    printf "%s\n" "${@}" | eval "${SPACES_TO_NEWLINES_GUARD}"
+    printf "%b\n" "${@}" | eval "${SPACES_TO_NEWLINES_GUARD}"
 }
 
 

@@ -42,7 +42,7 @@ if [ -n "${SOFIN_TRACE}" ]; then
         set -o xtrace
     fi
     set -x
-    printf "%s\n" "Enabled trace mode"
+    printf "%b\n" "Enabled trace mode"
 fi
 
 if [ -n "${SOFIN_VERBOSE}" ]; then
@@ -52,7 +52,7 @@ if [ -n "${SOFIN_VERBOSE}" ]; then
     else
         set -v
     fi
-    printf "%s\n" "Enabled verbose mode"
+    printf "%b\n" "Enabled verbose mode"
 fi
 
 # this is internal version check for defaults.def
@@ -204,10 +204,10 @@ if [ -n "${SOFIN_COMMAND}" ]; then
                         _cxxfl="$(echo "${_cxxfl}" | ${SED_BIN} 's/ *$//g; s/  //g' 2>/dev/null)"
                         _ldfl="$(echo "${_ldfl}" | ${SED_BIN} 's/ *$//g; s/  //g' 2>/dev/null)"
                         _pkgp="$(echo "${_pkgp}" | ${SED_BIN} 's/ *$//g; s/  //g' 2>/dev/null)"
-                        printf "${REPLAY_PREVIOUS_LINE}%s\n" "export CFLAGS=\"${_cfl}\""
-                        printf "%s\n" "export CXXFLAGS=\"${_cxxfl}\""
-                        printf "%s\n" "export LDFLAGS=\"${_ldfl}\""
-                        printf "%s\n" "export PKG_CONFIG_PATH=\"${_pkgp}\""
+                        printf "${REPLAY_PREVIOUS_LINE}%b\n" "export CFLAGS=\"${_cfl}\""
+                        printf "%b\n" "export CXXFLAGS=\"${_cxxfl}\""
+                        printf "%b\n" "export LDFLAGS=\"${_ldfl}\""
+                        printf "%b\n" "export PKG_CONFIG_PATH=\"${_pkgp}\""
                         unset _pth _cfl _cxxfl _ldfl _pkgp _abundle
 
                         print_local_env_vars
@@ -358,7 +358,7 @@ if [ -n "${SOFIN_COMMAND}" ]; then
                 error "Dependencies file not found! Expected file: $(diste "${DEFAULT_PROJECT_DEPS_LIST_FILE}") in current directory!"
             fi
             _pickd_bundls="$(${CAT_BIN} "${DEFAULT_PROJECT_DEPS_LIST_FILE}" 2>/dev/null | eval "${NEWLINES_TO_SPACES_GUARD}")"
-            _bundls_amount="$(printf "%s\n" "${_pickd_bundls}" | eval "${WORDS_COUNT_GUARD}")"
+            _bundls_amount="$(printf "%b\n" "${_pickd_bundls}" | eval "${WORDS_COUNT_GUARD}")"
             note "Dependencies list file found with $(distn "${_bundls_amount}") elements in order: $(distn "${_pickd_bundls}")"
             for _b in $(to_iter "${_pickd_bundls}"); do
                 debug "Buiding software: $(distd "${_b}") for: $(distd "${OS_TRIPPLE}")"

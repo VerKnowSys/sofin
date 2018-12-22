@@ -35,7 +35,7 @@ enable_sofin_env () {
     debug "Enabling Sofin env for: $(distd "${_envs}")"
     for _env in $(to_iter "${_envs}"); do
         ${GREP_BIN} -F "${_env}" "${SOFIN_ENV_ENABLED_INDICATOR_FILE}" >/dev/null 2>&1 \
-            || printf "%s\n" "${_env}" >> "${SOFIN_ENV_ENABLED_INDICATOR_FILE}"
+            || printf "%b\n" "${_env}" >> "${SOFIN_ENV_ENABLED_INDICATOR_FILE}"
     done
     note "Enabled Sofin environment for bundles: $(distn "${_envs}")"
 }
@@ -60,9 +60,9 @@ disable_sofin_env () {
 
 set_c_and_cxx_flags () {
     _flagz="${*}"
-    CFLAGS="$(printf "%s\n" "${_flagz} ${DEFAULT_COMPILER_FLAGS} -I${PREFIX}/include ${DEF_COMPILER_FLAGS}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
-    CXXFLAGS="$(printf "%s\n" "${_flagz} ${DEFAULT_COMPILER_FLAGS} -I${PREFIX}/include ${DEF_COMPILER_FLAGS}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
-    LDFLAGS="$(printf "%s\n" "${DEFAULT_LINKER_FLAGS} -L${PREFIX}/lib ${DEF_LINKER_FLAGS}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
+    CFLAGS="$(printf "%b\n" "${_flagz} ${DEFAULT_COMPILER_FLAGS} -I${PREFIX}/include ${DEF_COMPILER_FLAGS}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
+    CXXFLAGS="$(printf "%b\n" "${_flagz} ${DEFAULT_COMPILER_FLAGS} -I${PREFIX}/include ${DEF_COMPILER_FLAGS}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
+    LDFLAGS="$(printf "%b\n" "${DEFAULT_LINKER_FLAGS} -L${PREFIX}/lib ${DEF_LINKER_FLAGS}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
     unset _flagz
     export CFLAGS CXXFLAGS LDFLAGS
 }
@@ -487,7 +487,7 @@ create_lock () {
     debug "Pid of current Sofin session: $(distd "${SOFIN_PID}")"
     _bundle="$(capitalize "${_bundle_name}")"
     try "${MKDIR_BIN} -p ${LOCKS_DIR} 2>/dev/null"
-    printf "%s\n" "${SOFIN_PID}" > "${LOCKS_DIR}${_bundle}${DEFAULT_LOCK_EXT}"
+    printf "%b\n" "${SOFIN_PID}" > "${LOCKS_DIR}${_bundle}${DEFAULT_LOCK_EXT}"
     unset _bundle _bundle_name
 }
 

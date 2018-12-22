@@ -245,7 +245,7 @@ build () {
                     else
                         permnote "Installing: $(distn "${DEF_FULL_NAME:-${DEF_NAME}${DEF_SUFFIX}}"), version: $(distn "${DEF_VERSION}"), with requirements: $(distn "${DEF_REQUIREMENTS}")"
                     fi
-                    _req_amount="$(printf "%s\n" "${DEF_REQUIREMENTS}" | ${WC_BIN} -w 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)"
+                    _req_amount="$(printf "%b\n" "${DEF_REQUIREMENTS}" | ${WC_BIN} -w 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)"
                     _req_amount="$(calculate_bc "${_req_amount} + 1")"
                     _req_all="${_req_amount}"
                     for _req in $(to_iter "${DEF_REQUIREMENTS}"); do
@@ -341,7 +341,7 @@ build () {
                 if [ -n "${_disable}" ]; then
                     # Write .pax file:
                     _paxfile="${PREFIX}/.pax"
-                    printf "%s\n\n" '#!/bin/sh' > "${_paxfile}"
+                    printf "%b\n\n" '#!/bin/sh' > "${_paxfile}"
                     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
                         _dataset_parent="${DEFAULT_ZPOOL}/Software/${SYSTEM_DATASET}"
                         _dataset="${_dataset_parent}/${_anm}"
@@ -364,7 +364,7 @@ build () {
                                         # Lower security on requested binary:
                                         try "${HBSDCONTROL_BIN} pax disable ${_feature} '${_file}'"
                                         # + Store copy of a command to "${PREFIX}/.pax" file - will be invoked on each boot:
-                                        printf "%s\n" "${HBSDCONTROL_BIN} pax disable ${_feature} '${_file}'" >> "${_paxfile}"
+                                        printf "%b\n" "${HBSDCONTROL_BIN} pax disable ${_feature} '${_file}'" >> "${_paxfile}"
                                     fi
                                 fi
                             done
@@ -454,7 +454,7 @@ process_flat () {
     if [ ! -e "${_req_definition}" ]; then
         error "Cannot read definition file: $(diste "${_req_definition}")!"
     fi
-    _req_defname="$(printf "%s\n" "${_req_definition##*/}" | ${SED_BIN} -e 's/\..*$//g' 2>/dev/null)"
+    _req_defname="$(printf "%b\n" "${_req_definition##*/}" | ${SED_BIN} -e 's/\..*$//g' 2>/dev/null)"
     debug "Bundle: $(distd "${_bundlnm}"), requirement: $(distd "${_app_param}"), PREFIX: $(distd "${_prefix}") file: $(distd "${_req_definition}"), req-name: $(distd "${_req_defname}")"
 
     # XXX: FIXME: OPTIMIZE: Each definition read twice... log bloat & shit
@@ -538,8 +538,8 @@ process_flat () {
                 fi
 
                 unset _fd
-                _prm_nolib="$(printf "%s\n" "${_app_param}" | ${SED_BIN} 's/lib//' 2>/dev/null)"
-                _prm_no_undrlne_and_minus="$(printf "%s\n" "${_app_param}" | ${SED_BIN} 's/[-_].*$//' 2>/dev/null)"
+                _prm_nolib="$(printf "%b\n" "${_app_param}" | ${SED_BIN} 's/lib//' 2>/dev/null)"
+                _prm_no_undrlne_and_minus="$(printf "%b\n" "${_app_param}" | ${SED_BIN} 's/[-_].*$//' 2>/dev/null)"
                 # debug "Requirement: ${_app_param} short: ${_prm_nolib}, nafter-: ${_prm_no_undrlne_and_minus}, DEF_NAME: ${DEF_NAME}, BUILD_DIR: ${BUILD_DIR}"
                 # NOTE: patterns sorted by safety
                 for _pati in    "*${_app_param}*${DEF_VERSION}" \
@@ -751,7 +751,7 @@ process_flat () {
             unset _this_test_skipped
             if [ -n "${DEF_SKIPPED_DEFINITION_TEST}" ]; then
                 debug "Defined DEF_SKIPPED_DEFINITION_TEST: $(distd "${DEF_SKIPPED_DEFINITION_TEST}")"
-                printf "%s\n" " ${DEF_SKIPPED_DEFINITION_TEST} " | ${EGREP_BIN} -F " ${_app_param} " >/dev/null 2>&1 \
+                printf "%b\n" " ${DEF_SKIPPED_DEFINITION_TEST} " | ${EGREP_BIN} -F " ${_app_param} " >/dev/null 2>&1 \
                     && note "   ${NOTE_CHAR} Skipped tests for definition of: $(distn "${_app_param}")" \
                         && _this_test_skipped=1
             fi
@@ -788,8 +788,8 @@ process_flat () {
             try after_install_snapshot
 
             cd "${_pwd}"
-            run "printf '%s' \"${DEF_VERSION}\" > ${_prefix}/${_app_param}${DEFAULT_INST_MARK_EXT}" \
-                && debug "Stored version: $(distd "${DEF_VERSION}") of software: $(distd "${DEF_NAME}") installed in: $(distd "${_prefix}")"
+            run "printf '%b\n' '${DEF_VERSION}' > '${_prefix}/${_app_param}${DEFAULT_INST_MARK_EXT}'" \
+                && debug "Stored version: $(distd "${DEF_VERSION}") of software bundle: $(distd "${DEF_NAME}${DEF_SUFFIX}"). Bundle installation prefix: $(distd "${_prefix}")"
 
             cd "${_cwd}" 2>/dev/null
             unset _cwd _addon _dsname _bund
@@ -801,7 +801,7 @@ process_flat () {
             create_software_dir "${_prefix##*/}"
         fi
         _dis_def="${_prefix}/${_req_defname}${DEFAULT_INST_MARK_EXT}"
-        run "printf '%s' \"${DEFAULT_REQ_OS_PROVIDED}\" > ${_dis_def}"
+        run "printf '%b\n' '${DEFAULT_REQ_OS_PROVIDED}' > '${_dis_def}'"
     fi
     unset _current_branch _dis_def _req_defname _app_param _prefix _bundlnm
 
@@ -840,7 +840,7 @@ test_and_rate_def () {
 
             local_test_env_dispatch () {
                 _start_time="$(${DATE_BIN} +%F-%H%M-%s 2>/dev/null)"
-                printf "%s\n" \
+                printf "%b\n" \
                     "Test for ${_name} started at: ${_start_time}" >> "${PREFIX}/${_name}.test.log" 2>> "${PREFIX}/${_name}.test.log"
 
                 eval "\
@@ -857,7 +857,7 @@ test_and_rate_def () {
                 _end_time="$(${DATE_BIN} +%F-%H%M-%s 2>/dev/null)"
 
                 debug "Test result for: $(distd "${_name}") is: $(distd "${_result}")"
-                printf "%s\n" \
+                printf "%b\n" \
                     "Test for ${_name} finished at: ${_end_time}" >> "${PREFIX}/${_name}.test.log" 2>> "${PREFIX}/${_name}.test.log"
 
                 unset _test_command _end_time _start_time

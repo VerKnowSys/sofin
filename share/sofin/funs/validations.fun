@@ -29,7 +29,7 @@ validate_env () {
 
 fail_on_bg_job () {
     _deps="${*}"
-    debug "bgJobs => $(distd "$(printf "%s\n" "${_deps}" | eval "${NEWLINES_TO_SPACES_GUARD}")")"
+    debug "bgJobs => $(distd "$(printf "%b\n" "${_deps}" | eval "${NEWLINES_TO_SPACES_GUARD}")")"
     acquire_lock_for "${_deps}"
     unset _deps
 }
