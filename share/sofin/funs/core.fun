@@ -304,12 +304,12 @@ signal_handler_interrupt () {
 }
 
 
-signal_handler_terminate () {
-    warn "Terminated: $(distw "${SOFIN_PID:-$$}")"
-    finalize_complete_standard_task
-    warn "Terminated: Bye!"
-    exit "${ERRORCODE_TERMINATED}"
-}
+# signal_handler_terminate () {
+#     warn "Terminated: $(distw "${SOFIN_PID:-$$}")"
+#     finalize_complete_standard_task
+#     warn "Terminated: Bye!"
+#     exit "${ERRORCODE_TERMINATED}"
+# }
 
 
 signal_handler_noop_usr2 () {
@@ -351,21 +351,31 @@ trap_signals () {
     # 30    SIGUSR1      terminate process    User defined signal 1
     # 31    SIGUSR2      terminate process    User defined signal 2
 
+    trap 'signal_handler_interrupt' HUP
     trap 'signal_handler_interrupt' INT
-    trap 'signal_handler_terminate' TERM
-    trap 'signal_handler_noop_usr2' USR2 # This signal is used to "reload shell"-feature. Sofin should ignore it
+    trap 'signal_handler_interrupt' QUIT
+    trap 'signal_handler_interrupt' TERM
 
-    debug "trap_signals(): Completed!"
+    trap 'signal_handler_noop_usr2' USR2 # This signal is used to "reload shell"-feature. Sofin should ignore it
+    trap 'signal_handler_noop_usr2' INFO
+    trap 'signal_handler_noop_usr2' WINCH
+
+    debug "trap_signals(): Function triggers were associated to signal handlers for: $(distd "HUP. INT, QUIT, TERM, USR2, INFO, WINCH")!"
     return 0
 }
 
 
 untrap_signals () {
+    trap - HUP
     trap - INT
     trap - TERM
-    trap - USR2
+    trap - QUIT
 
-    debug "untrap_signals(): Completed!"
+    trap - USR2
+    trap - INFO
+    trap - WINCH
+
+    debug "untrap_signals(): Signal handler unloaded!"
     return 0
 }
 
