@@ -82,11 +82,12 @@ sofin_header () {
 
 
 processes_all_sofin () {
-    unset _processes
+    _processes=""
     for _ff in $(${FIND_BIN} "${LOCKS_DIR}" -name '*.lock' 2>/dev/null); do
-        _pid="$(${CAT_BIN} "${_ff}")"
+        _pid="$(${CAT_BIN} "${_ff}" 2>/dev/null)"
         ${KILL_BIN} -0 "${_pid}" >/dev/null 2>&1
-        if [ "0" = "${?}" ] && [ "${SOFIN_PID}" != "${_pid}" ]; then
+        if [ "0" = "${?}" ] \
+        && [ "${SOFIN_PID}" != "${_pid}" ]; then
             _processes="${_pid} ${_processes}"
         fi
     done
