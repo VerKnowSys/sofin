@@ -26,6 +26,7 @@ DTRACE_BIN="/usr/sbin/dtrace"
 PWD_MKDB_BIN="/usr/sbin/pwd_mkdb"
 GEOM_BIN="/sbin/geom"
 BEADM_BIN="/usr/sbin/beadm"
+HBSDCONTROL_BIN="/usr/sbin/hbsdcontrol"
 
 # ServeD governor, FreeBSD specific:
 # GVR_BIN="/usr/bin/gvr"
