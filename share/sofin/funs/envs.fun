@@ -398,7 +398,9 @@ compiler_setup () {
         LDFLAGS="${LDFLAGS} ${HARDEN_SAFE_STACK_FLAGS}"
     fi
 
-    if [ -n "${DEF_USE_LTO}" ]; then
+    # Enable LTO only if LLVM LLD linker is available:
+    if [ -n "${DEF_USE_LTO}" ] \
+    && [ "YES" = "${CAP_SYS_LLVM_LD}" ]; then
         CFLAGS="${CFLAGS} ${LTO_CFLAGS}"
         CXXFLAGS="${CXXFLAGS} ${LTO_CFLAGS}"
 
