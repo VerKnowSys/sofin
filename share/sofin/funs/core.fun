@@ -394,7 +394,7 @@ set_system_dataset_readonly () {
             _sp="$(processes_all_sofin)"
             if [ -z "${_sp}" ]; then
                 try "${ZFS_BIN} set readonly=on '${_boot_dataset}'" \
-                    debug "No background Sofin processes found. System dataset: '$(distd "${_boot_dataset}") is now: READ-ONLY'"
+                    && debug "No background Sofin processes found. System dataset: '$(distd "${_boot_dataset}") is now: READ-ONLY'"
             else
                 debug "Background Sofin found in background! System dataset: '$(distd "${_boot_dataset}") is untouched.'"
             fi
