@@ -77,30 +77,49 @@ finalize_complete_standard_task () {
 }
 
 
+# Task called on demand (manually).
+# Currently used by:
+#   `s reload`, `s env`, `s reset`…:
+finalize_with_shell_reload () {
+    update_shell_vars
+    reload_shell
+    finalize_and_quit_gracefully
+}
+
+
+# NOTE: C-c is handled differently:
+# finalize_complete_standard_task() is called:
+finalize_after_signal_interrupt () {
+    set_system_dataset_writable
+    set_software_dataset_writable
     untrap_signals
+    finalize_and_quit_gracefully
+}
+
+
+# Task to call as last for all other finalize_* functions:
+finalize_and_quit_gracefully () {
+    load_sysctl_system_production_hardening
     destroy_ramdisk_device
-    destroy_dead_locks
-    finalize_onquit
+    if [ "${TTY}" = "YES" ]; then
+        # Bring back echo to the terminal:
+        ${STTY_BIN} echo
+    fi
+    set_system_readonly
+    set_software_dataset_readonly
 }
 
 
 finalize_afterbuild_tasks_for_bundle () {
     _bund_name="${1}"
-    require_prefix_set
-    require_namesum_set
-    debug "finalize_afterbuild for bundle: $(distd "${_bund_name}"), PREFIX: ${PREFIX}, BUILD_NAMESUM: ${BUILD_NAMESUM}"
-
-    # Cleanup build dir if DEVEL unset:
-    if [ -z "${DEVEL}" ]; then
-        destroy_ramdisk_device
-        destroy_builddir "${PREFIX##*/}" "${BUILD_NAMESUM}"
-    else
-        # TODO: dump srcdir? here?
-        debug "No-Op - not yet implemented"
-    fi
-    # Destroy lock of just built bundle:
     if [ -n "${_bund_name}" ]; then
-        destroy_dead_locks "${_bund_name}"
+        debug "finalize_afterbuild_tasks_for_bundle():: $(distd "${_bund_name}") with PREFIX=$(distd "${PREFIX}"), BUILD_NAMESUM: ${BUILD_NAMESUM}"
+        require_prefix_set
+        require_namesum_set
+        destroy_builddir "${PREFIX##*/}" "${BUILD_NAMESUM}"
+        destroy_dead_locks_of_bundle "${_bund_name}"
+    else
+        debug "finalize_afterbuild_tasks_for_bundle(): Empty Bundle. NO-OP!"
     fi
 }
 
@@ -108,10 +127,9 @@ finalize_afterbuild_tasks_for_bundle () {
 remove_useless_files_of_bundle () {
     _rufiles="${*}"
     if [ -n "${_rufiles}" ]; then
-        echo "${_rufiles}" | ${XARGS_BIN} -n 1 -P "${CPUS}" -I {} "${SH_BIN}" -c "${RM_BIN} -rf {} >/dev/null 2>&1" >> "${LOG}" 2>> "${LOG}" \
-            && debug "Useless files wiped out: $(distd "${_rufiles}")" \
-                && return 0
+        echo "${_rufiles}" | ${XARGS_BIN} -n 1 -P "${CPUS}" -I {} "${SH_BIN}" -c "${RM_BIN} -rf {} >/dev/null 2>&1" >/dev/null 2>&1 \
+            && debug "Useless files wiped out: $(distd "${_rufiles}")"
+    else
+        debug "No bundle name given! NO-OP."
     fi
-    debug "Failure removing useless files: '$(distd "${_rufiles}")'"
-    return 1
 }
