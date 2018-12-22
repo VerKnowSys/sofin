@@ -175,7 +175,8 @@ update_defs () {
                 && note "Definitions branch: $(distn "${BRANCH}") is at: $(distn "${_def_head}")" \
                     && return
 
-            printf "${ColorRed}%s${ColorReset}\n$(fill)\n" "Error occured: Update from branch: $(diste "${BRANCH}") of repository: $(diste "${REPOSITORY}") wasn't possible. Log's below:"
+            printf "%b%b%b%b\n" "${ColorRed}" "$(fill)" \
+                "Error occured: Update from branch: $(diste "${BRANCH}") of repository: $(diste "${REPOSITORY}") wasn't possible. Log's below:" "${ColorReset}"
             show_log_if_available
             return
         fi
@@ -786,7 +787,7 @@ after_install_callback () {
 apply_patch () {
     # $1 => definition name, $2 => patch abs path
     for _level in $(${SEQ_BIN} 0 5 2>/dev/null); do # From p0 to-p5
-        try "${PATCH_BIN} -p${_level} -N -f -i ${2} >> ${LOG}-${1} 2>> ${LOG}-${1}" \
+        try "${PATCH_BIN} -p${_level} -N -f -i ${2} >> '${LOG}-${1}' 2>> '${LOG}-${1}'" \
             && debug "Patch applied: $(distd "${2##*/}") (level: $(distd "${_level}"))" \
                 && return 0
     done
