@@ -403,8 +403,10 @@ create_software_dir () {
         error "First argument with $(diste "BundleName") is required!"
     fi
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
-        _dsname="${DEFAULT_ZPOOL}${SOFTWARE_DIR}/${SYSTEM_DATASET}/${_dset_create}"
+        _dsbase="${DEFAULT_ZPOOL}${SOFTWARE_DIR}/${SYSTEM_DATASET}"
+        _dsname="${_dsbase}/${_dset_create}"
         debug "Create software dataset: '$(distd "${_dsname}")'"
+
         receive_orig () {
             receive_origin "${_dsname}" "Software" "user" \
                 && debug "Received ZFS software-dataset: $(distd "${_dsname}")"
@@ -412,16 +414,20 @@ create_software_dir () {
         try "${ZFS_BIN} list -H -t filesystem '${_dsname}' >/dev/null 2>&1" \
             || receive_orig
 
-        try "${ZFS_BIN} set sharenfs=off '${_dsname}' >/dev/null 2>&1"
-        try "${ZFS_BIN} set mountpoint=${SOFTWARE_DIR}/${_dset_create} '${_dsname}' >/dev/null 2>&1"
+        # sharing nothing by default:
+        try "${ZFS_BIN} set sharenfs=inherit '${_dsbase}' >/dev/null 2>&1"
+        try "${ZFS_BIN} set sharenfs=inherit '${_dsname}' >/dev/null 2>&1"
+
+        # finally - configure and mount created dataset:
+        try "${ZFS_BIN} set mountpoint='${SOFTWARE_DIR}/${_dset_create}' '${_dsname}' >/dev/null 2>&1"
         try "${ZFS_BIN} mount '${_dsname}' >/dev/null 2>&1"
-        unset _dsname
+
     else
         debug "Creating regular software-directory: $(distd "${SOFTWARE_DIR}/${_dset_create}")"
         try "${MKDIR_BIN} -p '${SOFTWARE_DIR}/${_dset_create}'"
     fi
     try "${CHMOD_BIN} 0711 '${SOFTWARE_DIR}/${_dset_create}'"
-    unset _dset_create
+    unset _dset_create _dsname
 }
 
 
