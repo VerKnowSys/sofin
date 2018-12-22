@@ -63,7 +63,6 @@ commit_origin () {
 
 
 install_sofin () {
-    echo
     load_requirements
     determine_system_capabilites
     set_software_root_writable
