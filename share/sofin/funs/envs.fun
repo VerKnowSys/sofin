@@ -428,12 +428,15 @@ compiler_setup () {
 
     # C++ standard:
     if [ -n "${DEF_USE_CXX11}" ]; then
+        unset DEF_USE_CXX14 DEF_USE_CXX17
         CXXFLAGS="${CXXFLAGS} ${CXX11_CXXFLAGS}"
     fi
     if [ -n "${DEF_USE_CXX14}" ]; then
+        unset DEF_USE_CXX11 DEF_USE_CXX17
         CXXFLAGS="${CXXFLAGS} ${CXX14_CXXFLAGS}"
     fi
     if [ -n "${DEF_USE_CXX17}" ]; then
+        unset DEF_USE_CXX11 DEF_USE_CXX14
         CXXFLAGS="${CXXFLAGS} ${CXX17_CXXFLAGS}"
     fi
     if [ -z "${DEF_USE_CXX11}" ] \
