@@ -1,9 +1,9 @@
 usage_howto () {
     permnote "Built in tasks:"
     permnote
-    permnote "  $(distn "i | install | get | pick | choose | use  ") installs software from list or from definition and switches exports for it ($(distn "example: "${SOFIN_BIN_SHORT}" install Rust" "${ColorExample}"))"
+    permnote "  $(distn "i | install | get | pick | use       ") installs software from list or from definition and switches exports for it ($(distn "example: "${SOFIN_BIN_SHORT}" install Rust" "${ColorExample}"))"
     permnote "  $(distn "dependencies | deps | local          ") installs software from list defined in '$(distn "${DEFAULT_PROJECT_DEPS_LIST_FILE}")' file in current directory"
-    permnote "  $(distn "rm | uninstall | remove | delete          ") removes an application or list ($(distn "example: "${SOFIN_BIN_SHORT}" uninstall Rust" "${ColorExample}"))"
+    permnote "  $(distn "rm | uninstall | destroy | delete    ") removes an application or list ($(distn "example: "${SOFIN_BIN_SHORT}" uninstall Rust" "${ColorExample}"))"
     permnote "  $(distn "list | installed                     ") gives short list of installed software"
     permnote "  $(distn "full | fulllist | fullinstalled      ") gives detailed list with installed software including requirements"
     permnote "  $(distn "available | avail                    ") lists available software"

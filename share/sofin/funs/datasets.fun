@@ -1,3 +1,4 @@
+# unshare any resource between: (ZFS)<-+->(NFS)
 unshare_all_zfs_datasets () {
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
         try "${ZFS_BIN} unshare -a >/dev/null 2>&1" \
