@@ -201,7 +201,7 @@ if [ -n "${SOFIN_COMMAND}" ]; then
                         _cxxfl="$(echo "${_cxxfl}" | ${SED_BIN} 's/ *$//g; s/  //g' 2>/dev/null)"
                         _ldfl="$(echo "${_ldfl}" | ${SED_BIN} 's/ *$//g; s/  //g' 2>/dev/null)"
                         _pkgp="$(echo "${_pkgp}" | ${SED_BIN} 's/ *$//g; s/  //g' 2>/dev/null)"
-                        printf "${REPLAY_PREVIOUS_LINE}%b\n" "export CFLAGS=\"${_cfl}\""
+                        printf "%b%b\n" "${REPLAY_PREVIOUS_LINE}" "export CFLAGS=\"${_cfl}\""
                         printf "%b\n" "export CXXFLAGS=\"${_cxxfl}\""
                         printf "%b\n" "export LDFLAGS=\"${_ldfl}\""
                         printf "%b\n" "export PKG_CONFIG_PATH=\"${_pkgp}\""
