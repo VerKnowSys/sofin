@@ -416,7 +416,7 @@ compiler_setup () {
                 warn ""
             }
             # determine if LD is LLD. If not - throw a fat warning with workaround for 11-stable-based build-hosts
-            ${LD_BIN} --version 2>/dev/null | ${GREP_BIN} -E 'LLD \d*.\d*.\d*' >/dev/null 2>&1 \
+            try "${LD_BIN} --version 2>/dev/null | ${GREP_BIN} -E 'LLD \d*.\d*.\d*' >/dev/null 2>&1" \
                 || warn_about_non_llvm_ld_on_buildhosts
         fi
     fi
