@@ -312,8 +312,8 @@ signal_handler_interrupt () {
 # }
 
 
-signal_handler_noop_usr2 () {
-    debug "Got USR2 signal. Doing nothing!"
+signal_handler_no_operation () {
+    debug "NOOP signal.triggered."
 }
 
 
@@ -351,31 +351,36 @@ trap_signals () {
     # 30    SIGUSR1      terminate process    User defined signal 1
     # 31    SIGUSR2      terminate process    User defined signal 2
 
-    trap 'signal_handler_interrupt' HUP
+    # Associate signals with function handler:
     trap 'signal_handler_interrupt' INT
     trap 'signal_handler_interrupt' QUIT
     trap 'signal_handler_interrupt' TERM
 
-    trap 'signal_handler_noop_usr2' USR2 # This signal is used to "reload shell"-feature. Sofin should ignore it
-    trap 'signal_handler_noop_usr2' INFO
-    trap 'signal_handler_noop_usr2' WINCH
+    # Associate 'No-Op' signals:
+    trap 'signal_handler_no_operation' HUP
+    trap 'signal_handler_no_operation' INFO
+    trap 'signal_handler_no_operation' USR1
+    trap 'signal_handler_no_operation' USR2 # This signal is used to "reload shell"-feature. Sofin should ignore it when triggered directly
+    trap 'signal_handler_no_operation' WINCH
 
-    debug "trap_signals(): Function triggers were associated to signal handlers for: $(distd "HUP. INT, QUIT, TERM, USR2, INFO, WINCH")!"
+    debug "trap_signals(): Interruption triggers were associated with signals: $(distd "INT, QUIT, TERM")."
+    debug "trap_signals(): No-Op triggers were associated with signals: $(distd "HUP, INFO, USR1, USR2, WINCH")!"
     return 0
 }
 
 
 untrap_signals () {
-    trap - HUP
+    # No-Op for each handled trigger:
     trap - INT
     trap - TERM
     trap - QUIT
-
+    trap - HUP
+    trap - USR1
     trap - USR2
     trap - INFO
     trap - WINCH
 
-    debug "untrap_signals(): Signal handler unloaded!"
+    debug "untrap_signals(): Signal trigger handlers were unassociated for: $(distd "INT, QUIT, TERM, HUP, INFO, USR1, USR2, WINCH")."
     return 0
 }
 
