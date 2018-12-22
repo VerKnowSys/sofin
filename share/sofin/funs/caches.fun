@@ -46,7 +46,7 @@ show_logs () {
 pretouch_logs () {
     _params="${*}"
     if [ -z "${CAP_SYS_PRODUCTION}" ]; then
-        debug "Logs pretouch called with params: $(distd "${_params}")"
+        debug "Calling log-pretouch for: $(distd "$(printf "%b\n" "${_params}" | ${WC_BIN} -w 2>/dev/null)") files…"
         unset _pret_list
         for _app in $(to_iter "${_params}"); do
             if [ -z "${_app}" ]; then
