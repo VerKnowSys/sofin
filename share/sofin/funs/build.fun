@@ -19,25 +19,26 @@ build_bundle () {
     else
         if [ ! -f "${FILE_CACHE_DIR}${_bsbelement}" ]; then
             debug "Found incomplete or damaged bundle file. Rebuilding: $(distd "${_bsbelement}")"
-            try "${RM_BIN} -f ${FILE_CACHE_DIR}${_bsbelement}"
+            try "${RM_BIN} -f '${FILE_CACHE_DIR}${_bsbelement}'"
             create_software_bundle_archive "${_bsbname}" "${_bsbelement}" "${_bsversion}"
         else
             debug "Found already existing bundle stream in file-cache: $(distd "${FILE_CACHE_DIR}${_bsbelement}")"
 
             # NOTE: Let's move old one, make a shasum difference, if different => overwrite
-            try "${MV_BIN} ${FILE_CACHE_DIR}${_bsbelement} ${FILE_CACHE_DIR}${_bsbelement}.old ; ${MV_BIN} ${FILE_CACHE_DIR}${_bsbelement}${DEFAULT_CHKSUM_EXT} ${FILE_CACHE_DIR}${_bsbelement}${DEFAULT_CHKSUM_EXT}.old" && \
-                debug "Old bundle stream, was temporarely moved."
+            _cached_copy="${FILE_CACHE_DIR}${_bsbelement}${DEFAULT_CHKSUM_EXT}.old"
+            try "${MV_BIN} -f '${FILE_CACHE_DIR}${_bsbelement}' '${FILE_CACHE_DIR}${_bsbelement}.old' ; ${MV_BIN} -f '${FILE_CACHE_DIR}${_bsbelement}${DEFAULT_CHKSUM_EXT}' '${_cached_copy}'" \
+                && debug "Old bundle stream, was temporarely moved."
             create_software_bundle_archive "${_bsbname}" "${_bsbelement}" "${_bsversion}"
             if [ -f "${FILE_CACHE_DIR}${_bsbelement}" ]; then
                 _newsum="$(file_checksum "${FILE_CACHE_DIR}${_bsbelement}")"
-                _oldsum="$(${CAT_BIN} "${FILE_CACHE_DIR}${_bsbelement}${DEFAULT_CHKSUM_EXT}.old" 2>/dev/null)"
+                _oldsum="$(${CAT_BIN} "${_cached_copy}" 2>/dev/null)"
                 debug "Comparing shasum of most recent stream and one from previous stream. Old-sum: $(distd "${_oldsum}"), new-sum: $(distd "${_newsum}")"
                 if [ "${_oldsum}" = "${_newsum}" ]; then
-                    try "${MV_BIN} -fv ${FILE_CACHE_DIR}${_bsbelement}.old ${FILE_CACHE_DIR}${_bsbelement}.old ; ${MV_BIN} -fv ${FILE_CACHE_DIR}${_bsbelement}${DEFAULT_CHKSUM_EXT}.old ${FILE_CACHE_DIR}${_bsbelement}${DEFAULT_CHKSUM_EXT}" && \
-                        debug "Checksums match! Upload unnecessary! Previous cache stream file was restored."
+                    try "${MV_BIN} -f '${FILE_CACHE_DIR}${_bsbelement}.old' '${FILE_CACHE_DIR}${_bsbelement}.old' ; ${MV_BIN} -f '${_cached_copy}' '${FILE_CACHE_DIR}${_bsbelement}${DEFAULT_CHKSUM_EXT}'" \
+                        && debug "Checksums match! Upload unnecessary! Previous cache stream file was restored."
                 else
-                    try "${RM_BIN} -f ${FILE_CACHE_DIR}${_bsbelement}.old ${FILE_CACHE_DIR}${_bsbelement}${DEFAULT_CHKSUM_EXT}.old" && \
-                        debug "Checksum didn't match. New stream will be used to upload bundle stream. Previous cache stream file was removed."
+                    try "${RM_BIN} -f '${FILE_CACHE_DIR}${_bsbelement}.old' '${_cached_copy}'" \
+                        && debug "Checksum didn't match. New stream will be used to upload bundle stream. Previous cache stream file was removed."
                 fi
             fi
         fi
@@ -62,9 +63,9 @@ push_binbuilds () {
         if [ ! -f "${_pbinstall_indicator_file}" ]; then
             error "Bundle install indicator: $(diste "${_pbinstall_indicator_file}") doesn't exist!"
         fi
-        if [ -n "${_pbelement}" ] && \
-           [ -d "${SOFTWARE_DIR}/${_pbelement}" ] && \
-           [ -n "${_pbbversion_element}" ]; then
+        if [ -n "${_pbelement}" ] \
+        && [ -d "${SOFTWARE_DIR}/${_pbelement}" ] \
+        && [ -n "${_pbbversion_element}" ]; then
             debug "About to push: $(distd "${_pbelement}"), install-indicator: $(distd "${_pbinstall_indicator_file}"), soft-version: $(distd "${_pbbversion_element}")"
             push_to_all_mirrors "${_pbelement}" "${_pbbversion_element}"
         else
@@ -97,16 +98,15 @@ fetch_binbuild () {
         if [ -z "${_bb_archive}" ]; then
             error "Cannot fetch binbuild! An empty $(diste "file-archive-name") given!"
         fi
-        try "${MKDIR_BIN} -p ${FILE_CACHE_DIR}"
-        # If sha1 of bundle file exists locally..
+        try "${MKDIR_BIN} -p '${FILE_CACHE_DIR}'"
         if [ ! -e "${FILE_CACHE_DIR}${_bb_archive}${DEFAULT_CHKSUM_EXT}" ]; then
-            try "${FETCH_BIN} -o ${FILE_CACHE_DIR}${_bb_archive}${DEFAULT_CHKSUM_EXT} ${FETCH_OPTS} '${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}${DEFAULT_CHKSUM_EXT}'" || \
-                try "${FETCH_BIN} -o ${FILE_CACHE_DIR}${_bb_archive}${DEFAULT_CHKSUM_EXT} ${FETCH_OPTS} '${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}${DEFAULT_CHKSUM_EXT}'"
+            try "${FETCH_BIN} -o ${FILE_CACHE_DIR}${_bb_archive}${DEFAULT_CHKSUM_EXT} ${FETCH_OPTS} '${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}${DEFAULT_CHKSUM_EXT}'" \
+                || try "${FETCH_BIN} -o ${FILE_CACHE_DIR}${_bb_archive}${DEFAULT_CHKSUM_EXT} ${FETCH_OPTS} '${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}${DEFAULT_CHKSUM_EXT}'"
             if [ "${?}" = "0" ]; then
-                try "${FETCH_BIN} -o ${FILE_CACHE_DIR}${_bb_archive} ${FETCH_OPTS} '${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}'" || \
-                    try "${FETCH_BIN} -o ${FILE_CACHE_DIR}${_bb_archive} ${FETCH_OPTS} '${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}'" || \
-                        try "${FETCH_BIN} -o ${FILE_CACHE_DIR}${_bb_archive} ${FETCH_OPTS} '${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}'" || \
-                            error "Failure fetching available binary build for: $(diste "${_bb_archive}"). Please check your network setup!"
+                try "${FETCH_BIN} -o ${FILE_CACHE_DIR}${_bb_archive} ${FETCH_OPTS} '${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}'" \
+                    || try "${FETCH_BIN} -o ${FILE_CACHE_DIR}${_bb_archive} ${FETCH_OPTS} '${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}'" \
+                        || try "${FETCH_BIN} -o ${FILE_CACHE_DIR}${_bb_archive} ${FETCH_OPTS} '${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}'" \
+                            || error "Failure fetching available binary build for: $(diste "${_bb_archive}"). Please check your network setup!"
             else
                 note "No binary build file available: $(distn "${_bb_archive}")"
             fi
@@ -303,7 +303,7 @@ build () {
         export_binaries "${_bund_lcase}"
         load_pax_file
         try after_export_callback
-        after_export_snapshot
+        try after_export_snapshot
         validate_pie_on_exports "${_build_list}"
 
         if [ -z "${CAP_SYS_PRODUCTION}" ]; then
@@ -362,12 +362,12 @@ build () {
                             _files="$(${FIND_BIN} "${PREFIX}/" -name "${_lower_security_binary}" -type f 2>/dev/null)"
                             for _file in $(to_iter "${_files}"); do
                                 if [ -x "${_file}" ]; then
-                                    ${FILE_BIN} "${_file}" 2>/dev/null | ${GREP_BIN} -F 'ELF 64-bit' >/dev/null 2>&1
+                                    try "${FILE_BIN} '${_file}' 2>/dev/null | ${GREP_BIN} -F 'ELF 64-bit' >/dev/null 2>&1"
                                     if [ "0" = "${?}" ]; then
-                                        try "${HBSDCONTROL_BIN} pax disable ${_feature} \"${_file}\"" && \
-                                            debug "Lowered security on requested binary: $(distd "${_file}")"
-                                        # Storing command to .pax file to be sure to apply on each boot:
-                                        printf "%s\n" "${HBSDCONTROL_BIN} pax disable ${_feature} \"${_file}\"" >> "${_paxfile}"
+                                        # Lower security on requested binary:
+                                        try "${HBSDCONTROL_BIN} pax disable ${_feature} '${_file}'"
+                                        # + Store copy of a command to "${PREFIX}/.pax" file - will be invoked on each boot:
+                                        printf "%s\n" "${HBSDCONTROL_BIN} pax disable ${_feature} '${_file}'" >> "${_paxfile}"
                                     fi
                                 fi
                             done
@@ -496,8 +496,8 @@ process_flat () {
                     _dest_file="${FILE_CACHE_DIR}${_base}"
                     # TODO: implement auto picking fetch method based on DEF_SOURCE_PATH contents
                     if [ ! -e "${_dest_file}" ]; then
-                        retry "${FETCH_BIN} -o ${_dest_file} ${FETCH_OPTS} '${DEF_SOURCE_PATH}'" || \
-                            error "Failed to fetch source: $(diste "${DEF_SOURCE_PATH}")"
+                        retry "${FETCH_BIN} -o ${_dest_file} ${FETCH_OPTS} '${DEF_SOURCE_PATH}'" \
+                            || error "Failed to fetch source: $(diste "${DEF_SOURCE_PATH}")"
                         note "   ${NOTE_CHAR} Source fetched: $(distn "${_base}")"
                     fi
                     # debug "Build root: $(distd "${BUILD_DIR}"), file: $(distd "${_dest_file}")"
@@ -510,8 +510,8 @@ process_flat () {
                         else
                             warn "   ${WARN_CHAR} Source checksum mismatch: '$(distw "${_a_file_checksum}")' vs '$(distw "${DEF_SHA}")'"
                             _bname="${_dest_file##*/}"
-                            try "${RM_BIN} -f ${_dest_file}" && \
-                                debug "Removed corrupted cache file: $(distd "${_bname}") and retrying.."
+                            try "${RM_BIN} -f ${_dest_file}" \
+                                && debug "Removed corrupted cache file: $(distd "${_bname}") and retrying.."
                             process_flat "${_app_param}" "${_prefix}"
                         fi
                         unset _bname _a_file_checksum
@@ -525,14 +525,14 @@ process_flat () {
                         _possible_old_build_dir="${_possible_old_build_dir%%/${_pbd_basename}}"
                     fi
                     if [ -d "${BUILD_DIR}/${_possible_old_build_dir%/}" ]; then
-                        try "${RM_BIN} -rf '${BUILD_DIR}/${_possible_old_build_dir%/}'" && \
-                            debug "Previous dependency build dir was removed to avoid conflicts: $(distd "${BUILD_DIR}/${_possible_old_build_dir%/}")"
+                        try "${RM_BIN} -rf '${BUILD_DIR}/${_possible_old_build_dir%/}'" \
+                            && debug "Previous dependency build dir was removed to avoid conflicts: $(distd "${BUILD_DIR}/${_possible_old_build_dir%/}")"
                     fi
 
                     debug "Unpacking $(distd "${_dest_file}") to: $(distd "${BUILD_DIR}")"
-                    try "${TAR_BIN} -xf ${_dest_file} --directory ${BUILD_DIR}" || \
-                        try "${TAR_BIN} -xjf ${_dest_file} --directory ${BUILD_DIR}" || \
-                            run "${TAR_BIN} -xJf ${_dest_file} --directory ${BUILD_DIR}"
+                    try "${TAR_BIN} -xf ${_dest_file} --directory ${BUILD_DIR} >/dev/null" \
+                        || try "${TAR_BIN} -xjf ${_dest_file} --directory ${BUILD_DIR} >/dev/null" \
+                            || run "${TAR_BIN} -xJf ${_dest_file} --directory ${BUILD_DIR} >/dev/null"
                 else
                     # git method:
                     # .cache/git-cache => git bare repos
@@ -594,7 +594,7 @@ process_flat () {
                 cd "${_pwd}"
                 try after_unpack_callback
                 cd "${_pwd}"
-                after_unpack_snapshot
+                try after_unpack_snapshot
 
                 cd "${_pwd}"
                 apply_definition_patches "${DEF_NAME}${DEF_SUFFIX}"
@@ -602,7 +602,7 @@ process_flat () {
                 cd "${_pwd}"
                 try after_patch_callback
                 cd "${_pwd}"
-                after_patch_snapshot
+                try after_patch_snapshot
                 cd "${_pwd}"
 
                 # configuration log:
@@ -634,11 +634,11 @@ process_flat () {
 
                     posix)
                         cache_conf_scrpt_hlp_opts "${_configure_options_log}"
-                        try "./configure -prefix ${_prefix} -cc '${CC_NAME} ${CFLAGS}' -libs '-L${PREFIX}/lib ${LDFLAGS}' -mandir ${PREFIX}/share/man -libdir ${PREFIX}/lib -aspp '${CC_NAME} ${CFLAGS} -c' ${DEF_CONFIGURE_ARGS}" || \
-                        try "./configure -prefix ${_prefix} -cc '${CC_NAME} ${CFLAGS}' -libs '-L${PREFIX}/lib ${LDFLAGS}' -libdir ${PREFIX}/lib -aspp '${CC_NAME} ${CFLAGS} -c' ${DEF_CONFIGURE_ARGS}" || \
-                        run "./configure -prefix ${_prefix} -cc '${CC_NAME} ${CFLAGS}' -libs '-L${PREFIX}/lib ${LDFLAGS}' -aspp '${CC_NAME} ${CFLAGS} -c' ${DEF_CONFIGURE_ARGS}"
+                        try "./configure -prefix ${_prefix} -cc '${CC_NAME} ${CFLAGS}' -libs '-L${PREFIX}/lib ${LDFLAGS}' -mandir ${PREFIX}/share/man -libdir ${PREFIX}/lib -aspp '${CC_NAME} ${CFLAGS} -c' ${DEF_CONFIGURE_ARGS}" \
+                            || try "./configure -prefix ${_prefix} -cc '${CC_NAME} ${CFLAGS}' -libs '-L${PREFIX}/lib ${LDFLAGS}' -libdir ${PREFIX}/lib -aspp '${CC_NAME} ${CFLAGS} -c' ${DEF_CONFIGURE_ARGS}" \
+                                || run "./configure -prefix ${_prefix} -cc '${CC_NAME} ${CFLAGS}' -libs '-L${PREFIX}/lib ${LDFLAGS}' -aspp '${CC_NAME} ${CFLAGS} -c' ${DEF_CONFIGURE_ARGS}"
 
-                        try "${INSTALL_BIN} \"${_configure_log}\" \"${_configure_status_log}\" >/dev/null"
+                        try "${INSTALL_BIN} '${_configure_log}' '${_configure_status_log}' >/dev/null"
                         ;;
 
                     cmake)
@@ -674,23 +674,23 @@ process_flat () {
 
                         if [ "${SYSTEM_NAME}" = "Linux" ]; then
                             # NOTE: No /Services feature implemented for Linux.
-                            try "printf "%s\n" \"${DEF_CONFIGURE_METHOD}\" | ${GREP_BIN} \"configure\" >/dev/null 2>&1"
+                            try "printf '%s\n' '${DEF_CONFIGURE_METHOD}' | ${GREP_BIN} -F 'configure' >/dev/null 2>&1"
                             if [ "${?}" = "0" ]; then
                                 # NOTE: by defaultautoconf configure accepts influencing variables as configure script params
-                                try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} ${_pic_optional} ${_addon}" || \
-                                try "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} ${_pic_optional}" || \
-                                try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} ${_addon}" || \
-                                run "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix}"
+                                try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} ${_pic_optional} ${_addon}" \
+                                    || try "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} ${_pic_optional}" \
+                                        || try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} ${_addon}" \
+                                            || run "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix}"
                             else
-                                try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} ${_addon}" || \
-                                try "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix}" || \
-                                try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} ${_addon}" || \
-                                run "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS}" # Trust definition
+                                try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} ${_addon}" \
+                                    || try "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix}" \
+                                        || try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} ${_addon}" \
+                                            || run "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS}" # Trust definition
                             fi
                         else
                             # do a simple check for "configure" in DEF_CONFIGURE_METHOD definition
                             # this way we can tell if we want to put configure options as params
-                            printf "%s\n" "${DEF_CONFIGURE_METHOD}" | ${GREP_BIN} "configure" >/dev/null 2>&1
+                            try "printf '%s\n' '${DEF_CONFIGURE_METHOD}' | ${GREP_BIN} -F 'configure' >/dev/null 2>&1"
                             if [ "${?}" = "0" ]; then
                                 # TODO: add --docdir=${_prefix}/docs
                                 # NOTE: By default try to configure software with these options:
@@ -702,40 +702,40 @@ process_flat () {
                                 #      build configure options quickly
                                 # try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var --runstatedir=${SERVICE_DIR}/run ${_pic_optional} ${_addon}" || \
                                 # try "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var --runstatedir=${SERVICE_DIR}/run ${_pic_optional}" || \
-                                try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var ${_pic_optional} ${_addon}" || \
-                                try "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var ${_pic_optional}" || \
-                                try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var ${_addon}" || \
-                                try "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var" || \
-                                try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc ${_pic_optional} ${_addon}" || \
-                                try "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc ${_pic_optional}" || \
-                                try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc ${_addon}" || \
-                                try "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc" || \
-                                try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} ${_pic_optional} ${_addon}" || \
-                                try "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} ${_pic_optional}" || \
-                                try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} ${_addon}" || \
-                                run "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix}" # last two - only as a fallback
+                                try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var ${_pic_optional} ${_addon}" \
+                                    || try "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var ${_pic_optional}" \
+                                        || try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var ${_addon}" \
+                                            || try "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var" \
+                                                || try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc ${_pic_optional} ${_addon}" \
+                                                    || try "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc ${_pic_optional}" \
+                                                        || try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc ${_addon}" \
+                                                            || try "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc" \
+                                                                || try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} ${_pic_optional} ${_addon}" \
+                                                                    || try "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} ${_pic_optional}" \
+                                                                        || try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} ${_addon}" \
+                                                                            || run "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix}" # last two - only as a fallback
 
                             else # fallback again:
                                 # NOTE: First - try to specify GNU prefix,
                                 # then trust prefix given in software definition.
-                                try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} ${_addon}" || \
-                                try "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix}" || \
-                                try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} ${_addon}" || \
-                                run "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS}"
+                                try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} ${_addon}" \
+                                    || try "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix}" \
+                                        || try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} ${_addon}" \
+                                            || run "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS}"
                             fi
                         fi
                         ;;
                 esac
 
                 debug "Gathering configuration output logs…"
-                try "${INSTALL_BIN} \"${_configure_log}\" \"${_configure_status_log}\" >/dev/null 2>&1"
-                try "${INSTALL_BIN} \"${_cmake_out_log}\" \"${_cmake_config_log}\" >/dev/null 2>&1"
-                try "${INSTALL_BIN} \"${_cmake_error_log}\" \"${_cmake_config_log}.error\" >/dev/null 2>&1"
+                try "${INSTALL_BIN} '${_configure_log}' '${_configure_status_log}' >/dev/null 2>&1"
+                try "${INSTALL_BIN} '${_cmake_out_log}' '${_cmake_config_log}' >/dev/null 2>&1"
+                try "${INSTALL_BIN} '${_cmake_error_log}' '${_cmake_config_log}.error' >/dev/null 2>&1"
 
                 cd "${_pwd}"
                 try after_configure_callback
                 cd "${_pwd}"
-                after_configure_snapshot
+                try after_configure_snapshot
             else
                 error "These values cannot be empty: BUILD_DIR, BUILD_NAMESUM"
             fi
@@ -748,19 +748,20 @@ process_flat () {
             cd "${_pwd}"
             try after_make_callback
             cd "${_pwd}"
-            after_make_snapshot
+            try after_make_snapshot
 
 
             # OTE: after successful make, invoke "make test" by default:
             unset _this_test_skipped
             if [ -n "${DEF_SKIPPED_DEFINITION_TEST}" ]; then
                 debug "Defined DEF_SKIPPED_DEFINITION_TEST: $(distd "${DEF_SKIPPED_DEFINITION_TEST}")"
-                printf "%s\n" " ${DEF_SKIPPED_DEFINITION_TEST} " 2>/dev/null | ${EGREP_BIN} " ${_app_param} " >/dev/null 2>/dev/null && \
-                    note "   ${NOTE_CHAR} Skipped tests for definition of: $(distn "${_app_param}")" && \
-                        _this_test_skipped=1
+                printf "%s\n" " ${DEF_SKIPPED_DEFINITION_TEST} " | ${EGREP_BIN} -F " ${_app_param} " >/dev/null 2>/dev/null \
+                    && note "   ${NOTE_CHAR} Skipped tests for definition of: $(distn "${_app_param}")" \
+                        && _this_test_skipped=1
             fi
 
-            if [ -z "${USE_NO_TEST}" ] && [ -z "${_this_test_skipped}" ]; then
+            if [ -z "${USE_NO_TEST}" ] \
+            && [ -z "${_this_test_skipped}" ]; then
                 note "   ${NOTE_CHAR} Testing requirement: $(distn "${_app_param}"), version: $(distn "${DEF_VERSION}")"
                 cd "${_pwd}"
 
@@ -772,7 +773,7 @@ process_flat () {
             cd "${_pwd}"
             try after_test_callback
             cd "${_pwd}"
-            after_test_snapshot
+            try after_test_snapshot
 
             debug "Cleaning man dir from previous dependencies, we want to install man pages that belong to LAST requirement which is app bundle itself"
             for place in man share/man share/info share/doc share/docs; do
@@ -788,11 +789,11 @@ process_flat () {
             cd "${_pwd}"
             try after_install_callback
             cd "${_pwd}"
-            after_install_snapshot
+            try after_install_snapshot
 
             cd "${_pwd}"
-            run "printf '%s' \"${DEF_VERSION}\" > ${_prefix}/${_app_param}${DEFAULT_INST_MARK_EXT}" && \
-                debug "Stored version: $(distd "${DEF_VERSION}") of software: $(distd "${DEF_NAME}") installed in: $(distd "${_prefix}")"
+            run "printf '%s' \"${DEF_VERSION}\" > ${_prefix}/${_app_param}${DEFAULT_INST_MARK_EXT}" \
+                && debug "Stored version: $(distd "${DEF_VERSION}") of software: $(distd "${DEF_NAME}") installed in: $(distd "${_prefix}")"
 
             cd "${_cwd}" 2>/dev/null
             unset _cwd _addon _dsname _bund
