@@ -728,9 +728,9 @@ process_flat () {
                 esac
 
                 debug "Gathering configuration output logs…"
-                try "${INSTALL_BIN} '${_configure_log}' '${_configure_status_log}' >/dev/null 2>&1"
-                try "${INSTALL_BIN} '${_cmake_out_log}' '${_cmake_config_log}' >/dev/null 2>&1"
-                try "${INSTALL_BIN} '${_cmake_error_log}' '${_cmake_config_log}.error' >/dev/null 2>&1"
+                try "test -f '${_configure_log}' && ${INSTALL_BIN} '${_configure_log}' '${_configure_status_log}' >/dev/null 2>&1"
+                try "test -f '${_cmake_out_log}' && ${INSTALL_BIN} '${_cmake_out_log}' '${_cmake_config_log}' >/dev/null 2>&1"
+                try "test -f '${_cmake_error_log}' && ${INSTALL_BIN} '${_cmake_error_log}' '${_cmake_config_log}.error' >/dev/null 2>&1"
 
                 cd "${_pwd}"
                 try after_configure_callback
