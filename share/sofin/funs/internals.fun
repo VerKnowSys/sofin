@@ -50,7 +50,7 @@ usage_howto () {
 
 
 sofin_header () {
-    printf '\r\n     %s\n%s\n\n  %s\n  %s\n  %s\n\n  %s\n\n' \
+    printf "\n     %b\n%b\n\n  %b\n  %b\n  %b\n\n  %b\n\n" \
         "$(distn 'Sof' "${ColorWhite}")$(distn 'tware' "${ColorGray}") $(distn 'In' "${ColorWhite}")$(distn 'staller v' "${ColorGray}")$(distn "${SOFIN_VERSION}" "${ColorWhite}")" \
         "$(distn "____________________________________" "${ColorGreen}")" \
         "design, implementation: $(distn "@dmilith")" \
@@ -58,19 +58,19 @@ sofin_header () {
         "released under: $(distn "MIT/BSD")" \
         "running os: $(distn "${OS_TRIPPLE}")"
 
-    printf '  %s\n' "system capabilities:"
+    printf "  %b\n" "system capabilities:"
     IFS=\n set 2>/dev/null | ${EGREP_BIN} -I 'CAP_SYS_' 2>/dev/null | while IFS= read -r _envv; do
         if [ -n "${_envv}" ]; then
-            printf '         %s %s\n' \
+            printf "         %b %b\n" \
                 "$(distn "${SUCCESS_CHAR}" "${ColorGreen}")" \
                 "$(distn "$(lowercase "${_envv%=YES}")")"
         fi
     done
 
-    printf '\r\n  %s\n' "terminal capabilities:"
+    printf "\n  %b\n" "terminal capabilities:"
     IFS=\n set 2>/dev/null | ${EGREP_BIN} -I 'CAP_TERM_' 2>/dev/null | while IFS= read -r _envv; do
         if [ -n "${_envv}" ]; then
-            printf '         %s %s\n' \
+            printf "         %b %b\n" \
                 "$(distn "${SUCCESS_CHAR}" "${ColorGreen}")" \
                 "$(distn "$(lowercase "${_envv%=YES}")")"
         fi
@@ -93,7 +93,7 @@ processes_all_sofin () {
     done
     if [ -n "${_processes}" ]; then
         debug "Sofin-tasks-locked by processes: $(distd "${_processes}")"
-        echo "${_processes}"
+        printf "%b\n" "${_processes}"
     fi
     return 0
 }
@@ -102,8 +102,7 @@ processes_all_sofin () {
 print_local_env_vars () {
     _s_env_file="${PWD}/.${SOFIN_NAME}.env"
     if [ -f "${_s_env_file}" ]; then
-        printf '\n# Loaded from local environment: %s\n' \
-            "${_s_env_file}"
+        printf "# Loaded local environment: %b\n" "${_s_env_file}"
         ${CAT_BIN} "${_s_env_file}" 2>/dev/null
     fi
     unset _s_env_file
@@ -191,7 +190,7 @@ print_shell_vars () {
     fi
 
     # Store values to environment file:
-    printf "# ${ColorParams}%s${ColorReset}:\n" "MANPATH"
+    printf "# %bMANPATH:%b\n" "${ColorParams}" "${ColorReset}"
     printf "%b\n" "export MANPATH=\"${_manpath}\""
 
     if [ -f "${SOFIN_ENV_ENABLED_INDICATOR_FILE}" ]; then # sofin disabled. Default system environment
@@ -199,33 +198,33 @@ print_shell_vars () {
         _cxxflags="$(printf "%b\n" "${_cxxflags}" | ${SED_BIN} 's/ *$//g; s/  //g' 2>/dev/null)"
         _ldflags="$(printf "%b\n" "${_ldflags}" | ${SED_BIN} 's/ *$//g; s/  //g' 2>/dev/null)"
         _pkg_config_path="$(printf "%b\n" "${_pkg_config_path}" | ${SED_BIN} 's/ *$//g; s/  //g' 2>/dev/null)"
-        printf "# ${ColorParams}%s${ColorReset}:\n" "CFLAGS"
+        printf "# %bCFLAGS:%b\n" "${ColorParams}" "${ColorReset}"
         printf "%b\n" "export CFLAGS=\"${_cflags}\""
-        printf "# ${ColorParams}%s${ColorReset}:\n" "CXXFLAGS"
+        printf "# %bCXXFLAGS:%b\n" "${ColorParams}" "${ColorReset}"
         printf "%b\n" "export CXXFLAGS=\"${_cxxflags}\""
-        printf "# ${ColorParams}%s${ColorReset}:\n" "LDFLAGS"
+        printf "# %bLDFLAGS:%b\n" "${ColorParams}" "${ColorReset}"
         printf "%b\n" "export LDFLAGS=\"${_ldflags}\""
-        printf "# ${ColorParams}%s${ColorReset}:\n" "PKG_CONFIG_PATH"
+        printf "# %bPKG_CONFIG_PATH:%b\n" "${ColorParams}" "${ColorReset}"
         printf "%b\n" "export PKG_CONFIG_PATH=\"${_pkg_config_path}\""
     else # sofin environment override enabled, Default behavior:
-        printf "# ${ColorParams}%s${ColorReset}:\n" "CFLAGS"
+        printf "# %bCFLAGS:%b\n" "${ColorParams}" "${ColorReset}"
         printf "%b\n" "export CFLAGS=\"\""
-        printf "# ${ColorParams}%s${ColorReset}:\n" "CXXFLAGS"
+        printf "# %bCXXFLAGS:%b\n" "${ColorParams}" "${ColorReset}"
         printf "%b\n" "export CXXFLAGS=\"\""
-        printf "# ${ColorParams}%s${ColorReset}:\n" "LDFLAGS"
+        printf "# %bLDFLAGS:%b\n" "${ColorParams}" "${ColorReset}"
         printf "%b\n" "export LDFLAGS=\"\""
-        printf "# ${ColorParams}%s${ColorReset}:\n" "PKG_CONFIG_PATH"
+        printf "# %bPKG_CONFIG_PATH:%b\n" "${ColorParams}" "${ColorReset}"
         printf "%b\n" "export PKG_CONFIG_PATH=\"\""
     fi
 
     # common
-    printf "# ${ColorParams}%s${ColorReset}:\n" "PATH"
+    printf "# %bPATH:%b\n" "${ColorParams}" "${ColorReset}"
     printf "%b\n" "export PATH=\"${_path}\""
-    printf "# ${ColorParams}%s${ColorReset}:\n" "CC"
+    printf "# %bCC:%b\n" "${ColorParams}" "${ColorReset}"
     printf "%b\n" "export CC=\"${CC_NAME}\""
-    printf "# ${ColorParams}%s${ColorReset}:\n" "CXX"
+    printf "# %bCXX:%b\n" "${ColorParams}" "${ColorReset}"
     printf "%b\n" "export CXX=\"${CXX_NAME}\""
-    printf "# ${ColorParams}%s${ColorReset}:\n" "CPP"
+    printf "# %bCPP:%b\n" "${ColorParams}" "${ColorReset}"
     printf "%b\n" "export CPP=\"${CPP}\""
 
     unset _cflags _cxxflags _ldflags _pkg_config_path _manpath _app _exp
@@ -245,7 +244,7 @@ list_bundles_full () {
                 permnote "$(distn "${FAIL_CHAR}" "${ColorRed}") ${_lbfapp_name} $(distn "[!]" "${ColorRed}")"
             fi
             for _lbfreq in $(${FIND_BIN} "${_lbfapp}" -mindepth 1 -maxdepth 1 -iname "*${DEFAULT_INST_MARK_EXT}" 2>/dev/null | ${SORT_BIN} 2>/dev/null); do
-                _lbpp="$(printf '%s' "${_lbfreq##*/}" | ${SED_BIN} "s/${DEFAULT_INST_MARK_EXT}//" 2>/dev/null)"
+                _lbpp="$(printf "%b\n" "${_lbfreq##*/}" | ${SED_BIN} "s/${DEFAULT_INST_MARK_EXT}//" 2>/dev/null)"
                 permnote "   ${NOTE_CHAR} ${_lbpp} $(distn "[" "${ColorGray}")$(distn "$(${CAT_BIN} "${_lbfreq}" 2>/dev/null)")$(distn "]" "${ColorGray}")"
             done
         done
@@ -324,7 +323,7 @@ mark_installed () {
         error "Failed with an empty _verfile!"
     fi
     _softfile="$(lowercase "${_softname}")"
-    run "printf '%s' '${_verfile}' > '${PREFIX}/${_softfile}${DEFAULT_INST_MARK_EXT}'" \
+    printf "%b\n" "${_verfile}" > "${PREFIX}/${_softfile}${DEFAULT_INST_MARK_EXT}" \
         && debug "Stored version: $(distd "${_verfile}") of software: $(distd "${_softfile}") installed in: $(distd "${PREFIX}")"
     unset _softname _verfile _softfile
 }

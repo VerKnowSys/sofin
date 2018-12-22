@@ -75,7 +75,7 @@ install_sofin () {
     compiler_setup \
         && build_sofin_natives \
             && install_sofin_files \
-                && echo "${SOFIN_VERSION}" > "${SOFIN_ROOT}/${SOFIN_NAME}${DEFAULT_INST_MARK_EXT}"
+                && printf "%b\n" "${SOFIN_VERSION}" > "${SOFIN_ROOT}/${SOFIN_NAME}${DEFAULT_INST_MARK_EXT}"
 
     if [ -x "${DEFAULT_SHELL_EXPORTS}/zsh" ]; then
         ${SED_BIN} -i '' -e "s#/usr/bin/env sh#${DEFAULT_SHELL_EXPORTS}/zsh#" \
@@ -126,7 +126,8 @@ try_sudo_installation () {
 
 
 install_sofin_files () {
-    if [ -z "${SOFTWARE_DIR}" ] || [ -z "${SOFIN_ROOT}" ]; then
+    if [ -z "${SOFTWARE_DIR}" ] \
+    || [ -z "${SOFIN_ROOT}" ]; then
         exit 67
     fi
 
