@@ -408,9 +408,9 @@ create_software_dir () {
         try "${ZFS_BIN} list -H -t filesystem '${_dsname}'" \
             || receive_orig
 
-        try "${ZFS_BIN} set sharenfs=off '${_dsname}'"
-        try "${ZFS_BIN} set mountpoint=${SOFTWARE_DIR}/${_dset_create} '${_dsname}'"
-        try "${ZFS_BIN} mount '${_dsname}'" || :
+        try "${ZFS_BIN} set sharenfs=off '${_dsname}' >/dev/null 2>&1"
+        try "${ZFS_BIN} set mountpoint=${SOFTWARE_DIR}/${_dset_create} '${_dsname}' >/dev/null 2>&1"
+        try "${ZFS_BIN} mount '${_dsname}' >/dev/null 2>&1" || :
         unset _dsname
     else
         debug "Creating regular software-directory: $(distd "${SOFTWARE_DIR}/${_dset_create}")"
