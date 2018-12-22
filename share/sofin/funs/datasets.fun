@@ -769,6 +769,6 @@ after_export_snapshot () {
 
 
 create_origin_snaphots () {
-    # Create origin snapshot of the software dataset.
+    debug "create_origin_snaphots(): Create $(distd "@origin") snapshot for software or service dataset of bundle of PREFIX: $(distd "${PREFIX}")."
     do_prefix_snapshot "${ORIGIN_ZFS_SNAP_NAME}"
 }
