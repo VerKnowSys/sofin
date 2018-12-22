@@ -771,12 +771,24 @@ process_flat () {
             cd "${_pwd}"
             try after_test_snapshot
 
+            _whole_list=""
             debug "Cleaning man dir from previous dependencies, we want to install man pages that belong to LAST requirement which is app bundle itself"
-            for place in man share/man share/info share/doc share/docs; do
-                if [ -e "${_prefix}/${place}" ]; then
-                    try "${RM_BIN} -rf '${_prefix}/${place}'"
+            for _stuff_of_other_defs in $(to_iter "man" "share/man" "share/info" "share/doc" "share/docs" "docs" "share/html"); do
+                if [ -d "${_prefix}/${_stuff_of_other_defs}" ]; then
+                    if [ -z "${_whole_list}" ]; then
+                        _whole_list="'./${_stuff_of_other_defs}'"
+                    else
+                        _whole_list="${_whole_list} './${_stuff_of_other_defs}'"
+                    fi
                 fi
             done
+
+            if [ -n "${_whole_list}" ]; then
+                debug "Prepared list of unwanted files: $(distd "\"${_whole_list}\""), from bundle with software PREFIX: $(distd "${_prefix}")."
+                try "${RM_BIN} -fr ${_whole_list} >/dev/null 2>&1"
+            else
+                debug "No known files from previous definitions installed for software PREFIX: $(distd "${_prefix}")"
+            fi
 
             cd "${_pwd}"
             note "   ${NOTE_CHAR} Installing requirement: $(distn "${_app_param}"), version: $(distn "${DEF_VERSION}")"
