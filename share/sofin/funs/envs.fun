@@ -194,14 +194,16 @@ dump_compiler_setup () {
 dump_system_capabilities () {
     # NOTE: make sure that this is not the way with IFS instead of echoing on tr in for loops;
     debug "System capabilities dump:"
-    IFS=\n set 2>/dev/null | ${EGREP_BIN} -i 'CAP_SYS_' 2>/dev/null | while IFS= read -r _envv
+    IFS=\n set 2>/dev/null | ${EGREP_BIN} -i 'CAP_SYS_' 2>/dev/null | while IFS= read -r _capab
     do
-        if [ -n "${_envv}" ]; then
-            debug "$(distd "${_envv}")"
+        if [ -n "${_capab}" ]; then
+            debug " $(distd "${SUCCESS_CHAR}") $(distd "${_capab}" "${ColorGreen}")"
+        else
+            debug " $(distd "${FAIL_CHAR}") $(distd "${_capab}" "${ColorGray}")"
         fi
     done
     debug "System capabilities dump eof"
-    unset _envv
+    unset _capab
 }
 
 
