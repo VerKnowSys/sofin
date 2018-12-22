@@ -296,7 +296,7 @@ initialize () {
 }
 
 
-interrupt_handler () {
+signal_handler_interrupt () {
     warn "Interrupted: $(distw "${SOFIN_PID:-$$}")"
     finalize_after_signal_interrupt
     warn "Interrupted: Bye!"
@@ -304,7 +304,7 @@ interrupt_handler () {
 }
 
 
-terminate_handler () {
+signal_handler_terminate () {
     warn "Terminated: $(distw "${SOFIN_PID:-$$}")"
     finalize_complete_standard_task
     warn "Terminated: Bye!"
@@ -312,8 +312,8 @@ terminate_handler () {
 }
 
 
-noop_handler () {
-    debug "Got USR2 signal. No-OP!"
+signal_handler_noop_usr2 () {
+    debug "Got USR2 signal. Doing nothing!"
 }
 
 
@@ -351,9 +351,9 @@ trap_signals () {
     # 30    SIGUSR1      terminate process    User defined signal 1
     # 31    SIGUSR2      terminate process    User defined signal 2
 
-    trap 'interrupt_handler' INT
-    trap 'terminate_handler' TERM
-    trap 'noop_handler' USR2 # This signal is used to "reload shell"-feature. Sofin should ignore it
+    trap 'signal_handler_interrupt' INT
+    trap 'signal_handler_terminate' TERM
+    trap 'signal_handler_noop_usr2' USR2 # This signal is used to "reload shell"-feature. Sofin should ignore it
 
     debug "trap_signals(): Completed!"
     return 0
@@ -370,7 +370,7 @@ untrap_signals () {
 }
 
 
-set_system_readonly () {
+set_system_dataset_readonly () {
     if [ "YES" = "${CAP_SYS_ZFS}" ] \
     && [ -x "${BEADM_BIN}" ] \
     && [ "root" = "${USER}" ] \

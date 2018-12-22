@@ -105,7 +105,7 @@ finalize_and_quit_gracefully () {
         # Bring back echo to the terminal:
         ${STTY_BIN} echo
     fi
-    set_system_readonly
+    set_system_dataset_readonly
     set_software_dataset_readonly
 }
 
