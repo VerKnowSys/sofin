@@ -32,32 +32,25 @@ check_definitions_availability () {
 }
 
 
-check_os () {
-    case "${SYSTEM_NAME}" in
-        FreeBSD)
-            ;;
-
-        OpenBSD)
-            ;;
-
-        NetBSD)
-            ;;
-
-        Darwin)
-            ;;
-
-        Minix)
-            ;;
-
-        Linux)
-            ;;
-
-        *)
-            error "Currently only FreeBSD, Minix, Darwin and some Linux hosts are supported."
-            ;;
-
-    esac
-}
+# check_os () {
+#     case "${SYSTEM_NAME}" in
+#         FreeBSD)
+#             ;;
+#         OpenBSD)
+#             ;;
+#         NetBSD)
+#             ;;
+#         Darwin)
+#             ;;
+#         Minix)
+#             ;;
+#         Linux)
+#             ;;
+#         *)
+#             error "Currently only FreeBSD, Minix, Darwin and some Linux hosts are supported."
+#             ;;
+#     esac
+# }
 
 
 file_size () {
