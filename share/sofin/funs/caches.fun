@@ -33,7 +33,7 @@ show_logs () {
             _all_files="${_mr} ${_all_files}"
         done
         if [ -n "${_all_files}" ]; then
-            _2x_more_lines="$(calculate_bc "2 * ${LOG_LINES_AMOUNT}")"
+            _2x_more_lines=$(( ${LOG_LINES_AMOUNT} * 2 ))
             eval "${TAIL_BIN} -F -n ${_2x_more_lines} ${_all_files}"
         else
             return 1

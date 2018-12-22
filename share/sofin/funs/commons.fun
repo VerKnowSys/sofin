@@ -240,16 +240,16 @@ file_checksum () {
 }
 
 
-# give any input to pass it through bc:
-calculate_bc () {
-    printf "%b\n" "${@}" 2>/dev/null | ${BC_BIN} 2>/dev/null
-}
+# # give any input to pass it through bc:
+# calculate_bc () {
+#     printf "%b\n" "${@}" 2>/dev/null | ${BC_BIN} 2>/dev/null
+# }
 
 
-print_rainbow () {
-    printf "${ColorReset}ColorReset${ColorRed}ColorRed${ColorGreen}ColorGreen${ColorYellow}ColorYellow${ColorBlue}ColorBlue${ColorMagenta}ColorMagenta${ColorCyan}ColorCyan${ColorGray}ColorGray${ColorWhite}ColorWhite"
+# print_rainbow () {
+#     printf "${ColorReset}ColorReset${ColorRed}ColorRed${ColorGreen}ColorGreen${ColorYellow}ColorYellow${ColorBlue}ColorBlue${ColorMagenta}ColorMagenta${ColorCyan}ColorCyan${ColorGray}ColorGray${ColorWhite}ColorWhite"
 
-    for i in $(seq 0 $(${TPUT_BIN} colors)); do
-        printf "$(${TPUT_BIN} setaf ${i}):${i}:TEXT-COLORFUL${ColorReset}\t"
-    done
-}
+#     for i in $(seq 0 $(${TPUT_BIN} colors)); do
+#         printf "$(${TPUT_BIN} setaf ${i}):${i}:TEXT-COLORFUL${ColorReset}\t"
+#     done
+# }

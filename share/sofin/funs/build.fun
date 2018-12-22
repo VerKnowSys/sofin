@@ -246,7 +246,7 @@ build () {
                         permnote "Installing: $(distn "${DEF_FULL_NAME:-${DEF_NAME}${DEF_SUFFIX}}"), version: $(distn "${DEF_VERSION}"), with requirements: $(distn "${DEF_REQUIREMENTS}")"
                     fi
                     _req_amount="$(printf "%b\n" "${DEF_REQUIREMENTS}" | ${WC_BIN} -w 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)"
-                    _req_amount="$(calculate_bc "${_req_amount} + 1")"
+                    _req_amount=$(( ${_req_amount} + 1 ))
                     _req_all="${_req_amount}"
                     for _req in $(to_iter "${DEF_REQUIREMENTS}"); do
                         if [ -n "${DEF_USER_INFO}" ]; then
@@ -262,7 +262,7 @@ build () {
                                 process_flat "${_req}" "${PREFIX}"
                             fi
                         fi
-                        _req_amount="$(calculate_bc "${_req_amount} - 1")"
+                        _req_amount=$(( ${_req_amount} - 1 ))
                     done
                 fi
 

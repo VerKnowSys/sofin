@@ -499,8 +499,9 @@ strip_bundle () {
     # _link="symbolic link to"
     # _script="script text executable"
     #
-    _counter="0"
-    unset _universal_ft _to_be_stripped_list
+    _files_counter="0"
+    _to_be_stripped_list=""
+    unset _universal_ft
     case "${SYSTEM_NAME}" in
         Darwin)
             _exec_ft="Mach-O 64-bit executable x86_64"
@@ -519,27 +520,25 @@ strip_bundle () {
             for _file in $(${FIND_BIN} "${_stripdir}" -maxdepth 1 -type f 2>/dev/null); do
                 _file_type="$(${FILE_BIN} -b "${_file}" 2>/dev/null)"
                 for _type in "${_exec_ft}" "${_lib_ft}" "${_universal_ft}"; do
-                    echo "'${_file_type}'" | ${GREP_BIN} -F "${_type}" >/dev/null 2>&1
+                    printf "%b\n" "${_file_type}" | ${GREP_BIN} -F "${_type}" >/dev/null 2>&1
                     if [ "0" = "${?}" ]; then
-                        _counter="${_counter} + 1"
-                        _to_be_stripped_list="${_file} ${_to_be_stripped_list}"
+                        _files_counter=$(( ${_files_counter} + 1 ))
+                        if [ -z "${_to_be_stripped_list}" ]; then
+                            _to_be_stripped_list="'${_file}'"
+                        else
+                            _to_be_stripped_list="${_to_be_stripped_list} '${_file}'"
+                        fi
                     fi
                 done
             done
         fi
     done
-    _sbresult="$(calculate_bc "${_counter}")"
-    if [ "${_sbresult}" -lt "0" ] \
-    || [ -z "${_sbresult}" ]; then
-        _sbresult="0"
-    else
-        if [ -n "${_to_be_stripped_list}" ]; then
-            printf "%b\n" "${_to_be_stripped_list}" | ${XARGS_BIN} -n 1 -P "${CPUS}" -I {} "${SH_BIN}" -c "${STRIP_BIN} ${DEFAULT_STRIP_OPTS} {} >/dev/null 2>&1" \
-                && debug "Stripping: $(distd "${_sbresult}") files in parallel." \
-                    && try "${TOUCH_BIN} '${PREFIX}/${_sbfdefinition_name}${DEFAULT_STRIPPED_MARK_EXT}'"
-        fi
+    if [ -n "${_to_be_stripped_list}" ]; then
+        printf "%b\n" "${_to_be_stripped_list}" | ${XARGS_BIN} -n 1 -P "4" -I {} "${SHELL}" -c "${STRIP_BIN} ${DEFAULT_STRIP_OPTS} {}" 2>/dev/null \
+            && debug "Stripping: $(distd "${_files_counter}") files in parallel." \
+                && try "${TOUCH_BIN} '${PREFIX}/${_sbfdefinition_name}${DEFAULT_STRIPPED_MARK_EXT}'"
     fi
-    unset _sbfdefinition_name _dirs_to_strip _sbresult _counter _files _stripdir _bundlower _to_be_stripped_list
+    unset _sbfdefinition_name _dirs_to_strip _files_counter _files _stripdir _bundlower _to_be_stripped_list
 }
 
 
