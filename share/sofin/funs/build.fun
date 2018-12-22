@@ -650,7 +650,7 @@ process_flat () {
                         if [ -x "${PREFIX}/bin/ninja" ] \
                         || [ -x "${SOFIN_UTILS_PATH}/ninja" ]; then
                             run "${RM_BIN} -f CMakeCache.txt; ${_cmake_cmdline} -G'Ninja'"
-                            DEF_MAKE_METHOD="ninja -j${CPUS:-8}"
+                            DEF_MAKE_METHOD="ninja -j${CPUS}"
                             DEF_INSTALL_METHOD="ninja install"
 
                         else # Makefiles:
