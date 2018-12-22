@@ -1,7 +1,11 @@
 unshare_all_zfs_datasets () {
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
-        try "${ZFS_BIN} unshare -a" \
-            && debug "Successfully unshared all NFS-shared datasets."
+        try "${ZFS_BIN} unshare -a >/dev/null 2>&1" \
+            && debug "Successfully unshared all NFS-shared datasets." \
+                && return 0
+
+        debug "Unsharing everything: Failed :("
+        return 1
     fi
 }
 
