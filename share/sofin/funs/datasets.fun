@@ -437,24 +437,27 @@ destroy_software_dir () {
         error "First argument with $(diste "BundleName") to destroy is required!"
     fi
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
-        set_system_writable
         _dsbase="${DEFAULT_ZPOOL}${SOFTWARE_DIR}/${SYSTEM_DATASET}"
         _dsname="${_dsbase}/${_dset_destroy}"
-        try "${ZFS_BIN} set readonly=off '${_dsbase}' >/dev/null 2>&1"
-        try "${ZFS_BIN} set readonly=off '${_dsname}' >/dev/null 2>&1"
-        try "${ZFS_BIN} set sharenfs=off '${_dsbase}' >/dev/null 2>&1"
-        try "${ZFS_BIN} set sharenfs=off '${_dsname}' >/dev/null 2>&1"
+
+        # make system writable, unshare any NFS shares associated with ZFS dataset,
+        set_system_writable
+        try "${ZFS_BIN} set sharenfs=inherit '${_dsbase}' >/dev/null 2>&1"
+        try "${ZFS_BIN} set sharenfs=inherit '${_dsname}' >/dev/null 2>&1"
+        try "${ZFS_BIN} unshare '${_dsname}' >/dev/null 2>&1"
+
+        # finally proceed with guaranteed destroy:
         try "${ZFS_BIN} umount -f '${_dsname}' >/dev/null 2>&1"
         try "${ZFS_BIN} destroy -fr '${_dsname}' >/dev/null 2>&1" \
-            && debug "Destroyed software-dataset: $(distd "${_dsname}")"
-        try "${RM_BIN} -rf '${SOFTWARE_DIR}/${_dset_destroy}' >/dev/null 2>&1"
+            && debug "Destroyed software-dataset: $(distd "${_dsname}")" \
+                && try "${RM_BIN} -rf '${SOFTWARE_DIR}/${_dset_destroy}' >/dev/null 2>&1"
+
         set_system_readonly
-        unset _dsname _dsbase
     else
         debug "Removing regular software-directory: $(distd "${SOFTWARE_DIR}/${_dset_destroy}")"
         try "${RM_BIN} -rf '${SOFTWARE_DIR}/${_dset_destroy}' >/dev/null 2>&1"
     fi
-    unset _dset_destroy
+    unset _dset_destroy _dsname _dsbase
 }
 
 
