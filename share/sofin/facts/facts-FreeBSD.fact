@@ -32,7 +32,7 @@ HBSDCONTROL_BIN="/usr/sbin/hbsdcontrol"
 # GVR_BIN="/usr/bin/gvr"
 
 # set core parameters:
-CPUS="$(${SYSCTL_BIN} -e kern.smp.cpus 2>/dev/null | ${CUT_BIN} -d'=' -f2 2>/dev/null)"
+CPUS="$(${SYSCTL_BIN} -n kern.smp.cpus 2>/dev/null)"
 ALL_CPUS="${CPUS:-${DEFAULT_CPUS}}"
 MAKE_OPTS="-s -j${CPUS:-${DEFAULT_CPUS}}"
 
