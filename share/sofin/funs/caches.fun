@@ -59,7 +59,7 @@ pretouch_logs () {
                 fi
             fi
         done
-        try "${TOUCH_BIN} ${LOGS_DIR}${SOFIN_NAME} ${_pret_list}"
+        ${TOUCH_BIN} ${LOGS_DIR}${SOFIN_NAME} ${_pret_list} >/dev/null 2>&1
         unset _app _params
     fi
 }
