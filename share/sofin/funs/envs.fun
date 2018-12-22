@@ -34,8 +34,8 @@ enable_sofin_env () {
     fi
     debug "Enabling Sofin env for: $(distd "${_envs}")"
     for _env in $(to_iter "${_envs}"); do
-        ${GREP_BIN} -F "${_env}" "${SOFIN_ENV_ENABLED_INDICATOR_FILE}" >/dev/null 2>&1 || \
-            printf "%s\n" "${_env}" >> "${SOFIN_ENV_ENABLED_INDICATOR_FILE}"
+        ${GREP_BIN} -F "${_env}" "${SOFIN_ENV_ENABLED_INDICATOR_FILE}" >/dev/null 2>&1 \
+            || printf "%s\n" "${_env}" >> "${SOFIN_ENV_ENABLED_INDICATOR_FILE}"
     done
     note "Enabled Sofin environment for bundles: $(distn "${_envs}")"
 }
@@ -146,35 +146,35 @@ dump_compiler_setup () {
     fi
 
     # -fPIC check:
-    echo "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'f[Pp][Ii][Cc]' >/dev/null 2>&1 && ( \
-        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "position-independent-code" "${ColorGreen}")" || \
-        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "position-independent-code" "${ColorGray}")")
+    echo "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'f[Pp][Ii][Cc]' >/dev/null 2>&1 \
+        && (debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "position-independent-code" "${ColorGreen}")" \
+            || debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "position-independent-code" "${ColorGray}")")
 
     # -fPIE check:
-    echo "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'f[Pp][Ii][Ee]' >/dev/null 2>&1 && ( \
-        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "position-independent-executable" "${ColorGreen}")" || \
-        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "position-independent-executable" "${ColorGray}")")
+    echo "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'f[Pp][Ii][Ee]' >/dev/null 2>&1 \
+        && (debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "position-independent-executable" "${ColorGreen}")" \
+            || debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "position-independent-executable" "${ColorGray}")")
 
     # -fstack-protector-all check:
-    echo "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'fstack-protector-all' >/dev/null 2>&1 && ( \
-        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "stack-protector-all" "${ColorGreen}")" || \
-        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "stack-protector-all" "${ColorGray}")")
+    echo "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'fstack-protector-all' >/dev/null 2>&1 \
+        && (debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "stack-protector-all" "${ColorGreen}")" \
+            || debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "stack-protector-all" "${ColorGray}")")
 
     # -fstack-protector-strong check:
-    echo "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'fstack-protector-strong' >/dev/null 2>&1 && ( \
-        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "stack-protector-strong" "${ColorGreen}")" || \
-        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "stack-protector-strong" "${ColorGray}")")
+    echo "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'fstack-protector-strong' >/dev/null 2>&1 \
+        && (debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "stack-protector-strong" "${ColorGreen}")" \
+            || debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "stack-protector-strong" "${ColorGray}")")
 
     # -fno-strict-overflow check:
-    echo "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'fno-strict-overflow' >/dev/null 2>&1 && ( \
-        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "no-strict-overflow" "${ColorGreen}")" || \
-        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "no-strict-overflow" "${ColorGray}")")
+    echo "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'fno-strict-overflow' >/dev/null 2>&1 \
+        && (debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "no-strict-overflow" "${ColorGreen}")" \
+            || debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "no-strict-overflow" "${ColorGray}")")
 
     # -ftrapv check:
     # NOTE: Signed integer overflow raises the signal SIGILL instead of SIGABRT/SIGSEGV:
-    echo "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'ftrapv' >/dev/null 2>&1 && ( \
-        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "trap-signed-integer-overflow" "${ColorGreen}")" || \
-        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "trap-signed-integer-overflow" "${ColorGray}")")
+    echo "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'ftrapv' >/dev/null 2>&1 \
+        && (debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "trap-signed-integer-overflow" "${ColorGreen}")" \
+            || debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "trap-signed-integer-overflow" "${ColorGray}")")
 
     if [ -z "${DEF_LINKER_NO_DTAGS}" ]; then
         debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "enable-new-dtags" "${ColorGreen}")"
@@ -290,16 +290,16 @@ compiler_setup () {
         _compiler_use_linker_flags="-fuse-ld=lld"
 
 
-    elif [ -z "${DEF_NO_GOLDEN_LINKER}" ] && \
-         [ "YES" = "${CAP_SYS_GOLD_LD}" ]; then
+    elif [ -z "${DEF_NO_GOLDEN_LINKER}" ] \
+      && [ "YES" = "${CAP_SYS_GOLD_LD}" ]; then
 
         # Golden linker support:
         case "${SYSTEM_NAME}" in
             FreeBSD|Minix)
                 _llvm_pfx="/Software/Gold"
                 _llvm_target="$(${_llvm_pfx}/bin/llvm-config --host-target 2>/dev/null || :)"
-                if [ -n "${_llvm_target}" ] && \
-                   [ -d "${_llvm_pfx}/${_llvm_target}" ]; then
+                if [ -n "${_llvm_target}" ] \
+                && [ -d "${_llvm_pfx}/${_llvm_target}" ]; then
                     _compiler_use_linker_flags="-fuse-ld=gold"
                     LD="${LD_BIN}.gold --plugin ${GOLD_SO}"
                     RANLIB="${_llvm_pfx}/${_llvm_target}/bin/ranlib --plugin ${GOLD_SO}"
@@ -311,8 +311,8 @@ compiler_setup () {
                 else
                     debug "Failed to get LLVM-host-target hint from llvm-config. Got: '$(distd "${_llvm_target}")'"
                     unset NM AR AS RANLIB STRIP
-                    if [ -x "${GOLD_SO}" ] && \
-                       [ -x "${LD_BIN}.gold" ]; then
+                    if [ -x "${GOLD_SO}" ] \
+                    && [ -x "${LD_BIN}.gold" ]; then
                         LD="${LD_BIN}.gold --plugin ${GOLD_SO}"
                     else
                         # Fallback:
@@ -500,8 +500,8 @@ acquire_lock_for () {
                     if [ "${_lock_pid}" = "${SOFIN_PID}" ] \
                     || [ "${PPID}" = "${SOFIN_PID}" ]; then
                         debug "Dealing with own process or it's fork, process may continue.."
-                    elif [ "${_lock_pid}" = "${SOFIN_PID}" ] && \
-                         [ -z "${PPID}" ]; then
+                    elif [ "${_lock_pid}" = "${SOFIN_PID}" ] \
+                      && [ -z "${PPID}" ]; then
                         debug "Dealing with no fork, process may continue.."
                     else
                         error "Bundle: $(diste "${_bundle}") is locked due to background job pid: $(diste "${_lock_pid}")"
@@ -528,22 +528,22 @@ destroy_dead_locks () {
 
     _pid="${SOFIN_PID}"
     for _dlf in $(${FIND_BIN} "${LOCKS_DIR%/}" -mindepth 1 -maxdepth 1 -name "*${_pattern}*${DEFAULT_LOCK_EXT}" -print 2>/dev/null); do
-        try "${EGREP_BIN} '^${_pid}$' ${_dlf}" && \
-            try "${RM_BIN} -f ${_dlf}" && \
-                debug "Removed currently owned pid lock: $(distd "${_dlf}")"
+        try "${EGREP_BIN} '^${_pid}$' ${_dlf}" \
+            && try "${RM_BIN} -f ${_dlf}" \
+                && debug "Removed currently owned pid lock: $(distd "${_dlf}")"
 
         _possiblepid="$(${CAT_BIN} "${_dlf}" 2>/dev/null)"
         if [ -n "${_possiblepid}" ]; then
-            try "${KILL_BIN} -0 ${_possiblepid}"
+            try "${KILL_BIN} -0 ${_possiblepid} >/dev/null 2>&1"
             if [ "${?}" != "0" ]; then
-                try "${RM_BIN} -f ${_dlf}" && \
-                    debug "Pid: $(distd "${_pid}") appears to be already dead. Removed lock file: $(distd "${_dlf}")"
+                try "${RM_BIN} -f '${_dlf}'" \
+                    && debug "Pid: $(distd "${_pid}") appears to be already dead. Removed lock file: $(distd "${_dlf}")"
             else
                 debug "Pid: $(distd "${_pid}") is alive. Leaving lock untouched."
             fi
         fi
-    done && \
-        debug "Finished locks cleanup using pattern: $(distd "${_pattern:-''}") that belong to pid: $(distd "${_pid}")"
+    done \
+        && debug "Finished locks cleanup using pattern: $(distd "${_pattern:-''}") that belong to pid: $(distd "${_pid}")"
     unset _dlf _pid _possiblepid _pattern
 }
 
@@ -558,8 +558,8 @@ reload_shell () {
     if [ -z "${NO_SIGNAL}" ]; then
         # NOTE: PPID contains pid of parent shell of Sofin
         if [ -n "${PPID}" ]; then
-            try "${KILL_BIN} -SIGUSR2 ${PPID}" && \
-                debug "Reload signal sent to parent pid: $(distd "${PPID}")"
+            try "${KILL_BIN} -SIGUSR2 ${PPID} >/dev/null 2>&1" \
+                && debug "Reload signal sent to parent pid: $(distd "${PPID}")"
         else
             debug "Skipped reload_shell() for no $(distd PPID)"
         fi
@@ -576,12 +576,12 @@ update_system_shell_env_files () {
             if [ "${?}" = "0" ]; then
                 continue
             else
-                printf '\n\n%s\n' "${SOFIN_SHELL_BLOCK}" >> "${_env_file}" && \
-                    debug "Environment block appended to file: $(distd "${_env_file}")"
+                printf '\n\n%b\n' "${SOFIN_SHELL_BLOCK}" >> "${_env_file}" \
+                    && debug "Environment block appended to file: $(distd "${_env_file}")"
             fi
         else
-            printf '\n\n%s\n' "${SOFIN_SHELL_BLOCK}" >> "${_env_file}" && \
-                debug "Environment block written to file: $(distd "${_env_file}")"
+            printf '\n\n%b\n' "${SOFIN_SHELL_BLOCK}" >> "${_env_file}" \
+                && debug "Environment block written to file: $(distd "${_env_file}")"
         fi
     done
     unset _default_envs _env_file

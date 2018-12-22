@@ -3,11 +3,11 @@
 
 # NOTE: Load core.fact for basic definitions:
 SOFIN_ROOT="${SOFIN_ROOT:-/Software/Sofin}"
-if [ -d "share/sofin/facts/" ] && \
-   [ -f "share/sofin/facts/core.fact" ]; then
+if [ -d "share/sofin/facts/" ] \
+&& [ -f "share/sofin/facts/core.fact" ]; then
     . "share/sofin/facts/core.fact"
-elif [ -d "${SOFIN_ROOT}/share/facts/" ] && \
-     [ -f "${SOFIN_ROOT}/share/facts/core.fact" ]; then
+elif [ -d "${SOFIN_ROOT}/share/facts/" ] \
+&&   [ -f "${SOFIN_ROOT}/share/facts/core.fact" ]; then
     . "${SOFIN_ROOT}/share/facts/core.fact"
 fi
 

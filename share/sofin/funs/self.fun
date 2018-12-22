@@ -22,12 +22,11 @@ load_requirements () {
 
 prepare_and_manage_origin () {
     if [ -n "${CAP_SYS_ZFS}" ]; then
-        try "zfs set readonly=off '${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/${SOFIN_BUNDLE_NAME}'"
+        try "zfs set readonly=off '${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/${SOFIN_BUNDLE_NAME}' >/dev/null 2>&1"
 
         # Create "root" Sofin dataset:
-        zfs list "${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/${SOFIN_BUNDLE_NAME}" >/dev/null 2>&1 || \
-            zfs create -o mountpoint="${SOFTWARE_DIR}/${SOFIN_BUNDLE_NAME}" \
-                "${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/${SOFIN_BUNDLE_NAME}"
+        try "zfs list '${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/${SOFIN_BUNDLE_NAME}' >/dev/null 2>&1" \
+            || try "zfs create -o mountpoint='${SOFTWARE_DIR}/${SOFIN_BUNDLE_NAME}' '${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/${SOFIN_BUNDLE_NAME}' >/dev/null 2>&1"
 
         _any_snap="$(zfs list -H -r -t snapshot -o name "${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/${SOFIN_BUNDLE_NAME}" 2>/dev/null)"
         if [ -n "${_any_snap}" ]; then
@@ -37,17 +36,17 @@ prepare_and_manage_origin () {
             if [ "${_snap_amount}" -gt "${DEFAULT_ZFS_MAX_SNAPSHOT_COUNT}" ]; then
                 debug "Old snapshots count: $(distd "${_snap_amount}")"
                 for _a_snap in $(to_iter "${_any_snap}"); do
-                    try "zfs destroy '${_a_snap}'" && \
-                        permnote "Destroyed the oldest $(distn "@${ORIGIN_ZFS_SNAP_NAME}") snapshot: $(distn "${_a_snap}")." && \
-                            break # - we want to remove at least one snapshot
+                    try "zfs destroy '${_a_snap}' >/dev/null 2>&1" \
+                        && permnote "Destroyed the oldest $(distn "@${ORIGIN_ZFS_SNAP_NAME}") snapshot: $(distn "${_a_snap}")." \
+                            && break # - we want to remove at least one snapshot
                 done
             else
                 debug "Old ${SOFIN_BUNDLE_NAME} snapshots count: $(distd "${_snap_amount}")"
             fi
 
             _timestamp_now="$(date +%F-%H%M-%s 2>/dev/null)"
-            try "zfs rename '${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/${SOFIN_BUNDLE_NAME}@${ORIGIN_ZFS_SNAP_NAME}' '@${ORIGIN_ZFS_SNAP_NAME}-${_timestamp_now}'" && \
-                permnote "Renamed current @${ORIGIN_ZFS_SNAP_NAME} for ${SOFIN_BUNDLE_NAME} dataset."
+            try "zfs rename '${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/${SOFIN_BUNDLE_NAME}@${ORIGIN_ZFS_SNAP_NAME}' '@${ORIGIN_ZFS_SNAP_NAME}-${_timestamp_now}'" \
+                && permnote "Renamed current @${ORIGIN_ZFS_SNAP_NAME} for ${SOFIN_BUNDLE_NAME} dataset."
         fi
     fi
 }
@@ -55,10 +54,10 @@ prepare_and_manage_origin () {
 
 commit_origin () {
     if [ -n "${CAP_SYS_ZFS}" ]; then
-        run "zfs snapshot ${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/${SOFIN_BUNDLE_NAME}@${ORIGIN_ZFS_SNAP_NAME}" && \
-            permnote "Created new $(distn "@${ORIGIN_ZFS_SNAP_NAME}") snapshot of bundle: $(distn "${SOFIN_BUNDLE_NAME}")."
+        run "zfs snapshot ${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/${SOFIN_BUNDLE_NAME}@${ORIGIN_ZFS_SNAP_NAME}" \
+            && permnote "Created new $(distn "@${ORIGIN_ZFS_SNAP_NAME}") snapshot of bundle: $(distn "${SOFIN_BUNDLE_NAME}")."
 
-        try "zfs set readonly=on ${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/${SOFIN_BUNDLE_NAME}"
+        try "zfs set readonly=on ${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/${SOFIN_BUNDLE_NAME} >/dev/null 2>&1"
     fi
 }
 
@@ -73,16 +72,17 @@ install_sofin () {
     prepare_and_manage_origin
 
     permnote "Install $(distn "${SOFIN_BUNDLE_NAME}") to prefix: $(distn "${SOFIN_ROOT}")"
-    compiler_setup && \
-        build_sofin_natives && \
-        install_sofin_files && \
-        echo "${SOFIN_VERSION}" > "${SOFIN_ROOT}/${SOFIN_NAME}${DEFAULT_INST_MARK_EXT}"
+    compiler_setup \
+        && build_sofin_natives \
+            && install_sofin_files \
+                && echo "${SOFIN_VERSION}" > "${SOFIN_ROOT}/${SOFIN_NAME}${DEFAULT_INST_MARK_EXT}"
 
     if [ -x "${DEFAULT_SHELL_EXPORTS}/zsh" ]; then
         ${SED_BIN} -i '' -e "s#/usr/bin/env sh#${DEFAULT_SHELL_EXPORTS}/zsh#" \
             "${SOFIN_ROOT}/bin/s" \
-            "${SOFIN_ROOT}/share/loader" && \
-            permnote "${SOFIN_BUNDLE_NAME} v$(distn "${SOFIN_VERSION}") was installed successfully!"
+            "${SOFIN_ROOT}/share/loader" \
+            >/dev/null 2>&1 \
+                && permnote "${SOFIN_BUNDLE_NAME} v$(distn "${SOFIN_VERSION}") was installed successfully!"
     fi
 
     commit_origin
@@ -107,8 +107,8 @@ build_sofin_natives () {
     for _prov in ${SOFIN_PROVIDES}; do
         if [ -f "src/${_prov}.cc" ]; then
             debug "${SOFIN_BUNDLE_NAME}: Build: ${CXX_NAME} -o bin/${_prov} ${CFLAGS} src/${_prov}.cc"
-            run "${CXX_NAME} ${DEFAULT_COMPILER_FLAGS} ${DEFAULT_LINKER_FLAGS} src/${_prov}.cc -o bin/${_prov}" && \
-                permnote "  ${_okch} cc: src/${_prov}.cc"
+            run "${CXX_NAME} ${DEFAULT_COMPILER_FLAGS} ${DEFAULT_LINKER_FLAGS} src/${_prov}.cc -o bin/${_prov}" \
+                && permnote "  ${_okch} cc: src/${_prov}.cc"
 
             continue
         fi
@@ -119,8 +119,8 @@ build_sofin_natives () {
 try_sudo_installation () {
     _cmds="sudo ${MKDIR_BIN} -vp ${SOFTWARE_DIR} ${SERVICES_DIR} && sudo ${CHOWN_BIN} -R ${USER} ${SOFTWARE_DIR} ${SERVICES_DIR}"
     permnote "Please provide password for commands: $(distn "${_cmds}")"
-    eval "${_cmds}" || \
-        exit 66
+    eval "${_cmds}" \
+        || exit 66
     unset _cmds
 }
 
@@ -130,8 +130,8 @@ install_sofin_files () {
         exit 67
     fi
 
-    ${MKDIR_BIN} -p "${SOFTWARE_DIR}" "${SERVICES_DIR}" "${SOFIN_ROOT}/bin" "${SOFIN_ROOT}/exports" "${SOFIN_ROOT}/share" || \
-        try_sudo_installation
+    ${MKDIR_BIN} -p "${SOFTWARE_DIR}" "${SERVICES_DIR}" "${SOFIN_ROOT}/bin" "${SOFIN_ROOT}/exports" "${SOFIN_ROOT}/share" \
+        || try_sudo_installation
 
     _okch="$(distn "${SUCCESS_CHAR}" "${ColorParams}")"
     for _prov in ${SOFIN_PROVIDES}; do
@@ -139,15 +139,15 @@ install_sofin_files () {
             run "${INSTALL_BIN} bin/${_prov} ${SOFIN_ROOT}/bin"
             run "${RM_BIN} -f bin/${_prov}"
         fi
-    done && \
-        permnote "  ${_okch} native utils"
+    done \
+        && permnote "  ${_okch} native utils"
 
-    run "${CP_BIN} -fR share/sofin/* ${SOFIN_ROOT}/share/" && \
-        permnote "  ${_okch} facts and functions"
+    run "${CP_BIN} -fR share/sofin/* ${SOFIN_ROOT}/share/" \
+        && permnote "  ${_okch} facts and functions"
 
-    run "${INSTALL_BIN} -m 755 src/s-hbsdcontrol.sh ${SOFIN_ROOT}/bin/s-hbsdcontrol" && \
-    run "${INSTALL_BIN} -m 755 src/s.sh ${SOFIN_ROOT}/bin/s" && \
-        permnote "  ${_okch} sofin launcher"
+    run "${INSTALL_BIN} -m 755 src/s-hbsdcontrol.sh ${SOFIN_ROOT}/bin/s-hbsdcontrol" \
+        && run "${INSTALL_BIN} -m 755 src/s.sh ${SOFIN_ROOT}/bin/s" \
+            && permnote "  ${_okch} sofin launcher"
 
     permnote "Read: $(distn "https://github.com/VerKnowSys/sofin") for more details."
     permnote "Type: $(distn "s usage") for quick help."
@@ -157,17 +157,21 @@ install_sofin_files () {
 
 set_software_root_readonly () {
     if [ "YES" = "${CAP_SYS_JAILED}" ]; then
-        ${ZFS_BIN} set readonly=on "${DEFAULT_ZPOOL}/Software/${HOST}" || :
+        ${ZFS_BIN} set readonly=on "${DEFAULT_ZPOOL}/Software/${HOST}" >/dev/null 2>&1 \
+            && debug "Ok(jailed): set readonly=on '${DEFAULT_ZPOOL}/Software/${HOST}'"
     else
-        ${ZFS_BIN} set readonly=on "${DEFAULT_ZPOOL}/Software/${USER}" || :
+        ${ZFS_BIN} set readonly=on "${DEFAULT_ZPOOL}/Software/${USER}" >/dev/null 2>&1 \
+            && debug "Ok(unjailed): set readonly=on '${DEFAULT_ZPOOL}/Software/${USER}'"
     fi
 }
 
 
 set_software_root_writable () {
     if [ "YES" = "${CAP_SYS_JAILED}" ]; then
-        ${ZFS_BIN} set readonly=off "${DEFAULT_ZPOOL}/Software/${HOST}" || :
+        ${ZFS_BIN} set readonly=off "${DEFAULT_ZPOOL}/Software/${HOST}" >/dev/null 2>&1 \
+            && debug "Ok(jailed): set readonly=off '${DEFAULT_ZPOOL}/Software/${HOST}'"
     else
-        ${ZFS_BIN} set readonly=off "${DEFAULT_ZPOOL}/Software/${USER}" || :
+        ${ZFS_BIN} set readonly=off "${DEFAULT_ZPOOL}/Software/${USER}" >/dev/null 2>&1 \
+            && debug "Ok(unjailed): set readonly=off '${DEFAULT_ZPOOL}/Software/${USER}'"
     fi
 }

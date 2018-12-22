@@ -257,8 +257,8 @@ show_diff () {
     create_dirs
     _sddefname="${1}"
     # if specified a file name, make sure it's named properly:
-    ${EGREP_BIN} "${DEFAULT_DEF_EXT}$" "${_sddefname}" >/dev/null 2>&1 || \
-        _sddefname="${_sddefname}${DEFAULT_DEF_EXT}"
+    ${EGREP_BIN} "${DEFAULT_DEF_EXT}$" "${_sddefname}" >/dev/null 2>&1 \
+        || _sddefname="${_sddefname}${DEFAULT_DEF_EXT}"
     _beauty_defn="$(distn "${_sddefname}")"
 
     cd "${DEFINITIONS_DIR}"
@@ -326,8 +326,8 @@ mark_installed () {
         error "Failed with an empty _verfile!"
     fi
     _softfile="$(lowercase "${_softname}")"
-    run "printf '%s' \"${_verfile}\" > ${PREFIX}/${_softfile}${DEFAULT_INST_MARK_EXT}" && \
-        debug "Stored version: $(distd "${_verfile}") of software: $(distd "${_softfile}") installed in: $(distd "${PREFIX}")"
+    run "printf '%s' '${_verfile}' > '${PREFIX}/${_softfile}${DEFAULT_INST_MARK_EXT}'" \
+        && debug "Stored version: $(distd "${_verfile}") of software: $(distd "${_softfile}") installed in: $(distd "${PREFIX}")"
     unset _softname _verfile _softfile
 }
 
@@ -338,8 +338,8 @@ mark_dependency_test_passed () {
         error "To mark dependency '$(diste "PASSED")' - you must provide it's name first!"
     fi
     _softfile="$(lowercase "${_softname}")"
-    run "${TOUCH_BIN} ${PREFIX}/${_softfile}${DEFAULT_TEST_PASSED_EXT}" && \
-        debug "Test suite $(distd "PASSED") for dependency: $(distd "${_softfile}")"
+    run "${TOUCH_BIN} '${PREFIX}/${_softfile}${DEFAULT_TEST_PASSED_EXT}'" \
+        && debug "Test suite $(distd "PASSED") for dependency: $(distd "${_softfile}")"
     unset _softname _verfile _softfile
 }
 

@@ -375,10 +375,10 @@ untrap_signals () {
 
 
 set_system_readonly () {
-    if [ "YES" = "${CAP_SYS_ZFS}" ] && \
-       [ -x "${BEADM_BIN}" ] && \
-       [ "root" = "${USER}" ] && \
-       [ -z "${CAP_SYS_JAILED}" ]; then
+    if [ "YES" = "${CAP_SYS_ZFS}" ] \
+    && [ -x "${BEADM_BIN}" ] \
+    && [ "root" = "${USER}" ] \
+    && [ -z "${CAP_SYS_JAILED}" ]; then
         debug "Beadm found, turning off readonly mode for default boot environment"
         _active_boot_env="$(${BEADM_BIN} list -H 2>/dev/null | ${EGREP_BIN} "R" 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)"
         _boot_dataset="${DEFAULT_ZPOOL}/ROOT/${_active_boot_env}"
@@ -399,9 +399,9 @@ set_system_readonly () {
 
 
 set_system_writable () {
-    if [ -x "${BEADM_BIN}" ] && \
-       [ "root" = "${USER}" ] && \
-       [ -z "${CAP_SYS_JAILED}" ]; then
+    if [ -x "${BEADM_BIN}" ] \
+    && [ "root" = "${USER}" ] \
+    && [ -z "${CAP_SYS_JAILED}" ]; then
         if [ -n "${CAP_SYS_PRODUCTION}" ]; then
             debug "Production mode, skipping readonly mode for /"
         else
@@ -437,7 +437,7 @@ disable_security_features () {
     if [ "YES" = "${CAP_SYS_HARDENED}" ]; then
         if [ -z "${CAP_SYS_PRODUCTION}" ]; then
             debug "Disabling all security features (this host is NOT production).."
-            try "${RM_BIN} -f ${DEFAULT_SECURITY_STATE_FILE}"
+            try "${RM_BIN} -f '${DEFAULT_SECURITY_STATE_FILE}'"
             for _key in ${DEFAULT_HARDEN_KEYS}; do
                 try "${SYSCTL_BIN} ${_key}=0 >/dev/null"
             done
@@ -452,11 +452,11 @@ disable_security_features () {
 
 
 create_dirs () {
-    if [ ! -d "${LOGS_DIR}" ] || \
-       [ ! -d "${CACHE_DIR}" ] || \
-       [ ! -d "${FILE_CACHE_DIR}" ] || \
-       [ ! -d "${LOCKS_DIR}" ]; then
-        try "${MKDIR_BIN} -p \"${CACHE_DIR}\" \"${FILE_CACHE_DIR}\" \"${LOCKS_DIR}\" \"${LOGS_DIR}\""
+    if [ ! -d "${LOGS_DIR}" ] \
+    || [ ! -d "${CACHE_DIR}" ] \
+    || [ ! -d "${FILE_CACHE_DIR}" ] \
+    || [ ! -d "${LOCKS_DIR}" ]; then
+        try "${MKDIR_BIN} -p '${CACHE_DIR}' '${FILE_CACHE_DIR}' '${LOCKS_DIR}' '${LOGS_DIR}'"
     fi
 }
 

@@ -9,8 +9,8 @@ show_logs () {
     _logf_pattern="${1:-+}"
     debug "Show logs pattern: '$(distd "${_logf_pattern}")'"
     touch_logsdir_and_logfile
-    if [ "-" = "${_logf_pattern}" ] || \
-       [ "${SOFIN_NAME}" = "${_logf_pattern}" ]; then
+    if [ "-" = "${_logf_pattern}" ] \
+    || [ "${SOFIN_NAME}" = "${_logf_pattern}" ]; then
         ${TAIL_BIN} -n "${LOG_LINES_AMOUNT}" "${LOG}"
 
     elif [ "@" = "${_logf_pattern}" ]; then
@@ -93,8 +93,8 @@ checksum_filecache_element () {
         error "No such file found in file-cache: $(diste "${FILE_CACHE_DIR}${_file_to_checksum}")"
     else
         _chksum_file="${FILE_CACHE_DIR}${_file_to_checksum}${DEFAULT_CHKSUM_EXT}"
-        printf '%s' "${_file_chksum}" > "${_chksum_file}" && \
-            debug "Stored chksum: $(distd "${_file_chksum}") of file: $(distd "${_file_to_checksum}") in path: $(distd "${FILE_CACHE_DIR}${_file_to_checksum}")"
+        printf '%s' "${_file_chksum}" > "${_chksum_file}" \
+            && debug "Stored chksum: $(distd "${_file_chksum}") of file: $(distd "${_file_to_checksum}") in path: $(distd "${FILE_CACHE_DIR}${_file_to_checksum}")"
     fi
     unset _file_chksum _file_to_checksum _chksum_file
 }
@@ -104,9 +104,9 @@ cache_conf_scrpt_hlp_opts () {
     _config_log="${1}"
     if [ ! -f "${_config_log}" ]; then
         # Store all options per definition from configure scripts
-        try "${MKDIR_BIN} -p \"$(${DIRNAME_BIN} "${_config_log}" 2>/dev/null)\" 2>/dev/null" \
-            && try "${DEF_CONFIGURE_METHOD} -h | ${GREP_BIN} -E '\-\-\s*' 2>/dev/null > \"${_config_log}\""
+        try "${MKDIR_BIN} -p \"$(${DIRNAME_BIN} "${_config_log}" 2>/dev/null)\" 2>/dev/null"
+        try "${DEF_CONFIGURE_METHOD} -h | ${GREP_BIN} -E '\-\-\s*' 2>/dev/null > '${_config_log}' 2>&1"
     fi
-    debug "Configure options: $(distd "$(${CAT_BIN} "${_config_log}" 2>/dev/null)" "${ColorBlue}")"
+    debug "Configure options: $(distd "$(${CAT_BIN} "${_config_log}" 2>/dev/null)" "${ColorBlue}" 2>/dev/null)"
     return 0
 }

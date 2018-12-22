@@ -71,8 +71,8 @@ validate_reqs () {
 
 validate_archive_sha1 () {
     _archive_name="${1}"
-    if [ ! -f "${_archive_name}" ] || \
-         [ -z "${_archive_name}" ]; then
+    if [ ! -f "${_archive_name}" ] \
+    || [ -z "${_archive_name}" ]; then
          error "Specified empty $(diste archive_name), or file doesn't exist: $(diste "${_archive_name}")"
     fi
     # checking archive sha1 checksum
@@ -84,8 +84,8 @@ validate_archive_sha1 () {
     fi
     _current_sha_file="${_archive_name}${DEFAULT_CHKSUM_EXT}"
     _sha1_value="$(${CAT_BIN} "${_current_sha_file}" 2>/dev/null)"
-    if [ ! -f "${_current_sha_file}" ] || \
-               [ -z "${_sha1_value}" ]; then
+    if [ ! -f "${_current_sha_file}" ] \
+    || [ -z "${_sha1_value}" ]; then
         debug "No sha1 file available for archive, or sha1 value is empty! Removing local binary build(s) of: $(distd "${_archive_name}")"
         try "${RM_BIN} -f ${_archive_name} ${_current_sha_file}"
     fi
@@ -116,15 +116,15 @@ validate_def_postfix () {
         _cispc_nme_diff="$(difftext "${_cigiven_name}" "$(lowercase "${DEF_NAME}")")"
     fi
     debug "validate_def_postfix() for: $(distd "${DEF_NAME}"), 1: $(distd "${_cigiven_name}"), 2: $(distd "${_cidefinition_name}"), DIFF: $(distd "${_cispc_nme_diff}")"
-    if  [ -z "${DEF_SUFFIX}" ] && \
-        [ "${_cispc_nme_diff}" != "${DEF_NAME}" ] && \
-        [ "${_cispc_nme_diff}" != "${DEF_NAME}${DEF_SUFFIX}" ]; then
+    if  [ -z "${DEF_SUFFIX}" ] \
+    && [ "${_cispc_nme_diff}" != "${DEF_NAME}" ] \
+    && [ "${_cispc_nme_diff}" != "${DEF_NAME}${DEF_SUFFIX}" ]; then
         debug "Inferred DEF_SUFFIX=$(distd "${_cispc_nme_diff}") from definition: $(distd "${DEF_NAME}")"
         DEF_SUFFIX="${_cispc_nme_diff}"
         # TODO: detect if postfix isn't already applied here
 
-    elif [ "${_cispc_nme_diff}" = "${DEF_NAME}" ] && \
-         [  "${_cispc_nme_diff}" = "${DEF_NAME}${DEF_SUFFIX}" ]; then
+    elif [ "${_cispc_nme_diff}" = "${DEF_NAME}" ] \
+      && [  "${_cispc_nme_diff}" = "${DEF_NAME}${DEF_SUFFIX}" ]; then
         # NOTE: This is case when dealing with definition file name,
         # that has nothing in common with DEF_NAME (usually it's a postfix).
         # In that case, we should pick specified name, *NOT* DEF_NAME:
@@ -186,19 +186,21 @@ validate_pie_on_exports () {
                 continue
             else
                 for _bin in $(${FIND_BIN} "${_a_dir}" -mindepth 1 -maxdepth 1 -type l 2>/dev/null | ${XARGS_BIN} "${READLINK_BIN}" -f 2>/dev/null); do
-                    try "${FILE_BIN} '${_bin}' 2>/dev/null | ${GREP_BIN} 'ELF' 2>/dev/null"
+                    try "${FILE_BIN} '${_bin}' 2>/dev/null | ${GREP_BIN} -F 'ELF' >/dev/null 2>&1"
                     if [ "$?" = "0" ]; then # it's ELF binary/library:
                         big_fat_warn () {
                             warn "Security - Exported ELF binary: $(distw "${_bin}"), is not a $(distw "${PIE_TYPE_ENTRY}") (not-PIE)!"
-                            printf "SECURITY: ELF binary: '${_bin}', is not a '${PIE_TYPE_ENTRY}' (not-PIE)!\n" >> "${_pie_indicator}.warn"
+                            printf "SECURITY: ELF binary: '%s', is not a '%s' (not-PIE)!\n" "${_bin}" "${PIE_TYPE_ENTRY}" \
+                                >> "${_pie_indicator}.warn"
                         }
-                        try "${FILE_BIN} '${_bin}' 2>/dev/null | ${GREP_BIN} 'ELF' 2>/dev/null | ${EGREP_BIN} '${PIE_TYPE_ENTRY}' 2>/dev/null" || big_fat_warn
+                        try "${FILE_BIN} '${_bin}' 2>/dev/null | ${GREP_BIN} -F 'ELF' 2>/dev/null | ${EGREP_BIN} -F '${PIE_TYPE_ENTRY}' 2>/dev/null" \
+                            || big_fat_warn
                     else
                         debug "Executable, but not an ELF: $(distd "${_bin}")"
                     fi
                 done
-                run "${TOUCH_BIN} ${_pie_indicator}" && \
-                    debug "PIE check done for bundle: $(distd "${_bun}")"
+                run "${TOUCH_BIN} ${_pie_indicator}" \
+                    && debug "PIE check done for bundle: $(distd "${_bun}")"
             fi
         done
 
@@ -215,7 +217,7 @@ validate_kern_loaded_dtrace () {
             FreeBSD)
                 debug "Making sure dtrace kernel module is loaded"
                 ${KLDSTAT_BIN} 2>/dev/null | ${GREP_BIN} -F 'dtraceall' >/dev/null 2>&1 \
-                    || try "${KLDLOAD_BIN} dtraceall"
+                    || try "${KLDLOAD_BIN} dtraceall >/dev/null 2>&1"
                 ;;
         esac
     fi
@@ -223,7 +225,6 @@ validate_kern_loaded_dtrace () {
 
 
 validate_sys_limits () {
-
     # Limits for production CAP_SYS_HARDENED environment:
     _ulimit_core="0"
     _ulimit_nofile="6000"
@@ -237,15 +238,17 @@ validate_sys_limits () {
         debug "Initialised limits for Darwin workstation"
     fi
 
-    try "ulimit -n ${_ulimit_nofile}" || \
-        warn "Sofin has failed to set reasonable environment limit of open files: $(distw "${_ulimit_nofile}"). Local limit is: "$(ulimit -n)". Troubles may follow!"
-    try "ulimit -s ${_ulimit_stackkb}" || \
-        warn "Sofin has failed to set reasonable environment limit of stack (in kb) to value: $(distw "${_ulimit_stackkb}"). Local limit is: "$(ulimit -s)". Troubles may follow!"
-    # try "ulimit -u ${_ulimit_up_max_ps}" || \
-    #     warn "Sofin has failed to set reasonable environment limit of running processes to: $(distw "${_ulimit_up_max_ps}"). Local limit is: "$(ulimit -u)". Troubles may follow!"
-    try "ulimit -c ${_ulimit_core}" || \
-        warn "Sofin has failed to set core size limit to: $(distw "${_ulimit_core}"). Local limit is: "$(ulimit -c)".!"
+    try "ulimit -n ${_ulimit_nofile}" \
+        || warn "Sofin has failed to set reasonable environment limit of open files: $(distw "${_ulimit_nofile}"). Local limit is: "$(ulimit -n 2>/dev/null)". Troubles may follow!"
 
+    try "ulimit -s ${_ulimit_stackkb}" \
+        || warn "Sofin has failed to set reasonable environment limit of stack (in kb) to value: $(distw "${_ulimit_stackkb}"). Local limit is: "$(ulimit -s 2>/dev/null)". Troubles may follow!"
+
+    try "ulimit -c ${_ulimit_core}" \
+        || warn "Sofin has failed to set core size limit to: $(distw "${_ulimit_core}"). Local limit is: "$(ulimit -c 2>/dev/null)".!"
+
+    # try "ulimit -u ${_ulimit_up_max_ps}" \
+    #     || warn "Sofin has failed to set reasonable environment limit of running processes to: $(distw "${_ulimit_up_max_ps}"). Local limit is: "$(ulimit -u 2>/dev/null)". Troubles may follow!"
     return 0
 }
 

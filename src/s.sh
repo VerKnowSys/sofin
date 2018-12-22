@@ -45,8 +45,8 @@ if [ -n "${SOFIN_TRACE}" ]; then
 fi
 
 if [ -n "${SOFIN_VERBOSE}" ]; then
-    if [ "YES" = "${CAP_TERM_ZSH}" ] || \
-       [ "YES" = "${CAP_TERM_BASH}" ]; then
+    if [ "YES" = "${CAP_TERM_ZSH}" ] \
+    || [ "YES" = "${CAP_TERM_BASH}" ]; then
         set -o verbose
     else
         set -v
@@ -334,10 +334,10 @@ if [ -n "${SOFIN_COMMAND}" ]; then
             for _b in $(to_iter "${_pickd_bundls}"); do
                 build "${_b}"
                 if [ "${USER}" != "root" ]; then
-                    try "${CHOWN_BIN} -R ${USER} '${SOFTWARE_DIR}/${_b}'" && \
-                        debug "OK: $(distd "chown -R ${USER} '${SOFTWARE_DIR}/${_b}'")."
-                    try "${CHOWN_BIN} -R ${USER} '${SERVICES_DIR}/${_b}'" && \
-                        debug "OK: $(distd "chown -R ${USER} '${SERVICES_DIR}/${_b}'")."
+                    try "${CHOWN_BIN} -R ${USER} '${SOFTWARE_DIR}/${_b}'" \
+                        && debug "OK: $(distd "chown -R ${USER} '${SOFTWARE_DIR}/${_b}'")."
+                    try "${CHOWN_BIN} -R ${USER} '${SERVICES_DIR}/${_b}'" \
+                        && debug "OK: $(distd "chown -R ${USER} '${SERVICES_DIR}/${_b}'")."
                 fi
             done
             note "Installed: $(distn "${_pickd_bundls}")"
