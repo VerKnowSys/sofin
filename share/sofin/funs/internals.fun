@@ -87,11 +87,11 @@ processes_all_sofin () {
         _pid="$(${CAT_BIN} "${_ff}")"
         ${KILL_BIN} -0 "${_pid}" >/dev/null 2>&1
         if [ "0" = "${?}" ] && [ "${SOFIN_PID}" != "${_pid}" ]; then
-            debug "Sofin alive pid found: $(distd "${_pid}") in lock: $(distd "${_pid}")"
             _processes="${_pid} ${_processes}"
         fi
     done
     if [ -n "${_processes}" ]; then
+        debug "Sofin-tasks-locked by processes: $(distd "${_processes}")"
         echo "${_processes}"
     fi
     return 0
