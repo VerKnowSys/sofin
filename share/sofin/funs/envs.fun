@@ -500,7 +500,7 @@ acquire_lock_for () {
             _lock_pid="$(${CAT_BIN} "${LOCKS_DIR}${_bundle}${DEFAULT_LOCK_EXT}" 2>/dev/null)"
             if [ -n "${_lock_pid}" ]; then
                 debug "Lock pid: $(distd "${_lock_pid}"). Sofin pid: $(distd "${SOFIN_PID}"), Sofin PPID: $(distd "${PPID}")"
-                try "${KILL_BIN} -0 ${_lock_pid} 2>/dev/null"
+                try "${KILL_BIN} -0 ${_lock_pid} >/dev/null 2>&1"
                 if [ "${?}" = "0" ]; then # NOTE: process is alive
                     if [ "${_lock_pid}" = "${SOFIN_PID}" ] \
                     || [ "${PPID}" = "${SOFIN_PID}" ]; then
@@ -539,12 +539,12 @@ destroy_dead_locks () {
 
         _possiblepid="$(${CAT_BIN} "${_dlf}" 2>/dev/null)"
         if [ -n "${_possiblepid}" ]; then
-            try "${KILL_BIN} -0 ${_possiblepid} >/dev/null 2>&1"
             if [ "${?}" != "0" ]; then
                 try "${RM_BIN} -f '${_dlf}'" \
                     && debug "Pid: $(distd "${_pid}") appears to be already dead. Removed lock file: $(distd "${_dlf}")"
             else
                 debug "Pid: $(distd "${_pid}") is alive. Leaving lock untouched."
+                try "${KILL_BIN} -0 ${_possiblepid} >/dev/null 2>&1"
             fi
         fi
     done \
