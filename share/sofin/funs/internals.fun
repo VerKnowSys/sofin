@@ -88,7 +88,11 @@ processes_all_sofin () {
         ${KILL_BIN} -0 "${_pid}" >/dev/null 2>&1
         if [ "0" = "${?}" ] \
         && [ "${SOFIN_PID}" != "${_pid}" ]; then
-            _processes="${_pid} ${_processes}"
+            if [ -z "${_processes}" ]; then
+                _processes="${_pid}"
+            else
+                _processes="${_processes} ${_pid}"
+            fi
         fi
     done
     if [ -n "${_processes}" ]; then
