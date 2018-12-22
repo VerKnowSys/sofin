@@ -32,8 +32,8 @@ push_to_all_mirrors () {
         build_bundle "${_pbto_bundle_name}" "${_ptelm_file_name}" "${_pversion_element}"
         checksum_filecache_element "${_ptelm_file_name}"
 
-        try "${CHMOD_BIN} -v o+r ${FILE_CACHE_DIR}${_ptelm_file_name} ${FILE_CACHE_DIR}${_ptelm_file_name}${DEFAULT_CHKSUM_EXT}" && \
-            debug "Set read access for archives: $(distd "${_ptelm_file_name}"), $(distd "${_ptelm_file_name}${DEFAULT_CHKSUM_EXT}") before we send them to public remote"
+        try "${CHMOD_BIN} -v o+r ${FILE_CACHE_DIR}${_ptelm_file_name} ${FILE_CACHE_DIR}${_ptelm_file_name}${DEFAULT_CHKSUM_EXT}" \
+            && debug "Set read access for archives: $(distd "${_ptelm_file_name}"), $(distd "${_ptelm_file_name}${DEFAULT_CHKSUM_EXT}") before we send them to public remote"
 
         debug "Deploying bin-bundle: $(distd "${_ptelm_file_name}") to mirror: $(distd "${_ptmirror}")"
         push_software_archive "${_ptelm_file_name}" "${_ptmirror}" "${_ptaddress}"
@@ -78,13 +78,13 @@ push_dset_zfs_stream () {
         if [ "${?}" = "0" ]; then
             debug "Service dataset file found existing on remote mirror: $(distd "${_psmirror}"). Service dataset origins can be stored only once (future ZFS-related features will rely on this!)"
         else
-            try "${CHMOD_BIN} -v a+r ${FILE_CACHE_DIR}${_psfin_snapfile}" && \
-                debug "Archive access a+r for: $(distd "${_psfin_snapfile}")"
+            try "${CHMOD_BIN} -v a+r ${FILE_CACHE_DIR}${_psfin_snapfile}" \
+                && debug "Archive access a+r for: $(distd "${_psfin_snapfile}")"
             retry "${SCP_BIN} ${DEFAULT_SSH_OPTS} ${DEFAULT_SCP_OPTS} -P ${SOFIN_SSH_PORT} ${FILE_CACHE_DIR}${_psfin_snapfile} ${SOFIN_NAME}@${_psmirror}:${COMMON_BINARY_REMOTE}/${_psfin_snapfile}${DEFAULT_PARTIAL_FILE_EXT}"
             if [ "${?}" = "0" ]; then
                 debug "Service origin stream was sent to: $(distd "${MAIN_COMMON_NAME}") repository: $(distd "${MAIN_COMMON_REPOSITORY}/${_psfin_snapfile}")"
-                retry "${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${SOFIN_SSH_PORT} ${SOFIN_NAME}@${_psmirror} \"cd ${COMMON_BINARY_REMOTE} && ${MV_BIN} ${_psfin_snapfile}${DEFAULT_PARTIAL_FILE_EXT} ${_psfin_snapfile}\"" && \
-                    debug "Partial file renamed successfully"
+                retry "${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${SOFIN_SSH_PORT} ${SOFIN_NAME}@${_psmirror} \"cd ${COMMON_BINARY_REMOTE} && ${MV_BIN} ${_psfin_snapfile}${DEFAULT_PARTIAL_FILE_EXT} ${_psfin_snapfile}\"" \
+                    && debug "Partial file renamed successfully"
             else
                 error "Failed to send service stream of bundle: $(diste "${_pselement}") file: $(diste "${_psfin_snapfile}") to remote host: $(diste "${SOFIN_NAME}@${_psmirror}")!"
             fi
@@ -119,13 +119,13 @@ build_service_dataset () {
                 try "${ZFS_BIN} list -H -t filesystem '${_full_dataset_name}'"
                 if [ "${?}" = "0" ]; then
                     note "Preparing to send service dataset: $(distn "${_full_dataset_name}"), for bundle: $(distn "${_ps_elem}")"
-                    try "${ZFS_BIN} umount -f '${_full_dataset_name}'"
+                    try "${ZFS_BIN} umount -f '${_full_dataset_name}' >/dev/null 2>&1"
                     run "${ZFS_BIN} send ${ZFS_SEND_OPTS} '${_full_dataset_name}@${ORIGIN_ZFS_SNAP_NAME}' | ${SOFIN_LZ4_BIN} ${DEFAULT_LZ4_OPTS} > ${FILE_CACHE_DIR}${_ps_snap_file}"
-                    try "${ZFS_BIN} mount '${_full_dataset_name}'" || :
+                    try "${ZFS_BIN} mount '${_full_dataset_name}' >/dev/null 2>&1"
                 fi
                 _snap_size="$(file_size "${FILE_CACHE_DIR}${_ps_snap_file}")"
                 if [ "${_snap_size}" = "0" ]; then
-                    try "${RM_BIN} -f ${FILE_CACHE_DIR}${_ps_snap_file}"
+                    try "${RM_BIN} -f '${FILE_CACHE_DIR}${_ps_snap_file}'"
                     debug "Service dataset dump is empty for bundle: $(distd "${_ps_elem}-${_ps_ver_elem}")"
                 else
                     debug "Snapshot of size: $(distd "${_snap_size}") is ready for bundle: $(distd "${_ps_elem}")"
@@ -152,15 +152,15 @@ build_service_dataset () {
                 debug "Service origin available!"
             else
                 debug "Service origin unavailable! Creating new one."
-                try "${MKDIR_BIN} -p ${SERVICES_DIR}/${_ps_elem}"
+                try "${MKDIR_BIN} -p '${SERVICES_DIR}/${_ps_elem}'"
                 _pwd="$(${PWD_BIN} 2>/dev/null)"
                 cd "${SERVICES_DIR}"
-                try "${TAR_BIN} --lz4 -c -f ${FILE_CACHE_DIR}${_ps_snap_file} ${_ps_elem}" || \
-                    run "${TAR_BIN} -cJf ${FILE_CACHE_DIR}${_ps_snap_file} ${_ps_elem}"
+                try "${TAR_BIN} --lz4 --create --file ${FILE_CACHE_DIR}${_ps_snap_file} ${_ps_elem} >/dev/null" \
+                    || run "${TAR_BIN} -cJf ${FILE_CACHE_DIR}${_ps_snap_file} ${_ps_elem} >/dev/null"
                 cd "${_pwd}"
                 _snap_size="$(file_size "${FILE_CACHE_DIR}${_ps_snap_file}")"
                 if [ "${_snap_size}" = "0" ]; then
-                    try "${RM_BIN} -f ${FILE_CACHE_DIR}${_ps_snap_file}"
+                    try "${RM_BIN} -f '${FILE_CACHE_DIR}${_ps_snap_file}'"
                     debug "Service tarball dump is empty for bundle: $(distd "${_ps_elem}-${_ps_ver_elem}")"
                 else
                     debug "Snapshot of size: $(distd "${_snap_size}") is ready for bundle: $(distd "${_ps_elem}")"
@@ -181,13 +181,13 @@ create_service_dataset () {
     fi
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
         _dataset_name="${DEFAULT_ZPOOL}${SERVICES_DIR}/${SYSTEM_DATASET}/${_bund_name}"
-        try "${ZFS_BIN} list -H -o name -t filesystem ${_dataset_name}"
+        try "${ZFS_BIN} list -H -o name -t filesystem '${_dataset_name}' >/dev/null 2>&1"
         if [ "0" = "${?}" ]; then
             debug "Service dataset already exists: $(distd "${_dataset_name}")"
         else
             debug "Creating initial service dataset: $(distd "${_dataset_name}") for: $(distd "${_bund_name}")."
-            run "${ZFS_BIN} create -p '${_dataset_name}'"
-            run "${ZFS_BIN} set mountpoint=${SERVICES_DIR}/${_bund_name} '${_dataset_name}'"
+            run "${ZFS_BIN} create -p '${_dataset_name}' >/dev/null 2>&1"
+            run "${ZFS_BIN} set mountpoint=${SERVICES_DIR}/${_bund_name} '${_dataset_name}' >/dev/null 2>&1"
         fi
     else
         debug "ZFS feature disabled"
@@ -211,8 +211,8 @@ fetch_dset_zfs_stream () {
         retry "${FETCH_BIN} -o ${FILE_CACHE_DIR}${_fdz_out_file} ${FETCH_OPTS} '${_commons_path}'"
         if [ "${?}" = "0" ]; then
             _dataset_name="${DEFAULT_ZPOOL}${SERVICES_DIR}/${SYSTEM_DATASET}/${_fdz_bund_name}"
-            try "${SOFIN_LZ4CAT_BIN} '${FILE_CACHE_DIR}${_fdz_out_file}' | ${ZFS_BIN} receive ${ZFS_RECEIVE_OPTS} '${_dataset_name}' | ${TAIL_BIN} -n1 2>/dev/null" && \
-                    note "Received service dataset: $(distn "${_dataset_name}")"
+            try "${SOFIN_LZ4CAT_BIN} '${FILE_CACHE_DIR}${_fdz_out_file}' | ${ZFS_BIN} receive ${ZFS_RECEIVE_OPTS} '${_dataset_name}' | ${TAIL_BIN} -n1 2>/dev/null" \
+                && note "Received service dataset: $(distn "${_dataset_name}")"
             unset _dataset_name
         else
             debug "Origin service dataset unavailable for: $(distd "${_fdz_bund_name}")."
@@ -224,8 +224,8 @@ fetch_dset_zfs_stream () {
         debug "Fetch service stream-tarball: $(distd "${FILE_CACHE_DIR}${_fdz_out_file}")"
         retry "${FETCH_BIN} -o ${FILE_CACHE_DIR}${_fdz_out_file} ${FETCH_OPTS} '${_commons_path}'"
         if [ "${?}" = "0" ]; then
-            try "${TAR_BIN} -xf ${FILE_CACHE_DIR}${_fdz_out_file} --directory ${SERVICES_DIR}" && \
-                note "Received service tarball for service: $(distn "${_fdz_bund_name}")"
+            try "${TAR_BIN} -xf ${FILE_CACHE_DIR}${_fdz_out_file} --directory ${SERVICES_DIR} >/dev/null" \
+                && note "Received service tarball for service: $(distn "${_fdz_bund_name}")"
             unset _tarball_name
         else
             debug "Origin service tarball unavailable for: $(distd "${_fdz_bund_name}")."
@@ -249,17 +249,17 @@ try_fetch_service_dir () {
         _svce_origin="${_dset_create}-${_dset_version}-${SYSTEM_NAME}${DEFAULT_SERVICE_SNAPSHOT_EXT}"
         _svce_org_file="${FILE_CACHE_DIR}${_svce_origin}"
         if [ ! -f "${_svce_org_file}" ]; then
-            retry "${FETCH_BIN} -o ${_svce_org_file} ${FETCH_OPTS} ${MAIN_COMMON_REPOSITORY}/${_svce_origin}" && \
-                debug "Service origin fetched successfully: $(distd "${_svce_origin}")"
+            retry "${FETCH_BIN} -o ${_svce_org_file} ${FETCH_OPTS} ${MAIN_COMMON_REPOSITORY}/${_svce_origin}" \
+                && debug "Service origin fetched successfully: $(distd "${_svce_origin}")"
         fi
         if [ -f "${_svce_org_file}" ]; then
             # NOTE: each user dataset is made of same origin, hence you can apply snapshots amongst them..
-            try "${ZFS_BIN} list '${DEFAULT_ZPOOL}${SERVICES_DIR}/${SYSTEM_DATASET}/${_dset_create}'"
+            try "${ZFS_BIN} list '${DEFAULT_ZPOOL}${SERVICES_DIR}/${SYSTEM_DATASET}/${_dset_create}' >/dev/null 2>&1"
             if [ "0" = "$?" ]; then
                 debug "Service origin is already present for: $(distd "${_svce_origin}")"
             else
-                run "${SOFIN_LZ4CAT_BIN} '${_svce_org_file}' | ${ZFS_BIN} receive ${ZFS_RECEIVE_OPTS} '${DEFAULT_ZPOOL}${SERVICES_DIR}/${SYSTEM_DATASET}/${_dset_create}' | ${TAIL_BIN} -n1 2>/dev/null" && \
-                    debug "Service origin received successfully: $(distd "${_svce_origin}")"
+                run "${SOFIN_LZ4CAT_BIN} '${_svce_org_file}' | ${ZFS_BIN} receive ${ZFS_RECEIVE_OPTS} '${DEFAULT_ZPOOL}${SERVICES_DIR}/${SYSTEM_DATASET}/${_dset_create}' | ${TAIL_BIN} -n1 2>/dev/null" \
+                    && debug "Service origin received successfully: $(distd "${_svce_origin}")"
             fi
         else
             debug "No Service origin file: '$(distd "${_svce_org_file}")' available! Skipped."
@@ -271,15 +271,15 @@ try_fetch_service_dir () {
         if [ -f "${_svce_org_file}" ]; then
             debug "Service origin file: '$(distd "${_svce_org_file}")' is present in local file-cache."
         else
-            retry "${FETCH_BIN} -o ${_svce_org_file} ${FETCH_OPTS} ${MAIN_COMMON_REPOSITORY}/${_svce_origin}" && \
-                debug "Service origin fetched successfully: $(distd "${_svce_origin}")"
+            retry "${FETCH_BIN} -o ${_svce_org_file} ${FETCH_OPTS} ${MAIN_COMMON_REPOSITORY}/${_svce_origin}" \
+                && debug "Service origin fetched successfully: $(distd "${_svce_origin}")"
         fi
         if [ -f "${_svce_org_file}" ]; then
             if [ -d "${SERVICES_DIR}/${_dset_create}" ]; then
                 debug "Service dir: $(distd "${SERVICES_DIR}/${_dset_create}") already exists. Leaving untouched!"
             else
-                run "${TAR_BIN} -xf \"${_svce_org_file}\" --directory \"${SERVICES_DIR}\"" && \
-                    debug "Service origin received successfully: $(distd "${_svce_origin}")"
+                run "${TAR_BIN} -xf '${_svce_org_file}' --directory '${SERVICES_DIR}' >/dev/null" \
+                    && debug "Service origin received successfully: $(distd "${_svce_origin}")"
             fi
         else
             debug "No Service origin file: '$(distd "${_svce_org_file}")' available! Skipped."
@@ -291,10 +291,10 @@ try_fetch_service_dir () {
 
 unmount_and_destroy () {
     _dataset_name="${1}"
-    try "${ZFS_BIN} list -H -t filesystem '${_dataset_name}'"
+    try "${ZFS_BIN} list -H -t filesystem '${_dataset_name}' >/dev/null 2>&1"
     if [ "${?}" = "0" ]; then
-        try "${ZFS_BIN} umount -f '${_dataset_name}' > /dev/null"
-        try "${ZFS_BIN} destroy -fr '${_dataset_name}' > /dev/null"
+        try "${ZFS_BIN} umount -f '${_dataset_name}' >/dev/null 2>&1"
+        try "${ZFS_BIN} destroy -fr '${_dataset_name}' >/dev/null 2>&1"
         if [ "${?}" = "0" ]; then
             debug "Service dataset destroyed: $(distd "${_dataset_name}")"
         else
@@ -313,8 +313,8 @@ destroy_service_dir () {
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
         unmount_and_destroy "${DEFAULT_ZPOOL}${SERVICES_DIR}/${SYSTEM_DATASET}/${_dset_destroy}"
     else
-        try "${RM_BIN} -rf '${SERVICES_DIR}/${_dset_destroy}'" && \
-            debug "Removed regular software-directory: $(distd "${SERVICES_DIR}/${_dset_destroy}")"
+        try "${RM_BIN} -rf '${SERVICES_DIR}/${_dset_destroy}'" \
+            && debug "Removed regular software-directory: $(distd "${SERVICES_DIR}/${_dset_destroy}")"
     fi
     unset _dset_destroy
 }
@@ -323,12 +323,12 @@ destroy_service_dir () {
 create_base_datasets () {
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
         _soft_origin="${DEFAULT_ZPOOL}${SOFTWARE_DIR}"
-        try "${ZFS_BIN} list -H -t filesystem '${_soft_origin}'" || \
-            receive_origin "${_soft_origin}" "Software"
+        try "${ZFS_BIN} list -H -t filesystem '${_soft_origin}' >/dev/null 2>&1" \
+            || receive_origin "${_soft_origin}" "Software"
 
         _serv_origin="${DEFAULT_ZPOOL}${SERVICES_DIR}"
-        try "${ZFS_BIN} list -H -t filesystem '${_serv_origin}'" || \
-            receive_origin "${_serv_origin}" "Services"
+        try "${ZFS_BIN} list -H -t filesystem '${_serv_origin}' >/dev/null 2>&1" \
+            || receive_origin "${_serv_origin}" "Services"
 
         unset _soft_origin _serv_origin
     fi
@@ -370,18 +370,17 @@ receive_origin () {
     fi
 
     set_mountpoint_and_mount () {
-        echo "${_dname}" | ${GREP_BIN} -F "${SOFTWARE_DIR}" >/dev/null 2>&1
+        try "echo '${_dname}' | ${GREP_BIN} -F '${SOFTWARE_DIR}' >/dev/null 2>&1"
         if [ "0" = "${?}" ]; then
             _mountpoint="${SOFTWARE_DIR}/${_dname##*/}"
         else
             _mountpoint="${SERVICES_DIR}/${_dname##*/}"
         fi
-        try "${ZFS_BIN} set mountpoint=${_mountpoint} '${_dname}'"
-        try "${ZFS_BIN} mount '${_dname}'"
+        try "${ZFS_BIN} set mountpoint=${_mountpoint} '${_dname}' >/dev/null 2>&1"
+        try "${ZFS_BIN} mount '${_dname}' >/dev/null 2>&1"
     }
 
     if [ -f "${_origin_file}" ]; then
-        debug "DataSet: $(distd "${_dname}")"
         # NOTE: each user dataset is made of same origin, hence you can apply snapshots amongst them..
         run "${SOFIN_LZ4CAT_BIN} '${_origin_file}' | ${ZFS_BIN} receive -u ${ZFS_RECEIVE_OPTS} '${_dname}'" \
             && set_mountpoint_and_mount \
@@ -405,12 +404,12 @@ create_software_dir () {
             receive_origin "${_dsname}" "Software" "user" \
                 && debug "Received ZFS software-dataset: $(distd "${_dsname}")"
         }
-        try "${ZFS_BIN} list -H -t filesystem '${_dsname}'" \
+        try "${ZFS_BIN} list -H -t filesystem '${_dsname}' >/dev/null 2>&1" \
             || receive_orig
 
         try "${ZFS_BIN} set sharenfs=off '${_dsname}' >/dev/null 2>&1"
         try "${ZFS_BIN} set mountpoint=${SOFTWARE_DIR}/${_dset_create} '${_dsname}' >/dev/null 2>&1"
-        try "${ZFS_BIN} mount '${_dsname}' >/dev/null 2>&1" || :
+        try "${ZFS_BIN} mount '${_dsname}' >/dev/null 2>&1"
         unset _dsname
     else
         debug "Creating regular software-directory: $(distd "${SOFTWARE_DIR}/${_dset_create}")"
@@ -430,19 +429,19 @@ destroy_software_dir () {
         set_system_writable
         _dsbase="${DEFAULT_ZPOOL}${SOFTWARE_DIR}/${SYSTEM_DATASET}"
         _dsname="${_dsbase}/${_dset_destroy}"
-        try "${ZFS_BIN} set readonly=off '${_dsbase}'"
-        try "${ZFS_BIN} set readonly=off '${_dsname}'"
-        try "${ZFS_BIN} set sharenfs=off '${_dsbase}'"
-        try "${ZFS_BIN} set sharenfs=off '${_dsname}'"
-        try "${ZFS_BIN} umount -f '${_dsname}'"
-        try "${ZFS_BIN} destroy -fr '${_dsname}'" && \
-            debug "Destroyed software-dataset: $(distd "${_dsname}")"
-        try "${RM_BIN} -rf '${SOFTWARE_DIR}/${_dset_destroy}'"
+        try "${ZFS_BIN} set readonly=off '${_dsbase}' >/dev/null 2>&1"
+        try "${ZFS_BIN} set readonly=off '${_dsname}' >/dev/null 2>&1"
+        try "${ZFS_BIN} set sharenfs=off '${_dsbase}' >/dev/null 2>&1"
+        try "${ZFS_BIN} set sharenfs=off '${_dsname}' >/dev/null 2>&1"
+        try "${ZFS_BIN} umount -f '${_dsname}' >/dev/null 2>&1"
+        try "${ZFS_BIN} destroy -fr '${_dsname}' >/dev/null 2>&1" \
+            && debug "Destroyed software-dataset: $(distd "${_dsname}")"
+        try "${RM_BIN} -rf '${SOFTWARE_DIR}/${_dset_destroy}' >/dev/null 2>&1"
         set_system_readonly
         unset _dsname _dsbase
     else
         debug "Removing regular software-directory: $(distd "${SOFTWARE_DIR}/${_dset_destroy}")"
-        try "${RM_BIN} -rf '${SOFTWARE_DIR}/${_dset_destroy}'"
+        try "${RM_BIN} -rf '${SOFTWARE_DIR}/${_dset_destroy}' >/dev/null 2>&1"
     fi
     unset _dset_destroy
 }
@@ -458,8 +457,8 @@ create_builddir () {
     try "${MKDIR_BIN} -p '${_bdir}'"
 
     if [ -n "${CAP_SYS_BUILDHOST}" ]; then
-        try "${UMOUNT_BIN} -f ${_bdir}" && \
-            debug "Unmounted build-dir ramdisk: $(distd "${_bdir}")"
+        try "${UMOUNT_BIN} -f '${_bdir}' >/dev/null 2>&1" \
+            && debug "Unmounted build-dir ramdisk: $(distd "${_bdir}")"
 
         case "${SYSTEM_NAME}" in
             Darwin)
@@ -469,16 +468,16 @@ create_builddir () {
                 RAMDISK_DEV="$(${HDID_BIN} -nomount ram://${_ramfs_sectors} 2>/dev/null)"
 
                 debug "Darwin ramdisk dev: $(distd "${RAMDISK_DEV}")"
-                run "${NEWFS_HFS_BIN} -v '${_cb_bundle_name}' ${RAMDISK_DEV}"
-                run "${MOUNT_BIN} -o noatime -t hfs ${RAMDISK_DEV} ${_bdir}" && \
-                    debug "Mounted tmpfs build-directory: $(distd "${_bdir}")"
+                run "${NEWFS_HFS_BIN} -v '${_cb_bundle_name}' ${RAMDISK_DEV} >/dev/null"
+                run "${MOUNT_BIN} -o noatime -t hfs ${RAMDISK_DEV} ${_bdir} >/dev/null" \
+                    && debug "Mounted tmpfs build-directory: $(distd "${_bdir}")"
                 ;;
 
             FreeBSD)
                 RAMDISK_DEV="${_bdir}"
                 debug "Mounting clean 5GiB tmpfs build-dir: $(distd "${RAMDISK_DEV}")"
-                run "${MOUNT_BIN} -t tmpfs -o size=5G,mode=0750 tmpfs ${RAMDISK_DEV}" && \
-                    debug "Mounted tmpfs build-directory: $(distd "${RAMDISK_DEV}")"
+                run "${MOUNT_BIN} -t tmpfs -o size=5G,mode=0750 tmpfs ${RAMDISK_DEV} >/dev/null" \
+                    && debug "Mounted tmpfs build-directory: $(distd "${RAMDISK_DEV}")"
                 ;;
         esac
         export RAMDISK_DEV
@@ -498,16 +497,16 @@ destroy_builddir () {
         case "${SYSTEM_NAME}" in
             Darwin)
                 if [ -n "${RAMDISK_DEV}" ]; then
-                    try "diskutil unmountDisk ${RAMDISK_DEV}; diskutil eject ${RAMDISK_DEV};" && \
-                        debug "Tmp ramdisk unmounted: $(distd "${RAMDISK_DEV}")"
+                    try "diskutil unmountDisk '${RAMDISK_DEV}' >/dev/null 2>&1; diskutil eject '${RAMDISK_DEV}' >/dev/null 2>&1" \
+                        && debug "Tmp ramdisk unmounted: $(distd "${RAMDISK_DEV}")"
                 fi
                 ;;
         esac
         destroy_ramdisk_device
-        try "${UMOUNT_BIN} -f ${_bdir}" && \
-            debug "Tmp build-dir force-unmounted: $(distd "${_bdir}")"
-        try "${RM_BIN} -rf '${_bdir}'" && \
-            debug "Tmp build-dir removed: $(distd "${_bdir}")"
+        try "${UMOUNT_BIN} -f ${_bdir} >/dev/null 2>&1" \
+            && debug "Tmp build-dir force-unmounted: $(distd "${_bdir}")"
+        try "${RM_BIN} -rf '${_bdir}'" \
+            && debug "Tmp build-dir removed: $(distd "${_bdir}")"
     fi
     unset _deste_bund_name _bdir _deste_bund_name _dset_sum
 }
@@ -535,16 +534,16 @@ create_software_bundle_archive () {
             _cdir="$(${PWD_BIN} 2>/dev/null)"
             cd /tmp
             try "${RM_BIN} -rf ${SOFTWARE_DIR}/${_csbname}/${DEFAULT_SRC_EXT}*"
-            try "${ZFS_BIN} snapshot '${_csbd_dataset}@${ORIGIN_ZFS_SNAP_NAME}'"
-            try "${ZFS_BIN} umount -f '${_csbd_dataset}'"
-            run "${ZFS_BIN} send ${ZFS_SEND_OPTS} '${_csbd_dataset}@${ORIGIN_ZFS_SNAP_NAME}' | ${SOFIN_LZ4_BIN} ${DEFAULT_LZ4_OPTS} > ${_cddestfile}" && \
-                note "Created bin-bundle from dataset: $(distd "${_csbd_dataset}")"
+            try "${ZFS_BIN} snapshot '${_csbd_dataset}@${ORIGIN_ZFS_SNAP_NAME}' >/dev/null 2>&1"
+            try "${ZFS_BIN} umount -f '${_csbd_dataset}' >/dev/null 2>&1"
+            run "${ZFS_BIN} send ${ZFS_SEND_OPTS} '${_csbd_dataset}@${ORIGIN_ZFS_SNAP_NAME}' | ${SOFIN_LZ4_BIN} ${DEFAULT_LZ4_OPTS} > ${_cddestfile}" \
+                && note "Created bin-bundle from dataset: $(distd "${_csbd_dataset}")"
             cd "${_cdir}"
 
             # set mountpoint for dataset explicitly:
             _dsname="${DEFAULT_ZPOOL}${SOFTWARE_DIR}/${SYSTEM_DATASET}/${_csbname}"
-            try "${ZFS_BIN} set mountpoint=${SOFTWARE_DIR}/${_csbname} '${_dsname}'"
-            try "${ZFS_BIN} mount '${_csbd_dataset}'" || :
+            try "${ZFS_BIN} set mountpoint=${SOFTWARE_DIR}/${_csbname} '${_dsname}' >/dev/null 2>&1"
+            try "${ZFS_BIN} mount '${_csbd_dataset}' >/dev/null 2>&1"
         else
             error "Can't build snapshot from broken/empty bundle dir: $(diste "${SOFTWARE_DIR}/${_inst_ind}")"
         fi
@@ -552,9 +551,9 @@ create_software_bundle_archive () {
         debug "No ZFS-binbuilds feature. Falling back to tarballs.."
         _cdir="$(${PWD_BIN} 2>/dev/null)"
         cd "${SOFTWARE_DIR}"
-        try "${TAR_BIN} --lz4 --totals -cf ${_cddestfile} ${_csbname}" || \
-            try "${TAR_BIN} --totals -cJf ${_cddestfile} ${_csbname}" || \
-                error "Failed to create archive file: $(diste "${_cddestfile}")"
+        try "${TAR_BIN} --lz4 --create --file ${_cddestfile} ${_csbname} >/dev/null 2>&1" \
+            || try "${TAR_BIN} -cJf ${_cddestfile} ${_csbname} >/dev/null 2>&1" \
+                || error "Failed to create archive file: $(diste "${_cddestfile}")"
         cd "${_cdir}"
     fi
     unset _csbname _csbelem _cddestfile _cdir _csversion _csbd_dataset
@@ -566,15 +565,13 @@ boot_device_name () {
     for _dsk in $(${GEOM_BIN} disk list 2>/dev/null | ${EGREP_BIN} -i "Geom name:" 2>/dev/null | ${SED_BIN} 's/^.*\: //' 2>/dev/null); do
 
         if [ "YES" = "${CAP_SYS_ZFS}" ]; then
-            ${ZPOOL_BIN} status "${DEFAULT_ZPOOL}" 2>/dev/null | \
-                ${EGREP_BIN} -i "${_dsk}p[0-9]+" >/dev/null 2>&1 && \
-                printf "%s\n" "${_dsk}" && \
-                return 0
+            ${ZPOOL_BIN} status "${DEFAULT_ZPOOL}" 2>/dev/null | ${EGREP_BIN} -i "${_dsk}p[0-9]+" >/dev/null 2>&1 \
+                && printf "%s\n" "${_dsk}" \
+                && return 0
         else
-            ${MOUNT_BIN} 2>/dev/null | \
-                ${EGREP_BIN} -i "/dev/${_dsk}" >/dev/null 2>&1 && \
-                printf "%s\n" "${_dsk}" && \
-                return 0
+            ${MOUNT_BIN} 2>/dev/null | ${EGREP_BIN} -i "/dev/${_dsk}" >/dev/null 2>&1 \
+                && printf "%s\n" "${_dsk}" \
+                && return 0
         fi
     done
 
@@ -589,23 +586,23 @@ install_software_from_binbuild () {
         # On systems with ZFS capability, we use zfs receive instead of tarballing:
         _isfb_dataset="${DEFAULT_ZPOOL}${SOFTWARE_DIR}/${SYSTEM_DATASET}/${_isfb_fullname}"
         debug "isfb: $(distd "${_isfb_archive}"), isff: $(distd "${_isfb_fullname}"), isfbdset: $(distd "${_isfb_dataset}")"
-        try "${ZFS_BIN} list -H -t filesystem ${_isfb_dataset} >> ${LOG} 2>/dev/null"
+        try "${ZFS_BIN} list -H -t filesystem ${_isfb_dataset} >/dev/null 2>&1"
         if [ "${?}" = "0" ]; then
             # note "Software dataset: $(distn "${_isfb_fullname}") already present. Will be destroyed!"
-            try "${ZFS_BIN} destroy -fr '${_isfb_dataset}'"
+            try "${ZFS_BIN} destroy -fr '${_isfb_dataset}' >/dev/null"
         fi
         debug "Installing ZFS based binary build to dataset: $(distd "${_isfb_dataset}")"
-        run "${SOFIN_LZ4CAT_BIN} '${FILE_CACHE_DIR}${_isfb_archive}' | ${ZFS_BIN} receive -F ${ZFS_RECEIVE_OPTS} '${_isfb_dataset}' | ${TAIL_BIN} -n1 2>/dev/null" && \
-                note "Installed: $(distn "${_isfb_fullname}")" && \
-                    DONT_BUILD_BUT_DO_EXPORTS=YES
+        run "${SOFIN_LZ4CAT_BIN} '${FILE_CACHE_DIR}${_isfb_archive}' | ${ZFS_BIN} receive -F ${ZFS_RECEIVE_OPTS} '${_isfb_dataset}' | ${TAIL_BIN} -n1 2>/dev/null" \
+            && note "Installed: $(distn "${_isfb_fullname}")" \
+                && DONT_BUILD_BUT_DO_EXPORTS=YES
     else
-        try "${TAR_BIN} -xf ${FILE_CACHE_DIR}${_isfb_archive} --directory ${SOFTWARE_DIR}"
+        try "${TAR_BIN} -xf ${FILE_CACHE_DIR}${_isfb_archive} --directory ${SOFTWARE_DIR} >/dev/null 2>&1"
         if [ "${?}" = "0" ]; then
             note "Installed binary build: $(distn "${_isfb_fullname}")"
             DONT_BUILD_BUT_DO_EXPORTS=YES
         else
             debug "No binary bundle available for: $(distd "${_isfb_fullname}")"
-            try "${RM_BIN} -f ${FILE_CACHE_DIR}${_isfb_archive} ${FILE_CACHE_DIR}${_isfb_archive}${DEFAULT_CHKSUM_EXT}"
+            try "${RM_BIN} -f '${FILE_CACHE_DIR}${_isfb_archive} ${FILE_CACHE_DIR}${_isfb_archive}${DEFAULT_CHKSUM_EXT}'"
         fi
     fi
 }
@@ -636,10 +633,10 @@ push_software_archive () {
     debug "BundleName: $(distd "${_bpbundle_file}"), bundle_file: $(distd "${_bpbundle_file}"), repository address: $(distd "${_bpaddress}")"
     retry "${SCP_BIN} ${DEFAULT_SSH_OPTS} ${DEFAULT_SCP_OPTS} -P ${SOFIN_SSH_PORT} ${_bpfn_file} ${_bpfn_file_dest}${DEFAULT_PARTIAL_FILE_EXT}"
     if [ "${?}" = "0" ]; then
-        retry "${SCP_BIN} ${DEFAULT_SSH_OPTS} ${DEFAULT_SCP_OPTS} -P ${SOFIN_SSH_PORT} ${_bpfn_chksum_file} ${_bpfn_chksum_file_dest}" || \
-            error "Failed to send the checksum file: $(diste "${_bpfn_chksum_file}") to: $(diste "${_bpfn_chksum_file_dest}")"
-        retry "${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${SOFIN_SSH_PORT} ${SOFIN_NAME}@${_bpamirror} \"${MV_BIN} ${_bp_remotfs_file}${DEFAULT_PARTIAL_FILE_EXT} ${_bp_remotfs_file}\"" && \
-            debug "Partial file renamed to destination name: $(distd "${_bp_remotfs_file}")"
+        retry "${SCP_BIN} ${DEFAULT_SSH_OPTS} ${DEFAULT_SCP_OPTS} -P ${SOFIN_SSH_PORT} ${_bpfn_chksum_file} ${_bpfn_chksum_file_dest}" \
+            || error "Failed to send the checksum file: $(diste "${_bpfn_chksum_file}") to: $(diste "${_bpfn_chksum_file_dest}")"
+        retry "${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${SOFIN_SSH_PORT} ${SOFIN_NAME}@${_bpamirror} \"${MV_BIN} -f ${_bp_remotfs_file}${DEFAULT_PARTIAL_FILE_EXT} ${_bp_remotfs_file}\"" \
+            && debug "Partial file renamed to destination name: $(distd "${_bp_remotfs_file}")"
     else
         error "Failed to push binary build of: $(diste "${_bpbundle_file}") to remote: $(diste "${_bp_remotfs_file}")"
     fi
@@ -709,8 +706,8 @@ set_software_dataset_readonly () {
         _datas="${DEFAULT_ZPOOL}/Software/${SYSTEM_DATASET}"
         _sofin_processes="$(processes_all_sofin)"
         if [ -z "${_sofin_processes}" ]; then
-            debug "No Sofin processes in background! Turning off readonly mode for dataset: '$(distd "${_datas}")'"
-            run "${ZFS_BIN} set readonly=on '${_datas}'"
+            try "${ZFS_BIN} set readonly=on '${_datas}' >/dev/null 2>&1" \
+                && debug "No Sofin processes found in background. Dataset: '$(distd "${_datas}")' is now read-only."
         else
             debug "Background Sofin jobs are still around! Leaving readonly mode for dataset: '$(distd "${_datas}")'"
         fi
@@ -721,54 +718,55 @@ set_software_dataset_readonly () {
 
 set_software_dataset_writable () {
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
-        ${ZFS_BIN} set readonly=off "${DEFAULT_ZPOOL}/Software/${SYSTEM_DATASET}"
+        try "${ZFS_BIN} set readonly=off '${DEFAULT_ZPOOL}/Software/${SYSTEM_DATASET}' >/dev/null" \
+            && debug "Dataset is now writable: $(distd "${DEFAULT_ZPOOL}/Software/${SYSTEM_DATASET}")"
     fi
 }
 
 
 after_unpack_snapshot () {
-    debug "after_unpack_snapshot(): Partial feature disabled: NIY"
+    debug "after_unpack_snapshot(): NO-OP: NIY"
     # do_prefix_snapshot "after_unpack"
 }
 
 
 after_patch_snapshot () {
-    debug "after_patch_snapshot(): Partial feature disabled: NIY"
+    debug "after_patch_snapshot(): NO-OP: NIY"
     # do_prefix_snapshot "after_patch"
 }
 
 
 after_configure_snapshot () {
-    debug "after_configure_snapshot(): Partial feature disabled: NIY"
+    debug "after_configure_snapshot(): NO-OP: NIY"
     # do_prefix_snapshot "after_configure"
 }
 
 
 after_make_snapshot () {
-    debug "after_make_snapshot(): Partial feature disabled: NIY"
+    debug "after_make_snapshot(): NO-OP: NIY"
     # do_prefix_snapshot "after_make"
 }
 
 
 after_test_snapshot () {
-    debug "after_test_snapshot(): Partial feature disabled: NIY"
+    debug "after_test_snapshot(): NO-OP: NIY"
     # do_prefix_snapshot "after_test"
 }
 
 
 after_install_snapshot () {
-    debug "after_install_snapshot(): Partial feature disabled: NIY"
+    debug "after_install_snapshot(): NO-OP: NIY"
     # do_prefix_snapshot "after_install"
 }
 
 
 after_export_snapshot () {
-    debug "after_export_snapshot(): Partial feature disabled: NIY"
+    debug "after_export_snapshot(): NO-OP: NIY"
     # do_prefix_snapshot "after_export"
 }
 
 
 create_origin_snaphots () {
-    debug "create_origin_snaphots(): Partial feature disabled: NIY"
+    debug "create_origin_snaphots(): NO-OP: NIY"
     # do_prefix_snapshot "origin"
 }
