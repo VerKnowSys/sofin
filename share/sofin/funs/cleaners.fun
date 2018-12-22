@@ -54,30 +54,6 @@ perform_clean () {
 }
 
 
-finalize () {
-    destroy_dead_locks
-    finalize_shell_reload
-}
-
-
-finalize_shell_reload () {
-    update_shell_vars
-    reload_shell
-    finalize_onquit
-}
-
-
-finalize_onquit () {
-    security_set_normal
-    destroy_ramdisk_device
-    set_software_dataset_readonly
-    if [ "${TTY}" = "YES" ]; then
-        # Bring back echo
-        ${STTY_BIN} echo
-    fi
-}
-
-
 destroy_ramdisk_device () {
     if [ -n "${RAMDISK_DEV}" ]; then
         case "${SYSTEM_NAME}" in
@@ -88,15 +64,19 @@ destroy_ramdisk_device () {
                 fi
                 ;;
         esac
-        try "${UMOUNT_BIN} -f ${RAMDISK_DEV} >/dev/null 2>&1" \
-            && debug "Tmp ramdisk force-unmounted: $(distd "${RAMDISK_DEV}")"
+        try "${UMOUNT_BIN} -f '${RAMDISK_DEV}' >/dev/null 2>&1" \
+            && debug "Ramdisk device unmounted: $(distd "${RAMDISK_DEV}")"
         unset RAMDISK_DEV
     fi
 }
 
 
-# NOTE: C-c is handled differently, not full finalize is running. f.e. build dir isn't wiped out
-finalize_interrupt () {
+# Standard finalizing task:
+finalize_complete_standard_task () {
+    finalize_with_shell_reload
+}
+
+
     untrap_signals
     destroy_ramdisk_device
     destroy_dead_locks
@@ -104,7 +84,7 @@ finalize_interrupt () {
 }
 
 
-finalize_afterbuild () {
+finalize_afterbuild_tasks_for_bundle () {
     _bund_name="${1}"
     require_prefix_set
     require_namesum_set
@@ -125,7 +105,7 @@ finalize_afterbuild () {
 }
 
 
-remove_useless () {
+remove_useless_files_of_bundle () {
     _rufiles="${*}"
     if [ -n "${_rufiles}" ]; then
         echo "${_rufiles}" | ${XARGS_BIN} -n 1 -P "${CPUS}" -I {} "${SH_BIN}" -c "${RM_BIN} -rf {} >/dev/null 2>&1" >> "${LOG}" 2>> "${LOG}" \

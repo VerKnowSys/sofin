@@ -522,28 +522,28 @@ strip_bundle () {
                     echo "'${_file_type}'" | ${GREP_BIN} -F "${_type}" >/dev/null 2>&1
                     if [ "0" = "${?}" ]; then
                         _counter="${_counter} + 1"
-                        _strip_list="${_file} ${_strip_list}"
-                        # debug "strip( file=$(distd "${_file}"), type=$(distd "${_type}"), full_type=$(distd "${_file_type}") )"
+                        _to_be_stripped_list="${_file} ${_to_be_stripped_list}"
                     fi
                 done
             done
         fi
     done
     _sbresult="$(calculate_bc "${_counter}")"
-    if [ "${_sbresult}" -lt "0" ] || [ -z "${_sbresult}" ]; then
+    if [ "${_sbresult}" -lt "0" ] \
+    || [ -z "${_sbresult}" ]; then
         _sbresult="0"
     else
-        if [ -n "${_strip_list}" ]; then
-            debug "Found: $(distd "${_sbresult}") files to strip in parallel."
-            try "${TOUCH_BIN} ${PREFIX}/${_sbfdefinition_name}${DEFAULT_STRIPPED_MARK_EXT}"
+        if [ -n "${_to_be_stripped_list}" ]; then
             printf "%b\n" "${_to_be_stripped_list}" | ${XARGS_BIN} -n 1 -P "${CPUS}" -I {} "${SH_BIN}" -c "${STRIP_BIN} ${DEFAULT_STRIP_OPTS} {} >/dev/null 2>&1" \
+                && debug "Stripping: $(distd "${_sbresult}") files in parallel." \
+                    && try "${TOUCH_BIN} '${PREFIX}/${_sbfdefinition_name}${DEFAULT_STRIPPED_MARK_EXT}'"
         fi
     fi
-    unset _sbfdefinition_name _dirs_to_strip _sbresult _counter _files _stripdir _bundlower _strip_list
+    unset _sbfdefinition_name _dirs_to_strip _sbresult _counter _files _stripdir _bundlower _to_be_stripped_list
 }
 
 
-track_useful_and_useless_files () {
+afterbuild_manage_files_of_bundle () {
     if [ "${DEF_CLEAN_USELESS}" = "YES" ]; then
         unset _fordel
         # we shall clean the bundle, from useless files..
@@ -558,8 +558,6 @@ track_useful_and_useless_files () {
                         else
                             _fordel="${_fordel} ${PREFIX}/${_cu_pattern}"
                         fi
-                    # else
-                    # debug "Not existent pattern.."
                     fi
                 done
             fi
@@ -619,8 +617,8 @@ track_useful_and_useless_files () {
                             else
                                 _fordel="${_cufile} ${_fordel}"
                             fi
-                        # else
-                        #     debug "Useful file left intact: $(distd "${_cufile}")"
+                        else
+                            debug "File considered to as useful: $(distd "${_cufile}")"
                         fi
                     fi
                 done
@@ -629,9 +627,9 @@ track_useful_and_useless_files () {
 
         if [ -n "${_dbg_exp_lst}" ]; then
             debug "Found exports: $(distd "${_dbg_exp_lst}"). Proceeding with useless files cleanup of: $(distd "${_fordel}")"
-            remove_useless "${_fordel}"
+            remove_useless_files_of_bundle "${_fordel}"
         else
-            debug "Empty exports list? Useless files removal skipped (cause it's damn annoing). Remember to invoke track_useful_and_useless_files() _after_ you do exports!"
+            debug "Empty exports list? Useless files removal skipped (cause it's damn annoing). Remember to invoke afterbuild_manage_files_of_bundle() _after_ you do exports!"
         fi
     else
         debug "Useless files cleanup skipped since DEF_CLEAN_USELESS=$(distd "${DEF_CLEAN_USELESS:-''}")!"
