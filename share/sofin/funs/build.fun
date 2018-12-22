@@ -654,7 +654,7 @@ process_flat () {
                             DEF_INSTALL_METHOD="ninja install"
 
                         else # Makefiles:
-                            run "${RM_BIN} -f CMakeCache.txt; ${_cmake_cmdline} -G\"Unix Makefiles\""
+                            run "${RM_BIN} -f CMakeCache.txt; ${_cmake_cmdline} -G'Unix Makefiles'"
                             DEF_MAKE_METHOD="make -j${CPUS}"
                             DEF_INSTALL_METHOD="make install"
 
@@ -755,7 +755,7 @@ process_flat () {
             unset _this_test_skipped
             if [ -n "${DEF_SKIPPED_DEFINITION_TEST}" ]; then
                 debug "Defined DEF_SKIPPED_DEFINITION_TEST: $(distd "${DEF_SKIPPED_DEFINITION_TEST}")"
-                printf "%s\n" " ${DEF_SKIPPED_DEFINITION_TEST} " | ${EGREP_BIN} -F " ${_app_param} " >/dev/null 2>/dev/null \
+                printf "%s\n" " ${DEF_SKIPPED_DEFINITION_TEST} " | ${EGREP_BIN} -F " ${_app_param} " >/dev/null 2>&1 \
                     && note "   ${NOTE_CHAR} Skipped tests for definition of: $(distn "${_app_param}")" \
                         && _this_test_skipped=1
             fi

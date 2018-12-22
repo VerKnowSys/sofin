@@ -87,7 +87,7 @@ determine_term_capabilites () {
         unset CAP_TERM_ANSI_COLORS
     fi
 
-    ${TPUT_BIN} setaf 0 >/dev/null 2>/dev/null
+    ${TPUT_BIN} setaf 0 >/dev/null 2>&1
     if [ "${?}" != "0" ]; then # broken with tput under FreeBSD, related bug: https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=210858
         unset CAP_TERM_TPUT_UTILITY
 

@@ -85,7 +85,7 @@ processes_all_sofin () {
     unset _processes
     for _ff in $(${FIND_BIN} "${LOCKS_DIR}" -name '*.lock' 2>/dev/null); do
         _pid="$(${CAT_BIN} "${_ff}")"
-        ${KILL_BIN} -0 "${_pid}" >/dev/null 2>/dev/null
+        ${KILL_BIN} -0 "${_pid}" >/dev/null 2>&1
         if [ "0" = "${?}" ] && [ "${SOFIN_PID}" != "${_pid}" ]; then
             debug "Sofin alive pid found: $(distd "${_pid}") in lock: $(distd "${_pid}")"
             _processes="${_pid} ${_processes}"
@@ -102,7 +102,7 @@ print_local_env_vars () {
     _s_env_file="${PWD}/.${SOFIN_NAME}.env"
     if [ -f "${_s_env_file}" ]; then
         printf '\n# Loaded from local environment: %s\n' \
-            "${_s_env_file}" 2>/dev/null
+            "${_s_env_file}"
         ${CAT_BIN} "${_s_env_file}" 2>/dev/null
     fi
     unset _s_env_file
