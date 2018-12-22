@@ -77,7 +77,7 @@ install_sofin () {
             && install_sofin_files \
                 && printf "%b\n" "${SOFIN_VERSION}" > "${SOFIN_ROOT}/${SOFIN_NAME}${DEFAULT_INST_MARK_EXT}"
 
-    if [ -x "${DEFAULT_SHELL_EXPORTS}/zsh" ]; then
+    if [ -x "${ZSH_BIN}" ]; then
         ${SED_BIN} -i '' -e "s#/usr/bin/env sh#${DEFAULT_SHELL_EXPORTS}/zsh#" \
             "${SOFIN_ROOT}/bin/s" \
             "${SOFIN_ROOT}/share/loader" \
