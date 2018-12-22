@@ -171,7 +171,7 @@ if [ -n "${SOFIN_COMMAND}" ]; then
                 *)
                     _bundles="${*}"
                     if [ -z "${_bundles}" ]; then
-                        printf "${REPLAY_PREVIOUS_LINE}"
+                        printf "%b\n" "${REPLAY_PREVIOUS_LINE}"
                         print_shell_vars
                         print_local_env_vars
                     else

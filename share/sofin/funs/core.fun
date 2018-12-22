@@ -40,7 +40,8 @@ warn () {
     _wrn_msgs="${*}"
     if [ -n "${_wrn_msgs}" ]; then
         if [ "YES" = "${TTY}" ]; then
-            printf "${REPLAY_PREVIOUS_LINE}%b%s%b\n\n" \
+            printf "%b%b%s%b\n\n" \
+                "${REPLAY_PREVIOUS_LINE}" \
                 "${ColorYellow}" \
                 "${_wrn_msgs}" \
                 "${ColorReset}" \
@@ -64,7 +65,8 @@ note () {
     _nte_msgs="${*}"
     if [ -n "${_nte_msgs}" ]; then
         if [ "YES" = "${TTY}" ]; then
-            printf "${REPLAY_PREVIOUS_LINE}%b%s%b\n" \
+            printf "%b%b%s%b\n" \
+                "${REPLAY_PREVIOUS_LINE}" \
                 "${ColorGreen}" \
                 "${_nte_msgs}" \
                 "${ColorReset}" \
@@ -88,7 +90,8 @@ permnote () {
     _prm_note="${*}"
     if [ -n "${_prm_note}" ]; then
         if [ "YES" = "${TTY}" ]; then
-            printf "${REPLAY_PREVIOUS_LINE}%b%s%b\n\n" \
+            printf "%b%b%s%b\n\n" \
+                "${REPLAY_PREVIOUS_LINE}" \
                 "${ColorGreen}" \
                 "${_prm_note}" \
                 "${ColorReset}" \
