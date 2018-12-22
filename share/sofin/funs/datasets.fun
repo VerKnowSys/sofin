@@ -429,7 +429,7 @@ destroy_software_dir () {
         _dsname="${_dsbase}/${_dset_destroy}"
 
         # make system writable, unshare any NFS shares associated with ZFS dataset,
-        set_system_writable
+        set_system_dataset_writable
         try "${ZFS_BIN} set sharenfs=inherit '${_dsbase}' >/dev/null 2>&1"
         try "${ZFS_BIN} set sharenfs=inherit '${_dsname}' >/dev/null 2>&1"
         try "${ZFS_BIN} unshare '${_dsname}' >/dev/null 2>&1"
@@ -440,7 +440,7 @@ destroy_software_dir () {
             && debug "Destroyed software-dataset: $(distd "${_dsname}")" \
                 && try "${RM_BIN} -rf '${SOFTWARE_DIR}/${_dset_destroy}' >/dev/null 2>&1"
 
-        set_system_readonly
+        # NOTE: set_system_readonly() is called in untrap_signals() once…
     else
         debug "Removing regular software-directory: $(distd "${SOFTWARE_DIR}/${_dset_destroy}")"
         try "${RM_BIN} -rf '${SOFTWARE_DIR}/${_dset_destroy}' >/dev/null 2>&1"
@@ -660,7 +660,7 @@ require_namesum_set () {
 }
 
 
-do_prefix_snapshot () {
+create_snapshot () {
     _snap_name="${1}"
     if [ -z "${_snap_name}" ]; then
         error "Snapshot name can't be empty!"
@@ -728,47 +728,47 @@ set_software_dataset_writable () {
 
 after_unpack_snapshot () {
     debug "after_unpack_snapshot(): NO-OP: NIY"
-    # do_prefix_snapshot "after_unpack"
+    # create_snapshot "after_unpack"
 }
 
 
 after_patch_snapshot () {
     debug "after_patch_snapshot(): NO-OP: NIY"
-    # do_prefix_snapshot "after_patch"
+    # create_snapshot "after_patch"
 }
 
 
 after_configure_snapshot () {
     debug "after_configure_snapshot(): NO-OP: NIY"
-    # do_prefix_snapshot "after_configure"
+    # create_snapshot "after_configure"
 }
 
 
 after_make_snapshot () {
     debug "after_make_snapshot(): NO-OP: NIY"
-    # do_prefix_snapshot "after_make"
+    # create_snapshot "after_make"
 }
 
 
 after_test_snapshot () {
     debug "after_test_snapshot(): NO-OP: NIY"
-    # do_prefix_snapshot "after_test"
+    # create_snapshot "after_test"
 }
 
 
 after_install_snapshot () {
     debug "after_install_snapshot(): NO-OP: NIY"
-    # do_prefix_snapshot "after_install"
+    # create_snapshot "after_install"
 }
 
 
 after_export_snapshot () {
     debug "after_export_snapshot(): NO-OP: NIY"
-    # do_prefix_snapshot "after_export"
+    # create_snapshot "after_export"
 }
 
 
 create_origin_snaphots () {
     debug "create_origin_snaphots(): Create $(distd "@origin") snapshot for software or service dataset of bundle of PREFIX: $(distd "${PREFIX}")."
-    do_prefix_snapshot "${ORIGIN_ZFS_SNAP_NAME}"
+    create_snapshot "${ORIGIN_ZFS_SNAP_NAME}"
 }

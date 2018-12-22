@@ -120,7 +120,7 @@ fetch_binbuild () {
             debug "Binary build unavailable for bundle: $(distd "${_fbb_bundname}")"
             if [ -n "${CAP_SYS_PRODUCTION}" ]; then
                 permnote "Software build from source disabled on production hosts!"
-                finalize
+                finalize_complete_standard_task
             fi
         fi
     fi
@@ -145,7 +145,7 @@ build () {
     _build_list="${*}"
 
     # Update definitions and perform more checks
-    security_set_build
+    load_sysctl_buildhost_hardening
     validate_kern_loaded_dtrace
     validate_sys_limits
 
@@ -311,10 +311,10 @@ build () {
             fi
 
             debug "Afterbuild for bundle: $(distd "${_anm}")"
-            finalize_afterbuild "${_anm}"
+            finalize_afterbuild_tasks_for_bundle "${_anm}"
 
             debug "Non production mode, hence tracking useful/useless files, stripping bundles and creating bundle snapshot!"
-            track_useful_and_useless_files
+            afterbuild_manage_files_of_bundle
             strip_bundle "${_anm}"
 
             if [ "YES" = "${CAP_SYS_HARDENED}" ]; then

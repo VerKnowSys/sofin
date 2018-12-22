@@ -214,7 +214,7 @@ if [ -n "${SOFIN_COMMAND}" ]; then
             esac
 
             # implicit reload:
-            finalize_shell_reload
+            finalize_with_shell_reload
             ;;
 
 
@@ -281,7 +281,6 @@ if [ -n "${SOFIN_COMMAND}" ]; then
 
             if [ -n "${_utils}" ]; then
                 initialize
-                set_software_dataset_writable
                 validate_reqs
 
                 for _util in $(to_iter "${_utils}"); do
@@ -311,14 +310,13 @@ if [ -n "${SOFIN_COMMAND}" ]; then
                     fi
                 done
                 note "Installed utilities: $(distn "${_utils}")"
-                finalize
+                finalize_complete_standard_task
             fi
             ;;
 
 
         i|install|get|pick|choose|use|switch)
             initialize
-            set_software_dataset_writable
             validate_reqs
             _list_maybe="$(lowercase "${1}")"
             if [ -z "${_list_maybe}" ]; then
@@ -342,13 +340,12 @@ if [ -n "${SOFIN_COMMAND}" ]; then
             done
             note "Installed: $(distn "${_pickd_bundls}")"
             unset _pickd_bundls _b
-            finalize
+            finalize_complete_standard_task
             ;;
 
 
         deps|dependencies|local)
             initialize
-            set_software_dataset_writable
             validate_reqs
             if [ "${USER}" = "root" ]; then
                 warn "Installation of project dependencies as root is immoral"
@@ -365,13 +362,12 @@ if [ -n "${SOFIN_COMMAND}" ]; then
                 build "${_b}"
             done
             unset _pickd_bundls _bundls_amount
-            finalize
+            finalize_complete_standard_task
             ;;
 
 
         p|push|binpush|send)
             initialize
-            set_software_dataset_writable
             validate_reqs
             fail_on_bg_job "${SOFIN_ARGS}"
             for _bundle in $(to_iter "${SOFIN_ARGS}"); do
@@ -395,13 +391,12 @@ if [ -n "${SOFIN_COMMAND}" ]; then
             done
             permnote "Push locally built binary build(s): $(distn "${SOFIN_ARGS}")"
             push_binbuilds "${SOFIN_ARGS}"
-            finalize
+            finalize_complete_standard_task
             ;;
 
 
         b|build)
             initialize
-            set_software_dataset_writable
             validate_reqs
             permnote "Build bundle(s): $(distn "${SOFIN_ARGS}")"
             fail_on_bg_job "${SOFIN_ARGS}"
@@ -411,18 +406,17 @@ if [ -n "${SOFIN_COMMAND}" ]; then
                 build "${_b}"
             done
             unset _b
-            finalize
+            finalize_complete_standard_task
             ;;
 
 
         d|deploy)
             initialize
-            set_software_dataset_writable
             validate_reqs
             permnote "Deploy bundle(s): $(distn "${SOFIN_ARGS}")"
             fail_on_bg_job "${SOFIN_ARGS}"
             deploy_binbuild "${SOFIN_ARGS}"
-            finalize
+            finalize_complete_standard_task
             ;;
 
 
@@ -431,17 +425,16 @@ if [ -n "${SOFIN_COMMAND}" ]; then
             fail_on_bg_job "${SOFIN_ARGS}"
             reset_defs
             update_defs
-            finalize
+            finalize_complete_standard_task
             ;;
 
 
         rebuild)
             initialize
-            set_software_dataset_writable
             validate_reqs
             fail_on_bg_job "${SOFIN_ARGS}"
             rebuild_bundle "${SOFIN_ARGS}"
-            finalize
+            finalize_complete_standard_task
             ;;
 
 
@@ -452,7 +445,6 @@ if [ -n "${SOFIN_COMMAND}" ]; then
 
         delete|destroy|remove|uninstall|rm)
             initialize
-            set_software_dataset_writable
             fail_on_bg_job "${SOFIN_ARGS}"
             for _arg in $(to_iter "${SOFIN_ARGS}"); do
                 _caparg="$(capitalize "${_arg}")"
@@ -462,13 +454,13 @@ if [ -n "${SOFIN_COMMAND}" ]; then
             done
             remove_bundles "${SOFIN_ARGS}"
             note "Removed bundle(s): $(distn "${SOFIN_ARGS}")"
-            finalize
+            finalize_complete_standard_task
             ;;
 
 
         # deprecated. Use: `s env reset`
         reload|rehash)
-            finalize_shell_reload
+            finalize_with_shell_reload
             ;;
 
 
@@ -484,9 +476,8 @@ if [ -n "${SOFIN_COMMAND}" ]; then
 
         exportapp|export|exp)
             initialize
-            set_software_dataset_writable
             make_exports "${1}" "${2}"
-            finalize
+            finalize_complete_standard_task
             ;;
 
 

@@ -365,7 +365,7 @@ show_alt_definitions_and_exit () {
             warn "No such definition found: $(distw "${_an_app}"). Alternatives found: $(distw "${_contents}")"
         fi
         unset _an_app _contents _maybe
-        finalize_onquit
+        finalize_and_quit_gracefully
     fi
     unset _an_app
 }

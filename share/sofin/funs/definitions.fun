@@ -234,7 +234,7 @@ remove_bundles () {
         error "Argument with at least one bundle name is required!"
     fi
     unset _destroyed
-    security_set_build
+    load_sysctl_buildhost_hardening
     for _def in $(to_iter "${_bundles}"); do
         _given_name="$(capitalize "${_def}")"
         if [ -z "${_given_name}" ]; then
@@ -258,7 +258,7 @@ remove_bundles () {
             # && [ -f "${SOFTWARE_DIR}/${_alternative}/$(lowercase "${_alternative}")${DEFAULT_INST_MARK_EXT}" ]; then
             #     permnote "Updating environment for installed alternative: $(distn "${_alternative}")"
             #     export_binaries "${_alternative}"
-            #     finalize
+            #     finalize_complete_standard_task
             #     unset _given_name _inname _alternative _aname _def
             #     return 0 # Just pick first available alternative bundle
             # elif [ -z "${_alternative}" ]; then
@@ -266,7 +266,7 @@ remove_bundles () {
             # fi
         fi
     done
-    security_set_normal
+    load_sysctl_system_production_hardening
 
     if [ -n "${_destroyed}" ]; then
         permnote "Software dataset(s) destroyed: $(distn "${_destroyed}")"
@@ -500,8 +500,7 @@ strip_bundle () {
     # _script="script text executable"
     #
     _counter="0"
-    unset _universal_ft
-    unset _strip_list
+    unset _universal_ft _to_be_stripped_list
     case "${SYSTEM_NAME}" in
         Darwin)
             _exec_ft="Mach-O 64-bit executable x86_64"

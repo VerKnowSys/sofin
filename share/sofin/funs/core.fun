@@ -131,7 +131,7 @@ error () {
             "*" \
             >&2
     fi
-    finalize_interrupt
+    finalize_after_signal_interrupt
     exit "${ERRORCODE_TASK_FAILURE}"
 }
 
@@ -280,29 +280,40 @@ setup_defs_repo () {
 }
 
 
-cleanup_handler () {
-    finalize
-    debug "Normal exit."
-    exit 0
+initialize () {
+    set_system_dataset_writable
+    set_software_dataset_writable
+
+    create_dirs
+    create_base_datasets
+    check_definitions_availability
+    trap_signals
+
+    if [ "${TTY}" = "YES" ]; then
+        # turn terminal echo *off*
+        ${STTY_BIN} -echo
+    fi
 }
 
 
 interrupt_handler () {
-    finalize_interrupt
     warn "Interrupted: $(distw "${SOFIN_PID:-$$}")"
+    finalize_after_signal_interrupt
+    warn "Interrupted: Bye!"
     exit "${ERRORCODE_USER_INTERRUPT}"
 }
 
 
 terminate_handler () {
-    finalize
     warn "Terminated: $(distw "${SOFIN_PID:-$$}")"
+    finalize_complete_standard_task
+    warn "Terminated: Bye!"
     exit "${ERRORCODE_TERMINATED}"
 }
 
 
 noop_handler () {
-    debug "Handled signal USR2 with noop()"
+    debug "Got USR2 signal. No-OP!"
 }
 
 
@@ -339,37 +350,22 @@ trap_signals () {
     # 29    SIGINFO      discard signal       status request from keyboard
     # 30    SIGUSR1      terminate process    User defined signal 1
     # 31    SIGUSR2      terminate process    User defined signal 2
-    #
-    # if [ "YES" = "${CAP_TERM_ZSH}" ]; then
-        # trap - ERR
-    #el
-    # if [ "YES" = "${CAP_TERM_BASH}" ]; then
-    # #     trap 'cleanup_handler' EXIT
-    #     trap 'error' ERR
-    # fi
+
     trap 'interrupt_handler' INT
     trap 'terminate_handler' TERM
     trap 'noop_handler' USR2 # This signal is used to "reload shell"-feature. Sofin should ignore it
 
-    set_system_writable
+    debug "trap_signals(): Completed!"
     return 0
 }
 
 
 untrap_signals () {
-
-    # if [ "YES" = "${CAP_TERM_ZSH}" ]; then
-    #     trap - ZERR
-    # el
-    # if [ "YES" = "${CAP_TERM_BASH}" ]; then
-    #     trap - ERR
-    # fi
-    # trap - EXIT
     trap - INT
     trap - TERM
     trap - USR2
 
-    set_system_readonly
+    debug "untrap_signals(): Completed!"
     return 0
 }
 
@@ -379,36 +375,31 @@ set_system_readonly () {
     && [ -x "${BEADM_BIN}" ] \
     && [ "root" = "${USER}" ] \
     && [ -z "${CAP_SYS_JAILED}" ]; then
-        debug "Beadm found, turning off readonly mode for default boot environment"
         _active_boot_env="$(${BEADM_BIN} list -H 2>/dev/null | ${EGREP_BIN} "R" 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)"
         _boot_dataset="${DEFAULT_ZPOOL}/ROOT/${_active_boot_env}"
         if [ -n "${CAP_SYS_PRODUCTION}" ]; then
-            debug "Production mode disabling readonly for dataset: '$(distd "${_boot_dataset}")'"
-            run "${ZFS_BIN} set readonly=off '${_boot_dataset}'"
+            try "${ZFS_BIN} set readonly=on '${_boot_dataset}'" \
+                && debug "System dataset: '$(distd "${_boot_dataset}")' is now: READ-ONLY"
         else
             _sp="$(processes_all_sofin)"
             if [ -z "${_sp}" ]; then
-                debug "No Sofin processes in background! Turning off readonly mode for dataset: '$(distd "${_boot_dataset}")'"
-                run "${ZFS_BIN} set readonly=off '${_boot_dataset}'"
+                try "${ZFS_BIN} set readonly=on '${_boot_dataset}'" \
+                    debug "No background Sofin processes found. System dataset: '$(distd "${_boot_dataset}") is now: READ-ONLY'"
             else
-                debug "Background Sofin jobs are still around! Leaving readonly mode for dataset: '$(distd "${_boot_dataset}")'"
+                debug "Background Sofin found in background! System dataset: '$(distd "${_boot_dataset}") is untouched.'"
             fi
         fi
     fi
 }
 
 
-set_system_writable () {
+set_system_dataset_writable () {
     if [ -x "${BEADM_BIN}" ] \
     && [ "root" = "${USER}" ] \
     && [ -z "${CAP_SYS_JAILED}" ]; then
-        if [ -n "${CAP_SYS_PRODUCTION}" ]; then
-            debug "Production mode, skipping readonly mode for /"
-        else
-            _active_boot_env="$(${BEADM_BIN} list -H | ${EGREP_BIN} "R" 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)"
-            debug "Turn on readonly mode for: $(distd "${DEFAULT_ZPOOL}/ROOT/${_active_boot_env}")"
-            try "${ZFS_BIN} set readonly=on '${DEFAULT_ZPOOL}/ROOT/${_active_boot_env}'"
-        fi
+        _active_boot_env="$(${BEADM_BIN} list -H | ${EGREP_BIN} "R" 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)"
+        try "${ZFS_BIN} set readonly=off '${DEFAULT_ZPOOL}/ROOT/${_active_boot_env}'" \
+            && debug "System dataset: $(distd "${DEFAULT_ZPOOL}/ROOT/${_active_boot_env}") is now: WRITABLE"
     fi
 }
 
@@ -457,19 +448,6 @@ create_dirs () {
     || [ ! -d "${FILE_CACHE_DIR}" ] \
     || [ ! -d "${LOCKS_DIR}" ]; then
         try "${MKDIR_BIN} -p '${CACHE_DIR}' '${FILE_CACHE_DIR}' '${LOCKS_DIR}' '${LOGS_DIR}'"
-    fi
-}
-
-
-initialize () {
-    create_dirs
-    create_base_datasets
-    check_definitions_availability
-    trap_signals
-
-    if [ "${TTY}" = "YES" ]; then
-        # turn echo off
-        ${STTY_BIN} -echo
     fi
 }
 
