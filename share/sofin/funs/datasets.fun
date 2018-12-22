@@ -772,6 +772,6 @@ after_export_snapshot () {
 
 
 create_origin_snaphots () {
-    debug "create_origin_snaphots(): NO-OP: NIY"
-    # do_prefix_snapshot "origin"
+    # Create origin snapshot of the software dataset.
+    do_prefix_snapshot "${ORIGIN_ZFS_SNAP_NAME}"
 }
