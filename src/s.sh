@@ -284,7 +284,6 @@ if [ -n "${SOFIN_COMMAND}" ]; then
 
             if [ -n "${_utils}" ]; then
                 initialize
-                unshare_all_zfs_datasets
                 validate_reqs
 
                 for _util in $(to_iter "${_utils}"); do
@@ -350,7 +349,6 @@ if [ -n "${SOFIN_COMMAND}" ]; then
 
         deps|dependencies|local)
             initialize
-            unshare_all_zfs_datasets
             validate_reqs
             if [ "${USER}" = "root" ]; then
                 warn "Installation of project dependencies as root is immoral"
@@ -402,7 +400,6 @@ if [ -n "${SOFIN_COMMAND}" ]; then
 
         b|build)
             initialize
-            unshare_all_zfs_datasets
             validate_reqs
             permnote "Build bundle(s): $(distn "${SOFIN_ARGS}")"
             fail_on_bg_job "${SOFIN_ARGS}"
@@ -418,7 +415,6 @@ if [ -n "${SOFIN_COMMAND}" ]; then
 
         d|deploy)
             initialize
-            unshare_all_zfs_datasets
             validate_reqs
             permnote "Deploy bundle(s): $(distn "${SOFIN_ARGS}")"
             fail_on_bg_job "${SOFIN_ARGS}"
@@ -438,7 +434,6 @@ if [ -n "${SOFIN_COMMAND}" ]; then
 
         rebuild)
             initialize
-            unshare_all_zfs_datasets
             validate_reqs
             fail_on_bg_job "${SOFIN_ARGS}"
             rebuild_bundle "${SOFIN_ARGS}"
@@ -453,7 +448,6 @@ if [ -n "${SOFIN_COMMAND}" ]; then
 
         delete|destroy|remove|uninstall|rm)
             initialize
-            unshare_all_zfs_datasets
             fail_on_bg_job "${SOFIN_ARGS}"
             for _arg in $(to_iter "${SOFIN_ARGS}"); do
                 _caparg="$(capitalize "${_arg}")"
@@ -485,7 +479,6 @@ if [ -n "${SOFIN_COMMAND}" ]; then
 
         exportapp|export|exp)
             initialize
-            unshare_all_zfs_datasets
             make_exports "${1}" "${2}"
             finalize
             ;;
