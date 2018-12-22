@@ -24,6 +24,7 @@ LOG_CHECK_INTERVAL=1
 
 # default CA Root certs to be used by Sofin:
 DEFAULT_CACERT="/etc/ssl/cert.pem"
+DEFAULT_SYSCTL_CONF="/etc/sysctl.conf"
 
 DEFINITIONS_DEFAULT_FILE_NAME="defaults" # NOTE: Base "def" file, loaded before each software definition
 DEFINITIONS_LISTS_FILE_NAME="lists" # NOTE: It's name of lists directory from "Sofin-definitions" repository
