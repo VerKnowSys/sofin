@@ -650,10 +650,10 @@ process_flat () {
                             DEF_MAKE_METHOD="ninja -j${CPUS}"
                             DEF_INSTALL_METHOD="ninja install"
 
-                        else # Makefiles:
+                        else # Makefile case: Use what's found in definition or set default calls:
                             run "${RM_BIN} -f CMakeCache.txt; ${_cmake_cmdline} -G'Unix Makefiles'"
-                            DEF_MAKE_METHOD="make -j${CPUS}"
-                            DEF_INSTALL_METHOD="make install"
+                            # DEF_MAKE_METHOD="${DEF_MAKE_METHOD:-"make -s -j${CPUS}"}"
+                            # DEF_INSTALL_METHOD="${DEF_INSTALL_METHOD:-"make -s install"}"
 
                         fi
                         unset _cmake_cmdline
