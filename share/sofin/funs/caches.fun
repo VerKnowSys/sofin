@@ -109,8 +109,8 @@ dump_software_build_configuration_options () {
     fi
     if [ -n "${DEBUG}" ] \
     || [ "YES" = "${CAP_SYS_BUILDHOST}" ]; then
-        printf "\n\n%b%b%b\n\n" "${ColorBlue}" "${_configuration_opts_rendered}" "${ColorReset}"
         note "  $(distn "${_bund_lcase}") Build-Level configuration file: $(distn "${_configuration_opts_rendered}" "${ColorExample}")"
+        printf "\n\n%b%b%b\n\n" "${ColorBlue}" "${_configuration_opts_rendered}" "${ColorReset}"
     fi
     return 0
 }
