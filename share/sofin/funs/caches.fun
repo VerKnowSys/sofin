@@ -100,13 +100,28 @@ checksum_filecache_element () {
 }
 
 
-cache_conf_scrpt_hlp_opts () {
+dump_software_build_configuration_options () {
     _config_log="${1}"
     if [ ! -f "${_config_log}" ]; then
         # Store all options per definition from configure scripts
-        try "${MKDIR_BIN} -p \"$(${DIRNAME_BIN} "${_config_log}" 2>/dev/null)\" 2>/dev/null"
-        try "${DEF_CONFIGURE_METHOD} -h | ${GREP_BIN} -E '\-\-\s*' 2>/dev/null > '${_config_log}' 2>&1"
+        ${MKDIR_BIN} -p "$(${DIRNAME_BIN} "${_config_log}" 2>/dev/null)"
+
+        # Copy whole configuration block from stdout but additionally redirect stderr to stdout:
+        try "${DEF_CONFIGURE_METHOD} -h 2>&1 | ${TEE_BIN} 2>/dev/null '${_config_log}'" \
+            && debug "Configuration options dump has been written to: $(distd "${_config_log}")"
+
+        printf "%b ----Build--Configuration--Options----> \n%b %b\n" \
+                "${ColorBlue}" \
+                "$(${CAT_BIN} "${_config_log}" | ${GREP_BIN} -E '\-\-\s*' 2>&1)" \
+                "${ColorReset}"
     fi
-    debug "Configure options: $(distd "$(${CAT_BIN} "${_config_log}" 2>/dev/null)" "${ColorBlue}" 2>/dev/null)"
+    _configuration_opts_only="${ColorBlue}$(${CAT_BIN} "${_config_log}")${ColorReset}"
+    if [ -n "${DEBUG}" ] \
+    || [ "YES" = "${CAP_SYS_BUILDHOST}" ]; then
+        note "Available configuration options available in file: '$(distd "${_config_log}" "${ColorExample}")'"
+        debug "Available configuration options in details: '$(distd "${_configuration_opts_only}" "${ColorBlue}")'"
+    else
+        note "Available configuration options available in file: '$(distd "${_config_log}" "${ColorExample}")'"
+    fi
     return 0
 }
