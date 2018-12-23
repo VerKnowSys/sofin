@@ -450,7 +450,7 @@ if [ -n "${SOFIN_COMMAND}" ]; then
                 fi
             done
             remove_bundles "${SOFIN_ARGS}"
-            note "Removed bundle(s): $(distn "${SOFIN_ARGS}")"
+            permnote "Removed bundle(s): $(distn "${SOFIN_ARGS}")"
             finalize_complete_standard_task
             ;;
 

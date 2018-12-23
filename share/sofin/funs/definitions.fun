@@ -386,7 +386,7 @@ show_outdated () {
         if [ "${FOUND_OUTDATED}" = "YES" ]; then
             exit "${ERRORCODE_TASK_FAILURE}"
         else
-            note "Installed bundles seems to be recent"
+            permnote "All currently installed bundles look recent!"
         fi
     fi
     unset _bund_vers _raw
