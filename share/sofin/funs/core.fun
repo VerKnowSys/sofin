@@ -167,28 +167,28 @@ error () {
 
 # distdebug
 distd () {
-    printf "%b%b%b\n" "${2:-${ColorDistinct}}" "${1}" "${3:-${ColorDebug}}" 2>/dev/null
+    printf "%b%b%b" "${2:-${ColorDistinct}}" "${1}" "${3:-${ColorDebug}}" 2>/dev/null
     return 0
 }
 
 
 # distnote
 distn () {
-    printf "%b%b%b\n" "${2:-${ColorDistinct}}" "${1}" "${3:-${ColorNote}}" 2>/dev/null
+    printf "%b%b%b" "${2:-${ColorDistinct}}" "${1}" "${3:-${ColorNote}}" 2>/dev/null
     return 0
 }
 
 
 # distwarn
 distw () {
-    printf "%b%b%b\n" "${2:-${ColorDistinct}}" "${1}" "${3:-${ColorWarning}}" 2>/dev/null
+    printf "%b%b%b" "${2:-${ColorDistinct}}" "${1}" "${3:-${ColorWarning}}" 2>/dev/null
     return 0
 }
 
 
 # disterror
 diste () {
-    printf "%b%b%b\n" "${2:-${ColorDistinct}}" "${1}" "${3:-${ColorError}}" 2>/dev/null
+    printf "%b%b%b" "${2:-${ColorDistinct}}" "${1}" "${3:-${ColorError}}" 2>/dev/null
     return 0
 }
 
