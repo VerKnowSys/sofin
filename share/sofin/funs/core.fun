@@ -66,16 +66,16 @@ warn () {
                     "   ${_wrn_msgs}" \
                     "${ColorReset}" \
                     "${ANSI_TWO_LINES_DOWN}" \
-                        >&2 | "${TEE_BIN}" 2>/dev/null
+                        >&2 | "${TEE_BIN}" >/dev/null
         else
             printf "%b%b%b\n" \
                     "${ColorYellow}" \
                     "   ${_wrn_msgs}" \
                     "${ColorReset}" \
-                        >&2 | "${TEE_BIN}" 2>/dev/null
+                        >&2 | "${TEE_BIN}" >/dev/null
         fi
     else
-        printf "\n" >&2
+        printf "\n" >/dev/null
     fi
     unset _wrn_msgs
     return 0
