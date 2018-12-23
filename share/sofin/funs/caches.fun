@@ -108,7 +108,7 @@ dump_software_build_configuration_options () {
         _configuration_opts_rendered="$(${CAT_BIN} "${_config_log}" 2>/dev/null | ${GREP_BIN} -E '\-\-\s*' 2>/dev/null)"
     fi
     if [ "YES" = "${CAP_SYS_BUILDHOST}" ]; then
-        note "$(distn "${_bund_lcase}")  Building……"
+        note "$(distn "(.~.)") "
     fi
     if [ -n "${DEBUG}" ]; then # display detailed options  for each dependency... not too amusing ;)
         printf "\n\n%b%b%b\n\n" "${ColorBlue}" "${_configuration_opts_rendered}" "${ColorReset}"
