@@ -104,13 +104,17 @@ dump_software_build_configuration_options () {
     _config_log="${1}"
     if [ ! -f "${_config_log}" ]; then
         ${MKDIR_BIN} -p "$(${DIRNAME_BIN} "${_config_log}" 2>/dev/null)"
-        try "${SHELL} -c \"${DEF_CONFIGURE_METHOD} -h | ${TEE_BIN} ${_config_log}\"" 2>/dev/null # 2> ${_config_log}.stderr
+        try "${SHELL} -c \"${DEF_CONFIGURE_METHOD} -h | ${TEE_BIN} ${_config_log}\""
         _configuration_opts_rendered="$(${CAT_BIN} "${_config_log}" 2>/dev/null | ${GREP_BIN} -E '\-\-\s*' 2>/dev/null)"
     fi
-    if [ "YES" = "${CAP_SYS_BUILDHOST}" ]; then
-        printf "\n%b%b%b\n" \
-            "${ColoOrange}" "$(distn "\r(.~.)")" "${ColorReset}"
-    fi
+    # TODO: play with rendering links to logs directly into interactive terminal output:
+    # if [ "YES" = "${CAP_SYS_BUILDHOST}" ]; then
+    #     printf "\t\t\t\t\6\6\r\r\n%b%b%b: %b\n" \
+    #         "${ColorDistinct}" \
+    #         "\t\t\t\t\t\t${ANSI_ONE_LINE_UP}   … for a complete list of build-features" \
+    #         "$(distn "${_config_log}")" \
+    #         "${ColorReset}"
+    # fi
     if [ -n "${DEBUG}" ]; then # display detailed options  for each dependency... not too amusing ;)
         printf "\n\n%b%b%b\n\n" "${ColorBlue}" "${_configuration_opts_rendered}" "${ColorReset}"
     fi
