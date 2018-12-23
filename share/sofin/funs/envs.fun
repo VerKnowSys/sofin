@@ -423,6 +423,18 @@ compiler_setup () {
         fi
     fi
 
+    # LTO works on Darwin, but stuff is done slightly different way on macOS…
+    if [ "Darwin" = "${SYSTEM_NAME}" ]; then
+        # as long as value of "${DEF_USE_LTO}" is unset
+        # (or simply the value is != "YES"), then it's
+        # just enabled by default on 64bit
+        # HardenedBSD/ FreeBSD and Darwin systems.
+        if [ "YES" = "${DEF_USE_LTO}" ]; then
+            CFLAGS="${CFLAGS} ${LTO_CFLAGS}"
+            CXXFLAGS="${CXXFLAGS} ${LTO_CFLAGS}"
+        fi
+    fi
+
     if [ -z "${DEF_NO_SSP_BUFFER_OVERRIDE}" ]; then
         CFLAGS="${CFLAGS} ${SSP_BUFFER_OVERRIDE}"
         CXXFLAGS="${CXXFLAGS} ${SSP_BUFFER_OVERRIDE}"
