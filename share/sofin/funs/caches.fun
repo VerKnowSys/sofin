@@ -103,24 +103,14 @@ checksum_filecache_element () {
 dump_software_build_configuration_options () {
     _config_log="${1}"
     if [ ! -f "${_config_log}" ]; then
-        # Store all options per definition from configure scripts
         ${MKDIR_BIN} -p "$(${DIRNAME_BIN} "${_config_log}" 2>/dev/null)"
-        # Copy whole configuration block from stdout but additionally redirect stderr to stdout:
-        try "${DEF_CONFIGURE_METHOD} -h 2>&1 | ${TEE_BIN} '${_config_log}' 2>/dev/null" \
-            && debug "Configuration options dump has been written to: $(distd "${_config_log}")"
-
-        printf "%b ----Build--Configuration--Options----> \n%b %b\n" \
-                "${ColorBlue}" \
-                "$(${CAT_BIN} "${_config_log}" | ${GREP_BIN} -E '\-\-\s*' 2>&1)" \
-                "${ColorReset}"
+        try "${SHELL} -c \"${DEF_CONFIGURE_METHOD} -h | ${TEE_BIN} ${_config_log}\"" 2>/dev/null # 2> ${_config_log}.stderr
+        _configuration_opts_rendered="$(${CAT_BIN} "${_config_log}" 2>/dev/null | ${GREP_BIN} -E '\-\-\s*' 2>/dev/null)"
     fi
-    _configuration_opts_only="${ColorBlue}$(${CAT_BIN} "${_config_log}")${ColorReset}"
     if [ -n "${DEBUG}" ] \
     || [ "YES" = "${CAP_SYS_BUILDHOST}" ]; then
-        note "Available configuration options available in file: '$(distd "${_config_log}" "${ColorExample}")'"
-        debug "Available configuration options in details: '$(distd "${_configuration_opts_only}" "${ColorBlue}")'"
-    else
-        note "Available configuration options available in file: '$(distd "${_config_log}" "${ColorExample}")'"
+        printf "\n\n%b%b%b\n\n" "${ColorBlue}" "${_configuration_opts_rendered}" "${ColorReset}"
+        note "  $(distn "${_bund_lcase}") Build-Level configuration file: $(distn "${_configuration_opts_rendered}" "${ColorExample}")"
     fi
     return 0
 }
