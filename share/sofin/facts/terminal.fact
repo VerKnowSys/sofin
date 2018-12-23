@@ -75,7 +75,7 @@ determine_term_capabilites () {
         unset CAP_TERM_ZSH CAP_TERM_BASH
     fi
 
-    printf "%b\n" "${LANG}" | ${GREP_BIN} -F ".UTF-8" >/dev/null 2>&1
+    try "printf \"%b\n\" \"${LANG}\" | ${GREP_BIN} -F \".UTF-8\""
     if [ "0" = "${?}" ]; then
         CAP_TERM_UNICODE=YES
         unset CAP_TERM_ASCII
@@ -84,7 +84,7 @@ determine_term_capabilites () {
         unset CAP_TERM_UNICODE
     fi
 
-    printf "%b\n" "${TERM}" | ${GREP_BIN} -F "256color" >/dev/null 2>&1
+    try "printf \"%b\n\" \"${TERM}\" | ${GREP_BIN} -F \"256color\""
     if [ "0" = "${?}" ]; then
         CAP_TERM_ANSI_COLORS=YES
         unset CAP_TERM_NO_COLORS
@@ -93,7 +93,7 @@ determine_term_capabilites () {
         unset CAP_TERM_ANSI_COLORS
     fi
 
-    ${TPUT_BIN} setaf 0 >/dev/null 2>&1
+    try "${TPUT_BIN} setaf 0"
     if [ "${?}" != "0" ]; then # broken with tput under FreeBSD, related bug: https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=210858
         unset CAP_TERM_TPUT_UTILITY
 
