@@ -200,7 +200,8 @@ run () {
         _rnm="${DEF_NAME}${DEF_SUFFIX}"
         if [ -z "${_rnm}" ]; then
             if [ -z "${DEBUG}" ]; then
-                eval "PATH=${PATH}${GIT_EXPORTS} ${_run_params}" >/dev/null 2>> "${LOG}" \
+                # No DEBUG set -> discard both STDOUT and STDERR for try() calls…:
+                eval "PATH=${PATH}${GIT_EXPORTS} ${_run_params}" >/dev/null 2>&1 \
                     && check_result "${?}" "${_run_params}" \
                     && return 0
             else
@@ -211,7 +212,7 @@ run () {
             fi
         else
             if [ -z "${DEBUG}" ]; then
-                eval "PATH=${PATH}${GIT_EXPORTS} ${_run_params}" >/dev/null 2>> "${LOG}-${_rnm}" \
+                eval "PATH=${PATH}${GIT_EXPORTS} ${_run_params}" >/dev/null 2>&1 \
                     && check_result "${?}" "${_run_params}" \
                     && return 0
             else
@@ -273,8 +274,8 @@ retry () {
     touch_logsdir_and_logfile
     while [ -n "${_ammo}" ]; do
         if [ -n "${_targets}" ]; then
-            if [ -z "${DEBUG}" ]; then
-                eval "PATH=${DEFAULT_PATH}${GIT_EXPORTS} ${_targets}" 2>> "${LOG}" >&2  \
+            if [ -z "${DEBUG}" ]; then # No DEBUG set -> discard both STDOUT and STDERR for try() calls…:
+                eval "PATH=${DEFAULT_PATH}${GIT_EXPORTS} ${_targets}" 2>/dev/null >&2  \
                     && check_result "${?}" "${_targets}" \
                         && unset _ammo _targets \
                             && return 0
