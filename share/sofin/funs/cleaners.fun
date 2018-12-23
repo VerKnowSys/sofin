@@ -102,8 +102,8 @@ finalize_and_quit_gracefully () {
     load_sysctl_system_production_hardening
     destroy_ramdisk_device
     if [ "${TTY}" = "YES" ]; then
-        # Bring back echo to the terminal:
-        ${STTY_BIN} echo
+        ${STTY_BIN} echo \
+            && debug "Interactive Terminal Echo is now: $(distd "*enabled*")"
     fi
     set_system_dataset_readonly
     set_software_dataset_readonly

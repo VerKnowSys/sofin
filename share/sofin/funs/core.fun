@@ -5,30 +5,29 @@ debug () {
         printf "\n" >&2
         return 0
     fi
-    if [ "${TTY}" = "YES" ]; then
+    if [ "YES" = "${TTY}" ]; then
         _permdbg="\n"
     else
         unset _permdbg
     fi
     if [ -n "${CAP_SYS_PRODUCTION}" ]; then
         if [ -n "${DEBUG}" ]; then
-            printf "# λ %b%s%b\n" "${ColorDebug}" "${_in}" "${ColorReset}" >&2
+            printf "# %b λ %b%b%b\n" "${ColorDebug}" "${_in}" "${ColorReset}" >&2
         fi
         return 0
-        # printf "# (%s) λ %b%s%b\n" "${SHLVL}" "${ColorDebug}" "${_in}" "${ColorReset}"  >&2 2>> "${LOG}"
     else
         touch_logsdir_and_logfile
         _dbfn=" "
         if [ -z "${DEBUG}" ]; then
             if [ -n "${DEF_NAME}${DEF_SUFFIX}" ]; then
                 # Definition log, log to stderr only
-                printf "#%b%s%s%b" "${ColorDebug}" "${_dbfn}" "${_in}" "${ColorReset}${_permdbg}" 2>> "${LOG}-${DEF_NAME}${DEF_SUFFIX}" >&2
+                printf "# %b%b%b%b%b" "${ColorDebug}" "${_dbfn}" "${_in}" "${ColorReset}" "${_permdbg}" 2>> "${LOG}-${DEF_NAME}${DEF_SUFFIX}" >&2
             else
                 # Main log, all to stderr
-                printf "#%b%s%s%b" "${ColorDebug}" "${_dbfn}" "${_in}" "${ColorReset}${_permdbg}" 2>> "${LOG}" >&2
+                printf "# %b%b%b%b%b" "${ColorDebug}" "${_dbfn}" "${_in}" "${ColorReset}" "${_permdbg}" 2>> "${LOG}" >&2
             fi
         else # DEBUG is set. Print to stderr
-            printf "#%b%s%s%b\n" "${ColorDebug}" "${_dbfn}" "${_in}" "${ColorReset}" >&2
+            printf "# %b%b%b%b%b" "${ColorDebug}" "${_dbfn}" "${_in}" "${ColorReset}" "${_permdbg}" >&2
         fi
         unset _dbgnme _in _dbfn
     fi
@@ -115,14 +114,14 @@ error () {
     _err_root="${0}"
     _err_msg="${*}"
     if [ -n "${_err_msg}" ]; then
-        printf "%b\n  %s %s\n    %b %b\n\n" \
+        printf "%b\n  %b %b\n    %b %b\n\n" \
             "${ColorRed}" \
             "${NOTE_CHAR2}" \
             "Task crashed!" \
             "${_err_root}: ${_err_msg}" \
             "${ColorReset}" >&2
         if [ "error" = "${_err_root}" ]; then
-            printf "%b  %s Try: %b%b\n\n" \
+            printf "%b  %b Try: %b%b\n\n" \
                 "${ColorRed}" \
                 "${NOTE_CHAR2}" \
                 "$(diste "s log ${DEF_NAME}${DEF_SUFFIX}"), to read the task log." \
@@ -141,28 +140,28 @@ error () {
 
 # distdebug
 distd () {
-    printf "%b%s%b" "${2:-${ColorDistinct}}" "${1}" "${3:-${ColorDebug}}" 2>/dev/null
+    printf "%b%b%b\n" "${2:-${ColorDistinct}}" "${1}" "${3:-${ColorDebug}}" 2>/dev/null
     return 0
 }
 
 
 # distnote
 distn () {
-    printf "%b%s%b" "${2:-${ColorDistinct}}" "${1}" "${3:-${ColorNote}}" 2>/dev/null
+    printf "%b%b%b\n" "${2:-${ColorDistinct}}" "${1}" "${3:-${ColorNote}}" 2>/dev/null
     return 0
 }
 
 
 # distwarn
 distw () {
-    printf "%b%s%b" "${2:-${ColorDistinct}}" "${1}" "${3:-${ColorWarning}}" 2>/dev/null
+    printf "%b%b%b\n" "${2:-${ColorDistinct}}" "${1}" "${3:-${ColorWarning}}" 2>/dev/null
     return 0
 }
 
 
 # disterror
 diste () {
-    printf "%b%s%b" "${2:-${ColorDistinct}}" "${1}" "${3:-${ColorError}}" 2>/dev/null
+    printf "%b%b%b\n" "${2:-${ColorDistinct}}" "${1}" "${3:-${ColorError}}" 2>/dev/null
     return 0
 }
 
@@ -175,23 +174,23 @@ run () {
         if [ -z "${_rnm}" ]; then
             if [ -z "${DEBUG}" ]; then
                 eval "PATH=${PATH}${GIT_EXPORTS} ${_run_params}" >/dev/null 2>> "${LOG}" \
-                    && check_result ${?} "${_run_params}" \
+                    && check_result "${?}" "${_run_params}" \
                     && return 0
             else
-                printf "%b" "${ColorBlue}" >&2
+                printf "%b\n" "${ColorBlue}" >&2
                 eval "PATH=${PATH}${GIT_EXPORTS} ${_run_params}" 2>> "${LOG}" \
-                    && check_result ${?} "${_run_params}" \
+                    && check_result "${?}" "${_run_params}" \
                     && return 0
             fi
         else
             if [ -z "${DEBUG}" ]; then
                 eval "PATH=${PATH}${GIT_EXPORTS} ${_run_params}" >/dev/null 2>> "${LOG}-${_rnm}" \
-                    && check_result ${?} "${_run_params}" \
+                    && check_result "${?}" "${_run_params}" \
                     && return 0
             else
-                printf "%b" "${ColorBlue}" >&2
+                printf "%b\n" "${ColorBlue}" >&2
                 eval "PATH=${PATH}${GIT_EXPORTS} ${_run_params}" >&2 2>> "${LOG}-${_rnm}" \
-                    && check_result ${?} "${_run_params}" \
+                    && check_result "${?}" "${_run_params}" \
                     && return 0
             fi
         fi
@@ -211,24 +210,24 @@ try () {
         if [ -z "${_try_aname}" ]; then
             if [ -z "${DEBUG}" ]; then
                 eval "PATH=${PATH}${GIT_EXPORTS} ${_try_params}" >/dev/null 2>> "${LOG}" \
-                    && check_result ${?} "${_try_params}" \
+                    && check_result "${?}" "${_try_params}" \
                     && return 0
             else
                 # show all progress on stderr
-                printf "%b" "${ColorBlue}" >&2
+                printf "%b\n" "${ColorBlue}" >&2
                 eval "PATH=${PATH}${GIT_EXPORTS} ${_try_params}" >&2 2>> "${LOG}" \
-                    && check_result ${?} "${_try_params}" \
+                    && check_result "${?}" "${_try_params}" \
                     && return 0
             fi
         else
             if [ -z "${DEBUG}" ]; then
                 eval "PATH=${PATH}${GIT_EXPORTS} ${_try_params}" >/dev/null 2>> "${LOG}-${_try_aname}" \
-                    && check_result ${?} "${_try_params}" \
+                    && check_result "${?}" "${_try_params}" \
                     && return 0
             else
-                printf "%b" "${ColorBlue}" >&2
+                printf "%b\n" "${ColorBlue}" >&2
                 eval "PATH=${PATH}${GIT_EXPORTS} ${_try_params}" >&2 2>> "${LOG}-${_try_aname}" \
-                    && check_result ${?} "${_try_params}" \
+                    && check_result "${?}" "${_try_params}" \
                     && return 0
             fi
         fi
@@ -248,16 +247,16 @@ retry () {
     while [ -n "${_ammo}" ]; do
         if [ -n "${_targets}" ]; then
             if [ -z "${DEBUG}" ]; then
-                eval "PATH=${DEFAULT_PATH}${GIT_EXPORTS} ${_targets}" >&2 2>> "${LOG}" \
-                    && check_result ${?} "${_targets}" \
-                    && unset _ammo _targets \
-                    && return 0
+                eval "PATH=${DEFAULT_PATH}${GIT_EXPORTS} ${_targets}" 2>> "${LOG}" >&2  \
+                    && check_result "${?}" "${_targets}" \
+                        && unset _ammo _targets \
+                            && return 0
             else
-                printf "%b" "${ColorBlue}" >&2
-                eval "PATH=${DEFAULT_PATH}${GIT_EXPORTS} ${_targets}" >&2 2>> "${LOG}" \
-                    && check_result ${?} "${_targets}" \
-                    && unset _ammo _targets \
-                    && return 0
+                printf "%b\n" "${ColorBlue}" >&2
+                eval "PATH=${DEFAULT_PATH}${GIT_EXPORTS} ${_targets}" 2>> "${LOG}" >&2  \
+                    && check_result "${?}" "${_targets}" \
+                        && unset _ammo _targets \
+                            && return 0
             fi
         else
             error "Given an empty command to evaluate with retry()!"
@@ -293,16 +292,17 @@ initialize () {
     trap_signals
 
     if [ "${TTY}" = "YES" ]; then
-        # turn terminal echo *off*
-        ${STTY_BIN} -echo
+        ${STTY_BIN} -echo \
+            && debug "Interactive Terminal Echo is now: $(distd "*disabled*")"
     fi
 }
 
 
 signal_handler_interrupt () {
-    warn "Interrupted: $(distw "${SOFIN_PID:-$$}")"
+    warn "Received Interrupt-Signal from some Human!…"
+    warn "Service will shutdown immediatelly after completing required cleanup-duties…"
     finalize_after_signal_interrupt
-    warn "Interrupted: Bye!"
+    warn "Service Terminated."
     exit "${ERRORCODE_USER_INTERRUPT}"
 }
 
@@ -472,7 +472,7 @@ create_dirs () {
 
 # Converts space-separated argument list to newline separated "Shell POSIX-Array"
 to_iter () {
-    printf "%b\n" "${@}" | eval "${SPACES_TO_NEWLINES_GUARD}"
+    printf "%b\n" "${@}" | ${TR_BIN} ' ' '\n' 2>/dev/null
 }
 
 

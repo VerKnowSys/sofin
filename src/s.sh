@@ -168,7 +168,7 @@ if [ -n "${SOFIN_COMMAND}" ]; then
                 *)
                     _bundles="${*}"
                     if [ -z "${_bundles}" ]; then
-                        printf "%b\n" "${REPLAY_PREVIOUS_LINE}"
+                        printf "%b\n" "${ANSI_ONE_LINE_UP}"
                         print_shell_vars
                         print_local_env_vars
                     else
@@ -252,7 +252,7 @@ if [ -n "${SOFIN_COMMAND}" ]; then
                 && test -f ${_archive_name} || curl -4 --progress-bar -C - -k -L -O '${_url}' > /tmp/sofin.sync.log 2>&1 \
                 && ${_sha} \
                 && return 0; \
-                echo; ${CAT_BIN} /tmp/sofin.sync.log; \
+                ${CAT_BIN} /tmp/sofin.sync.log; \
                 return 1; \
                 ")" || error "Failed to sync archive: $(diste "${_archive_name}")"
             _version="$(printf "%b\n" "${_archive_name}" | ${SED_BIN} -e 's#^.*-##; s#\.t[agx][rz]\..*$##;' 2>/dev/null)"
@@ -395,7 +395,7 @@ if [ -n "${SOFIN_COMMAND}" ]; then
         b|build)
             initialize
             validate_reqs
-            permnote "Build bundle(s): $(distn "${SOFIN_ARGS}")"
+            permnote "Requested Build of: $(distn "${SOFIN_ARGS}")"
             fail_on_bg_job "${SOFIN_ARGS}"
             USE_UPDATE=NO
             USE_BINBUILD=NO

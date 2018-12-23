@@ -778,14 +778,15 @@ process_flat () {
                     if [ -z "${_whole_list}" ]; then
                         _whole_list="'./${_stuff_of_other_defs}'"
                     else
-                        _whole_list="${_whole_list} './${_stuff_of_other_defs}'"
+                        _whole_list="${_whole_list} ./${_stuff_of_other_defs}"
                     fi
                 fi
             done
 
             if [ -n "${_whole_list}" ]; then
-                debug "Prepared list of unwanted files: $(distd "\"${_whole_list}\""), from bundle with software PREFIX: $(distd "${_prefix}")."
-                try "${RM_BIN} -fr ${_whole_list} >/dev/null 2>&1"
+                debug "Prepared list of unwanted files: $(distd "${_whole_list}"), from bundle with software PREFIX: $(distd "${_prefix}")."
+                try "${RM_BIN} -fr ${_whole_list}" >/dev/null 2>&1 \
+                    && debug "Unwanted files were destroyed."
             else
                 debug "No known files from previous definitions installed for software PREFIX: $(distd "${_prefix}")"
             fi
@@ -857,10 +858,10 @@ test_and_rate_def () {
                 eval "\
                     export TEST_JOBS=${CPUS} \
                         && export TEST_ENV=${DEF_TEST_ENV:-test} \
-                        && export PATH=${SERVICE_DIR}/bin:${SERVICE_DIR}/sbin:${PREFIX}/bin:${PREFIX}/sbin:${PREFIX}/libexec:${SOFIN_UTILS_PATH}:/bin:/usr/bin:/sbin:/usr/sbin && \
+                        && export PATH=${SERVICE_DIR}/bin:${SERVICE_DIR}/sbin:${PREFIX}/bin:${PREFIX}/sbin:${PREFIX}/libexec:${SOFIN_UTILS_PATH}:/bin:/usr/bin:/sbin:/usr/sbin \
                         && export LD_LIBRARY_PATH=${PREFIX}/lib:${PREFIX}/libexec:${SERVICE_DIR}/lib \
                         && export DYLD_LIBRARY_PATH=${PREFIX}/lib:${PREFIX}/libexec:${SERVICE_DIR}/lib \
-                        && ${SHELL} -c \"${_cmdline}\" >> '${PREFIX}/${_name}.test.log' 2>> '${PREFIX}/${_name}.test.log' \
+                        && ${SHELL} -c \"${_cmdline}\" >> \"${PREFIX}/${_name}.test.log\" 2>> \"${PREFIX}/${_name}.test.log\" \
                 "
                 _result="${?}"
                 _end_time="$(${DATE_BIN} +%F-%H%M-%s 2>/dev/null)"

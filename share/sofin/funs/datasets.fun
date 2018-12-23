@@ -363,7 +363,7 @@ receive_origin () {
     fi
 
     set_mountpoint_and_mount () {
-        try "echo '${_dname}' | ${GREP_BIN} -F '${SOFTWARE_DIR}' >/dev/null 2>&1"
+        printf "%b\n" "${_dname}" | ${GREP_BIN} -F "${SOFTWARE_DIR}" >/dev/null 2>&1
         if [ "0" = "${?}" ]; then
             _mountpoint="${SOFTWARE_DIR}/${_dname##*/}"
         else
