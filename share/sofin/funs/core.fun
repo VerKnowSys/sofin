@@ -326,10 +326,10 @@ initialize () {
 
 
 signal_handler_interrupt () {
-    warn "Received Interrupt-Signal from some Human!…"
-    warn "Service will shutdown immediatelly after completing required cleanup-duties…"
+    warn "Received Interrupt-Signal from some Human!…" >&2
+    warn "Service will shutdown immediatelly after completing required cleanup-duties…" >&2
     finalize_after_signal_interrupt
-    warn "Service Terminated."
+    warn "Service Terminated." >&2
     exit "${ERRORCODE_USER_INTERRUPT}"
 }
 
