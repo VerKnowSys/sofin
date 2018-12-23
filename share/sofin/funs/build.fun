@@ -803,7 +803,7 @@ process_flat () {
 
             cd "${_pwd}"
             printf "%b\n" "${DEF_VERSION}" > "${_prefix}/${_app_param}${DEFAULT_INST_MARK_EXT}" \
-                && note "Stored version: $(distn "${DEF_VERSION}") of software bundle: $(distn "${DEF_NAME}${DEF_SUFFIX}"). Bundle installation prefix: $(distn "${_prefix}")"
+                && debug "Commited version: $(distd "${DEF_VERSION}") of software bundle: $(distd "${DEF_NAME}${DEF_SUFFIX}"). Bundle installation prefix: $(distd "${_prefix}")"
 
             cd "${_cwd}" 2>/dev/null
             unset _cwd _addon _dsname _bund
