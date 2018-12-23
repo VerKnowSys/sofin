@@ -205,7 +205,7 @@ fetch_dset_zfs_stream () {
         if [ "${?}" = "0" ]; then
             _dataset_name="${DEFAULT_ZPOOL}${SERVICES_DIR}/${SYSTEM_DATASET}/${_fdz_bund_name}"
             try "${SOFIN_LZ4CAT_BIN} '${FILE_CACHE_DIR}${_fdz_out_file}' | ${ZFS_BIN} receive ${ZFS_RECEIVE_OPTS} '${_dataset_name}' | ${TAIL_BIN} -n1" \
-                && note "Received service dataset: $(distn "${_dataset_name}")"
+                && permnote "Received service dataset: $(distn "${_dataset_name}")"
             unset _dataset_name
         else
             debug "Origin service dataset unavailable for: $(distd "${_fdz_bund_name}")."
@@ -218,7 +218,7 @@ fetch_dset_zfs_stream () {
         retry "${FETCH_BIN} -o ${FILE_CACHE_DIR}${_fdz_out_file} ${FETCH_OPTS} '${_commons_path}'"
         if [ "${?}" = "0" ]; then
             try "${TAR_BIN} -xf ${FILE_CACHE_DIR}${_fdz_out_file} --directory ${SERVICES_DIR}" \
-                && note "Received service tarball for service: $(distn "${_fdz_bund_name}")"
+                && permnote "Received service tarball for service: $(distn "${_fdz_bund_name}")"
             unset _tarball_name
         else
             debug "Origin service tarball unavailable for: $(distd "${_fdz_bund_name}")."
@@ -539,7 +539,7 @@ create_software_bundle_archive () {
             try "${ZFS_BIN} snapshot '${_csbd_dataset}@${ORIGIN_ZFS_SNAP_NAME}'"
             try "${ZFS_BIN} umount -f '${_csbd_dataset}'"
             run "${ZFS_BIN} send ${ZFS_SEND_OPTS} '${_csbd_dataset}@${ORIGIN_ZFS_SNAP_NAME}' | ${SOFIN_LZ4_BIN} ${DEFAULT_LZ4_OPTS} > ${_cddestfile}" \
-                && note "Created bin-bundle from dataset: $(distd "${_csbd_dataset}")"
+                && permnote "Ddtaset: $(distd "${_csbd_dataset}") successfully sent to file: $(distn "${_cddestfile}")"
             cd "${_cdir}"
 
             # set mountpoint for dataset explicitly:

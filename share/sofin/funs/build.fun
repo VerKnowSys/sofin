@@ -687,7 +687,7 @@ process_flat () {
                         else
                             # do a simple check for "configure" in DEF_CONFIGURE_METHOD definition
                             # this way we can tell if we want to put configure options as params
-                            printf "%b\n" "${DEF_CONFIGURE_METHOD}" | ${GREP_BIN} -F 'configure'
+                            try "printf \"%b\n\" \"${DEF_CONFIGURE_METHOD}\" | ${GREP_BIN} -F 'configure'"
                             if [ "${?}" = "0" ]; then
                                 # TODO: add --docdir=${_prefix}/docs
                                 # NOTE: By default try to configure software with these options:
@@ -803,7 +803,7 @@ process_flat () {
 
             cd "${_pwd}"
             printf "%b\n" "${DEF_VERSION}" > "${_prefix}/${_app_param}${DEFAULT_INST_MARK_EXT}" \
-                && debug "Stored version: $(distd "${DEF_VERSION}") of software bundle: $(distd "${DEF_NAME}${DEF_SUFFIX}"). Bundle installation prefix: $(distd "${_prefix}")"
+                && note "Stored version: $(distn "${DEF_VERSION}") of software bundle: $(distn "${DEF_NAME}${DEF_SUFFIX}"). Bundle installation prefix: $(distn "${_prefix}")"
 
             cd "${_cwd}" 2>/dev/null
             unset _cwd _addon _dsname _bund

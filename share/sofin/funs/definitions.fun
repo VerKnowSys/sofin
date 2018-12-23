@@ -131,7 +131,7 @@ update_defs () {
     setup_defs_repo
     _cwd="$(${PWD_BIN} 2>/dev/null)"
     if [ ! -x "${GIT_BIN}" ]; then
-        note "Installing initial definition list from tarball to cache dir: $(distn "${CACHE_DIR}")"
+        permnote "Installing initial definition list from tarball to cache dir: $(distn "${CACHE_DIR}")"
         try "${RM_BIN} -rf ${CACHE_DIR}${DEFINITIONS_BASE}; ${MKDIR_BIN} -p ${LOGS_DIR} ${CACHE_DIR}${DEFINITIONS_BASE}"
         _initial_defs="${MAIN_SOURCE_REPOSITORY}${DEFINITIONS_INITIAL_FILE_NAME}${DEFAULT_ARCHIVE_TARBALL_EXT}"
         debug "Fetching latest tarball with initial definitions from: $(distd "${_initial_defs}")"
@@ -172,7 +172,7 @@ update_defs () {
                         || warn "Can't checkout branch: $(distw "${BRANCH}")"
             fi
             try "${GIT_BIN} pull ${DEFAULT_GIT_PULL_FETCH_OPTS} origin ${BRANCH} >> ${LOG}" \
-                && note "Definitions branch: $(distn "${BRANCH}") is at: $(distn "${_def_head}")" \
+                && permnote "Definitions branch: $(distn "${BRANCH}") is at: $(distn "${_def_head}")" \
                     && return
 
             printf "%b%b%b%b\n" "${ColorRed}" "$(fill)" \
@@ -198,7 +198,7 @@ update_defs () {
         try "${GIT_BIN} pull --depth 1 --progress origin ${BRANCH}" \
             && _def_head="$(${CAT_BIN} "${CACHE_DIR}${DEFINITIONS_BASE}/${DEFAULT_GIT_DIR_NAME}/refs/heads/${_def_cur_branch}" 2>/dev/null)"
 
-        note "Repository: $(distn "${REPOSITORY}"), on branch: $(distn "${BRANCH}"). Commit HEAD: $(distn "${_def_head}")."
+        permnote "Repository: $(distn "${REPOSITORY}"), on branch: $(distn "${BRANCH}"). Commit HEAD: $(distn "${_def_head}")."
     fi
     cd "${_cwd}"
     unset _def_head _def_branch _def_cur_branch _out_file _cwd
@@ -216,7 +216,7 @@ reset_defs () {
     if [ -z "${_rdefs_branch}" ]; then
         _rdefs_branch="HEAD"
     fi
-    note "Definitions repository reset to: $(distn "${_rdefs_branch}")"
+    permnote "Definitions repository reset to: $(distn "${_rdefs_branch}")"
     for _def_line in $(${GIT_BIN} status --short 2>/dev/null | ${CUT_BIN} -f2 -d' ' 2>/dev/null); do
         unset _add_opt
         printf "%b\n" "${_def_line}" | ${EGREP_BIN} -F 'patches/' >/dev/null 2>&1 \
@@ -310,7 +310,7 @@ available_definitions () {
         cd "${DEFINITIONS_LISTS_DIR}"
         permnote "Available lists: $(distn "$(${LS_BIN} -m 2>/dev/null | ${SED_BIN} "s/${DEFAULT_DEF_EXT}//g" 2>/dev/null)")"
     fi
-    note "Definitions count: $(distn "$(printf "%b\n" "${_alldefs}" | eval "${FILES_COUNT_GUARD}")")"
+    permnote "Definitions count: $(distn "$(printf "%b\n" "${_alldefs}" | eval "${FILES_COUNT_GUARD}")")"
 }
 
 
@@ -411,7 +411,7 @@ wipe_remote_archives () {
             fi
             debug "Using defined mirror(s): $(distd "${_wr_dig}")"
             for _wr_mirr in $(to_iter "${_wr_dig}"); do
-                note "Wiping out remote: $(distn "${_wr_mirr}") binary archives: $(distn "${_remote_ar_name}")"
+                permnote "Wiping out remote: $(distn "${_wr_mirr}") binary archives: $(distn "${_remote_ar_name}")"
                 retry "${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${SOFIN_SSH_PORT} ${SOFIN_NAME}@${_wr_mirr} \"${FIND_BIN} ${MAIN_BINARY_PREFIX}/${SYS_SPECIFIC_BINARY_REMOTE} -iname '${_remote_ar_name}' -delete\""
             done
         done
@@ -843,8 +843,8 @@ clone_or_fetch_git_bare_repo () {
     _git_cached="${GIT_CACHE_DIR}${_bare_name}${DEFAULT_GIT_DIR_NAME}"
     try "${MKDIR_BIN} -p ${GIT_CACHE_DIR}"
     note "   ${NOTE_CHAR} Fetching source repository: $(distn "${_source_path}")"
-    try "${GIT_BIN} clone --depth 1 --jobs=3 --recursive --mirror ${_source_path} ${_git_cached} 2> /dev/null" \
-        || try "${GIT_BIN} clone --depth 1 --jobs=3 --mirror ${_source_path} ${_git_cached} 2> /dev/null"
+    try "${GIT_BIN} clone --depth 1 --jobs=3 --recursive --mirror ${_source_path} ${_git_cached}" \
+        || try "${GIT_BIN} clone --depth 1 --jobs=3 --mirror ${_source_path} ${_git_cached}"
     if [ "${?}" = "0" ]; then
         debug "Cloned bare repository: $(distd "${_bare_name}")"
     elif [ -d "${_git_cached}" ]; then

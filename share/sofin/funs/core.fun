@@ -424,7 +424,7 @@ set_system_dataset_readonly () {
         _boot_dataset="${DEFAULT_ZPOOL}/ROOT/${_active_boot_env}"
         if [ -n "${CAP_SYS_PRODUCTION}" ]; then
             try "${ZFS_BIN} set readonly=on '${_boot_dataset}'" \
-                && debug "System dataset: '$(distd "${_boot_dataset}")' is now: READ-ONLY"
+                && debug "System dataset: $(distd "${_boot_dataset}") is now: READ-ONLY"
         else
             _sp="$(processes_all_sofin)"
             if [ -z "${_sp}" ]; then
