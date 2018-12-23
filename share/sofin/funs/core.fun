@@ -144,7 +144,7 @@ error () {
                 "Task crashed!" \
                 "   ${_err_root}: ${_err_msg}" \
                 "${ColorReset}" \
-                    >&2 | "${TEE_BIN}" 2>/dev/null
+                    >&2 | "${TEE_BIN}" >/dev/null
 
         if [ "error" = "${_err_root}" ]; then
             printf "%b  %b Try: %b%b\n\n" \
@@ -152,13 +152,13 @@ error () {
                     "${NOTE_CHAR2}" \
                     "   $(diste "s log ${DEF_NAME}${DEF_SUFFIX}"), to read the task log." \
                     "${ColorReset}" \
-                         >&2 | "${TEE_BIN}" 2>/dev/null
+                         >&2 | "${TEE_BIN}" >/dev/null
         fi
     else
         printf "%b: %b\n\n" \
             "General Error" \
             "*" \
-                >&2 | "${TEE_BIN}" 2>/dev/null
+                >&2 | "${TEE_BIN}" >/dev/null
     fi
     finalize_after_signal_interrupt
     exit "${ERRORCODE_TASK_FAILURE}"
