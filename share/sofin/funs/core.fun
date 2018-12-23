@@ -10,24 +10,45 @@ debug () {
     else
         unset _permdbg
     fi
-    if [ -n "${CAP_SYS_PRODUCTION}" ]; then
-        if [ -n "${DEBUG}" ]; then
-            printf "# %b λ %b%b%b\n" "${ColorDebug}" "${_in}" "${ColorReset}" >&2
-        fi
-        return 0
+
+    if [ -n "${DEBUG}" ]; then
+        printf "# %b   %b%b%b\n" \
+                "${ColorGreen} λ" \
+                "${ColorDebug}" \
+                "${_in}" \
+                "${ColorReset}" \
+                    >&2
     else
         touch_logsdir_and_logfile
         _dbfn=" "
         if [ -z "${DEBUG}" ]; then
             if [ -n "${DEF_NAME}${DEF_SUFFIX}" ]; then
                 # Definition log, log to stderr only
-                printf "# %b%b%b%b%b" "${ColorDebug}" "${_dbfn}" "${_in}" "${ColorReset}" "${_permdbg}" 2>> "${LOG}-${DEF_NAME}${DEF_SUFFIX}" >&2
+                printf "# %b%b%b%b%b" \
+                        "${ColorDebug}" \
+                        "${_dbfn}" \
+                        "${_in}" \
+                        "${ColorReset}" \
+                        "${_permdbg}" \
+                            2>> "${LOG}-${DEF_NAME}${DEF_SUFFIX}" >&2
             else
                 # Main log, all to stderr
-                printf "# %b%b%b%b%b" "${ColorDebug}" "${_dbfn}" "${_in}" "${ColorReset}" "${_permdbg}" 2>> "${LOG}" >&2
+                printf "# %b%b%b%b%b" \
+                        "${ColorDebug}" \
+                        "${_dbfn}" \
+                        "${_in}" \
+                        "${ColorReset}" \
+                        "${_permdbg}" \
+                            2>> "${LOG}" >&2
             fi
         else # DEBUG is set. Print to stderr
-            printf "# %b%b%b%b%b" "${ColorDebug}" "${_dbfn}" "${_in}" "${ColorReset}" "${_permdbg}" >&2
+            printf "# %b%b%b%b%b" \
+                    "${ColorDebug}" \
+                    "${_dbfn}" \
+                    "${_in}" \
+                    "${ColorReset}" \
+                    "${_permdbg}" \
+                        >&2
         fi
         unset _dbgnme _in _dbfn
     fi
@@ -39,18 +60,19 @@ warn () {
     _wrn_msgs="${*}"
     if [ -n "${_wrn_msgs}" ]; then
         if [ "YES" = "${TTY}" ]; then
-            printf "%b%b%s%b\n\n" \
-                "${REPLAY_PREVIOUS_LINE}" \
-                "${ColorYellow}" \
-                "${_wrn_msgs}" \
-                "${ColorReset}" \
-                >&2
+            printf "\n%b%b%b%b%b\n" \
+                    "${ANSI_ONE_LINE_UP}" \
+                    "${ColorYellow}" \
+                    "   ${_wrn_msgs}" \
+                    "${ColorReset}" \
+                    "${ANSI_TWO_LINES_DOWN}" \
+                        >&2 | "${TEE_BIN}"
         else
-            printf "%b%s%b\n" \
-                "${ColorYellow}" \
-                "${_wrn_msgs}" \
-                "${ColorReset}" \
-                >&2
+            printf "%b%b%b\n" \
+                    "${ColorYellow}" \
+                    "   ${_wrn_msgs}" \
+                    "${ColorReset}" \
+                        >&2 | "${TEE_BIN}"
         fi
     else
         printf "\n" >&2
@@ -64,18 +86,19 @@ note () {
     _nte_msgs="${*}"
     if [ -n "${_nte_msgs}" ]; then
         if [ "YES" = "${TTY}" ]; then
-            printf "%b%b%s%b\n" \
-                "${REPLAY_PREVIOUS_LINE}" \
-                "${ColorGreen}" \
-                "${_nte_msgs}" \
-                "${ColorReset}" \
-                >&2
+            printf "\n%b%b%b%b%b" \
+                    "${ANSI_ONE_LINE_UP}" \
+                    "${ColorGreen}" \
+                    "   ${_nte_msgs}" \
+                    "${ColorReset}" \
+                    "${ANSI_ONE_LINE_DOWN}" \
+                        >&2
         else
-            printf "%b%s%b\n" \
-                "${ColorGreen}" \
-                "${_nte_msgs}" \
-                "${ColorReset}" \
-                >&2
+            printf "%b%b%b\n" \
+                    "${ColorGreen}" \
+                    "   ${_nte_msgs}" \
+                    "${ColorReset}" \
+                        >&2
         fi
     else
         printf "\n" >&2
@@ -89,18 +112,19 @@ permnote () {
     _prm_note="${*}"
     if [ -n "${_prm_note}" ]; then
         if [ "YES" = "${TTY}" ]; then
-            printf "%b%b%s%b\n\n" \
-                "${REPLAY_PREVIOUS_LINE}" \
-                "${ColorGreen}" \
-                "${_prm_note}" \
-                "${ColorReset}" \
-                >&2
+            printf "\n%b%b%b%b%b\n" \
+                    "${ANSI_ONE_LINE_UP}" \
+                    "${ColorGreen}" \
+                    "   ${_prm_note}" \
+                    "${ColorReset}" \
+                    "${ANSI_TWO_LINES_DOWN}" \
+                        >&2
         else
-            printf "%b%s%b\n" \
-                "${ColorGreen}" \
-                "${_prm_note}" \
-                "${ColorReset}" \
-                >&2
+            printf "%b%b%b\n" \
+                    "${ColorGreen}" \
+                    "   ${_prm_note}" \
+                    "${ColorReset}" \
+                        >&2
         fi
     else
         printf "\n" >&2
@@ -115,23 +139,26 @@ error () {
     _err_msg="${*}"
     if [ -n "${_err_msg}" ]; then
         printf "%b\n  %b %b\n    %b %b\n\n" \
-            "${ColorRed}" \
-            "${NOTE_CHAR2}" \
-            "Task crashed!" \
-            "${_err_root}: ${_err_msg}" \
-            "${ColorReset}" >&2
-        if [ "error" = "${_err_root}" ]; then
-            printf "%b  %b Try: %b%b\n\n" \
                 "${ColorRed}" \
                 "${NOTE_CHAR2}" \
-                "$(diste "s log ${DEF_NAME}${DEF_SUFFIX}"), to read the task log." \
-                "${ColorReset}" >&2
+                "Task crashed!" \
+                "   ${_err_root}: ${_err_msg}" \
+                "${ColorReset}" \
+                    >&2 | "${TEE_BIN}"
+
+        if [ "error" = "${_err_root}" ]; then
+            printf "%b  %b Try: %b%b\n\n" \
+                    "${ColorRed}" \
+                    "${NOTE_CHAR2}" \
+                    "   $(diste "s log ${DEF_NAME}${DEF_SUFFIX}"), to read the task log." \
+                    "${ColorReset}" \
+                         >&2 | "${TEE_BIN}"
         fi
     else
         printf "%b: %b\n\n" \
             "General Error" \
             "*" \
-            >&2
+                >&2 | "${TEE_BIN}"
     fi
     finalize_after_signal_interrupt
     exit "${ERRORCODE_TASK_FAILURE}"
@@ -208,27 +235,27 @@ try () {
         touch_logsdir_and_logfile
         _try_aname="${DEF_NAME}${DEF_SUFFIX}"
         if [ -z "${_try_aname}" ]; then
-            if [ -z "${DEBUG}" ]; then
-                eval "PATH=${PATH}${GIT_EXPORTS} ${_try_params}" >/dev/null 2>> "${LOG}" \
+            if [ -z "${DEBUG}" ]; then # No DEBUG set -> discard both STDOUT and STDERR for try() calls…:
+                eval "PATH=${PATH}${GIT_EXPORTS} ${_try_params}" >/dev/null 2>&1 \
                     && check_result "${?}" "${_try_params}" \
-                    && return 0
+                        && return 0
             else
                 # show all progress on stderr
                 printf "%b\n" "${ColorBlue}" >&2
                 eval "PATH=${PATH}${GIT_EXPORTS} ${_try_params}" >&2 2>> "${LOG}" \
                     && check_result "${?}" "${_try_params}" \
-                    && return 0
+                        && return 0
             fi
         else
-            if [ -z "${DEBUG}" ]; then
-                eval "PATH=${PATH}${GIT_EXPORTS} ${_try_params}" >/dev/null 2>> "${LOG}-${_try_aname}" \
+            if [ -z "${DEBUG}" ]; then # No DEBUG set -> discard both STDOUT and STDERR for try() calls…:
+                eval "PATH=${PATH}${GIT_EXPORTS} ${_try_params}" >/dev/null 2>&1 \
                     && check_result "${?}" "${_try_params}" \
-                    && return 0
+                        && return 0
             else
                 printf "%b\n" "${ColorBlue}" >&2
                 eval "PATH=${PATH}${GIT_EXPORTS} ${_try_params}" >&2 2>> "${LOG}-${_try_aname}" \
                     && check_result "${?}" "${_try_params}" \
-                    && return 0
+                        && return 0
             fi
         fi
     else
@@ -448,7 +475,7 @@ set_system_dataset_writable () {
 #             debug "Disabling all security features (this host is NOT production).."
 #             try "${RM_BIN} -f '${DEFAULT_SECURITY_STATE_FILE}'"
 #             for _key in ${DEFAULT_HARDEN_KEYS}; do
-#                 try "${SYSCTL_BIN} ${_key}=0 >/dev/null"
+#                 try "${SYSCTL_BIN} ${_key}=0"
 #             done
 #             unset _key _dsf_name
 #         else
