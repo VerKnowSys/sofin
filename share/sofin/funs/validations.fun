@@ -41,7 +41,7 @@ fail_any_bg_jobs () {
         _bundle_name="${_a_lock##*/}"
         _lock_pid="$(${CAT_BIN} "${_a_lock}" 2>/dev/null)"
         if [ -n "${_lock_pid}" ]; then
-            try "${KILL_BIN} -0 ${_lock_pid} >/dev/null 2>&1"
+            try "${KILL_BIN} -0 ${_lock_pid}"
             if [ "${?}" = "0" ]; then
                 error "Detected running instance of Sofin, locked on bundle: $(diste "${_bundle_name}") pid: $(diste "${_lock_pid}")"
             fi
@@ -186,13 +186,13 @@ validate_pie_on_exports () {
                 continue
             else
                 for _bin in $(${FIND_BIN} "${_a_dir}" -mindepth 1 -maxdepth 1 -type l 2>/dev/null | ${XARGS_BIN} "${READLINK_BIN}" -f 2>/dev/null); do
-                    ${FILE_BIN} "${_bin}" 2>/dev/null | ${GREP_BIN} -F 'ELF' >/dev/null 2>&1
+                    try "${FILE_BIN} \"${_bin}\" | ${GREP_BIN} -F 'ELF'"
                     if [ "$?" = "0" ]; then # it's ELF binary/library:
                         big_fat_warn () {
                             warn "Security - Exported ELF binary: $(distw "${_bin}"), is not a $(distw "${PIE_TYPE_ENTRY}") (not-PIE)!"
                             printf "SECURITY: ELF binary: '%b', is not a '%b' (not-PIE)!\n" "${_bin}" "${PIE_TYPE_ENTRY}" >> "${_pie_indicator}.warn"
                         }
-                        try "${FILE_BIN} '${_bin}' 2>/dev/null | ${GREP_BIN} -F 'ELF' 2>/dev/null | ${EGREP_BIN} -F '${PIE_TYPE_ENTRY}' 2>/dev/null" \
+                        try "${FILE_BIN} '${_bin}' | ${GREP_BIN} -F 'ELF' | ${EGREP_BIN} -F '${PIE_TYPE_ENTRY}'" \
                             || big_fat_warn
                     else
                         debug "Executable, but not an ELF: $(distd "${_bin}")"
@@ -216,7 +216,7 @@ validate_kern_loaded_dtrace () {
             FreeBSD)
                 debug "Making sure dtrace kernel module is loaded"
                 ${KLDSTAT_BIN} 2>/dev/null | ${GREP_BIN} -F 'dtraceall' >/dev/null 2>&1 \
-                    || try "${KLDLOAD_BIN} dtraceall >/dev/null 2>&1"
+                    || try "${KLDLOAD_BIN} dtraceall"
                 ;;
         esac
     fi

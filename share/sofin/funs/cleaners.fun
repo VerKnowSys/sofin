@@ -59,12 +59,12 @@ destroy_ramdisk_device () {
         case "${SYSTEM_NAME}" in
             Darwin)
                 if [ -n "${RAMDISK_DEV}" ]; then
-                    try "diskutil unmountDisk ${RAMDISK_DEV}; diskutil eject ${RAMDISK_DEV} >/dev/null 2>&1" \
+                    try "diskutil unmountDisk ${RAMDISK_DEV}; diskutil eject '${RAMDISK_DEV}'" \
                         && debug "Tmp ramdisk unmounted: $(distd "${RAMDISK_DEV}")"
                 fi
                 ;;
         esac
-        try "${UMOUNT_BIN} -f '${RAMDISK_DEV}' >/dev/null 2>&1" \
+        try "${UMOUNT_BIN} -f '${RAMDISK_DEV}'" \
             && debug "Ramdisk device unmounted: $(distd "${RAMDISK_DEV}")"
         unset RAMDISK_DEV
     fi
@@ -127,7 +127,7 @@ finalize_afterbuild_tasks_for_bundle () {
 remove_useless_files_of_bundle () {
     _rufiles="${*}"
     if [ -n "${_rufiles}" ]; then
-        printf "%b\n" "${_rufiles}" | ${XARGS_BIN} -n 1 -P "4" -I {} "${SHELL}" -c "${RM_BIN} -rf {}" >/dev/null 2>&1 \
+        printf "%b\n" "${_rufiles}" | ${XARGS_BIN} -n 1 -P "4" -I {} "${SHELL}" -c "${RM_BIN} -rf {}" >/dev/null 2>> "${LOG}" \
             && debug "Useless files wiped out: $(distd "${_rufiles}")"
     else
         debug "No bundle name given! NO-OP."

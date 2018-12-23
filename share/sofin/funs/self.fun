@@ -22,11 +22,11 @@ load_requirements () {
 
 prepare_and_manage_origin () {
     if [ -n "${CAP_SYS_ZFS}" ]; then
-        try "zfs set readonly=off '${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/${SOFIN_BUNDLE_NAME}' >/dev/null 2>&1"
+        try "zfs set readonly=off '${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/${SOFIN_BUNDLE_NAME}'"
 
         # Create "root" Sofin dataset:
-        try "zfs list '${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/${SOFIN_BUNDLE_NAME}' >/dev/null 2>&1" \
-            || try "zfs create -o mountpoint='${SOFTWARE_DIR}/${SOFIN_BUNDLE_NAME}' '${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/${SOFIN_BUNDLE_NAME}' >/dev/null 2>&1"
+        try "zfs list '${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/${SOFIN_BUNDLE_NAME}'" \
+            || try "zfs create -o mountpoint='${SOFTWARE_DIR}/${SOFIN_BUNDLE_NAME}' '${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/${SOFIN_BUNDLE_NAME}'"
 
         _any_snap="$(zfs list -H -r -t snapshot -o name "${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/${SOFIN_BUNDLE_NAME}" 2>/dev/null)"
         if [ -n "${_any_snap}" ]; then
@@ -36,7 +36,7 @@ prepare_and_manage_origin () {
             if [ "${_snap_amount}" -gt "${DEFAULT_ZFS_MAX_SNAPSHOT_COUNT}" ]; then
                 debug "Old snapshots count: $(distd "${_snap_amount}")"
                 for _a_snap in $(to_iter "${_any_snap}"); do
-                    try "zfs destroy '${_a_snap}' >/dev/null 2>&1" \
+                    try "zfs destroy '${_a_snap}'" \
                         && permnote "Destroyed the oldest $(distn "@${ORIGIN_ZFS_SNAP_NAME}") snapshot: $(distn "${_a_snap}")." \
                             && break # - we want to remove at least one snapshot
                 done
@@ -57,7 +57,7 @@ commit_origin () {
         run "zfs snapshot ${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/${SOFIN_BUNDLE_NAME}@${ORIGIN_ZFS_SNAP_NAME}" \
             && permnote "Created new $(distn "@${ORIGIN_ZFS_SNAP_NAME}") snapshot of bundle: $(distn "${SOFIN_BUNDLE_NAME}")."
 
-        try "zfs set readonly=on ${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/${SOFIN_BUNDLE_NAME} >/dev/null 2>&1"
+        try "zfs set readonly=on ${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/${SOFIN_BUNDLE_NAME}"
     fi
 }
 

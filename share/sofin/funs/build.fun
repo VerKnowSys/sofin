@@ -359,7 +359,7 @@ build () {
                             _files="$(${FIND_BIN} "${PREFIX}/" -name "${_lower_security_binary}" -type f 2>/dev/null)"
                             for _file in $(to_iter "${_files}"); do
                                 if [ -x "${_file}" ]; then
-                                    try "${FILE_BIN} '${_file}' 2>/dev/null | ${GREP_BIN} -F 'ELF 64-bit' >/dev/null 2>&1"
+                                    try "${FILE_BIN} '${_file}' | ${GREP_BIN} -F 'ELF 64-bit'"
                                     if [ "0" = "${?}" ]; then
                                         # Lower security on requested binary:
                                         try "${HBSDCONTROL_BIN} pax disable ${_feature} '${_file}'"
@@ -485,7 +485,8 @@ process_flat () {
             note "   ${NOTE_CHAR2} Meta bundle detected."
         else
             _cwd="$(${PWD_BIN} 2>/dev/null)"
-            if [ -n "${BUILD_DIR}" ] && [ -n "${BUILD_NAMESUM}" ]; then
+            if [ -n "${BUILD_DIR}" ] \
+            && [ -n "${BUILD_NAMESUM}" ]; then
                 cd "${BUILD_DIR}"
                 if [ -z "${DEF_GIT_CHECKOUT}" ]; then # Standard "fetch source archive" method
                     _base="${DEF_SOURCE_PATH##*/}"
@@ -527,9 +528,9 @@ process_flat () {
                     fi
 
                     debug "Unpacking $(distd "${_dest_file}") to: $(distd "${BUILD_DIR}")"
-                    try "${TAR_BIN} -xf ${_dest_file} --directory ${BUILD_DIR} >/dev/null" \
-                        || try "${TAR_BIN} -xjf ${_dest_file} --directory ${BUILD_DIR} >/dev/null" \
-                            || run "${TAR_BIN} -xJf ${_dest_file} --directory ${BUILD_DIR} >/dev/null"
+                    try "${TAR_BIN} -xf ${_dest_file} --directory ${BUILD_DIR}" \
+                        || try "${TAR_BIN} -xjf ${_dest_file} --directory ${BUILD_DIR}" \
+                            || run "${TAR_BIN} -xJf ${_dest_file} --directory ${BUILD_DIR}"
                 else
                     # git method:
                     # .cache/git-cache => git bare repos
@@ -635,7 +636,7 @@ process_flat () {
                             || try "./configure -prefix ${_prefix} -cc '${CC_NAME} ${CFLAGS}' -libs '-L${PREFIX}/lib ${LDFLAGS}' -libdir ${PREFIX}/lib -aspp '${CC_NAME} ${CFLAGS} -c' ${DEF_CONFIGURE_ARGS}" \
                                 || run "./configure -prefix ${_prefix} -cc '${CC_NAME} ${CFLAGS}' -libs '-L${PREFIX}/lib ${LDFLAGS}' -aspp '${CC_NAME} ${CFLAGS} -c' ${DEF_CONFIGURE_ARGS}"
 
-                        try "${INSTALL_BIN} '${_configure_log}' '${_configure_status_log}' >/dev/null"
+                        try "${INSTALL_BIN} '${_configure_log}' '${_configure_status_log}'"
                         ;;
 
                     cmake)
@@ -670,7 +671,7 @@ process_flat () {
 
                         if [ "${SYSTEM_NAME}" = "Linux" ]; then
                             # NOTE: No /Services feature implemented for Linux.
-                            printf "%b\n" "${DEF_CONFIGURE_METHOD}" | ${GREP_BIN} -F 'configure' >/dev/null 2>&1
+                            try "printf \"%b\n\" \"${DEF_CONFIGURE_METHOD}\" | ${GREP_BIN} -F 'configure'"
                             if [ "${?}" = "0" ]; then
                                 # NOTE: by defaultautoconf configure accepts influencing variables as configure script params
                                 try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} ${_pic_optional} ${_addon}" \
@@ -686,7 +687,7 @@ process_flat () {
                         else
                             # do a simple check for "configure" in DEF_CONFIGURE_METHOD definition
                             # this way we can tell if we want to put configure options as params
-                            printf "%b\n" "${DEF_CONFIGURE_METHOD}" | ${GREP_BIN} -F 'configure' >/dev/null 2>&1
+                            printf "%b\n" "${DEF_CONFIGURE_METHOD}" | ${GREP_BIN} -F 'configure'
                             if [ "${?}" = "0" ]; then
                                 # TODO: add --docdir=${_prefix}/docs
                                 # NOTE: By default try to configure software with these options:
@@ -724,9 +725,9 @@ process_flat () {
                 esac
 
                 debug "Gathering configuration output logs…"
-                try "test -f '${_configure_log}' && ${INSTALL_BIN} '${_configure_log}' '${_configure_status_log}'" >/dev/null 2>&1
-                try "test -f '${_cmake_out_log}' && ${INSTALL_BIN} '${_cmake_out_log}' '${_cmake_config_log}'" >/dev/null 2>&1
-                try "test -f '${_cmake_error_log}' && ${INSTALL_BIN} '${_cmake_error_log}' '${_cmake_config_log}.error'" >/dev/null 2>&1
+                try "test -f '${_configure_log}' && ${INSTALL_BIN} '${_configure_log}' '${_configure_status_log}'"
+                try "test -f '${_cmake_out_log}' && ${INSTALL_BIN} '${_cmake_out_log}' '${_cmake_config_log}'"
+                try "test -f '${_cmake_error_log}' && ${INSTALL_BIN} '${_cmake_error_log}' '${_cmake_config_log}.error'"
 
                 cd "${_pwd}"
                 try after_configure_callback
@@ -751,7 +752,7 @@ process_flat () {
             unset _this_test_skipped
             if [ -n "${DEF_SKIPPED_DEFINITION_TEST}" ]; then
                 debug "Defined DEF_SKIPPED_DEFINITION_TEST: $(distd "${DEF_SKIPPED_DEFINITION_TEST}")"
-                printf "%b\n" " ${DEF_SKIPPED_DEFINITION_TEST} " | ${EGREP_BIN} -F " ${_app_param} " >/dev/null 2>&1 \
+                printf "%b\n" " ${DEF_SKIPPED_DEFINITION_TEST} " | ${EGREP_BIN} -F " ${_app_param} "  \
                     && note "   ${NOTE_CHAR} Skipped tests for definition of: $(distn "${_app_param}")" \
                         && _this_test_skipped=1
             fi
@@ -785,7 +786,7 @@ process_flat () {
 
             if [ -n "${_whole_list}" ]; then
                 debug "Prepared list of unwanted files: $(distd "${_whole_list}"), from bundle with software PREFIX: $(distd "${_prefix}")."
-                try "${RM_BIN} -fr ${_whole_list}" >/dev/null 2>&1 \
+                try "${RM_BIN} -fr ${_whole_list}"  \
                     && debug "Unwanted files were destroyed."
             else
                 debug "No known files from previous definitions installed for software PREFIX: $(distd "${_prefix}")"

@@ -418,7 +418,7 @@ compiler_setup () {
                 warn ""
             }
             # determine if LD is LLD. If not - throw a fat warning with workaround for 11-stable-based build-hosts
-            try "${LD_BIN} --version 2>/dev/null | ${GREP_BIN} -E 'LLD \d*.\d*.\d*' >/dev/null 2>&1" \
+            try "${LD_BIN} --version 2>&1 | ${GREP_BIN} -E 'LLD \d*.\d*.\d*'" \
                 || warn_about_non_llvm_ld_on_buildhosts
         fi
     fi
@@ -488,7 +488,7 @@ create_lock () {
     fi
     debug "Pid of current Sofin session: $(distd "${SOFIN_PID}")"
     _bundle="$(capitalize "${_bundle_name}")"
-    try "${MKDIR_BIN} -p ${LOCKS_DIR} 2>/dev/null"
+    try "${MKDIR_BIN} -p '${LOCKS_DIR}'"
     printf "%b\n" "${SOFIN_PID}" > "${LOCKS_DIR}${_bundle}${DEFAULT_LOCK_EXT}"
     unset _bundle _bundle_name
 }
@@ -502,7 +502,7 @@ acquire_lock_for () {
             _lock_pid="$(${CAT_BIN} "${LOCKS_DIR}${_bundle}${DEFAULT_LOCK_EXT}" 2>/dev/null)"
             if [ -n "${_lock_pid}" ]; then
                 debug "Lock pid: $(distd "${_lock_pid}"). Sofin pid: $(distd "${SOFIN_PID}"), Sofin PPID: $(distd "${PPID}")"
-                try "${KILL_BIN} -0 ${_lock_pid} >/dev/null 2>&1"
+                try "${KILL_BIN} -0 ${_lock_pid}"
                 if [ "${?}" = "0" ]; then # NOTE: process is alive
                     if [ "${_lock_pid}" = "${SOFIN_PID}" ] \
                     || [ "${PPID}" = "${SOFIN_PID}" ]; then
@@ -535,13 +535,13 @@ destroy_dead_locks_of_bundle () {
         debug "destroy_dead_locks_of_bundle(): With pattern: '$(distd "${_pattern}")'"
         _pid="${SOFIN_PID}"
         for _dlf in $(${FIND_BIN} "${LOCKS_DIR%/}" -mindepth 1 -maxdepth 1 -name "*${_pattern}*${DEFAULT_LOCK_EXT}" -print 2>/dev/null); do
-            try "${EGREP_BIN} '^${_pid}$' ${_dlf} >/dev/null 2>&1" \
+            try "${EGREP_BIN} '^${_pid}$' ${_dlf}" \
                 && try "${RM_BIN} -f '${_dlf}'" \
                     && debug "Removed currently owned pid lock: $(distd "${_dlf}")"
 
             _possiblepid="$(${CAT_BIN} "${_dlf}" 2>/dev/null)"
             if [ -n "${_possiblepid}" ]; then
-                try "${KILL_BIN} -0 ${_possiblepid} >/dev/null 2>&1"
+                try "${KILL_BIN} -0 ${_possiblepid}"
                 if [ "${?}" != "0" ]; then
                     try "${RM_BIN} -f '${_dlf}'" \
                         && debug "Pid: $(distd "${_pid}") appears to be already dead. Removed lock file: $(distd "${_dlf}")"
@@ -566,7 +566,7 @@ reload_shell () {
     if [ -z "${NO_SIGNAL}" ]; then
         # NOTE: PPID contains pid of parent shell of Sofin
         if [ -n "${PPID}" ]; then
-            try "${KILL_BIN} -SIGUSR2 ${PPID} >/dev/null 2>&1" \
+            try "${KILL_BIN} -SIGUSR2 ${PPID}" \
                 && debug "Reload signal sent to parent pid: $(distd "${PPID}")"
         else
             debug "Skipped reload_shell() for no $(distd PPID)"
@@ -597,7 +597,7 @@ update_system_shell_env_files () {
 
 
 load_sysctl_system_defaults () {
-    try "${SYSCTL_BIN} -f '${DEFAULT_SYSCTL_CONF}' >/dev/null 2>&1" \
+    try "${SYSCTL_BIN} -f '${DEFAULT_SYSCTL_CONF}'" \
         && debug "Restored sysctl system-defaults from: $(distd "${DEFAULT_SYSCTL_CONF}")."
 }
 
