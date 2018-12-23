@@ -38,8 +38,14 @@ else
 fi
 
 # Line replay ANSI codes:
-REPLAY_CURRENT_LINE="\33[2K\r"
-REPLAY_PREVIOUS_LINE="\033[A\33[2K\r"
+ANSI_ONE_LINE_UP="\r\033[1A"
+ANSI_TWO_LINES_UP="\r\033[2A"
+ANSI_THREE_LINES_UP="\r\033[3A"
+
+ANSI_ONE_LINE_DOWN="\r\033[1C"
+ANSI_TWO_LINES_DOWN="\r\033[2C"
+ANSI_THREE_LINES_DOWN="\r\033[3C"
+
 
 # determine TERM capabilities:
 determine_term_capabilites () {
