@@ -66,13 +66,13 @@ warn () {
                     "   ${_wrn_msgs}" \
                     "${ColorReset}" \
                     "${ANSI_TWO_LINES_DOWN}" \
-                        >&2 | "${TEE_BIN}"
+                        >&2 | "${TEE_BIN}" 2>/dev/null
         else
             printf "%b%b%b\n" \
                     "${ColorYellow}" \
                     "   ${_wrn_msgs}" \
                     "${ColorReset}" \
-                        >&2 | "${TEE_BIN}"
+                        >&2 | "${TEE_BIN}" 2>/dev/null
         fi
     else
         printf "\n" >&2
@@ -144,7 +144,7 @@ error () {
                 "Task crashed!" \
                 "   ${_err_root}: ${_err_msg}" \
                 "${ColorReset}" \
-                    >&2 | "${TEE_BIN}"
+                    >&2 | "${TEE_BIN}" 2>/dev/null
 
         if [ "error" = "${_err_root}" ]; then
             printf "%b  %b Try: %b%b\n\n" \
@@ -152,13 +152,13 @@ error () {
                     "${NOTE_CHAR2}" \
                     "   $(diste "s log ${DEF_NAME}${DEF_SUFFIX}"), to read the task log." \
                     "${ColorReset}" \
-                         >&2 | "${TEE_BIN}"
+                         >&2 | "${TEE_BIN}" 2>/dev/null
         fi
     else
         printf "%b: %b\n\n" \
             "General Error" \
             "*" \
-                >&2 | "${TEE_BIN}"
+                >&2 | "${TEE_BIN}" 2>/dev/null
     fi
     finalize_after_signal_interrupt
     exit "${ERRORCODE_TASK_FAILURE}"

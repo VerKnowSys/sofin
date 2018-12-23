@@ -105,9 +105,8 @@ dump_software_build_configuration_options () {
     if [ ! -f "${_config_log}" ]; then
         # Store all options per definition from configure scripts
         ${MKDIR_BIN} -p "$(${DIRNAME_BIN} "${_config_log}" 2>/dev/null)"
-
         # Copy whole configuration block from stdout but additionally redirect stderr to stdout:
-        try "${DEF_CONFIGURE_METHOD} -h 2>&1 | ${TEE_BIN} 2>/dev/null '${_config_log}'" \
+        try "${DEF_CONFIGURE_METHOD} -h 2>&1 | ${TEE_BIN} '${_config_log}' 2>/dev/null" \
             && debug "Configuration options dump has been written to: $(distd "${_config_log}")"
 
         printf "%b ----Build--Configuration--Options----> \n%b %b\n" \
