@@ -209,11 +209,10 @@ text_checksum () {
 
 # First n chars of content in first argument
 firstn () {
-    _contents=${1:-""}
-    _length=${2:-16}
-    printf "%b%b\n" \
-        "%.${_length}s" \
-        "${_contents}"
+    _content="${1:-""}"
+    _req_length=${2:-16}
+    printf "%.${_req_length}s\n" \
+        "${_content}"
 }
 
 
