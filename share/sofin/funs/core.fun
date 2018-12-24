@@ -23,7 +23,7 @@ debug () {
         touch_logsdir_and_logfile
         if [ -n "${DEF_NAME}${DEF_SUFFIX}" ]; then
             # Definition log, log to stderr only
-            printf "# %b%b%b%b" \
+            printf "# %b%b%b%b\n" \
                     "${ColorDebug}" \
                     "${_debug_msg}" \
                     "${ColorReset}" \
@@ -31,7 +31,7 @@ debug () {
                         2>> "${LOG}-${DEF_NAME}${DEF_SUFFIX}" >&2
         else
             # Main log, all to stderr
-            printf "# %b%b%b%b" \
+            printf "# %b%b%b%b\n" \
                     "${ColorDebug}" \
                     "${_debug_msg}" \
                     "${ColorReset}" \
