@@ -63,14 +63,14 @@ warn () {
             printf "\n%b%b%b%b%b\n" \
                     "${ANSI_ONE_LINE_UP}" \
                     "${ColorYellow}" \
-                    "   ${_wrn_msgs}" \
+                    "  ${_wrn_msgs}" \
                     "${ColorReset}" \
                     "${ANSI_TWO_LINES_DOWN}" \
                         >&2 | "${TEE_BIN}" >/dev/null
         else
             printf "%b%b%b\n" \
                     "${ColorYellow}" \
-                    "   ${_wrn_msgs}" \
+                    "${_wrn_msgs}" \
                     "${ColorReset}" \
                         >&2 | "${TEE_BIN}" >/dev/null
         fi
@@ -89,14 +89,14 @@ note () {
             printf "\n%b%b%b%b%b" \
                     "${ANSI_ONE_LINE_UP}" \
                     "${ColorGreen}" \
-                    "   ${_nte_msgs}" \
+                    "  ${_nte_msgs}" \
                     "${ColorReset}" \
                     "${ANSI_ONE_LINE_DOWN}" \
                         >&2
         else
             printf "%b%b%b\n" \
                     "${ColorGreen}" \
-                    "   ${_nte_msgs}" \
+                    "${_nte_msgs}" \
                     "${ColorReset}" \
                         >&2
         fi
@@ -115,14 +115,14 @@ permnote () {
             printf "\n%b%b%b%b%b\n" \
                     "${ANSI_ONE_LINE_UP}" \
                     "${ColorGreen}" \
-                    "   ${_prm_note}" \
+                    "  ${_prm_note}" \
                     "${ColorReset}" \
                     "${ANSI_TWO_LINES_DOWN}" \
                         >&2
         else
             printf "%b%b%b\n" \
                     "${ColorGreen}" \
-                    "   ${_prm_note}" \
+                    "${_prm_note}" \
                     "${ColorReset}" \
                         >&2
         fi
@@ -142,7 +142,7 @@ error () {
                 "${ColorRed}" \
                 "${NOTE_CHAR2}" \
                 "Task crashed!" \
-                "   ${_err_root}: ${_err_msg}" \
+                "  ${_err_root}: ${_err_msg}" \
                 "${ColorReset}" \
                     >&2 | "${TEE_BIN}" >/dev/null
 
@@ -150,7 +150,7 @@ error () {
             printf "%b  %b Try: %b%b\n\n" \
                     "${ColorRed}" \
                     "${NOTE_CHAR2}" \
-                    "   $(diste "s log ${DEF_NAME}${DEF_SUFFIX}"), to read the task log." \
+                    "$(diste "s log ${DEF_NAME}${DEF_SUFFIX}"), to read the task log." \
                     "${ColorReset}" \
                          >&2 | "${TEE_BIN}" >/dev/null
         fi
