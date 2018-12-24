@@ -5,7 +5,7 @@ debug () {
         printf "\n" >&2
         return 0
     fi
-    if [ "YES" = "${TTY}" ]; then
+    if [ "YES" = "${CAP_TERM_INTERACTIVE}" ]; then
         _permdbg="\n"
     else
         unset _permdbg
@@ -58,7 +58,7 @@ debug () {
 warn () {
     _wrn_msgs="${*}"
     if [ -n "${_wrn_msgs}" ]; then
-        if [ "YES" = "${TTY}" ]; then
+        if [ "YES" = "${CAP_TERM_INTERACTIVE}" ]; then
             printf "\n%b%b%b%b%b\n" \
                     "${ANSI_ONE_LINE_UP}" \
                     "${ColorYellow}" \
@@ -84,7 +84,7 @@ warn () {
 note () {
     _nte_msgs="${*}"
     if [ -n "${_nte_msgs}" ]; then
-        if [ "YES" = "${TTY}" ]; then
+        if [ "YES" = "${CAP_TERM_INTERACTIVE}" ]; then
             printf "\n%b%b%b%b%b" \
                     "${ANSI_ONE_LINE_UP}" \
                     "${ColorGreen}" \
@@ -110,7 +110,7 @@ note () {
 permnote () {
     _prm_note="${*}"
     if [ -n "${_prm_note}" ]; then
-        if [ "YES" = "${TTY}" ]; then
+        if [ "YES" = "${CAP_TERM_INTERACTIVE}" ]; then
             printf "\n%b%b%b%b%b\n" \
                     "${ANSI_ONE_LINE_UP}" \
                     "${ColorGreen}" \
@@ -317,7 +317,7 @@ initialize () {
     check_definitions_availability
     trap_signals
 
-    if [ "${TTY}" = "YES" ]; then
+    if [ "YES" = "${CAP_TERM_INTERACTIVE}" ]; then
         ${STTY_BIN} -echo \
             && debug "Interactive Terminal Echo is now: $(distd "*disabled*")"
     fi

@@ -97,7 +97,7 @@ fill () {
     fi
     _times=${2}
     if [ -z "${_times}" ]; then
-        _times=${MAX_COLS}
+        _times=${CAP_TERM_MAX_COLUMNS:-80}
     fi
     unset _buf
     for i in $(${SEQ_BIN} 1 "${_times}" 2>/dev/null); do

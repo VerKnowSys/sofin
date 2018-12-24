@@ -5,8 +5,7 @@ SHELL="${SHELL:-${ZSH_BIN}}"
 TERM="${TERM:-xterm-256color}"
 BLOCKSIZE="${BLOCKSIZE:-K}"
 
-TTY="NO"
-MAX_COLS=80
+# Non-Interactive mode settings (defaults):
 SUCCESS_CHAR="V"
 TRY_CHAR="?"
 RUN_CHAR="!"
@@ -16,8 +15,12 @@ FAIL_CHAR="#"
 NOTE_CHAR2="-"
 SEPARATOR_CHAR="_"
 SEPARATOR_CHAR2="-"
+
+# Interactivity (tty) test and override:
 if [ -t 1 ]; then
-    TTY="YES"
+    CAP_TERM_INTERACTIVE=YES
+    unset CAP_TERM_NON_INTERACTIVE
+    # NOTE: for interactive mode we use UTF-8 by default:
     TRY_CHAR="⁇"
     RUN_CHAR="⁈"
     SUCCESS_CHAR="✓"
@@ -27,14 +30,9 @@ if [ -t 1 ]; then
     FAIL_CHAR="✘"
     SEPARATOR_CHAR="┈"
     SEPARATOR_CHAR2="─"
-fi
-
-if [ "NO" = "${TTY}" ]; then
+else
     CAP_TERM_NON_INTERACTIVE=YES
     unset CAP_TERM_INTERACTIVE
-else
-    CAP_TERM_INTERACTIVE=YES
-    unset CAP_TERM_NON_INTERACTIVE
 fi
 
 # Line replay ANSI codes:

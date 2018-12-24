@@ -103,7 +103,7 @@ finalize_after_signal_interrupt () {
 finalize_and_quit_gracefully () {
     load_sysctl_system_production_hardening
     destroy_ramdisk_device
-    if [ "${TTY}" = "YES" ]; then
+    if [ "YES" = "${CAP_TERM_INTERACTIVE}" ]; then
         ${STTY_BIN} echo \
             && debug "Interactive Terminal Echo is now: $(distd "*enabled*")"
     fi
