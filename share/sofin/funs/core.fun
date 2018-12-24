@@ -15,7 +15,7 @@ debug () {
         else
             printf "# %b%b%b\n" \
                     "${ColorDebug}" \
-                    "${_debug_msg}$" \
+                    "${_debug_msg}" \
                     "${ColorReset}" \
                         >&2
         fi
