@@ -2,7 +2,7 @@
 # f.e.: parse_version "1.2.41" will return 1 2 41
 parse_version () {
     _version="${1}"
-    IFS=. read _major _minor _micro <<EOF
+    IFS=. read -r _major _minor _micro <<EOF
 ${_version##*-}
 EOF
     printf "%b %b %b\n" \
