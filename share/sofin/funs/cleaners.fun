@@ -61,12 +61,12 @@ destroy_ramdisk_device () {
         case "${SYSTEM_NAME}" in
             Darwin)
                 if [ -n "${RAMDISK_DEV}" ]; then
-                    try "diskutil unmountDisk ${RAMDISK_DEV}; diskutil eject '${RAMDISK_DEV}'" \
+                    try "diskutil unmountDisk ${RAMDISK_DEV}; diskutil eject ${RAMDISK_DEV}" \
                         && debug "Tmp ramdisk unmounted: $(distd "${RAMDISK_DEV}")"
                 fi
                 ;;
         esac
-        try "${UMOUNT_BIN} -f '${RAMDISK_DEV}'" \
+        try "${UMOUNT_BIN} -f ${RAMDISK_DEV}" \
             && debug "Ramdisk device unmounted: $(distd "${RAMDISK_DEV}")"
         unset RAMDISK_DEV
     fi

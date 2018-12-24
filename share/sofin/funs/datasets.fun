@@ -456,10 +456,10 @@ create_builddir () {
         error "First argument with $(diste "BundleName") is required!"
     fi
     _bdir="${SOFTWARE_DIR}/${_cb_bundle_name}/${DEFAULT_SRC_EXT}${_dset_namesum}"
-    try "${MKDIR_BIN} -p '${_bdir}'"
+    try "${MKDIR_BIN} -p ${_bdir}"
 
     if [ -n "${CAP_SYS_BUILDHOST}" ]; then
-        try "${UMOUNT_BIN} -f '${_bdir}'" \
+        try "${UMOUNT_BIN} -f ${_bdir}" \
             && debug "Unmounted build-dir ramdisk: $(distd "${_bdir}")"
 
         case "${SYSTEM_NAME}" in
@@ -470,7 +470,7 @@ create_builddir () {
                 RAMDISK_DEV="$(${HDID_BIN} -nomount ram://${_ramfs_sectors} 2>/dev/null)"
 
                 debug "Darwin ramdisk dev: $(distd "${RAMDISK_DEV}")"
-                run "${NEWFS_HFS_BIN} -v '${_cb_bundle_name}' ${RAMDISK_DEV}"
+                run "${NEWFS_HFS_BIN} -v ${_cb_bundle_name} ${RAMDISK_DEV}"
                 run "${MOUNT_BIN} -o noatime -t hfs ${RAMDISK_DEV} ${_bdir}" \
                     && debug "Mounted tmpfs build-directory: $(distd "${_bdir}")"
                 ;;
@@ -499,7 +499,7 @@ destroy_builddir () {
         case "${SYSTEM_NAME}" in
             Darwin)
                 if [ -n "${RAMDISK_DEV}" ]; then
-                    try "diskutil unmountDisk '${RAMDISK_DEV}'; diskutil eject '${RAMDISK_DEV}'" \
+                    try "diskutil unmountDisk ${RAMDISK_DEV} && diskutil eject ${RAMDISK_DEV}" \
                         && debug "Tmp ramdisk unmounted: $(distd "${RAMDISK_DEV}")"
                 fi
                 ;;
