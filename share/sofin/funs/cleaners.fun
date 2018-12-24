@@ -95,6 +95,7 @@ finalize_with_shell_reload () {
 # NOTE: C-c is handled differently:
 # finalize_complete_standard_task() is called:
 finalize_after_signal_interrupt () {
+    destroy_ramdisk_device
     set_system_dataset_writable
     set_software_dataset_writable
     untrap_signals
@@ -105,7 +106,6 @@ finalize_after_signal_interrupt () {
 # Task to call as last for all other finalize_* functions:
 finalize_and_quit_gracefully () {
     load_sysctl_system_production_hardening
-    destroy_ramdisk_device
     if [ "YES" = "${CAP_TERM_INTERACTIVE}" ]; then
         ${STTY_BIN} echo \
             && debug "Interactive Terminal Echo is now: $(distd "*enabled*")"
