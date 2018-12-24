@@ -67,10 +67,15 @@ pretouch_logs () {
 
 show_log_if_available () {
     if [ -f "${LOG}" ]; then
-        note "$(fill)"
-        ${TAIL_BIN} -n "${LOG_LINES_AMOUNT_ON_ERR}" "${LOG}" 2>/dev/null
+        permnote "$(fill)"
+        ${TAIL_BIN} -n "${LOG_LINES_AMOUNT_ON_ERR}" \
+            "${LOG}" \
+            "${LOG}-${DEF_NAME}" \
+            "${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
+                2>/dev/null
+        permnote "$(fill)"
     else
-        debug "No log available to attach tail to.."
+        permnote "No logs matching the pattern has been found."
     fi
 }
 
