@@ -1,7 +1,7 @@
 
 debug () {
-    _in="${*}"
-    if [ -z "${_in}" ]; then
+    _debug_msg="${*}"
+    if [ -z "${_debug_msg}" ]; then
         printf "\n" >&2
         return 0
     fi
@@ -14,7 +14,7 @@ debug () {
     if [ -n "${DEBUG}" ]; then
         printf "# %b%b%b\n" \
                 "${ColorDebug}" \
-                "${_in}" \
+                "${_debug_msg}" \
                 "${ColorReset}" \
                     >&2
     else
@@ -26,7 +26,7 @@ debug () {
                 printf "# %b%b%b%b%b" \
                         "${ColorDebug}" \
                         "${_dbfn}" \
-                        "${_in}" \
+                        "${_debug_msg}$(fill_interactive_line "${_debug_msg}")" \
                         "${ColorReset}" \
                         "${_permdbg}" \
                             2>> "${LOG}-${DEF_NAME}${DEF_SUFFIX}" >&2
@@ -35,7 +35,7 @@ debug () {
                 printf "# %b%b%b%b%b" \
                         "${ColorDebug}" \
                         "${_dbfn}" \
-                        "${_in}" \
+                        "${_debug_msg}$(fill_interactive_line "${_debug_msg}")" \
                         "${ColorReset}" \
                         "${_permdbg}" \
                             2>> "${LOG}" >&2
@@ -44,12 +44,12 @@ debug () {
             printf "# %b%b%b%b%b" \
                     "${ColorDebug}" \
                     "${_dbfn}" \
-                    "${_in}" \
+                    "${_debug_msg}$(fill_interactive_line "${_debug_msg}")" \
                     "${ColorReset}" \
                     "${_permdbg}" \
                         >&2
         fi
-        unset _dbgnme _in _dbfn
+        unset _dbgnme _debug_msg _dbfn
     fi
     return 0
 }
@@ -62,7 +62,7 @@ warn () {
             printf "\n%b%b%b%b%b\n" \
                     "${ANSI_ONE_LINE_UP}" \
                     "${ColorYellow}" \
-                    "  ${_wrn_msgs}" \
+                    "  ${_wrn_msgs}$(fill_interactive_line "${_wrn_msgs}")" \
                     "${ColorReset}" \
                     "${ANSI_TWO_LINES_DOWN}" \
                         >&2 | "${TEE_BIN}" >/dev/null
@@ -88,7 +88,7 @@ note () {
             printf "\n%b%b%b%b%b" \
                     "${ANSI_ONE_LINE_UP}" \
                     "${ColorGreen}" \
-                    "  ${_nte_msgs}" \
+                    "  ${_nte_msgs}$(fill_interactive_line "${_nte_msgs}")" \
                     "${ColorReset}" \
                     "${ANSI_ONE_LINE_DOWN}" \
                         >&2
@@ -114,7 +114,7 @@ permnote () {
             printf "\n%b%b%b%b%b\n" \
                     "${ANSI_ONE_LINE_UP}" \
                     "${ColorGreen}" \
-                    "  ${_prm_note}" \
+                    "  ${_prm_note}$(fill_interactive_line "${_prm_note}")" \
                     "${ColorReset}" \
                     "${ANSI_TWO_LINES_DOWN}" \
                         >&2

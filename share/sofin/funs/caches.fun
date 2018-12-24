@@ -81,8 +81,11 @@ show_log_if_available () {
 
 
 touch_logsdir_and_logfile () {
-    ${MKDIR_BIN} -p "${LOGS_DIR}" >/dev/null 2>&1
-    ${TOUCH_BIN} "${LOG}" >/dev/null 2>&1
+    if [ ! -d "${LOGS_DIR}" ] \
+    || [ ! -f "${LOG}" ]; then
+        ${MKDIR_BIN} -p "${LOGS_DIR}" >/dev/null 2>&1
+        ${TOUCH_BIN} "${LOG}" >/dev/null 2>&1
+    fi
 }
 
 
