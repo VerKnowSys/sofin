@@ -93,6 +93,11 @@ determine_term_capabilites () {
         unset CAP_TERM_ANSI_COLORS
     fi
 
+    if [ -x "${TPUT_BIN}" ]; then
+        CAP_TERM_MAX_COLUMNS="$(tput cols 2>/dev/null)"
+        CAP_TERM_MAX_LINES="$(tput lines 2>/dev/null)"
+    fi
+
     try "${TPUT_BIN} setaf 0"
     if [ "${?}" != "0" ]; then # broken with tput under FreeBSD, related bug: https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=210858
         unset CAP_TERM_TPUT_UTILITY
