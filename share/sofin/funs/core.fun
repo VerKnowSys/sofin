@@ -200,19 +200,18 @@ run () {
         _rnm="${DEF_NAME}${DEF_SUFFIX}"
         if [ -z "${_rnm}" ]; then
             if [ -z "${DEBUG}" ]; then
-                # No DEBUG set -> discard both STDOUT and STDERR for try() calls…:
-                eval "PATH=${PATH}${GIT_EXPORTS} ${_run_params}" >/dev/null 2>&1 \
+                eval "PATH=${PATH}${GIT_EXPORTS} ${_run_params}" >/dev/null 2>> "${LOG}" \
                     && check_result "${?}" "${_run_params}" \
                     && return 0
             else
                 printf "%b\n" "${ColorBlue}" >&2
-                eval "PATH=${PATH}${GIT_EXPORTS} ${_run_params}" 2>> "${LOG}" \
+                eval "PATH=${PATH}${GIT_EXPORTS} ${_run_params}" >&2 2>> "${LOG}" \
                     && check_result "${?}" "${_run_params}" \
                     && return 0
             fi
         else
             if [ -z "${DEBUG}" ]; then
-                eval "PATH=${PATH}${GIT_EXPORTS} ${_run_params}" >/dev/null 2>&1 \
+                eval "PATH=${PATH}${GIT_EXPORTS} ${_run_params}" >/dev/null 2>> "${LOG}-${_rnm}" \
                     && check_result "${?}" "${_run_params}" \
                     && return 0
             else
