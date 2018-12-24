@@ -39,7 +39,7 @@ push_to_all_mirrors () {
         fi
         push_dset_zfs_stream "${_pfin_svc_name}" "${_pbto_bundle_name}" "${_ptmirror}" "${_pversion_element}"
     done
-    permnote "Bundle pushed successfully: $(distn "${_pbto_bundle_name}")!"
+    permnote "Successfully deployed bundle: $(distn "${_pbto_bundle_name}")."
     unset _ptaddress _ptmirror _pversion_element _ptelm_file_name _pt_query
 }
 
@@ -205,10 +205,10 @@ fetch_dset_zfs_stream () {
         if [ "${?}" = "0" ]; then
             _dataset_name="${DEFAULT_ZPOOL}${SERVICES_DIR}/${SYSTEM_DATASET}/${_fdz_bund_name}"
             try "${SOFIN_LZ4CAT_BIN} '${FILE_CACHE_DIR}${_fdz_out_file}' | ${ZFS_BIN} receive ${ZFS_RECEIVE_OPTS} '${_dataset_name}' | ${TAIL_BIN} -n1" \
-                && permnote "Received service dataset: $(distn "${_dataset_name}")"
+                && permnote "Received service dataset for bundle: $(distn "${_dataset_name}")"
             unset _dataset_name
         else
-            debug "Origin service dataset unavailable for: $(distd "${_fdz_bund_name}")."
+            debug "Origin service dataset unavailable for bundle: $(distd "${_fdz_bund_name}")."
             return 1
         fi
     else
@@ -218,10 +218,10 @@ fetch_dset_zfs_stream () {
         retry "${FETCH_BIN} -o ${FILE_CACHE_DIR}${_fdz_out_file} ${FETCH_OPTS} '${_commons_path}'"
         if [ "${?}" = "0" ]; then
             try "${TAR_BIN} -xf ${FILE_CACHE_DIR}${_fdz_out_file} --directory ${SERVICES_DIR}" \
-                && permnote "Received service tarball for service: $(distn "${_fdz_bund_name}")"
+                && permnote "Received service tarball for bundle: $(distn "${_fdz_bund_name}")"
             unset _tarball_name
         else
-            debug "Origin service tarball unavailable for: $(distd "${_fdz_bund_name}")."
+            debug "Origin service tarball unavailable for bundle: $(distd "${_fdz_bund_name}")."
             return 1
         fi
     fi
@@ -243,16 +243,16 @@ try_fetch_service_dir () {
         _svce_org_file="${FILE_CACHE_DIR}${_svce_origin}"
         if [ ! -f "${_svce_org_file}" ]; then
             retry "${FETCH_BIN} -o ${_svce_org_file} ${FETCH_OPTS} ${MAIN_COMMON_REPOSITORY}/${_svce_origin}" \
-                && debug "Service origin fetched successfully: $(distd "${_svce_origin}")"
+                && debug "Service origin fetched successfully for bundle: $(distd "${_svce_origin}")"
         fi
         if [ -f "${_svce_org_file}" ]; then
             # NOTE: each user dataset is made of same origin, hence you can apply snapshots amongst them..
             try "${ZFS_BIN} list '${DEFAULT_ZPOOL}${SERVICES_DIR}/${SYSTEM_DATASET}/${_dset_create}'"
             if [ "0" = "$?" ]; then
-                debug "Service origin is already present for: $(distd "${_svce_origin}")"
+                debug "Service origin is already present for bundle: $(distd "${_svce_origin}")"
             else
                 run "${SOFIN_LZ4CAT_BIN} '${_svce_org_file}' | ${ZFS_BIN} receive ${ZFS_RECEIVE_OPTS} '${DEFAULT_ZPOOL}${SERVICES_DIR}/${SYSTEM_DATASET}/${_dset_create}' | ${TAIL_BIN} -n1" \
-                    && debug "Service origin received successfully: $(distd "${_svce_origin}")"
+                    && debug "Service origin received successfully for bundle: $(distd "${_svce_origin}")"
             fi
         else
             debug "No Service origin file: '$(distd "${_svce_org_file}")' available! Skipped."
@@ -539,7 +539,7 @@ create_software_bundle_archive () {
             try "${ZFS_BIN} snapshot '${_csbd_dataset}@${ORIGIN_ZFS_SNAP_NAME}'"
             try "${ZFS_BIN} umount -f '${_csbd_dataset}'"
             run "${ZFS_BIN} send ${ZFS_SEND_OPTS} '${_csbd_dataset}@${ORIGIN_ZFS_SNAP_NAME}' | ${SOFIN_LZ4_BIN} ${DEFAULT_LZ4_OPTS} > ${_cddestfile}" \
-                && permnote "Ddtaset: $(distn "${_csbd_dataset}") successfully sent to file: $(distn "${_cddestfile}")"
+                && debug "ZFS-send-ok: $(distd "${_csbd_dataset}") -> $(distd "${_cddestfile}")"
             cd "${_cdir}"
 
             # set mountpoint for dataset explicitly:

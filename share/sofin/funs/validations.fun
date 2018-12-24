@@ -43,7 +43,7 @@ fail_any_bg_jobs () {
         if [ -n "${_lock_pid}" ]; then
             try "${KILL_BIN} -0 ${_lock_pid}"
             if [ "${?}" = "0" ]; then
-                error "Detected running instance of Sofin, locked on bundle: $(diste "${_bundle_name}") pid: $(diste "${_lock_pid}")"
+                error "Bundle: $(diste "${_bundle_name}") is currently locked by pid: $(diste "${_lock_pid}"). Other Sofin instance is still running in background!"
             fi
         fi
     done

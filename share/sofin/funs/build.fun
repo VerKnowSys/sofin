@@ -108,7 +108,7 @@ fetch_binbuild () {
                         || try "${FETCH_BIN} -o ${FILE_CACHE_DIR}${_bb_archive} ${FETCH_OPTS} '${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}'" \
                             || error "Failure fetching available binary build for: $(diste "${_bb_archive}"). Please check your network setup!"
             else
-                note "No binary build file available: $(distn "${_bb_archive}")"
+                permnote "No binary build available: $(distn "${_bb_archive}")"
             fi
         fi
 

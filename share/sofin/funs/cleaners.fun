@@ -36,17 +36,19 @@ perform_clean () {
     fail_any_bg_jobs
     case "${1}" in
         purge) # purge
+            permnote "Purge clean: $(distd "clean_purge()")"
             clean_purge
             ;;
 
         dist) # distclean
-            note "Dist cleaning.."
+            permnote "Dist clean: $(distn "clean_logs(), clean_filecache(), clean_all_bdirs_leftovers()")"
             clean_logs
             clean_filecache
             clean_all_bdirs_leftovers
             ;;
 
         *) # clean
+            permnote "Clean: $(distn "${clean_all_bdirs_leftovers}")"
             clean_all_bdirs_leftovers
             ;;
     esac
