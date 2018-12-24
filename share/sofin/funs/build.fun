@@ -773,25 +773,31 @@ process_flat () {
             cd "${_pwd}"
             try after_test_snapshot
 
-            _whole_list=""
-            debug "Cleaning PREFIX man dir from previous dependencies, we want to install man pages that belong to LAST requirement which is app bundle itself"
-            for _stuff_of_other_defs in $(to_iter "share/man" "share/info" "share/doc" "share/docs" "docs" "share/html"); do # "man"
-                if [ -d "${_prefix}/${_stuff_of_other_defs}" ]; then
-                    if [ -z "${_whole_list}" ]; then
-                        _whole_list="'./${_stuff_of_other_defs}'"
-                    else
-                        _whole_list="${_whole_list} ./${_stuff_of_other_defs}"
+            if [ -n "${_prefix}" ]; then
+                _whole_list=""
+                debug "Cleaning PREFIX man dir from previous dependencies, we want to install man pages that belong to LAST requirement which is app bundle itself"
+                for _stuff_of_other_defs in $(to_iter "share/man" "share/info" "share/doc" "share/docs" "docs" "share/html"); do # "man"
+                    if [ -d "${_prefix}/${_stuff_of_other_defs}" ]; then
+                        if [ -z "${_whole_list}" ]; then
+                            _whole_list="'${_prefix}/${_stuff_of_other_defs}'"
+                        else
+                            _whole_list="${_whole_list} ${_prefix}/${_stuff_of_other_defs}"
+                        fi
                     fi
-                fi
-            done
-            try "${MKDIR_BIN} man" # NOTE: this thing is a real trouble for some definitions that crashes after "make install" without this directory in PREFIX…
+                done
 
-            if [ -n "${_whole_list}" ]; then
-                debug "Prepared list of unwanted files: $(distd "${_whole_list}"), from bundle with software PREFIX: $(distd "${_prefix}")."
-                try "${RM_BIN} -fr ${_whole_list}"  \
-                    && debug "Unwanted files were destroyed."
+                if [ -n "${_whole_list}" ]; then
+                    debug "Prepared list of unwanted files: $(distd "${_whole_list}"), from bundle with software PREFIX: $(distd "${_prefix}")."
+                    try "${RM_BIN} -fr ${_whole_list}"  \
+                        && debug "Unwanted files were destroyed."
+                else
+                    debug "No known files from previous definitions installed for software PREFIX: $(distd "${_prefix}")"
+                fi
+
+                # NOTE: this thing is a real trouble for some definitions that crashes after "make install" without these directories in _prefix: <facepalm>
+                try "${MKDIR_BIN} -p ${_prefix}/man ${_prefix}/docs"
             else
-                debug "No known files from previous definitions installed for software PREFIX: $(distd "${_prefix}")"
+                error "Sofin-Assertion-Failed: EMPTY _prefix?! Undefined behavior is always a BUG! Please report this!"
             fi
 
             cd "${_pwd}"
@@ -805,7 +811,7 @@ process_flat () {
 
             cd "${_pwd}"
             printf "%b\n" "${DEF_VERSION}" > "${_prefix}/${_app_param}${DEFAULT_INST_MARK_EXT}" \
-                && debug "Commited version: $(distd "${DEF_VERSION}") of software bundle: $(distd "${DEF_NAME}${DEF_SUFFIX}"). Bundle installation prefix: $(distd "${_prefix}")"
+                && debug "Commited version: $(distd "${DEF_VERSION}") of software bundle: $(distd "${DEF_NAME}${DEF_SUFFIX}"). Bundle prefix: $(distd "${_prefix}")"
 
             cd "${_cwd}" 2>/dev/null
             unset _cwd _addon _dsname _bund
