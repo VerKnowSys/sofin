@@ -1,56 +1,45 @@
 
 debug () {
-    _debug_msg="${*}"
+    _debug_msg="${@}"
     if [ -z "${_debug_msg}" ]; then
         printf "\n" >&2
         return 0
     fi
-    if [ "YES" = "${CAP_TERM_INTERACTIVE}" ]; then
-        _permdbg="\n"
-    else
-        unset _permdbg
-    fi
-
     if [ -n "${DEBUG}" ]; then
-        printf "# %b%b%b\n" \
-                "${ColorDebug}" \
-                "${_debug_msg}" \
-                "${ColorReset}" \
-                    >&2
-    else
-        touch_logsdir_and_logfile
-        _dbfn=" "
-        if [ -z "${DEBUG}" ]; then
-            if [ -n "${DEF_NAME}${DEF_SUFFIX}" ]; then
-                # Definition log, log to stderr only
-                printf "# %b%b%b%b%b" \
-                        "${ColorDebug}" \
-                        "${_dbfn}" \
-                        "${_debug_msg}$(fill_interactive_line "${_debug_msg}")" \
-                        "${ColorReset}" \
-                        "${_permdbg}" \
-                            2>> "${LOG}-${DEF_NAME}${DEF_SUFFIX}" >&2
-            else
-                # Main log, all to stderr
-                printf "# %b%b%b%b%b" \
-                        "${ColorDebug}" \
-                        "${_dbfn}" \
-                        "${_debug_msg}$(fill_interactive_line "${_debug_msg}")" \
-                        "${ColorReset}" \
-                        "${_permdbg}" \
-                            2>> "${LOG}" >&2
-            fi
-        else # DEBUG is set. Print all debugs to stderr:
-            printf "# %b%b%b%b%b" \
+        if [ "YES" = "${CAP_TERM_INTERACTIVE}" ]; then
+            printf "#λ %b%b%b\n" \
                     "${ColorDebug}" \
-                    "${_dbfn}" \
                     "${_debug_msg}$(fill_interactive_line "${_debug_msg}")" \
                     "${ColorReset}" \
-                    "${_permdbg}" \
+                        >&2
+        else
+            printf "# %b%b%b\n" \
+                    "${ColorDebug}" \
+                    "${_debug_msg}$" \
+                    "${ColorReset}" \
                         >&2
         fi
-        unset _dbgnme _debug_msg _dbfn
+    else
+        touch_logsdir_and_logfile
+        if [ -n "${DEF_NAME}${DEF_SUFFIX}" ]; then
+            # Definition log, log to stderr only
+            printf "# %b%b%b%b" \
+                    "${ColorDebug}" \
+                    "${_debug_msg}" \
+                    "${ColorReset}" \
+                    "${_permdbg}" \
+                        2>> "${LOG}-${DEF_NAME}${DEF_SUFFIX}" >&2
+        else
+            # Main log, all to stderr
+            printf "# %b%b%b%b" \
+                    "${ColorDebug}" \
+                    "${_debug_msg}" \
+                    "${ColorReset}" \
+                    "${_permdbg}" \
+                        2>> "${LOG}" >&2
+        fi
     fi
+    unset _dbgnme _debug_msg _dbfn
     return 0
 }
 
