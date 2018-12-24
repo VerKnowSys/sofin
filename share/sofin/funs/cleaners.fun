@@ -58,6 +58,8 @@ perform_clean () {
 
 destroy_ramdisk_device () {
     if [ -n "${RAMDISK_DEV}" ]; then
+        cd /
+        debug "${0}: destroy_ramdisk_device(): RAM_DISK_DEVICE: $(distd "${RAMDISK_DEV}")"
         case "${SYSTEM_NAME}" in
             Darwin)
                 if [ -n "${RAMDISK_DEV}" ]; then
