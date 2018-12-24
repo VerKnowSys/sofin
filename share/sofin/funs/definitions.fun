@@ -160,7 +160,10 @@ update_defs () {
                 && note "Definitions branch: $(distn "${_def_cur_branch}") is now at: $(distn "${_def_head}")" \
                     && return
 
-            printf "%b%s%b\n$(fill)\n" "${ColorRed}" "Error occured: Update from branch: $(diste "${BRANCH}") of repository: $(diste "${REPOSITORY}") wasn't possible. Log's below:" "${ColorReset}"
+            printf "%b%b\n%b\n" \
+                "${ColorRed}" \
+                "Error occured: Update from branch: $(diste "${BRANCH}") of repository: $(diste "${REPOSITORY}") wasn't possible. Log's below:" \
+                "${ColorReset}"
             show_log_if_available
             return
 
@@ -175,8 +178,11 @@ update_defs () {
                 && permnote "Definitions branch: $(distn "${BRANCH}") is at: $(distn "${_def_head}")" \
                     && return
 
-            printf "%b%b%b%b\n" "${ColorRed}" "$(fill)" \
-                "Error occured: Update from branch: $(diste "${BRANCH}") of repository: $(diste "${REPOSITORY}") wasn't possible. Log's below:" "${ColorReset}"
+            printf "%b%b\n%b\n%b\n" \
+                "${ColorRed}" \
+                "$(fill)" \
+                "Error occured: Update from branch: $(diste "${BRANCH}") of repository: $(diste "${REPOSITORY}") wasn't possible. Log's below:" \
+                "${ColorReset}"
             show_log_if_available
             return
         fi
