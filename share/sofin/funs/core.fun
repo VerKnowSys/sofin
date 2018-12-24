@@ -12,8 +12,7 @@ debug () {
     fi
 
     if [ -n "${DEBUG}" ]; then
-        printf "# %b   %b%b%b\n" \
-                "${ColorGreen} λ" \
+        printf "# %b%b%b\n" \
                 "${ColorDebug}" \
                 "${_in}" \
                 "${ColorReset}" \
@@ -41,7 +40,7 @@ debug () {
                         "${_permdbg}" \
                             2>> "${LOG}" >&2
             fi
-        else # DEBUG is set. Print to stderr
+        else # DEBUG is set. Print all debugs to stderr:
             printf "# %b%b%b%b%b" \
                     "${ColorDebug}" \
                     "${_dbfn}" \
