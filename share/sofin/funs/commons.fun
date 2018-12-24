@@ -111,11 +111,12 @@ fill () {
 fill_interactive_line () {
     _msg="${@}"
     _msg_length="${#_msg}"
-    _msg_filler="$(( ${CAP_TERM_MAX_COLUMNS:-80} - ${_msg_length} ))"
-    printf "%b" \
-        "$(fill ' ' "${_msg_filler}")" \
-            2>/dev/null
-    unset _msg _msg_filler
+    _max_length="${CAP_TERM_MAX_COLUMNS:-80}"
+    _msg_filler="$(( ${_max_length} - ${_msg_length} ))"
+    if [ "${_msg_length}" -lt "${_max_length}" ]; then
+        printf "%b" "$(fill ' ' "${_msg_filler}")" 2>/dev/null
+    fi
+    unset _msg _msg_length _max_length _msg_filler
 }
 
 
