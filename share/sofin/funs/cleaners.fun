@@ -98,7 +98,6 @@ finalize_after_signal_interrupt () {
     destroy_ramdisk_device
     set_system_dataset_writable
     set_software_dataset_writable
-    untrap_signals
     finalize_and_quit_gracefully
 }
 
@@ -112,6 +111,7 @@ finalize_and_quit_gracefully () {
     fi
     set_system_dataset_readonly
     set_software_dataset_readonly
+    untrap_signals
 }
 
 
