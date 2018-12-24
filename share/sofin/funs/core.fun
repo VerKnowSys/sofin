@@ -391,7 +391,7 @@ trap_signals () {
     trap 'signal_handler_no_operation' INFO
     trap 'signal_handler_no_operation' USR1
     trap 'signal_handler_no_operation' USR2 # This signal is used to "reload shell"-feature. Sofin should ignore it when triggered directly
-    trap 'signal_handler_no_operation' WINCH
+    # trap 'signal_handler_no_operation' WINCH
 
     debug "trap_signals(): Interruption triggers were associated with signals: $(distd "INT, QUIT, TERM")."
     debug "trap_signals(): No-Op triggers were associated with signals: $(distd "HUP, INFO, USR1, USR2, WINCH")!"
@@ -408,7 +408,7 @@ untrap_signals () {
     trap - USR1
     trap - USR2
     trap - INFO
-    trap - WINCH
+    # trap - WINCH
 
     debug "untrap_signals(): Signal trigger handlers were unassociated for: $(distd "INT, QUIT, TERM, HUP, INFO, USR1, USR2, WINCH")."
     return 0
