@@ -63,16 +63,22 @@ determine_term_capabilites () {
         # NOTE: don't do notification on signal handling:
         unsetopt monitor 2>/dev/null
 
+        CAP_TERM_MAX_COLUMNS="${COLUMNS}"
+        CAP_TERM_MAX_LINES="${LINES}"
+
         CAP_TERM_ZSH=YES
         unset CAP_TERM_BASH CAP_TERM_SH
 
     elif [ -n "${BASH_VERSION}" ]; then
+        CAP_TERM_MAX_COLUMNS="${COLUMNS}"
+        CAP_TERM_MAX_LINES="${LINES}"
+
         CAP_TERM_BASH=YES
         unset CAP_TERM_ZSH CAP_TERM_SH
 
     else # fallback to most limited "/bin/sh" legacy-shell:
         CAP_TERM_SH=YES
-        unset CAP_TERM_ZSH CAP_TERM_BASH
+        unset CAP_TERM_ZSH CAP_TERM_BASH CAP_TERM_MAX_COLUMNS CAP_TERM_MAX_LINES
     fi
 
     try "printf \"%b\n\" \"${LANG}\" | ${GREP_BIN} -F \".UTF-8\""
@@ -91,11 +97,6 @@ determine_term_capabilites () {
     else
         CAP_TERM_NO_COLORS=YES
         unset CAP_TERM_ANSI_COLORS
-    fi
-
-    if [ -x "${TPUT_BIN}" ]; then
-        CAP_TERM_MAX_COLUMNS="$(tput cols 2>/dev/null)"
-        CAP_TERM_MAX_LINES="$(tput lines 2>/dev/null)"
     fi
 
     try "${TPUT_BIN} setaf 0"
