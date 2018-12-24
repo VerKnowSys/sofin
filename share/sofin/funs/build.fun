@@ -774,8 +774,8 @@ process_flat () {
             try after_test_snapshot
 
             _whole_list=""
-            debug "Cleaning man dir from previous dependencies, we want to install man pages that belong to LAST requirement which is app bundle itself"
-            for _stuff_of_other_defs in $(to_iter "man" "share/man" "share/info" "share/doc" "share/docs" "docs" "share/html"); do
+            debug "Cleaning PREFIX man dir from previous dependencies, we want to install man pages that belong to LAST requirement which is app bundle itself"
+            for _stuff_of_other_defs in $(to_iter "share/man" "share/info" "share/doc" "share/docs" "docs" "share/html"); do # "man"
                 if [ -d "${_prefix}/${_stuff_of_other_defs}" ]; then
                     if [ -z "${_whole_list}" ]; then
                         _whole_list="'./${_stuff_of_other_defs}'"
@@ -784,6 +784,7 @@ process_flat () {
                     fi
                 fi
             done
+            try "${MKDIR_BIN} man" # NOTE: this thing is a real trouble for some definitions that crashes after "make install" without this directory in PREFIX…
 
             if [ -n "${_whole_list}" ]; then
                 debug "Prepared list of unwanted files: $(distd "${_whole_list}"), from bundle with software PREFIX: $(distd "${_prefix}")."
