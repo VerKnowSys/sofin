@@ -47,13 +47,13 @@ disable_sofin_env () {
         error "No bundles to disable were provided!"
     fi
     if [ "@" = "${_envs}" ]; then
-        debug "Wiping out environment for @!"
-        ${RM_BIN} -f "${SOFIN_ENV_ENABLED_INDICATOR_FILE}"
+        ${RM_BIN} -f "${SOFIN_ENV_ENABLED_INDICATOR_FILE}" \
+            && debug "Environment file: $(distd "${SOFIN_ENV_ENABLED_INDICATOR_FILE}") removed."
     else
         for _env in $(to_iter "${_envs}"); do
             ${SED_BIN} -i '' -e "/^.*${_env}.*$/ d" "${SOFIN_ENV_ENABLED_INDICATOR_FILE}" 2>/dev/null
         done
-        note "Disabled Sofin environment for bundles: $(distn "${_envs}")"
+        permnote "Disabled bundles: $(distn "${_envs}") from the Sofin environment"
     fi
 }
 

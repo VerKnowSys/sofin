@@ -115,7 +115,6 @@ if [ -n "${SOFIN_COMMAND}" ]; then
                         return 0
                     fi
                     enable_sofin_env "${_bundles}"
-                    note "Updated profile with new bundles: $(distn "${_bundles}")"
                     ;;
 
                 -*) # remove N elements
@@ -131,14 +130,13 @@ if [ -n "${SOFIN_COMMAND}" ]; then
                         return 0
                     fi
                     disable_sofin_env "${_bundles}"
-                    note "Updated profile without bundles: $(distn "${_bundles}")"
                     ;;
 
                 !|store|save) # save profile
                     shift
                     _fname="${SOFIN_ENV_ENABLED_INDICATOR_FILE}.${1}"
-                    note "Storing new environment profile: $(distn "${_fname}")"
-                    run "${INSTALL_BIN} ${SOFIN_ENV_ENABLED_INDICATOR_FILE} ${_fname}"
+                    run "${INSTALL_BIN} ${SOFIN_ENV_ENABLED_INDICATOR_FILE} ${_fname}" \
+                        && permnote "Saved new environment profile: $(distn "${_fname}")"
                     ;;
 
                 ^|load|ld) # load profile
@@ -146,8 +144,8 @@ if [ -n "${SOFIN_COMMAND}" ]; then
                     _name="${1}"
                     _fname="${SOFIN_ENV_ENABLED_INDICATOR_FILE}.${_name}"
                     if [ -f "${_fname}" ]; then
-                        note "Loading environment profile: $(distn "${_fname}")"
-                        run "${INSTALL_BIN} ${_fname} ${SOFIN_ENV_ENABLED_INDICATOR_FILE}"
+                        run "${INSTALL_BIN} ${_fname} ${SOFIN_ENV_ENABLED_INDICATOR_FILE}" \
+                            && permnote "Loaded environment profile: $(distn "${_fname}")."
                     else
                         error "No such profile: $(diste "${_name}")"
                     fi
@@ -158,8 +156,8 @@ if [ -n "${SOFIN_COMMAND}" ]; then
                     ;;
 
                 reset)
-                    note "Resetting Sofin envrionment"
-                    ${RM_BIN} -f "${SOFIN_ENV_ENABLED_INDICATOR_FILE}"
+                    ${RM_BIN} -f "${SOFIN_ENV_ENABLED_INDICATOR_FILE}" \
+                        && permnote "Sofin environment is now: $(distn "dynamic")"
                     ;;
 
                 r|reload|rehash) # NOTE: always done implicitly later

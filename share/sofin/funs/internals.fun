@@ -276,7 +276,7 @@ show_diff () {
         fi
         ${GIT_BIN} status -vv --long "${_sddefname}" 2>/dev/null
     else
-        permnote "Showing all modifications from current defintions cache"
+        permnote "Listing all modified definitions in local cache: ($(distn "${CACHE_DIR}"))"
         ${GIT_BIN} status --short 2>/dev/null
     fi
     unset _sddefname _beauty_defn
@@ -291,7 +291,7 @@ develop () {
     if [ -z "${_defname_input}" ]; then
         error "No definition file name specified as first param!"
     fi
-    note "Paste your definition below. Hit $(distn "[Enter]"), $(distn "Ctrl-D") to update definitions file: $(distn "${DEFINITIONS_DIR}/${_devname}${DEFAULT_DEF_EXT}")"
+    permnote "Paste your definition below. Hit $(distn "[Enter]"), $(distn "Ctrl-D") to update definitions file: $(distn "${DEFINITIONS_DIR}/${_devname}${DEFAULT_DEF_EXT}")"
     ${CAT_BIN} > "${DEFINITIONS_DIR}/${_devname}${DEFAULT_DEF_EXT}" 2>/dev/null
     unset _defname_input _devname _defname_no_ext
 }
@@ -299,9 +299,9 @@ develop () {
 
 env_status () {
     if [ -f "${SOFIN_ENV_ENABLED_INDICATOR_FILE}" ]; then
-        note "Sofin Shell environment enabled for: $(distn "$(${CAT_BIN} "${SOFIN_ENV_ENABLED_INDICATOR_FILE}" | ${TR_BIN} '\n' ' ' 2>/dev/null)")"
+        permnote "Sofin environment is: $(distn "limited") to bundles: $(distn "$(${CAT_BIN} "${SOFIN_ENV_ENABLED_INDICATOR_FILE}" | ${TR_BIN} '\n' ' ' 2>/dev/null)")"
     else
-        note "Sofin shell environment is: $(distn "disabled" "${ColorRed}")"
+        permnote "Sofin environment is: $(distn "dynamic")"
     fi
 }
 
@@ -364,9 +364,9 @@ show_alt_definitions_and_exit () {
             _contents="${_contents}$(printf "%b\n" "$(capitalize "${_maybe##*/}")" | ${SED_BIN} 's/\..*//' 2>/dev/null) "
         done
         if [ -z "${_contents}" ]; then
-            warn "No such definition found: $(distw "${_an_app}"). No alternatives found."
+            warn "No such definition: $(distw "${_an_app}"). No alternatives found."
         else
-            warn "No such definition found: $(distw "${_an_app}"). Alternatives found: $(distw "${_contents}")"
+            warn "No such definition: $(distw "${_an_app}"). Alternatives found: $(distw "${_contents}")"
         fi
         unset _an_app _contents _maybe
         finalize_and_quit_gracefully
