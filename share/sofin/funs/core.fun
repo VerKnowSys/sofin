@@ -55,13 +55,13 @@ warn () {
                     "  ${_wrn_msgs}$(fill_interactive_line "${_wrn_msgs}")" \
                     "${ColorReset}" \
                     "${ANSI_TWO_LINES_DOWN}" \
-                        >&2 | "${TEE_BIN}" >/dev/null
+                        >&2 | eval "${DUP_ERR_TO_OUT_GUARD}" >/dev/null
         else
             printf "%b%b%b\n" \
                     "${ColorYellow}" \
                     "${_wrn_msgs}" \
                     "${ColorReset}" \
-                        >&2 | "${TEE_BIN}" >/dev/null
+                        >&2 >/dev/null
         fi
     else
         printf "\n" >/dev/null
