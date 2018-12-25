@@ -304,7 +304,7 @@ if [ -n "${SOFIN_COMMAND}" ]; then
                         link_utilities
                     fi
                 done
-                note "Installed utilities: $(distn "${_utils}")"
+                permnote "Installed utilities: $(distn "${_utils}")"
                 finalize_complete_standard_task
             fi
             ;;
@@ -333,7 +333,7 @@ if [ -n "${SOFIN_COMMAND}" ]; then
                         && debug "OK: $(distd "chown -R ${USER} '${SERVICES_DIR}/${_b}'")."
                 fi
             done
-            note "Installed: $(distn "${_pickd_bundls}")"
+            permnote "Installed: $(distn "${_pickd_bundls}")"
             unset _pickd_bundls _b
             finalize_complete_standard_task
             ;;
