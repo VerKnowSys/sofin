@@ -117,7 +117,7 @@ dump_software_build_configuration_options () {
 
         printf "\n\t\t\t\t\r\r\n%b%b%b %b\n" \
             "${ColorDistinct}" \
-            "\t\t\t\t\t\t${ANSI_ONE_LINE_UP}     ${ColorDark}${NOTE_CHAR} Complete list of configured build options:${ColorReset} "    \
+            "\t\t\t\t\t\t${ANSI_ONE_LINE_UP}     ${ColorDark}${NOTE_CHAR} Complete list of configurable build options:${ColorReset} "    \
             "$(distn "${_config_log}" "${ColorExample}")" \
             "${ColorReset}"
 
