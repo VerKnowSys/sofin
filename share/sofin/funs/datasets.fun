@@ -459,8 +459,8 @@ create_builddir () {
     try "${MKDIR_BIN} -p ${_bdir}"
 
     if [ -n "${CAP_SYS_BUILDHOST}" ]; then
-        try "${UMOUNT_BIN} -f ${_bdir}" \
-            && debug "Unmounted build-dir ramdisk: $(distd "${_bdir}")"
+        # try "${UMOUNT_BIN} -f ${_bdir}" \
+        #     && debug "Unmounted build-dir ramdisk: $(distd "${_bdir}")"
 
         case "${SYSTEM_NAME}" in
             Darwin)
