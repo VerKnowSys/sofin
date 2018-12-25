@@ -55,7 +55,7 @@ warn () {
                     "  ${_wrn_msgs}$(fill_interactive_line "${_wrn_msgs}")" \
                     "${ColorReset}" \
                     "${ANSI_TWO_LINES_DOWN}" \
-                        >&2 | eval "${DUP_ERR_TO_OUT_GUARD}" >/dev/null
+                        | ${TEE_BIN} "${LOG}" >/dev/stdout 2>/dev/stderr
         else
             printf "%b%b%b\n" \
                     "${ColorYellow}" \
@@ -138,7 +138,7 @@ error () {
                 "${ColorRed}" \
                 "$(fill)" \
                 "${ColorReset}" \
-                    >&2 | eval "${DUP_ERR_TO_OUT_GUARD}" >/dev/null
+                    | ${TEE_BIN} "${LOG}"
 
         if [ "error" = "${_err_root}" ]; then
             printf "%b  %b Try: %b%b\n\n" \
