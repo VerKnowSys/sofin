@@ -116,6 +116,7 @@ determine_term_capabilites () {
         ColorViolet="\033[38;5;97m"
         ColorFunction="\033[38;5;163m"
         ColorDark="\033[38;5;236m"
+        ColorDarkWood="\033[38;5;130m"
     else
         CAP_TERM_TPUT_UTILITY=YES
 
@@ -132,11 +133,12 @@ determine_term_capabilites () {
         ColorViolet="$(${TPUT_BIN} setaf 97)"
         ColorFunction="$(${TPUT_BIN} setaf 163)"
         ColorDark="$(${TPUT_BIN} setaf 236)"
+        ColorDarkWood="$(${TPUT_BIN} setaf 130)"
     fi
 
     ColorReset="${ColorGray}"
     ColorComment="${ColorDark}"
-    ColorExample="${ColorOrange}"
+    ColorExample="${ColorDarkWood}"
     ColorDistinct="${ColorCyan}"
     ColorDebug="${ColorViolet}"
     ColorNote="${ColorGreen}"
