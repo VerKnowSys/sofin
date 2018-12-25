@@ -80,6 +80,19 @@ show_log_if_available () {
 }
 
 
+show_bundle_log_if_available () {
+    if [ -f "${LOG}-${DEF_NAME}${DEF_SUFFIX}" ]; then
+        ${TAIL_BIN} -n "${LOG_LINES_AMOUNT_ON_ERR}" "${LOG}-${DEF_NAME}${DEF_SUFFIX}" 2>/dev/null
+    elif [ -f "${LOG}-${DEF_NAME}" ]; then
+        ${TAIL_BIN} -n "${LOG_LINES_AMOUNT_ON_ERR}" "${LOG}-${DEF_NAME}" 2>/dev/null
+    elif [ -f "${LOG}" ]; then
+        ${TAIL_BIN} -n "${LOG_LINES_AMOUNT_ON_ERR}" "${LOG}" 2>/dev/null
+    else
+        permnote "No log for bundle: $(distn "${DEF_NAME}${DEF_SUFFIX}")"
+    fi
+}
+
+
 checksum_filecache_element () {
     _file_to_checksum="${1}"
     if [ -z "${_file_to_checksum}" ]; then
