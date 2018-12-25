@@ -320,7 +320,7 @@ available_definitions () {
         cd "${DEFINITIONS_LISTS_DIR}"
         permnote "Available lists: $(distn "$(${LS_BIN} -m 2>/dev/null | ${SED_BIN} "s/${DEFAULT_DEF_EXT}//g" 2>/dev/null)")"
     fi
-    permnote "Definitions count: $(distn "$(printf "%b\n" "${_alldefs}" | eval "${FILES_COUNT_GUARD}")")"
+    permnote "Definitions count: $(distn "$(printf "%b\n" "${_alldefs}" | eval "${WORDS_COUNT_GUARD}")")"
 }
 
 
