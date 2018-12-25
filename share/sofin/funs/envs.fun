@@ -639,8 +639,9 @@ load_sysctl_buildhost_hardening () {
             hardening.pax.aslr.status=1 \
             >/dev/null" \
                 && debug "load_sysctl_buildhost_hardening(): System-hardening features are DISABLED now! (not enforced by kernel)!"
+    elif [ -n "${CAP_SYS_WORKSTATION}" ]; then
+        debug "No hardening for workstation systems"
     else
-        debug "load_sysctl_buildhost_hardening(): called on production-system! Build-feature is available only for Build-Hosts, not for productions!"
         load_sysctl_system_defaults \
             && debug "Loaded sysctl system defaults"
     fi
