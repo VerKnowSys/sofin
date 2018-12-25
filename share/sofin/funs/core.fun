@@ -154,8 +154,7 @@ error () {
             "*" \
                 >&2 >/dev/null
     fi
-    finalize_after_signal_interrupt
-    exit "${ERRORCODE_TASK_FAILURE}"
+    finalize_after_signal_interrupt "${ERRORCODE_TASK_FAILURE}"
 }
 
 
@@ -321,9 +320,8 @@ initialize () {
 
 signal_handler_interrupt () {
     warn "Received Interruption signal! Will shutdown immediatelly after completing required cleanup-duties…"
-    finalize_after_signal_interrupt
-    warn "Terminated task: $(distw "${SOFIN_CMDLINE}")!"
-    exit "${ERRORCODE_USER_INTERRUPT}"
+    warn "Terminating task: $(distw "${SOFIN_CMDLINE}")!"
+    finalize_after_signal_interrupt "${ERRORCODE_USER_INTERRUPT}"
 }
 
 

@@ -394,7 +394,7 @@ show_outdated () {
 
     if [ -z "${_raw}" ]; then
         if [ "${FOUND_OUTDATED}" = "YES" ]; then
-            exit "${ERRORCODE_TASK_FAILURE}"
+            finalize_and_quit_gracefully_with_exitcode "${ERRORCODE_TASK_FAILURE}"
         else
             permnote "All currently installed bundles look recent!"
         fi

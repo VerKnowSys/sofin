@@ -91,7 +91,7 @@ finalize_complete_standard_task () {
 finalize_with_shell_reload () {
     update_shell_vars
     reload_shell
-    finalize_and_quit_gracefully
+    finalize_and_quit_gracefully_with_exitcode
 }
 
 
@@ -102,12 +102,12 @@ finalize_after_signal_interrupt () {
     destroy_ramdisk_device
     set_system_dataset_writable
     set_software_dataset_writable
-    finalize_and_quit_gracefully
+    finalize_and_quit_gracefully_with_exitcode
 }
 
 
 # Task to call as last for all other finalize_* functions:
-finalize_and_quit_gracefully () {
+finalize_and_quit_gracefully_with_exitcode () {
     _errorcode="${1:-${ERRORCODE_NORMAL_EXIT}}"
     load_sysctl_system_production_hardening
     set_system_dataset_readonly

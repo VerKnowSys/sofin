@@ -22,7 +22,8 @@ validate_env () {
         if [ ! -x "${_var_value}" ]; then
             error "Required binary is unavailable: $(diste "${_envvar}")"
         fi
-    done || exit "${ERRORCODE_VALIDATE_ENV_FAILURE}"
+    done \
+        || finalize_and_quit_gracefully_with_exitcode "${ERRORCODE_VALIDATE_ENV_FAILURE}"
     unset _var_value _envvar
 }
 
