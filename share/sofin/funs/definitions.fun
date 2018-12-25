@@ -156,7 +156,7 @@ update_defs () {
                 || try "${GIT_BIN} checkout ${_def_cur_branch}" \
                     || warn "Can't checkout branch: $(distw "${_def_cur_branch}")"
 
-            try "${GIT_BIN} pull ${DEFAULT_GIT_PULL_FETCH_OPTS} origin ${_def_cur_branch} >> ${LOG}" \
+            try "${GIT_BIN} pull ${DEFAULT_GIT_PULL_FETCH_OPTS} origin ${_def_cur_branch} 2>> ${LOG}" \
                 && note "Definitions branch: $(distn "${_def_cur_branch}") is now at: $(distn "${_def_head}")" \
                     && return
 
@@ -174,7 +174,7 @@ update_defs () {
                     || try "${GIT_BIN} checkout ${BRANCH}" \
                         || warn "Can't checkout branch: $(distw "${BRANCH}")"
             fi
-            try "${GIT_BIN} pull ${DEFAULT_GIT_PULL_FETCH_OPTS} origin ${BRANCH} >> ${LOG}" \
+            try "${GIT_BIN} pull ${DEFAULT_GIT_PULL_FETCH_OPTS} origin ${BRANCH} 2>> ${LOG}" \
                 && permnote "Definitions branch: $(distn "${BRANCH}") is at: $(distn "${_def_head}")" \
                     && return
 
