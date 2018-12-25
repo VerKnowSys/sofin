@@ -115,6 +115,7 @@ determine_term_capabilites () {
         ColorParams="\033[38;5;12m"
         ColorViolet="\033[38;5;97m"
         ColorFunction="\033[38;5;163m"
+        ColorDark="\033[38;5;236m"
     else
         CAP_TERM_TPUT_UTILITY=YES
 
@@ -130,9 +131,11 @@ determine_term_capabilites () {
         ColorParams="$(${TPUT_BIN} setaf 12)"
         ColorViolet="$(${TPUT_BIN} setaf 97)"
         ColorFunction="$(${TPUT_BIN} setaf 163)"
+        ColorDark="$(${TPUT_BIN} setaf 236)"
     fi
 
     ColorReset="${ColorGray}"
+    ColorComment="${ColorDark}"
     ColorExample="${ColorOrange}"
     ColorDistinct="${ColorCyan}"
     ColorDebug="${ColorViolet}"
