@@ -457,7 +457,7 @@ process_flat () {
         error "Cannot read definition file: $(diste "${_req_definition}")!"
     fi
     _req_defname="$(printf "%b\n" "${_req_definition##*/}" | ${SED_BIN} -e 's/\..*$//g' 2>/dev/null)"
-    debug "Bundle: $(distd "${_bundlnm}"), requirement: $(distd "${_app_param}"), PREFIX: $(distd "${_prefix}") file: $(distd "${_req_definition}"), req-name: $(distd "${_req_defname}")"
+    debug "Process requirement: $(distd "${_req_defname}") from definition: $(distd "${_req_definition}") for bundle with PREFIX: $(distd "${_prefix}")"
 
     # XXX: FIXME: OPTIMIZE: Each definition read twice... log bloat & shit
     # NOTE: Because compiler_setup() uses DEF_* from definition file to
