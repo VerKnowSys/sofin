@@ -1,6 +1,6 @@
 
 debug () {
-    _debug_msg="${@}"
+    _debug_msg="${*}"
     if [ -z "${_debug_msg}" ]; then
         printf "\n" >&2
         return 0
