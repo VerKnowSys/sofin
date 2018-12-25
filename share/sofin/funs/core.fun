@@ -323,14 +323,6 @@ signal_handler_interrupt () {
 }
 
 
-# signal_handler_terminate () {
-#     warn "Terminated: $(distw "${SOFIN_PID:-$$}")"
-#     finalize_complete_standard_task
-#     warn "Terminated: Bye!"
-#     exit "${ERRORCODE_TERMINATED}"
-# }
-
-
 signal_handler_no_operation () {
     debug "NOOP signal.triggered."
 }
@@ -436,44 +428,6 @@ set_system_dataset_writable () {
             && debug "System dataset: $(distd "${DEFAULT_ZPOOL}/ROOT/${_active_boot_env}") is now: WRITABLE"
     fi
 }
-
-
-# store_security_state () {
-#     if [ "YES" = "${CAP_SYS_HARDENED}" ]; then
-#         if [ -z "${CAP_SYS_PRODUCTION}" ]; then
-#             try "${RM_BIN} -f ${DEFAULT_SECURITY_STATE_FILE}"
-#             debug "Storing current security state to file: $(distd "${DEFAULT_SECURITY_STATE_FILE}")"
-#             for _key in ${DEFAULT_HARDEN_KEYS}; do
-#                 _sss_value="$(${SYSCTL_BIN} -n "${_key}" 2>/dev/null)"
-#                 _sss_cntnt="${SYSCTL_BIN} ${_key}=${_sss_value}"
-#                 printf "%b\n" "${_sss_cntnt}" >> "${DEFAULT_SECURITY_STATE_FILE}" 2>/dev/null
-#             done
-#             unset _key _sss_cntnt _sss_value
-#         else
-#             debug "Store disabled in production mode"
-#         fi
-#     else
-#         debug "No hardening capabilities in system"
-#     fi
-# }
-
-
-# disable_security_features () {
-#     if [ "YES" = "${CAP_SYS_HARDENED}" ]; then
-#         if [ -z "${CAP_SYS_PRODUCTION}" ]; then
-#             debug "Disabling all security features (this host is NOT production).."
-#             try "${RM_BIN} -f '${DEFAULT_SECURITY_STATE_FILE}'"
-#             for _key in ${DEFAULT_HARDEN_KEYS}; do
-#                 try "${SYSCTL_BIN} ${_key}=0"
-#             done
-#             unset _key _dsf_name
-#         else
-#             debug "Security features left intact cause in production mode."
-#         fi
-#     else
-#         debug "No hardening capabilities in system"
-#     fi
-# }
 
 
 create_sofin_dirs () {
