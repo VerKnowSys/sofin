@@ -127,11 +127,16 @@ error () {
     _err_root="${0}"
     _err_msg="${*}"
     if [ -n "${_err_msg}" ]; then
-        printf "%b\n  %b %b\n    %b %b\n\n" \
+        printf "%b\n  %b %b\n    %b\n\n%b%b\n%b%b\n%b\n%b\n\n" \
                 "${ColorRed}" \
                 "${NOTE_CHAR2}" \
                 "Task crashed!" \
                 "  ${_err_root}: ${_err_msg}" \
+                "$(fill)" \
+                "${ColorReset}" \
+                "$(show_bundle_log_if_available "${DEF_NAME}${DEF_SUFFIX}")" \
+                "${ColorRed}" \
+                "$(fill)" \
                 "${ColorReset}" \
                     >&2 | "${TEE_BIN}" >/dev/null
 
