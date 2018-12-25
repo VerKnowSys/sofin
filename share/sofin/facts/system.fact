@@ -12,9 +12,6 @@ DUP_ERR_TO_OUT_GUARD="${TEE_BIN} /dev/stdout"
 # Build timestamp in seconds since 1970
 TIMESTAMP="${TIMESTAMP:-$(${DATE_BIN} "${DEFAULT_DATE_TS_OPTS}" 2>/dev/null)}"
 
-# Hardened system support:
-DEFAULT_SECURITY_STATE_FILE="${SOFTWARE_DIR}/.sys-security-state.${TIMESTAMP}"
-
 
 # System specific configuration
 
