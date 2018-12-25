@@ -108,6 +108,7 @@ finalize_after_signal_interrupt () {
 
 # Task to call as last for all other finalize_* functions:
 finalize_and_quit_gracefully () {
+    _errorcode="${1:-${ERRORCODE_NORMAL_EXIT}}"
     load_sysctl_system_production_hardening
     set_system_dataset_readonly
     set_software_dataset_readonly
@@ -115,6 +116,7 @@ finalize_and_quit_gracefully () {
         ${STTY_BIN} echo \
             && debug "Interactive Terminal Echo is now: $(distd "*enabled*")"
     fi
+    exit "${_errorcode}"
 }
 
 
