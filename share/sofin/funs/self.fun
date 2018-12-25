@@ -107,10 +107,7 @@ build_sofin_natives () {
     for _prov in ${SOFIN_PROVIDES}; do
         if [ -f "src/${_prov}.cc" ]; then
             debug "${SOFIN_BUNDLE_NAME}: Build: ${CXX_NAME} -o bin/${_prov} ${CFLAGS} src/${_prov}.cc"
-            # NOTE: ${DEFAULT_COMPILER_FLAGS#${SINGLE_ERROR_CFLAGS}} => cut SINGLE_ERROR_CFLAGS from beginning of DEFAULT_COMPILER_FLAGS:
-            #       it's required for Darwin cause of some weird reason it crashes linker with that option enabled:
             run "${CXX_NAME} ${CXX14_CXXFLAGS} ${LTO_CFLAGS} ${HARDEN_CFLAGS} \
-                  ${DEFAULT_COMPILER_FLAGS#${SINGLE_ERROR_CFLAGS}} \
                   ${DEFAULT_LINKER_FLAGS} \
                     src/${_prov}.cc \
                         -o bin/${_prov}" \
