@@ -16,7 +16,8 @@ if [ "${#}" -gt "0" ]; then
     _args="  args[$(distd "${#}")]: $(distd "${SOFIN_ARGS}"),"
 fi
 
-debug "Sofin (CMD=$(distd "${SOFIN_COMMAND}"),${_args}  SOFIN_PID=$(distd "${SOFIN_PID}"),  SOFIN_PPID=$(distd "${PPID}"),  SOFIN_ROOT=$(distd "${SOFIN_ROOT}"))"
+SOFIN_CMDLINE="${SOFIN_NAME} ${SOFIN_COMMAND} ${SOFIN_ARGS}"
+debug "Sofin (cmdline: $(distd "${SOFIN_CMDLINE}"),  SOFIN_PID=$(distd "${SOFIN_PID}"),  SOFIN_PPID=$(distd "${PPID}"),  SOFIN_ROOT=$(distd "${SOFIN_ROOT}"))"
 
 # Set explicit +e for Sofin shell:
 env_forgivable
