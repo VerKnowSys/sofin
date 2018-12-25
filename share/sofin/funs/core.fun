@@ -320,10 +320,9 @@ initialize () {
 
 
 signal_handler_interrupt () {
-    warn "Received Interrupt-Signal from some Human!…"
-    warn "Service will shutdown immediatelly after completing required cleanup-duties…"
+    warn "Received Interruption signal! Will shutdown immediatelly after completing required cleanup-duties…"
     finalize_after_signal_interrupt
-    warn "Service Terminated."
+    warn "Terminated task: $(distw "${SOFIN_CMDLINE}")!"
     exit "${ERRORCODE_USER_INTERRUPT}"
 }
 
