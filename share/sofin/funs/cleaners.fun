@@ -65,15 +65,16 @@ destroy_ramdisk_device () {
                 try "${DISKUTIL_BIN} unmountDisk ${RAMDISK_DEV}" \
                     && debug "${0}: RAMdisk device unmounted: $(distd "${RAMDISK_DEV}")"
                 try "${DISKUTIL_BIN} eject ${RAMDISK_DEV}" \
-                    && debug "${0}: RAMdisk device ejected: $(distd "${RAMDISK_DEV}")"
+                    && debug "${0}: RAMdisk device ejected: $(distd "${RAMDISK_DEV}")" \
+                        && unset RAMDISK_DEV
                 ;;
 
             *)
                 try "${UMOUNT_BIN} -f ${RAMDISK_DEV}" \
-                    && debug "${0}: RAMdisk device unmounted: $(distd "${RAMDISK_DEV}")"
+                    && debug "${0}: RAMdisk device unmounted: $(distd "${RAMDISK_DEV}")" \
+                        && unset RAMDISK_DEV
                 ;;
         esac
-        unset RAMDISK_DEV
     fi
 }
 
