@@ -201,7 +201,7 @@ update_defs () {
                     || warn "Can't checkout branch: $(distw "${BRANCH}")"
         fi
         _def_head="HEAD"
-        try "${GIT_BIN} pull --depth 1 --progress origin ${BRANCH}" \
+        try "${GIT_BIN} pull --depth 1 --progress origin ${BRANCH} 2>> ${LOG}" \
             && _def_head="$(${CAT_BIN} "${CACHE_DIR}${DEFINITIONS_BASE}/${DEFAULT_GIT_DIR_NAME}/refs/heads/${_def_cur_branch}" 2>/dev/null)"
 
         permnote "Repository: $(distn "${REPOSITORY}"), on branch: $(distn "${BRANCH}"). Commit HEAD: $(distn "${_def_head}")."
