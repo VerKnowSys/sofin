@@ -518,6 +518,10 @@ create_software_bundle_archive () {
     if [ -z "${_csversion}" ]; then
         error "Third argument with $(diste "version-string") is required!"
     fi
+    if [ -n "${CAP_SYS_BUILDHOST}" ]; then
+        debug "Making sure RAMdisk is not mounted at this point to avoid pushinng PREFIX/.src_* build files into final archive."
+        destroy_ramdisk_device
+    fi
     _cddestfile="${FILE_CACHE_DIR}${_csbelem}"
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
         _inst_ind="${_csbname}/$(lowercase "${_csbname}")${DEFAULT_INST_MARK_EXT}"
