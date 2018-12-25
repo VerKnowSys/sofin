@@ -305,7 +305,7 @@ build () {
         # TODO: validate_linked_properly "${_build_list}"
         # TODO: validate_bundle_binaries "${_build_list}"
 
-        if [ -z "${CAP_SYS_PRODUCTION}" ]; then
+        if [ -n "${CAP_SYS_BUILDHOST}" ]; then
             if [ -n "${DEF_UTILITY_BUNDLE}" ]; then
                 try "${RM_BIN} -rf '${PREFIX}/include' '${PREFIX}/doc' ${PREFIX}/${DEFAULT_SRC_EXT}*"
                 debug "Utility bundle: $(distd "${_anm}") build completed!"

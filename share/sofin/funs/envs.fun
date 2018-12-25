@@ -631,21 +631,20 @@ load_sysctl_system_production_hardening () {
 
 
 load_sysctl_buildhost_hardening () {
-    if [ -n "${CAP_SYS_HARDENED}" ]; then
-        if [ -z "${CAP_SYS_PRODUCTION}" ]; then
-            try "${SYSCTL_BIN} \
-                hardening.pax.segvguard.status=1 \
-                hardening.pax.mprotect.status=1 \
-                hardening.pax.pageexec.status=1 \
-                hardening.pax.disallow_map32bit.status=1 \
-                hardening.pax.aslr.status=1 \
-                >/dev/null" \
-                    && debug "load_sysctl_buildhost_hardening(): System-hardening features are DISABLED now! (not enforced by kernel)!"
-        else
-            debug "load_sysctl_buildhost_hardening(): called on production-system! Build-feature is available only for Build-Hosts, not for productions!"
-            load_sysctl_system_defaults \
-                && debug "Loaded sysctl system defaults"
-        fi
+    if [ -n "${CAP_SYS_HARDENED}" ] \
+    && [ -n "${CAP_SYS_BUILDHOST}" ]; then
+        try "${SYSCTL_BIN} \
+            hardening.pax.segvguard.status=1 \
+            hardening.pax.mprotect.status=1 \
+            hardening.pax.pageexec.status=1 \
+            hardening.pax.disallow_map32bit.status=1 \
+            hardening.pax.aslr.status=1 \
+            >/dev/null" \
+                && debug "load_sysctl_buildhost_hardening(): System-hardening features are DISABLED now! (not enforced by kernel)!"
+    else
+        debug "load_sysctl_buildhost_hardening(): called on production-system! Build-feature is available only for Build-Hosts, not for productions!"
+        load_sysctl_system_defaults \
+            && debug "Loaded sysctl system defaults"
     fi
 }
 
