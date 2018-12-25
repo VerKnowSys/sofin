@@ -110,9 +110,10 @@ checksum_filecache_element () {
 
 dump_software_build_configuration_options () {
     _config_log="${1}"
+    _config_args="${2:-"-h"}" # ANYCONFIG -h => Help (usually)
     if [ "YES" = "${CAP_SYS_BUILDHOST}" ]; then
         ${MKDIR_BIN} -p "$(${DIRNAME_BIN} "${_config_log}" 2>/dev/null)"
-        eval "${DEF_CONFIGURE_METHOD} -h | ${TEE_BIN} ${_config_log}" >/dev/null 2>&1
+        eval "${DEF_CONFIGURE_METHOD} ${_config_args} | ${TEE_BIN} ${_config_log}" >/dev/null 2>&1
         _configuration_opts_rendered="$(${CAT_BIN} "${_config_log}" 2>/dev/null | ${GREP_BIN} -E '\-\-\s*' 2>/dev/null)"
 
         printf "\n\t\t\t\t\r\r\n%b%b%b %b\n" \
