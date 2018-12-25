@@ -124,7 +124,7 @@ inherit () {
 update_defs () {
     if [ -n "${USE_UPDATE}" ]; then
         debug "Definitions update skipped on demand"
-        return
+        return 0
     fi
     create_sofin_dirs
     setup_defs_branch
@@ -139,7 +139,7 @@ update_defs () {
         retry "${FETCH_BIN} -o ${_out_file} ${FETCH_OPTS} '${_initial_defs}'" \
             && try "${TAR_BIN} -xf ${_out_file} --directory ${CACHE_DIR}${DEFINITIONS_BASE}" \
                 && try "${RM_BIN} -vrf ${_initial_defs}" \
-                    && return
+                    && return 0
     fi
     if [ -d "${CACHE_DIR}${DEFINITIONS_BASE}/${DEFAULT_GIT_DIR_NAME}" ] \
     && [ -f "${DEFINITIONS_DEFAULTS}" ]; then
@@ -158,14 +158,7 @@ update_defs () {
 
             try "${GIT_BIN} pull ${DEFAULT_GIT_PULL_FETCH_OPTS} origin ${_def_cur_branch} 2>> ${LOG}" \
                 && note "Definitions branch: $(distn "${_def_cur_branch}") is now at: $(distn "${_def_head}")" \
-                    && return
-
-            printf "%b%b\n%b\n" \
-                "${ColorRed}" \
-                "Error occured: Update from branch: $(diste "${BRANCH}") of repository: $(diste "${REPOSITORY}") wasn't possible. Log's below:" \
-                "${ColorReset}"
-            show_log_if_available
-            return
+                    && return 0
 
         else # else use default branch
             debug "Using default branch: $(distd "${BRANCH}")"
@@ -176,16 +169,27 @@ update_defs () {
             fi
             try "${GIT_BIN} pull ${DEFAULT_GIT_PULL_FETCH_OPTS} origin ${BRANCH} 2>> ${LOG}" \
                 && permnote "Definitions branch: $(distn "${BRANCH}") is at: $(distn "${_def_head}")" \
-                    && return
-
-            printf "%b%b\n%b\n%b\n" \
-                "${ColorRed}" \
-                "$(fill)" \
-                "Error occured: Update from branch: $(diste "${BRANCH}") of repository: $(diste "${REPOSITORY}") wasn't possible. Log's below:" \
-                "${ColorReset}"
-            show_log_if_available
-            return
+                    && return 0
         fi
+
+        # Render error header for user:
+        printf "\n%b%b\n%b\n%b%b\n%b\n" \
+            "${ColorRed}" \
+            "$(fill)" \
+            "Error occured: Update from branch: $(diste "${BRANCH}") of repository: $(diste "${REPOSITORY}") wasn't possible. Log's below:" \
+            "${ColorRed}" \
+            "$(fill)" \
+            "${ColorReset}" \
+                2>/dev/null
+
+        show_log_if_available
+
+        # Render error footer for user
+        printf "\n%b%b%b\n\n" \
+            "${ColorRed}" \
+            "$(fill)" \
+            "${ColorReset}" \
+                2>/dev/null
     else
         # create cache; clone definitions repository:
         cd "${CACHE_DIR}"
