@@ -8,7 +8,7 @@ less_logs () {
 show_logs () {
     _logf_pattern="${1:-+}"
     debug "Show logs pattern: '$(distd "${_logf_pattern}")'"
-    touch_logsdir_and_logfile
+    create_sofin_dirs
     if [ "-" = "${_logf_pattern}" ] \
     || [ "${SOFIN_NAME}" = "${_logf_pattern}" ]; then
         ${TAIL_BIN} -n "${LOG_LINES_AMOUNT}" "${LOG}"
@@ -76,15 +76,6 @@ show_log_if_available () {
         permnote "$(fill)"
     else
         permnote "No logs matching the pattern has been found."
-    fi
-}
-
-
-touch_logsdir_and_logfile () {
-    if [ ! -d "${LOGS_DIR}" ] \
-    || [ ! -f "${LOG}" ]; then
-        ${MKDIR_BIN} -p "${LOGS_DIR}" >/dev/null 2>&1
-        ${TOUCH_BIN} "${LOG}" >/dev/null 2>&1
     fi
 }
 

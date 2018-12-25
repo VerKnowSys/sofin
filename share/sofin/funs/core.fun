@@ -5,6 +5,7 @@ debug () {
         printf "\n" >&2
         return 0
     fi
+    create_sofin_dirs
     if [ -n "${DEBUG}" ]; then
         if [ "YES" = "${CAP_TERM_INTERACTIVE}" ]; then
             printf "%bλ %b%b%b\n" \
@@ -21,7 +22,6 @@ debug () {
                         >&2
         fi
     else
-        touch_logsdir_and_logfile
         if [ -n "${DEF_NAME}${DEF_SUFFIX}" ]; then
             # Definition log, log to stderr only
             printf "# %b%b%b%b\n" \
@@ -185,7 +185,7 @@ diste () {
 run () {
     _run_params="${*}"
     if [ -n "${_run_params}" ]; then
-        touch_logsdir_and_logfile
+        create_sofin_dirs
         _rnm="${DEF_NAME}${DEF_SUFFIX}"
         if [ -z "${_rnm}" ]; then
             if [ -z "${DEBUG}" ]; then
@@ -221,7 +221,7 @@ run () {
 try () {
     _try_params="${*}"
     if [ -n "${_try_params}" ]; then
-        touch_logsdir_and_logfile
+        create_sofin_dirs
         _try_aname="${DEF_NAME}${DEF_SUFFIX}"
         if [ -z "${_try_aname}" ]; then
             if [ -z "${DEBUG}" ]; then # No DEBUG set -> discard both STDOUT and STDERR for try() calls…:
@@ -259,7 +259,7 @@ try () {
 retry () {
     _targets="${*}"
     _ammo="OOO"
-    touch_logsdir_and_logfile
+    create_sofin_dirs
     while [ -n "${_ammo}" ]; do
         if [ -n "${_targets}" ]; then
             if [ -z "${DEBUG}" ]; then # No DEBUG set -> discard both STDOUT and STDERR for try() calls…:
@@ -476,12 +476,13 @@ set_system_dataset_writable () {
 # }
 
 
-create_dirs () {
+create_sofin_dirs () {
     if [ ! -d "${LOGS_DIR}" ] \
-    || [ ! -d "${CACHE_DIR}" ] \
     || [ ! -d "${FILE_CACHE_DIR}" ] \
     || [ ! -d "${LOCKS_DIR}" ]; then
-        try "${MKDIR_BIN} -p '${CACHE_DIR}' '${FILE_CACHE_DIR}' '${LOCKS_DIR}' '${LOGS_DIR}'"
+        ${MKDIR_BIN} -p "${FILE_CACHE_DIR}" "${LOCKS_DIR}" "${LOGS_DIR}" 2>/dev/null
+        ${TOUCH_BIN} "${LOG}" >/dev/null 2>&1 # touch default Sofin log file.
+        debug "create_sofin_dirs(): Done!"
     fi
 }
 
