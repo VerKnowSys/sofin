@@ -90,6 +90,7 @@ install_sofin () {
     update_shell_vars
     set_software_root_readonly
     reload_shell
+    permnote "Installation successful."
     return 0
 }
 
@@ -170,7 +171,7 @@ set_software_root_readonly () {
                 && debug "Ok(unjailed): set readonly=on '${DEFAULT_ZPOOL}/Software/${USER}'"
         fi
     else
-        warn "Other Sofin instances found in background"
+        warn "Other Sofin instances found in background, management of Software datasets skipped."
     fi
     unset _sofin_processes
 }
