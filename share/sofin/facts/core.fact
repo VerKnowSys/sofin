@@ -10,6 +10,7 @@ SOFIN_PROVIDES="s s-osver s-usec s-lz4 s-lz4cat"
 SOFIN_RREPO="https://github.com"
 SOFIN_ORG="VerKnowSys"
 SOFIN_NAME="sofin"
+SOFIN_SHORT_NAME="s"
 SOFIN_BUNDLE_NAME="Sofin"
 DEFAULT_HOME="/User"
 DEFAULT_CPUS=4
