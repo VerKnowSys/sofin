@@ -160,13 +160,19 @@ install_sofin_files () {
 
 
 set_software_root_readonly () {
-    if [ "YES" = "${CAP_SYS_JAILED}" ]; then
-        ${ZFS_BIN} set readonly=on "${DEFAULT_ZPOOL}/Software/${HOST}" >/dev/null 2>&1 \
-            && debug "Ok(jailed): set readonly=on '${DEFAULT_ZPOOL}/Software/${HOST}'"
+    _sofin_processes="$(processes_all_sofin)"
+    if [ -z "${_sofin_processes}" ]; then
+        if [ "YES" = "${CAP_SYS_JAILED}" ]; then
+            ${ZFS_BIN} set readonly=on "${DEFAULT_ZPOOL}/Software/${HOST}" >/dev/null 2>&1 \
+                && debug "Ok(jailed): set readonly=on '${DEFAULT_ZPOOL}/Software/${HOST}'"
+        else
+            ${ZFS_BIN} set readonly=on "${DEFAULT_ZPOOL}/Software/${USER}" >/dev/null 2>&1 \
+                && debug "Ok(unjailed): set readonly=on '${DEFAULT_ZPOOL}/Software/${USER}'"
+        fi
     else
-        ${ZFS_BIN} set readonly=on "${DEFAULT_ZPOOL}/Software/${USER}" >/dev/null 2>&1 \
-            && debug "Ok(unjailed): set readonly=on '${DEFAULT_ZPOOL}/Software/${USER}'"
+        warn "Other Sofin instances found in background"
     fi
+    unset _sofin_processes
 }
 
 
