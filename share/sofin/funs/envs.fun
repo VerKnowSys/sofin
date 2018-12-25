@@ -347,7 +347,7 @@ compiler_setup () {
             ;;
 
         Darwin)
-            DEFAULT_COMPILER_FLAGS="${HARDEN_CFLAGS} ${CMACROS}"
+            DEFAULT_COMPILER_FLAGS="${SINGLE_ERROR_CFLAGS} ${HARDEN_CFLAGS} ${CMACROS}"
             ;;
 
         Linux)
