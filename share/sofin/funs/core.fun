@@ -303,6 +303,8 @@ setup_defs_repo () {
 
 
 initialize () {
+    trap_signals
+
     if [ "YES" = "${CAP_TERM_INTERACTIVE}" ]; then
         ${STTY_BIN} -echo \
             && debug "Interactive Terminal Echo is now: $(distd "*disabled*")"
@@ -314,7 +316,6 @@ initialize () {
     create_sofin_dirs
     create_base_datasets
     check_definitions_availability
-    trap_signals
 }
 
 
