@@ -173,10 +173,11 @@ update_defs () {
         fi
 
         # Render error header for user:
-        printf "\n%b%b\n%b\n%b%b\n%b\n" \
+        printf "\n%b%b\n%b\n%b\n%b%b\n%b\n" \
             "${ColorRed}" \
             "$(fill)" \
-            "Error occured: Update from branch: $(diste "${BRANCH}") of repository: $(diste "${REPOSITORY}") wasn't possible. Log's below:" \
+            "Failed to update repository: $(diste "${REPOSITORY}") (affected branch: $(diste "${BRANCH}"))" \
+            "Tt's most likely just a dirty state of local definitions cache. $(diste "${SOFIN_SHORT_NAME} reset") to reset cache to fresh state." \
             "${ColorRed}" \
             "$(fill)" \
             "${ColorReset}" \
