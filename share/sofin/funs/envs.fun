@@ -208,8 +208,6 @@ dump_system_capabilities () {
 
 
 compiler_setup () {
-    # TODO: linker pick should be implemented via "capabilities"!
-
     # if [ -n "${DEBUGBUILD}" ]; then
     #     debug "DEBUGBUILD defined! Appending compiler flags with: $(distd "-O0 -ggdb")"
     #     DEFAULT_COMPILER_FLAGS="${DEFAULT_COMPILER_FLAGS} -O0 -ggdb"
