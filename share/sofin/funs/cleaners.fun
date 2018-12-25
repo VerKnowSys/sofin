@@ -52,7 +52,7 @@ perform_clean () {
             clean_all_bdirs_leftovers
             ;;
     esac
-    create_dirs
+    create_sofin_dirs
 }
 
 

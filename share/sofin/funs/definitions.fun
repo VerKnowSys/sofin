@@ -126,7 +126,7 @@ update_defs () {
         debug "Definitions update skipped on demand"
         return
     fi
-    create_dirs
+    create_sofin_dirs
     setup_defs_branch
     setup_defs_repo
     _cwd="$(${PWD_BIN} 2>/dev/null)"

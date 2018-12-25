@@ -258,7 +258,7 @@ list_bundles_full () {
 
 
 show_diff () {
-    create_dirs
+    create_sofin_dirs
     _sddefname="${1}"
     # if specified a file name, make sure it's named properly:
     ${EGREP_BIN} "${DEFAULT_DEF_EXT}$" "${_sddefname}" >/dev/null 2>&1 \
@@ -285,7 +285,7 @@ show_diff () {
 
 develop () {
     _defname_input="${*}"
-    create_dirs
+    create_sofin_dirs
     _defname_no_ext="$(printf "%b\n" "${_defname_input}" | ${SED_BIN} -e "s#\.${DEFAULT_DEF_EXT}##" 2>/dev/null)"
     _devname="$(lowercase "${_defname_no_ext##*/}")"
     if [ -z "${_defname_input}" ]; then

@@ -307,7 +307,7 @@ initialize () {
     set_system_dataset_writable
     set_software_dataset_writable
 
-    create_dirs
+    create_sofin_dirs
     create_base_datasets
     check_definitions_availability
     trap_signals

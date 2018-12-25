@@ -17,5 +17,5 @@ fi
 export NO_SIGNAL=1
 
 load_requirements
-create_dirs
+create_sofin_dirs
 install_sofin

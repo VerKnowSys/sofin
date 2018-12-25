@@ -66,7 +66,7 @@ install_sofin () {
     load_requirements
     determine_system_capabilites
     set_software_root_writable
-    create_dirs
+    create_sofin_dirs
 
     prepare_and_manage_origin
 
