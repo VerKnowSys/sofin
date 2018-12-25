@@ -8,7 +8,7 @@ debug () {
     if [ -n "${DEBUG}" ]; then
         if [ "YES" = "${CAP_TERM_INTERACTIVE}" ]; then
             printf "%bλ %b%b%b\n" \
-                    "${ColorWhite}" \
+                    "${ColorDark}" \
                     "${ColorDebug}" \
                     "${_debug_msg}$(fill_interactive_line "${_debug_msg}")" \
                     "${ColorReset}" \
