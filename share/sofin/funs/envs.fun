@@ -361,6 +361,7 @@ compiler_setup () {
             DEFAULT_COMPILER_FLAGS="-fstack-protector -fstack-protector-all -fno-strict-overflow -Wformat -Wformat-security ${CMACROS}"
             ;;
     esac
+    DEFAULT_COMPILER_FLAGS="${SINGLE_ERROR_CFLAGS} ${DEFAULT_COMPILER_FLAGS}"
 
     # CFLAGS, CXXFLAGS setup:
     set_c_and_cxx_flags "${_compiler_use_linker_flags}"

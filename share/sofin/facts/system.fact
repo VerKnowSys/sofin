@@ -76,6 +76,7 @@ CXX_NAME="${CC_NAME}++"
 CPP_NAME="${CC_NAME}-cpp"
 
 # Compiler flags:
+SINGLE_ERROR_CFLAGS="-error-limit=1"
 LTO_CFLAGS="-flto=thin -ffat-lto-objects -fuse-linker-plugin"
 CXX11_CXXFLAGS="-std=c++11"
 CXX14_CXXFLAGS="-std=c++14"
