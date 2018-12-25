@@ -97,6 +97,7 @@ finalize_with_shell_reload () {
 # NOTE: C-c is handled differently:
 # finalize_complete_standard_task() is called:
 finalize_after_signal_interrupt () {
+    untrap_signals
     destroy_ramdisk_device
     set_system_dataset_writable
     set_software_dataset_writable
@@ -113,7 +114,6 @@ finalize_and_quit_gracefully () {
     fi
     set_system_dataset_readonly
     set_software_dataset_readonly
-    untrap_signals
 }
 
 
