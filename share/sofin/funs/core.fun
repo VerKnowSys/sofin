@@ -299,6 +299,11 @@ setup_defs_repo () {
 
 
 initialize () {
+    if [ "YES" = "${CAP_TERM_INTERACTIVE}" ]; then
+        ${STTY_BIN} -echo \
+            && debug "Interactive Terminal Echo is now: $(distd "*disabled*")"
+    fi
+
     set_system_dataset_writable
     set_software_dataset_writable
 
@@ -306,11 +311,6 @@ initialize () {
     create_base_datasets
     check_definitions_availability
     trap_signals
-
-    if [ "YES" = "${CAP_TERM_INTERACTIVE}" ]; then
-        ${STTY_BIN} -echo \
-            && debug "Interactive Terminal Echo is now: $(distd "*disabled*")"
-    fi
 }
 
 

@@ -108,12 +108,12 @@ finalize_after_signal_interrupt () {
 # Task to call as last for all other finalize_* functions:
 finalize_and_quit_gracefully () {
     load_sysctl_system_production_hardening
+    set_system_dataset_readonly
+    set_software_dataset_readonly
     if [ "YES" = "${CAP_TERM_INTERACTIVE}" ]; then
         ${STTY_BIN} echo \
             && debug "Interactive Terminal Echo is now: $(distd "*enabled*")"
     fi
-    set_system_dataset_readonly
-    set_software_dataset_readonly
 }
 
 
