@@ -617,22 +617,26 @@ process_flat () {
                 case "${DEF_CONFIGURE_METHOD}" in
 
                     ignore)
+                        debug "Build type: $(distd "ignore")"
                         note "   ${NOTE_CHAR} Configuration skipped for definition: $(distn "${_app_param}")"
                         ;;
 
                     no-conf)
+                        debug "Build type: $(distd "no-conf")"
                         note "   ${NOTE_CHAR} No configuration for definition: $(distn "${_app_param}")"
                         DEF_MAKE_METHOD="${DEF_MAKE_METHOD} PREFIX=${_prefix} CFLAGS='${CFLAGS}' CXXFLAGS='${CXXFLAGS}' LDFLAGS='${LDFLAGS}'"
                         DEF_INSTALL_METHOD="${DEF_INSTALL_METHOD} PREFIX=${_prefix} CFLAGS='${CFLAGS}' CXXFLAGS='${CXXFLAGS}' LDFLAGS='${LDFLAGS}'"
                         ;;
 
                     binary)
+                        debug "Build type: $(distd "binary")"
                         note "   ${NOTE_CHAR} Prebuilt definition of: $(distn "${_app_param}")"
                         DEF_MAKE_METHOD="true"
                         DEF_INSTALL_METHOD="true"
                         ;;
 
                     posix)
+                        debug "Build type: $(distd "posix")"
                         dump_software_build_configuration_options "${_configure_options_log}"
                         try "./configure -prefix ${_prefix} -cc '${CC_NAME} ${CFLAGS}' -libs '-L${PREFIX}/lib ${LDFLAGS}' -mandir ${PREFIX}/share/man -libdir ${PREFIX}/lib -aspp '${CC_NAME} ${CFLAGS} -c' ${DEF_CONFIGURE_ARGS}" \
                             || try "./configure -prefix ${_prefix} -cc '${CC_NAME} ${CFLAGS}' -libs '-L${PREFIX}/lib ${LDFLAGS}' -libdir ${PREFIX}/lib -aspp '${CC_NAME} ${CFLAGS} -c' ${DEF_CONFIGURE_ARGS}" \
@@ -642,6 +646,7 @@ process_flat () {
                         ;;
 
                     meson) # new player each year ;)
+                        debug "Build type: $(distd "meson")"
                         dump_software_build_configuration_options "${_configure_options_log}"
                         try "${DEF_CONFIGURE_METHOD} . build --prefix=${PREFIX} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var" \
                             || try "${DEF_CONFIGURE_METHOD} . build --prefix=${PREFIX} --sysconfdir=${SERVICE_DIR}/etc" \
@@ -652,6 +657,7 @@ process_flat () {
                         ;;
 
                     cmake)
+                        debug "Build type: $(distd "cmake")"
                         try "${RM_BIN} -rf build; ${MKDIR_BIN} -p build"
                         _pwd="${_pwd}/build"
                         cd "${_pwd}"
@@ -672,6 +678,7 @@ process_flat () {
                         ;;
 
                     *)
+                        debug "Build type: $(distd "autotools") (default)"
                         unset _pic_optional
                         if [ "${SYSTEM_NAME}" != "Darwin" ]; then
                             _pic_optional="--with-pic"
