@@ -641,6 +641,16 @@ process_flat () {
                         try "${INSTALL_BIN} '${_configure_log}' '${_configure_status_log}'"
                         ;;
 
+                    meson) # new player each year ;)
+                        dump_software_build_configuration_options "${_configure_options_log}"
+                        try "${DEF_CONFIGURE_METHOD} . build --prefix=${PREFIX} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var" \
+                            || try "${DEF_CONFIGURE_METHOD} . build --prefix=${PREFIX} --sysconfdir=${SERVICE_DIR}/etc" \
+                                || run "${DEF_CONFIGURE_METHOD} . build --prefix=${PREFIX}"
+
+                        DEF_MAKE_METHOD="ninja -C build -j${CPUS}"
+                        DEF_INSTALL_METHOD="ninja -C build install"
+                        ;;
+
                     cmake)
                         try "${RM_BIN} -rf build; ${MKDIR_BIN} -p build"
                         _pwd="${_pwd}/build"
