@@ -107,10 +107,12 @@ build_service_dataset () {
             if [ -f "${FILE_CACHE_DIR}${_ps_snap_file}" ]; then
                 debug "Service origin available!"
             else
-                debug "Service origin unavailable! Creating new one."
-                debug "Grepping for dataset: $(distd "${_full_dataset_name}")"
+                debug "Service origin unavailable! Creating new one: $(distd "${_full_dataset_name}")"
                 try "${ZFS_BIN} list -H -t filesystem '${_full_dataset_name}'"
                 if [ "${?}" = "0" ]; then
+                    try "${ZFS_BIN} destroy '${_full_dataset_name}@${ORIGIN_ZFS_SNAP_NAME}'"
+                    run "${ZFS_BIN} snapshot '${_full_dataset_name}@${ORIGIN_ZFS_SNAP_NAME}'"
+
                     note "Preparing to send service dataset: $(distn "${_full_dataset_name}"), for bundle: $(distn "${_ps_elem}")"
                     try "${ZFS_BIN} umount -f '${_full_dataset_name}'"
                     run "${ZFS_BIN} send ${ZFS_SEND_OPTS} '${_full_dataset_name}@${ORIGIN_ZFS_SNAP_NAME}' | ${SOFIN_LZ4_BIN} ${DEFAULT_LZ4_OPTS} > ${FILE_CACHE_DIR}${_ps_snap_file}"
