@@ -161,6 +161,7 @@ build () {
         if [ "${DEF_DISABLED_ON}" = "YES" ]; then
             warn "Bundle: $(distw "${_anm}") is disabled on: $(distw "${OS_TRIPPLE}")"
             destroy_software_dir "${_anm}"
+            return 0
         else
             create_software_dir "${_anm}"
             for _req_name in ${DEFINITIONS_DIR}/${_bund_name}${DEFAULT_DEF_EXT}; do
