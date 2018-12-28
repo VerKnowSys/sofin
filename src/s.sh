@@ -498,4 +498,5 @@ fi
 
 unset sofin_args_FULL SOFIN_ARGS SOFIN_COMMAND SOFIN_PID
 
-exit
+debug "${0}: Exit: $(distd "${ERRORCODE_NORMAL_EXIT}"). Pid: $(distd "${SOFIN_PID}")"
+exit "${ERRORCODE_NORMAL_EXIT}"
