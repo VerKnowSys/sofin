@@ -149,9 +149,8 @@ install_sofin_files () {
     run "${CP_BIN} -fR share/sofin/* ${SOFIN_ROOT}/share/" \
         && permnote "  ${_okch} facts and functions"
 
-    run "${INSTALL_BIN} -m 755 src/s-hbsdcontrol.sh ${SOFIN_ROOT}/bin/s-hbsdcontrol" \
-        && run "${INSTALL_BIN} -m 755 src/s.sh ${SOFIN_ROOT}/bin/s" \
-            && permnote "  ${_okch} sofin launcher"
+    run "${INSTALL_BIN} -m 755 src/s.sh ${SOFIN_ROOT}/bin/s" \
+        && permnote "  ${_okch} sofin launcher"
 
     permnote "Read: $(distn "https://github.com/VerKnowSys/sofin") for more details."
     permnote "Type: $(distn "s usage") for quick help."
