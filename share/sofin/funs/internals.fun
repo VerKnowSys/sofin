@@ -49,6 +49,82 @@ usage_howto () {
 }
 
 
+default_compiler_features () {
+    if [ "YES" = "${DEBUGBUILD}" ]; then
+        permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "debug-build" "${ColorDistinct}")"
+    fi
+    if [ -n "${DEF_USE_SAFE_STACK}" ]; then
+        permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "safe-stack" "${ColorDistinct}")"
+    fi
+    if [ -z "${DEF_NO_RETPOLINE}" ]; then
+        permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "retpoline" "${ColorDistinct}")"
+    fi
+    if [ "YES" = "${DEF_USE_LTO}" ]; then
+        permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "link-time-optimizations (LLVM-LTO)" "${ColorDistinct}")"
+    fi
+    if [ -z "${DEF_NO_SSP_BUFFER_OVERRIDE}" ]; then
+        permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "ssp-buffer-override" "${ColorDistinct}")"
+    fi
+    if [ -z "${DEF_NO_FORTIFY_SOURCE}" ]; then
+        permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "fortify-source" "${ColorDistinct}")"
+    fi
+    if [ -z "${DEF_NO_LLVM_LINKER}" ] && [ "YES" = "${CAP_SYS_LLVM_LD}" ]; then
+        permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "llvm-lld-linker" "${ColorDistinct}")"
+    elif [ -z "${DEF_NO_GOLDEN_LINKER}" ] && [ -n "${DEF_NO_LLVM_LINKER}" ] && [ "YES" = "${CAP_SYS_GOLD_LD}" ]; then
+        permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "gnu-gold-linker" "${ColorDistinct}")"
+    else
+        permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "ld-linker" "${ColorDistinct}")"
+    fi
+
+    # C++ standard used:
+    if [ -n "${DEF_USE_CXX11}" ]; then
+        permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "std-c++11" "${ColorDistinct}")"
+    elif [ -n "${DEF_USE_CXX14}" ]; then
+        permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "std-c++14" "${ColorDistinct}")"
+    elif [ -n "${DEF_USE_CXX17}" ]; then
+        permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "std-c++17" "${ColorDistinct}")"
+    fi
+    if [ -z "${DEF_USE_CXX11}" ] \
+    && [ -z "${DEF_USE_CXX14}" ] \
+    && [ -z "${DEF_USE_CXX17}" ]; then
+        # 14 is current standard since Sofin v1.8
+        permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "std-c++14" "${ColorDistinct}")"
+    fi
+
+    # -fPIC check:
+    printf "%b\n" "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'f[Pp][Ii][Cc]' >/dev/null 2>&1 \
+        && permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "position-independent-code" "${ColorDistinct}")"
+
+    # -fPIE check:
+    printf "%b\n" "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'f[Pp][Ii][Ee]' >/dev/null 2>&1 \
+        && permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "position-independent-executable" "${ColorDistinct}")"
+
+    # -fstack-protector-all check:
+    printf "%b\n" "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'fstack-protector-all' >/dev/null 2>&1 \
+        && permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "stack-protector-all" "${ColorDistinct}")"
+
+    # -fstack-protector-strong check:
+    printf "%b\n" "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'fstack-protector-strong' >/dev/null 2>&1 \
+        && permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "stack-protector-strong" "${ColorDistinct}")"
+
+    # -fno-strict-overflow check:
+    printf "%b\n" "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'fno-strict-overflow' >/dev/null 2>&1 \
+        && permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "no-strict-overflow" "${ColorDistinct}")"
+
+    # -ftrapv check:
+    # NOTE: Signed integer overflow raises the signal SIGILL instead of SIGABRT/SIGSEGV:
+    printf "%b\n" "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'ftrapv' >/dev/null 2>&1 \
+        && permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "trap-signed-integer-overflow" "${ColorDistinct}")"
+
+    if [ -z "${DEF_LINKER_NO_DTAGS}" ]; then
+        permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "enable-new-dtags" "${ColorDistinct}")"
+    fi
+    if [ -z "${DEF_NO_FAST_MATH}" ]; then
+        permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "fast-math" "${ColorDistinct}")"
+    fi
+}
+
+
 sofin_header () {
     printf "\n     %b\n%b\n\n  %b\n  %b\n  %b\n\n  %b\n\n" \
         "$(distn 'Sof' "${ColorWhite}")$(distn 'tware' "${ColorGray}") $(distn 'In' "${ColorWhite}")$(distn 'staller v' "${ColorGray}")$(distn "${SOFIN_VERSION}" "${ColorWhite}")" \
@@ -61,7 +137,7 @@ sofin_header () {
     printf "  %b\n" "system capabilities:"
     IFS=\n set 2>/dev/null | ${EGREP_BIN} -I 'CAP_SYS_' 2>/dev/null | while IFS= read -r _envv; do
         if [ -n "${_envv}" ]; then
-            printf "         %b %b\n" \
+            printf "\t %b %b\n" \
                 "$(distn "${SUCCESS_CHAR}" "${ColorGreen}")" \
                 "$(distn "$(lowercase "${_envv%=YES}")")"
         fi
@@ -70,12 +146,14 @@ sofin_header () {
     printf "\n  %b\n" "terminal capabilities:"
     IFS=\n set 2>/dev/null | ${EGREP_BIN} -I 'CAP_TERM_' 2>/dev/null | while IFS= read -r _envv; do
         if [ -n "${_envv}" ]; then
-            printf "         %b %b\n" \
+            printf "\t %b %b\n" \
                 "$(distn "${SUCCESS_CHAR}" "${ColorGreen}")" \
                 "$(distn "$(lowercase "${_envv%=YES}")")"
         fi
     done
-    unset _envv
+
+    printf "\n  %b\n" "default build features:"
+    default_compiler_features
 
     printf "%b\n" "${ColorReset}"
 }
