@@ -586,7 +586,7 @@ afterbuild_manage_files_of_bundle () {
                 done
             fi
         else
-            error "No $(distw "PREFIX") defined! Something went wrong (at least)!"
+            error "$(distw "PREFIX=${PREFIX}") NOT found!"
         fi
 
         unset _dbg_exp_lst

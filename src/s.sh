@@ -398,10 +398,10 @@ if [ -n "${SOFIN_COMMAND}" ]; then
             fail_on_bg_job "${SOFIN_ARGS}"
             USE_UPDATE=NO
             USE_BINBUILD=NO
-            for _b in $(to_iter "${SOFIN_ARGS}"); do
-                build "${_b}"
+            for _bundle in $(to_iter "${SOFIN_ARGS}"); do
+                build "${_bundle}"
             done
-            unset _b
+            unset _bundle
             finalize_complete_standard_task
             ;;
 

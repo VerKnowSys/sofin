@@ -251,7 +251,7 @@ build () {
                     _req_all="${_req_amount}"
                     for _req in $(to_iter "${DEF_REQUIREMENTS}"); do
                         if [ -n "${DEF_USER_INFO}" ]; then
-                            warn "${DEF_USER_INFO}"
+                            warn "NOTICE: ${DEF_USER_INFO}"
                         fi
                         if [ -z "${_req}" ]; then
                             note "No additional requirements defined"
