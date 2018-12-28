@@ -152,5 +152,5 @@ fi
 
 # hbsdcontrol
 if [ ! -x "${HBSDCONTROL_BIN}" ]; then
-    HBSDCONTROL_BIN="${SOFIN_HBSDCONTROL_BIN}"
+    HBSDCONTROL_BIN="/usr/bin/true"
 fi
