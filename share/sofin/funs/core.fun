@@ -138,7 +138,7 @@ error () {
                 "${ColorRed}" \
                 "$(fill)" \
                 "${ColorReset}" \
-                    | ${TEE_BIN} "${LOG}"
+                    | ${TEE_BIN} "${LOG}" >/dev/stdout 2>/dev/stderr
 
         if [ "error" = "${_err_root}" ]; then
             printf "%b  %b Try: %b%b\n\n" \
