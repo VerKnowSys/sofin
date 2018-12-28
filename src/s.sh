@@ -363,6 +363,10 @@ if [ -n "${SOFIN_COMMAND}" ]; then
 
 
         p|push|binpush|send)
+            if [ -n "${CAP_SYS_PRODUCTION}" ]; then
+                warn "Bundle pushes are disabled on production systems!"
+                finalize_and_quit_gracefully_with_exitcode "${ERRORCODE_TASK_FAILURE}"
+            fi
             initialize
             validate_reqs
             fail_on_bg_job "${SOFIN_ARGS}"
@@ -392,6 +396,10 @@ if [ -n "${SOFIN_COMMAND}" ]; then
 
 
         b|build)
+            if [ -n "${CAP_SYS_PRODUCTION}" ]; then
+                warn "Bundle builds are disabled on production systems!"
+                finalize_and_quit_gracefully_with_exitcode "${ERRORCODE_TASK_FAILURE}"
+            fi
             initialize
             validate_reqs
             permnote "Requested Build of: $(distn "${SOFIN_ARGS}")"
@@ -407,6 +415,10 @@ if [ -n "${SOFIN_COMMAND}" ]; then
 
 
         d|deploy)
+            if [ -n "${CAP_SYS_PRODUCTION}" ]; then
+                warn "Bundle deployments are disabled on production systems!"
+                finalize_and_quit_gracefully_with_exitcode "${ERRORCODE_TASK_FAILURE}"
+            fi
             initialize
             validate_reqs
             permnote "Deploy bundle(s): $(distn "${SOFIN_ARGS}")"
