@@ -38,7 +38,7 @@ else
 
     note "Pushing Sofin package to remote server: "
     ${CHMOD_BIN} a+r "releases/${DEST_NAME}"
-    ${SCP_BIN} "releases/${DEST_NAME}" "${DEFAULT_RELEASE_HOST}:${DEFAULT_RELEASE_REMOTE_PATH}" >/dev/null
+    ${SCP_BIN} "releases/${DEST_NAME}" "${DEFAULT_RELEASE_HOST}:${DEFAULT_RELEASE_REMOTE_PATH}" 2>/dev/null
     ${SSH_BIN} "${SOFIN_NAME}@${DEFAULT_RELEASE_HOST}" "source ~/.functions.sh && gather-source ${DEFAULT_RELEASE_PATH}/${DEST_NAME}"
 
     note "Preparing initial snapshot from repository: ${DEFAULT_DEFINITIONS_REPOSITORY}"
@@ -51,7 +51,7 @@ else
 
     note "Pushing snapshot to remote server(s)"
     ${CHMOD_BIN} a+r "releases/${DEFINITIONS_INITIAL_FILE_NAME}${DEFAULT_ARCHIVE_TARBALL_EXT}"
-    ${SCP_BIN} "releases/${DEFINITIONS_INITIAL_FILE_NAME}${DEFAULT_ARCHIVE_TARBALL_EXT}" "${DEFAULT_RELEASE_HOST}:${DEFAULT_RELEASE_REMOTE_PATH}" >/dev/null
+    ${SCP_BIN} "releases/${DEFINITIONS_INITIAL_FILE_NAME}${DEFAULT_ARCHIVE_TARBALL_EXT}" "${DEFAULT_RELEASE_HOST}:${DEFAULT_RELEASE_REMOTE_PATH}" 2>/dev/null
     ${SSH_BIN} "${SOFIN_NAME}@${DEFAULT_RELEASE_HOST}" "rm /Mirror/software/source/${DEFINITIONS_INITIAL_FILE_NAME}${DEFAULT_ARCHIVE_TARBALL_EXT} ; source ~/.functions.sh && gather-source ${DEFAULT_RELEASE_PATH}/${DEFINITIONS_INITIAL_FILE_NAME}${DEFAULT_ARCHIVE_TARBALL_EXT}" >/dev/null
     ${RM_BIN} -rf "./${SOFIN_DEFINITIONS_DIR}" "${DEFINITIONS_INITIAL_FILE_NAME}${DEFAULT_ARCHIVE_TARBALL_EXT}"
 
