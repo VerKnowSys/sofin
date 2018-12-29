@@ -15,7 +15,7 @@ show_logs () {
 
     elif [ "@" = "${_logf_pattern}" ]; then
         unset _all_files
-        for _mr in $(${FIND_BIN} "${LOGS_DIR%/}" -name "${SOFIN_NAME}*" -not -name "*.log" -not -name "*.help" -not -name "*.strip" -type f 2>/dev/null); do
+        for _mr in $(${FIND_BIN} "${LOGS_DIR%/}" -name "${SOFIN_NAME}*" -not -name "*.result" -not -name "*.config" -not -name "*.strip" -type f 2>/dev/null); do
             _all_files="${_mr} ${_all_files}"
         done
         eval "${TAIL_BIN} -n1 -F ${_all_files}"
@@ -29,7 +29,7 @@ show_logs () {
 
     else
         unset _all_files
-        for _mr in $(${FIND_BIN} "${LOGS_DIR%/}" -name "${SOFIN_NAME}*${_logf_pattern}*" -not -name "*.log" -not -name "*.help" -not -name "*.strip" -type f 2>/dev/null); do
+        for _mr in $(${FIND_BIN} "${LOGS_DIR%/}" -name "${SOFIN_NAME}*${_logf_pattern}*" -not -name "*.result" -not -name "*.config" -not -name "*.strip" -type f 2>/dev/null); do
             _all_files="${_mr} ${_all_files}"
         done
         if [ -n "${_all_files}" ]; then
@@ -115,9 +115,9 @@ dump_software_build_configuration_options () {
         eval "${DEF_CONFIGURE_METHOD} ${_config_args} | ${TEE_BIN} ${_config_log}" >/dev/null 2>&1
         _configuration_opts_rendered="$(${CAT_BIN} "${_config_log}" 2>/dev/null | ${GREP_BIN} -E '\-\-\s*' 2>/dev/null)"
 
-        printf "\n\t\t\t\t\r\r\n%b%b%b%b%b %b\n" \
+        printf "\t\t\t\t\r\r\n%b%b%b%b%b %b\n" \
             "${ColorDistinct}" \
-            "\t\t\t\t\t\t${ANSI_ONE_LINE_UP}     ${ColorDark}${NOTE_CHAR} Cfg:${ColorReset} "    \
+            "\t\t\t\t\t\t${ANSI_ONE_LINE_UP}     ${ColorDark}${NOTE_CHAR} Config:${ColorReset} "    \
             "$(distn "${_config_log}" "${ColorExample}")" \
             "${ColorDark} -> " \
             "$(distn "${_config_result}" "${ColorExample}")" \
