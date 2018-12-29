@@ -49,6 +49,34 @@ usage_howto () {
 
 
 default_compiler_features () {
+    if [ "clang" = "${CC_NAME}" ] \
+    && [ "clang++" = "${CXX_NAME}" ]; then
+        permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "LLVM compilers" "${ColorDistinct}")"
+    fi
+    if [ -z "${DEF_NO_LLVM_LINKER}" ] && [ "YES" = "${CAP_SYS_LLVM_LD}" ]; then
+        permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "LLVM-LLD-linker" "${ColorDistinct}")"
+    elif [ -z "${DEF_NO_GOLDEN_LINKER}" ] && [ -n "${DEF_NO_LLVM_LINKER}" ] && [ "YES" = "${CAP_SYS_GOLD_LD}" ]; then
+        permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "GNU-GOLD-linker" "${ColorDistinct}")"
+    else
+        ${LD_BIN} -v 2>&1 \
+            | ${GREP_BIN} -F "Apple" >/dev/null 2>&1
+        if [ "0" = "${?}" ]; then
+            permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "LD64 Dynamic-linker (Apple)" "${ColorDistinct}")"
+        fi
+
+        ${LD_BIN} -v 2>&1 \
+            | ${GREP_BIN} -E "^LLD \d*.\d*.\d*.*${SYSTEM_NAME} " >/dev/null 2>&1
+        if [ "0" = "${?}" ]; then
+            permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "LLVM LLD-linker" "${ColorDistinct}")"
+        fi
+
+        ${LD_BIN} -v 2>&1 \
+            | ${GREP_BIN} -E "GNU ld \d*.\d*.\d*.*${SYSTEM_NAME}" >/dev/null 2>&1
+        if [ "0" = "${?}" ]; then
+            permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "GNU linker" "${ColorDistinct}")"
+        fi
+    fi
+
     if [ "YES" = "${DEBUGBUILD}" ]; then
         permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "debug-build" "${ColorDistinct}")"
     fi
@@ -66,13 +94,6 @@ default_compiler_features () {
     fi
     if [ -z "${DEF_NO_FORTIFY_SOURCE}" ]; then
         permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "fortify-source" "${ColorDistinct}")"
-    fi
-    if [ -z "${DEF_NO_LLVM_LINKER}" ] && [ "YES" = "${CAP_SYS_LLVM_LD}" ]; then
-        permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "llvm-lld-linker" "${ColorDistinct}")"
-    elif [ -z "${DEF_NO_GOLDEN_LINKER}" ] && [ -n "${DEF_NO_LLVM_LINKER}" ] && [ "YES" = "${CAP_SYS_GOLD_LD}" ]; then
-        permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "gnu-gold-linker" "${ColorDistinct}")"
-    else
-        permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "ld-linker" "${ColorDistinct}")"
     fi
 
     # C++ standard used:
@@ -117,9 +138,6 @@ default_compiler_features () {
 
     if [ -z "${DEF_LINKER_NO_DTAGS}" ]; then
         permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "enable-new-dtags" "${ColorDistinct}")"
-    fi
-    if [ -z "${DEF_NO_FAST_MATH}" ]; then
-        permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "fast-math" "${ColorDistinct}")"
     fi
 }
 
