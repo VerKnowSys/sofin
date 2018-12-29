@@ -77,37 +77,6 @@ default_compiler_features () {
         fi
     fi
 
-    if [ "YES" = "${DEBUGBUILD}" ]; then
-        permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "debug-build" "${ColorDistinct}")"
-    fi
-    if [ -n "${DEF_USE_SAFE_STACK}" ]; then
-        permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "safe-stack" "${ColorDistinct}")"
-    fi
-    if [ -z "${DEF_NO_RETPOLINE}" ]; then
-        permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "retpoline" "${ColorDistinct}")"
-    fi
-    if [ -z "${DEF_NO_SSP_BUFFER_OVERRIDE}" ]; then
-        permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "ssp-buffer-override" "${ColorDistinct}")"
-    fi
-    if [ -z "${DEF_NO_FORTIFY_SOURCE}" ]; then
-        permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "fortify-source" "${ColorDistinct}")"
-    fi
-
-    # C++ standard used:
-    if [ -n "${DEF_USE_CXX11}" ]; then
-        permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "std-c++11" "${ColorDistinct}")"
-    elif [ -n "${DEF_USE_CXX14}" ]; then
-        permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "std-c++14" "${ColorDistinct}")"
-    elif [ -n "${DEF_USE_CXX17}" ]; then
-        permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "std-c++17" "${ColorDistinct}")"
-    fi
-    if [ -z "${DEF_USE_CXX11}" ] \
-    && [ -z "${DEF_USE_CXX14}" ] \
-    && [ -z "${DEF_USE_CXX17}" ]; then
-        # 14 is current standard since Sofin v1.8
-        permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "std-c++14" "${ColorDistinct}")"
-    fi
-
     # -fPIC check:
     printf "%b\n" "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'f[Pp][Ii][Cc]' >/dev/null 2>&1 \
         && permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "position-independent-code (PIC)" "${ColorDistinct}")"
@@ -144,6 +113,39 @@ default_compiler_features () {
     # NOTE: Signed integer overflow raises the signal SIGILL instead of SIGABRT/SIGSEGV:
     printf "%b\n" "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'ftrapv' >/dev/null 2>&1 \
         && permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "trap-signed-integer-overflow (TRAPV)" "${ColorDistinct}")"
+
+
+    if [ -n "${DEF_USE_SAFE_STACK}" ]; then
+        permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "safe-stack" "${ColorDistinct}")"
+    fi
+    if [ -z "${DEF_NO_RETPOLINE}" ]; then
+        permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "retpoline" "${ColorDistinct}")"
+    fi
+    if [ "YES" = "${DEBUGBUILD}" ]; then
+        permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "debug-build" "${ColorDistinct}")"
+    fi
+    if [ -z "${DEF_NO_SSP_BUFFER_OVERRIDE}" ]; then
+        permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "ssp-buffer-override" "${ColorDistinct}")"
+    fi
+    if [ -z "${DEF_NO_FORTIFY_SOURCE}" ]; then
+        permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "fortify-source" "${ColorDistinct}")"
+    fi
+
+    # C++ standard used:
+    if [ -n "${DEF_USE_CXX11}" ]; then
+        permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "std-c++11" "${ColorDistinct}")"
+    elif [ -n "${DEF_USE_CXX14}" ]; then
+        permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "std-c++14" "${ColorDistinct}")"
+    elif [ -n "${DEF_USE_CXX17}" ]; then
+        permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "std-c++17" "${ColorDistinct}")"
+    fi
+    if [ -z "${DEF_USE_CXX11}" ] \
+    && [ -z "${DEF_USE_CXX14}" ] \
+    && [ -z "${DEF_USE_CXX17}" ]; then
+        # 14 is current standard since Sofin v1.8
+        permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "std-c++14" "${ColorDistinct}")"
+    fi
+
 }
 
 
