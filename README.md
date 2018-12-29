@@ -1,4 +1,4 @@
-# Sofin - SOFtware INstaller. Designed for BSD and Darwin.
+# Sofin - SOFtware INstaller. Designed for HardenedBSD-driven production systems - like svdOS.
 
 ## Author:
 * Daniel (dmilith) Dettlaff (@dmilith). I'm also on freenode IRC.
