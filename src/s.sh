@@ -362,39 +362,6 @@ if [ -n "${SOFIN_COMMAND}" ]; then
             ;;
 
 
-        p|push|binpush|send)
-            if [ -n "${CAP_SYS_PRODUCTION}" ]; then
-                warn "Bundle pushes are disabled on production systems!"
-                finalize_and_quit_gracefully_with_exitcode "${ERRORCODE_TASK_FAILURE}"
-            fi
-            initialize
-            validate_reqs
-            fail_on_bg_job "${SOFIN_ARGS}"
-            for _bundle in $(to_iter "${SOFIN_ARGS}"); do
-
-                PREFIX="${SOFTWARE_DIR}/${_bundle}"
-                debug "Cleaning up src dirs of prefix: $(distd "${PREFIX}/${DEFAULT_SRC_EXT}*")"
-
-                # NOTE: Load details from Sofin definitions:
-                load_defaults
-
-                _req_definition="${DEFINITIONS_DIR}/$(lowercase "${_bundle}")${DEFAULT_DEF_EXT}"
-                if [ ! -e "${_req_definition}" ]; then
-                    error "Cannot read definition file: $(diste "${_req_definition}")!"
-                fi
-                load_defs "${_req_definition}"
-
-                _full_version="$(lowercase "${DEF_NAME}${DEF_SUFFIX}-${DEF_VERSION}")"
-                BUILD_NAMESUM="$(firstn "$(text_checksum "${_full_version}")")"
-                debug "Calling destroy on prefix=$(distd "${PREFIX##*/}") _full_version=$(distd "${_full_version}") BUILD_NAMESUM=$(distd "${BUILD_NAMESUM}")"
-                destroy_builddir "${PREFIX##*/}" "${BUILD_NAMESUM}"
-            done
-            permnote "Push locally built binary build(s): $(distn "${SOFIN_ARGS}")"
-            push_binbuilds "${SOFIN_ARGS}"
-            finalize_complete_standard_task
-            ;;
-
-
         b|build)
             if [ -n "${CAP_SYS_PRODUCTION}" ]; then
                 warn "Bundle builds are disabled on production systems!"
@@ -414,7 +381,7 @@ if [ -n "${SOFIN_COMMAND}" ]; then
             ;;
 
 
-        d|deploy)
+        d|deploy|p|push|send)
             if [ -n "${CAP_SYS_PRODUCTION}" ]; then
                 warn "Bundle deployments are disabled on production systems!"
                 finalize_and_quit_gracefully_with_exitcode "${ERRORCODE_TASK_FAILURE}"
@@ -423,7 +390,16 @@ if [ -n "${SOFIN_COMMAND}" ]; then
             validate_reqs
             permnote "Deploy bundle(s): $(distn "${SOFIN_ARGS}")"
             fail_on_bg_job "${SOFIN_ARGS}"
-            deploy_binbuild "${SOFIN_ARGS}"
+
+            # build and remove useless files of each definition:
+            for _bundle in $(to_iter "${SOFIN_ARGS}"); do
+                export USE_BINBUILD=NO \
+                    && build "${_bundle}" \
+                    && afterbuild_manage_files_of_bundle \
+                    && push_binbuilds "${_bundle}"
+            done
+            unset _bundle
+
             finalize_complete_standard_task
             ;;
 

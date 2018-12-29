@@ -24,8 +24,7 @@ usage_howto () {
     permnote "  $(distn "purge                                ") cleans binbuilds cache, unpacked source content, logs, definitions, source cache and possible states"
     permnote "  $(distn "out | outdated                       ") lists outdated software"
     permnote "  $(distn "build                                ") does binary build from source for software specified as params"
-    permnote "  $(distn "deploy                               ") build + push"
-    permnote "  $(distn "push | binpush | send                ") creates binary build from prebuilt software bundles name given as params ($(distn "example: "${SOFIN_BIN_SHORT}" push Rust Vifm Curl" "${ColorExample}"))"
+    permnote "  $(distn "deploy | push | send                 ") creates binary build of software bundle(s) and pushes it to remote server ($(distn "example: "${SOFIN_BIN_SHORT}" push Rust Vifm Curl" "${ColorExample}"))"
     permnote "  $(distn "wipe                                 ") wipes binary builds (matching given name) from binary respositories ($(distn "example: "${SOFIN_BIN_SHORT}" wipe Rust Vifm" "${ColorExample}"))"
 
     permnote
