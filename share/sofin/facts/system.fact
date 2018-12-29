@@ -152,7 +152,7 @@ determine_system_capabilites () {
     fi
 
     _jailed="$(${SYSCTL_BIN} -n security.jail.jailed 2>/dev/null)"
-    if [ "0" = "${_jailed}" ]; then
+    if [ "1" = "${_jailed}" ]; then
         # NOTE: For jails, use jail hostname as dataset prefixed user:
         SYSTEM_DATASET="${HOST:-$(hostname 2>/dev/null)}"
         CAP_SYS_JAILED=YES
