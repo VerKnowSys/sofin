@@ -79,7 +79,7 @@ determine_term_capabilites () {
         unset CAP_TERM_ZSH CAP_TERM_BASH CAP_TERM_MAX_COLUMNS CAP_TERM_MAX_LINES
     fi
 
-    try "printf \"%b\n\" \"${LANG}\" | ${GREP_BIN} -F \".UTF-8\""
+    printf "%b\n" "${LANG}" | ${GREP_BIN} -F ".UTF-8" >/dev/null 2>&1
     if [ "0" = "${?}" ]; then
         CAP_TERM_UNICODE=YES
         unset CAP_TERM_ASCII
@@ -88,7 +88,7 @@ determine_term_capabilites () {
         unset CAP_TERM_UNICODE
     fi
 
-    try "printf \"%b\n\" \"${TERM}\" | ${GREP_BIN} -F \"256color\""
+    printf "%b\n" "${TERM}" | ${GREP_BIN} -F "256color" >/dev/null 2>&1
     if [ "0" = "${?}" ]; then
         CAP_TERM_ANSI_COLORS=YES
         unset CAP_TERM_NO_COLORS
@@ -97,9 +97,10 @@ determine_term_capabilites () {
         unset CAP_TERM_ANSI_COLORS
     fi
 
-    try "${TPUT_BIN} setaf 0"
+    ${TPUT_BIN} setaf 0 >/dev/null 2>&1
     if [ "${?}" != "0" ]; then # broken with tput under FreeBSD, related bug: https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=210858
         unset CAP_TERM_TPUT_UTILITY
+        CAP_TERM_ANSI_UNIVERSAL=YES
 
         # Use legacy ANSI definitions:
         ColorGray="\033[39m" # default color of terminal
@@ -118,6 +119,7 @@ determine_term_capabilites () {
         ColorDark="\033[38;5;236m"
         ColorDarkWood="\033[38;5;130m"
     else
+        unset CAP_TERM_ANSI_UNIVERSAL
         CAP_TERM_TPUT_UTILITY=YES
 
         ColorRed="$(${TPUT_BIN} setaf 1)"
