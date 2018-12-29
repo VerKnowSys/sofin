@@ -116,6 +116,8 @@ finalize_and_quit_gracefully_with_exitcode () {
         ${STTY_BIN} echo \
             && debug "Interactive Terminal Echo is now: $(distd "*enabled*")"
     fi
+
+    debug "${0}: Exit: $(distd "${_errorcode}"). Pid: $(distd "${SOFIN_PID}")"
     exit "${_errorcode}"
 }
 
