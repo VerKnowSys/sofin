@@ -741,56 +741,56 @@ export_binaries () {
 
 after_unpack_callback () {
     if [ -n "${DEF_AFTER_UNPACK_METHOD}" ]; then
-        debug "Evaluating callback DEF_AFTER_UNPACK_METHOD: $(distd "${DEF_AFTER_UNPACK_METHOD}")"
-        run "${DEF_AFTER_UNPACK_METHOD}"
+        run "${DEF_AFTER_UNPACK_METHOD}" \
+            && debug "Evaluated callback DEF_AFTER_UNPACK_METHOD: $(distd "${DEF_AFTER_UNPACK_METHOD}")"
     fi
 }
 
 
 after_export_callback () {
     if [ -n "${DEF_AFTER_EXPORT_METHOD}" ]; then
-        debug "Evaluating callback DEF_AFTER_EXPORT_METHOD: $(distd "${DEF_AFTER_EXPORT_METHOD}")"
-        run "${DEF_AFTER_EXPORT_METHOD}"
+        run "${DEF_AFTER_EXPORT_METHOD}" \
+            && debug "Evaluated callback DEF_AFTER_EXPORT_METHOD: $(distd "${DEF_AFTER_EXPORT_METHOD}")"
     fi
 }
 
 
 after_patch_callback () {
     if [ -n "${DEF_AFTER_PATCH_METHOD}" ]; then
-        debug "Evaluating callback DEF_AFTER_PATCH_METHOD: $(distd "${DEF_AFTER_PATCH_METHOD}")"
-        run "${DEF_AFTER_PATCH_METHOD}"
+        run "${DEF_AFTER_PATCH_METHOD}" \
+            && debug "Evaluated callback DEF_AFTER_PATCH_METHOD: $(distd "${DEF_AFTER_PATCH_METHOD}")"
     fi
 }
 
 
 after_configure_callback () {
     if [ -n "${DEF_AFTER_CONFIGURE_METHOD}" ]; then
-        debug "Evaluating callback DEF_AFTER_CONFIGURE_METHOD: $(distd "${DEF_AFTER_CONFIGURE_METHOD}")"
-        run "${DEF_AFTER_CONFIGURE_METHOD}"
+        run "${DEF_AFTER_CONFIGURE_METHOD}" \
+            && debug "Evaluated callback DEF_AFTER_CONFIGURE_METHOD: $(distd "${DEF_AFTER_CONFIGURE_METHOD}")"
     fi
 }
 
 
 after_make_callback () {
     if [ -n "${DEF_AFTER_MAKE_METHOD}" ]; then
-        debug "Evaluating callback DEF_AFTER_MAKE_METHOD: $(distd "${DEF_AFTER_MAKE_METHOD}")"
-        run "${DEF_AFTER_MAKE_METHOD}"
+        run "${DEF_AFTER_MAKE_METHOD}" \
+            && debug "Evaluated callback DEF_AFTER_MAKE_METHOD: $(distd "${DEF_AFTER_MAKE_METHOD}")"
     fi
 }
 
 
 after_test_callback () {
     if [ -n "${DEF_AFTER_TEST_METHOD}" ]; then
-        debug "Evaluating callback DEF_AFTER_TEST_METHOD: $(distd "${DEF_AFTER_TEST_METHOD}")"
-        run "${DEF_AFTER_TEST_METHOD}"
+        run "${DEF_AFTER_TEST_METHOD}" \
+            && debug "Evaluated callback DEF_AFTER_TEST_METHOD: $(distd "${DEF_AFTER_TEST_METHOD}")"
     fi
 }
 
 
 after_install_callback () {
     if [ -n "${DEF_AFTER_INSTALL_METHOD}" ]; then
-        debug "Evaluating callback DEF_AFTER_INSTALL_METHOD: $(distd "${DEF_AFTER_INSTALL_METHOD}")"
-        run "${DEF_AFTER_INSTALL_METHOD}"
+        run "${DEF_AFTER_INSTALL_METHOD}" \
+            && debug "Evaluated callback DEF_AFTER_INSTALL_METHOD: $(distd "${DEF_AFTER_INSTALL_METHOD}")"
     fi
 }
 
