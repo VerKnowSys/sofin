@@ -618,7 +618,6 @@ process_flat () {
                 _configuration_result="${_configure_options_log}.result"
                 _cmake_configuration_result="${LOGS_DIR}${SOFIN_NAME}-${DEF_NAME}${DEF_SUFFIX}.cmake.result.log"
 
-                note "   ${NOTE_CHAR} Configuring: $(distn "${_app_param}"), version: $(distn "${DEF_VERSION}")"
                 case "${DEF_CONFIGURE_METHOD}" in
 
                     ignore)
@@ -643,6 +642,8 @@ process_flat () {
                     posix)
                         debug "Build type: $(distd "posix")"
                         dump_software_build_configuration_options "${_configure_options_log}"
+
+                        note "   ${NOTE_CHAR} Configuring: $(distn "${_app_param}"), version: $(distn "${DEF_VERSION}")"
                         try "./configure -prefix ${_prefix} -cc '${CC_NAME} ${CFLAGS}' -libs '-L${PREFIX}/lib ${LDFLAGS}' -mandir ${PREFIX}/share/man -libdir ${PREFIX}/lib -aspp '${CC_NAME} ${CFLAGS} -c' ${DEF_CONFIGURE_ARGS}" \
                             || try "./configure -prefix ${_prefix} -cc '${CC_NAME} ${CFLAGS}' -libs '-L${PREFIX}/lib ${LDFLAGS}' -libdir ${PREFIX}/lib -aspp '${CC_NAME} ${CFLAGS} -c' ${DEF_CONFIGURE_ARGS}" \
                                 || run "./configure -prefix ${_prefix} -cc '${CC_NAME} ${CFLAGS}' -libs '-L${PREFIX}/lib ${LDFLAGS}' -aspp '${CC_NAME} ${CFLAGS} -c' ${DEF_CONFIGURE_ARGS}"
@@ -653,6 +654,8 @@ process_flat () {
                     meson) # new player each year ;)
                         debug "Build type: $(distd "meson")"
                         dump_software_build_configuration_options "${_configure_options_log}"
+                        note "   ${NOTE_CHAR} Configuring: $(distn "${_app_param}"), version: $(distn "${DEF_VERSION}")"
+
                         try "${DEF_CONFIGURE_METHOD} . build --prefix=${PREFIX} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var" \
                             || try "${DEF_CONFIGURE_METHOD} . build --prefix=${PREFIX} --sysconfdir=${SERVICE_DIR}/etc" \
                                 || run "${DEF_CONFIGURE_METHOD} . build --prefix=${PREFIX}"
@@ -663,6 +666,8 @@ process_flat () {
 
                     cmake)
                         debug "Build type: $(distd "cmake")"
+                        note "   ${NOTE_CHAR} Configuring: $(distn "${_app_param}"), version: $(distn "${DEF_VERSION}")"
+
                         try "${RM_BIN} -rf build; ${MKDIR_BIN} -p build"
                         _pwd="${_pwd}/build"
                         cd "${_pwd}"
@@ -683,8 +688,8 @@ process_flat () {
                         fi
                         _addon="CFLAGS='${CFLAGS}' CXXFLAGS='${CXXFLAGS}' LDFLAGS='${LDFLAGS}'"
 
-                        # NOTE: Store `configure --help` outputs per definition (useful):
                         dump_software_build_configuration_options "${_configure_options_log}"
+                        note "   ${NOTE_CHAR} Configuring: $(distn "${_app_param}"), version: $(distn "${DEF_VERSION}")"
 
                         if [ "${SYSTEM_NAME}" = "Linux" ]; then
                             # NOTE: No /Services feature implemented for Linux.
@@ -773,7 +778,7 @@ process_flat () {
 
             if [ -z "${USE_NO_TEST}" ] \
             && [ -z "${_this_test_skipped}" ]; then
-                permnote "   ${NOTE_CHAR} Testing requirement: $(distn "${_app_param}"), version: $(distn "${DEF_VERSION}")"
+                note "   ${NOTE_CHAR} Testing requirement: $(distn "${_app_param}"), version: $(distn "${DEF_VERSION}")"
                 cd "${_pwd}"
 
                 # NOTE: mandatory on production machines:
