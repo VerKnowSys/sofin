@@ -86,9 +86,6 @@ default_compiler_features () {
     if [ -z "${DEF_NO_RETPOLINE}" ]; then
         permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "retpoline" "${ColorDistinct}")"
     fi
-    if [ "YES" = "${DEF_USE_LTO}" ]; then
-        permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "link-time-optimizations (LLVM-LTO)" "${ColorDistinct}")"
-    fi
     if [ -z "${DEF_NO_SSP_BUFFER_OVERRIDE}" ]; then
         permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "ssp-buffer-override" "${ColorDistinct}")"
     fi
@@ -124,6 +121,13 @@ default_compiler_features () {
         permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "linker-BINDNOW" "${ColorDistinct}")"
     fi
 
+    if [ -z "${DEF_LINKER_NO_DTAGS}" ]; then
+        permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "linker-new-DTAGS" "${ColorDistinct}")"
+    fi
+    if [ "YES" = "${DEF_USE_LTO}" ]; then
+        permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "link-time-optimizations (LLVM-LTO)" "${ColorDistinct}")"
+    fi
+
     # -fstack-protector-all check:
     printf "%b\n" "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'fstack-protector-all' >/dev/null 2>&1 \
         && permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "stack-protector-all" "${ColorDistinct}")"
@@ -140,11 +144,6 @@ default_compiler_features () {
     # NOTE: Signed integer overflow raises the signal SIGILL instead of SIGABRT/SIGSEGV:
     printf "%b\n" "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'ftrapv' >/dev/null 2>&1 \
         && permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "trap-signed-integer-overflow (TRAPV)" "${ColorDistinct}")"
-
-    if [ -z "${DEF_LINKER_NO_DTAGS}" ]; then
-        permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "linker-new-DTAGS" "${ColorDistinct}")"
-    fi
-
 }
 
 
