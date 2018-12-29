@@ -109,15 +109,18 @@ checksum_filecache_element () {
 dump_software_build_configuration_options () {
     _config_log="${1}"
     _config_args="${2:-"-h"}" # ANYCONFIG -h => Help (usually)
+    _config_result="${_config_log}.result"
     if [ "YES" = "${CAP_SYS_BUILDHOST}" ]; then
         ${MKDIR_BIN} -p "$(${DIRNAME_BIN} "${_config_log}" 2>/dev/null)"
         eval "${DEF_CONFIGURE_METHOD} ${_config_args} | ${TEE_BIN} ${_config_log}" >/dev/null 2>&1
         _configuration_opts_rendered="$(${CAT_BIN} "${_config_log}" 2>/dev/null | ${GREP_BIN} -E '\-\-\s*' 2>/dev/null)"
 
-        printf "\n\t\t\t\t\r\r\n%b%b%b %b\n" \
+        printf "\n\t\t\t\t\r\r\n%b%b%b%b%b %b\n" \
             "${ColorDistinct}" \
-            "\t\t\t\t\t\t${ANSI_ONE_LINE_UP}     ${ColorDark}${NOTE_CHAR} Complete list of configurable build options:${ColorReset} "    \
+            "\t\t\t\t\t\t${ANSI_ONE_LINE_UP}     ${ColorDark}${NOTE_CHAR} Configuration options:${ColorReset} "    \
             "$(distn "${_config_log}" "${ColorExample}")" \
+            "${ColorDark} -> " \
+            "$(distn "${_config_result}" "${ColorExample}")" \
             "${ColorReset}"
 
         if [ -n "${DEBUG}" ]; then # display detailed options  for each dependency... not too amusing ;)

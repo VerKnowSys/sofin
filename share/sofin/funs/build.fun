@@ -486,6 +486,8 @@ process_flat () {
     if [ -z "${DEF_DISABLED_ON}" ]; then
         if [ "${DEF_TYPE}" = "meta" ]; then
             note "   ${NOTE_CHAR2} Meta bundle detected."
+
+            debug "Build type: $(distd "meta")"
             try after_install_callback
             try after_install_snapshot
         else
@@ -612,9 +614,9 @@ process_flat () {
                 _configure_log="config.log"
                 _cmake_out_log="CMakeFiles/CMakeOutput.log"
                 _cmake_error_log="CMakeFiles/CMakeError.log"
-                _cmake_config_log="${LOGS_DIR}${SOFIN_NAME}-${DEF_NAME}${DEF_SUFFIX}.cmake.log"
-                _configure_options_log="${LOGS_DIR}${SOFIN_NAME}-${DEF_NAME}${DEF_SUFFIX}.config.help"
-                _configure_status_log="${LOGS_DIR}${SOFIN_NAME}-${DEF_NAME}${DEF_SUFFIX}.${_configure_log}"
+                _configure_options_log="${LOGS_DIR}${SOFIN_NAME}-${DEF_NAME}${DEF_SUFFIX}.config"
+                _configuration_result="${_configure_options_log}.result"
+                _cmake_configuration_result="${LOGS_DIR}${SOFIN_NAME}-${DEF_NAME}${DEF_SUFFIX}.cmake.result.log"
 
                 note "   ${NOTE_CHAR} Configuring: $(distn "${_app_param}"), version: $(distn "${DEF_VERSION}")"
                 case "${DEF_CONFIGURE_METHOD}" in
@@ -645,7 +647,7 @@ process_flat () {
                             || try "./configure -prefix ${_prefix} -cc '${CC_NAME} ${CFLAGS}' -libs '-L${PREFIX}/lib ${LDFLAGS}' -libdir ${PREFIX}/lib -aspp '${CC_NAME} ${CFLAGS} -c' ${DEF_CONFIGURE_ARGS}" \
                                 || run "./configure -prefix ${_prefix} -cc '${CC_NAME} ${CFLAGS}' -libs '-L${PREFIX}/lib ${LDFLAGS}' -aspp '${CC_NAME} ${CFLAGS} -c' ${DEF_CONFIGURE_ARGS}"
 
-                        try "${INSTALL_BIN} '${_configure_log}' '${_configure_status_log}'"
+                        try "${INSTALL_BIN} '${_configure_log}' '${_configuration_result}'"
                         ;;
 
                     meson) # new player each year ;)
@@ -737,9 +739,8 @@ process_flat () {
 
                 debug "Gathering configuration output logs…"
                 try "test -f '${_configure_log}' && ${INSTALL_BIN} '${_configure_log}' '${_configuration_result}'" \
-                    || try "test -f '${_cmake_out_log}' && ${INSTALL_BIN} '${_cmake_out_log}' '${_cmake_configuration_result}'" \
-                        || try "test -f '${_cmake_error_log}' && ${INSTALL_BIN} '${_cmake_error_log}' '${_cmake_configuration_result}.error'" \
-                            debug "No configuration result found."
+                    || try "test -f '${_cmake_out_log}' && ${INSTALL_BIN} '${_cmake_out_log}' '${_cmake_configuration_result}.stdout'; test -f '${_cmake_error_log}' && ${INSTALL_BIN} '${_cmake_error_log}' '${_cmake_configuration_result}.stderr'" \
+                            debug "No configuration results."
 
                 cd "${_pwd}"
                 try after_configure_callback
