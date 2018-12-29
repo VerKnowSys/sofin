@@ -762,7 +762,7 @@ process_flat () {
             if [ -n "${DEF_SKIPPED_DEFINITION_TEST}" ]; then
                 debug "Defined DEF_SKIPPED_DEFINITION_TEST: $(distd "${DEF_SKIPPED_DEFINITION_TEST}")"
 
-                try "printf \"%b\n\" \" ${DEF_SKIPPED_DEFINITION_TEST} \" | ${EGREP_BIN} -F \" ${_app_param} \""  \
+                printf "%b\n" " ${DEF_SKIPPED_DEFINITION_TEST} " | ${EGREP_BIN} -F " ${_app_param} " >/dev/null 2>&1 \
                     && note "   ${NOTE_CHAR} Skipped tests for definition of: $(distn "${_app_param}")" \
                         && _this_test_skipped=1
             fi
