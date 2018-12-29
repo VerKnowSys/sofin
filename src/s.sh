@@ -66,7 +66,7 @@ if [ -n "${SOFIN_COMMAND}" ]; then
             ;;
 
 
-        ver|version)
+        info|ver|version)
             sofin_header
             ;;
 
