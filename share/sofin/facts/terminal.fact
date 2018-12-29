@@ -90,17 +90,17 @@ determine_term_capabilites () {
 
     printf "%b\n" "${TERM}" | ${GREP_BIN} -F "256color" >/dev/null 2>&1
     if [ "0" = "${?}" ]; then
-        CAP_TERM_ANSI_COLORS=YES
+        CAP_TERM_256_COLORS=YES
         unset CAP_TERM_NO_COLORS
     else
         CAP_TERM_NO_COLORS=YES
-        unset CAP_TERM_ANSI_COLORS
+        unset CAP_TERM_256_COLORS
     fi
 
     ${TPUT_BIN} setaf 0 >/dev/null 2>&1
     if [ "${?}" != "0" ]; then # broken with tput under FreeBSD, related bug: https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=210858
         unset CAP_TERM_TPUT
-        CAP_TERM_SIMPLE=YES
+        CAP_TERM_ANSI=YES
 
         # Use legacy ANSI definitions:
         ColorGray="\033[39m" # default color of terminal
@@ -119,7 +119,7 @@ determine_term_capabilites () {
         ColorDark="\033[38;5;236m"
         ColorDarkWood="\033[38;5;130m"
     else
-        unset CAP_TERM_SIMPLE
+        unset CAP_TERM_ANSI
         CAP_TERM_TPUT=YES
 
         ColorRed="$(${TPUT_BIN} setaf 1)"
