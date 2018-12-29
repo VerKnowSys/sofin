@@ -29,7 +29,7 @@ push_to_all_mirrors () {
             && debug "Set read access for archives: $(distd "${_ptelm_file_name}"), $(distd "${_ptelm_file_name}${DEFAULT_CHKSUM_EXT}") before we send them to public remote"
 
         debug "Deploying bin-bundle: $(distd "${_ptelm_file_name}") to mirror: $(distd "${_ptmirror}")"
-        push_software_archive "${_ptelm_file_name}" "${_ptmirror}" "${_ptaddress}"
+        push_software_archive "${_ptelm_file_name}" "${_ptmirror}" "${_ptaddress}" "${_pbto_bundle_name}"
 
         build_service_dataset "${_pbto_bundle_name}" "${_pversion_element}"
         _pfin_svc_name="${_ptelm_service_name}-${SYSTEM_NAME}${DEFAULT_SERVICE_SNAPSHOT_EXT}"
@@ -612,6 +612,7 @@ push_software_archive () {
     _bpbundle_file="${1}"
     _bpamirror="${2}"
     _bpaddress="${3}"
+    _bname="${4}" # optional bundle name
     if [ -z "${_bpbundle_file}" ]; then
         error "First argument: $(diste "BundleName") is empty!"
     fi
@@ -630,7 +631,7 @@ push_software_archive () {
     if [ -z "${_bpshortsha}" ]; then
         error "No sha checksum in file: $(diste "${_bpfn_chksum_file}")"
     fi
-    _logname="${LOG}-$(lowercase "${_bpbundle_file}")"
+    _logname="${LOG}-$(lowercase "${_bname}")"
     debug "push_software_archive(): Bundle: $(distd "${_bpbundle_file}"), bundle_file: $(distd "${_bpbundle_file}"), repository address: $(distd "${_bpaddress}"), logname: $(distd "${_logname}")"
     retry "${SCP_BIN} ${DEFAULT_SSH_OPTS} ${DEFAULT_SCP_OPTS} -P ${SOFIN_SSH_PORT} ${_bpfn_file} ${_bpfn_file_dest}${DEFAULT_PARTIAL_FILE_EXT} >> ${_logname}"
     if [ "${?}" = "0" ]; then
@@ -641,7 +642,7 @@ push_software_archive () {
     else
         error "Failed to push binary build of: $(diste "${_bpbundle_file}") to remote: $(diste "${_bp_remotfs_file}")"
     fi
-    unset _bpbundle_file _bpbundle_file _bpamirror _bpaddress _bpshortsha _bpfn_chksum_file _bp_remotfs_file _bpfn_chksum_file _bpfn_chksum_file_dest
+    unset _bname _bpbundle_file _bpbundle_file _bpamirror _bpaddress _bpshortsha _bpfn_chksum_file _bp_remotfs_file _bpfn_chksum_file _bpfn_chksum_file_dest
 }
 
 
