@@ -486,6 +486,8 @@ process_flat () {
     if [ -z "${DEF_DISABLED_ON}" ]; then
         if [ "${DEF_TYPE}" = "meta" ]; then
             note "   ${NOTE_CHAR2} Meta bundle detected."
+            try after_install_callback
+            try after_install_snapshot
         else
             _cwd="$(${PWD_BIN} 2>/dev/null)"
             if [ -n "${BUILD_DIR}" ] \
