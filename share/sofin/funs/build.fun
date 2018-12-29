@@ -769,7 +769,7 @@ process_flat () {
 
             if [ -z "${USE_NO_TEST}" ] \
             && [ -z "${_this_test_skipped}" ]; then
-                note "   ${NOTE_CHAR} Testing requirement: $(distn "${_app_param}"), version: $(distn "${DEF_VERSION}")"
+                permnote "   ${NOTE_CHAR} Testing requirement: $(distn "${_app_param}"), version: $(distn "${DEF_VERSION}")"
                 cd "${_pwd}"
 
                 # NOTE: mandatory on production machines:
