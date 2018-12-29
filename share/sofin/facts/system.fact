@@ -122,7 +122,7 @@ fallback_nonzfs_setup () {
 
 determine_system_capabilites () {
     env_forgivable
-    try "${ZPOOL_BIN} list -H"
+    ${ZPOOL_BIN} list -H >/dev/null 2>&1
     if [ "${?}" = "0" ]; then
         CAP_SYS_ZFS=YES
         if [ "${SYSTEM_NAME}" = "Darwin" ]; then
@@ -134,11 +134,12 @@ determine_system_capabilites () {
         fallback_nonzfs_setup
     fi
 
-    try "${SYSCTL_BIN} hardening.pax"
-    if [ "${?}" = "0" ]; then
-        CAP_SYS_HARDENED=YES
+    _pax_version="$(${SYSCTL_BIN} -n hardening.version 2>/dev/null)"
+    if [ "${_pax_version}" -ge "${MIN_HARDENING_VERSION}" ]; then
+        CAP_SYS_HARDENED_VERSION="${_pax_version}"
+        CAP_SYS_HARDENED="YES"
     else
-        unset CAP_SYS_HARDENED
+        unset CAP_SYS_HARDENED CAP_SYS_HARDENED_VERSION
     fi
 
     if [ -f "/usr/include/kvm.h" ] \
@@ -150,14 +151,14 @@ determine_system_capabilites () {
         unset CAP_SYS_KERNEL_KVM CAP_SYS_KERNEL_PROCSTAT
     fi
 
-    try "${SYSCTL_BIN} security.jail.jailed 2>/dev/null | ${GREP_BIN} 'security.jail.jailed: 1'"
-    if [ "${?}" = "0" ]; then
+    _jailed="$(${SYSCTL_BIN} -n security.jail.jailed 2>/dev/null)"
+    if [ "0" = "${_jailed}" ]; then
         # NOTE: For jails, use jail hostname as dataset prefixed user:
-        SYSTEM_DATASET="${HOST:-$(hostname)}"
+        SYSTEM_DATASET="${HOST:-$(hostname 2>/dev/null)}"
         CAP_SYS_JAILED=YES
     else
         # NOTE: For non-jails, use local USER name as dataset prefixed user:
-        SYSTEM_DATASET="${USER:-$(id -u)}"
+        SYSTEM_DATASET="${USER:-$(id -u 2>/dev/null)}"
         unset CAP_SYS_JAILED
     fi
 
@@ -167,10 +168,9 @@ determine_system_capabilites () {
         unset CAP_SYS_DTRACE
     fi
 
-    try "${SYSCTL_BIN} kern.features.linux64"
-    if [ "${?}" = "0" ]; then
+    _linux64_binary_support="$(${SYSCTL_BIN} -n kern.features.linux64 2>/dev/null)"
+    if [ "${_linux64_binary_support}" = "1" ]; then
         CAP_SYS_LINUX64_ABI=YES
-        # try "${KLDLOAD_BIN} linux64 >/dev/null 2>&1"
     else
         unset CAP_SYS_LINUX64_ABI
     fi

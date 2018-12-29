@@ -9,3 +9,5 @@ hardening.pax.mprotect.status \
 hardening.pax.pageexec.status \
 hardening.pax.disallow_map32bit.status \
 hardening.pax.aslr.status"
+
+MIN_HARDENING_VERSION="1100055"
