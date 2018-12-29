@@ -113,11 +113,16 @@ default_compiler_features () {
 
     # -fPIC check:
     printf "%b\n" "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'f[Pp][Ii][Cc]' >/dev/null 2>&1 \
-        && permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "position-independent-code (PIE)" "${ColorDistinct}")"
+        && permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "position-independent-code (PIC)" "${ColorDistinct}")"
 
     # -fPIE check:
-    printf "%b\n" "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'f[Pp][Ii][Ee]' >/dev/null 2>&1 \
-        && permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "position-independent-executable (PIC)" "${ColorDistinct}")"
+    if [ -z "${DEF_NO_PIE}" ] \
+    && [ -z "${DEF_NO_LLVM_LINKER}" ] \
+    && [ "YES" = "${CAP_SYS_LLVM_LD}" ]; then
+        permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "position-independent-executable (PIE)" "${ColorDistinct}")"
+        permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "linker-RELRO" "${ColorDistinct}")"
+        permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "linker-BINDNOW" "${ColorDistinct}")"
+    fi
 
     # -fstack-protector-all check:
     printf "%b\n" "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'fstack-protector-all' >/dev/null 2>&1 \
@@ -139,14 +144,6 @@ default_compiler_features () {
     if [ -z "${DEF_LINKER_NO_DTAGS}" ]; then
         permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "linker-new-DTAGS" "${ColorDistinct}")"
     fi
-
-    # -z relro check:
-    printf "%b\n" "${LDFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} -F 'relro' >/dev/null 2>&1 \
-        && permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "linker-RELRO" "${ColorDistinct}")"
-
-    # -z now check:
-    printf "%b\n" "${LDFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} -F 'now' >/dev/null 2>&1 \
-        && permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "linker-BINDNOW" "${ColorDistinct}")"
 
 }
 
