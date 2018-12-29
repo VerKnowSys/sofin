@@ -77,14 +77,12 @@ default_compiler_features () {
         fi
     fi
 
-    # -fPIC check:
-    printf "%b\n" "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'f[Pp][Ii][Cc]' >/dev/null 2>&1 \
-        && permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "position-independent-code (PIC)" "${ColorDistinct}")"
-
-    # -fPIE check:
-    if [ -z "${DEF_NO_PIE}" ] \
+    # -fPIC + -fPIE checks:
+    if [ -z "${DEF_NO_PIC}" ] \
+    && [ -z "${DEF_NO_PIE}" ] \
     && [ -z "${DEF_NO_LLVM_LINKER}" ] \
     && [ "YES" = "${CAP_SYS_LLVM_LD}" ]; then
+        permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "position-independent-code (PIC)" "${ColorDistinct}")"
         permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "position-independent-executable (PIE)" "${ColorDistinct}")"
         permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "linker-RELRO" "${ColorDistinct}")"
         permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "linker-BINDNOW" "${ColorDistinct}")"
