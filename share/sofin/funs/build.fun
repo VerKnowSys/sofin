@@ -742,7 +742,7 @@ process_flat () {
                 debug "Gathering configuration output logs…"
                 try "test -f '${_configure_log}' && ${INSTALL_BIN} '${_configure_log}' '${_configuration_result}'" \
                     || try "test -f '${_cmake_out_log}' && ${INSTALL_BIN} '${_cmake_out_log}' '${_cmake_configuration_result}.stdout'; test -f '${_cmake_error_log}' && ${INSTALL_BIN} '${_cmake_error_log}' '${_cmake_configuration_result}.stderr'" \
-                            debug "No configuration results."
+                            || debug "No configuration results!"
 
                 cd "${_pwd}"
                 try after_configure_callback
