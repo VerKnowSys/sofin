@@ -522,7 +522,7 @@ process_flat () {
                         unset _bname _a_file_checksum
                     fi
 
-                    note "   ${NOTE_CHAR} Unpacking source of: $(distn "${DEF_NAME}${DEF_SUFFIX}"), version: $(distn "${DEF_VERSION}")"
+                    debug "   ${NOTE_CHAR} Unpacking source of: $(distd "${DEF_NAME}${DEF_SUFFIX}"), version: $(distd "${DEF_VERSION}")"
 
                     _possible_old_build_dir="$(${TAR_BIN} -t --list --file "${_dest_file}" 2>/dev/null | ${HEAD_BIN} -n1 2>/dev/null | ${AWK_BIN} '{print $9;}' 2>/dev/null)"
                     _pbd_basename="${_possible_old_build_dir##*/}"
