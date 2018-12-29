@@ -134,12 +134,20 @@ determine_system_capabilites () {
         fallback_nonzfs_setup
     fi
 
-    _pax_version="$(${SYSCTL_BIN} -n hardening.version 2>/dev/null)"
-    if [ "${_pax_version}" -ge "${MIN_HARDENING_VERSION}" ]; then
-        CAP_SYS_HARDENED_VERSION="${_pax_version}"
+    _hardening_version="$(${SYSCTL_BIN} -n hardening.version 2>/dev/null)"
+    if [ "${_hardening_version}" -ge "${MIN_HARDENING_VERSION}" ]; then
+        CAP_SYS_HARDENED_VERSION="${_hardening_version}"
         CAP_SYS_HARDENED="YES"
+
+        # render other useful security enforcements:
+        CAP_SYS_HARDENED_ASLR="$(${SYSCTL_BIN} -n hardening.pax.aslr.status 2>/dev/null)"
+        CAP_SYS_HARDENED_MPROTECT="$(${SYSCTL_BIN} -n hardening.pax.mprotect.status 2>/dev/null)"
+        CAP_SYS_HARDENED_PAGEEXEC="$(${SYSCTL_BIN} -n hardening.pax.pageexec.status 2>/dev/null)"
+        CAP_SYS_HARDENED_SEGVGUARD="$(${SYSCTL_BIN} -n hardening.pax.segvguard.status 2>/dev/null)"
+        CAP_SYS_HARDENED_DISALLOW_MAP32BIT="$(${SYSCTL_BIN} -n hardening.pax.disallow_map32bit.status 2>/dev/null)"
+        CAP_SYS_HARDENED_EXTATTR="$(${SYSCTL_BIN} -n hardening.control.extattr.status 2>/dev/null)"
     else
-        unset CAP_SYS_HARDENED CAP_SYS_HARDENED_VERSION
+        unset CAP_SYS_HARDENED CAP_SYS_HARDENED_VERSION CAP_SYS_HARDENED_ASLR CAP_SYS_HARDENED_MPROTECT CAP_SYS_HARDENED_PAGEEXEC CAP_SYS_HARDENED_PAGEEXEC CAP_SYS_HARDENED_SEGVGUARD CAP_SYS_HARDENED_DISALLOW_MAP32BIT CAP_SYS_HARDENED_EXTATTR
     fi
 
     if [ -f "/usr/include/kvm.h" ] \
