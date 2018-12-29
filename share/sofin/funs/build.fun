@@ -480,8 +480,6 @@ process_flat () {
     fi
 
     dump_system_capabilities
-    dump_debug_info
-    dump_compiler_setup
 
     if [ -z "${DEF_DISABLED_ON}" ]; then
         if [ "${DEF_TYPE}" = "meta" ]; then
@@ -494,6 +492,9 @@ process_flat () {
             _cwd="$(${PWD_BIN} 2>/dev/null)"
             if [ -n "${BUILD_DIR}" ] \
             && [ -n "${BUILD_NAMESUM}" ]; then
+                dump_debug_info
+                dump_compiler_setup
+
                 cd "${BUILD_DIR}"
                 if [ -z "${DEF_GIT_CHECKOUT}" ]; then # Standard "fetch source archive" method
                     _base="${DEF_SOURCE_PATH##*/}"
