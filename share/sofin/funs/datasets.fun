@@ -724,44 +724,51 @@ set_software_dataset_writable () {
 
 
 after_unpack_snapshot () {
-    debug "after_unpack_snapshot(): NO-OP: NIY"
+    # TODO: debug "after_unpack_snapshot(): NO-OP: NIY"
     # create_snapshot "after_unpack"
+    return 0
 }
 
 
 after_patch_snapshot () {
-    debug "after_patch_snapshot(): NO-OP: NIY"
+    # TODO: debug "after_patch_snapshot(): NO-OP: NIY"
     # create_snapshot "after_patch"
+    return 0
 }
 
 
 after_configure_snapshot () {
-    debug "after_configure_snapshot(): NO-OP: NIY"
+    # TODO: debug "after_configure_snapshot(): NO-OP: NIY"
     # create_snapshot "after_configure"
+    return 0
 }
 
 
 after_make_snapshot () {
-    debug "after_make_snapshot(): NO-OP: NIY"
+    # TODO: debug "after_make_snapshot(): NO-OP: NIY"
     # create_snapshot "after_make"
+    return 0
 }
 
 
 after_test_snapshot () {
-    debug "after_test_snapshot(): NO-OP: NIY"
+    # TODO: debug "after_test_snapshot(): NO-OP: NIY"
     # create_snapshot "after_test"
+    return 0
 }
 
 
 after_install_snapshot () {
-    debug "after_install_snapshot(): NO-OP: NIY"
+    # TODO: debug "after_install_snapshot(): NO-OP: NIY"
     # create_snapshot "after_install"
+    return 0
 }
 
 
 after_export_snapshot () {
-    debug "after_export_snapshot(): NO-OP: NIY"
+    # TODO: debug "after_export_snapshot(): NO-OP: NIY"
     # create_snapshot "after_export"
+    return 0
 }
 
 
