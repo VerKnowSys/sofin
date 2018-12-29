@@ -547,8 +547,8 @@ strip_bundle () {
     done
     if [ -n "${_to_be_stripped_list}" ]; then
         printf "%b\n" "${_to_be_stripped_list}" | ${XARGS_BIN} -n 1 -P "4" -I {} "${SHELL}" -c "${STRIP_BIN} ${DEFAULT_STRIP_OPTS} {}" 2>/dev/null \
-            && debug "Stripping: $(distd "${_files_counter}") files in parallel." \
-                && try "${TOUCH_BIN} '${PREFIX}/$(lowercase "${_sbfdefinition_name}")${DEFAULT_STRIPPED_MARK_EXT}'"
+            && try "${TOUCH_BIN} '${PREFIX}/$(lowercase "${_sbfdefinition_name}")${DEFAULT_STRIPPED_MARK_EXT}'" \
+                && debug "Stripped $(distd "${_files_counter}") files"
     fi
     unset _sbfdefinition_name _dirs_to_strip _files_counter _files _stripdir _bundlower _to_be_stripped_list
 }
