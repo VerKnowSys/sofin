@@ -140,13 +140,39 @@ determine_system_capabilites () {
         CAP_SYS_HARDENED="YES"
 
         # render other useful security enforcements:
-        CAP_SYS_HARDENED_ASLR="$(${SYSCTL_BIN} -n hardening.pax.aslr.status 2>/dev/null)"
-        CAP_SYS_HARDENED_MPROTECT="$(${SYSCTL_BIN} -n hardening.pax.mprotect.status 2>/dev/null)"
-        CAP_SYS_HARDENED_PAGEEXEC="$(${SYSCTL_BIN} -n hardening.pax.pageexec.status 2>/dev/null)"
-        CAP_SYS_HARDENED_SEGVGUARD="$(${SYSCTL_BIN} -n hardening.pax.segvguard.status 2>/dev/null)"
-        CAP_SYS_HARDENED_DISALLOW_MAP32BIT="$(${SYSCTL_BIN} -n hardening.pax.disallow_map32bit.status 2>/dev/null)"
+        # NOTE: PAX feature is enforced if value >2 (with value 3, there's no xattr override possibility, so default is "2")
+        CAP_SYS_HARDENED_PAX_ASLR="$(${SYSCTL_BIN} -n hardening.pax.aslr.status 2>/dev/null)"
+        if [ "${CAP_SYS_HARDENED_PAX_ASLR}" -le "1" ]; then
+            unset CAP_SYS_HARDENED_PAX_ASLR
+        else
+            CAP_SYS_HARDENED_PAX_ASLR=YES
+        fi
+        CAP_SYS_HARDENED_PAX_MPROTECT="$(${SYSCTL_BIN} -n hardening.pax.mprotect.status 2>/dev/null)"
+        if [ "${CAP_SYS_HARDENED_PAX_MPROTECT}" -le "1" ]; then
+            unset CAP_SYS_HARDENED_PAX_MPROTECT
+        else
+            CAP_SYS_HARDENED_PAX_MPROTECT=YES
+        fi
+        CAP_SYS_HARDENED_PAX_PAGEEXEC="$(${SYSCTL_BIN} -n hardening.pax.pageexec.status 2>/dev/null)"
+        if [ "${CAP_SYS_HARDENED_PAX_PAGEEXEC}" -le "1" ]; then
+            unset CAP_SYS_HARDENED_PAX_PAGEEXEC
+        else
+            CAP_SYS_HARDENED_PAX_PAGEEXEC=YES
+        fi
+        CAP_SYS_HARDENED_PAX_SEGVGUARD="$(${SYSCTL_BIN} -n hardening.pax.segvguard.status 2>/dev/null)"
+        if [ "${CAP_SYS_HARDENED_PAX_SEGVGUARD}" -le "1" ]; then
+            unset CAP_SYS_HARDENED_PAX_SEGVGUARD
+        else
+            CAP_SYS_HARDENED_PAX_SEGVGUARD=YES
+        fi
+        CAP_SYS_HARDENED_PAX_DISALLOW_MAP32BIT="$(${SYSCTL_BIN} -n hardening.pax.disallow_map32bit.status 2>/dev/null)"
+        if [ "${CAP_SYS_HARDENED_PAX_DISALLOW_MAP32BIT}" -le "1" ]; then
+            unset CAP_SYS_HARDENED_PAX_DISALLOW_MAP32BIT
+        else
+            CAP_SYS_HARDENED_PAX_DISALLOW_MAP32BIT=YES
+        fi
     else
-        unset CAP_SYS_HARDENED CAP_SYS_HARDENED_VERSION CAP_SYS_HARDENED_ASLR CAP_SYS_HARDENED_MPROTECT CAP_SYS_HARDENED_PAGEEXEC CAP_SYS_HARDENED_PAGEEXEC CAP_SYS_HARDENED_SEGVGUARD CAP_SYS_HARDENED_DISALLOW_MAP32BIT
+        unset CAP_SYS_HARDENED CAP_SYS_HARDENED_PAX_VERSION CAP_SYS_HARDENED_PAX_ASLR CAP_SYS_HARDENED_PAX_MPROTECT CAP_SYS_HARDENED_PAX_PAGEEXEC CAP_SYS_HARDENED_PAX_SEGVGUARD CAP_SYS_HARDENED_PAX_DISALLOW_MAP32BIT
     fi
 
     if [ -f "/usr/include/kvm.h" ] \
