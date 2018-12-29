@@ -270,8 +270,8 @@ build () {
                 if [ -z "${DONT_BUILD_BUT_DO_EXPORTS}" ]; then
                     if [ -e "${PREFIX}/${_bund_lcase}${DEFAULT_INST_MARK_EXT}" ]; then
                         if [ "${CHANGED}" = "YES" ]; then
+                            warn "  ${NOTE_CHAR} Definition requirements were modified. Rebuilding: $(distw "${_bund_lcase}")"
                             permnote "  $(distn "${_bund_lcase}") ($(distn 1) of $(distn "${_req_all}"))"
-                            note "   ${NOTE_CHAR} Definition dependencies has changed. Rebuilding: $(distn "${_bund_lcase}")"
                             process_flat "${_bund_lcase}" "${PREFIX}"
                             unset CHANGED
                             mark_installed "${DEF_NAME}${DEF_SUFFIX}" "${DEF_VERSION}"
