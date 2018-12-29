@@ -497,15 +497,13 @@ process_flat () {
                 cd "${BUILD_DIR}"
                 if [ -z "${DEF_GIT_CHECKOUT}" ]; then # Standard "fetch source archive" method
                     _base="${DEF_SOURCE_PATH##*/}"
-                    # debug "DEF_SOURCE_PATH: $(distd "${DEF_SOURCE_PATH}") base: $(distd "${_base}")"
                     _dest_file="${FILE_CACHE_DIR}${_base}"
                     # TODO: implement auto picking fetch method based on DEF_SOURCE_PATH contents
                     if [ ! -e "${_dest_file}" ]; then
                         retry "${FETCH_BIN} -o ${_dest_file} ${FETCH_OPTS} '${DEF_SOURCE_PATH}'" \
                             || error "Failed to fetch source: $(diste "${DEF_SOURCE_PATH}")"
-                        note "   ${NOTE_CHAR} Source fetched: $(distn "${_base}")"
+                        debug "Source fetched: $(distd "${_base}")"
                     fi
-                    # debug "Build root: $(distd "${BUILD_DIR}"), file: $(distd "${_dest_file}")"
                     if [ -z "${DEF_SHA}" ]; then
                         error "Missing SHA sum for source: $(diste "${_dest_file}")!"
                     else
@@ -522,8 +520,6 @@ process_flat () {
                         unset _bname _a_file_checksum
                     fi
 
-                    debug "   ${NOTE_CHAR} Unpacking source of: $(distd "${DEF_NAME}${DEF_SUFFIX}"), version: $(distd "${DEF_VERSION}")"
-
                     _possible_old_build_dir="$(${TAR_BIN} -t --list --file "${_dest_file}" 2>/dev/null | ${HEAD_BIN} -n1 2>/dev/null | ${AWK_BIN} '{print $9;}' 2>/dev/null)"
                     _pbd_basename="${_possible_old_build_dir##*/}"
                     if [ "${_pbd_basename}" != "${_possible_old_build_dir}" ]; then # more than one path element?
@@ -534,10 +530,11 @@ process_flat () {
                             && debug "Previous dependency build dir was removed to avoid conflicts: $(distd "${BUILD_DIR}/${_possible_old_build_dir%/}")"
                     fi
 
-                    debug "Unpacking $(distd "${_dest_file}") to: $(distd "${BUILD_DIR}")"
                     try "${TAR_BIN} -xf ${_dest_file} --directory ${BUILD_DIR}" \
                         || try "${TAR_BIN} -xjf ${_dest_file} --directory ${BUILD_DIR}" \
                             || run "${TAR_BIN} -xJf ${_dest_file} --directory ${BUILD_DIR}"
+
+                    debug "Unpacked source for: $(distd "${DEF_NAME}${DEF_SUFFIX}"), version: $(distd "${DEF_VERSION}") into build-dir: $(distd "${BUILD_DIR}")"
                 else
                     # git method:
                     # .cache/git-cache => git bare repos
