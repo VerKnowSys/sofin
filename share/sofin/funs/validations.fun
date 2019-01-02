@@ -281,22 +281,17 @@ validate_linked_properly () {
 
         for _bin in $(${FIND_BIN} "${_a_dir}" -mindepth 1 -maxdepth 1 -type l 2>/dev/null); do
             debug "Validating $(distd "${_bin}") from bundle $(distd "${_bun}")"
-            _which=`"${WHICH_BIN}" "${_bin}"`
-              if [ "$?" = "0" ]; then
-                  case "${SYSTEM_NAME}" in
-                      Darwin)
-                          _ldd_cmd="${OTOOL_BIN} -L ${_which}"
-                          ;;
-                      *)
-                          _ldd_cmd="${LDD_BIN} ${_which}"
-                          ;;
-                  esac
-                  try "${_ldd_cmd} | ${GREP_BIN} -v /usr/lib | ${GREP_BIN} -v ${SOFTWARE_DIR}/${_bun}" \
-                      && error "Found links to external libraries for binary: $(diste "${_bin}") in bundle $(diste "${_bun}")!" \
-                      || debug "OK"
-              else
-                  error "Export $(diste "{$_bin}") not found!"
-              fi
+                case "${SYSTEM_NAME}" in
+                    Darwin)
+                        _ldd_cmd="${OTOOL_BIN} -L ${_bin}"
+                        ;;
+                    *)
+                        _ldd_cmd="${LDD_BIN} ${_bin}"
+                        ;;
+                esac
+                try "${_ldd_cmd} | ${GREP_BIN} -v /usr/lib | ${GREP_BIN} -v ${SOFTWARE_DIR}/${_bun}" \
+                    && error "Found links to external libraries for binary: $(diste "${_bin}") in bundle $(diste "${_bun}")!" \
+                    || debug "OK"
         done
     done
     return 0
