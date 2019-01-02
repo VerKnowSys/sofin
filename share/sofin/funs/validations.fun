@@ -1,3 +1,5 @@
+#!/usr/bin/env sh
+
 check_version () { # $1 => installed version, $2 => available version
     if [ -n "${1}" ]; then
         if [ -n "${2}" ]; then
@@ -259,4 +261,43 @@ crash_if_mission_critical () {
     if [ -n "${DEF_CRITICAL}" ]; then
         error "Bundle: $(diste "${1}") is marked as $(diste "Mission-Critical") and cannot be destroyed automatically. It has to be done manually."
     fi
+}
+
+validate_linked_properly () {
+    _bundz="${*}"
+    if [ -z "${_bundz}" ]; then
+        error "At least single bundle name has to be specified."
+    fi
+    debug "Validating links on exports: $(distd "${_bundz}")"
+    for _bun in $(to_iter "${_bundz}"); do
+        if [ -d "${SOFTWARE_DIR}/${_bun}/exports" ]; then
+            _a_dir="${SOFTWARE_DIR}/${_bun}/exports"
+        elif [ -d "${SOFTWARE_DIR}/${_bun}/exports-disabled" ]; then
+            _a_dir="${SOFTWARE_DIR}/${_bun}/exports-disabled"
+        else
+            debug "No exports of bundle: $(distd "${_bun}"). Link validation skipped."
+            return 0
+        fi
+
+        for _bin in $(${FIND_BIN} "${_a_dir}" -mindepth 1 -maxdepth 1 -type l 2>/dev/null); do
+            debug "Validating $(distd "${_bin}") from bundle $(distd "${_bun}")"
+            _which=`"${WHICH_BIN}" "${_bin}"`
+              if [ "$?" = "0" ]; then
+                  case "${SYSTEM_NAME}" in
+                      Darwin)
+                          _ldd_cmd="${OTOOL_BIN} -L ${_which}"
+                          ;;
+                      *)
+                          _ldd_cmd="${LDD_BIN} ${_which}"
+                          ;;
+                  esac
+                  try "${_ldd_cmd} | ${GREP_BIN} -v /usr/lib | ${GREP_BIN} -v ${SOFTWARE_DIR}/${_bun}" \
+                      && error "Found links to external libraries for binary: $(diste "${_bin}") in bundle $(diste "${_bun}")!" \
+                      || debug "OK"
+              else
+                  error "Export $(diste "{$_bin}") not found!"
+              fi
+        done
+    done
+    return 0
 }
