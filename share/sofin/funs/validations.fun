@@ -289,7 +289,7 @@ validate_linked_properly () {
                         _ldd_cmd="${LDD_BIN} ${_bin}"
                         ;;
                 esac
-                try "${_ldd_cmd} | ${GREP_BIN} -v /usr/lib | ${GREP_BIN} -v ${SOFTWARE_DIR}/${_bun}" \
+                try "${_ldd_cmd} | ${GREP_BIN} -v /usr/lib  2>/dev/null| ${GREP_BIN} -v ${SOFTWARE_DIR}/${_bun} 2>/dev/null" \
                     && error "Found links to external libraries for binary: $(diste "${_bin}") in bundle $(diste "${_bun}")!" \
                     || debug "OK"
         done
