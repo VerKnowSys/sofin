@@ -286,7 +286,7 @@ validate_linked_properly () {
                     _linked=$(${OTOOL_BIN} -L "${_bin}" | ${GREP_BIN} -Ev "(\s${SOFTWARE_DIR}/${_bun}/lib/)|(\s/usr/lib/)|(\s/lib/)|(\s/System/Library/Frameworks/)"  2>/dev/null | ${CUT_BIN} -f1 -d":")
                     ;;
                 *)
-                    _linked=$(${LDD_BIN} "${_bin}" | ${GREP_BIN} -Ev "(\s/usr/lib/)|(\s${SOFTWARE_DIR}/${_bun}/lib/)|(\s/lib/)"  2>/dev/null | ${CUT_BIN} -f1 -d":")
+                    _linked=$(${LDD_BIN} "${_bin}" | ${GREP_BIN} -Ev "( /usr/lib/)|( ${SOFTWARE_DIR}/${_bun}/lib/)|( /lib/)"  2>/dev/null | ${CUT_BIN} -f1 -d":")
                     ;;
             esac
             if [ "${_linked}" = "${_bin}" ]; then
