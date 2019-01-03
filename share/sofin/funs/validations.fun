@@ -281,17 +281,23 @@ validate_linked_properly () {
 
         for _bin in $(${FIND_BIN} "${_a_dir}" -mindepth 1 -maxdepth 1 -type l 2>/dev/null); do
             debug "Validating $(distd "${_bin}") from bundle $(distd "${_bun}")"
-                case "${SYSTEM_NAME}" in
-                    Darwin)
-                        _ldd_cmd="${OTOOL_BIN} -L ${_bin}"
-                        ;;
-                    *)
-                        _ldd_cmd="${LDD_BIN} ${_bin}"
-                        ;;
-                esac
-                try "${_ldd_cmd} | ${GREP_BIN} -v /usr/lib  2>/dev/null| ${GREP_BIN} -v ${SOFTWARE_DIR}/${_bun} 2>/dev/null" \
-                    && error "Found links to external libraries for binary: $(diste "${_bin}") in bundle $(diste "${_bun}")!" \
-                    || debug "OK"
+            case "${SYSTEM_NAME}" in
+                Darwin)
+                    _ldd_cmd="${OTOOL_BIN} -L ${_bin}"
+                    debug "$(distd ${_ldd_cmd})"
+                    _linked="$("${_ldd_cmd}" | "${GREP_BIN}" -Ev '( /usr/lib)|( ${SOFTWARE_DIR}/${_bun}/lib)|( /lib)|( /System/Library/Frameworks/)'  2>/dev/null | ${CUT_BIN} -f1 -d":")"
+                    debug "$(distd ${_linked})"
+                    ;;
+                *)
+                    _ldd_cmd="${LDD_BIN} ${_bin}"
+                    _linked="$("${_ldd_cmd}" | "${GREP_BIN}" -Ev '( /usr/lib)|( ${SOFTWARE_DIR}/${_bun}/lib)|( /lib)'  2>/dev/null | ${CUT_BIN} -f1 -d":")"
+                    ;;
+            esac
+            if [ "${_linked}" = "${_a_dir}/${_bin}" ]; then
+                debug "OK"
+            else
+                error "Found links to external libraries for binary: $(diste "${_bin}") in bundle $(diste "${_bun}")! See: \n $(diste "${_linked}")"
+            fi
         done
     done
     return 0
