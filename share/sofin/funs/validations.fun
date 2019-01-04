@@ -297,7 +297,7 @@ validate_linked_properly () {
                 if [ "${_linked}" = "${_bin}:" ]; then
                     debug "OK"
                 else
-                    error "Inalid links for binary: $(diste "${_bin}")! See: \n $(diste "${_linked}")"
+                    error "Invalid links for binary: $(diste "${_bin}")! See: \n $(diste "${_linked}")"
                 fi
             elif ${FILE_BIN} -L "${_bin}" | ${GREP_BIN} -E 'text' >/dev/null 2>&1; then
                 debug "$(distd "${_bin}") is a script or text file, skipping validation"
