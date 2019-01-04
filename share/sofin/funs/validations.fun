@@ -286,10 +286,10 @@ validate_linked_properly () {
             if ${FILE_BIN} -L "${_bin}" | ${GREP_BIN} -E 'x86(-|_)64' >/dev/null 2>&1; then
                 case "${SYSTEM_NAME}" in
                     Darwin)
-                        _linked=$(${OTOOL_BIN} -L "${_bin}" | ${GREP_BIN} -Ev "(\s${SOFTWARE_DIR}/${_bun}(/|/bin/../)lib/)|(\s/usr/lib/)|(\s/lib/)|(\s/System/Library/Frameworks/)"  2>/dev/null)
+                        _linked="$(${OTOOL_BIN} -L "${_bin}" | ${GREP_BIN} -Ev "(\s${SOFTWARE_DIR}/${_bun}(/|/bin/../)lib/)|(\s/usr/lib/)|(\s/lib/)|(\s/System/Library/Frameworks/)"  2>/dev/null)"
                         ;;
                     *)
-                        _linked=$(${LDD_BIN} "${_bin}" | ${GREP_BIN} -Ev "( /usr/lib/)|( ${SOFTWARE_DIR}/${_bun}(/|/bin/../)lib/)|( /lib/)"  2>/dev/null)
+                        _linked="$(${LDD_BIN} "${_bin}" | ${GREP_BIN} -Ev "( /usr/lib/)|( ${SOFTWARE_DIR}/${_bun}(/|/bin/../)lib/)|( /lib/)"  2>/dev/null)"
                         ;;
                 esac
                 if [ "${_linked}" = "${_bin}:" ]; then
