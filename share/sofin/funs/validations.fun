@@ -280,19 +280,25 @@ validate_linked_properly () {
         fi
 
         for _bin in $(${FIND_BIN} "${_a_dir}" -mindepth 1 -maxdepth 1 -type l 2>/dev/null); do
-            debug "Validating $(distd "${_bin}") from bundle $(distd "${_bun}")"
-            case "${SYSTEM_NAME}" in
-                Darwin)
-                    _linked=$(${OTOOL_BIN} -L "${_bin}" | ${GREP_BIN} -Ev "(\s${SOFTWARE_DIR}/${_bun}/lib/)|(\s/usr/lib/)|(\s/lib/)|(\s/System/Library/Frameworks/)"  2>/dev/null)
-                    ;;
-                *)
-                    _linked=$(${LDD_BIN} "${_bin}" | ${GREP_BIN} -Ev "( /usr/lib/)|( ${SOFTWARE_DIR}/${_bun}/lib/)|( /lib/)"  2>/dev/null)
-                    ;;
-            esac
-            if [ "${_linked}" = "${_bin}:" ]; then
-                debug "OK"
+            debug "Validating $(distd "${_bin}")"
+            if ${FILE_BIN} -L "${_bin}" | ${GREP_BIN} -E 'x86(-|_)64' >/dev/null 2>&1; then
+                case "${SYSTEM_NAME}" in
+                    Darwin)
+                        _linked=$(${OTOOL_BIN} -L "${_bin}" | ${GREP_BIN} -Ev "(\s${SOFTWARE_DIR}/${_bun}/lib/)|(\s/usr/lib/)|(\s/lib/)|(\s/System/Library/Frameworks/)"  2>/dev/null)
+                        ;;
+                    *)
+                        _linked=$(${LDD_BIN} "${_bin}" | ${GREP_BIN} -Ev "( /usr/lib/)|( ${SOFTWARE_DIR}/${_bun}/lib/)|( /lib/)"  2>/dev/null)
+                        ;;
+                esac
+                if [ "${_linked}" = "${_bin}:" ]; then
+                    debug "OK"
+                else
+                    error "Found links to external libraries for binary: $(diste "${_bin}")! See: \n $(diste "${_linked}")"
+                fi
+            elif ${FILE_BIN} -L "${_bin}" | ${GREP_BIN} -E 'POSIX shell script' >/dev/null 2>&1; then
+                debug "$(distd "${_bin}") is a shell script, skipping validation"
             else
-                error "Found links to external libraries for binary: $(diste "${_bin}") in bundle $(diste "${_bun}")! See: \n $(diste "${_linked}")"
+                error "$(diste "${_bin}") is not a proper executable or shell script!"
             fi
         done
     done
