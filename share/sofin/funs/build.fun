@@ -1,4 +1,3 @@
-
 build_bundle () {
     _bsbname="${1}"
     _bsbelement="${2}"
@@ -303,7 +302,7 @@ build () {
         try after_export_callback
         try after_export_snapshot
         validate_pie_on_exports "${_build_list}"
-        # TODO: validate_linked_properly "${_build_list}"
+        validate_linked_properly "${_build_list}"
         # TODO: validate_bundle_binaries "${_build_list}"
 
         if [ -n "${CAP_SYS_BUILDHOST}" ]; then

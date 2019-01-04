@@ -15,6 +15,7 @@ HDID_BIN="/usr/bin/hdid"
 NEWFS_HFS_BIN="/sbin/newfs_hfs"
 CHFLAGS_BIN="/usr/bin/chflags"
 DISKUTIL_BIN="/usr/sbin/diskutil"
+OTOOL_BIN="/usr/bin/otool"
 
 # set core parameters:
 ALL_CPUS="$(${SYSCTL_BIN} -n machdep.cpu.thread_count 2>/dev/null)"
