@@ -18,15 +18,19 @@ check_version () { # $1 => installed version, $2 => available version
 
 # validate environment availability or crash
 validate_env () {
-    for _envvar in $(set | ${GREP_BIN} -EI "^[A-Z]+_BIN=" 2>/dev/null)
-    do
-        _var_value="${_envvar#*=}"
-        if [ ! -x "${_var_value}" ]; then
-            error "Required binary is unavailable: $(diste "${_envvar}")"
-        fi
-    done \
-        || finalize_and_quit_gracefully_with_exitcode "${ERRORCODE_VALIDATE_ENV_FAILURE}"
-    unset _var_value _envvar
+    if [ -z "${SKIP_ENV_VALIDATION}" ]; then
+        for _envvar in $(set | ${GREP_BIN} -EI "^[A-Z]+_BIN=" 2>/dev/null)
+        do
+            _var_value="${_envvar#*=}"
+            if [ ! -x "${_var_value}" ]; then
+                error "Required binary is unavailable: $(diste "${_envvar}")"
+            fi
+        done \
+            || finalize_and_quit_gracefully_with_exitcode "${ERRORCODE_VALIDATE_ENV_FAILURE}"
+        unset _var_value _envvar
+    else
+        debug "ENV validation skipped!"
+    fi
 }
 
 
