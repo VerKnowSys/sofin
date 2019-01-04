@@ -1,5 +1,3 @@
-#!/usr/bin/env sh
-
 build_bundle () {
     _bsbname="${1}"
     _bsbelement="${2}"

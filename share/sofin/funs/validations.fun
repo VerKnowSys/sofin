@@ -1,5 +1,3 @@
-#!/usr/bin/env sh
-
 check_version () { # $1 => installed version, $2 => available version
     if [ -n "${1}" ]; then
         if [ -n "${2}" ]; then
