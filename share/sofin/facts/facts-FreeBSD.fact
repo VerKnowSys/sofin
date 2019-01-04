@@ -27,6 +27,7 @@ PWD_MKDB_BIN="/usr/sbin/pwd_mkdb"
 GEOM_BIN="/sbin/geom"
 BEADM_BIN="/usr/sbin/beadm"
 HBSDCONTROL_BIN="/usr/sbin/hbsdcontrol"
+LDD_BIN="/usr/bin/ldd"
 
 # ServeD governor, FreeBSD specific:
 # GVR_BIN="/usr/bin/gvr"

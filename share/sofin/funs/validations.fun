@@ -264,3 +264,45 @@ crash_if_mission_critical () {
         error "Bundle: $(diste "${1}") is marked as $(diste "Mission-Critical") and cannot be destroyed automatically. It has to be done manually."
     fi
 }
+
+validate_linked_properly () {
+    _bundz="${*}"
+    if [ -z "${_bundz}" ]; then
+        error "At least single bundle name has to be specified."
+    fi
+    debug "Validating links on exports: $(distd "${_bundz}")"
+    for _bun in $(to_iter "${_bundz}"); do
+        if [ -d "${SOFTWARE_DIR}/${_bun}/exports" ]; then
+            _a_dir="${SOFTWARE_DIR}/${_bun}/exports"
+        elif [ -d "${SOFTWARE_DIR}/${_bun}/exports-disabled" ]; then
+            _a_dir="${SOFTWARE_DIR}/${_bun}/exports-disabled"
+        else
+            debug "No exports of bundle: $(distd "${_bun}"). Link validation skipped."
+            return 0
+        fi
+
+        for _bin in $(${FIND_BIN} "${_a_dir}" -mindepth 1 -maxdepth 1 -type l 2>/dev/null); do
+            debug "Validating $(distd "${_bin}")"
+            if ${FILE_BIN} -L "${_bin}" | ${GREP_BIN} -E 'x86(-|_)64' >/dev/null 2>&1; then
+                case "${SYSTEM_NAME}" in
+                    Darwin)
+                        _linked=$(${OTOOL_BIN} -L "${_bin}" | ${GREP_BIN} -Ev "(\s${SOFTWARE_DIR}/${_bun}(/|/bin/../)lib/)|(\s/usr/lib/)|(\s/lib/)|(\s/System/Library/Frameworks/)"  2>/dev/null)
+                        ;;
+                    *)
+                        _linked=$(${LDD_BIN} "${_bin}" | ${GREP_BIN} -Ev "( /usr/lib/)|( ${SOFTWARE_DIR}/${_bun}(/|/bin/../)lib/)|( /lib/)"  2>/dev/null)
+                        ;;
+                esac
+                if [ "${_linked}" = "${_bin}:" ]; then
+                    debug "OK"
+                else
+                    error "Invalid links for binary: $(diste "${_bin}")! See: \n $(diste "${_linked}")"
+                fi
+            elif ${FILE_BIN} -L "${_bin}" | ${GREP_BIN} -E 'text' >/dev/null 2>&1; then
+                debug "$(distd "${_bin}") is a script or text file, skipping validation"
+            else
+                error "$(diste "${_bin}") is not a proper executable or script!"
+            fi
+        done
+    done
+    return 0
+}
