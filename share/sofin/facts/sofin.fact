@@ -1,3 +1,5 @@
+#!/usr/bin/env sh
+
 SOFIN_VERSION="1.8.8"
 
 DEFAULT_RELEASE_HOST="git.verknowsys.com" # NOTE: use value for v from /etc/hosts

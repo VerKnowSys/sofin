@@ -1,3 +1,5 @@
+#!/usr/bin/env sh
+
 env_reset () {
     # unset conflicting environment variables
     # dynamic linker:
@@ -646,4 +648,3 @@ load_sysctl_buildhost_hardening () {
             && debug "Loaded sysctl system defaults"
     fi
 }
-

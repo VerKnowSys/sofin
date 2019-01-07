@@ -1,3 +1,4 @@
+#!/usr/bin/env sh
 
 debug () {
     _debug_msg="${*}"

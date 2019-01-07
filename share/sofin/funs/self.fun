@@ -1,3 +1,4 @@
+#!/usr/bin/env sh
 
 load_requirements () {
     # load base facts

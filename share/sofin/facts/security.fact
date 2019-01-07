@@ -1,3 +1,5 @@
+#!/usr/bin/env sh
+
 # Security specific configuration
 
 DEFAULT_HARDEN_KEYS="hardening.procfs_harden \

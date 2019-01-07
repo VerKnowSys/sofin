@@ -1,3 +1,5 @@
+#!/usr/bin/env sh
+
 # POSIX base system binaries used internally by Sofin:
 HOSTNAME_BIN="/bin/hostname"
 KILL_BIN="/bin/kill"

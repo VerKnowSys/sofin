@@ -1,3 +1,4 @@
+#!/usr/bin/env sh
 
 # Guards:
 FIRST_ARG_GUARD="${CUT_BIN} -f1 2>/dev/null"

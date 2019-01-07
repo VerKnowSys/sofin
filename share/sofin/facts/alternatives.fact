@@ -1,3 +1,5 @@
+#!/usr/bin/env sh
+
 #
 # alternatives.fact - definitions of possible alternatives for base utilities
 

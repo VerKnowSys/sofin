@@ -1,3 +1,5 @@
+#!/usr/bin/env sh
+
 # Core facts
 
 # executables provided with Sofin:
@@ -137,4 +139,3 @@ SOFIN_PROFILE="${HOME}/.profile"
 SOFIN_ENV_ENABLED_INDICATOR_FILE="${HOME}/.${SOFIN_NAME}-enabled"
 SERVED_BUILDHOST_INDICATOR_FILE="/.build-host"
 SERVED_BUILDHOST_INDICATOR_FILE_ALT="${HOME}${SERVED_BUILDHOST_INDICATOR_FILE}"
-
