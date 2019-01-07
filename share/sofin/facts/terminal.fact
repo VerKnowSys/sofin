@@ -1,3 +1,5 @@
+#!/usr/bin/env sh
+
 # Terminal definitions
 
 LOGNAME="${LOGNAME:-${USER}}"

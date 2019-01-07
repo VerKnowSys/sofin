@@ -1,3 +1,4 @@
+#!/usr/bin/env sh
 
 less_logs () {
     ${LESS_BIN} ${DEFAULT_LESS_OPTIONS} ${LOGS_DIR}/${SOFIN_NAME}-*${1}* 2>/dev/null

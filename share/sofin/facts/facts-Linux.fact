@@ -1,3 +1,5 @@
+#!/usr/bin/env sh
+
 # Linux specific configuration
 
 CHFLAGS_BIN="/usr/bin/chattr"

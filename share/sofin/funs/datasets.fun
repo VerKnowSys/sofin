@@ -1,3 +1,4 @@
+#!/usr/bin/env sh
 
 push_to_all_mirrors () {
     _pbto_bundle_name="${1}"

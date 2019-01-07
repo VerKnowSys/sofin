@@ -1,3 +1,5 @@
+#!/usr/bin/env sh
+
 # Parse version string to list of 3 arguments.
 # f.e.: parse_version "1.2.41" will return 1 2 41
 parse_version () {

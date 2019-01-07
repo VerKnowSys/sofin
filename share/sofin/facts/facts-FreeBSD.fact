@@ -1,3 +1,5 @@
+#!/usr/bin/env sh
+
 # FreeBSD specific configuration
 
 BHYVE_BIN="/usr/sbin/bhyve"

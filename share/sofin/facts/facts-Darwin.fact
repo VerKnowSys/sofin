@@ -1,3 +1,5 @@
+#!/usr/bin/env sh
+
 # OSX specific configuration
 
 unset SERVICE_BIN # not necessary

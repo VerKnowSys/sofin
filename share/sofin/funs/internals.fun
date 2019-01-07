@@ -1,3 +1,5 @@
+#!/usr/bin/env sh
+
 usage_howto () {
     permnote "Built in tasks:"
     permnote

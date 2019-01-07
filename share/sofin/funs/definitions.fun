@@ -1,3 +1,5 @@
+#!/usr/bin/env sh
+
 load_defs () {
     _definitions="${*}"
     if [ -z "${_definitions}" ]; then

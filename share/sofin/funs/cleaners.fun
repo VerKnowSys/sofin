@@ -1,3 +1,5 @@
+#!/usr/bin/env sh
+
 clean_purge () {
     try "${RM_BIN} -rf '${CACHE_DIR}'" \
         && debug "Clean: Purged everything."
