@@ -286,27 +286,26 @@ validate_linked_properly () {
         for _bin in $(${FIND_BIN} "${_a_dir}" -mindepth 1 -maxdepth 1 -type l 2>/dev/null); do
             debug "Validating $(distd "${_bin}")"
             if ${FILE_BIN} -L "${_bin}" | ${GREP_BIN} -E 'x86(-|_)64' >/dev/null 2>&1; then
-                case "${SYSTEM_NAME}" in
-                    Darwin)
+                if [ "${SYSTEM_NAME}" = "Darwin" ]; then
                         _linked=$(${OTOOL_BIN} -L "${_bin}" | ${GREP_BIN} -Ev "(\s${SOFTWARE_DIR}/${_bun}(/|/bin/../)lib/)|(\s/usr/lib/)|(\s/lib/)|(\s/System/Library/Frameworks/)"  2>/dev/null)
-                        ;;
-                    *)
+                else
                         _linked=$(${LDD_BIN} "${_bin}" | ${GREP_BIN} -Ev "( /usr/lib/)|( ${SOFTWARE_DIR}/${_bun}(/|/bin/../)lib/)|( /lib/)"  2>/dev/null)
-                        ;;
-                esac
+                fi
 
                 if [ "${_linked}" != "${_bin}:" ]; then
                     error "Invalid links for binary: $(diste "${_bin}")! See: \n $(diste "${_linked}")"
                 fi
-
-                debug "OK"
             elif ${FILE_BIN} -L "${_bin}" | ${GREP_BIN} -E 'text' >/dev/null 2>&1; then
                 debug "$(distd "${_bin}") is a script or text file, skipping validation"
             else
                 error "$(diste "${_bin}") is not a proper executable or script!"
             fi
         done
+
+        debug "OK"
     done
+
+    unset _bundz _bun _a_dir _bin _linked
     return 0
 }
 
@@ -343,5 +342,7 @@ validate_libs () {
 
         debug "OK"
     done
+
+    unset _bundz _bun _a_dir _lib _linked _libext
     return 0
 }
