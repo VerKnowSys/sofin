@@ -267,7 +267,7 @@ crash_if_mission_critical () {
     fi
 }
 
-validate_linked_properly () {
+validate_bins_links () {
     _bundz="${*}"
     if [ -z "${_bundz}" ]; then
         error "At least single bundle name has to be specified."
@@ -308,7 +308,7 @@ validate_linked_properly () {
     return 0
 }
 
-validate_libs () {
+validate_libs_links () {
     _bundz="${*}"
     if [ -z "${_bundz}" ]; then
         error "At least single bundle name has to be specified."

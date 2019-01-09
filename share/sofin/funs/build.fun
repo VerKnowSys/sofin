@@ -304,8 +304,8 @@ build () {
         try after_export_callback
         try after_export_snapshot
         validate_pie_on_exports "${_build_list}"
-        validate_linked_properly "${_build_list}"
-        validate_libs "${_build_list}"
+        validate_bins_links "${_build_list}"
+        validate_libs_links "${_build_list}"
 
         if [ -n "${CAP_SYS_BUILDHOST}" ]; then
             if [ -n "${DEF_UTILITY_BUNDLE}" ]; then
