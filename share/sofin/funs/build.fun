@@ -306,7 +306,6 @@ build () {
         validate_pie_on_exports "${_build_list}"
         validate_linked_properly "${_build_list}"
         validate_libs "${_build_list}"
-        # TODO: validate_bundle_binaries "${_build_list}"
 
         if [ -n "${CAP_SYS_BUILDHOST}" ]; then
             if [ -n "${DEF_UTILITY_BUNDLE}" ]; then
