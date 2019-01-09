@@ -294,11 +294,12 @@ validate_linked_properly () {
                         _linked=$(${LDD_BIN} "${_bin}" | ${GREP_BIN} -Ev "( /usr/lib/)|( ${SOFTWARE_DIR}/${_bun}(/|/bin/../)lib/)|( /lib/)"  2>/dev/null)
                         ;;
                 esac
-                if [ "${_linked}" = "${_bin}:" ]; then
-                    debug "OK"
-                else
+
+                if [ "${_linked}" != "${_bin}:" ]; then
                     error "Invalid links for binary: $(diste "${_bin}")! See: \n $(diste "${_linked}")"
                 fi
+
+                debug "OK"
             elif ${FILE_BIN} -L "${_bin}" | ${GREP_BIN} -E 'text' >/dev/null 2>&1; then
                 debug "$(distd "${_bin}") is a script or text file, skipping validation"
             else
@@ -339,6 +340,7 @@ validate_libs () {
                 error "Invalid links for library: $(diste "${_lib}")! See: \n $(diste "${_linked}")"
             fi
         done
+
         debug "OK"
     done
     return 0
