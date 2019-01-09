@@ -267,7 +267,7 @@ crash_if_mission_critical () {
     fi
 }
 
-validate_linked_properly () {
+validate_bins_links () {
     _bundz="${*}"
     if [ -z "${_bundz}" ]; then
         error "At least single bundle name has to be specified."
@@ -284,19 +284,14 @@ validate_linked_properly () {
         fi
 
         for _bin in $(${FIND_BIN} "${_a_dir}" -mindepth 1 -maxdepth 1 -type l 2>/dev/null); do
-            debug "Validating $(distd "${_bin}")"
             if ${FILE_BIN} -L "${_bin}" | ${GREP_BIN} -E 'x86(-|_)64' >/dev/null 2>&1; then
-                case "${SYSTEM_NAME}" in
-                    Darwin)
+                if [ "${SYSTEM_NAME}" = "Darwin" ]; then
                         _linked="$(${OTOOL_BIN} -L "${_bin}" | ${GREP_BIN} -Ev "(\s${SOFTWARE_DIR}/${_bun}(/|/bin/../)lib/)|(\s/usr/lib/)|(\s/lib/)|(\s/System/Library/Frameworks/)"  2>/dev/null)"
-                        ;;
-                    *)
-                        _linked="$(${LDD_BIN} "${_bin}" | ${GREP_BIN} -Ev "( /usr/lib/)|( ${SOFTWARE_DIR}/${_bun}(/|/bin/../)lib/)|( /lib/)"  2>/dev/null)"
-                        ;;
-                esac
-                if [ "${_linked}" = "${_bin}:" ]; then
-                    debug "OK"
                 else
+                        _linked="$(${LDD_BIN} "${_bin}" | ${GREP_BIN} -Ev "( /usr/lib/)|( ${SOFTWARE_DIR}/${_bun}(/|/bin/../)lib/)|( /lib/)"  2>/dev/null)"
+                fi
+
+                if [ "${_linked}" != "${_bin}:" ]; then
                     error "Invalid links for binary: $(diste "${_bin}")! See: \n $(diste "${_linked}")"
                 fi
             elif ${FILE_BIN} -L "${_bin}" | ${GREP_BIN} -E 'text' >/dev/null 2>&1; then
@@ -305,6 +300,48 @@ validate_linked_properly () {
                 error "$(diste "${_bin}") is not a proper executable or script!"
             fi
         done
+
+        debug "OK"
     done
+
+    unset _bundz _bun _a_dir _bin _linked
+    return 0
+}
+
+validate_libs_links () {
+    _bundz="${*}"
+    if [ -z "${_bundz}" ]; then
+        error "At least single bundle name has to be specified."
+    fi
+    debug "Validating libraries: $(distd "${_bundz}")"
+    for _bun in $(to_iter "${_bundz}"); do
+        if [ -d "${SOFTWARE_DIR}/${_bun}/lib" ]; then
+            _a_dir="${SOFTWARE_DIR}/${_bun}/lib"
+        else
+            debug "Libraries dir not found, skipping"
+        fi
+
+        if [ "${SYSTEM_NAME}" = "Darwin" ]; then
+            _libext="dylib"
+        else
+            _libext="so"
+        fi
+
+        for _lib in $(${FIND_BIN} "${_a_dir}" \( -name "*.${_libext}" -or -name "*.${_libext}.*" \) -mindepth 1 -type f 2>/dev/null); do
+            if [ "${SYSTEM_NAME}" = "Darwin" ]; then
+                _linked="$(${OTOOL_BIN} -L "${_lib}" | ${GREP_BIN} -Ev "(\s${SOFTWARE_DIR}/${_bun}(/|/bin/../)lib/)|(\s/usr/lib/)|(\s/lib/)|(\s/System/Library/Frameworks/)"  2>/dev/null)"
+            else
+                _linked="$(${LDD_BIN} "${_lib}" | ${GREP_BIN} -Ev "( /usr/lib/)|( ${SOFTWARE_DIR}/${_bun}(/|/bin/../)lib/)|( /lib/)"  2>/dev/null)"
+            fi
+
+            if [ "${_linked}" != "${_lib}:" ]; then
+                error "Invalid links for library: $(diste "${_lib}")! See: \n $(diste "${_linked}")"
+            fi
+        done
+
+        debug "OK"
+    done
+
+    unset _bundz _bun _a_dir _lib _linked _libext
     return 0
 }
