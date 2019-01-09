@@ -695,14 +695,14 @@ process_flat () {
                             printf "%b\n" "${DEF_CONFIGURE_METHOD}" | ${GREP_BIN} -F 'configure' >/dev/null 2>&1
                             if [ "${?}" = "0" ]; then
                                 # NOTE: by defaultautoconf configure accepts influencing variables as configure script params
-                                try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} ${_pic_optional} ${_addon}" \
-                                    || try "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} ${_pic_optional}" \
-                                        || try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} ${_addon}" \
+                                try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} ${_pic_optional} ${_addon} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
+                                    || try "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} ${_pic_optional} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
+                                        || try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} ${_addon} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
                                             || run "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix}"
                             else
-                                try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} ${_addon}" \
-                                    || try "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix}" \
-                                        || try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} ${_addon}" \
+                                try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} ${_addon} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
+                                    || try "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
+                                        || try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} ${_addon} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
                                             || run "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS}" # Trust definition
                             fi
                         else
@@ -716,25 +716,25 @@ process_flat () {
                                 #   --localstatedir=${SERVICE_DIR}/var
                                 #   --runstatedir=${SERVICE_DIR}/run
                                 #   --with-pic
-                                try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var ${_pic_optional} ${_addon}" \
-                                    || try "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var ${_pic_optional}" \
-                                        || try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var ${_addon}" \
-                                            || try "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var" \
-                                                || try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc ${_pic_optional} ${_addon}" \
-                                                    || try "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc ${_pic_optional}" \
-                                                        || try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc ${_addon}" \
-                                                            || try "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc" \
-                                                                || try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} ${_pic_optional} ${_addon}" \
-                                                                    || try "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} ${_pic_optional}" \
-                                                                        || try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} ${_addon}" \
+                                try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var ${_pic_optional} ${_addon} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
+                                    || try "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var ${_pic_optional} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
+                                        || try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var ${_addon} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
+                                            || try "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
+                                                || try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc ${_pic_optional} ${_addon} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
+                                                    || try "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc ${_pic_optional} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
+                                                        || try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc ${_addon} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
+                                                            || try "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
+                                                                || try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} ${_pic_optional} ${_addon} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
+                                                                    || try "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} ${_pic_optional} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
+                                                                        || try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} ${_addon} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
                                                                             || run "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix}" # last two - only as a fallback
 
                             else # fallback again:
                                 # NOTE: First - try to specify GNU prefix,
                                 # then trust prefix given in software definition.
-                                try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} ${_addon}" \
-                                    || try "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix}" \
-                                        || try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} ${_addon}" \
+                                try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} ${_addon} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
+                                    || try "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
+                                        || try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} ${_addon} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
                                             || run "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS}"
                             fi
                         fi
