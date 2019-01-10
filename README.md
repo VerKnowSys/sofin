@@ -6,6 +6,7 @@
 
 ## Contributors:
 * Michał (tallica) Lipski
+* Bartosz (bart) Kośnik
 
 
 ## Thanks:
