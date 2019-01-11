@@ -294,7 +294,7 @@ validate_bins_links () {
                 if [ "${_linked}" != "${_bin}:" ]; then
                     error "Invalid links for binary: $(diste "${_bin}")! See: \n $(diste "${_linked}")"
                 fi
-            elif ${FILE_BIN} -L "${_bin}" | ${GREP_BIN} -E 'text' >/dev/null 2>&1; then
+            elif ${FILE_BIN} -L "${_bin}" | ${GREP_BIN} -E '(text|script)' >/dev/null 2>&1; then
                 debug "$(distd "${_bin}") is a script or text file, skipping validation"
             else
                 error "$(diste "${_bin}") is not a proper executable or script!"
