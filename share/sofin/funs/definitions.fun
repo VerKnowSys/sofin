@@ -418,7 +418,7 @@ wipe_remote_archives () {
         for _wr_element in $(to_iter "${_bund_names}"); do
             _lowercase_element="$(lowercase "${_wr_element}")"
             _remote_ar_name="${_wr_element}-"
-            _wr_dig="$(${HOST_BIN} A "${MAIN_SOFTWARE_ADDRESS}" 2>/dev/null | ${GREP_BIN} 'Address:' 2>/dev/null | eval "${HOST_ADDRESS_GUARD}")"
+            _wr_dig="$(${HOST_BIN} "${MAIN_SOFTWARE_ADDRESS}" 2>/dev/null | ${CUT_BIN} -d' ' -f4 2>/dev/null)"
             if [ -z "${_wr_dig}" ]; then
                 error "No mirrors found in address: $(diste "${MAIN_SOFTWARE_ADDRESS}")"
             fi

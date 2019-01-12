@@ -5,7 +5,7 @@ push_to_all_mirrors () {
     _pversion_element="${2}"
     _ptelm_file_name="${_pbto_bundle_name}-${_pversion_element}-${OS_TRIPPLE}${DEFAULT_ARCHIVE_EXT}"
     _ptelm_service_name="${_pbto_bundle_name}-${_pversion_element}"
-    _pt_query="$(${HOST_BIN} A "${MAIN_SOFTWARE_ADDRESS}" 2>/dev/null | ${GREP_BIN} 'Address:' 2>/dev/null | eval "${HOST_ADDRESS_GUARD}")"
+    _pt_query="$(${HOST_BIN} "${MAIN_SOFTWARE_ADDRESS}" 2>/dev/null | ${CUT_BIN} -d' ' -f4 2>/dev/null)"
     debug "Address: $(distd "${_pt_query}"), bundle: $(distd "${_pbto_bundle_name}"), name: $(distd "${_ptelm_file_name}")"
     if [ -z "${_pbto_bundle_name}" ]; then
         error "First argument with a $(diste "BundleName") is required!"
