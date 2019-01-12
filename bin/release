@@ -31,29 +31,22 @@ ${TAR_BIN} cJf "${archive_name}" "./${base_name}"
 ${RM_BIN} -rf "${base_name}"
 cd ../
 
-# if [ "${USER}" != "dmilith" ]; then
-#     warn "You should be dmilith, to push a release."
-# else
-#     DEST_NAME="${SOFIN_NAME}-${SOFIN_VERSION}${DEFAULT_ARCHIVE_TARBALL_EXT}"
 
-#     note "Pushing Sofin package to remote server: "
-#     ${CHMOD_BIN} a+r "releases/${DEST_NAME}"
-#     ${SCP_BIN} "releases/${DEST_NAME}" "${DEFAULT_RELEASE_HOST}:${DEFAULT_RELEASE_REMOTE_PATH}" 2>/dev/null
-#     ${SSH_BIN} "${SOFIN_NAME}@${DEFAULT_RELEASE_HOST}" "source ~/.functions.sh && gather-source ${DEFAULT_RELEASE_PATH}/${DEST_NAME}"
+DEST_NAME="${SOFIN_NAME}-${SOFIN_VERSION}${DEFAULT_ARCHIVE_TARBALL_EXT}"
+note "Pushing Sofin package to remote server…"
+${CHMOD_BIN} a+r "releases/${DEST_NAME}"
+${SCP_BIN} \
+    -P "${SOFIN_SSH_PORT}" \
+    "releases/${DEST_NAME}" \
+    "${SOFIN_NAME}@${DEFAULT_RELEASE_HOST}:${MAIN_SOURCE_PREFIX}"
 
-#     note "Preparing initial snapshot from repository: ${DEFAULT_DEFINITIONS_REPOSITORY}"
-#     ${GIT_BIN} clone --depth 1 "${DEFAULT_DEFINITIONS_REPOSITORY}" "${SOFIN_DEFINITIONS_DIR}" >/dev/null
-#     cd "./${SOFIN_DEFINITIONS_DIR}"
-#     # ${GIT_BIN} push --all "${DEFAULT_DEFINITIONS_REPOSITORY_ALT}" >/dev/null
-#     # ${GIT_BIN} push --tags "${DEFAULT_DEFINITIONS_REPOSITORY_ALT}" >/dev/null
-#     ${TAR_BIN} cJf "../releases/${DEFINITIONS_INITIAL_FILE_NAME}${DEFAULT_ARCHIVE_TARBALL_EXT}" definitions lists README.md >/dev/null
-#     cd ../
-# fi
-
-note "Pushing snapshot to remote server(s)"
+note "Pushing snapshot to remote server…"
 ${CHMOD_BIN} a+r "releases/${DEFINITIONS_INITIAL_FILE_NAME}${DEFAULT_ARCHIVE_TARBALL_EXT}"
-${SCP_BIN} "releases/${DEFINITIONS_INITIAL_FILE_NAME}${DEFAULT_ARCHIVE_TARBALL_EXT}" "${DEFAULT_RELEASE_HOST}:${MAIN_SOURCE_PREFIX}" 2>/dev/null
-# ${SSH_BIN} "${SOFIN_NAME}@${DEFAULT_RELEASE_HOST}" "rm /Mirror/software/source/${DEFINITIONS_INITIAL_FILE_NAME}${DEFAULT_ARCHIVE_TARBALL_EXT} ; source ~/.functions.sh && gather-source ${DEFAULT_RELEASE_PATH}/${DEFINITIONS_INITIAL_FILE_NAME}${DEFAULT_ARCHIVE_TARBALL_EXT}" >/dev/null
+${SCP_BIN} \
+    -P "${SOFIN_SSH_PORT}" \
+    "releases/${DEFINITIONS_INITIAL_FILE_NAME}${DEFAULT_ARCHIVE_TARBALL_EXT}" \
+    "${SOFIN_NAME}@${DEFAULT_RELEASE_HOST}:${MAIN_SOURCE_PREFIX}"
+
 ${RM_BIN} -rf "./${SOFIN_DEFINITIONS_DIR}" "${DEFINITIONS_INITIAL_FILE_NAME}${DEFAULT_ARCHIVE_TARBALL_EXT}"
 
 permnote "Sofin v$(distn "${SOFIN_VERSION}") deployed to: $(distn "${MAIN_SOURCE_REPOSITORY}")"
