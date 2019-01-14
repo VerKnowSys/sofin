@@ -340,24 +340,25 @@ print_shell_vars () {
 
 
 list_bundles_full () {
-    permnote "Installed software bundles (with dependencies):"
-    if [ -d "${SOFTWARE_DIR}" ]; then
-        for _lbfapp in ${SOFTWARE_DIR}/*; do
+    note "Bundle checks in progress…"
+    for _lbfapp in ${SOFTWARE_DIR}/*; do
+        if [ -d "${_lbfapp}" ]; then
             _lbfapp_name="${_lbfapp##*/}"
             _lbflowercase="$(lowercase "${_lbfapp_name}")"
             _lbinstald_file="${SOFTWARE_DIR}/${_lbfapp_name}/${_lbflowercase}${DEFAULT_INST_MARK_EXT}"
             if [ -e "${_lbinstald_file}" ]; then
-                permnote "${SUCCESS_CHAR} ${_lbfapp_name}"
+                permnote "${SUCCESS_CHAR} $(distn "${_lbfapp_name}")"
             else
-                permnote "$(distn "${FAIL_CHAR}" "${ColorRed}") ${_lbfapp_name} $(distn "[!]" "${ColorRed}")"
+                warn "$(distw "${FAIL_CHAR}" "${ColorRed}") ${_lbfapp_name} $(distw "[!]" "${ColorRed}")"
             fi
             for _lbfreq in $(${FIND_BIN} "${_lbfapp}" -mindepth 1 -maxdepth 1 -iname "*${DEFAULT_INST_MARK_EXT}" 2>/dev/null | ${SORT_BIN} 2>/dev/null); do
                 _lbpp="$(printf "%b\n" "${_lbfreq##*/}" | ${SED_BIN} "s/${DEFAULT_INST_MARK_EXT}//" 2>/dev/null)"
-                permnote "   ${NOTE_CHAR} ${_lbpp} $(distn "[" "${ColorGray}")$(distn "$(${CAT_BIN} "${_lbfreq}" 2>/dev/null)")$(distn "]" "${ColorGray}")"
+                note "   ${NOTE_CHAR} $(distn "${_lbpp}") $(distn "[" "${ColorGray}")$(distn "$(${CAT_BIN} "${_lbfreq}" 2>/dev/null)")$(distn "]" "${ColorGray}")"
             done
-        done
-        unset _lbfreq _lbfapp _lbflowercase _lbfapp_name _lbinstald_file _lbpp
-    fi
+        fi
+    done
+    unset _lbfreq _lbfapp _lbflowercase _lbfapp_name _lbinstald_file _lbpp
+    permnote "Bundle checks completed."
 }
 
 
