@@ -109,13 +109,18 @@ if [ -n "${SOFIN_COMMAND}" ]; then
                     for _in in $(to_iter "${_all}"); do
                         _bundle="$(capitalize "${_in#+}")"
                         if [ -e "${SOFTWARE_DIR}/${_bundle}" ]; then
-                            _bundles="${_bundle} ${_bundles}"
+                            if [ -z "${_bundles}" ]; then
+                                _bundles="${_bundle}"
+                            else
+                                _bundles="${_bundle} ${_bundles}"
+                            fi
                         fi
                     done
                     if [ -z "${_bundles}" ]; then
                         return 0
                     fi
                     enable_sofin_env "${_bundles}"
+                    permnote "Bundles: $(distn "${_bundles}") added to the environment."
                     ;;
 
                 -*) # remove N elements
@@ -124,13 +129,18 @@ if [ -n "${SOFIN_COMMAND}" ]; then
                     for _in in $(to_iter "${_all}"); do
                         _bundle="$(capitalize "${_in#-}")"
                         if [ -e "${SOFTWARE_DIR}/${_bundle}" ]; then
-                            _bundles="${_bundle} ${_bundles}"
+                            if [ -z "${_bundles}" ]; then
+                                _bundles="${_bundle}"
+                            else
+                                _bundles="${_bundle} ${_bundles}"
+                            fi
                         fi
                     done
                     if [ -z "${_bundles}" ]; then
                         return 0
                     fi
                     disable_sofin_env "${_bundles}"
+                    permnote "Bundles: $(distn "${_bundles}") removed from the environment."
                     ;;
 
                 !|store|save) # save profile
