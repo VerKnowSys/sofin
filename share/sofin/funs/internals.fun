@@ -45,8 +45,9 @@ usage_howto () {
     permnote
     permnote "  $(distn "dev                                  ") puts definition content on the fly. Second argument is (lowercase) definition name (no extension). ($(distn "example: "${SOFIN_BIN_SHORT}" dev rubinius" "${ColorExample}"))"
     permnote "  $(distn "rebuild                              ") rebuilds and pushes each software bundle that depends on definition given as a param. ($(distn "example: "${SOFIN_BIN_SHORT}" rebuild openssl - will rebuild all bundles that have 'openssl' dependency" "${ColorExample}"))"
-    permnote "  $(distn "reset                               ") resets local definitions repository"
-    permnote "  $(distn "diff                                ") displays changes in current definitions cache. Accepts any part of definition name"
+    permnote "  $(distn "reset                                ") resets local definitions repository"
+    permnote "  $(distn "diff                                 ") displays changes in current definitions cache. Accepts any part of definition name"
+    permnote "  $(distn "srccheck                             ") checks sources availability for all existing definitions in local definitions repository"
 }
 
 

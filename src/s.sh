@@ -475,6 +475,9 @@ if [ -n "${SOFIN_COMMAND}" ]; then
             show_outdated RAW
             ;;
 
+        srccheck)
+            validate_sources
+            ;;
 
         *)
             usage_howto

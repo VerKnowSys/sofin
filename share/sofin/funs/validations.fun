@@ -345,3 +345,39 @@ validate_libs_links () {
     unset _bundz _bun _a_dir _lib _linked _libext
     return 0
 }
+
+validate_sources () {
+    if [ -n "${CAP_SYS_BUILDHOST}" ]; then
+        if [ -z "${CURL_BIN}" ]; then
+            error "Curl binary not found - required to run this validation"
+        fi
+
+        permnote "Validating sources for all definitions"
+        _alldefs="$(${FIND_BIN} "${DEFINITIONS_DIR}" -mindepth 1 -maxdepth 1 -type f -name "*${DEFAULT_DEF_EXT}" 2>/dev/null)"
+
+        for _def in $(to_iter "${_alldefs}"); do
+            load_defaults
+            . "${_def}"
+            if [ "${DEF_TYPE}" = "meta" ] || [ "${_def}" = "${DEFINITIONS_DEFAULTS}" ]; then
+                # Skip validations for "not real definition":
+                continue
+            elif [ -n "${DEF_GIT_MODE}" ] || [ -n "${DEF_GIT_CHECKOUT}" ]; then
+                "${GIT_BIN}" ls-remote -h "${DEF_SOURCE_PATH}" >/dev/null 2>&1 \
+                || warn "Failed to access repository: $(distw "${DEF_SOURCE_PATH}") for $(distw "${_def}")"
+            else
+                _curlres="$("${CURL_BIN}" -s -o /dev/null -L -I -w "%{http_code}" "${DEF_SOURCE_PATH}")"
+                if [ "$?" != "0" ]; then
+                    warn "Not an URL: $(distw "${DEF_SOURCE_PATH}") in $(distw "${_def}")"
+                elif [ "${_curlres}" != "200" ]; then
+                    warn "Response code $(distw "${_curlres}") for URL $(distw "${DEF_SOURCE_PATH}") in $(distw "${_def}")"
+                fi
+            fi
+        done
+
+        permnote "Done"
+        load_defaults
+        unset _alldefs _def _curlres
+    else
+        permnote "This is a buildhost-specific task, refusing to run on a production system"
+    fi
+}

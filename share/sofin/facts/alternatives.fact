@@ -84,6 +84,17 @@ elif [ -x "/usr/bin/wget" ]; then
     FETCH_OPTS="--continue --no-verbose --progress=bar --ca-certificate=${DEFAULT_CACERT}"
 fi
 
+# Curl only version of the above:
+if [ -x "/usr/bin/curl" ]; then
+    CURL_BIN="/usr/bin/curl"
+elif [ -x "/bin/curl" ]; then
+    CURL_BIN="/bin/curl"
+elif [ -x "${SOFTWARE_DIR}/Curl/bin/curl" ]; then
+    CURL_BIN="${SOFTWARE_DIR}/Curl/bin/curl"
+elif [ -x "${SOFIN_UTILS_PATH}/curl" ]; then
+    CURL_BIN="${SOFIN_UTILS_PATH}/curl"
+fi
+
 # Git
 if [ -x "/Software/Git/bin/git" ]; then
     GIT_BIN="/Software/Git/bin/git"
