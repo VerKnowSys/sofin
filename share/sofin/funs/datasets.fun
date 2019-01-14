@@ -5,7 +5,7 @@ push_to_all_mirrors () {
     _pversion_element="${2}"
     _ptelm_file_name="${_pbto_bundle_name}-${_pversion_element}-${OS_TRIPPLE}${DEFAULT_ARCHIVE_EXT}"
     _ptelm_service_name="${_pbto_bundle_name}-${_pversion_element}"
-    _pt_query="$(${HOST_BIN} A "${MAIN_SOFTWARE_ADDRESS}" 2>/dev/null | ${GREP_BIN} 'Address:' 2>/dev/null | eval "${HOST_ADDRESS_GUARD}")"
+    _pt_query="$(${HOST_BIN} "${MAIN_SOFTWARE_ADDRESS}" 2>/dev/null | ${CUT_BIN} -d' ' -f4 2>/dev/null)"
     debug "Address: $(distd "${_pt_query}"), bundle: $(distd "${_pbto_bundle_name}"), name: $(distd "${_ptelm_file_name}")"
     if [ -z "${_pbto_bundle_name}" ]; then
         error "First argument with a $(diste "BundleName") is required!"
@@ -68,7 +68,7 @@ push_dset_zfs_stream () {
         try "${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${SOFIN_SSH_PORT} ${SOFIN_NAME}@${_psmirror} \"${MKDIR_BIN} -p '${COMMON_BINARY_REMOTE}'; ${CHMOD_BIN} -v 0755 '${COMMON_BINARY_REMOTE}'\""
 
         # NOTE: check if service dataset bundle isn't already pushed. ZFS streams cannot be overwritten!
-        try "${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${SOFIN_SSH_PORT} ${SOFIN_NAME}@${_psmirror} \"${FILE_BIN} ${COMMON_BINARY_REMOTE}/${_psfin_snapfile}\""
+        try "${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${SOFIN_SSH_PORT} ${SOFIN_NAME}@${_psmirror} \"test -f ${COMMON_BINARY_REMOTE}/${_psfin_snapfile}\""
         if [ "${?}" = "0" ]; then
             debug "Service dataset file found existing on remote mirror: $(distd "${_psmirror}"). Service dataset origins can be stored only once (future ZFS-related features will rely on this!)"
         else

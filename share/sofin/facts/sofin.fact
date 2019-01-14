@@ -1,12 +1,9 @@
 #!/usr/bin/env sh
 
-SOFIN_VERSION="1.8.9"
+SOFIN_VERSION="1.8.10"
 
-DEFAULT_RELEASE_HOST="git.verknowsys.com" # NOTE: use value for v from /etc/hosts
-DEFAULT_RELEASE_PATH="http://dmilith.verknowsys.com/Public/${SOFIN_BUNDLE_NAME}-releases"
-DEFAULT_RELEASE_REMOTE_PATH="/home/dmilith/Web/Public/${SOFIN_BUNDLE_NAME}-releases"
-
-MAIN_SOFTWARE_ADDRESS="${MAIN_SOFTWARE_ADDRESS:-software.verknowsys.com}"
+DEFAULT_RELEASE_HOST="software.verknowsys.com"
+MAIN_SOFTWARE_ADDRESS="${MAIN_SOFTWARE_ADDRESS:-${DEFAULT_RELEASE_HOST}}"
 MAIN_COMMON_NAME="${MAIN_COMMON_NAME:-Common}"
 MAIN_SOFTWARE_PREFIX="${MAIN_SOFTWARE_PREFIX:-/Mirror}"
 MAIN_BINARY_PATH="${MAIN_BINARY_PATH:-/software/binary}"
