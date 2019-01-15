@@ -328,10 +328,11 @@ validate_libs_links () {
         fi
 
         for _lib in $(${FIND_BIN} "${_a_dir}" \( -name "*.${_libext}" -or -name "*.${_libext}.*" \) -mindepth 1 -type f 2>/dev/null); do
+            _libname="$(echo ${_lib} | ${AWK_BIN} -F/ '{print $NF}')"
             if [ "${SYSTEM_NAME}" = "Darwin" ]; then
-                _linked="$(${OTOOL_BIN} -L "${_lib}" | ${GREP_BIN} -Ev "(\s${SOFTWARE_DIR}/${_bun}(/|/bin/../)lib/)|(\s/usr/lib/)|(\s/lib/)|(\s/System/Library/Frameworks/)"  2>/dev/null)"
+                _linked="$(${OTOOL_BIN} -L "${_lib}" | ${GREP_BIN} -Ev "(\s${SOFTWARE_DIR}/${_bun}(/|/bin/../)lib/)|(\s/usr/lib/)|(\s/lib/)|(\s/System/Library/Frameworks/)|(\s${_libname})|(\s@rpath)"  2>/dev/null)"
             else
-                _linked="$(${LDD_BIN} "${_lib}" | ${GREP_BIN} -Ev "( /usr/lib/)|( ${SOFTWARE_DIR}/${_bun}(/|/bin/../)lib/)|( /lib/)"  2>/dev/null)"
+                _linked="$(${LDD_BIN} "${_lib}" | ${GREP_BIN} -Ev "( /usr/lib/)|( ${SOFTWARE_DIR}/${_bun}(/|/bin/../)lib/)|( /lib/)|( ${_libname})"  2>/dev/null)"
             fi
 
             if [ "${_linked}" != "${_lib}:" ]; then
@@ -342,7 +343,7 @@ validate_libs_links () {
         debug "OK"
     done
 
-    unset _bundz _bun _a_dir _lib _linked _libext
+    unset _bundz _bun _a_dir _lib _linked _libext _libname
     return 0
 }
 
