@@ -916,7 +916,13 @@ available_bundles () {
         _bundle=$(echo "${_bundle}" | "${SED_BIN}" -E "s/-([0-9])/ \1/g" )
         _bname=$(echo "${_bundle}" | "${CUT_BIN}" -d" " -f1 )
         _bver=$(echo "${_bundle}" | "${CUT_BIN}" -d" " -f2 )
-        load_defs "${_bname}"
+        if [ -e "${DEFINITIONS_DIR}/$(lowercase "${_bname}")${DEFAULT_DEF_EXT}" ]; then
+            load_defs "${_bname}"
+        else
+            debug "Definition for bundle $(distd "${_bname}") not found, skipping."
+            continue
+        fi
+
         if [ "${_bver}" = "${DEF_VERSION}" ]; then
             permnote "$(distn "${_bname}") [$(distn "${_bver}")]"
         else
