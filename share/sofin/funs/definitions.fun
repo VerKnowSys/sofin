@@ -315,15 +315,31 @@ remove_bundles () {
 
 available_definitions () {
     if [ -d "${DEFINITIONS_DIR}" ]; then
-        cd "${DEFINITIONS_DIR}"
-        _alldefs="$(${FIND_BIN} "${DEFINITIONS_DIR}" -mindepth 1 -maxdepth 1 -type f -name "*${DEFAULT_DEF_EXT}" 2>/dev/null)"
-        permnote "All definitions defined in current cache: $(distn "$(${LS_BIN} -m 2>/dev/null | eval "${CUT_TRAILING_SPACES_GUARD}")" "${ColorReset}")"
+        _alldefs="$(${FIND_BIN} "${DEFINITIONS_DIR}" -mindepth 1 -maxdepth 1 -type f -name "*${DEFAULT_DEF_EXT}" 2>/dev/null | ${SORT_BIN} )"
+        _sysdefs=""
+        permnote "All definitions defined in current cache: $(distn "$(echo "${_alldefs}" | ${AWK_BIN} -F/ '{print $NF}' | ${SED_BIN} "s/${DEFAULT_DEF_EXT}//g" 2>/dev/null | ${TR_BIN} '\n' ' ')")"
+
+        for _def in $(to_iter "${_alldefs}"); do
+            _deffile="$(echo ${_def%${DEFAULT_DEF_EXT}} | ${AWK_BIN} -F/ '{print $NF}')"
+            load_defaults
+            DEF_DISABLED_ON=""
+            . "${_def}"
+            validate_definition_disabled
+            if [ "${DEF_DISABLED_ON}" != "YES" ]; then
+                _sysdefs="${_sysdefs}\n${_deffile}"
+            fi
+        done
+
+        load_defaults
+        _sysdefs="$(echo ${_sysdefs} | ${SORT_BIN} | ${TR_BIN} '\n' ' ')"
+        permnote "Definitions available for $(distn "${SYSTEM_NAME}") system:$(distn "${_sysdefs}")"
+        permnote "Available definitions count: $(distn "$(printf "%b\n" "${_sysdefs}" | eval "${WORDS_COUNT_GUARD}")")"
     fi
     if [ -d "${DEFINITIONS_LISTS_DIR}" ]; then
-        cd "${DEFINITIONS_LISTS_DIR}"
-        permnote "Available lists: $(distn "$(${LS_BIN} -m 2>/dev/null | ${SED_BIN} "s/${DEFAULT_DEF_EXT}//g" 2>/dev/null)")"
+        _lists="$(${FIND_BIN} "${DEFINITIONS_LISTS_DIR}" -mindepth 1 -maxdepth 1 -type f 2>/dev/null | ${SORT_BIN} | ${AWK_BIN} -F/ '{print $NF}' | ${TR_BIN} '\n' ' ')"
+        permnote "Available lists: $(distn "${_lists}")"
     fi
-    permnote "Definitions count: $(distn "$(printf "%b\n" "${_alldefs}" | eval "${WORDS_COUNT_GUARD}")")"
+    permnote "All definitions count: $(distn "$(printf "%b\n" "${_alldefs}" | eval "${WORDS_COUNT_GUARD}")")"
 }
 
 
