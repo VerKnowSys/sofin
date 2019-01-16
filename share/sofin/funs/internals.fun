@@ -8,7 +8,8 @@ usage_howto () {
     permnote "  $(distn "rm | uninstall | destroy | delete    ") removes an application or list ($(distn "example: "${SOFIN_BIN_SHORT}" uninstall Rust" "${ColorExample}"))"
     permnote "  $(distn "list | installed                     ") gives short list of installed software"
     permnote "  $(distn "full | fulllist | fullinstalled      ") gives detailed list with installed software including requirements"
-    permnote "  $(distn "available | avail                    ") lists available software"
+    permnote "  $(distn "available | avail                    ") lists available software definitions"
+    permnote "  $(distn "bundlelist                           ") lists available binary bundles"
     permnote "  $(distn "export | exp | exportapp             ") adds given command to application exports ($(distn "example: "${SOFIN_BIN_SHORT}" export rails Rust" "${ColorExample}"))"
     permnote
     permnote "  $(distn "log                                  ") shows tail of all logs (for debug messages and verbose info)"

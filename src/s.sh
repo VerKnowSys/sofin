@@ -489,6 +489,10 @@ if [ -n "${SOFIN_COMMAND}" ]; then
             validate_sources
             ;;
 
+        bundlelist)
+            available_bundles
+            ;;
+
         *)
             usage_howto
             ;;

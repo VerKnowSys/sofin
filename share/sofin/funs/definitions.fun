@@ -901,3 +901,28 @@ clone_or_fetch_git_bare_repo () {
         && debug "Cloned branch: $(distd "${_chk_branch}") from cached repository: $(distd "${_git_cached}")"
     unset _git_cached _bare_name _chk_branch _build_dir _dest_repo
 }
+
+available_bundles () {
+    if [ -z "${CURL_BIN}" ]; then
+        error "Curl binary not found"
+    fi
+
+    permnote "Binary bundles available for $(distn "${OS_TRIPPLE}") system:"
+    _bundlelist="$("${CURL_BIN}" -s "${MAIN_BINARY_REPOSITORY}/${OS_TRIPPLE}/" | "${GREP_BIN}" -E "(${DEFAULT_ARCHIVE_TARBALL_EXT}|${DEFAULT_SOFTWARE_SNAPSHOT_EXT})" 2>/dev/null \
+    | "${GREP_BIN}" -v "sha1" 2>/dev/null | "${CUT_BIN}" -d "\"" -f2 | "${SED_BIN}" -E "s/-${OS_TRIPPLE}(\\${DEFAULT_ARCHIVE_TARBALL_EXT}|\\${DEFAULT_SOFTWARE_SNAPSHOT_EXT})//g")"
+
+    for _bundle in $(to_iter "${_bundlelist}"); do
+        load_defaults
+        _bundle=$(echo "${_bundle}" | "${SED_BIN}" -E "s/-([0-9])/ \1/g" )
+        _bname=$(echo "${_bundle}" | "${CUT_BIN}" -d" " -f1 )
+        _bver=$(echo "${_bundle}" | "${CUT_BIN}" -d" " -f2 )
+        load_defs "${_bname}"
+        if [ "${_bver}" = "${DEF_VERSION}" ]; then
+            permnote "$(distn "${_bname}") [$(distn "${_bver}")]"
+        else
+            printf "  %b%b%b\n" "${ColorDark}" "${_bname} [${_bver}]" ${ColorReset} >&2
+        fi
+    done
+
+    permnote "Bundles highlighted in $(distn "cyan") are the current versions to be installed by Sofin. To install another available version, change the version number in the definition."
+}
