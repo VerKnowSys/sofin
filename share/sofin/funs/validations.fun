@@ -154,7 +154,7 @@ validate_def_postfix () {
 validate_definition_disabled () {
     # check requirement for disabled state:
     for _def_disable_on in $(to_iter "${DEF_DISABLE_ON}"); do
-        if [ "${SYSTEM_NAME}" = "${_def_disable_on}" ]; then
+        if [ "${SYSTEM_NAME}" = "${_def_disable_on}" ] || [ "${SYSTEM_NAME}-${SYSTEM_VERSION}" = "${_def_disable_on}" ] ; then
             debug "Disabled: $(distd "${_def_disable_on}") on $(distd "${SYSTEM_NAME}")"
             DEF_DISABLED_ON=YES
         fi
