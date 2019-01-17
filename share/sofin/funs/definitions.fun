@@ -923,12 +923,12 @@ available_bundles () {
             continue
         fi
 
-        if [ "${_bver}" = "${DEF_VERSION}" ]; then
+        if [ "${_bver}" = "${DEF_VERSION}" ] && [ "${CURRENT_DEFINITION_DISABLED}" != "YES" ]; then
             permnote "$(distn "${_bname}") [$(distn "${_bver}")]"
         else
             printf "  %b%b%b\n" "${ColorDark}" "${_bname} [${_bver}]" ${ColorReset} >&2
         fi
     done
 
-    permnote "Bundles highlighted in $(distn "cyan") are the current versions to be installed by Sofin. To install another available version, change the version number in the definition."
+    permnote "Bundles highlighted in $(distn "cyan") are the current versions to be installed by Sofin. Greyed out are versions or bundles currently disabled for your system version."
 }
