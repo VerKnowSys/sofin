@@ -156,7 +156,7 @@ validate_definition_disabled () {
     for _def_disable_on in $(to_iter "${DEF_DISABLE_ON}"); do
         if [ "${SYSTEM_NAME}" = "${_def_disable_on}" ] || [ "${SYSTEM_NAME}-${SYSTEM_VERSION}" = "${_def_disable_on}" ] ; then
             debug "Disabled: $(distd "${_def_disable_on}") on $(distd "${SYSTEM_NAME}")"
-            DEF_DISABLED_ON=YES
+            CURRENT_DEFINITION_DISABLED=YES
         fi
     done
 }
@@ -168,7 +168,7 @@ validate_util_availability () {
     debug "Checking req name: $(distd "${_req_name}") with installing indicator: $(distd "${_req_util_indicator}")"
     if [ -f "${_req_util_indicator}" ]; then
         debug "Utility available for: $(distd "${_req_name}"). Disabling"
-        DEF_DISABLED_ON=YES
+        CURRENT_DEFINITION_DISABLED=YES
     fi
 }
 

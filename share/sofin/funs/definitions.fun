@@ -30,7 +30,7 @@ load_defs () {
             validate_def_postfix "${_given_def}" "${DEF_NAME}"
 
             # check disabled definition state
-            unset DEF_DISABLED_ON
+            unset CURRENT_DEFINITION_DISABLED
             validate_definition_disabled
 
             if [ -z "${USE_NO_UTILS}" ]; then
@@ -322,10 +322,10 @@ available_definitions () {
         for _def in $(to_iter "${_alldefs}"); do
             _deffile="$(echo ${_def%${DEFAULT_DEF_EXT}} | ${AWK_BIN} -F/ '{print $NF}')"
             load_defaults
-            DEF_DISABLED_ON=""
+            CURRENT_DEFINITION_DISABLED=""
             . "${_def}"
             validate_definition_disabled
-            if [ "${DEF_DISABLED_ON}" != "YES" ]; then
+            if [ "${CURRENT_DEFINITION_DISABLED}" != "YES" ]; then
                 _sysdefs="${_sysdefs}\n${_deffile}"
             fi
         done

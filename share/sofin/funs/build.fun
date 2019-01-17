@@ -159,7 +159,7 @@ build () {
         _anm="$(capitalize "${_bund_name}")"
         load_defaults
         load_defs "${_bund_name}"
-        if [ "${DEF_DISABLED_ON}" = "YES" ]; then
+        if [ "${CURRENT_DEFINITION_DISABLED}" = "YES" ]; then
             warn "Bundle: $(distw "${_anm}") is disabled on: $(distw "${OS_TRIPPLE}")"
             destroy_software_dir "${_anm}"
             return 0
@@ -482,7 +482,7 @@ process_flat () {
 
     dump_system_capabilities
 
-    if [ -z "${DEF_DISABLED_ON}" ]; then
+    if [ -z "${CURRENT_DEFINITION_DISABLED}" ]; then
         if [ "${DEF_TYPE}" = "meta" ]; then
             note "   ${NOTE_CHAR2} Meta bundle detected."
 
