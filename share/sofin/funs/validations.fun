@@ -181,6 +181,7 @@ validate_pie_on_exports () {
     if [ "YES" = "${CAP_SYS_HARDENED}" ]; then
         debug "Checking PIE on exports: $(distd "${_bundz}")"
         for _bun in $(to_iter "${_bundz}"); do
+            _bun="${_bun%=*}"
             if [ -d "${SOFTWARE_DIR}/${_bun}/exports" ]; then
                 _a_dir="${SOFTWARE_DIR}/${_bun}/exports"
             elif [ -d "${SOFTWARE_DIR}/${_bun}/exports-disabled" ]; then
@@ -274,6 +275,7 @@ validate_bins_links () {
     fi
     debug "Validating links on exports: $(distd "${_bundz}")"
     for _bun in $(to_iter "${_bundz}"); do
+        _bun="${_bun%=*}"
         if [ -d "${SOFTWARE_DIR}/${_bun}/exports" ]; then
             _a_dir="${SOFTWARE_DIR}/${_bun}/exports"
         elif [ -d "${SOFTWARE_DIR}/${_bun}/exports-disabled" ]; then
@@ -315,6 +317,7 @@ validate_libs_links () {
     fi
     debug "Validating libraries: $(distd "${_bundz}")"
     for _bun in $(to_iter "${_bundz}"); do
+        _bun="${_bun%=*}"
         if [ -d "${SOFTWARE_DIR}/${_bun}/lib" ]; then
             _a_dir="${SOFTWARE_DIR}/${_bun}/lib"
         else

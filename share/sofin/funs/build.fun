@@ -156,6 +156,7 @@ build () {
     debug "Sofin v$(distd "${SOFIN_VERSION}"): New build started for bundles: $(distd "${_build_list}")"
     for _bund_name in $(to_iter "${_build_list}"); do
         _bund_name="$(lowercase "${_bund_name}")"
+        _bund_name="${_bund_name%=*}" # cut the version if specified using Bundlename=1.2.3
         _anm="$(capitalize "${_bund_name}")"
         load_defaults
         load_defs "${_bund_name}"

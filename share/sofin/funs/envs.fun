@@ -509,6 +509,7 @@ create_lock () {
 acquire_lock_for () {
     _bundles="${*}"
     for _bundle in $(to_iter "${_bundles}"); do
+        _bundle="${_bundle%=*}" # cut off possible postfix with custom version, f.e.: =1.2.3
         debug "Acquiring lock for bundle: [$(distd "${_bundle}")]"
         if [ -f "${LOCKS_DIR}${_bundle}${DEFAULT_LOCK_EXT}" ]; then
             _lock_pid="$(${CAT_BIN} "${LOCKS_DIR}${_bundle}${DEFAULT_LOCK_EXT}" 2>/dev/null)"
