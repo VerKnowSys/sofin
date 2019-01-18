@@ -9,7 +9,7 @@ usage_howto () {
     permnote "  $(distn "list | installed                     ") gives short list of installed software"
     permnote "  $(distn "full | fulllist | fullinstalled      ") gives detailed list with installed software including requirements"
     permnote "  $(distn "available | avail                    ") lists available software definitions"
-    permnote "  $(distn "bundlelist                           ") lists available binary bundles"
+    permnote "  $(distn "bundlelist | bundles                 ") lists available binary bundles"
     permnote "  $(distn "export | exp | exportapp             ") adds given command to application exports ($(distn "example: "${SOFIN_BIN_SHORT}" export rails Rust" "${ColorExample}"))"
     permnote
     permnote "  $(distn "log                                  ") shows tail of all logs (for debug messages and verbose info)"
@@ -49,6 +49,7 @@ usage_howto () {
     permnote "  $(distn "reset                                ") resets local definitions repository"
     permnote "  $(distn "diff                                 ") displays changes in current definitions cache. Accepts any part of definition name"
     permnote "  $(distn "srccheck                             ") checks sources availability for all existing definitions in local definitions repository"
+    permnote "  $(distn "oldsrc                               ") lists unused sources in main repository"
 }
 
 
@@ -478,4 +479,24 @@ show_alt_definitions_and_exit () {
         finalize_and_quit_gracefully_with_exitcode
     fi
     unset _an_app
+}
+
+list_unused_sources () {
+    _sourcelist="$("${CURL_BIN}" -s "${MAIN_SOURCE_REPOSITORY}" | "${GREP_BIN}" "href" | "${GREP_BIN}" -v "\/\"" \
+    | "${AWK_BIN}" -F"\"" '{print $2,$3}' | "${AWK_BIN}" '{print $1,$5}' | "${SORT_BIN}" -n -r -k 2 | "${SED_BIN}" -E 's/%2B/\+/g')"
+
+    _alldefs="$(${FIND_BIN} "${DEFINITIONS_DIR}" -mindepth 1 -maxdepth 1 -type f -name "*${DEFAULT_DEF_EXT}" 2>/dev/null)"
+
+    for _def in $(to_iter "${_alldefs}"); do
+        . "${_def}"
+        _defsrc="$(echo "${DEF_SOURCE_PATH##*/}")"
+        if [ -n "${_defsrc}" ]; then
+            _sourcelist="$(echo "${_sourcelist}" | "${GREP_BIN}" -v "${_defsrc}")"
+        fi
+    done
+
+    load_defaults
+    echo "${_sourcelist}" | "${AWK_BIN}" '{print $1}'
+
+    unset _sourcelist _def _alldefs _defsrc
 }
