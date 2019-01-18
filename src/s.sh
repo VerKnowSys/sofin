@@ -493,6 +493,10 @@ if [ -n "${SOFIN_COMMAND}" ]; then
             available_bundles
             ;;
 
+        oldsrc)
+            list_unused_sources
+            ;;
+
         *)
             usage_howto
             ;;
