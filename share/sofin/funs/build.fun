@@ -141,7 +141,7 @@ load_pax_file () {
 }
 
 
-# NOTE: build() works incorrectly now - when specified multiple arguments the post tasks fail
+# NOTE: build() - bundle build
 build () {
     _build_list="${*}"
 
