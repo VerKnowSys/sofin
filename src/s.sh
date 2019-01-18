@@ -335,17 +335,27 @@ if [ -n "${SOFIN_COMMAND}" ]; then
             else
                 _pickd_bundls="${SOFIN_ARGS}"
             fi
-            for _b in $(to_iter "${_pickd_bundls}"); do
-                build "${_b}"
+            for _buname in $(to_iter "${_pickd_bundls}"); do
+                unset CURRENT_DEFINITION_VERSION_OVERRIDE
+                _specified_version_with_name="$(eval "echo \"\$${_buname}\"" | ${SED_BIN} -E 's/=//;' 2>/dev/null)"
+                if [ -n "${_specified_version_with_name}" ]; then
+                    debug "Definition version is overriden to: '$(distd "${_specified_version_with_name}")'"
+                    CURRENT_DEFINITION_VERSION_OVERRIDE="${_specified_version_with_name}"
+                else
+                    debug "No version override. Using most recent bundle version"
+                fi
+
+                _buname="${_buname%=*}"
+                build "${_buname}"
                 if [ "${USER}" != "root" ]; then
-                    try "${CHOWN_BIN} -R ${USER} '${SOFTWARE_DIR}/${_b}'" \
-                        && debug "OK: $(distd "chown -R ${USER} '${SOFTWARE_DIR}/${_b}'")."
-                    try "${CHOWN_BIN} -R ${USER} '${SERVICES_DIR}/${_b}'" \
-                        && debug "OK: $(distd "chown -R ${USER} '${SERVICES_DIR}/${_b}'")."
+                    try "${CHOWN_BIN} -R ${USER} '${SOFTWARE_DIR}/${_buname}'" \
+                        && debug "OK: $(distd "chown -R ${USER} '${SOFTWARE_DIR}/${_buname}'")."
+                    try "${CHOWN_BIN} -R ${USER} '${SERVICES_DIR}/${_buname}'" \
+                        && debug "OK: $(distd "chown -R ${USER} '${SERVICES_DIR}/${_buname}'")."
                 fi
             done
             permnote "Installed: $(distn "${_pickd_bundls}")"
-            unset _pickd_bundls _b
+            unset _list_maybe _pickd_bundls _buname _specified_version_with_name
             finalize_complete_standard_task
             ;;
 

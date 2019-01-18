@@ -172,6 +172,12 @@ build () {
                 load_defs "${_req_name}"
                 pretouch_logs "${DEF_REQUIREMENTS}"
 
+                # NOTE: feature to specify custom version of bundle to install via: `s i Rust=1.31.1`:
+                if [ -n "${CURRENT_DEFINITION_VERSION_OVERRIDE}" ]; then
+                    DEF_VERSION="${CURRENT_DEFINITION_VERSION_OVERRIDE}"
+                    debug "Bundle: $(distd "${_anm}") version override: $(distd "${DEF_VERSION}")"
+                fi
+
                 # Note: this acutally may break definitions like ImageMagick..
                 #_bund_lcase="$(lowercase "${DEF_NAME}${DEF_SUFFIX}")"
                 _bund_lcase="${DEF_NAME}${DEF_SUFFIX}"
