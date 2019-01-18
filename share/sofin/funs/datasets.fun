@@ -595,12 +595,12 @@ install_software_from_binbuild () {
         debug "Installing ZFS based binary build to dataset: $(distd "${_isfb_dataset}")"
         run "${SOFIN_LZ4CAT_BIN} '${FILE_CACHE_DIR}${_isfb_archive}' | ${ZFS_BIN} receive -F ${ZFS_RECEIVE_OPTS} '${_isfb_dataset}' | ${TAIL_BIN} -n1" \
             && note "Installed: $(distn "${_isfb_fullname}")" \
-                && DONT_BUILD_BUT_DO_EXPORTS=YES
+                && CURRENT_DEFINITION_SKIP_BUILD_DO_EXPORTS=YES
     else
         try "${TAR_BIN} -xf ${FILE_CACHE_DIR}${_isfb_archive} --directory ${SOFTWARE_DIR}"
         if [ "${?}" = "0" ]; then
             note "Installed binary build: $(distn "${_isfb_fullname}")"
-            DONT_BUILD_BUT_DO_EXPORTS=YES
+            CURRENT_DEFINITION_SKIP_BUILD_DO_EXPORTS=YES
         else
             debug "No binary bundle available for: $(distd "${_isfb_fullname}")"
             try "${RM_BIN} -f '${FILE_CACHE_DIR}${_isfb_archive} ${FILE_CACHE_DIR}${_isfb_archive}${DEFAULT_CHKSUM_EXT}'"

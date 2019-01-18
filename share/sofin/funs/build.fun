@@ -166,7 +166,7 @@ build () {
         else
             create_software_dir "${_anm}"
             for _req_name in ${DEFINITIONS_DIR}/${_bund_name}${DEFAULT_DEF_EXT}; do
-                unset DONT_BUILD_BUT_DO_EXPORTS
+                unset CURRENT_DEFINITION_SKIP_BUILD_DO_EXPORTS
                 debug "Reading definition: $(distd "${_req_name}")"
                 load_defaults
                 load_defs "${_req_name}"
@@ -229,17 +229,17 @@ build () {
                         else
                             error "$(capitalize "$(diste "${_bund_lcase}")") bundle is installed with version: $(diste "${_already_installed_version}"), different from found in definition: $(diste "${DEF_VERSION}"). Aborting!"
                         fi
-                        DONT_BUILD_BUT_DO_EXPORTS=YES
+                        CURRENT_DEFINITION_SKIP_BUILD_DO_EXPORTS=YES
                         unset _already_installed_version
                     fi
 
                     if [ -n "${CAP_SYS_PRODUCTION}" ]; then
                         debug "Production mode enabled. Software build skipped!"
-                        DONT_BUILD_BUT_DO_EXPORTS=YES
+                        CURRENT_DEFINITION_SKIP_BUILD_DO_EXPORTS=YES
                     fi
                 fi
 
-                if [ -z "${DONT_BUILD_BUT_DO_EXPORTS}" ]; then
+                if [ -z "${CURRENT_DEFINITION_SKIP_BUILD_DO_EXPORTS}" ]; then
                     # NOTE: It's necessary to create build dir *after* binbuild check (which may create dataset itself)
                     create_builddir "${_bundl_name}" "${BUILD_NAMESUM}"
                     if [ -z "${DEF_REQUIREMENTS}" ]; then
@@ -268,7 +268,7 @@ build () {
                     done
                 fi
 
-                if [ -z "${DONT_BUILD_BUT_DO_EXPORTS}" ]; then
+                if [ -z "${CURRENT_DEFINITION_SKIP_BUILD_DO_EXPORTS}" ]; then
                     if [ -e "${PREFIX}/${_bund_lcase}${DEFAULT_INST_MARK_EXT}" ]; then
                         if [ "${CHANGED}" = "YES" ]; then
                             warn "  ${NOTE_CHAR} Definition requirements were modified. Rebuilding: $(distw "${_bund_lcase}")"
