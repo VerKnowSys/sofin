@@ -489,7 +489,7 @@ if [ -n "${SOFIN_COMMAND}" ]; then
             validate_sources
             ;;
 
-        bundlelist)
+        bundlelist|bundles)
             available_bundles
             ;;
 
