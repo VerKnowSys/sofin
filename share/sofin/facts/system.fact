@@ -71,6 +71,7 @@ CPP_NAME="${CC_NAME}-cpp"
 # Compiler flags:
 SINGLE_ERROR_CFLAGS="-ferror-limit=1"
 LTO_CFLAGS="-flto=thin -ffat-lto-objects -fuse-linker-plugin"
+CFI_CFLAGS="-fsanitize=cfi -fvisibility=hidden"
 CXX11_CXXFLAGS="-std=c++11"
 CXX14_CXXFLAGS="-std=c++14"
 CXX17_CXXFLAGS="-std=c++17"
