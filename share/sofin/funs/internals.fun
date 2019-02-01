@@ -96,8 +96,11 @@ default_compiler_features () {
     if [ -z "${DEF_LINKER_NO_DTAGS}" ]; then
         permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "linker-new-DTAGS" "${ColorDistinct}")"
     fi
-    if [ "YES" = "${DEF_USE_LTO}" ]; then
+    if [ -n "${DEF_USE_LTO}" ]; then
         permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "link-time-optimizations (LLVM-LTO)" "${ColorDistinct}")"
+    fi
+    if [ -n "${DEF_USE_CFI}" ]; then
+        permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "control-flow-integrity (LLVM-CFI)" "${ColorDistinct}")"
     fi
 
     # -fstack-protector-all check:

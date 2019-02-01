@@ -92,16 +92,22 @@ dump_compiler_setup () {
         debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "safe-stack" "${ColorGray}")"
     fi
 
+    if [ -n "${DEF_USE_LTO}" ]; then
+        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "link-time-optimizations (LLVM-LTO)" "${ColorGreen}")"
+    else
+        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "link-time-optimizations (LLVM-LTO)" "${ColorGray}")"
+    fi
+
+    if [ -n "${DEF_USE_CFI}" ]; then
+        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "control-flow-integrity (LLVM-CFI)" "${ColorGreen}")"
+    else
+        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "control-flow-integrity (LLVM-CFI)" "${ColorGray}")"
+    fi
+
     if [ -z "${DEF_NO_RETPOLINE}" ]; then
         debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "retpoline" "${ColorGreen}")"
     else
         debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "retpoline" "${ColorGray}")"
-    fi
-
-    if [ "YES" = "${DEF_USE_LTO}" ]; then
-        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "link-time-optimizations (LLVM-LTO)" "${ColorGreen}")"
-    else
-        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "link-time-optimizations (LLVM-LTO)" "${ColorGray}")"
     fi
 
     if [ -z "${DEF_NO_SSP_BUFFER_OVERRIDE}" ]; then
