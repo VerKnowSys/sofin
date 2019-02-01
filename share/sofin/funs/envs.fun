@@ -406,6 +406,12 @@ compiler_setup () {
         CFLAGS="${CFLAGS} ${LTO_CFLAGS}"
         CXXFLAGS="${CXXFLAGS} ${LTO_CFLAGS}"
 
+        # only when LTO is enabled, we can enable CFI:
+        if [ -n "${DEF_USE_CFI}" ]; then
+            CFLAGS="${CFLAGS} ${CFI_CFLAGS}"
+            CXXFLAGS="${CXXFLAGS} ${CFI_CFLAGS}"
+        fi
+
         if [ -n "${CAP_SYS_BUILDHOST}" ]; then
             warn_about_non_llvm_ld_on_buildhosts () {
                 warn ""
