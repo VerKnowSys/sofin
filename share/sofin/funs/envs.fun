@@ -438,6 +438,12 @@ compiler_setup () {
         if [ "YES" = "${DEF_USE_LTO}" ]; then
             CFLAGS="${CFLAGS} ${LTO_CFLAGS}"
             CXXFLAGS="${CXXFLAGS} ${LTO_CFLAGS}"
+
+            # only when LTO is enabled, we can enable CFI:
+            if [ -n "${DEF_USE_CFI}" ]; then
+                CFLAGS="${CFLAGS} ${CFI_CFLAGS}"
+                CXXFLAGS="${CXXFLAGS} ${CFI_CFLAGS}"
+            fi
         fi
     fi
 
