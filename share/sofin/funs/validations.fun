@@ -331,7 +331,7 @@ validate_libs_links () {
         fi
 
         for _lib in $(${FIND_BIN} "${_a_dir}" \( -name "*.${_libext}" -or -name "*.${_libext}.*" \) -mindepth 1 -type f 2>/dev/null); do
-            _libname="$(echo ${_lib} | ${AWK_BIN} -F/ '{print $NF}' | ${SED_BIN} -E 's/([^[:alnum:]])/\\\\\1/g')"
+            _libname="$(echo ${_lib} | ${AWK_BIN} -F/ '{print $NF}' | ${SED_BIN} -E 's/([^[:alnum:]])/\\\1/g')"
             if [ "${SYSTEM_NAME}" = "Darwin" ]; then
                 _linked="$(${OTOOL_BIN} -L "${_lib}" | ${GREP_BIN} -Ev "(\s${SOFTWARE_DIR}/${_bun}(/|/bin/../)lib/)|(\s/usr/lib/)|(\s/lib/)|(\s/System/Library/Frameworks/)|(\s${_libname})|(\s@rpath)"  2>/dev/null)"
             else
