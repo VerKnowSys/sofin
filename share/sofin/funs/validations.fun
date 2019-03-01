@@ -290,6 +290,7 @@ validate_bins_links () {
                 if [ "${SYSTEM_NAME}" = "Darwin" ]; then
                         _linked="$(${OTOOL_BIN} -L "${_bin}" | ${GREP_BIN} -Ev "(\s${SOFTWARE_DIR}/${_bun}(/|/bin/../)lib/)|(\s/usr/lib/)|(\s/lib/)|(\s/System/Library/Frameworks/)"  2>/dev/null)"
                 else
+                        _bin="$(${READLINK_BIN} -f ${_bin})"
                         _linked="$(${LDD_BIN} "${_bin}" | ${GREP_BIN} -Ev "( /usr/lib/)|( ${SOFTWARE_DIR}/${_bun}(/|/bin/../)lib/)|( /lib/)"  2>/dev/null)"
                 fi
 
@@ -335,6 +336,7 @@ validate_libs_links () {
             if [ "${SYSTEM_NAME}" = "Darwin" ]; then
                 _linked="$(${OTOOL_BIN} -L "${_lib}" | ${GREP_BIN} -Ev "(\s${SOFTWARE_DIR}/${_bun}(/|/bin/../)lib/)|(\s/usr/lib/)|(\s/lib/)|(\s/System/Library/Frameworks/)|(\s${_libname})|(\s@rpath)"  2>/dev/null)"
             else
+                _lib="$(${READLINK_BIN} -f ${_lib})"
                 _linked="$(${LDD_BIN} "${_lib}" | ${GREP_BIN} -Ev "( /usr/lib/)|( ${SOFTWARE_DIR}/${_bun}(/|/bin/../)lib/)|( /lib/)|( ${_libname})"  2>/dev/null)"
             fi
 
