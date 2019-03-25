@@ -15,7 +15,7 @@ show_logs () {
         ${TAIL_BIN} -n "${LOG_LINES_AMOUNT}" "${LOG}"
 
     elif [ "@" = "${_logf_pattern}" ]; then
-        ${LW_BIN} "${LOGS_DIR}" \
+        ${LW_BIN} "${LOGS_DIR}" 2>/dev/null \
             && return
 
         unset _all_files
@@ -25,7 +25,7 @@ show_logs () {
         eval "${TAIL_BIN} -n1 -F ${_all_files}"
 
     elif [ "+" = "${_logf_pattern}" ]; then
-        ${LW_BIN} "${LOGS_DIR}" \
+        ${LW_BIN} "${LOGS_DIR}" 2>/dev/null \
             && return
 
         unset _all_files
@@ -35,7 +35,7 @@ show_logs () {
         eval "${TAIL_BIN} -n ${LOG_LINES_AMOUNT} -F ${_all_files}"
 
     else
-        ${LW_BIN} "${LOGS_DIR}" \
+        ${LW_BIN} "${LOGS_DIR}" 2>/dev/null \
             && return
 
         unset _all_files
