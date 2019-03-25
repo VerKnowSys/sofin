@@ -167,3 +167,12 @@ fi
 if [ ! -x "${HBSDCONTROL_BIN}" ]; then
     HBSDCONTROL_BIN="/usr/bin/true"
 fi
+
+# log-watcher utility - lw - replaces "tail")
+if [ -x "/Services/Rust/exports/lw" ]; then
+    LW_BIN="/Services/Rust/exports/lw"
+elif [ -x "${HOME}/.cargo/bin/lw" ]; then
+    LW_BIN="${HOME}/.cargo/bin/lw"
+else
+    unset LW_BIN
+fi

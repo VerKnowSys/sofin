@@ -15,6 +15,9 @@ show_logs () {
         ${TAIL_BIN} -n "${LOG_LINES_AMOUNT}" "${LOG}"
 
     elif [ "@" = "${_logf_pattern}" ]; then
+        ${LW_BIN} "${LOGS_DIR}" \
+            && return
+
         unset _all_files
         for _mr in $(${FIND_BIN} "${LOGS_DIR%/}" -name "${SOFIN_NAME}*" -not -name "*.result" -not -name "*.config" -not -name "*.strip" -type f 2>/dev/null); do
             _all_files="${_mr} ${_all_files}"
@@ -22,6 +25,9 @@ show_logs () {
         eval "${TAIL_BIN} -n1 -F ${_all_files}"
 
     elif [ "+" = "${_logf_pattern}" ]; then
+        ${LW_BIN} "${LOGS_DIR}" \
+            && return
+
         unset _all_files
         for _mr in $(find_most_recent "${LOGS_DIR%/}" "${SOFIN_NAME}*" | ${HEAD_BIN} -n "${LOG_LAST_FILES}" 2>/dev/null); do
             _all_files="${_mr} ${_all_files}"
@@ -29,6 +35,9 @@ show_logs () {
         eval "${TAIL_BIN} -n ${LOG_LINES_AMOUNT} -F ${_all_files}"
 
     else
+        ${LW_BIN} "${LOGS_DIR}" \
+            && return
+
         unset _all_files
         for _mr in $(${FIND_BIN} "${LOGS_DIR%/}" -name "${SOFIN_NAME}*${_logf_pattern}*" -not -name "*.result" -not -name "*.config" -not -name "*.strip" -type f 2>/dev/null); do
             _all_files="${_mr} ${_all_files}"
