@@ -32,10 +32,10 @@ load_sofin () {
     # determining facts:
     load_facts \
         paths.fact \
+        security.fact \
         system.fact \
         terminal.fact \
-        sofin.fact \
-        security.fact
+        sofin.fact
 
     # loading functions:
     load_funs \

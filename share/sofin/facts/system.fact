@@ -137,8 +137,8 @@ determine_system_capabilites () {
     fi
 
     _hardening_version="$(${SYSCTL_BIN} -n hardening.version 2>/dev/null)"
-    if [ "${_hardening_version}" -ge "${MIN_HARDENING_VERSION}" ]; then
-        CAP_SYS_HARDENED_VERSION="${_hardening_version}"
+    if [ "${_hardening_version:-0}" -ge "${MIN_HARDENING_VERSION:-11}" ]; then
+        CAP_SYS_HARDENED_VERSION="${_hardening_version:-0}"
         CAP_SYS_HARDENED="YES"
 
         # render other useful security enforcements:
