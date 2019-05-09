@@ -286,7 +286,7 @@ validate_bins_links () {
         fi
 
         for _bin in $(${FIND_BIN} "${_a_dir}" -mindepth 1 -maxdepth 1 -type l 2>/dev/null); do
-            if ${FILE_BIN} -L "${_bin}" | ${GREP_BIN} -E 'x86(-|_)64' >/dev/null 2>&1; then
+            if ${FILE_BIN} -L "${_bin}" | ${GREP_BIN} -E 'x86(-|_)64' | ${GREP_BIN} 'dynamically' >/dev/null 2>&1; then
                 if [ "${SYSTEM_NAME}" = "Darwin" ]; then
                         _linked="$(${OTOOL_BIN} -L "${_bin}" | ${GREP_BIN} -Ev "(\s${SOFTWARE_DIR}/${_bun}(/|/bin/../)lib/)|(\s/usr/lib/)|(\s/lib/)|(\s/System/Library/Frameworks/)"  2>/dev/null)"
                 else
@@ -297,8 +297,8 @@ validate_bins_links () {
                 if [ "${_linked}" != "${_bin}:" ]; then
                     error "Invalid links for binary: $(diste "${_bin}")! See: \n $(diste "${_linked}")"
                 fi
-            elif ${FILE_BIN} -L "${_bin}" | ${GREP_BIN} -E '(text|script)' >/dev/null 2>&1; then
-                debug "$(distd "${_bin}") is a script or text file, skipping validation"
+            elif ${FILE_BIN} -L "${_bin}" | ${GREP_BIN} -E '(text|script|statically)' >/dev/null 2>&1; then
+                debug "$(distd "${_bin}") is statically linked or a script, skipping validation"
             else
                 error "$(diste "${_bin}") is not a proper executable or script!"
             fi
