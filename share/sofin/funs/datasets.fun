@@ -480,8 +480,8 @@ create_builddir () {
 
             FreeBSD)
                 RAMDISK_DEV="${_bdir}"
-                debug "Mounting clean 5GiB tmpfs build-dir: $(distd "${RAMDISK_DEV}")"
-                run "${MOUNT_BIN} -t tmpfs -o size=5G,mode=0750 tmpfs ${RAMDISK_DEV}" \
+                debug "Mounting clean $(distd "${DEFAULT_RAMDISK_SIZE}") tmpfs build-dir: $(distd "${RAMDISK_DEV}")"
+                run "${MOUNT_BIN} -t tmpfs -o size=${DEFAULT_RAMDISK_SIZE},mode=0750 tmpfs ${RAMDISK_DEV}" \
                     && debug "Mounted tmpfs build-directory: $(distd "${RAMDISK_DEV}")"
                 ;;
         esac
