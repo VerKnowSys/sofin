@@ -332,16 +332,22 @@ validate_libs_links () {
         fi
 
         for _lib in $(${FIND_BIN} "${_a_dir}" \( -name "*.${_libext}" -or -name "*.${_libext}.*" \) -mindepth 1 -type f 2>/dev/null); do
-            _libname="$(echo ${_lib} | ${AWK_BIN} -F/ '{print $NF}' | ${SED_BIN} -E 's/([^[:alnum:]])/\\\1/g')"
-            if [ "${SYSTEM_NAME}" = "Darwin" ]; then
-                _linked="$(${OTOOL_BIN} -L "${_lib}" | ${GREP_BIN} -Ev "(\s${SOFTWARE_DIR}/${_bun}(/|/bin/../)lib/)|(\s/usr/lib/)|(\s/lib/)|(\s/System/Library/Frameworks/)|(\s${_libname})|(\s@rpath)"  2>/dev/null)"
-            else
-                _lib="$(${READLINK_BIN} -f ${_lib})"
-                _linked="$(${LDD_BIN} "${_lib}" | ${GREP_BIN} -Ev "( /usr/lib/)|( ${SOFTWARE_DIR}/${_bun}(/|/bin/../)lib/)|( /lib/)|( ${_libname})"  2>/dev/null)"
-            fi
+            if ${FILE_BIN} -L "${_lib}" | ${GREP_BIN} -E 'x86(-|_)64' | ${GREP_BIN} 'dynamically' >/dev/null 2>&1; then
+                _libname="$(echo ${_lib} | ${AWK_BIN} -F/ '{print $NF}' | ${SED_BIN} -E 's/([^[:alnum:]])/\\\1/g')"
+                if [ "${SYSTEM_NAME}" = "Darwin" ]; then
+                    _linked="$(${OTOOL_BIN} -L "${_lib}" | ${GREP_BIN} -Ev "(\s${SOFTWARE_DIR}/${_bun}(/|/bin/../)lib/)|(\s/usr/lib/)|(\s/lib/)|(\s/System/Library/Frameworks/)|(\s${_libname})|(\s@rpath)"  2>/dev/null)"
+                else
+                    _lib="$(${READLINK_BIN} -f ${_lib})"
+                    _linked="$(${LDD_BIN} "${_lib}" | ${GREP_BIN} -Ev "( /usr/lib/)|( ${SOFTWARE_DIR}/${_bun}(/|/bin/../)lib/)|( /lib/)|( ${_libname})"  2>/dev/null)"
+                fi
 
-            if [ "${_linked}" != "${_lib}:" ]; then
-                error "Invalid links for library: $(diste "${_lib}")! See: \n $(diste "${_linked}")"
+                if [ "${_linked}" != "${_lib}:" ]; then
+                    error "Invalid links for library: $(diste "${_lib}")! See: \n $(diste "${_linked}")"
+                fi
+            elif ${FILE_BIN} -L "${_lib}" | ${GREP_BIN} -E '(text|script|statically)' >/dev/null 2>&1; then
+                debug "$(distd "${_lib}") is statically linked or a script, skipping validation"
+            else
+                error "$(diste "${_lib}") is not a proper library or script!"
             fi
         done
 
