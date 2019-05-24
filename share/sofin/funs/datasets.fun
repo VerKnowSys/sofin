@@ -463,29 +463,31 @@ create_builddir () {
     try "${MKDIR_BIN} -p ${_bdir}"
 
     if [ -n "${CAP_SYS_BUILDHOST}" ]; then
-        # try "${UMOUNT_BIN} -f ${_bdir}" \
-        #     && debug "Unmounted build-dir ramdisk: $(distd "${_bdir}")"
+        if [ -z "${DEF_USE_RAMDISK}" ]; then
+            debug "Disabled RAMDISK feature"
+        else
+            debug "Initializing RAMDISK feature"
+            case "${SYSTEM_NAME}" in
+                Darwin)
+                    _ramfs_size_mb=4096
+                    _ramfs_sectors=$((${_ramfs_size_mb}*1024*1024/512))
+                    RAMDISK_DEV="$(${HDID_BIN} -nomount ram://${_ramfs_sectors} 2>/dev/null)"
 
-        case "${SYSTEM_NAME}" in
-            Darwin)
-                _ramfs_size_mb=4096
-                _ramfs_sectors=$((${_ramfs_size_mb}*1024*1024/512))
-                RAMDISK_DEV="$(${HDID_BIN} -nomount ram://${_ramfs_sectors} 2>/dev/null)"
+                    debug "Darwin ramdisk dev: $(distd "${RAMDISK_DEV}")"
+                    run "${NEWFS_HFS_BIN} -v ${_cb_bundle_name} ${RAMDISK_DEV}"
+                    run "${MOUNT_BIN} -o noatime -t hfs ${RAMDISK_DEV} ${_bdir}" \
+                        && debug "Mounted tmpfs build-directory: $(distd "${_bdir}")"
+                    ;;
 
-                debug "Darwin ramdisk dev: $(distd "${RAMDISK_DEV}")"
-                run "${NEWFS_HFS_BIN} -v ${_cb_bundle_name} ${RAMDISK_DEV}"
-                run "${MOUNT_BIN} -o noatime -t hfs ${RAMDISK_DEV} ${_bdir}" \
-                    && debug "Mounted tmpfs build-directory: $(distd "${_bdir}")"
-                ;;
-
-            FreeBSD)
-                RAMDISK_DEV="${_bdir}"
-                debug "Mounting clean $(distd "${DEFAULT_RAMDISK_SIZE}") tmpfs build-dir: $(distd "${RAMDISK_DEV}")"
-                run "${MOUNT_BIN} -t tmpfs -o size=${DEFAULT_RAMDISK_SIZE},mode=0750 tmpfs ${RAMDISK_DEV}" \
-                    && debug "Mounted tmpfs build-directory: $(distd "${RAMDISK_DEV}")"
-                ;;
-        esac
-        export RAMDISK_DEV
+                FreeBSD)
+                    RAMDISK_DEV="${_bdir}"
+                    debug "Mounting clean $(distd "${DEFAULT_RAMDISK_SIZE}") tmpfs build-dir: $(distd "${RAMDISK_DEV}")"
+                    run "${MOUNT_BIN} -t tmpfs -o size=${DEFAULT_RAMDISK_SIZE},mode=0750 tmpfs ${RAMDISK_DEV}" \
+                        && debug "Mounted tmpfs build-directory: $(distd "${RAMDISK_DEV}")"
+                    ;;
+            esac
+            export RAMDISK_DEV
+        fi
     fi
     unset _bdir _cb_bundle_name _dset_namesum
 }
