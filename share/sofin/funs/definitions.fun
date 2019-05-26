@@ -720,7 +720,7 @@ export_binaries () {
         run "${MV_BIN} ${SERVICE_DIR}/exports-disabled ${SERVICE_DIR}/exports"
     fi
     if [ -z "${DEF_EXPORTS}" ]; then
-        note "Defined no exports of prefix: $(distn "${PREFIX}")"
+        permnote "Defined no exports of prefix: $(distn "${PREFIX}")"
     else
         _an_amount="$(printf "%b\n" "${DEF_EXPORTS}" | ${WC_BIN} -w 2>/dev/null | ${TR_BIN} -d '\t|\r|\ ' 2>/dev/null)"
         debug "Exporting $(distd "${_an_amount}") binaries of prefixes: $(distd "${PREFIX}") + $(distd "${SERVICE_DIR}")"
