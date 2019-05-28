@@ -337,7 +337,8 @@ if [ -n "${SOFIN_COMMAND}" ]; then
             fi
             for _buname in $(to_iter "${_pickd_bundls}"); do
                 unset CURRENT_DEFINITION_VERSION_OVERRIDE
-                _specified_version_with_name="$(eval "echo \"\$${_buname}\"" | ${SED_BIN} -E 's/=//;' 2>/dev/null)"
+                _buname_sh_escaped="$(echo "${_buname}" | ${SED_BIN} -E 's/[-+%]/_/g' 2>/dev/null)"
+                _specified_version_with_name="$(eval "echo \"\$${_buname_sh_escaped}\"" | ${SED_BIN} -E 's/-/_/; s/=//;' 2>/dev/null)"
                 if [ -n "${_specified_version_with_name}" ]; then
                     debug "Definition version is overriden to: '$(distd "${_specified_version_with_name}")'"
                     CURRENT_DEFINITION_VERSION_OVERRIDE="${_specified_version_with_name}"
