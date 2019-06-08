@@ -160,6 +160,7 @@ build () {
         _anm="$(capitalize "${_bund_name}")"
         load_defaults
         load_defs "${_bund_name}"
+        validate_loaded_def
         if [ "${CURRENT_DEFINITION_DISABLED}" = "YES" ]; then
             warn "Bundle: $(distw "${_anm}") is disabled on: $(distw "${OS_TRIPPLE}")"
             destroy_software_dir "${_anm}"
@@ -471,6 +472,7 @@ process_flat () {
     #       setup correct environment for build process..
     load_defaults
     load_defs "${_req_definition}"
+    validate_loaded_def
 
     # Setup compiler features and options for given definition
     compiler_setup

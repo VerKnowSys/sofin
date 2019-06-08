@@ -60,6 +60,58 @@ fail_any_bg_jobs () {
 }
 
 
+
+validate_loaded_def () {
+    if [ "${DEF_TYPE}" = "meta" ]; then
+        return 0 # Skip validations for "not real definition":
+    fi
+
+    # Perform several sanity checks here..
+    for _required_field in  "DEF_NAME=${DEF_NAME}" \
+                            "DEF_NAME_DEF_SUFFIX=${DEF_NAME}${DEF_SUFFIX}" \
+                            "DEF_VERSION=${DEF_VERSION}" \
+                            "DEF_SHA_OR_DEF_GIT_CHECKOUT=${DEF_SHA}${DEF_GIT_CHECKOUT}" \
+                            "DEF_COMPLIANCE=${DEF_COMPLIANCE}" \
+                            "DEF_SOURCE_PATH=${DEF_SOURCE_PATH}" \
+                            "SYSTEM_VERSION=${SYSTEM_VERSION}" \
+                            "OS_TRIPPLE=${OS_TRIPPLE}" \
+                            "SYS_SPECIFIC_BINARY_REMOTE=${SYS_SPECIFIC_BINARY_REMOTE}";
+        do
+            unset _valid_checks
+            for _check in   "DEF_NAME" \
+                            "DEF_NAME_DEF_SUFFIX" \
+                            "DEF_VERSION" \
+                            "DEF_SHA_OR_DEF_GIT_CHECKOUT" \
+                            "DEF_COMPLIANCE" \
+                            "DEF_SOURCE_PATH" \
+                            "SYSTEM_VERSION" \
+                            "OS_TRIPPLE" \
+                            "SYS_SPECIFIC_BINARY_REMOTE";
+                do
+                    if [ "${_check}=" = "${_required_field}" ] \
+                    || [ "${_check}=." = "${_required_field}" ] \
+                    || [ "${_check}=${DEFAULT_DEF_EXT}" = "${_required_field}" ]; then
+                        error "ASSERTION FAILURE: Empty or invalid value in required field: $(diste "${_check}"). Failed definition of bundle: $(diste "${DEF_NAME}${DEF_SUFFIX}")"
+                    else
+                        # gather passed checks, but print it only once..
+                        if [ -z "${_valid_checks}" ]; then
+                            _valid_checks="${_check}"
+                        else
+                            _valid_checks="${_check}, ${_valid_checks}"
+                        fi
+                    fi
+                done
+        done
+
+    if [ -z "${SYSTEM_DATASET}" ]; then
+        error "ASSERTION FAILURE: No SYSTEM_DATASET is set! Either HOST=${HOST} or USER=${USER} is not set!"
+    fi
+
+    debug "Necessary values were validated: $(distd "${_valid_checks}")"
+    unset _def _check _required_field _valid_checks
+}
+
+
 validate_reqs () {
     if [ "${SYSTEM_NAME}" != "Darwin" ]; then
         if [ -n "${CAP_SYS_BUILDHOST}" ]; then

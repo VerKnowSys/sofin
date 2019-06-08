@@ -37,58 +37,10 @@ load_defs () {
                 debug "USE_NO_UTILS environment value is unset! Using available utilities!"
                 validate_util_availability "${DEF_NAME}${DEF_SUFFIX}"
             fi
-
         done
     fi
 
-    if [ "${DEF_TYPE}" = "meta" ]; then
-        # Skip validations for "not real definition":
-        return 0
-    fi
-
-    # Perform several sanity checks here..
-    for _required_field in  "DEF_NAME=${DEF_NAME}" \
-                            "DEF_NAME_DEF_SUFFIX=${DEF_NAME}${DEF_SUFFIX}" \
-                            "DEF_VERSION=${DEF_VERSION}" \
-                            "DEF_SHA_OR_DEF_GIT_CHECKOUT=${DEF_SHA}${DEF_GIT_CHECKOUT}" \
-                            "DEF_COMPLIANCE=${DEF_COMPLIANCE}" \
-                            "DEF_SOURCE_PATH=${DEF_SOURCE_PATH}" \
-                            "SYSTEM_VERSION=${SYSTEM_VERSION}" \
-                            "OS_TRIPPLE=${OS_TRIPPLE}" \
-                            "SYS_SPECIFIC_BINARY_REMOTE=${SYS_SPECIFIC_BINARY_REMOTE}";
-        do
-            unset _valid_checks
-            for _check in   "DEF_NAME" \
-                            "DEF_NAME_DEF_SUFFIX" \
-                            "DEF_VERSION" \
-                            "DEF_SHA_OR_DEF_GIT_CHECKOUT" \
-                            "DEF_COMPLIANCE" \
-                            "DEF_SOURCE_PATH" \
-                            "SYSTEM_VERSION" \
-                            "OS_TRIPPLE" \
-                            "SYS_SPECIFIC_BINARY_REMOTE";
-                do
-                    if [ "${_check}=" = "${_required_field}" ] \
-                    || [ "${_check}=." = "${_required_field}" ] \
-                    || [ "${_check}=${DEFAULT_DEF_EXT}" = "${_required_field}" ]; then
-                        error "Empty or wrong value for required field: $(diste "${_check}") from definition: $(diste "${_def}")."
-                    else
-                        # gather passed checks, but print it only once..
-                        if [ -z "${_valid_checks}" ]; then
-                            _valid_checks="${_check}"
-                        else
-                            _valid_checks="${_check}, ${_valid_checks}"
-                        fi
-                    fi
-                done
-        done
-
-    if [ -z "${SYSTEM_DATASET}" ]; then
-        error "No SYSTEM_DATASET is set! Either HOST=${HOST} or USER=${USER} is not set!"
-    fi
-
-    debug "Necessary values were validated: $(distd "${_valid_checks}")"
-    unset _def _definitions _check _required_field _name_base _given_def _valid_checks
+    unset _def _definitions _given_def _name_base
 }
 
 
@@ -256,6 +208,7 @@ remove_bundles () {
         fi
         load_defaults
         load_defs "${_def}"
+        validate_loaded_def
         crash_if_mission_critical "${_given_name}"
         if [ -d "${SOFTWARE_DIR}/${_given_name}" ]; then
             _aname="$(lowercase "${_given_name}")"
@@ -280,7 +233,7 @@ remove_bundles () {
             # fi
         fi
     done
-    load_sysctl_system_production_hardening
+    # load_sysctl_system_production_hardening
 
     if [ -n "${_destroyed}" ]; then
         permnote "Software dataset(s) destroyed: $(distn "${_destroyed}")"
