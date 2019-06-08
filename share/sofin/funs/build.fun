@@ -403,7 +403,6 @@ build () {
 
 
 dump_debug_info () {
-    debug "Build settings dump:"
     debug "CPUS: (inUse/Total): ($(distd "${CPUS}")/$(distd "${ALL_CPUS}"))"
     debug "PREFIX: '$(distd "${PREFIX}"),  PATH: '$(distd "${PATH}")'"
     debug "SERVICE_DIR: '$(distd "${SERVICE_DIR}"),  CURRENT_DIR: '$(distd "$(${PWD_BIN} 2>/dev/null)")'"
@@ -444,7 +443,6 @@ dump_debug_info () {
     if [ -n "${DEF_AFTER_EXPORT_METHOD}" ]; then
         debug "DEF_AFTER_EXPORT_METHOD: '$(distd "${DEF_AFTER_EXPORT_METHOD}")'"
     fi
-    debug "Build settings dump eof"
 }
 
 

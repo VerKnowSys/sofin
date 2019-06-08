@@ -65,7 +65,7 @@ set_c_and_cxx_flags () {
     CFLAGS="${_flagz} ${DEFAULT_COMPILER_FLAGS} -I${PREFIX}/include ${DEF_COMPILER_FLAGS}"
     CXXFLAGS="${_flagz} ${DEFAULT_COMPILER_FLAGS} -I${PREFIX}/include ${DEF_COMPILER_FLAGS}"
     LDFLAGS="${DEFAULT_LINKER_FLAGS} -L${PREFIX}/lib ${DEF_LINKER_FLAGS}"
-    debug "set_c_and_cxx_flags(): flags: '${_flagz}'. CFLAGS: '${CFLAGS}'"
+    # debug "set_c_and_cxx_flags(): flags: '${_flagz}'. CFLAGS: '${CFLAGS}'"
     # CFLAGS="$(printf "%b\n" "${_flagz} ${DEFAULT_COMPILER_FLAGS} -I${PREFIX}/include ${DEF_COMPILER_FLAGS}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
     # CXXFLAGS="$(printf "%b\n" "${_flagz} ${DEFAULT_COMPILER_FLAGS} -I${PREFIX}/include ${DEF_COMPILER_FLAGS}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
     # LDFLAGS="$(printf "%b\n" "${DEFAULT_LINKER_FLAGS} -L${PREFIX}/lib ${DEF_LINKER_FLAGS}" | eval "${CUT_TRAILING_SPACES_GUARD}")"
@@ -75,7 +75,6 @@ set_c_and_cxx_flags () {
 
 
 dump_compiler_setup () {
-    debug "Listing compiler features for platform: $(distd "${SYSTEM_NAME}"):"
     if [ -n "${DEBUGBUILD}" ]; then
         debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "debug-build" "${ColorGreen}")"
         debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "production-build" "${ColorGray}")"
@@ -91,33 +90,15 @@ dump_compiler_setup () {
     fi
 
     if [ -z "${DEF_NO_CCACHE}" ]; then # ccache is supported by default but it's optional
-        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "ccache" "${ColorGreen}")"
+        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "ccached-build" "${ColorGreen}")"
     else
-        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "ccache" "${ColorGray}")"
-    fi
-
-    if [ -n "${DEF_USE_SAFE_STACK}" ]; then
-        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "safe-stack" "${ColorGreen}")"
-    else
-        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "safe-stack" "${ColorGray}")"
-    fi
-
-    if [ -n "${DEF_USE_LTO}" ]; then
-        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "link-time-optimizations (LLVM-LTO)" "${ColorGreen}")"
-    else
-        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "link-time-optimizations (LLVM-LTO)" "${ColorGray}")"
-    fi
-
-    if [ -n "${DEF_USE_CFI}" ]; then
-        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "control-flow-integrity (LLVM-CFI)" "${ColorGreen}")"
-    else
-        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "control-flow-integrity (LLVM-CFI)" "${ColorGray}")"
+        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "ccached-build" "${ColorGray}")"
     fi
 
     if [ -z "${DEF_NO_RETPOLINE}" ]; then
-        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "retpoline" "${ColorGreen}")"
+        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "cpu-branch-predict-mitigation (retpoline)" "${ColorGreen}")"
     else
-        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "retpoline" "${ColorGray}")"
+        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "cpu-branch-predict-mitigation (retpoline)" "${ColorGray}")"
     fi
 
     if [ -z "${DEF_NO_SSP_BUFFER_OVERRIDE}" ]; then
@@ -147,52 +128,103 @@ dump_compiler_setup () {
     fi
 
     # C++ standard used:
-    if [ -n "${DEF_USE_CXX11}" ]; then
-        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "std-c++11" "${ColorGreen}")"
+    printf "%b\n" "${CXXFLAGS}" | ${GREP_BIN} 'c++11' >/dev/null 2>&1
+    if [ "0" = "${?}" ]; then
+        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "C++ standard: std-c++11" "${ColorGreen}")"
     else
-        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "std-c++11" "${ColorGray}")"
+        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "C++ standard: std-c++11" "${ColorGray}")"
     fi
-    if [ -n "${DEF_USE_CXX14}" ]; then
-        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "std-c++14" "${ColorGreen}")"
+    printf "%b\n" "${CXXFLAGS}" | ${GREP_BIN} 'c++14' >/dev/null 2>&1
+    if [ "0" = "${?}" ]; then
+        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "C++ standard: std-c++14" "${ColorGreen}")"
     else
-        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "std-c++14" "${ColorGray}")"
+        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "C++ standard: std-c++14" "${ColorGray}")"
     fi
-    if [ -n "${DEF_USE_CXX17}" ]; then
-        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "std-c++17" "${ColorGreen}")"
+    printf "%b\n" "${CXXFLAGS}" | ${GREP_BIN} 'c++17' >/dev/null 2>&1
+    if [ "0" = "${?}" ]; then
+        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "C++ standard: std-c++17" "${ColorGreen}")"
     else
-        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "std-c++17" "${ColorGray}")"
+        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "C++ standard: std-c++17" "${ColorGray}")"
+    fi
+
+    printf "%b\n" "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'flto' >/dev/null 2>&1
+    if [ "0" = "${?}" ]; then
+        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "link-time-optimizations (LLVM-LTO)" "${ColorGreen}")"
+    else
+        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "link-time-optimizations (LLVM-LTO)" "${ColorGray}")"
+    fi
+
+    printf "%b\n" "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'fsanitize=cfi' >/dev/null 2>&1
+    if [ "0" = "${?}" ]; then
+        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "control-flow-integrity-sanitizer (LLVM-CFI)" "${ColorGreen}")"
+    else
+        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "control-flow-integrity-sanitizer (LLVM-CFI)" "${ColorGray}")"
+    fi
+
+    # SAFE_STACK check:
+    printf "%b\n" "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'fsanitize=safe-stack' >/dev/null 2>&1
+    if [ "0" = "${?}" ]; then
+        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "safe-stack-sanitizer (LLVM-SAFE_STACK)" "${ColorGreen}")"
+    else
+        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "safe-stack-sanitizer (LLVM-SAFE_STACK)" "${ColorGray}")"
+    fi
+
+    # ASAN check:
+    printf "%b\n" "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'fsanitize=address' >/dev/null 2>&1
+    if [ "0" = "${?}" ]; then
+        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "address-sanitizer (LLVM-ASAN)" "${ColorGreen}")"
+    else
+        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "address-sanitizer (LLVM-ASAN)" "${ColorGray}")"
     fi
 
     # -fPIC check:
-    printf "%b\n" "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'f[Pp][Ii][Cc]' >/dev/null 2>&1 \
-        && (debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "position-independent-code" "${ColorGreen}")" \
-            || debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "position-independent-code" "${ColorGray}")")
+    printf "%b\n" "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'f[Pp][Ii][Cc]' >/dev/null 2>&1
+    if [ "0" = "${?}" ]; then
+        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "position-independent-code" "${ColorGreen}")"
+    else
+        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "position-independent-code" "${ColorGray}")"
+    fi
 
     # -fPIE check:
-    printf "%b\n" "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'f[Pp][Ii][Ee]' >/dev/null 2>&1 \
-        && (debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "position-independent-executable" "${ColorGreen}")" \
-            || debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "position-independent-executable" "${ColorGray}")")
+    printf "%b\n" "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'f[Pp][Ii][Ee]' >/dev/null 2>&1
+    if [ "0" = "${?}" ]; then
+        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "position-independent-executable" "${ColorGreen}")"
+    else
+        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "position-independent-executable" "${ColorGray}")"
+    fi
 
     # -fstack-protector-all check:
-    printf "%b\n" "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'fstack-protector-all' >/dev/null 2>&1 \
-        && (debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "stack-protector-all" "${ColorGreen}")" \
-            || debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "stack-protector-all" "${ColorGray}")")
+    printf "%b\n" "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'fstack-protector-all' >/dev/null 2>&1
+    if [ "0" = "${?}" ]; then
+        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "stack-protector-all" "${ColorGreen}")"
+    else
+        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "stack-protector-all" "${ColorGray}")"
+    fi
 
     # -fstack-protector-strong check:
-    printf "%b\n" "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'fstack-protector-strong' >/dev/null 2>&1 \
-        && (debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "stack-protector-strong" "${ColorGreen}")" \
-            || debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "stack-protector-strong" "${ColorGray}")")
+    printf "%b\n" "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'fstack-protector-strong' >/dev/null 2>&1
+    if [ "0" = "${?}" ]; then
+        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "stack-protector-strong" "${ColorGreen}")"
+    else
+        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "stack-protector-strong" "${ColorGray}")"
+    fi
 
     # -fno-strict-overflow check:
-    printf "%b\n" "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'fno-strict-overflow' >/dev/null 2>&1 \
-        && (debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "no-strict-overflow" "${ColorGreen}")" \
-            || debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "no-strict-overflow" "${ColorGray}")")
+    printf "%b\n" "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'fno-strict-overflow' >/dev/null 2>&1
+    if [ "0" = "${?}" ]; then
+        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "no-strict-overflow" "${ColorGreen}")"
+    else
+        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "no-strict-overflow" "${ColorGray}")"
+    fi
 
     # -ftrapv check:
     # NOTE: Signed integer overflow raises the signal SIGILL instead of SIGABRT/SIGSEGV:
-    printf "%b\n" "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'ftrapv' >/dev/null 2>&1 \
-        && (debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "trap-signed-integer-overflow" "${ColorGreen}")" \
-            || debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "trap-signed-integer-overflow" "${ColorGray}")")
+    printf "%b\n" "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'ftrapv' >/dev/null 2>&1
+    if [ "0" = "${?}" ]; then
+        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "trap-signed-integer-overflow" "${ColorGreen}")"
+    else
+        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "trap-signed-integer-overflow" "${ColorGray}")"
+    fi
 
     if [ -z "${DEF_LINKER_NO_DTAGS}" ]; then
         debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "enable-new-dtags" "${ColorGreen}")"
@@ -205,13 +237,11 @@ dump_compiler_setup () {
     else
         debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "fast-math" "${ColorGray}")"
     fi
-    debug "Compiler features dump eof"
 }
 
 
 dump_system_capabilities () {
     # NOTE: make sure that this is not the way with IFS instead of echoing on tr in for loops;
-    debug "System capabilities dump:"
     IFS=\n set 2>/dev/null | ${EGREP_BIN} -i 'CAP_SYS_' 2>/dev/null | while IFS= read -r _capab
     do
         if [ -n "${_capab}" ]; then
@@ -220,7 +250,6 @@ dump_system_capabilities () {
             debug " $(distd "${FAIL_CHAR}") $(distd "${_capab}" "${ColorGray}")"
         fi
     done
-    debug "System capabilities dump eof"
     unset _capab
 }
 
