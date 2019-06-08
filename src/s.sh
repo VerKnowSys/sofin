@@ -402,12 +402,13 @@ if [ -n "${SOFIN_COMMAND}" ]; then
 
             permnote "Installing $(distn "${_bundls_amount}") bundle dependencies: $(distn "${_pickd_bundls}")"
             for _dep_bundle in $(to_iter "${_pickd_bundls}"); do
-                USE_BINBUILD=YES build "${_dep_bundle}"
+                build "${_dep_bundle}"
             done
 
-            permnote "Limiting local-environment to bundles: $(distn "${_pickd_bundls}")"
-            s env +${_pickd_bundls}
+            permnote "Building environment from local dependencies: $(distn "${_pickd_bundls}")"
+            eval "${SOFIN_SHORT_NAME} env +${_pickd_bundls}"
 
+            permnote "NOTE: You can return to default environment with: $(distn "${SOFIN_SHORT_NAME} env reset")"
             unset _pickd_bundls _bundls_amount
             finalize_complete_standard_task
             ;;
