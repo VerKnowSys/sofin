@@ -84,6 +84,12 @@ dump_compiler_setup () {
         debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "debug-build" "${ColorGray}")"
     fi
 
+    if [ -z "${DEF_NO_HARDEN_FLAGS}" ]; then
+        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "hardened-compiler-flags" "${ColorGreen}")"
+    else
+        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "hardened-compiler-flags" "${ColorGray}")"
+    fi
+
     if [ -z "${DEF_NO_CCACHE}" ]; then # ccache is supported by default but it's optional
         debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "ccache" "${ColorGreen}")"
     else
@@ -346,25 +352,27 @@ compiler_setup () {
     && [ -z "${DEBUGBUILD}" ]; then
         CMACROS="${HARDEN_CMACROS}"
     fi
-    case "${SYSTEM_NAME}" in
-        FreeBSD)
-            DEFAULT_COMPILER_FLAGS="${SINGLE_ERROR_CFLAGS} ${HARDEN_CFLAGS} ${HARDEN_CFLAGS_PRODUCTION} ${CMACROS}"
-            DEFAULT_LINKER_FLAGS="${HARDEN_LDFLAGS_PRODUCTION}"
-            ;;
 
-        Darwin)
-            DEFAULT_COMPILER_FLAGS="${SINGLE_ERROR_CFLAGS} ${HARDEN_CFLAGS} ${CMACROS}"
-            ;;
+    if [ -z "${DEF_NO_HARDEN_FLAGS}" ]; then
+        case "${SYSTEM_NAME}" in
+            FreeBSD)
+                DEFAULT_COMPILER_FLAGS="${SINGLE_ERROR_CFLAGS} ${HARDEN_CFLAGS} ${HARDEN_CFLAGS_PRODUCTION} ${CMACROS}"
+                DEFAULT_LINKER_FLAGS="${HARDEN_LDFLAGS_PRODUCTION}"
+                ;;
 
-        Linux)
-            DEFAULT_COMPILER_FLAGS="${HARDEN_CFLAGS} ${CMACROS}"
-            ;;
+            Darwin|Linux)
+                DEFAULT_COMPILER_FLAGS="${SINGLE_ERROR_CFLAGS} ${HARDEN_CFLAGS} ${CMACROS}"
+                ;;
 
-        Minix)
-            # Disabled -fstack-protector-strong - not supported on clang 3.4
-            DEFAULT_COMPILER_FLAGS="-fstack-protector -fstack-protector-all -fno-strict-overflow -Wformat -Wformat-security ${CMACROS}"
-            ;;
-    esac
+            Minix)
+                # Disabled -fstack-protector-strong - not supported on clang 3.4
+                DEFAULT_COMPILER_FLAGS="${SINGLE_ERROR_CFLAGS} -fstack-protector -fstack-protector-all -fno-strict-overflow -Wformat -Wformat-security ${CMACROS}"
+                ;;
+        esac
+    else
+        debug "DEF_NO_HARDEN_FLAGS is set, Disabling all default HARDEN_CFLAGS, HARDEN_LDFLAGS_PRODUCTION and CMACROS"
+        DEFAULT_COMPILER_FLAGS="${SINGLE_ERROR_CFLAGS}"
+    fi
 
     # CFLAGS, CXXFLAGS setup:
     set_c_and_cxx_flags "${_compiler_use_linker_flags}"
