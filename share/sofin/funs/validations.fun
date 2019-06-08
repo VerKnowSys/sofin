@@ -290,7 +290,7 @@ validate_bins_links () {
                 debug "$(distd "${_bin}") is statically linked or a script, skipping validation"
             elif ${FILE_BIN} -L "${_bin}" | ${GREP_BIN} -E 'x86(-|_)64' >/dev/null 2>&1; then
                 if [ "${SYSTEM_NAME}" = "Darwin" ]; then
-                        _linked="$(${OTOOL_BIN} -L "${_bin}" | ${GREP_BIN} -Ev "(\s${SOFTWARE_DIR}/${_bun}(/|/bin/../)lib/)|(\s/usr/lib/)|(\s/lib/)|(\s/System/Library/Frameworks/)"  2>/dev/null)"
+                        _linked="$(${OTOOL_BIN} -L "${_bin}" | ${GREP_BIN} -Ev "(\s${SOFTWARE_DIR}/${_bun}(/|/bin/../)lib/)|(\s/usr/lib/)|(\s/lib/)|(\s/System/Library/Frameworks/)|(@rpath/)"  2>/dev/null)"
                 else
                         _bin="$(${READLINK_BIN} -f ${_bin})"
                         _linked="$(${LDD_BIN} "${_bin}" | ${GREP_BIN} -Ev "( /usr/lib/)|( ${SOFTWARE_DIR}/${_bun}(/|/bin/../)lib/)|( /lib/)"  2>/dev/null)"
