@@ -268,7 +268,7 @@ build () {
                         else
                             permnote "  $(distn "${_req}") ($(distn "${_req_amount}") of $(distn "${_req_all}") remaining)"
                             if [ ! -f "${PREFIX}/${_req}${DEFAULT_INST_MARK_EXT}" ]; then
-                                CHANGED=YES
+                                BUNDLE_REQ_MODIFIED=YES
                                 process_flat "${_req}" "${PREFIX}"
                             fi
                         fi
@@ -278,22 +278,22 @@ build () {
 
                 if [ -z "${CURRENT_DEFINITION_SKIP_BUILD_DO_EXPORTS}" ]; then
                     if [ -e "${PREFIX}/${_bund_lcase}${DEFAULT_INST_MARK_EXT}" ]; then
-                        if [ "${CHANGED}" = "YES" ]; then
-                            warn "  ${NOTE_CHAR} Definition requirements were modified. Rebuilding: $(distw "${_bund_lcase}")"
+                        if [ "${BUNDLE_REQ_MODIFIED}" = "YES" ]; then
+                            unset BUNDLE_REQ_MODIFIED
+                            warn "  ${NOTE_CHAR} Modified requirements of defintion: $(distw "${_bund_lcase}"). Rebuilding${CHAR_DOTS}"
                             permnote "  $(distn "${_bund_lcase}") ($(distn 1) of $(distn "${_req_all}"))"
-                            process_flat "${_bund_lcase}" "${PREFIX}"
-                            unset CHANGED
-                            mark_installed "${DEF_NAME}${DEF_SUFFIX}" "${DEF_VERSION}"
-                            show_done "${DEF_NAME}${DEF_SUFFIX}"
+                            process_flat "${_bund_lcase}" "${PREFIX}" \
+                                && mark_installed "${DEF_NAME}${DEF_SUFFIX}" "${DEF_VERSION}" \
+                                && show_done "${DEF_NAME}${DEF_SUFFIX}"
                         else
                             permnote "  $(distn "${_bund_lcase}") ($(distn 1) of $(distn "${_req_all}"))"
                             show_done "${DEF_NAME}${DEF_SUFFIX}"
                         fi
                     else
                         permnote "  $(distn "${_bund_lcase}") ($(distn 1) of $(distn "${_req_all}"))"
-                        process_flat "${_bund_lcase}" "${PREFIX}"
-                        mark_installed "${DEF_NAME}${DEF_SUFFIX}" "${DEF_VERSION}"
-                        permnote "$(distn "${SUCCESS_CHAR}") $(distn "${_anm}") [$(distn "${DEF_VERSION}" "${ColorCyan}")]"
+                        process_flat "${_bund_lcase}" "${PREFIX}" \
+                            && mark_installed "${DEF_NAME}${DEF_SUFFIX}" "${DEF_VERSION}" \
+                            && permnote "$(distn "${SUCCESS_CHAR}") $(distn "${_anm}") [$(distn "${DEF_VERSION}" "${ColorCyan}")]"
                     fi
                 fi
             done
