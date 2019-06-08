@@ -55,6 +55,25 @@ unset COMPLIANCE_CHECK
 
 if [ -n "${SOFIN_COMMAND}" ]; then
     case ${SOFIN_COMMAND} in
+        dump|defaults|compiler-defaults|dump-defaults|dmp|build-defaults)
+            compiler_setup
+
+            permnote "### System capabilities:"
+            DEBUG=1 dump_system_capabilities
+            # permnote "$(DEBUG=1 dump_system_capabilities)"
+
+            permnote; permnote
+            permnote "### Compiler settings:"
+            DEBUG=1 dump_compiler_setup
+
+            permnote; permnote
+            permnote "### Local shell-environment settings:"
+            print_local_env_vars
+
+            permnote; permnote
+            permnote "### Global shell-environment settings:"
+            print_shell_vars
+            ;;
 
         dev)
             develop "${SOFIN_ARGS}"
