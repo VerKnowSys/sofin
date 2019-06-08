@@ -220,13 +220,6 @@ dump_system_capabilities () {
 
 
 compiler_setup () {
-    # if [ -n "${DEBUGBUILD}" ]; then
-    #     debug "DEBUGBUILD defined! Appending compiler flags with: $(distd "-O0 -ggdb")"
-    #     DEFAULT_COMPILER_FLAGS="${DEFAULT_COMPILER_FLAGS} -O0 -ggdb"
-    # else
-    #     DEFAULT_COMPILER_FLAGS="${DEFAULT_COMPILER_FLAGS} -O2"
-    # fi
-
     _default_c="${CC_NAME}"
     _default_cxx="${CXX_NAME}"
     _default_cpp="${CPP_NAME}"
@@ -349,7 +342,8 @@ compiler_setup () {
     fi
 
     unset DEFAULT_LINKER_FLAGS CMACROS
-    if [ -z "${DEF_NO_FORTIFY_SOURCE}" ]; then
+    if [ -z "${DEF_NO_FORTIFY_SOURCE}" ] \
+    && [ -z "${DEBUGBUILD}" ]; then
         CMACROS="${HARDEN_CMACROS}"
     fi
     case "${SYSTEM_NAME}" in
@@ -374,6 +368,15 @@ compiler_setup () {
 
     # CFLAGS, CXXFLAGS setup:
     set_c_and_cxx_flags "${_compiler_use_linker_flags}"
+
+    # inject debug compiler options
+    if [ -n "${DEBUGBUILD}" ]; then
+        _dbgflags="-O0 -ggdb ${ASAN_CFLAGS}"
+        note "DEBUGBUILD is enabled. Additional compiler flags: $(distn "${_dbgflags}")"
+        CFLAGS="${_dbgflags} ${CFLAGS}"
+        CXXFLAGS="${_dbgflags} ${CXXFLAGS}"
+        LDFLAGS="${_dbgflags} ${LDFLAGS}"
+    fi
 
     if [ -z "${DEF_NO_PIC}" ]; then
         CFLAGS="-fPIC ${CFLAGS}"
@@ -412,6 +415,7 @@ compiler_setup () {
 
     # Enable LTO only if LLVM LLD linker is available:
     if [ -n "${DEF_USE_LTO}" ] \
+    && [ -z "${DEBUGBUILD}" ] \
     && [ "YES" = "${CAP_SYS_LLVM_LD}" ]; then
         CFLAGS="${CFLAGS} ${LTO_CFLAGS}"
         CXXFLAGS="${CXXFLAGS} ${LTO_CFLAGS}"
@@ -445,7 +449,8 @@ compiler_setup () {
         # (or simply the value is != "YES"), then it's
         # just enabled by default on 64bit
         # HardenedBSD/ FreeBSD and Darwin systems.
-        if [ "YES" = "${DEF_USE_LTO}" ]; then
+        if [ "YES" = "${DEF_USE_LTO}" ] \
+        && [ -z "${DEBUGBUILD}" ]; then
             CFLAGS="${CFLAGS} ${LTO_CFLAGS}"
             CXXFLAGS="${CXXFLAGS} ${LTO_CFLAGS}"
 
