@@ -746,7 +746,7 @@ process_flat () {
                         ;;
                 esac
 
-                debug "Gathering configuration output logs…"
+                debug "Gathering configuration output logs${CHAR_DOTS}"
                 try "test -f '${_configure_log}' && ${INSTALL_BIN} '${_configure_log}' '${_configuration_result}'" \
                     || try "test -f '${_cmake_out_log}' && ${INSTALL_BIN} '${_cmake_out_log}' '${_cmake_configuration_result}.stdout'; test -f '${_cmake_error_log}' && ${INSTALL_BIN} '${_cmake_error_log}' '${_cmake_configuration_result}.stderr'" \
                             || debug "No configuration results!"

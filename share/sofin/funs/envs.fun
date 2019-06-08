@@ -688,7 +688,7 @@ load_sysctl_system_production_hardening () {
             if [ -z "${_sp}" ]; then
                 load_sysctl_system_defaults
             else
-                debug "System security sysctls left intact, since Sofin background tasks were found…"
+                debug "System security sysctls left intact, since Sofin background tasks were found${CHAR_DOTS}"
             fi
         fi
     fi

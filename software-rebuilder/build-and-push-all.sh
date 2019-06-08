@@ -48,7 +48,7 @@ slack_notification () {
 
 permnote "Checking remote machine connection (shouldn't take more than a second).."
 run "${SSH_BIN} sofin@git.verknowsys.com uname -a" \
-    && slack_notification "INFO" "[${_host_quad}] Connection test passed… Ok!"
+    && slack_notification "INFO" "[${_host_quad}] Connection test passed${CHAR_DOTS} Ok!"
 
 set +e
 
@@ -58,7 +58,7 @@ _working_state_file="/tmp/software.list.processing"
 if [ ! -f "${_working_state_file}" ]; then
     permnote "Creating new work-state file: $(distn "${_working_state_file}")"
     run "${CP_BIN} -v software.list ${_working_state_file}"
-    slack_notification "INFO" "[${_host_quad}] Starting new build iteration…"
+    slack_notification "INFO" "[${_host_quad}] Starting new build iteration${CHAR_DOTS}"
     TIME_START_S="$(${DATE_BIN} +%s 2>/dev/null)"
 fi
 
@@ -91,7 +91,7 @@ for _software in $(${CAT_BIN} ${_working_state_file} 2>/dev/null); do
 
         _bundle_time_start_s="$(${DATE_BIN} +%s 2>/dev/null)"
         permnote "Deploying software: $(distn "${_software}")"
-        slack_notification "INFO" "[${_host_quad}] Deploying software bundle: ${_software}…"
+        slack_notification "INFO" "[${_host_quad}] Deploying software bundle: ${_software}${CHAR_DOTS}"
 
         remove_from_list_and_destroy () {
             try "${SED_BIN} -i '' -e \"/${_software}/d\" ${_working_state_file}"

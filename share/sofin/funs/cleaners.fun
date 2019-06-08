@@ -89,7 +89,7 @@ finalize_complete_standard_task () {
 
 # Task called on demand (manually).
 # Currently used by:
-#   `s reload`, `s env`, `s reset`…:
+#   `s reload`, `s env`, `s reset`:
 finalize_with_shell_reload () {
     update_shell_vars
     reload_shell

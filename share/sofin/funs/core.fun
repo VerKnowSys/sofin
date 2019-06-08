@@ -229,7 +229,7 @@ try () {
         create_sofin_dirs
         _try_aname="${DEF_NAME}${DEF_SUFFIX}"
         if [ -z "${_try_aname}" ]; then
-            if [ -z "${DEBUG}" ]; then # No DEBUG set -> discard both STDOUT and STDERR for try() calls…:
+            if [ -z "${DEBUG}" ]; then # No DEBUG set -> discard both STDOUT and STDERR for try() calls${CHAR_DOTS}:
                 eval "PATH=${PATH}${GIT_EXPORTS} ${_try_params}" >/dev/null 2>&1 \
                     && check_result "${?}" "${_try_params}" \
                         && return 0
@@ -241,7 +241,7 @@ try () {
                         && return 0
             fi
         else
-            if [ -z "${DEBUG}" ]; then # No DEBUG set -> discard both STDOUT and STDERR for try() calls…:
+            if [ -z "${DEBUG}" ]; then # No DEBUG set -> discard both STDOUT and STDERR for try() calls${CHAR_DOTS}:
                 eval "PATH=${PATH}${GIT_EXPORTS} ${_try_params}" >/dev/null 2>&1 \
                     && check_result "${?}" "${_try_params}" \
                         && return 0
@@ -267,7 +267,7 @@ retry () {
     create_sofin_dirs
     while [ -n "${_ammo}" ]; do
         if [ -n "${_targets}" ]; then
-            if [ -z "${DEBUG}" ]; then # No DEBUG set -> discard both STDOUT and STDERR for try() calls…:
+            if [ -z "${DEBUG}" ]; then # No DEBUG set -> discard both STDOUT and STDERR for try() calls${CHAR_DOTS}:
                 eval "PATH=${DEFAULT_PATH}${GIT_EXPORTS} ${_targets}" 2>/dev/null >&2  \
                     && check_result "${?}" "${_targets}" \
                         && unset _ammo _targets \
@@ -321,7 +321,7 @@ initialize () {
 
 
 signal_handler_interrupt () {
-    warn "Received Interruption signal! Will shutdown immediatelly after completing required cleanup-duties…"
+    warn "Received Interruption signal! Will shutdown immediatelly after completing required cleanup-duties${CHAR_DOTS}"
     warn "Terminating task: $(distw "${SOFIN_CMDLINE}")!"
     finalize_after_signal_interrupt "${ERRORCODE_USER_INTERRUPT}"
 }
@@ -452,7 +452,7 @@ to_iter () {
 
 
 link_utilities () {
-    debug "Linking all utilities…" # simple exports for utils
+    debug "Linking all utilities${CHAR_DOTS}" # simple exports for utils
     _sofin_svc_dir="${SERVICES_DIR}/${SOFIN_BUNDLE_NAME}"
     try "${MKDIR_BIN} -p '${_sofin_svc_dir}/exports'"
     for _tool_bundle in $(${FIND_BIN} "${_sofin_svc_dir}" -mindepth 1 -maxdepth 1 -type d -name '[A-Z0-9]*' 2>/dev/null); do

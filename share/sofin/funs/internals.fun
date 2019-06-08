@@ -347,7 +347,7 @@ print_shell_vars () {
 
 
 list_bundles_full () {
-    note "Bundle checks in progress…"
+    note "Bundle checks in progress${CHAR_DOTS}"
     for _lbfapp in ${SOFTWARE_DIR}/*; do
         if [ -d "${_lbfapp}" ]; then
             _lbfapp_name="${_lbfapp##*/}"

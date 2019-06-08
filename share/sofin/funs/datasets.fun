@@ -444,7 +444,7 @@ destroy_software_dir () {
             && debug "Destroyed software-dataset: $(distd "${_dsname}")" \
                 && try "${RM_BIN} -rf '${SOFTWARE_DIR}/${_dset_destroy}'"
 
-        # NOTE: set_system_dataset_readonly() is called in untrap_signals() once…
+        # NOTE: set_system_dataset_readonly() is called in untrap_signals() once
     else
         debug "Removing regular software-directory: $(distd "${SOFTWARE_DIR}/${_dset_destroy}")"
         try "${RM_BIN} -rf '${SOFTWARE_DIR}/${_dset_destroy}'"
