@@ -215,7 +215,7 @@ processes_all_sofin () {
 print_local_env_vars () {
     _s_env_file="${PWD}/.${SOFIN_NAME}.env"
     if [ -f "${_s_env_file}" ]; then
-        printf "# Loaded local environment: %b\n" "${_s_env_file}"
+        printf "\n# Local environment loaded from: %b\n" "${_s_env_file}"
         ${CAT_BIN} "${_s_env_file}" 2>/dev/null
     fi
     unset _s_env_file

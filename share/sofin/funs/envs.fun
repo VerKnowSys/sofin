@@ -245,9 +245,9 @@ dump_system_capabilities () {
     IFS=\n set 2>/dev/null | ${EGREP_BIN} -i 'CAP_SYS_' 2>/dev/null | while IFS= read -r _capab
     do
         if [ -n "${_capab}" ]; then
-            debug " $(distd "${SUCCESS_CHAR}") $(distd "${_capab}" "${ColorGreen}")"
+            debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "${_capab}" "${ColorGreen}")"
         else
-            debug " $(distd "${FAIL_CHAR}") $(distd "${_capab}" "${ColorGray}")"
+            debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "${_capab}" "${ColorGray}")"
         fi
     done
     unset _capab
