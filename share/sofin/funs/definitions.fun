@@ -233,7 +233,6 @@ remove_bundles () {
             # fi
         fi
     done
-    # load_sysctl_system_production_hardening
 
     if [ -n "${_destroyed}" ]; then
         permnote "Software dataset(s) destroyed: $(distn "${_destroyed}")"
