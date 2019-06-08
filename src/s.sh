@@ -399,11 +399,15 @@ if [ -n "${SOFIN_COMMAND}" ]; then
             fi
             _pickd_bundls="$(${CAT_BIN} "${DEFAULT_PROJECT_DEPS_LIST_FILE}" 2>/dev/null | eval "${NEWLINES_TO_SPACES_GUARD}")"
             _bundls_amount="$(printf "%b\n" "${_pickd_bundls}" | eval "${WORDS_COUNT_GUARD}")"
-            note "Dependencies list file found with $(distn "${_bundls_amount}") elements in order: $(distn "${_pickd_bundls}")"
-            for _b in $(to_iter "${_pickd_bundls}"); do
-                debug "Buiding software: $(distd "${_b}") for: $(distd "${OS_TRIPPLE}")"
-                build "${_b}"
+
+            permnote "Installing $(distn "${_bundls_amount}") bundle dependencies: $(distn "${_pickd_bundls}")"
+            for _dep_bundle in $(to_iter "${_pickd_bundls}"); do
+                USE_BINBUILD=YES build "${_dep_bundle}"
             done
+
+            permnote "Limiting local-environment to bundles: $(distn "${_pickd_bundls}")"
+            s env +${_pickd_bundls}
+
             unset _pickd_bundls _bundls_amount
             finalize_complete_standard_task
             ;;
