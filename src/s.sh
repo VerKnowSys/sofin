@@ -67,12 +67,19 @@ if [ -n "${SOFIN_COMMAND}" ]; then
             DEBUG=1 dump_compiler_setup
 
             permnote; permnote
-            permnote "### Local shell-environment settings:"
-            print_local_env_vars
-
-            permnote; permnote
             permnote "### Global shell-environment settings:"
             print_shell_vars
+
+            permnote; permnote
+            _local_vars="$(print_local_env_vars)"
+            if [ -n "${_local_vars}" ]; then
+                permnote "### Loaded local-environment file"
+                printf "%b\n" "${_local_vars}"
+            else
+                permnote "### No local-environment file"
+            fi
+            unset _local_vars
+
             ;;
 
         dev)
