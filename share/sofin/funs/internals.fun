@@ -289,7 +289,9 @@ print_shell_vars () {
 
         # /Services
         for _exp in $(${FIND_BIN} "${SERVICES_DIR}" -mindepth 2 -maxdepth 2 -name 'exports' -type d 2>/dev/null); do
-            _path="${_exp}:${_path}"
+            if [ "${_exp}" != "${SERVICES_DIR}/${SOFIN_BUNDLE_NAME}/exports" ]; then # skip Sofin utility exports
+                _path="${_exp}:${_path}"
+            fi
         done
         for _exp in $(${FIND_BIN} "${SERVICES_DIR}" -mindepth 2 -maxdepth 2 -name 'lib' -or -name 'libexec' -type d 2>/dev/null); do
             _ldflags="-L${_exp} ${_ldflags}"
