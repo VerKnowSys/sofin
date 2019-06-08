@@ -127,7 +127,7 @@ default_compiler_features () {
     if [ -z "${DEF_NO_RETPOLINE}" ]; then
         permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "retpoline" "${ColorDistinct}")"
     fi
-    if [ "YES" = "${DEBUGBUILD}" ]; then
+    if [ -n "${DEBUGBUILD}" ]; then
         permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "debug-build" "${ColorDistinct}")"
     fi
     if [ -z "${DEF_NO_SSP_BUFFER_OVERRIDE}" ]; then

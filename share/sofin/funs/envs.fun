@@ -76,7 +76,7 @@ set_c_and_cxx_flags () {
 
 dump_compiler_setup () {
     debug "Listing compiler features for platform: $(distd "${SYSTEM_NAME}"):"
-    if [ "YES" = "${DEBUGBUILD}" ]; then
+    if [ -n "${DEBUGBUILD}" ]; then
         debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "debug-build" "${ColorGreen}")"
         debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "production-build" "${ColorGray}")"
     else
