@@ -33,14 +33,14 @@ cd ../
 
 
 DEST_NAME="${SOFIN_NAME}-${SOFIN_VERSION}${DEFAULT_ARCHIVE_TARBALL_EXT}"
-note "Pushing Sofin package to remote server…"
+note "Pushing Sofin package to remote server${CHAR_DOTS}"
 ${CHMOD_BIN} a+r "releases/${DEST_NAME}"
 ${SCP_BIN} \
     -P "${SOFIN_SSH_PORT}" \
     "releases/${DEST_NAME}" \
     "${SOFIN_NAME}@${DEFAULT_RELEASE_HOST}:${MAIN_SOURCE_PREFIX}"
 
-note "Pushing snapshot to remote server…"
+note "Pushing snapshot to remote server${CHAR_DOTS}"
 ${CHMOD_BIN} a+r "releases/${DEFINITIONS_INITIAL_FILE_NAME}${DEFAULT_ARCHIVE_TARBALL_EXT}"
 ${SCP_BIN} \
     -P "${SOFIN_SSH_PORT}" \

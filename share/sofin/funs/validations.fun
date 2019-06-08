@@ -206,7 +206,8 @@ validate_def_postfix () {
 validate_definition_disabled () {
     # check requirement for disabled state:
     for _def_disable_on in $(to_iter "${DEF_DISABLE_ON}"); do
-        if [ "${SYSTEM_NAME}" = "${_def_disable_on}" ] || [ "${SYSTEM_NAME}-${SYSTEM_VERSION}" = "${_def_disable_on}" ] ; then
+        if [ "${SYSTEM_NAME}" = "${_def_disable_on}" ] \
+        || [ "${SYSTEM_NAME}-${SYSTEM_VERSION}" = "${_def_disable_on}" ] ; then
             debug "Disabled: $(distd "${_def_disable_on}") on $(distd "${SYSTEM_NAME}")"
             CURRENT_DEFINITION_DISABLED=YES
         fi
@@ -296,7 +297,7 @@ validate_sys_limits () {
         _ulimit_nofile="6000"
         _ulimit_stackkb="16384"
         _ulimit_up_max_ps="1024"
-        debug "Initialised limits for Darwin workstation"
+        debug "Initialized limits for Darwin workstation"
     fi
 
     ulimit -n "${_ulimit_nofile}" >/dev/null 2>&1 \

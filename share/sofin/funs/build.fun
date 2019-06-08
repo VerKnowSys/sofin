@@ -390,7 +390,7 @@ build () {
             fi
 
             if [ -n "${CAP_SYS_ZFS}" ]; then
-                debug "Creating post build '$(distd "@${ORIGIN_ZFS_SNAP_NAME}")' snapshots…"
+                debug "Creating post build '$(distd "@${ORIGIN_ZFS_SNAP_NAME}")' snapshots${CHAR_DOTS}"
                 create_origin_snaphots
             fi
         fi
