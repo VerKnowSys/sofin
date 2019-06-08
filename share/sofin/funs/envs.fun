@@ -674,16 +674,17 @@ update_system_shell_env_files () {
 
 
 load_sysctl_system_defaults () {
-    try "${SYSCTL_BIN} -f '${DEFAULT_SYSCTL_CONF}'" \
+    try "${SYSCTL_BIN} -f '${DEFAULT_SYSCTL_CONF}' >> ${LOG} 2>> ${LOG}" \
         && debug "Restored sysctl system-defaults from: $(distd "${DEFAULT_SYSCTL_CONF}")."
 }
 
 
 load_sysctl_system_production_hardening () {
     if [ -n "${CAP_SYS_HARDENED}" ]; then
-        if [ -n "${CAP_SYS_PRODUCTION}" ]; then
-            load_sysctl_system_defaults # Simply read sysctl configuration from: sysctl.conf
-        else
+        if [ -n "${CAP_SYS_PRODUCTION}" ] \
+        || [ -n "${CAP_SYS_WORKSTATION}" ]; then
+            debug "No sysctl.conf autoload for production/workstation systems${CHAR_DOTS}"
+        elif [ -n "${CAP_SYS_BUILDHOST}" ]; then
             _sp="$(processes_all_sofin)" # Make sure there are no Sofin processes running in background
             if [ -z "${_sp}" ]; then
                 load_sysctl_system_defaults
