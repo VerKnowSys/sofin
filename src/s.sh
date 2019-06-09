@@ -56,6 +56,7 @@ unset COMPLIANCE_CHECK
 if [ -n "${SOFIN_COMMAND}" ]; then
     case ${SOFIN_COMMAND} in
         dump|defaults|compiler-defaults|dump-defaults|dmp|build-defaults)
+            load_defaults
             compiler_setup
 
             permnote "### System capabilities:"
@@ -63,7 +64,7 @@ if [ -n "${SOFIN_COMMAND}" ]; then
             # permnote "$(DEBUG=1 dump_system_capabilities)"
 
             permnote; permnote
-            permnote "### Compiler settings:"
+            permnote "### Default compiler-settings:"
             DEBUG=1 dump_compiler_setup
 
             permnote; permnote
