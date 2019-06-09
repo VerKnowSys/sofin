@@ -503,8 +503,10 @@ process_flat () {
             _cwd="$(${PWD_BIN} 2>/dev/null)"
             if [ -n "${BUILD_DIR}" ] \
             && [ -n "${BUILD_NAMESUM}" ]; then
-                dump_debug_info
-                dump_compiler_setup
+                if [ -n "${CAP_SYS_BUILDHOST}" ]; then
+                    dump_debug_info
+                    dump_compiler_setup
+                fi
 
                 cd "${BUILD_DIR}"
                 if [ -z "${DEF_GIT_CHECKOUT}" ]; then # Standard "fetch source archive" method
