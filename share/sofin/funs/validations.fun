@@ -161,45 +161,39 @@ validate_archive_sha1 () {
 
 
 validate_def_suffix () {
-    _arg1="${1%${DEFAULT_DEF_EXT}}" # <- cut extensions
-    _arg2="${2%${DEFAULT_DEF_EXT}}"
+    _arg1="${1%${DEFAULT_DEF_EXT}}" # <- cut extension
+    _defname="$(lowercase "${2}")"
+    _defmatch="$(lowercase "${_arg1##*/}")" # <- basename
+    _defcapi="$(capitalize "${_defname}")"
 
-    # This forces to rewrite given name to match Sofin "Bundlename" convention:
-    _defname="$(lowercase "${DEF_NAME}")"
-    DEF_NAME="$(capitalize "${_defname}")"
     if [ -n "${DEF_SUFFIX}" ]; then
         unset _defname _arg1 _arg2
-        debug "validate_def_suffix(): Definition value of DEF_SUFFIX=$(distd "${DEF_SUFFIX}"). Final name: $(distd "${DEF_NAME}${DEF_SUFFIX}")"
+        debug "validate_def_suffix(): Definition value of $(distd "DEF_SUFFIX=${DEF_SUFFIX}"). Final name: $(distd "${_defcapi}${DEF_SUFFIX}")"
         return 0
     fi
 
-    # case when DEF_SUFFIX was ommited => use definition file name difference as SUFFIX:
-    _first="$(lowercase "${_arg1##*/}")" # <- basename
-    _second="$(lowercase "${_arg2##*/}")"
-    # poor man's length check:
-    if [ "${#_second}" -gt "${#_first}" ]; then
-        _defdiff="$(difftext "${_second}" "${_first}")"
+    # handle case when DEF_SUFFIX was ommited => use definition file name difference as SUFFIX:
+    if [ "${#_defname}" -gt "${#_defmatch}" ]; then
+        _defdiff="$(difftext "${_defname}" "${_defmatch}")"
     fi
-    if [ "${#_first}" -gt "${#_second}" ] \
-    || [ "${#_second}" = "${#_first}" ]; then
-        _defdiff="$(difftext "${_first}" "${_second}")"
+    if [ "${#_defmatch}" -gt "${#_defname}" ] \
+    || [ "${#_defname}" = "${#_defmatch}" ]; then
+        _defdiff="$(difftext "${_defmatch}" "${_defname}")"
     fi
 
     # assume, that length of a diff shouldn't match length of both specified names:
-    if [ "$(( ${#_defdiff} + ${#_defdiff} ))" = "$(( ${#_first} + ${#_second}))" ]; then
+    if [ "$(( ${#_defdiff} + ${#_defdiff} ))" = "$(( ${#_defmatch} + ${#_defname}))" ]; then
         unset _defdiff # unset value, since we wish to ignore malformed diff
-
-        debug "validate_def_suffix(): Concatenated values, setting diff to be empty for definition: $(distd "${DEF_NAME}")."
+        debug "validate_def_suffix(): Concatenated values, setting diff to be empty for definition: $(distd "${_defcapi}")."
     fi
 
     # finally if diff looks reasonable, let's guess DEF_SUFFIX:
     if [ -n "${_defdiff}" ]; then
         DEF_SUFFIX="${_defdiff}"
-
-        debug "validate_def_suffix(): Inferred: DEF_SUFFIX=$(distd "${DEF_SUFFIX}") => $(distd "${DEF_NAME}${DEF_SUFFIX}"), 1: $(distd "${_first}"), 2: $(distd "${_second}"), DIFF: '$(distd "${_defdiff}")'"
+        debug "validate_def_suffix(): Inferred: $(distd "DEF_SUFFIX=${DEF_SUFFIX}") => $(distd "${_defcapi}${DEF_SUFFIX}"), 1: $(distd "${_defmatch}"), 2: $(distd "${_defname}"), DIFF: '$(distd "${_defdiff}")'"
     fi
 
-    unset _second _first _defdiff _arg1 _arg2 _defname
+    unset _defname _defmatch _defdiff _arg1 _arg2 _defname
 }
 
 
