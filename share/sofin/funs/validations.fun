@@ -160,9 +160,9 @@ validate_archive_sha1 () {
 }
 
 
-validate_def_postfix () {
-    _arg1="$(printf "%b\n" "$(lowercase "${1}")" | eval "${CUTOFF_DEF_EXT_GUARD}")"
-    _arg2="$(printf "%b\n" "$(lowercase "${2}")" | eval "${CUTOFF_DEF_EXT_GUARD}")"
+validate_def_suffix () {
+    _arg1="${1%${DEFAULT_DEF_EXT}}" # <- cut extensions
+    _arg2="${2%${DEFAULT_DEF_EXT}}"
     _cigiven_name="${_arg1##*/}" # basename
     _cidefinition_name="${_arg2##*/}"
     # case when DEF_SUFFIX was ommited => use definition file name difference as POSTFIX:

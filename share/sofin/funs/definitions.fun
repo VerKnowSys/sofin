@@ -27,7 +27,7 @@ load_defs () {
 
             # if definition lacks definition of DEF_SUFFIX, after loading
             # the definition file, try to infer DEF_SUFFIX:
-            validate_def_postfix "${_given_def}" "${DEF_NAME}"
+            validate_def_suffix "${_given_def}" "${DEF_NAME}"
 
             # check disabled definition state
             unset CURRENT_DEFINITION_DISABLED
