@@ -206,6 +206,7 @@ validate_definition_disabled () {
             CURRENT_DEFINITION_DISABLED=YES
         fi
     done
+    unset _def_disable_on
 }
 
 
@@ -214,9 +215,10 @@ validate_util_availability () {
     _req_bundle_name="$(capitalize "${_req_name}")"
     _req_util_indicator="${SOFIN_UTILS_DIR}/${_req_bundle_name}/${_req_name}${DEFAULT_INST_MARK_EXT}"
     if [ -f "${_req_util_indicator}" ]; then
-        debug "Utility available for: $(distd "${_req_name}"). Disabling build for requirement: $(distd "${_req_name}")"
+        debug "Utility available for: $(distd "${_req_name}"). Skipping requirement build. Will attempt to use utility."
         CURRENT_DEFINITION_DISABLED=YES
     fi
+    unset _req_name _req_bundle_name _req_util_indicator
 }
 
 
