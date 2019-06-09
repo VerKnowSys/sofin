@@ -56,18 +56,33 @@ unset COMPLIANCE_CHECK
 if [ -n "${SOFIN_COMMAND}" ]; then
     case ${SOFIN_COMMAND} in
         dump|defaults|compiler-defaults|dump-defaults|dmp|build-defaults)
-            load_defaults
+            _definition="${1:-defaults}"
+            case "${_definition}" in
+                defaults)
+                    permnote "Loading definition-defaults: $(distn "${DEFINITIONS_DEFAULTS}")"
+                    load_defaults
+
+                    permnote; permnote
+                    permnote "### Default compiler-settings:"
+                    DEBUG=1 dump_compiler_setup
+                    ;;
+
+                *)
+                    permnote "Loading definitions: $(distn "${DEFINITIONS_DEFAULTS}") + $(distn "${CHAR_DOTS}/${_definition}${DEFAULT_DEF_EXT}")"
+                    load_defaults
+                    load_defs "${_definition}"
+
+                    permnote; permnote
+                    permnote "### Definition specific compiler-settings:"
+                    DEBUG=1 dump_compiler_setup
+                    ;;
+            esac
             compiler_setup
 
+            permnote; permnote
             permnote "### System capabilities:"
             DEBUG=1 dump_system_capabilities
-            # permnote "$(DEBUG=1 dump_system_capabilities)"
 
-            permnote; permnote
-            permnote "### Default compiler-settings:"
-            DEBUG=1 dump_compiler_setup
-
-            permnote; permnote
             permnote "### Global shell-environment settings:"
             print_shell_vars
 
