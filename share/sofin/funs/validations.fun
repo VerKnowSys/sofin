@@ -164,52 +164,42 @@ validate_def_suffix () {
     _arg1="${1%${DEFAULT_DEF_EXT}}" # <- cut extensions
     _arg2="${2%${DEFAULT_DEF_EXT}}"
 
+    # This forces to rewrite given name to match Sofin "Bundlename" convention:
     _defname="$(lowercase "${DEF_NAME}")"
+    DEF_NAME="$(capitalize "${_defname}")"
     if [ -n "${DEF_SUFFIX}" ]; then
-        DEF_NAME="$(capitalize "${_defname}")"
-        debug "Definition value of DEF_SUFFIX=$(distd "${DEF_SUFFIX}"). Final name: $(distd "${DEF_NAME}${DEF_SUFFIX}")"
-        unset _cidefinition_name _cigiven_name _defname
+        unset _defname _arg1 _arg2
+        debug "validate_def_suffix(): Definition value of DEF_SUFFIX=$(distd "${DEF_SUFFIX}"). Final name: $(distd "${DEF_NAME}${DEF_SUFFIX}")"
         return 0
     fi
 
-    _cigiven_name="$(lowercase "${_arg1##*/}")" # <- basename
-    _cidefinition_name="$(lowercase "${_arg2##*/}")"
-
     # case when DEF_SUFFIX was ommited => use definition file name difference as SUFFIX:
-    _l1="${#_cidefinition_name}"
-    _l2="${#_cigiven_name}"
-    if [ "${_l1}" -gt "${_l2}" ]; then
-        _cispc_nme_diff="$(difftext "${_cidefinition_name}" "${_cigiven_name}")"
-    elif [ "${_l2}" -gt "${_l1}" ]; then
-        _cispc_nme_diff="$(difftext "${_cigiven_name}" "${_cidefinition_name}")"
-    else # equal
-        # if difference is the name itself..
-        _cispc_nme_diff="$(difftext "${_cigiven_name}" "$(lowercase "${DEF_NAME}")")"
+    _first="$(lowercase "${_arg1##*/}")" # <- basename
+    _second="$(lowercase "${_arg2##*/}")"
+    # poor man's length check:
+    if [ "${#_second}" -gt "${#_first}" ]; then
+        _defdiff="$(difftext "${_second}" "${_first}")"
     fi
-    debug "validate_def_postfix() for: $(distd "${DEF_NAME}"), 1: $(distd "${_cigiven_name}"), 2: $(distd "${_cidefinition_name}"), DIFF: $(distd "${_cispc_nme_diff}")"
-    if  [ -z "${DEF_SUFFIX}" ] \
-    && [ "${_cispc_nme_diff}" != "${DEF_NAME}" ] \
-    && [ "${_cispc_nme_diff}" != "${DEF_NAME}${DEF_SUFFIX}" ]; then
-        debug "Inferred DEF_SUFFIX=$(distd "${_cispc_nme_diff}") from definition: $(distd "${DEF_NAME}")"
-        DEF_SUFFIX="${_cispc_nme_diff}"
-        # TODO: detect if postfix isn't already applied here
-
-    elif [ "${_cispc_nme_diff}" = "${DEF_NAME}" ] \
-      && [  "${_cispc_nme_diff}" = "${DEF_NAME}${DEF_SUFFIX}" ]; then
-        # NOTE: This is case when dealing with definition file name,
-        # that has nothing in common with DEF_NAME (usually it's a postfix).
-        # In that case, we should pick specified name, *NOT* DEF_NAME:
-        DEF_NAME="${_cigiven_name}"
-        unset DEF_SUFFIX
-
-        debug "Inferred DEF_NAME: $(distd "${_cigiven_name}"), no DEF_SUFFIX, since definition file name, has nothing in common with DEF_NAME - which is allowed."
-
-    elif [ -n "${_cispc_nme_diff}" ]; then
-        debug "Given-name and definition-name difference: $(distd "${_cispc_nme_diff}")"
-    else
-        debug "No difference between given-name and definition-name."
+    if [ "${#_first}" -gt "${#_second}" ] \
+    || [ "${#_second}" = "${#_first}" ]; then
+        _defdiff="$(difftext "${_first}" "${_second}")"
     fi
-    unset _cidefinition_name _cigiven_name _cispec_name_diff __cut_ext_guard _cispc_nme_diff _l1 _l2
+
+    # assume, that length of a diff shouldn't match length of both specified names:
+    if [ "$(( ${#_defdiff} + ${#_defdiff} ))" = "$(( ${#_first} + ${#_second}))" ]; then
+        unset _defdiff # unset value, since we wish to ignore malformed diff
+
+        debug "validate_def_suffix(): Concatenated values, setting diff to be empty for definition: $(distd "${DEF_NAME}")."
+    fi
+
+    # finally if diff looks reasonable, let's guess DEF_SUFFIX:
+    if [ -n "${_defdiff}" ]; then
+        DEF_SUFFIX="${_defdiff}"
+
+        debug "validate_def_suffix(): Inferred: DEF_SUFFIX=$(distd "${DEF_SUFFIX}") => $(distd "${DEF_NAME}${DEF_SUFFIX}"), 1: $(distd "${_first}"), 2: $(distd "${_second}"), DIFF: '$(distd "${_defdiff}")'"
+    fi
+
+    unset _second _first _defdiff _arg1 _arg2 _defname
 }
 
 
