@@ -217,10 +217,10 @@ validate_definition_disabled () {
 
 validate_util_availability () {
     _req_name="$(lowercase "${1}")"
-    _req_util_indicator="${SOFIN_UTILS_DIR}/$(capitalize "${_req_name}")/${_req_name}${DEFAULT_INST_MARK_EXT}"
-    debug "Checking req name: $(distd "${_req_name}") with installing indicator: $(distd "${_req_util_indicator}")"
+    _req_bundle_name="$(capitalize "${_req_name}")"
+    _req_util_indicator="${SOFIN_UTILS_DIR}/${_req_bundle_name}/${_req_name}${DEFAULT_INST_MARK_EXT}"
     if [ -f "${_req_util_indicator}" ]; then
-        debug "Utility available for: $(distd "${_req_name}"). Disabling"
+        debug "Utility available for: $(distd "${_req_name}"). Disabling build for requirement: $(distd "${_req_name}")"
         CURRENT_DEFINITION_DISABLED=YES
     fi
 }
