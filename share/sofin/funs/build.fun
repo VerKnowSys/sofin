@@ -487,7 +487,10 @@ process_flat () {
         PATH="${DEFAULT_SHELL_EXPORTS}:${SERVICE_DIR}/bin:${SERVICE_DIR}/sbin:${_prefix}/bin:${_prefix}/sbin:${SOFIN_UTILS_PATH}:${DEFAULT_PATH}"
     fi
 
-    dump_system_capabilities
+    if [ -n "${CAP_SYS_BUILDHOST}" ]; then
+        debug "Printing system capabilities:"
+        dump_system_capabilities
+    fi
 
     if [ -z "${CURRENT_DEFINITION_DISABLED}" ]; then
         if [ "${DEF_TYPE}" = "meta" ]; then
