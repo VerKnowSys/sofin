@@ -12,6 +12,9 @@ usage_howto () {
     permnote "  $(distn "bundlelist | bundles                 ") lists available binary bundles"
     permnote "  $(distn "export | exp | exportapp             ") adds given command to application exports ($(distn "example: "${SOFIN_BIN_SHORT}" export rails Rust" "${ColorExample}"))"
     permnote
+    permnote "  $(distn "dump                                 ") dumps current default compiler and environment settings"
+    permnote "  $(distn "dump definition-name                 ") dumps definition-specific compiler and environment settings"
+    permnote
     permnote "  $(distn "log                                  ") shows tail of all logs (for debug messages and verbose info)"
     permnote "  $(distn "log @                                ") shows tail of all Sofin logs"
     permnote "  $(distn "log -                                ") shows tail of Sofin internal log only"

@@ -59,41 +59,43 @@ if [ -n "${SOFIN_COMMAND}" ]; then
             _definition="${1:-defaults}"
             case "${_definition}" in
                 defaults)
-                    permnote "Loading definition-defaults: $(distn "${DEFINITIONS_DEFAULTS}")"
+                    permnote "Loading definition-defaults: $(distn "${CHAR_DOTS}/${DEFINITIONS_DEFAULTS##*/}")"
                     load_defaults
+                    compiler_setup
 
-                    permnote; permnote
-                    permnote "### Default compiler-settings:"
+                    permnote "\n\n### Default compiler-settings:"
                     DEBUG=1 dump_compiler_setup
                     ;;
 
                 *)
-                    permnote "Loading definitions: $(distn "${DEFINITIONS_DEFAULTS}") + $(distn "${CHAR_DOTS}/${_definition}${DEFAULT_DEF_EXT}")"
-                    load_defaults
-                    load_defs "${_definition}"
+                    _def2dump="${DEFINITIONS_DIR}/${_definition}${DEFAULT_DEF_EXT}"
+                    debug "Checking existence of definition file: $(distd "${_def2dump}")"
+                    if [ -f "${_def2dump}" ]; then
+                        permnote "Loading definitions: $(distn "${CHAR_DOTS}/${DEFINITIONS_DEFAULTS##*/}") + $(distn "${CHAR_DOTS}/${_definition}${DEFAULT_DEF_EXT}")"
+                        load_defaults
+                        load_defs "${_definition}"
+                        compiler_setup
 
-                    permnote; permnote
-                    permnote "### Definition specific compiler-settings:"
-                    DEBUG=1 dump_compiler_setup
+                        permnote "\n\n### Definition specific compiler-settings:"
+                        DEBUG=1 dump_compiler_setup
+                    else
+                        error "No such definition file: $(distw "${_def2dump}")!"
+                    fi
                     ;;
             esac
-            compiler_setup
 
-            permnote; permnote
-            permnote "### System capabilities:"
+            permnote "\n\n### System capabilities:"
             DEBUG=1 dump_system_capabilities
 
-            permnote; permnote
-            permnote "### Current user shell-environment settings:"
+            permnote "\n\n### Current user shell-environment settings:"
             print_shell_vars
 
-            permnote; permnote
             _local_vars="$(print_local_env_vars)"
             if [ -n "${_local_vars}" ]; then
-                permnote "### Loaded local-environment file"
+                permnote "\n\n### Loaded local-environment file"
                 printf "%b\n" "${_local_vars}"
             else
-                permnote "### No local-environment file"
+                permnote "\n\n### No local-environment file"
             fi
             unset _local_vars
 
