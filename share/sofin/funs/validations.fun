@@ -163,9 +163,19 @@ validate_archive_sha1 () {
 validate_def_suffix () {
     _arg1="${1%${DEFAULT_DEF_EXT}}" # <- cut extensions
     _arg2="${2%${DEFAULT_DEF_EXT}}"
-    _cigiven_name="${_arg1##*/}" # basename
-    _cidefinition_name="${_arg2##*/}"
-    # case when DEF_SUFFIX was ommited => use definition file name difference as POSTFIX:
+
+    _defname="$(lowercase "${DEF_NAME}")"
+    if [ -n "${DEF_SUFFIX}" ]; then
+        DEF_NAME="$(capitalize "${_defname}")"
+        debug "Definition value of DEF_SUFFIX=$(distd "${DEF_SUFFIX}"). Final name: $(distd "${DEF_NAME}${DEF_SUFFIX}")"
+        unset _cidefinition_name _cigiven_name _defname
+        return 0
+    fi
+
+    _cigiven_name="$(lowercase "${_arg1##*/}")" # <- basename
+    _cidefinition_name="$(lowercase "${_arg2##*/}")"
+
+    # case when DEF_SUFFIX was ommited => use definition file name difference as SUFFIX:
     _l1="${#_cidefinition_name}"
     _l2="${#_cigiven_name}"
     if [ "${_l1}" -gt "${_l2}" ]; then
