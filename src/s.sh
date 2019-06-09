@@ -83,7 +83,8 @@ if [ -n "${SOFIN_COMMAND}" ]; then
             permnote "### System capabilities:"
             DEBUG=1 dump_system_capabilities
 
-            permnote "### Global shell-environment settings:"
+            permnote; permnote
+            permnote "### Current user shell-environment settings:"
             print_shell_vars
 
             permnote; permnote
