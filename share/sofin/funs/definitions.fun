@@ -19,7 +19,7 @@ load_defs () {
                 . "${DEFINITIONS_DIR}/${_def}"
                 env_forgivable
 
-                _given_def="$(printf "%b\n" "${_def}" | eval "${CUTOFF_DEF_EXT_GUARD}")"
+                _given_def="${_def%${DEFAULT_DEF_EXT}}"
             else
                 # validate available alternatives and quit no matter the result
                 show_alt_definitions_and_exit "${_given_def}"
