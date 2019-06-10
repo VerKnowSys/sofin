@@ -223,7 +223,6 @@ if [ -n "${SOFIN_COMMAND}" ]; then
                 *)
                     _bundles="${*}"
                     if [ -z "${_bundles}" ]; then
-                        # printf "%b\n" "${ANSI_ONE_LINE_UP}"
                         print_env_status
                         print_shell_vars
                         print_local_env_vars
