@@ -634,7 +634,8 @@ destroy_dead_locks_of_bundle () {
 
 
 update_shell_vars () {
-    print_shell_vars > "${SOFIN_PROFILE}"
+    print_env_status > "${SOFIN_PROFILE}"
+    print_shell_vars >> "${SOFIN_PROFILE}"
     print_local_env_vars >> "${SOFIN_PROFILE}"
 }
 

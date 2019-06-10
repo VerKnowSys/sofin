@@ -413,9 +413,18 @@ develop () {
 
 env_status () {
     if [ -f "${SOFIN_ENV_ENABLED_INDICATOR_FILE}" ]; then
-        permnote "Sofin environment is: $(distn "limited") to bundles: $(distn "$(${CAT_BIN} "${SOFIN_ENV_ENABLED_INDICATOR_FILE}" | ${TR_BIN} '\n' ' ' 2>/dev/null)")"
+        permnote "Sofin environment of $(distn "specific") bundles: $(distn "$(${CAT_BIN} "${SOFIN_ENV_ENABLED_INDICATOR_FILE}" | ${TR_BIN} '\n' ' ' 2>/dev/null)")"
     else
-        permnote "Sofin environment is: $(distn "dynamic")"
+        permnote "Sofin environment is $(distn "dynamic"). All installed software-bundles are included"
+    fi
+}
+
+
+print_env_status () {
+    if [ -f "${SOFIN_ENV_ENABLED_INDICATOR_FILE}" ]; then
+        printf "#\n# Generated environment from specific bundles: %b\n#\n" "$(${CAT_BIN} "${SOFIN_ENV_ENABLED_INDICATOR_FILE}" | ${TR_BIN} '\n' ' ' 2>/dev/null)"
+    else
+        printf "#\n# Generated dynamic environment. (env is built from all installed software-bundles) \n#\n"
     fi
 }
 

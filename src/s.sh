@@ -88,6 +88,7 @@ if [ -n "${SOFIN_COMMAND}" ]; then
             DEBUG=1 dump_system_capabilities
 
             permnote "\n\n### Current user shell-environment settings:"
+            print_env_status
             print_shell_vars
 
             _local_vars="$(print_local_env_vars)"
@@ -222,7 +223,8 @@ if [ -n "${SOFIN_COMMAND}" ]; then
                 *)
                     _bundles="${*}"
                     if [ -z "${_bundles}" ]; then
-                        printf "%b\n" "${ANSI_ONE_LINE_UP}"
+                        # printf "%b\n" "${ANSI_ONE_LINE_UP}"
+                        print_env_status
                         print_shell_vars
                         print_local_env_vars
                     else
@@ -281,6 +283,7 @@ if [ -n "${SOFIN_COMMAND}" ]; then
 
         # deprecated. Use: `s env` instead
         getshellvars|shellvars|vars)
+            print_env_status
             print_shell_vars
             print_local_env_vars
             ;;
