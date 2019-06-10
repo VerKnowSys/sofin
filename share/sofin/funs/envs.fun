@@ -428,7 +428,7 @@ compiler_setup () {
     if [ -z "${DEF_NO_LINKER_DTAGS}" ]; then
         CFLAGS="${CFLAGS} -Wl,-rpath=${PREFIX}/lib,--enable-new-dtags"
         CXXFLAGS="${CXXFLAGS} -Wl,-rpath=${PREFIX}/lib,--enable-new-dtags"
-        LDFLAGS="${LDFLAGS} -rpath=${PREFIX}/lib --enable-new-dtags"
+        # LDFLAGS="${LDFLAGS} -rpath=${PREFIX}/lib --enable-new-dtags"
     fi
     if [ -z "${DEF_NO_FAST_MATH}" ]; then
         CFLAGS="${CFLAGS} -ffast-math"
