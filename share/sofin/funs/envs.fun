@@ -410,25 +410,25 @@ compiler_setup () {
     if [ -n "${DEBUGBUILD}" ]; then
         _dbgflags="-O0 -ggdb ${ASAN_CFLAGS}"
         note "DEBUGBUILD is enabled. Additional compiler flags: $(distn "${_dbgflags}")"
-        CFLAGS="${_dbgflags} ${CFLAGS}"
-        CXXFLAGS="${_dbgflags} ${CXXFLAGS}"
-        LDFLAGS="${_dbgflags} ${LDFLAGS}"
+        CFLAGS="${CFLAGS} ${_dbgflags}"
+        CXXFLAGS="${CXXFLAGS} ${_dbgflags}"
+        # LDFLAGS="${LDFLAGS} ${_dbgflags}"
     fi
 
     if [ -z "${DEF_NO_PIC}" ]; then
-        CFLAGS="-fPIC ${CFLAGS}"
-        CXXFLAGS="-fPIC ${CXXFLAGS}"
-        LDFLAGS="-fPIC ${LDFLAGS}"
+        CFLAGS="${CFLAGS} -fPIC"
+        CXXFLAGS="${CXXFLAGS} -fPIC"
+        # LDFLAGS="-fPIC ${LDFLAGS}"
     fi
     if [ -z "${DEF_NO_PIE}" ]; then
-        CFLAGS="-fPIE ${CFLAGS}"
-        CXXFLAGS="-fPIE ${CXXFLAGS}"
-        LDFLAGS="-pie ${LDFLAGS}"
+        CFLAGS="${CFLAGS} -fPIE"
+        CXXFLAGS="${CXXFLAGS} -fPIE"
+        LDFLAGS="${LDFLAGS} -pie"
     fi
     if [ -z "${DEF_NO_LINKER_DTAGS}" ]; then
         CFLAGS="${CFLAGS} -Wl,-rpath=${PREFIX}/lib,--enable-new-dtags"
         CXXFLAGS="${CXXFLAGS} -Wl,-rpath=${PREFIX}/lib,--enable-new-dtags"
-        LDFLAGS="${LDFLAGS} -Wl,-rpath=${PREFIX}/lib,--enable-new-dtags"
+        LDFLAGS="${LDFLAGS} -rpath=${PREFIX}/lib --enable-new-dtags"
     fi
     if [ -z "${DEF_NO_FAST_MATH}" ]; then
         CFLAGS="${CFLAGS} -ffast-math"
@@ -447,7 +447,7 @@ compiler_setup () {
     && [ "Minix" != "${SYSTEM_NAME}" ]; then
         CFLAGS="${CFLAGS} ${HARDEN_SAFE_STACK_FLAGS}"
         CXXFLAGS="${CXXFLAGS} ${HARDEN_SAFE_STACK_FLAGS}"
-        LDFLAGS="${LDFLAGS} ${HARDEN_SAFE_STACK_FLAGS}"
+        # LDFLAGS="${LDFLAGS} ${HARDEN_SAFE_STACK_FLAGS}"
     fi
 
     # Enable LTO only if LLVM LLD linker is available:
