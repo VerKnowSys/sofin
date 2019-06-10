@@ -484,15 +484,6 @@ if [ -n "${SOFIN_COMMAND}" ]; then
             ;;
 
 
-        rebuild)
-            initialize
-            validate_reqs
-            fail_on_bg_job "${SOFIN_ARGS}"
-            rebuild_bundle "${SOFIN_ARGS}"
-            finalize_complete_standard_task
-            ;;
-
-
         wipe)
             wipe_remote_archives "${SOFIN_ARGS}"
             ;;
