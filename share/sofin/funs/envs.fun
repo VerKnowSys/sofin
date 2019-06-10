@@ -675,7 +675,7 @@ update_system_shell_env_files () {
 
 
 load_sysctl_system_defaults () {
-    try "${SYSCTL_BIN} -f '${DEFAULT_SYSCTL_CONF}' >> ${LOG} 2>> ${LOG}" \
+    try "${SYSCTL_BIN} -f '${DEFAULT_SYSCTL_CONF}' >/dev/null 2>> ${LOG}" \
         && debug "Restored sysctl system-defaults from: $(distd "${DEFAULT_SYSCTL_CONF}")."
 }
 
