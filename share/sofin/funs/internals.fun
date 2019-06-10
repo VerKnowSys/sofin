@@ -95,7 +95,7 @@ default_compiler_features () {
         permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "linker-BINDNOW" "${ColorDistinct}")"
     fi
 
-    if [ -z "${DEF_LINKER_NO_DTAGS}" ]; then
+    if [ -z "${DEF_NO_LINKER_DTAGS}" ]; then
         permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "linker-new-DTAGS" "${ColorDistinct}")"
     fi
     if [ -n "${DEF_USE_LTO}" ]; then

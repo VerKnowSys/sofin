@@ -226,7 +226,7 @@ dump_compiler_setup () {
         debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "trap-signed-integer-overflow" "${ColorGray}")"
     fi
 
-    if [ -z "${DEF_LINKER_NO_DTAGS}" ]; then
+    if [ -z "${DEF_NO_LINKER_DTAGS}" ]; then
         debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "enable-new-dtags" "${ColorGreen}")"
     else
         debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "enable-new-dtags" "${ColorGray}")"
@@ -425,7 +425,7 @@ compiler_setup () {
         CXXFLAGS="-fPIE ${CXXFLAGS}"
         LDFLAGS="-pie ${LDFLAGS}"
     fi
-    if [ -z "${DEF_LINKER_NO_DTAGS}" ]; then
+    if [ -z "${DEF_NO_LINKER_DTAGS}" ]; then
         CFLAGS="${CFLAGS} -Wl,-rpath=${PREFIX}/lib,--enable-new-dtags"
         CXXFLAGS="${CXXFLAGS} -Wl,-rpath=${PREFIX}/lib,--enable-new-dtags"
         LDFLAGS="${LDFLAGS} -Wl,-rpath=${PREFIX}/lib,--enable-new-dtags"
