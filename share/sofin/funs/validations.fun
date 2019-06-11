@@ -322,7 +322,9 @@ validate_bins_links () {
     if [ -z "${_bundz}" ]; then
         error "At least single bundle name has to be specified."
     fi
+    #Make sure LIBRARY_PATH is unset, else binaries without RUNPATH will report correct links on PREFIX/lib despite reporting them as not found later
     unset LD_LIBRARY_PATH
+    unset DYLD_LIBRARY_PATH
     debug "Validating links on exports: $(distd "${_bundz}")"
     for _bun in $(to_iter "${_bundz}"); do
         _bun="${_bun%=*}"
