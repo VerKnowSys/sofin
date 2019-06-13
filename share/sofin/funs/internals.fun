@@ -186,6 +186,7 @@ sofin_header () {
 
     printf "\n  %b\n" "default build features:"
     load_defaults
+    compiler_setup
     default_compiler_features
 
     printf "%b\n" "${ColorReset}"
