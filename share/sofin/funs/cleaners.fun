@@ -1,18 +1,27 @@
 #!/usr/bin/env sh
 
 clean_purge () {
+    if [ -z "${CACHE_DIR}" ]; then
+        error "Assertion failed: $(diste "CACHE_DIR") is empty!"
+    fi
     try "${RM_BIN} -rf '${CACHE_DIR}'" \
         && debug "Clean: Purged everything."
 }
 
 
 clean_logs () {
+    if [ -z "${LOGS_DIR}" ]; then
+        error "Assertion failed: $(diste "LOGS_DIR") is empty!"
+    fi
     try "${RM_BIN} -rf '${LOGS_DIR}'" \
         && debug "Clean: Logs wiped out."
 }
 
 
 clean_filecache () {
+    if [ -z "${FILE_CACHE_DIR}" ]; then
+        error "Assertion failed: $(diste "FILE_CACHE_DIR") is empty!"
+    fi
     try "${RM_BIN} -rf '${FILE_CACHE_DIR}'" \
         && debug "Clean: Files-cache wiped out."
 }
