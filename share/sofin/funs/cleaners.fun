@@ -58,7 +58,8 @@ perform_clean () {
             ;;
 
         *) # clean
-            permnote "Clean: $(distn "clean_all_bdirs_leftovers()")"
+            permnote "Clean: $(distn "clean_logs(), clean_all_bdirs_leftovers()")"
+            clean_logs
             clean_all_bdirs_leftovers
             ;;
     esac
