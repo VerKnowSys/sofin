@@ -25,8 +25,12 @@ clean_all_bdirs_leftovers () {
                 && debug "Dataset destroyed: $(distd "${i}")"
         done
     else
+        if [ -z "${SOFTWARE_DIR}" ] \
+        || [ -z "${DEFAULT_SRC_EXT}" ]; then
+            error "Assertion failed! $(diste "SOFTWARE_DIR") / $(diste "DEFAULT_SRC_EXT") are empty! Aborting unsafe clean_all_bdirs_leftovers()!"
+        fi
         for i in $(${FIND_BIN} "${SOFTWARE_DIR}" -mindepth 2 -maxdepth 2 -name "${DEFAULT_SRC_EXT}*" -type d 2>/dev/null); do
-            try "${RM_BIN} -f '${i}'" \
+            try "${RM_BIN} -rf '${i}'" \
                 && debug "Empty dir removed using <slow-file-IO>: $(distd "${i}")"
         done
         debug "Done cleaning of build-dir leftovers."
