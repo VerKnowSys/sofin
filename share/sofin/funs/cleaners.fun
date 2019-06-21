@@ -27,6 +27,15 @@ clean_filecache () {
 }
 
 
+clean_gitcache () {
+    if [ -z "${GIT_CACHE_DIR}" ]; then
+        error "Assertion failed: $(diste "GIT_CACHE_DIR") is empty!"
+    fi
+    try "${RM_BIN} -rf '${GIT_CACHE_DIR}'" \
+        && debug "Clean: Git-cache wiped out."
+}
+
+
 clean_all_bdirs_leftovers () {
     if [ "YES" != "${CAP_SYS_ZFS}" ]; then
         if [ -z "${SOFTWARE_DIR}" ] \
@@ -51,9 +60,10 @@ perform_clean () {
             ;;
 
         dist) # distclean
-            permnote "Dist clean: $(distn "clean_logs(), clean_filecache(), clean_all_bdirs_leftovers()")"
+            permnote "Dist clean: $(distn "clean_logs(), clean_filecache(), clean_gitcache(), clean_all_bdirs_leftovers()")"
             clean_logs
             clean_filecache
+            clean_gitcache
             clean_all_bdirs_leftovers
             ;;
 
