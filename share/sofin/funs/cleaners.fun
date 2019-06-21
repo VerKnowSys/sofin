@@ -160,8 +160,10 @@ finalize_afterbuild_tasks_for_bundle () {
 remove_useless_files_of_bundle () {
     _rufiles="${*}"
     if [ -n "${_rufiles}" ]; then
-        printf "%b\n" "${_rufiles}" | ${XARGS_BIN} -n 1 -P "4" -I {} "${SHELL}" -c "${RM_BIN} -rf {}" >/dev/null 2>&1 \
-            && debug "Useless files wiped out: $(distd "${_rufiles}")"
+        debug "Useless files to be wiped out: $(distd "${_rufiles}")"
+        for _rmfile in $(to_iter "${_rufiles}"); do
+            try "${RM_BIN} -rf ${_rmfile}"
+        done
     else
         debug "No bundle name given! NO-OP."
     fi
