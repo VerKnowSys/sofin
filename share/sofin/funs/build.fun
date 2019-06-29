@@ -439,10 +439,10 @@ dump_debug_info () {
 
 
 process_flat () {
-    _app_param="${1}"
+    _definition_name="$(lowercase "${1}")"
     _prefix="${2}"
-    _bundlnm="$(capitalize_abs "${_app_param}")"
-    if [ -z "${_app_param}" ]; then
+    _bundlnm="$(capitalize_abs "${_definition_name}")"
+    if [ -z "${_definition_name}" ]; then
         error "First argument with $(diste "requirement-name") is required!"
     fi
     if [ -z "${_prefix}" ]; then
@@ -451,7 +451,7 @@ process_flat () {
     if [ -z "${_bundlnm}" ]; then
         error "Third argument with $(diste "BundleName") is required!"
     fi
-    _req_definition="${DEFINITIONS_DIR}/$(lowercase "${_app_param}")${DEFAULT_DEF_EXT}"
+    _req_definition="${DEFINITIONS_DIR}/${_definition_name}${DEFAULT_DEF_EXT}"
     if [ ! -e "${_req_definition}" ]; then
         error "Cannot read definition file: $(diste "${_req_definition}")!"
     fi
@@ -520,7 +520,7 @@ process_flat () {
                             _bname="${_dest_file##*/}"
                             try "${RM_BIN} -f ${_dest_file}" \
                                 && debug "Removed corrupted cache file: $(distd "${_bname}") and retrying.."
-                            process_flat "${_app_param}" "${_prefix}"
+                            process_flat "${_definition_name}" "${_prefix}"
                         fi
                         unset _bname _a_file_checksum
                     fi
@@ -548,15 +548,15 @@ process_flat () {
                 fi
 
                 unset _fd
-                _prm_nolib="$(printf "%b\n" "${_app_param}" | ${SED_BIN} 's/lib//' 2>/dev/null)"
-                _prm_no_undrlne_and_minus="$(printf "%b\n" "${_app_param}" | ${SED_BIN} 's/[-_].*$//' 2>/dev/null)"
-                # debug "Requirement: ${_app_param} short: ${_prm_nolib}, nafter-: ${_prm_no_undrlne_and_minus}, DEF_NAME: ${DEF_NAME}, BUILD_DIR: ${BUILD_DIR}"
+                _prm_nolib="$(printf "%b\n" "${_definition_name}" | ${SED_BIN} 's/lib//' 2>/dev/null)"
+                _prm_no_undrlne_and_minus="$(printf "%b\n" "${_definition_name}" | ${SED_BIN} 's/[-_].*$//' 2>/dev/null)"
+                # debug "Requirement: ${_definition_name} short: ${_prm_nolib}, nafter-: ${_prm_no_undrlne_and_minus}, DEF_NAME: ${DEF_NAME}, BUILD_DIR: ${BUILD_DIR}"
                 # NOTE: patterns sorted by safety
-                for _pati in    "*${_app_param}*${DEF_VERSION}" \
+                for _pati in    "*${_definition_name}*${DEF_VERSION}" \
                                 "*${_prm_no_undrlne_and_minus}*${DEF_VERSION}" \
                                 "*${_prm_nolib}*${DEF_VERSION}" \
                                 "*${DEF_NAME}*${DEF_VERSION}" \
-                                "*${_app_param}*" \
+                                "*${_definition_name}*" \
                                 "*${_prm_no_undrlne_and_minus}*" \
                                 "*${_prm_nolib}*" \
                                 "*${DEF_NAME}*";
@@ -573,7 +573,7 @@ process_flat () {
                     # XXX: hardcoded name of function inherit() - which might be used in any definition file:
                     _inherited="$(${GREP_BIN} 'inherit' "${_req_definition}" 2>/dev/null | ${SED_BIN} 's/inherit[ ]*//g' 2>/dev/null)"
                     if [ -z "${_inherited}" ]; then
-                        error "No source dir found for definition: $(diste "${_app_param}")?"
+                        error "No source dir found for definition: $(diste "${_definition_name}")?"
                     else
                         for _inh in $(to_iter "${_inherited}"); do
                             debug "Trying inherited value: $(distd "${_inh}")"
@@ -585,7 +585,7 @@ process_flat () {
                         done
                         # If nothing helps..
                         if [ -z "${_fd}" ]; then
-                            error "No inherited source dir found for definition: $(diste "${_app_param}")?"
+                            error "No inherited source dir found for definition: $(diste "${_definition_name}")?"
                         fi
                     fi
                 fi
@@ -624,19 +624,19 @@ process_flat () {
 
                     ignore)
                         debug "Build type: $(distd "ignore")"
-                        note "   ${NOTE_CHAR} Configuration skipped for definition: $(distn "${_app_param}")"
+                        note "   ${NOTE_CHAR} Configuration skipped for definition: $(distn "${_definition_name}")"
                         ;;
 
                     no-conf)
                         debug "Build type: $(distd "no-conf")"
-                        note "   ${NOTE_CHAR} No configuration for definition: $(distn "${_app_param}")"
+                        note "   ${NOTE_CHAR} No configuration for definition: $(distn "${_definition_name}")"
                         DEF_MAKE_METHOD="${DEF_MAKE_METHOD} PREFIX=${_prefix} CFLAGS='${CFLAGS}' CXXFLAGS='${CXXFLAGS}' LDFLAGS='${LDFLAGS}'"
                         DEF_INSTALL_METHOD="${DEF_INSTALL_METHOD} PREFIX=${_prefix} CFLAGS='${CFLAGS}' CXXFLAGS='${CXXFLAGS}' LDFLAGS='${LDFLAGS}'"
                         ;;
 
                     binary)
                         debug "Build type: $(distd "binary")"
-                        note "   ${NOTE_CHAR} Prebuilt definition of: $(distn "${_app_param}")"
+                        note "   ${NOTE_CHAR} Prebuilt definition of: $(distn "${_definition_name}")"
                         DEF_MAKE_METHOD="true"
                         DEF_INSTALL_METHOD="true"
                         ;;
@@ -645,7 +645,7 @@ process_flat () {
                         debug "Build type: $(distd "posix")"
                         dump_software_build_configuration_options "${_configure_options_log}"
 
-                        note "   ${NOTE_CHAR} Configuring: $(distn "${_app_param}"), version: $(distn "${DEF_VERSION}")"
+                        note "   ${NOTE_CHAR} Configuring: $(distn "${_definition_name}"), version: $(distn "${DEF_VERSION}")"
                         try "./configure -prefix ${_prefix} -cc '${CC_NAME} ${CFLAGS}' -libs '-L${PREFIX}/lib ${LDFLAGS}' -mandir ${PREFIX}/share/man -libdir ${PREFIX}/lib -aspp '${CC_NAME} ${CFLAGS} -c' ${DEF_CONFIGURE_ARGS} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
                             || try "./configure -prefix ${_prefix} -cc '${CC_NAME} ${CFLAGS}' -libs '-L${PREFIX}/lib ${LDFLAGS}' -libdir ${PREFIX}/lib -aspp '${CC_NAME} ${CFLAGS} -c' ${DEF_CONFIGURE_ARGS} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
                                 || run "./configure -prefix ${_prefix} -cc '${CC_NAME} ${CFLAGS}' -libs '-L${PREFIX}/lib ${LDFLAGS}' -aspp '${CC_NAME} ${CFLAGS} -c' ${DEF_CONFIGURE_ARGS}"
@@ -656,7 +656,7 @@ process_flat () {
                     meson) # new player each year ;)
                         debug "Build type: $(distd "meson")"
                         dump_software_build_configuration_options "${_configure_options_log}"
-                        note "   ${NOTE_CHAR} Configuring: $(distn "${_app_param}"), version: $(distn "${DEF_VERSION}")"
+                        note "   ${NOTE_CHAR} Configuring: $(distn "${_definition_name}"), version: $(distn "${DEF_VERSION}")"
 
                         try "${DEF_CONFIGURE_METHOD} . build --prefix=${PREFIX} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
                             || try "${DEF_CONFIGURE_METHOD} . build --prefix=${PREFIX} --sysconfdir=${SERVICE_DIR}/etc 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
@@ -668,7 +668,7 @@ process_flat () {
 
                     cmake)
                         debug "Build type: $(distd "cmake")"
-                        note "   ${NOTE_CHAR} Configuring: $(distn "${_app_param}"), version: $(distn "${DEF_VERSION}")"
+                        note "   ${NOTE_CHAR} Configuring: $(distn "${_definition_name}"), version: $(distn "${DEF_VERSION}")"
 
                         try "${RM_BIN} -rf build; ${MKDIR_BIN} -p build"
                         _pwd="${_pwd}/build"
@@ -691,7 +691,7 @@ process_flat () {
                         _addon="CFLAGS='${CFLAGS}' CXXFLAGS='${CXXFLAGS}' LDFLAGS='${LDFLAGS}'"
 
                         dump_software_build_configuration_options "${_configure_options_log}"
-                        note "   ${NOTE_CHAR} Configuring: $(distn "${_app_param}"), version: $(distn "${DEF_VERSION}")"
+                        note "   ${NOTE_CHAR} Configuring: $(distn "${_definition_name}"), version: $(distn "${DEF_VERSION}")"
 
                         if [ "${SYSTEM_NAME}" = "Linux" ]; then
                             # NOTE: No /Services feature implemented for Linux.
@@ -759,7 +759,7 @@ process_flat () {
 
             # and common part between normal and continue modes:
             cd "${_pwd}"
-            note "   ${NOTE_CHAR} Building requirement: $(distn "${_app_param}"), version: $(distn "${DEF_VERSION}")"
+            note "   ${NOTE_CHAR} Building requirement: $(distn "${_definition_name}"), version: $(distn "${DEF_VERSION}")"
             run "${DEF_MAKE_METHOD}"
 
             cd "${_pwd}"
@@ -773,20 +773,20 @@ process_flat () {
             if [ -n "${DEF_SKIPPED_DEFINITION_TEST}" ]; then
                 debug "Defined DEF_SKIPPED_DEFINITION_TEST: $(distd "${DEF_SKIPPED_DEFINITION_TEST}")"
 
-                printf "%b\n" " ${DEF_SKIPPED_DEFINITION_TEST} " | ${EGREP_BIN} -F " ${_app_param} " >/dev/null 2>&1 \
-                    && note "   ${NOTE_CHAR} Skipped tests for definition of: $(distn "${_app_param}")" \
+                printf "%b\n" " ${DEF_SKIPPED_DEFINITION_TEST} " | ${EGREP_BIN} -F " ${_definition_name} " >/dev/null 2>&1 \
+                    && note "   ${NOTE_CHAR} Skipped tests for definition of: $(distn "${_definition_name}")" \
                         && _this_test_skipped=1
             fi
 
             if [ -z "${USE_NO_TEST}" ] \
             && [ -z "${_this_test_skipped}" ]; then
-                note "   ${NOTE_CHAR} Testing requirement: $(distn "${_app_param}"), version: $(distn "${DEF_VERSION}")"
+                note "   ${NOTE_CHAR} Testing requirement: $(distn "${_definition_name}"), version: $(distn "${DEF_VERSION}")"
                 cd "${_pwd}"
 
                 # NOTE: mandatory on production machines:
-                test_and_rate_def "${_app_param}" "${DEF_TEST_METHOD}"
+                test_and_rate_def "${_definition_name}" "${DEF_TEST_METHOD}"
             else
-                note "   ${WARN_CHAR} Tests for definition: $(distn "${_app_param}") skipped on demand"
+                note "   ${WARN_CHAR} Tests for definition: $(distn "${_definition_name}") skipped on demand"
             fi
             cd "${_pwd}"
             try after_test_callback
@@ -821,7 +821,7 @@ process_flat () {
             fi
 
             cd "${_pwd}"
-            note "   ${NOTE_CHAR} Installing requirement: $(distn "${_app_param}"), version: $(distn "${DEF_VERSION}")"
+            note "   ${NOTE_CHAR} Installing requirement: $(distn "${_definition_name}"), version: $(distn "${DEF_VERSION}")"
             run "${DEF_INSTALL_METHOD}"
 
             cd "${_pwd}"
@@ -830,7 +830,7 @@ process_flat () {
             try after_install_snapshot
 
             cd "${_pwd}"
-            printf "%b\n" "${DEF_VERSION}" > "${_prefix}/${_app_param}${DEFAULT_INST_MARK_EXT}" \
+            printf "%b\n" "${DEF_VERSION}" > "${_prefix}/${_definition_name}${DEFAULT_INST_MARK_EXT}" \
                 && debug "Commited version: $(distd "${DEF_VERSION}") of software bundle: $(distd "${DEF_NAME}${DEF_SUFFIX}"). Bundle prefix: $(distd "${_prefix}")"
 
             cd "${_cwd}" 2>/dev/null
@@ -845,7 +845,7 @@ process_flat () {
         _dis_def="${_prefix}/${_req_defname}${DEFAULT_INST_MARK_EXT}"
         printf "%b\n" "${DEFAULT_REQ_OS_PROVIDED}" > "${_dis_def}"
     fi
-    unset _current_branch _dis_def _req_defname _app_param _prefix _bundlnm
+    unset _current_branch _dis_def _req_defname _app_param _prefix _bundlnm _definition_name
 
     # TODO: reset env here?
 }

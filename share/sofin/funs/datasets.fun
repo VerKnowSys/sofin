@@ -40,7 +40,7 @@ push_to_all_mirrors () {
         fi
         push_dset_zfs_stream "${_pfin_svc_name}" "${_pbto_bundle_name}" "${_ptmirror}" "${_pversion_element}"
     done
-    permnote "Successfully deployed bundle: $(distn "${_pbto_bundle_name}")."
+    permnote "Successfully deployed bundle: $(distn "${_pbto_bundle_name}")"
     unset _ptaddress _ptmirror _pversion_element _ptelm_file_name _pt_query
 }
 
