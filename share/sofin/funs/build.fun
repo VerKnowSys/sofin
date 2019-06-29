@@ -55,6 +55,7 @@ push_binbuilds () {
     fi
     for _pbelement in $(to_iter "${_push_bundles}"); do
         _pblowercase_element="$(lowercase "${_pbelement}")"
+        _pbelement="$(capitalize "${_pblowercase_element}")"
         if [ -z "${_pblowercase_element}" ]; then
             error "Lowercase bundle name is empty!"
         fi

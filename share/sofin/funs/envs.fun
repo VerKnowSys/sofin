@@ -557,23 +557,21 @@ compiler_setup () {
 
 create_lock () {
     _bundle_name="${1}"
+    _bundle_cap="$(capitalize_abs "${_bundle_name}")"
     if [ -z "${_bundle_name}" ]; then
         error "No bundle name specified to lock!"
-    else
-        debug "Acquring bundle lock for: $(distd "${_bundle_name}")"
     fi
-    debug "Pid of current Sofin session: $(distd "${SOFIN_PID}")"
-    _bundle="$(capitalize_abs "${_bundle_name}")"
+    debug "Acquring bundle-lock for PID: $(distd "${SOFIN_PID}") of bundle: $(distd "${_bundle_name}")"
     try "${MKDIR_BIN} -p '${LOCKS_DIR}'"
-    printf "%b\n" "${SOFIN_PID}" > "${LOCKS_DIR}${_bundle}${DEFAULT_LOCK_EXT}"
-    unset _bundle _bundle_name
+    printf "%b\n" "${SOFIN_PID}" > "${LOCKS_DIR}${_bundle_cap}${DEFAULT_LOCK_EXT}"
+    unset _bundle_cap _bundle_name
 }
 
 
 acquire_lock_for () {
     _bundles="${*}"
     for _bundle in $(to_iter "${_bundles}"); do
-        _bundle="${_bundle%=*}" # cut off possible postfix with custom version, f.e.: =1.2.3
+        _bundle="$(capitalize_abs "${_bundle%=*}")" # cut off possible postfix with custom version, f.e.: =1.2.3
         debug "Acquiring lock for bundle: [$(distd "${_bundle}")]"
         if [ -f "${LOCKS_DIR}${_bundle}${DEFAULT_LOCK_EXT}" ]; then
             _lock_pid="$(${CAT_BIN} "${LOCKS_DIR}${_bundle}${DEFAULT_LOCK_EXT}" 2>/dev/null)"
