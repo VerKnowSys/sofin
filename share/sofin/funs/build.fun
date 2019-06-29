@@ -77,16 +77,6 @@ push_binbuilds () {
 }
 
 
-deploy_binbuild () {
-    _dbbundles="${*}"
-    for _dbbundle in $(to_iter "${_dbbundles}"); do
-        USE_BINBUILD=NO
-        build "${_dbbundle}"
-        push_binbuilds "${_dbbundle}"
-    done
-    unset _dbbundles _dbbundle
-}
-
 
 fetch_binbuild () {
     _fbb_bundname="${1}"
