@@ -5,9 +5,9 @@ check_version () { # $1 => installed version, $2 => available version
         if [ -n "${2}" ]; then
             if [ "${1}" != "${2}" ]; then
                 if [ -z "${4}" ]; then
-                    warn "Bundle: $(distw "$(capitalize "${3}")"), version: $(distw "${2}") is definied, but installed version is: $(distw "${1}")"
+                    warn "Bundle: $(distw "$(capitalize_abs "${3}")"), version: $(distw "${2}") is definied, but installed version is: $(distw "${1}")"
                 else
-                    printf "%b\n" "$(capitalize "${3}")"
+                    printf "%b\n" "$(capitalize_abs "${3}")"
                 fi
                 FOUND_OUTDATED=YES
             fi
@@ -370,7 +370,7 @@ validate_libs_links () {
     fi
     debug "Validating libraries: $(distd "${_bundz}")"
     for _bun in $(to_iter "${_bundz}"); do
-        _bun="${_bun%=*}"
+        _bun="$(capitalize_abs "${_bun%=*}")"
         if [ -d "${SOFTWARE_DIR}/${_bun}/lib" ]; then
             _a_dir="${SOFTWARE_DIR}/${_bun}/lib"
         else

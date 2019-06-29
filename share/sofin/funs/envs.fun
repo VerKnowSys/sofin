@@ -563,7 +563,7 @@ create_lock () {
         debug "Acquring bundle lock for: $(distd "${_bundle_name}")"
     fi
     debug "Pid of current Sofin session: $(distd "${SOFIN_PID}")"
-    _bundle="$(capitalize "${_bundle_name}")"
+    _bundle="$(capitalize_abs "${_bundle_name}")"
     try "${MKDIR_BIN} -p '${LOCKS_DIR}'"
     printf "%b\n" "${SOFIN_PID}" > "${LOCKS_DIR}${_bundle}${DEFAULT_LOCK_EXT}"
     unset _bundle _bundle_name

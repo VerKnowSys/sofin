@@ -183,7 +183,7 @@ build () {
                 # Note: this acutally may break definitions like ImageMagick..
                 #_bund_lcase="$(lowercase "${DEF_NAME}${DEF_SUFFIX}")"
                 _bund_lcase="${DEF_NAME}${DEF_SUFFIX}"
-                _bundl_name="$(capitalize "${_bund_lcase}")"
+                _bundl_name="$(capitalize_abs "${_bund_lcase}")"
                 DEF_NAME="${_bundl_name}"
 
                 # if definition requires root privileges, throw an "exception":
@@ -450,7 +450,7 @@ dump_debug_info () {
 process_flat () {
     _app_param="${1}"
     _prefix="${2}"
-    _bundlnm="$(capitalize "${_app_param}")"
+    _bundlnm="$(capitalize_abs "${_app_param}")"
     if [ -z "${_app_param}" ]; then
         error "First argument with $(diste "requirement-name") is required!"
     fi

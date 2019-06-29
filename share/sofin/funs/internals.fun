@@ -485,7 +485,7 @@ show_alt_definitions_and_exit () {
     if [ ! -f "${DEFINITIONS_DIR}/${_an_app}${DEFAULT_DEF_EXT}" ]; then
         unset _contents
         for _maybe in $(${FIND_BIN} "${DEFINITIONS_DIR}" -maxdepth 1 -name "${_an_app}*${DEFAULT_DEF_EXT}" 2>/dev/null); do
-            _contents="${_contents}$(printf "%b\n" "$(capitalize "${_maybe##*/}")" | ${SED_BIN} 's/\..*//' 2>/dev/null) "
+            _contents="${_contents}$(printf "%b\n" "$(capitalize_abs "${_maybe##*/}")" | ${SED_BIN} 's/\..*//' 2>/dev/null) "
         done
         if [ -z "${_contents}" ]; then
             warn "No such definition: $(distw "${_an_app}"). No alternatives found."

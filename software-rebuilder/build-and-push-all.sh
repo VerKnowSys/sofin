@@ -82,7 +82,7 @@ for _software in $(${CAT_BIN} ${_working_state_file} 2>/dev/null); do
             try "${SOFIN_BIN} rm ${_software}"
             try "${ZFS_BIN} destroy -fr ${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/${_software}"
             try "${ZFS_BIN} destroy -fr ${DEFAULT_ZPOOL}${SERVICES_DIR}/root/${_software}"
-            try "${RM_BIN} -rf ${HOME}/.sofin/file-cache/$(capitalize "${_software}")* '${SOFTWARE_DIR}/${_software}' '${SERVICES_DIR}/${_software}'"
+            try "${RM_BIN} -rf ${HOME}/.sofin/file-cache/$(capitalize_abs "${_software}")* '${SOFTWARE_DIR}/${_software}' '${SERVICES_DIR}/${_software}'"
         }
 
         permnote "Removing software: $(distn "${_software}")"

@@ -153,7 +153,7 @@ if [ -n "${SOFIN_COMMAND}" ]; then
                     unset _bundles
                     _all="${*}"
                     for _in in $(to_iter "${_all}"); do
-                        _bundle="$(capitalize "${_in#+}")"
+                        _bundle="$(capitalize_abs "${_in#+}")"
                         if [ -e "${SOFTWARE_DIR}/${_bundle}" ]; then
                             if [ -z "${_bundles}" ]; then
                                 _bundles="${_bundle}"
@@ -173,7 +173,7 @@ if [ -n "${SOFIN_COMMAND}" ]; then
                     unset _bundles
                     _all="${*}"
                     for _in in $(to_iter "${_all}"); do
-                        _bundle="$(capitalize "${_in#-}")"
+                        _bundle="$(capitalize_abs "${_in#-}")"
                         if [ -e "${SOFTWARE_DIR}/${_bundle}" ]; then
                             if [ -z "${_bundles}" ]; then
                                 _bundles="${_bundle}"
@@ -337,7 +337,7 @@ if [ -n "${SOFIN_COMMAND}" ]; then
                 validate_reqs
 
                 for _util in $(to_iter "${_utils}"); do
-                    _util="$(capitalize "${_util}")"
+                    _util="$(capitalize_abs "${_util}")"
                     debug "Starting utility build: $(distd "${_util}")"
 
                     export SOFTWARE_DIR="${SERVICES_DIR}/${SOFIN_BUNDLE_NAME}/${_util}"
@@ -382,6 +382,7 @@ if [ -n "${SOFIN_COMMAND}" ]; then
             else
                 _pickd_bundls="${SOFIN_ARGS}"
             fi
+            unset _instld_bundls
             for _buname in $(to_iter "${_pickd_bundls}"); do
                 unset CURRENT_DEFINITION_VERSION_OVERRIDE
                 _buname_sh_escaped="$(echo "${_buname}" | ${SED_BIN} -E 's/[-+%]/_/g' 2>/dev/null)"
@@ -393,8 +394,9 @@ if [ -n "${SOFIN_COMMAND}" ]; then
                     debug "No version override. Using most recent bundle version"
                 fi
 
-                _buname="${_buname%=*}"
-                build "${_buname}"
+                _buname="$(capitalize_abs "${_buname%=*}")"
+                build "${_buname}" \
+                    && _instld_bundls="${_instld_bundls} ${_buname}"
                 if [ "${USER}" != "root" ]; then
                     try "${CHOWN_BIN} -R ${USER} '${SOFTWARE_DIR}/${_buname}'" \
                         && debug "OK: $(distd "chown -R ${USER} '${SOFTWARE_DIR}/${_buname}'")."
@@ -402,8 +404,8 @@ if [ -n "${SOFIN_COMMAND}" ]; then
                         && debug "OK: $(distd "chown -R ${USER} '${SERVICES_DIR}/${_buname}'")."
                 fi
             done
-            permnote "Installed: $(distn "${_pickd_bundls}")"
-            unset _list_maybe _pickd_bundls _buname _specified_version_with_name
+            permnote "Installed bundles:$(distn "${_instld_bundls}")"
+            unset _list_maybe _pickd_bundls _buname _specified_version_with_name _instld_bundls
             finalize_complete_standard_task
             ;;
 
@@ -495,13 +497,13 @@ if [ -n "${SOFIN_COMMAND}" ]; then
             initialize
             fail_on_bg_job "${SOFIN_ARGS}"
             for _arg in $(to_iter "${SOFIN_ARGS}"); do
-                _caparg="$(capitalize "${_arg}")"
+                _caparg="$(capitalize_abs "${_arg}")"
                 if [ -z "${_caparg}" ]; then
                     error "No software bundle names given?"
                 fi
             done
             remove_bundles "${SOFIN_ARGS}"
-            permnote "Removed bundle(s): $(distn "${SOFIN_ARGS}")"
+            permnote "Removed bundle(s): $(distn "$(capitalize_abs "${SOFIN_ARGS}")")"
             finalize_complete_standard_task
             ;;
 

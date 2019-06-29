@@ -202,7 +202,7 @@ remove_bundles () {
     unset _destroyed
     load_sysctl_buildhost_hardening
     for _def in $(to_iter "${_bundles}"); do
-        _given_name="$(capitalize "${_def}")"
+        _given_name="$(capitalize_abs "${_def}")"
         if [ -z "${_given_name}" ]; then
             error "Empty bundle name given as first param!"
         fi
@@ -297,7 +297,7 @@ available_definitions () {
 
 make_exports () {
     _export_bin="${1}"
-    _bundle_name="$(capitalize "${2}")"
+    _bundle_name="$(capitalize_abs "${2}")"
     if [ -z "${_export_bin}" ]; then
         error "First argument with $(diste "exported-bin") is required!"
     fi
@@ -442,7 +442,7 @@ strip_bundle () {
     load_defaults
     load_defs "${_sbfdefinition_name}"
     if [ -z "${PREFIX}" ]; then
-        PREFIX="${SOFTWARE_DIR}/$(capitalize "${DEF_NAME}${DEF_SUFFIX}")"
+        PREFIX="${SOFTWARE_DIR}/$(capitalize_abs "${DEF_NAME}${DEF_SUFFIX}")"
         debug "An empty prefix for: $(distd "${_sbfdefinition_name}"). Resetting to: $(distd "${PREFIX}")"
     fi
     if [ -f "${PREFIX}/${_sbfdefinition_name}${DEFAULT_STRIPPED_MARK_EXT}" ]; then
@@ -623,7 +623,7 @@ conflict_resolve () {
     if [ ! -f "${SOFIN_ENV_ENABLED_INDICATOR_FILE}" ]; then
         debug "Sofin ENV is NOT set, performing conflicts resolve!"
         if [ -n "${DEF_CONFLICTS_WITH}" ]; then
-            _appname="$(capitalize "${DEF_NAME}${DEF_SUFFIX}")"
+            _appname="$(capitalize_abs "${DEF_NAME}${DEF_SUFFIX}")"
             debug "Seeking possible bundle conflicts: $(distd "${DEF_CONFLICTS_WITH}")"
             for _app in $(to_iter "${DEF_CONFLICTS_WITH}"); do
                 for _soft in $(${FIND_BIN} "${SOFTWARE_DIR}" -maxdepth 1 -type d -iname "${_app}*" 2>/dev/null); do
