@@ -327,7 +327,7 @@ validate_bins_links () {
     unset DYLD_LIBRARY_PATH
     debug "Validating links on exports: $(distd "${_bundz}")"
     for _bun in $(to_iter "${_bundz}"); do
-        _bun="${_bun%=*}"
+        _bun="$(capitalize_abs "${_bun%=*}")"
         if [ -d "${SOFTWARE_DIR}/${_bun}/exports" ]; then
             _a_dir="${SOFTWARE_DIR}/${_bun}/exports"
         elif [ -d "${SOFTWARE_DIR}/${_bun}/exports-disabled" ]; then
