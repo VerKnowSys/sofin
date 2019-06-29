@@ -163,12 +163,12 @@ validate_archive_sha1 () {
 validate_def_suffix () {
     _arg1="${1%${DEFAULT_DEF_EXT}}" # <- cut extension
     _defname="$(lowercase "${2}")"
+    _def_bundle_name="$(capitalize "${_defname}")"
     _defmatch="$(lowercase "${_arg1##*/}")" # <- basename
-    _defcapi="$(capitalize "${_defname}")"
 
     if [ -n "${DEF_SUFFIX}" ]; then
         unset _defname _arg1 _arg2
-        debug "validate_def_suffix(): Definition value of $(distd "DEF_SUFFIX=${DEF_SUFFIX}"). Final name: $(distd "${_defcapi}${DEF_SUFFIX}")"
+        debug "validate_def_suffix(): Definition value of $(distd "DEF_SUFFIX=${DEF_SUFFIX}"). Final name: $(distd "${_def_bundle_name}${DEF_SUFFIX}")"
         return 0
     fi
 
@@ -184,16 +184,16 @@ validate_def_suffix () {
     # assume, that length of a diff shouldn't match length of both specified names:
     if [ "$(( ${#_defdiff} + ${#_defdiff} ))" = "$(( ${#_defmatch} + ${#_defname}))" ]; then
         unset _defdiff # unset value, since we wish to ignore malformed diff
-        debug "validate_def_suffix(): Concatenated values, setting diff to be empty for definition: $(distd "${_defcapi}")."
+        debug "validate_def_suffix(): Concatenated values, setting diff to be empty for definition: $(distd "${_def_bundle_name}")."
     fi
 
     # finally if diff looks reasonable, let's guess DEF_SUFFIX:
     if [ -n "${_defdiff}" ]; then
         DEF_SUFFIX="${_defdiff}"
-        debug "validate_def_suffix(): Inferred: $(distd "DEF_SUFFIX=${DEF_SUFFIX}") => $(distd "${_defcapi}${DEF_SUFFIX}"), 1: $(distd "${_defmatch}"), 2: $(distd "${_defname}"), DIFF: '$(distd "${_defdiff}")'"
+        debug "validate_def_suffix(): Inferred: $(distd "DEF_SUFFIX=${DEF_SUFFIX}") => $(distd "${_def_bundle_name}${DEF_SUFFIX}"), 1: $(distd "${_defmatch}"), 2: $(distd "${_defname}"), DIFF: '$(distd "${_defdiff}")'"
     fi
 
-    unset _defname _defmatch _defdiff _arg1 _arg2 _defname
+    unset _defname _defmatch _defdiff _arg1 _arg2 _def_bundle_name
 }
 
 

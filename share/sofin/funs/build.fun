@@ -157,16 +157,16 @@ build () {
     for _bund_name in $(to_iter "${_build_list}"); do
         _bund_name="$(lowercase "${_bund_name}")"
         _bund_name="${_bund_name%=*}" # cut the version if specified using Bundlename=1.2.3
-        _anm="$(capitalize "${_bund_name}")"
+        _bund_name_capit="$(capitalize "${_bund_name}")"
         load_defaults
         load_defs "${_bund_name}"
         validate_loaded_def
         if [ "${CURRENT_DEFINITION_DISABLED}" = "YES" ]; then
-            warn "Bundle: $(distw "${_anm}") is disabled on: $(distw "${OS_TRIPPLE}")"
-            destroy_software_dir "${_anm}"
+            warn "Bundle: $(distw "${_bund_name_capit}") is disabled on: $(distw "${OS_TRIPPLE}")"
+            destroy_software_dir "${_bund_name_capit}"
             return 0
         else
-            create_software_dir "${_anm}"
+            create_software_dir "${_bund_name_capit}"
             for _req_name in ${DEFINITIONS_DIR}/${_bund_name}${DEFAULT_DEF_EXT}; do
                 unset CURRENT_DEFINITION_SKIP_BUILD_DO_EXPORTS
                 debug "Reading definition: $(distd "${_req_name}")"
@@ -177,7 +177,7 @@ build () {
                 # NOTE: feature to specify custom version of bundle to install via: `s i Rust=1.31.1`:
                 if [ -n "${CURRENT_DEFINITION_VERSION_OVERRIDE}" ]; then
                     DEF_VERSION="${CURRENT_DEFINITION_VERSION_OVERRIDE}"
-                    debug "Bundle: $(distd "${_anm}") version override: $(distd "${DEF_VERSION}")"
+                    debug "Bundle: $(distd "${_bund_name_capit}") version override: $(distd "${DEF_VERSION}")"
                 fi
 
                 # Note: this acutally may break definitions like ImageMagick..
@@ -233,9 +233,9 @@ build () {
                     else
                         _already_installed_version="$(${CAT_BIN} "${_installed_indicator}" 2>/dev/null)"
                         if [ "${DEF_VERSION}" = "${_already_installed_version}" ]; then
-                            debug "$(capitalize "$(distd "${_bund_lcase}")") bundle is installed with version: $(distd "${_already_installed_version}")"
+                            debug "$(distd "${_bundl_name}") bundle is installed with version: $(distd "${_already_installed_version}")"
                         else
-                            error "$(capitalize "$(diste "${_bund_lcase}")") bundle is installed with version: $(diste "${_already_installed_version}"), different from found in definition: $(diste "${DEF_VERSION}"). Aborting!"
+                            error "$(diste "${_bundl_name}") bundle is installed with version: $(diste "${_already_installed_version}"), different from found in definition: $(diste "${DEF_VERSION}"). Aborting!"
                         fi
                         CURRENT_DEFINITION_SKIP_BUILD_DO_EXPORTS=YES
                         unset _already_installed_version
@@ -293,7 +293,7 @@ build () {
                         permnote "  $(distn "${_bund_lcase}") ($(distn 1) of $(distn "${_req_all}"))"
                         process_flat "${_bund_lcase}" "${PREFIX}" \
                             && mark_installed "${DEF_NAME}${DEF_SUFFIX}" "${DEF_VERSION}" \
-                            && permnote "$(distn "${SUCCESS_CHAR}") $(distn "${_anm}") [$(distn "${DEF_VERSION}" "${ColorCyan}")]"
+                            && permnote "$(distn "${SUCCESS_CHAR}") $(distn "${_bund_name_capit}") [$(distn "${DEF_VERSION}" "${ColorCyan}")]"
                     fi
                 fi
             done
@@ -301,7 +301,7 @@ build () {
 
         if [ "YES" = "${CAP_SYS_ZFS}" ]; then
             _dataset_parent="${DEFAULT_ZPOOL}/Software/${SYSTEM_DATASET}"
-            _dataset="${_dataset_parent}/${_anm}"
+            _dataset="${_dataset_parent}/${_bund_name_capit}"
             debug "Setting dataset: $(distd "${_dataset}") to inherit 'readonly' attribute from readonly parent: $(distd "${_dataset_parent}")"
             try "${ZFS_BIN} set readonly=off '${_dataset_parent}'"
             try "${ZFS_BIN} inherit readonly '${_dataset}'"
@@ -318,16 +318,16 @@ build () {
         if [ -n "${CAP_SYS_BUILDHOST}" ]; then
             if [ -n "${DEF_UTILITY_BUNDLE}" ]; then
                 try "${RM_BIN} -rf '${PREFIX}/include' '${PREFIX}/doc' ${PREFIX}/${DEFAULT_SRC_EXT}*"
-                debug "Utility bundle: $(distd "${_anm}") build completed!"
+                debug "Utility bundle: $(distd "${_bund_name_capit}") build completed!"
                 link_utilities
             fi
 
-            debug "Afterbuild for bundle: $(distd "${_anm}")"
-            finalize_afterbuild_tasks_for_bundle "${_anm}"
+            debug "Afterbuild for bundle: $(distd "${_bund_name_capit}")"
+            finalize_afterbuild_tasks_for_bundle "${_bund_name_capit}"
 
             debug "Non production mode, hence tracking useful/useless files, stripping bundles and creating bundle snapshot!"
             afterbuild_manage_files_of_bundle
-            strip_bundle "${_anm}"
+            strip_bundle "${_bund_name_capit}"
 
             if [ "YES" = "${CAP_SYS_HARDENED}" ]; then
                 _disable=""
@@ -356,7 +356,7 @@ build () {
                     printf "%b\n\n" '#!/bin/sh' > "${_paxfile}"
                     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
                         _dataset_parent="${DEFAULT_ZPOOL}/Software/${SYSTEM_DATASET}"
-                        _dataset="${_dataset_parent}/${_anm}"
+                        _dataset="${_dataset_parent}/${_bund_name_capit}"
 
                         # NOTE: Make sure readonly is put down to the .pax file!
                         {
@@ -397,7 +397,7 @@ build () {
 
     done
 
-    unset _build_list _bund_lcase _req_all _req _disable _feature _file _files _anm _dataset
+    unset _build_list _bund_lcase _req_all _req _disable _feature _file _files _bund_name_capit _dataset
     env_reset
     return 0
 }
