@@ -83,13 +83,24 @@ file_size () {
 
 
 capitalize () {
-    printf "%b\n" "${@}" 2>/dev/null | ${AWK_BIN} '{for(i=1;i<=NF;i++){ $i=toupper(substr($i,1,1)) substr($i,2) }}1' 2>/dev/null
+    printf "%b\n" "${@}" 2>/dev/null \
+        | ${AWK_BIN} '{for(i=1;i<=NF;i++){ $i=toupper(substr($i,1,1)) substr($i,2) }}1' 2>/dev/null
 }
 
 
 lowercase () {
-    printf "%b\n" "${@}" 2>/dev/null | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null
+    printf "%b\n" "${@}" 2>/dev/null \
+        | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null
 }
+
+
+# capitalize_abs => lowercase() + capitalize ()
+capitalize_abs () {
+    printf "%b\n" "${@}" 2>/dev/null \
+        | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null \
+        | ${AWK_BIN} '{for(i=1;i<=NF;i++){ $i=toupper(substr($i,1,1)) substr($i,2) }}1' 2>/dev/null
+}
+
 
 
 fill () {
