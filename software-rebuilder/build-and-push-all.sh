@@ -47,7 +47,7 @@ slack_notification () {
 
 
 permnote "Checking remote machine connection (shouldn't take more than a second).."
-run "${SSH_BIN} sofin@git.verknowsys.com uname -a" \
+run "${SSH_BIN} sofin@software.verknowsys.com uname -a" \
     && slack_notification "INFO" "[${_host_quad}] Connection test passed${CHAR_DOTS} Ok!"
 
 set +e
