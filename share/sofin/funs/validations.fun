@@ -389,7 +389,7 @@ validate_libs_links () {
             elif ${FILE_BIN} -L "${_lib}" | ${GREP_BIN} -E 'x86(-|_)64' >/dev/null 2>&1; then
                 _libname="$(echo ${_lib} | ${AWK_BIN} -F/ '{print $NF}' | ${SED_BIN} -E 's/([^[:alnum:]])/\\\1/g')"
                 if [ "${SYSTEM_NAME}" = "Darwin" ]; then
-                    _linked="$(${OTOOL_BIN} -L "${_lib}" | ${GREP_BIN} -Ev "(\s${SOFTWARE_DIR}/${_bun}(/|/bin/../)lib/)|(\s/usr/lib/)|(\s/lib/)|(\s/System/Library/Frameworks/)|(\s${_libname})|(\s@rpath)"  2>/dev/null)"
+                    _linked="$(${OTOOL_BIN} -L "${_lib}" | ${GREP_BIN} -Ev "(\s${SOFTWARE_DIR}/${_bun}(/|/bin/../)lib/)|(\s/usr/lib/)|(\s/lib/)|(\s/System/Library/Frameworks/)|(\s${_libname})|(\s@rpath)|(\s@executable_path)"  2>/dev/null)"
                 else
                     _lib="$(${READLINK_BIN} -f ${_lib})"
                     _linked="$(${LDD_BIN} "${_lib}" | ${GREP_BIN} -Ev "( /usr/lib/)|( ${SOFTWARE_DIR}/${_bun}(/|/bin/../)lib/)|( /lib/)|( ${_libname})"  2>/dev/null)"
