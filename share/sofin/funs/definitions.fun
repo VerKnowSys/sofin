@@ -308,7 +308,7 @@ make_exports () {
     for _bindir in "/bin/" "/sbin/" "/libexec/"; do
         # SOFTWARE_DIR:
         if [ -e "${SOFTWARE_DIR}/${_bundle_name}${_bindir}${_export_bin}" ]; then
-            note "Exporting binary: $(distn "${SOFTWARE_DIR}/${_bundle_name}${_bindir}${_export_bin}")"
+            permnote "Exporting binary: $(distn "${SOFTWARE_DIR}/${_bundle_name}${_bindir}${_export_bin}")"
             _cdir="$(${PWD_BIN} 2>/dev/null)"
             cd "${SOFTWARE_DIR}/${_bundle_name}${_bindir}"
             try "${RM_BIN} -f ../exports/${_export_bin}; ${LN_BIN} -s ..${_bindir}/${_export_bin} ../exports/${_export_bin}"
@@ -321,7 +321,7 @@ make_exports () {
 
         # SERVICES_DIR:
         if [ -e "${SERVICES_DIR}/${_bundle_name}${_bindir}${_export_bin}" ]; then
-            note "Exporting binary: $(distn "${SERVICES_DIR}/${_bundle_name}${_bindir}${_export_bin}")"
+            permnote "Exporting binary: $(distn "${SERVICES_DIR}/${_bundle_name}${_bindir}${_export_bin}")"
             _cdir="$(${PWD_BIN} 2>/dev/null)"
             cd "${SERVICES_DIR}/${_bundle_name}${_bindir}"
             try "${RM_BIN} -f ../exports/${_export_bin}; ${LN_BIN} -s ..${_bindir}/${_export_bin} ../exports/${_export_bin}"
