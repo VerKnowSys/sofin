@@ -34,7 +34,7 @@ if [ -x "${SOFIN_OS_VER_BIN}" ]; then
         finalize_and_quit_gracefully_with_exitcode "${ERRORCODE_VALIDATE_ENV_FAILURE}"
     fi
     # NOTE: MINIMAL_MAJOR_OS_VERSION is important here!
-    OS_TRIPPLE="${SYSTEM_NAME}-${MINIMAL_MAJOR_OS_VERSION}-${SYSTEM_ARCH}"
+    OS_TRIPPLE="${SYSTEM_NAME}-${SYSTEM_VERSION}-${SYSTEM_ARCH}"
     SYS_SPECIFIC_BINARY_REMOTE="${MAIN_BINARY_PREFIX}/${OS_TRIPPLE}"
 else
     # Fallback to static version default:
