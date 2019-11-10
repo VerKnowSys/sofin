@@ -41,4 +41,4 @@ MAKE_OPTS="-s -j${CPUS:-${DEFAULT_CPUS}}"
 
 # Default options of "strip" utility:
 DEFAULT_STRIP_OPTS="--strip-debug --strip-unneeded --preserve-dates"
-MINIMAL_MAJOR_OS_VERSION="11.0"
+MINIMAL_MAJOR_OS_VERSION="11.2"
