@@ -166,8 +166,8 @@ if [ -x "/usr/bin/lz4" ]; then
 fi
 
 # hbsdcontrol
-if [ ! -x "${HBSDCONTROL_BIN}" ]; then
-    HBSDCONTROL_BIN="/usr/bin/true"
+if [ -x "/usr/sbin/hbsdcontrol" ]; then
+    HBSDCONTROL_BIN="/usr/sbin/hbsdcontrol"
 fi
 
 # log-watcher utility - lw - replaces "tail")
