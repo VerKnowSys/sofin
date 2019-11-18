@@ -385,8 +385,8 @@ compiler_setup () {
     if [ -z "${DEF_NO_HARDEN_FLAGS}" ]; then
         case "${SYSTEM_NAME}" in
             FreeBSD)
-                DEFAULT_COMPILER_FLAGS="${SINGLE_ERROR_CFLAGS} ${HARDEN_CFLAGS} ${HARDEN_CFLAGS_PRODUCTION} ${CMACROS}"
-                DEFAULT_LINKER_FLAGS="${HARDEN_LDFLAGS_PRODUCTION}"
+                DEFAULT_COMPILER_FLAGS="${SINGLE_ERROR_CFLAGS} ${CFLAGS_PRODUCTION} ${HARDEN_CFLAGS} ${CMACROS}"
+                DEFAULT_LINKER_FLAGS="${LDFLAGS_PRODUCTION}"
                 ;;
 
             Darwin|Linux)
@@ -395,12 +395,12 @@ compiler_setup () {
 
             Minix)
                 # Disabled -fstack-protector-strong - not supported on clang 3.4
-                DEFAULT_COMPILER_FLAGS="${SINGLE_ERROR_CFLAGS} -fstack-protector -fstack-protector-all -fno-strict-overflow -Wformat -Wformat-security ${CMACROS}"
+                DEFAULT_COMPILER_FLAGS="${SINGLE_ERROR_CFLAGS} ${CFLAGS_PRODUCTION} ${CMACROS}"
                 ;;
         esac
     else
-        debug "DEF_NO_HARDEN_FLAGS is set, Disabling all default HARDEN_CFLAGS, HARDEN_LDFLAGS_PRODUCTION and CMACROS"
-        DEFAULT_COMPILER_FLAGS="${SINGLE_ERROR_CFLAGS}"
+        DEFAULT_COMPILER_FLAGS="${SINGLE_ERROR_CFLAGS} ${CFLAGS_PRODUCTION}"
+        DEFAULT_LINKER_FLAGS="${LDFLAGS_PRODUCTION}"
     fi
 
     # CFLAGS, CXXFLAGS setup:
@@ -413,6 +413,9 @@ compiler_setup () {
         CFLAGS="${CFLAGS} ${_dbgflags}"
         CXXFLAGS="${CXXFLAGS} ${_dbgflags}"
         # LDFLAGS="${LDFLAGS} ${_dbgflags}"
+    else
+        CFLAGS="${CFLAGS} -g"
+        CXXFLAGS="${CXXFLAGS} -g"
     fi
 
     if [ -z "${DEF_NO_PIC}" ]; then
