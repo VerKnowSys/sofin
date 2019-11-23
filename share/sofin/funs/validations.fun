@@ -345,7 +345,7 @@ validate_bins_links () {
                         _linked="$(${OTOOL_BIN} -L "${_bin}" | ${GREP_BIN} -Ev "(\s${SOFTWARE_DIR}/${_bun}(/|/bin/../)lib/)|(\s/usr/lib/)|(\s/lib/)|(\s/System/Library/Frameworks/)|(@rpath/)"  2>/dev/null)"
                 else
                         _bin="$(${READLINK_BIN} -f ${_bin})"
-                        _linked="$(${LDD_BIN} "${_bin}" | ${GREP_BIN} -Ev "( /usr/lib/)|( ${SOFTWARE_DIR}/${_bun}(/|/bin/../)lib/)|( /lib/)"  2>/dev/null)"
+                        _linked="$(${LDD_BIN} "${_bin}" 2>> ${LOG} | ${GREP_BIN} -Ev "( /usr/lib/)|( ${SOFTWARE_DIR}/${_bun}(/|/bin/../)lib/)|( /lib/)"  2>/dev/null)"
                 fi
 
                 if [ "${_linked}" != "${_bin}:" ]; then
@@ -392,7 +392,7 @@ validate_libs_links () {
                     _linked="$(${OTOOL_BIN} -L "${_lib}" | ${GREP_BIN} -Ev "(\s${SOFTWARE_DIR}/${_bun}(/|/bin/../)lib/)|(\s/usr/lib/)|(\s/lib/)|(\s/System/Library/Frameworks/)|(\s${_libname})|(\s@rpath)|(\s@executable_path)"  2>/dev/null)"
                 else
                     _lib="$(${READLINK_BIN} -f ${_lib})"
-                    _linked="$(${LDD_BIN} "${_lib}" | ${GREP_BIN} -Ev "( /usr/lib/)|( ${SOFTWARE_DIR}/${_bun}(/|/bin/../)lib/)|( /lib/)|( ${_libname})"  2>/dev/null)"
+                    _linked="$(${LDD_BIN} "${_lib}" 2>> ${LOG} | ${GREP_BIN} -Ev "( /usr/lib/)|( ${SOFTWARE_DIR}/${_bun}(/|/bin/../)lib/)|( /lib/)|( ${_libname})"  2>/dev/null)"
                 fi
 
                 if [ "${_linked}" != "${_lib}:" ]; then
