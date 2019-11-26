@@ -193,12 +193,12 @@ dump_compiler_setup () {
         debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "position-independent-executable" "${ColorGray}")"
     fi
 
-    # -fstack-protector-all check:
-    printf "%b\n" "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'fstack-protector-all' >/dev/null 2>&1
+    # -fstack-protector check:
+    printf "%b\n" "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'fstack-protector ' >/dev/null 2>&1
     if [ "0" = "${?}" ]; then
-        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "stack-protector-all" "${ColorGreen}")"
+        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "stack-protector" "${ColorGreen}")"
     else
-        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "stack-protector-all" "${ColorGray}")"
+        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "stack-protector" "${ColorGray}")"
     fi
 
     # -fstack-protector-strong check:
@@ -207,6 +207,14 @@ dump_compiler_setup () {
         debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "stack-protector-strong" "${ColorGreen}")"
     else
         debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "stack-protector-strong" "${ColorGray}")"
+    fi
+
+    # -fstack-protector-all check:
+    printf "%b\n" "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'fstack-protector-all' >/dev/null 2>&1
+    if [ "0" = "${?}" ]; then
+        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "stack-protector-all" "${ColorGreen}")"
+    else
+        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "stack-protector-all" "${ColorGray}")"
     fi
 
     # -fno-strict-overflow check:
