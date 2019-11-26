@@ -81,8 +81,8 @@ SSP_BUFFER_OVERRIDE="--param ssp-buffer-size=4"
 HARDEN_OFLOW_CFLAGS="-ftrapv"
 HARDEN_SAFE_STACK_FLAGS="-fsanitize=safe-stack"
 HARDEN_CMACROS="-D_FORTIFY_SOURCE=2"
-HARDEN_CFLAGS="-fstack-protector-all -fno-strict-overflow"
-CFLAGS_PRODUCTION="-fstack-protector -fstack-protector-strong -Wformat -Wformat-security -Wl,-z,relro,-z,now"
+HARDEN_CFLAGS="-fstack-protector-strong -fno-strict-overflow" # -fstack-protector-all
+CFLAGS_PRODUCTION="-fstack-protector -Wformat -Wformat-security -Wl,-z,relro,-z,now"
 LDFLAGS_PRODUCTION="-z relro -z now"
 
 
