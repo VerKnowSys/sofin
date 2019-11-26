@@ -84,9 +84,9 @@ dump_compiler_setup () {
     fi
 
     if [ -z "${DEF_NO_HARDEN_FLAGS}" ]; then
-        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "hardened-compiler-flags" "${ColorGreen}")"
+        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "extra-hardened-compiler-flags" "${ColorGreen}")"
     else
-        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "hardened-compiler-flags" "${ColorGray}")"
+        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "extra-hardened-compiler-flags" "${ColorGray}")"
     fi
 
     if [ -z "${DEF_NO_CCACHE}" ]; then # ccache is supported by default but it's optional
