@@ -407,8 +407,16 @@ compiler_setup () {
                 ;;
         esac
     else
-        DEFAULT_COMPILER_FLAGS="${SINGLE_ERROR_CFLAGS} ${CFLAGS_PRODUCTION}"
-        DEFAULT_LINKER_FLAGS="${LDFLAGS_PRODUCTION}"
+        case "${SYSTEM_NAME}" in
+            Darwin|Minix)
+                DEFAULT_COMPILER_FLAGS="${SINGLE_ERROR_CFLAGS}"
+                ;;
+
+            *)
+                DEFAULT_COMPILER_FLAGS="${SINGLE_ERROR_CFLAGS} ${CFLAGS_PRODUCTION}"
+                DEFAULT_LINKER_FLAGS="${LDFLAGS_PRODUCTION}"
+                ;;
+        esac
     fi
 
     # CFLAGS, CXXFLAGS setup:
