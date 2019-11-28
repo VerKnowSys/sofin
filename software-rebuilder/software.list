@@ -15,6 +15,7 @@ Influxdb
 Jq
 Lftp
 Libressl
+Llvm
 Lz4
 Kibana5
 Logstash5
@@ -26,6 +27,7 @@ Mosh
 Mysqltuner
 Nano
 Nginx
+Nghttp2-utils
 Node
 Node12
 Ocaml
