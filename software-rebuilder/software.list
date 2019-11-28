@@ -7,8 +7,10 @@ Elixir
 Filebeat
 Geoipupdate
 Git-devel
+Grafana
 Gnupg
 Httpd
+Influxdb
 Jq
 Lftp
 Libressl
