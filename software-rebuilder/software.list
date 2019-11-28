@@ -5,6 +5,7 @@ Dmidecode
 Elasticsearch5
 Elixir
 Filebeat
+Freeipmi
 Geoipupdate
 Git-devel
 Grafana
@@ -27,6 +28,7 @@ Nano
 Nginx
 Node
 Node12
+Ocaml
 Openjdk8
 Openssl
 Openssl10
@@ -52,6 +54,7 @@ Ruby26
 Rust
 Smartmontools
 Sonar-scanner
+Sysbench
 Telegraf
 Tig
 Tmux
