@@ -1,6 +1,7 @@
 Awscli
 Bash
 Curl
+Dhcp
 Dmidecode
 Elasticsearch5
 Elixir
@@ -12,6 +13,7 @@ Git-devel
 Grafana
 Gnupg
 Httpd
+Iftop
 Influxdb
 Jq
 Lftp
