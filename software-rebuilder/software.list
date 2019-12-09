@@ -1,5 +1,6 @@
 Awscli
 Bash
+Clang
 Curl
 Dhcp
 Dmidecode
@@ -18,6 +19,7 @@ Influxdb
 Jq
 Lftp
 Libressl
+Lldb
 Llvm
 Lz4
 Kibana5
@@ -31,6 +33,7 @@ Mysqltuner
 Nano
 Nginx
 Nghttp2-utils
+Nmap
 Node
 Node12
 Ocaml
