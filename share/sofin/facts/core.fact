@@ -92,7 +92,7 @@ DEFAULT_DATE_TS_OPTS="+%s"
 DEFAULT_DATE_TRYRUN_OPTS="+%F-%H%M%S"
 
 # Base values used by ZFS:
-DEFAULT_SNAPSHOT_SEND_OPTS="-D -L -e -p -v" # dedup, large-blocks, write-embed, include-properties, verbose
+DEFAULT_SNAPSHOT_SEND_OPTS="-c -R -D -e -v" # compress, replicate-whole-dataset, dedup, write-embed, verbose
 DEFAULT_SNAPSHOT_RECEIVE_OPTS="-s -v" # save-interrupted-state, verbose
 DEFAULT_ZFS_MAX_SNAPSHOT_COUNT="5" # max amount of snapshots to keep per dataset
 DEFAULT_ZPOOL="zroot"
