@@ -33,7 +33,8 @@ load_defs () {
             unset CURRENT_DEFINITION_DISABLED
             validate_definition_disabled
 
-            if [ -z "${USE_NO_UTILS}" ]; then
+            if [ -z "${USE_NO_UTILS}" ] \
+            && [ -n "${CAP_SYS_BUILDHOST}" ]; then
                 debug "USE_NO_UTILS environment value is unset! Using available BuildHost utilities!"
                 validate_util_availability "${DEF_NAME}${DEF_SUFFIX}"
             fi
