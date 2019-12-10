@@ -171,15 +171,12 @@ space than it does with "old fasioned, system wide, shared software".
   - Start using Sofin as regular user.
 
 ### Darwin/ Mac OS X specific:
-  - Install Mac OS X 10.9, 10.10 or 10.11 (one currently supported)
+  - Install Mac OS X 10.11+ with Command utilities package or Xcode installed.
   - Type `sudo mkdir /Software; sudo chown ${USER} /Software; git clone https://github.com/VerKnowSys/sofin && cd sofin && bin/install` in your terminal, and you're ready to go.
-  - Type `s get Zsh`, then when it finishes, do: `grep 'Software/Zsh' /etc/shells || sudo echo '/Software/Zsh/exports/zsh' >> /etc/shells; sudo chsh -s /Software/Zsh/exports/zsh ${USER}` to change your shell, to one that is supported by default by Sofin.
-    - Start using Sofin as regular user.
 
 
 ## Conflicts/ Problems/ Known issues:
 * Sofin build mechanism is known to be in conflict with other software managment solutions like: BSD Ports, HomeBrew, MacPorts, Fink. Keep that in mind before reporting problems, cause they're the root of true evil on your OS :)
-* It's recommended to change shell by doing: `chsh -s /Software/Zsh/exports/zsh` for each user which will use Sofin. It's caused shells built the way, they don't read default shell initialization scripts like /etc/zshenv for Zsh.
 
 
 ## Major changes since 1.0:
