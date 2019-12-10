@@ -1,6 +1,7 @@
 #!/usr/bin/env zsh
 # @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
 
+s i Git
 git pull
 bin/install
 
