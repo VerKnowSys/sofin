@@ -471,7 +471,10 @@ if [ -n "${SOFIN_COMMAND}" ]; then
                 export USE_BINBUILD=NO \
                     && build "${_bundle}" \
                     && afterbuild_manage_files_of_bundle \
-                    && push_binbuilds "${_bundle}"
+                    && push_binbuilds "${_bundle}" \
+                    && continue
+
+                error "Process failed for bundle: $(diste "${_bundle}")!"
             done
             unset _bundle
 
