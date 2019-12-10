@@ -424,14 +424,14 @@ compiler_setup () {
 
     # inject debug compiler options
     if [ -n "${DEBUGBUILD}" ]; then
-        _dbgflags="-O0 -ggdb ${ASAN_CFLAGS}"
+        _dbgflags="-O0 -gdwarf-4 -glldb ${ASAN_CFLAGS}"
         note "DEBUGBUILD is enabled. Additional compiler flags: $(distn "${_dbgflags}")"
         CFLAGS="${CFLAGS} ${_dbgflags}"
         CXXFLAGS="${CXXFLAGS} ${_dbgflags}"
         # LDFLAGS="${LDFLAGS} ${_dbgflags}"
     else
-        CFLAGS="${CFLAGS} -g"
-        CXXFLAGS="${CXXFLAGS} -g"
+        CFLAGS="${CFLAGS} -gdwarf-4"
+        CXXFLAGS="${CXXFLAGS} -gdwarf-4"
     fi
 
     if [ -z "${DEF_NO_PIC}" ]; then
