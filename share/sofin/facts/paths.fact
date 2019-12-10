@@ -84,6 +84,7 @@ OPENSSL_BIN="/usr/bin/openssl"
 DTRACE_BIN="/usr/sbin/dtrace"
 JOT_BIN="/usr/bin/jot"
 SH_BIN="/bin/sh"
+OBJCOPY_BIN="/usr/bin/objcopy"
 
 # Pick best utilities available:
 if [ -f "${DEFAULT_FACTS_DIR}alternatives.fact" ]; then

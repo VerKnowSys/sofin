@@ -2,6 +2,7 @@
 
 # OSX specific configuration
 
+unset OBJCOPY_BIN # not applicable
 unset SERVICE_BIN # not necessary
 unset DEFAULT_STRIP_OPTS # strip doesn't accept params under Darwin
 
