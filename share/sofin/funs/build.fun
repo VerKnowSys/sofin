@@ -137,8 +137,10 @@ build () {
     _build_list="${*}"
 
     # Update definitions and perform more checks
-    load_sysctl_buildhost_hardening
-    validate_kern_loaded_dtrace
+    if [ -n "${CAP_SYS_BUILDHOST}" ]; then
+        load_sysctl_buildhost_hardening
+        validate_kern_loaded_dtrace
+    fi
     validate_sys_limits
 
     # store_security_state
