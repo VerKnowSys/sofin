@@ -1,5 +1,7 @@
 Awscli
 Bash
+Boost
+Cairo
 Clang
 Curl
 Dhcp
@@ -47,6 +49,7 @@ Pass
 Perl
 Php72
 Php73
+Pkgconf
 Postgresql10
 Postgresql11
 Postgresql96
