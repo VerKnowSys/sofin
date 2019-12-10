@@ -516,9 +516,26 @@ strip_bundle () {
         fi
     done
     if [ -n "${_to_be_stripped_list}" ]; then
-        printf "%b\n" "${_to_be_stripped_list}" | ${XARGS_BIN} -n 1 -P "4" -I {} "${SHELL}" -c "${STRIP_BIN} ${DEFAULT_STRIP_OPTS} {}" 2>/dev/null \
-            && try "${TOUCH_BIN} '${PREFIX}/$(lowercase "${_sbfdefinition_name}")${DEFAULT_STRIPPED_MARK_EXT}'" \
-                && debug "Stripped $(distd "${_files_counter}") files"
+        if [ -z "${DEF_KEEP_DEBUG_SYMBOLS}" ]; then
+            debug "Stripping debug information from build products…"
+            for _file in $(to_iter "${_to_be_stripped_list}"); do
+                debug "Stripping $(distd "${_file}")"
+                try "${STRIP_BIN} ${DEFAULT_STRIP_OPTS} ${_file}"
+            done
+        else
+            debug "Splitting debug information into separate files…"
+            local _debug_dest_dir="${PREFIX}/.debug"
+            mkdir -p "${_debug_dest_dir}"
+            for _file in $(to_iter "${_to_be_stripped_list}"); do
+                local _dbgfile_basename="${_file##*/}.debug"
+                debug "Coying debug data from: $(distd "${_file}") to: $(distd "${_debug_dest_dir}/${_dbgfile_basename}")"
+                try "${OBJCOPY_BIN} --only-keep-debug ${_file} ${_debug_dest_dir}/${_dbgfile_basename}"
+                debug "Stripping $(distd "${_file}")"
+                try "${STRIP_BIN} ${DEFAULT_STRIP_OPTS} ${_file}"
+                debug "Associate separated debug file to debug file"
+                try "${OBJCOPY_BIN} --add-gnu-debuglink=${_debug_dest_dir}/${_dbgfile_basename} ${_file}"
+            done
+        fi
     fi
     unset _sbfdefinition_name _dirs_to_strip _files_counter _files _stripdir _bundlower _to_be_stripped_list
 }
