@@ -77,13 +77,17 @@ install_sofin () {
             && install_sofin_files \
                 && printf "%b\n" "${SOFIN_VERSION}" > "${SOFIN_ROOT}/${SOFIN_NAME}${DEFAULT_INST_MARK_EXT}"
 
-    if [ -x "${ZSH_BIN}" ]; then
-        ${SED_BIN} -i '' -e "s#/usr/bin/env sh#${DEFAULT_SHELL_EXPORTS}/zsh#" \
-            "${SOFIN_ROOT}/bin/s" \
-            "${SOFIN_ROOT}/share/loader" \
-            >/dev/null 2>&1 \
-                && permnote "${SOFIN_BUNDLE_NAME} v$(distn "${SOFIN_VERSION}") was installed successfully!"
+    _zsh="${DEFAULT_SHELL_EXPORTS}/zsh"
+    _zsh_maybe="$(which zsh)"
+    if [ -x "${_zsh_maybe}" ]; then
+        _zsh="${_zsh_maybe}"
     fi
+
+    ${SED_BIN} -i '' -e "s#/usr/bin/env sh#${_zsh}#" \
+        "${SOFIN_ROOT}/bin/s" \
+        "${SOFIN_ROOT}/share/loader" \
+        >/dev/null 2>&1 \
+            && permnote "${SOFIN_BUNDLE_NAME} v$(distn "${SOFIN_VERSION}") was installed successfully!"
 
     commit_origin
 
