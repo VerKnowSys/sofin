@@ -316,11 +316,11 @@ build () {
             debug "Non production mode, hence tracking useful/useless files, stripping bundles and creating bundle snapshot!"
             afterbuild_manage_files_of_bundle
             strip_bundle "${_bund_name_capit}"
-        fi
 
-        validate_pie_on_exports "${_bund_name_capit}"
-        validate_bins_links "${_bund_name_capit}"
-        validate_libs_links "${_bund_name_capit}"
+            validate_pie_on_exports "${_bund_name_capit}"
+            validate_bins_links "${_bund_name_capit}"
+            validate_libs_links "${_bund_name_capit}"
+        fi
 
         if [ -n "${CAP_SYS_BUILDHOST}" ]; then
             if [ "YES" = "${CAP_SYS_HARDENED}" ]; then
