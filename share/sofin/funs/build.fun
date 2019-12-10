@@ -519,11 +519,9 @@ process_flat () {
                         if [ "${_a_file_checksum}" = "${DEF_SHA}" ]; then
                             debug "$(distd "${SUCCESS_CHAR}" "${ColorGreen}"): $(distd "${_base}"): checksum matches: $(distd "${DEF_SHA}")"
                         else
-                            warn "   ${WARN_CHAR} Source checksum mismatch: '$(distw "${_a_file_checksum}")' vs '$(distw "${DEF_SHA}")'"
-                            _bname="${_dest_file##*/}"
                             try "${RM_BIN} -f ${_dest_file}" \
-                                && debug "Removed corrupted cache file: $(distd "${_bname}") and retrying.."
-                            process_flat "${_definition_name}" "${_prefix}"
+                                && debug "Removed corrupted partial file: $(distd "${_bname}")"
+                            error "Source tarball checksum mismatch: '$(distw "${_a_file_checksum}")' vs '$(distw "${DEF_SHA}")' for prefix: $(distw "${_prefix} == ${PREFIX}")"
                         fi
                         unset _bname _a_file_checksum
                     fi
