@@ -724,7 +724,7 @@ export_binaries () {
 
             done
         done
-        debug "List of exports: $(distd "${_expolist}")"
+        permnote "Bundle exports:$(distn "${_expolist}")"
     fi
     unset _expo_elem _acurrdir _an_amount _expolist _ebdef_name _soft_to_exp _service_to_exp
 }
