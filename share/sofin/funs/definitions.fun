@@ -506,9 +506,13 @@ strip_bundle () {
                     if [ "0" = "${?}" ]; then
                         _files_counter=$(( ${_files_counter} + 1 ))
                         if [ -z "${_to_be_stripped_list}" ]; then
-                            _to_be_stripped_list="'${_file}'"
+                            _to_be_stripped_list="${_file}"
                         else
-                            _to_be_stripped_list="${_to_be_stripped_list} '${_file}'"
+                            # dedup:
+                            echo "${_to_be_stripped_list}" | ${GREP_BIN} -F "${_file}" >/dev/null 2>&1
+                            if [ "0" != "${?}" ]; then
+                                _to_be_stripped_list="${_to_be_stripped_list} ${_file}"
+                            fi
                         fi
                     fi
                 done
