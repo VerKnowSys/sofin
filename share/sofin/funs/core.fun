@@ -379,7 +379,7 @@ trap_signals () {
     # trap 'signal_handler_no_operation' WINCH
 
     debug "trap_signals(): Interruption triggers were associated with signals: $(distd "INT, QUIT, TERM")."
-    debug "trap_signals(): No-Op triggers were associated with signals: $(distd "HUP, INFO, USR1, USR2, WINCH")!"
+    debug "trap_signals(): No-Op triggers were associated with signals: $(distd "HUP, INFO, USR1, USR2")!"
     return 0
 }
 

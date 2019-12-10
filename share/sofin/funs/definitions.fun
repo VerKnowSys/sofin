@@ -34,7 +34,7 @@ load_defs () {
             validate_definition_disabled
 
             if [ -z "${USE_NO_UTILS}" ]; then
-                debug "USE_NO_UTILS environment value is unset! Using available utilities!"
+                debug "USE_NO_UTILS environment value is unset! Using available BuildHost utilities!"
                 validate_util_availability "${DEF_NAME}${DEF_SUFFIX}"
             fi
         done
