@@ -499,7 +499,7 @@ strip_bundle () {
 
     for _stripdir in $(to_iter "${_dirs_to_strip}"); do
         if [ -d "${_stripdir}" ]; then
-            for _file in $(${FIND_BIN} "${_stripdir}" -maxdepth 1 -type f 2>/dev/null); do
+            for _file in $(${FIND_BIN} "${_stripdir}" -maxdepth 1 -type f -not -name '*.la' -not -name '*.sh' 2>/dev/null); do
                 _file_type="$(${FILE_BIN} -b "${_file}" 2>/dev/null)"
                 for _type in "${_exec_ft}" "${_lib_ft}" "${_universal_ft}"; do
                     printf "%b\n" "${_file_type}" | ${GREP_BIN} -F "${_type}" >/dev/null 2>&1
