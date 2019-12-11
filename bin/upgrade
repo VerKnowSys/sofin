@@ -1,7 +1,10 @@
 #!/usr/bin/env zsh
 # @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
 
-s i Git
+which git >/dev/null 2>&1
+if [ "0" != "${?}" ]; then
+    s i Git
+fi
 git pull
 bin/install
 
