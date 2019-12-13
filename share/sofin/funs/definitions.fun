@@ -510,7 +510,7 @@ strip_bundle () {
                             _to_be_stripped_list="${_file}"
                         else
                             # dedup:
-                            echo "${_to_be_stripped_list}" | ${GREP_BIN} -F "${_file}" >/dev/null 2>&1
+                            echo "${_to_be_stripped_list}" | ${GREP_BIN} -F "${_file} " >/dev/null 2>&1
                             if [ "0" != "${?}" ]; then
                                 _to_be_stripped_list="${_to_be_stripped_list} ${_file}"
                             fi
