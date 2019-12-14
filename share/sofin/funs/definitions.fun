@@ -650,7 +650,8 @@ conflict_resolve () {
             for _app in $(to_iter "${DEF_CONFLICTS_WITH}"); do
                 for _soft in $(${FIND_BIN} "${SOFTWARE_DIR}" -maxdepth 1 -type d -iname "${_app}*" 2>/dev/null); do
                     _soft_name="${_soft##*/}"
-                    if [ -d "${_soft}/exports" ]; then
+                    if [ -d "${_soft}/exports" ] \
+                    && [ "${_soft_name}" != "Zsh" ]; then # NOTE: Avoid task for one critical bundle: Zsh - since this may cause system turn to locked-state-without-default=$SHELL
                         debug "conflict_resolve(name=$(distd "${_soft_name}"), def_name=$(distd "${_appname}")):"
                         if [ "${_soft_name}" != "${_appname}" ]; then
                             debug "Disabling bundle exports of: $(distd "${_soft_name}") -> in conflict with: $(distd "${_appname}")"
