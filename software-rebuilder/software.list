@@ -22,6 +22,7 @@ Git-devel
 Grafana
 Gnupg
 Httpd
+Icecast
 Iftop
 Influxdb
 Jq
@@ -86,6 +87,7 @@ Unbound
 Vifm
 Vim
 Weechat
+Wget
 Zabbix
 Znc
 Zip
