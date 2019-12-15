@@ -45,6 +45,7 @@ Iperf
 Jam
 Julius
 Jq
+Jruby
 Lame
 Lftp
 Libressl
@@ -54,6 +55,7 @@ Lua51
 Lua53
 Lynx
 Lz4
+Lzop
 Kibana5
 Logstash5
 Mariadb
@@ -69,6 +71,7 @@ Node
 Node12
 Ocaml
 Openjdk8
+Openntpd
 Openssl
 Openssl10
 Openvpn
@@ -90,16 +93,19 @@ Pstree
 Pwgen
 Redis
 Rhash
+Rlwrap
 Rsync
 Ruby24
 Ruby25
 Ruby26
+Rust-basic
 Rust
 Sed
 Shc
 Sox
 Smartmontools
 Sonar-scanner
+Squid
 Ssmtp
 Subversion
 Sphinx
