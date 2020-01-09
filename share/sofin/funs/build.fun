@@ -111,7 +111,7 @@ fetch_binbuild () {
         else
             debug "Binary build unavailable for bundle: $(distd "${_fbb_bundname}")"
             if [ -n "${CAP_SYS_PRODUCTION}" ]; then
-                warn "Software bundle build is not available on production hosts!"
+                warn "Prebuilt software bundle is not available for current system! Building from source is enabled only on Sofin build-hosts."
                 finalize_complete_standard_task
             fi
         fi
