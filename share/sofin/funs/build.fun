@@ -523,7 +523,7 @@ process_flat () {
                         else
                             try "${RM_BIN} -f ${_dest_file}" \
                                 && debug "Removed corrupted partial file: $(distd "${_bname}")"
-                            error "Source tarball checksum mismatch: '$(distw "${_a_file_checksum}")' vs '$(distw "${DEF_SHA}")' for prefix: $(distw "${_prefix} == ${PREFIX}")"
+                            error "Source tarball checksum mismatch: '$(diste "${_a_file_checksum}")' vs '$(diste "${DEF_SHA}")' for prefix: $(diste "${_prefix} == ${PREFIX}")"
                         fi
                         unset _bname _a_file_checksum
                     fi
