@@ -418,7 +418,7 @@ create_software_dir () {
         debug "Creating regular software-directory: $(distd "${SOFTWARE_DIR}/${_dset_create}")"
         try "${MKDIR_BIN} -p '${SOFTWARE_DIR}/${_dset_create}'"
     fi
-    try "${CHMOD_BIN} 0711 '${SOFTWARE_DIR}/${_dset_create}'"
+    try "${CHMOD_BIN} 0755 '${SOFTWARE_DIR}/${_dset_create}'"
     unset _dset_create _dsname
 }
 
