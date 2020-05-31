@@ -9,7 +9,7 @@ SOFIN_ROOT="${SOFIN_ROOT:-/Software/Sofin}"
 _slack_channel="#development"
 _slack_webhook="$(${CAT_BIN} "${HOME}/.sofin.notification.webhook" 2>/dev/null)"
 if [ -z "${_slack_webhook}" ]; then
-    error "Please write your full Slack WebHook URL to file: $(diste "${HOME}/.sofin/.notification.webhook")"
+    error "Please write your full Slack WebHook URL to file: $(diste "${HOME}/.sofin.notification.webhook")"
 fi
 
 # Curl binary utlility:
