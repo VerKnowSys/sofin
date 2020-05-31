@@ -68,6 +68,7 @@ for _software in $(${CAT_BIN} ${_working_state_file} 2>/dev/null); do
         TIME_END_S="$(${DATE_BIN} +%s 2>/dev/null)"
         ELAPSED_S=$(( ${TIME_END_S} - ${TIME_START_S} ))
         slack_notification "INFO" "[${_host_quad}] All tasks finished! Iteration took: ${ELAPSED_S} seconds."
+        ${RM_BIN} -f "${_working_state_file}"
         exit
     fi
     permnote "________________________________"
