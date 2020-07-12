@@ -45,6 +45,8 @@ slack_notification () {
             >> "${LOG}" 2>> "${LOG}"
 }
 
+permnote "Wiping out all Sofin locks"
+${RM_BIN} -rf "${HOME}/.sofin/locks/*.lock"
 
 permnote "Checking remote machine connection (shouldn't take more than a second).."
 run "${SSH_BIN} sofin@software.verknowsys.com uname -a" \
