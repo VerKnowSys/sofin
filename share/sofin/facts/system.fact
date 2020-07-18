@@ -85,6 +85,17 @@ HARDEN_CFLAGS="-fstack-protector-strong -fno-strict-overflow" # -fstack-protecto
 CFLAGS_PRODUCTION="-fstack-protector -Wformat -Wformat-security -Wl,-z,relro,-z,now"
 LDFLAGS_PRODUCTION="-z relro -z now"
 
+# Determine "file binary" output on PIE executable:
+case "${SYSTEM_VERSION}" in
+    12*)
+        PIE_TYPE_ENTRY="LSB pie executable"
+        ;;
+
+    *)
+        PIE_TYPE_ENTRY="LSB shared object"
+        ;;
+esac
+
 
 SOFIN_SHELL_BLOCK=$(${CAT_BIN} <<EOF
 
