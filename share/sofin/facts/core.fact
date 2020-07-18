@@ -101,7 +101,17 @@ ZFS_SEND_OPTS="${DEFAULT_SNAPSHOT_SEND_OPTS}"
 ZFS_RECEIVE_OPTS="${DEFAULT_SNAPSHOT_RECEIVE_OPTS}"
 
 # Security related values:
-PIE_TYPE_ENTRY="LSB shared object"
+
+# Determine "file binary" output on PIE executable:
+case "${SYSTEM_VERSION}" in
+    12*)
+        PIE_TYPE_ENTRY="LSB pie executable"
+        ;;
+
+    *)
+        PIE_TYPE_ENTRY="LSB shared object"
+        ;;
+esac
 
 # Shell error code meanings:
 ERRORCODE_NORMAL_EXIT=0
