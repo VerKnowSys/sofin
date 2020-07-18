@@ -123,7 +123,7 @@ finalize_after_signal_interrupt () {
     destroy_ramdisk_device
     set_system_dataset_writable
     set_software_dataset_writable
-    finalize_and_quit_gracefully_with_exitcode
+    finalize_and_quit_gracefully_with_exitcode "${1}"
 }
 
 

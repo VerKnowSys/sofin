@@ -9,7 +9,7 @@ SOFIN_ROOT="${SOFIN_ROOT:-/Software/Sofin}"
 _slack_channel="#development"
 _slack_webhook="$(${CAT_BIN} "${HOME}/.sofin.notification.webhook" 2>/dev/null)"
 if [ -z "${_slack_webhook}" ]; then
-    error "Please write your full Slack WebHook URL to file: $(diste "${HOME}/.sofin/.notification.webhook")"
+    error "Please write your full Slack WebHook URL to file: $(diste "${HOME}/.sofin.notification.webhook")"
 fi
 
 # Curl binary utlility:
@@ -45,6 +45,8 @@ slack_notification () {
             >> "${LOG}" 2>> "${LOG}"
 }
 
+permnote "Wiping out all Sofin locks"
+${RM_BIN} -rf "${HOME}/.sofin/locks/*.lock"
 
 permnote "Checking remote machine connection (shouldn't take more than a second).."
 run "${SSH_BIN} sofin@software.verknowsys.com uname -a" \
@@ -68,6 +70,7 @@ for _software in $(${CAT_BIN} ${_working_state_file} 2>/dev/null); do
         TIME_END_S="$(${DATE_BIN} +%s 2>/dev/null)"
         ELAPSED_S=$(( ${TIME_END_S} - ${TIME_START_S} ))
         slack_notification "INFO" "[${_host_quad}] All tasks finished! Iteration took: ${ELAPSED_S} seconds."
+        ${RM_BIN} -f "${_working_state_file}"
         exit
     fi
     permnote "________________________________"
