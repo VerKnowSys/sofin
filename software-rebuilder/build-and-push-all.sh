@@ -109,8 +109,8 @@ for _software in $(${CAT_BIN} ${_working_state_file} 2>/dev/null); do
             && remove_from_list_and_destroy \
             && continue
 
-        slack_notification "FAILURE" "[${_host_quad}] Task: ('${SOFIN_BIN} deploy ${_software}') has crashed!"
-        remove_from_list_and_destroy
+        slack_notification "FAILURE" "[${_host_quad}] Task: ('${SOFIN_BIN} deploy ${_software}') has crashed! Leaving bundle intact."
+        # remove_from_list_and_destroy
     fi
     permnote "--------------------------------"
 done
