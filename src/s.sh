@@ -357,10 +357,9 @@ if [ -n "${SOFIN_COMMAND}" ]; then
                     if [ ! -f "${PREFIX}/${_util}${DEFAULT_INST_MARK_EXT}" ]; then
                         note "Buiding an utility: $(distn "${_util}") for: $(distn "${OS_TRIPPLE}")"
                         build "${_util}"
-                    else
-                        note "Linking prebuilt utility: $(distn "${_util}") for: $(distn "${OS_TRIPPLE}")"
-                        link_utilities
                     fi
+                    note "Linking prebuilt utility: $(distn "${_util}") for: $(distn "${OS_TRIPPLE}")"
+                    link_utilities
                 done
                 permnote "Installed utilities: $(distn "${_utils}")"
                 finalize_complete_standard_task
