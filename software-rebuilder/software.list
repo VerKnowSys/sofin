@@ -33,7 +33,6 @@ Ghostscript
 Git-devel
 Gperf
 Grafana
-Groff
 Gnupg
 Gpgme
 Go
@@ -68,6 +67,7 @@ Mongodb
 Mosh
 Mysqltuner
 Nano
+Nasm
 Netdata
 Nginx
 Nginx-mainline
@@ -126,7 +126,6 @@ Tmux
 Transmission
 Tree
 Unbound
-Unit
 Varnish
 Vifm
 Vim
