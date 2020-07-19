@@ -453,7 +453,7 @@ to_iter () {
 
 link_utilities () {
     debug "Linking all utilities${CHAR_DOTS}" # simple exports for utils
-    _sofin_svc_dir="${SERVICES_DIR}/${SOFIN_BUNDLE_NAME}"
+    _sofin_svc_dir="${SERVICES_DIR}/${SOFIN_BUNDLE_NAME}/"
     try "${MKDIR_BIN} -p '${_sofin_svc_dir}/exports'"
     for _tool_bundle in $(${FIND_BIN} "${_sofin_svc_dir}" -mindepth 1 -maxdepth 1 -type d -name '[A-Z0-9]*' 2>/dev/null); do
         for _export in $(${LS_BIN} "${_tool_bundle}/exports" 2>/dev/null); do
