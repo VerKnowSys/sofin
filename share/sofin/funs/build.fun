@@ -673,7 +673,7 @@ process_flat () {
                         debug "Build type: $(distd "cmake")"
                         note "   ${NOTE_CHAR} Configuring: $(distn "${_definition_name}"), version: $(distn "${DEF_VERSION}")"
 
-                        try "${RM_BIN} -rf build; ${MKDIR_BIN} -p build"
+                        try "${MKDIR_BIN} -p build"
                         _pwd="${_pwd}/build"
                         cd "${_pwd}"
                         _cmake_cmdline="${DEF_CONFIGURE_METHOD} ../ -LH -DCMAKE_INSTALL_RPATH=\"${_prefix}/lib;${_prefix}/libexec\" -DCMAKE_INSTALL_PREFIX=${_prefix} -DCMAKE_BUILD_TYPE=Release -DSYSCONFDIR=${SERVICE_DIR}/etc -DMAN_INSTALLDIR=${_prefix}/share/man -DDOCDIR=${_prefix}/share/doc -DJOB_POOL_COMPILE=${CPUS} -DJOB_POOL_LINK=${CPUS} -DCMAKE_C_FLAGS=\"${CFLAGS}\" -DCMAKE_CXX_FLAGS=\"${CXXFLAGS}\" ${DEF_CONFIGURE_ARGS}"
