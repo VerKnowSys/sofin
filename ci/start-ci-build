@@ -20,13 +20,19 @@ permnote "Checking remote machine connection (shouldn't take more than a second)
 run "${SSH_BIN} sofin@software.verknowsys.com uname -a" \
     && slack_notification "INFO" "[${_host_quad}] Connection test passed${CHAR_DOTS} Ok!"
 
+# Curl binary utlility:
+_curl="${SOFTWARE_DIR}/Tmux/exports/tmux"
+if [ ! -L "${_curl}" ]; then
+    error "Please install Tmux, by calling: $(diste "s i Tmux") first."
+fi
 
-run_tmux () {
-    tmux new-session -d zsh
-    tmux split-window -h zsh
 
-    tmux send -t 0:0.0 "zsh ./build-list ${_split_name}-aa" C-m
-    tmux send -t 0:0.1 "zsh ./build-list ${_split_name}-ab" C-m
+permnote "Starting parallel build via Tmux"
 
-    tmux -2 attach-session -d
-}
+tmux new-session -d zsh
+tmux split-window -h zsh
+
+tmux send -t 0:0.0 "zsh ./build-list ${_split_name}-aa" C-m
+tmux send -t 0:0.1 "zsh ./build-list ${_split_name}-ab" C-m
+
+tmux -2 attach-session -d
