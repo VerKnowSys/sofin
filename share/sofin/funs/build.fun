@@ -305,7 +305,7 @@ build () {
         try after_export_callback
         try after_export_snapshot
 
-        if [ -n "${CAP_SYS_BUILDHOST}" ]; then
+        if [ "YES" = "${CAP_SYS_BUILDHOST}" ]; then
             if [ -n "${DEF_UTILITY_BUNDLE}" ]; then
                 try "${RM_BIN} -rf '${PREFIX}/include' '${PREFIX}/doc' ${PREFIX}/${DEFAULT_SRC_EXT}*"
                 debug "Utility bundle: $(distd "${_bund_name_capit}") build completed!"
@@ -385,7 +385,7 @@ build () {
                 fi
             fi
 
-            if [ -n "${CAP_SYS_ZFS}" ]; then
+            if [ "YES" = "${CAP_SYS_ZFS}" ]; then
                 debug "Creating post build '$(distd "@${ORIGIN_ZFS_SNAP_NAME}")' snapshots${CHAR_DOTS}"
                 create_origin_snaphots
             fi
