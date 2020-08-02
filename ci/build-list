@@ -53,23 +53,16 @@ set +e
 
 unset USE_NO_TEST
 
+TIME_START_S="$(${DATE_BIN} +%s 2>/dev/null)"
+
 _working_state_file="/tmp/software.list.processing.${_list_file}"
 if [ ! -f "${_working_state_file}" ]; then
     permnote "Creating new work-state file: $(distn "${_working_state_file}")"
     run "${CP_BIN} -v ${_list_file} ${_working_state_file}"
     slack_notification "INFO" "[${_host_quad}] Starting new build iteration${CHAR_DOTS}"
-    TIME_START_S="$(${DATE_BIN} +%s 2>/dev/null)"
 fi
 
 for _software in $(${CAT_BIN} ${_working_state_file} 2>/dev/null); do
-    if [ "###" = "${_software}" ]; then
-        permnote "All tasks finished!"
-        TIME_END_S="$(${DATE_BIN} +%s 2>/dev/null)"
-        ELAPSED_S=$(( ${TIME_END_S} - ${TIME_START_S} ))
-        slack_notification "INFO" "[${_host_quad}] All tasks finished! Iteration took: ${ELAPSED_S} seconds."
-        ${RM_BIN} -f "${_working_state_file}"
-        exit
-    fi
     permnote "________________________________"
 
     _indicator="/Software/${_software}/$(lowercase "${_software}")${DEFAULT_INST_MARK_EXT}"
@@ -114,3 +107,8 @@ for _software in $(${CAT_BIN} ${_working_state_file} 2>/dev/null); do
     fi
     permnote "--------------------------------"
 done
+
+TIME_END_S="$(${DATE_BIN} +%s 2>/dev/null)"
+ELAPSED_S=$(( ${TIME_END_S} - ${TIME_START_S} ))
+slack_notification "INFO" "[${_host_quad}] Tasks from list: ${_list_file} are done! Iteration took: ${ELAPSED_S} seconds."
+${RM_BIN} -f "${_working_state_file}"
