@@ -322,9 +322,7 @@ build () {
             validate_pie_on_exports "${_bund_name_capit}"
             validate_bins_links "${_bund_name_capit}"
             validate_libs_links "${_bund_name_capit}"
-        fi
 
-        if [ -n "${CAP_SYS_BUILDHOST}" ]; then
             if [ "YES" = "${CAP_SYS_HARDENED}" ]; then
                 _disable=""
                 if [ -n "${DEF_NO_ASLR}" ]; then
