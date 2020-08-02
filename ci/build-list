@@ -111,4 +111,4 @@ done
 TIME_END_S="$(${DATE_BIN} +%s 2>/dev/null)"
 ELAPSED_S=$(( ${TIME_END_S} - ${TIME_START_S} ))
 slack_notification "INFO" "[${_host_quad}] Tasks from list: ${_list_file} are done! Iteration took: ${ELAPSED_S} seconds."
-${RM_BIN} -f "${_working_state_file}"
+${RM_BIN} -f "${_working_state_file}" "${_list_file}"
