@@ -2,5 +2,6 @@ bin/s-*
 releases
 *.sublime-*
 src/.*.o
+ci/sofin-ci-*
 .*
 TheVolumeSettingsFolder
