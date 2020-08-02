@@ -292,14 +292,6 @@ build () {
             done
         fi
 
-        if [ "YES" = "${CAP_SYS_ZFS}" ]; then
-            _dataset_parent="${DEFAULT_ZPOOL}/Software/${SYSTEM_DATASET}"
-            _dataset="${_dataset_parent}/${_bund_name_capit}"
-            debug "Setting dataset: $(distd "${_dataset}") to inherit 'readonly' attribute from readonly parent: $(distd "${_dataset_parent}")"
-            try "${ZFS_BIN} set readonly=off '${_dataset_parent}'"
-            try "${ZFS_BIN} inherit readonly '${_dataset}'"
-        fi
-
         export_binaries "${_bund_lcase}"
         load_pax_file
         try after_export_callback
@@ -387,6 +379,14 @@ build () {
                 debug "Creating post build '$(distd "@${ORIGIN_ZFS_SNAP_NAME}")' snapshots${CHAR_DOTS}"
                 create_origin_snaphots
             fi
+        fi
+
+        if [ "YES" = "${CAP_SYS_ZFS}" ]; then
+            _dataset_parent="${DEFAULT_ZPOOL}/Software/${SYSTEM_DATASET}"
+            _dataset="${_dataset_parent}/${_bund_name_capit}"
+            debug "Setting dataset: $(distd "${_dataset}") to inherit 'readonly' attribute from readonly parent: $(distd "${_dataset_parent}")"
+            try "${ZFS_BIN} set readonly=off '${_dataset_parent}'"
+            try "${ZFS_BIN} inherit readonly '${_dataset}'"
         fi
 
     done
