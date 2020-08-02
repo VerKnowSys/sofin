@@ -11,7 +11,8 @@ _split_by="$(( (${_lines} / ${_workers}) + 1 ))"
 
 debug "workers: $(distd "${_workers}"), lines: $(distd "${_lines}"), split by: $(distd "${_split_by}") lines"
 split -l "${_split_by}" "${_src_list}" "${_split_name}-"
-
+debug "appending end-of-list marker to generated lists"
+printf "%b\n" "###" >> ${_split_name}-*
 
 permnote "Wiping out all Sofin locks"
 ${RM_BIN} -rf "${HOME}/.sofin/locks/*.lock"

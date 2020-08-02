@@ -62,7 +62,7 @@ if [ ! -f "${_working_state_file}" ]; then
 fi
 
 for _software in $(${CAT_BIN} ${_working_state_file} 2>/dev/null); do
-    if [ -z "${_software}" ]; then
+    if [ "###" = "${_software}" ]; then
         permnote "All tasks finished!"
         TIME_END_S="$(${DATE_BIN} +%s 2>/dev/null)"
         ELAPSED_S=$(( ${TIME_END_S} - ${TIME_START_S} ))
