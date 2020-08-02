@@ -19,7 +19,7 @@ ${RM_BIN} -rf "${HOME}/.sofin/locks/*.lock"
 
 permnote "Checking remote machine connection (shouldn't take more than a second).."
 run "${SSH_BIN} sofin@software.verknowsys.com uname -a" \
-    && slack_notification "INFO" "[${_host_quad}] Connection test passed${CHAR_DOTS} Ok!"
+    || error "Connection test failed!"
 
 # Curl binary utlility:
 _curl="${SOFTWARE_DIR}/Tmux/exports/tmux"
