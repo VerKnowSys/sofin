@@ -3,7 +3,7 @@
 SOFIN_ROOT="${SOFIN_ROOT:-/Software/Sofin}"
 . "${SOFIN_ROOT}/share/loader"
 
-_workers="2"
+_workers="3"
 _src_list="software.list"
 _lines="$(${GREP_BIN} -c '' "${_src_list}")"
 _split_name="sofin-ci"
@@ -32,8 +32,10 @@ permnote "Starting parallel build via Tmux"
 
 tmux new-session -d zsh
 tmux split-window -h zsh
+tmux split-window -h zsh
 
 tmux send -t 0:0.0 "zsh ./build-list ${_split_name}-aa" C-m
 tmux send -t 0:0.1 "zsh ./build-list ${_split_name}-ab" C-m
+tmux send -t 0:0.2 "zsh ./build-list ${_split_name}-ac" C-m
 
 tmux -2 attach-session -d
