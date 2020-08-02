@@ -12,8 +12,8 @@ _split_by="$(( (${_lines} / ${_workers}) + 1 ))"
 debug "workers: $(distd "${_workers}"), lines: $(distd "${_lines}"), split by: $(distd "${_split_by}") lines"
 split -l "${_split_by}" "${_src_list}" "${_split_name}-"
 
-permnote "Wiping out all Sofin locks"
-${RM_BIN} -rf "${HOME}/.sofin/locks/*.lock"
+permnote "Wiping out all Sofin locks and cached bundle files"
+${RM_BIN} -rf "${HOME}/.sofin/locks/*.lock" "${HOME}/.sofin/file-cache/*.zfs*"
 
 permnote "Checking remote machine connection (shouldn't take more than a second).."
 run "${SSH_BIN} sofin@software.verknowsys.com uname -a" \
