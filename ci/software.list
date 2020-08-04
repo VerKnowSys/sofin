@@ -4,12 +4,17 @@ Aspell
 Asciinema
 Awscli
 Bash
+Bison
+Bison27
+Binutils
+Binutils-gold
 Boost
 Cairo
 Cdrtools
 Check
 Chicken
 Clang
+Clamav
 Curl
 Cppcheck
 Ctags
@@ -27,6 +32,7 @@ Flac
 Freeipmi
 Galera
 Gcc
+Geoip
 Geoipupdate
 Getopt
 Ghostscript
@@ -34,8 +40,11 @@ Git-devel
 Gperf
 Grafana
 Gnupg
+Gnutls
+Gperf
 Gpgme
 Go
+Gold
 Httpd
 Htop
 Icecast
@@ -77,6 +86,7 @@ Nmap
 Node
 Node12
 Ocaml
+Onig
 Openjdk8
 Openntpd
 Openssl
@@ -85,6 +95,7 @@ Openvpn
 Otp19
 Otp21
 Pass
+Pax-utils
 Perl
 Php72
 Php73
