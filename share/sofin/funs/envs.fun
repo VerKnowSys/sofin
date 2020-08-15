@@ -626,9 +626,8 @@ acquire_lock_for () {
 release_locks () {
     for _lock_file in $(${LS_BIN} ${LOCKS_DIR}/*.lock); do
         _lock_pid="$(${CAT_BIN} "${_lock_file}")"
-        debug "Checking if lock file: $(distd "${_lock_file}") (contents: $(distd "${_lock_pid}")) is acquired by current pid: $(distd "${SOFIN_PID}")"
         if [ "${_lock_pid}" = "${SOFIN_PID}" ]; then
-            debug "Removing lock file: $(distd "${_lock_file}")"
+            debug "Removing lock file: $(distd "${_lock_file##*/}") that contains current pid: $(distd "${SOFIN_PID}")"
             ${RM_BIN} -f "${_lock_file}"
         fi
     done
