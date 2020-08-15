@@ -102,6 +102,7 @@ destroy_ramdisk_device () {
 
 # Standard finalizing task:
 finalize_complete_standard_task () {
+    release_locks
     finalize_with_shell_reload
 }
 
