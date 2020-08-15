@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/usr/bin/env zsh
 
 
 SOFIN_ROOT="${SOFIN_ROOT:-/Software/Sofin}"
