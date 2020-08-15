@@ -3,7 +3,15 @@
 SOFIN_ROOT="${SOFIN_ROOT:-/Software/Sofin}"
 . "${SOFIN_ROOT}/share/loader"
 
-_workers="3"
+set_system_dataset_writable
+permnote "Marking current system as build host"
+${TOUCH_BIN} "${SERVED_BUILDHOST_INDICATOR_FILE}"
+
+permnote "Wiping out all Sofin locks and cached bundle files"
+${RM_BIN} -f ${HOME}/.sofin/locks/*.lock ${HOME}/.sofin/file-cache/*.zfs*
+set_system_dataset_readonly
+
+_workers="4"
 _src_list="software.list"
 _lines="$(${GREP_BIN} -c '' "${_src_list}")"
 _split_name="sofin-ci"
@@ -12,28 +20,28 @@ _split_by="$(( (${_lines} / ${_workers}) + 1 ))"
 debug "workers: $(distd "${_workers}"), lines: $(distd "${_lines}"), split by: $(distd "${_split_by}") lines"
 split -l "${_split_by}" "${_src_list}" "${_split_name}-"
 
-permnote "Wiping out all Sofin locks and cached bundle files"
-${RM_BIN} -rf "${HOME}/.sofin/locks/*.lock" "${HOME}/.sofin/file-cache/*.zfs*"
 
 permnote "Checking remote machine connection (shouldn't take more than a second).."
 run "${SSH_BIN} sofin@software.verknowsys.com uname -a" \
     || error "Connection test failed!"
 
 # Curl binary utlility:
-_curl="${SOFTWARE_DIR}/Tmux/exports/tmux"
-if [ ! -L "${_curl}" ]; then
+_tmux="${SOFTWARE_DIR}/Tmux/exports/tmux"
+if [ ! -L "${_tmux}" ]; then
     error "Please install Tmux, by calling: $(diste "s i Tmux") first."
 fi
 
 
 permnote "Starting parallel build via Tmux"
 
-tmux new-session -d zsh
-tmux split-window -h zsh
-tmux split-window -h zsh
+${_tmux} new-session -d zsh
+for _idx in $(${SEQ_BIN} 2 "${_workers}"); do
+    ${_tmux} split-window -h zsh
+done
 
-tmux send -t 0:0.0 "zsh ./build-list ${_split_name}-aa" C-m
-tmux send -t 0:0.1 "zsh ./build-list ${_split_name}-ab" C-m
-tmux send -t 0:0.2 "zsh ./build-list ${_split_name}-ac" C-m
+${_tmux} send -t 0:0.0 "zsh ./build-list ${_split_name}-aa" C-m
+${_tmux} send -t 0:0.1 "zsh ./build-list ${_split_name}-ab" C-m
+${_tmux} send -t 0:0.2 "zsh ./build-list ${_split_name}-ac" C-m
+${_tmux} send -t 0:0.3 "zsh ./build-list ${_split_name}-ad" C-m
 
-tmux -2 attach-session -d
+${_tmux} -2 attach-session -d
