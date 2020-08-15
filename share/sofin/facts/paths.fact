@@ -85,6 +85,7 @@ DTRACE_BIN="/usr/sbin/dtrace"
 JOT_BIN="/usr/bin/jot"
 SH_BIN="/bin/sh"
 OBJCOPY_BIN="/usr/bin/objcopy"
+SPLIT_BIN="/usr/bin/split"
 
 # Pick best utilities available:
 if [ -f "${DEFAULT_FACTS_DIR}alternatives.fact" ]; then
