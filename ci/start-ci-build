@@ -3,13 +3,15 @@
 SOFIN_ROOT="${SOFIN_ROOT:-/Software/Sofin}"
 . "${SOFIN_ROOT}/share/loader"
 
-set_system_dataset_writable
-permnote "Marking current system as build host"
-${TOUCH_BIN} "${SERVED_BUILDHOST_INDICATOR_FILE}"
+if [ ! -f "${SERVED_BUILDHOST_INDICATOR_FILE}" ]; then
+    set_system_dataset_writable
+    permnote "Marking current system as build host"
+    ${TOUCH_BIN} "${SERVED_BUILDHOST_INDICATOR_FILE}"
+    set_system_dataset_readonly
+fi
 
 permnote "Wiping out all Sofin locks and cached bundle files"
-${RM_BIN} -f ${HOME}/.sofin/locks/*.lock ${HOME}/.sofin/file-cache/*.zfs*
-set_system_dataset_readonly
+${RM_BIN} -f ${HOME}/.sofin/locks/*.lock ${HOME}/.sofin/file-cache/*.zfs* 2>/dev/null
 
 _workers="4"
 _src_list="software.list"
@@ -18,12 +20,11 @@ _split_name="sofin-ci"
 _split_by="$(( (${_lines} / ${_workers}) + 1 ))"
 
 debug "workers: $(distd "${_workers}"), lines: $(distd "${_lines}"), split by: $(distd "${_split_by}") lines"
-split -l "${_split_by}" "${_src_list}" "${_split_name}-"
+${SPLIT_BIN} -l "${_split_by}" "${_src_list}" "${_split_name}-"
 
 
 permnote "Checking remote machine connection (shouldn't take more than a second).."
-run "${SSH_BIN} sofin@software.verknowsys.com uname -a" \
-    || error "Connection test failed!"
+run "${SSH_BIN} sofin@software.verknowsys.com uname -a"
 
 # Curl binary utlility:
 _tmux="${SOFTWARE_DIR}/Tmux/exports/tmux"
@@ -39,9 +40,9 @@ for _idx in $(${SEQ_BIN} 2 "${_workers}"); do
     ${_tmux} split-window -h zsh
 done
 
-${_tmux} send -t 0:0.0 "zsh ./build-list ${_split_name}-aa" C-m
-${_tmux} send -t 0:0.1 "zsh ./build-list ${_split_name}-ab" C-m
-${_tmux} send -t 0:0.2 "zsh ./build-list ${_split_name}-ac" C-m
-${_tmux} send -t 0:0.3 "zsh ./build-list ${_split_name}-ad" C-m
+${_tmux} send -t 0:0.0 "./build-list ${_split_name}-aa" C-m
+${_tmux} send -t 0:0.1 "./build-list ${_split_name}-ab" C-m
+${_tmux} send -t 0:0.2 "./build-list ${_split_name}-ac" C-m
+${_tmux} send -t 0:0.3 "./build-list ${_split_name}-ad" C-m
 
 ${_tmux} -2 attach-session -d
