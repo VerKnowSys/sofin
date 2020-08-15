@@ -624,7 +624,7 @@ acquire_lock_for () {
 
 
 release_locks () {
-    for _lock_file in $(${LS_BIN} ${LOCKS_DIR}/*.lock); do
+    for _lock_file in $(${LS_BIN} ${LOCKS_DIR}/*.lock 2>/dev/null); do
         if [ -f "${_lock_file}" ]; then
             _lock_pid="$(${CAT_BIN} "${_lock_file}")"
             if [ "${_lock_pid}" = "${SOFIN_PID}" ]; then
