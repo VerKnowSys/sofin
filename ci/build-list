@@ -109,6 +109,6 @@ for _software in $(${CAT_BIN} ${_working_state_file} 2>/dev/null); do
 done
 
 TIME_END_S="$(${DATE_BIN} +%s 2>/dev/null)"
-ELAPSED_S=$(( ${TIME_END_S} - ${TIME_START_S} ))
-slack_notification "INFO" "[${_host_quad}] Tasks from list: ${_list_file} are done! Iteration took: ${ELAPSED_S} seconds."
+ELAPSED_S=$(( ${TIME_END_S} - ${TIME_START_S} / 60 / 60 ))
+slack_notification "INFO" "[${_host_quad}] Tasks from list: ${_list_file} are done! Iteration took: ~${ELAPSED_S} hours."
 ${RM_BIN} -f "${_working_state_file}" "${_list_file}"
