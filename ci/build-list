@@ -59,7 +59,7 @@ _working_state_file="/tmp/software.list.processing.${_list_file}"
 if [ ! -f "${_working_state_file}" ]; then
     permnote "Creating new work-state file: $(distn "${_working_state_file}")"
     run "${CP_BIN} -v ${_list_file} ${_working_state_file}"
-    slack_notification "INFO" "[${_host_quad}] Starting new build iteration${CHAR_DOTS}"
+    slack_notification "INFO" "[${_host_quad}] Starting new build (list: ${_list_file})"
 fi
 
 for _software in $(${CAT_BIN} ${_working_state_file} 2>/dev/null); do
