@@ -315,13 +315,13 @@ try_fetch_service_dir () {
 #     fi
 #     unset _dset_destroy
 # }
+
+
+set_software_dataset_unmountable () {
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
-        unmount_and_destroy "${DEFAULT_ZPOOL}${SERVICES_DIR}/${SYSTEM_DATASET}/${_dset_destroy}"
-    else
-        try "${RM_BIN} -rf '${SERVICES_DIR}/${_dset_destroy}'" \
-            && debug "Removed regular software-directory: $(distd "${SERVICES_DIR}/${_dset_destroy}")"
+        debug "Making sure root Software dataset is unmountable"
+        try "${ZFS_BIN} set canmount=off ${DEFAULT_ZPOOL}${SOFTWARE_DIR}"
     fi
-    unset _dset_destroy
 }
 
 
