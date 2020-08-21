@@ -325,6 +325,14 @@ set_software_dataset_unmountable () {
 }
 
 
+set_services_dataset_unmountable () {
+    if [ "YES" = "${CAP_SYS_ZFS}" ]; then
+        debug "Making sure root Services dataset is unmountable"
+        try "${ZFS_BIN} set canmount=off ${DEFAULT_ZPOOL}${SERVICES_DIR}"
+    fi
+}
+
+
 create_base_datasets () {
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
         _soft_origin="${DEFAULT_ZPOOL}${SOFTWARE_DIR}"

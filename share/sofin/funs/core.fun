@@ -315,6 +315,7 @@ initialize () {
     set_software_dataset_writable
 
     set_software_dataset_unmountable
+    set_services_dataset_unmountable
     create_sofin_dirs
     create_base_datasets
     check_definitions_availability
