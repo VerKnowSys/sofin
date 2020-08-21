@@ -20,6 +20,9 @@ push_to_all_mirrors () {
     fi
     for _ptmirror in $(to_iter "${_pt_query}"); do
         _ptaddress="${SOFIN_NAME}@${_ptmirror}:${MAIN_BINARY_PREFIX}/${SYS_SPECIFIC_BINARY_REMOTE}"
+        # if [ -n "${DEF_KEEP_DEBUG_SYMBOLS}" ]; then
+        #     _ptaddress="${SOFIN_NAME}@${_ptmirror}:${MAIN_BINARY_PREFIX}-debug/${SYS_SPECIFIC_BINARY_REMOTE}"
+        # fi
         debug "Remote address inspect: $(distd "${_ptaddress}")"
         try "${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${SOFIN_SSH_PORT} ${SOFIN_NAME}@${_ptmirror} '${MKDIR_BIN} -vp ${MAIN_BINARY_PREFIX}/${SYS_SPECIFIC_BINARY_REMOTE}'"
 
@@ -389,6 +392,7 @@ receive_origin () {
         else
             _mountpoint="${SERVICES_DIR}/${_dname##*/}"
         fi
+        debug "Set mountpoint: $(distd "${_mountpoint}") and mount: $(distd "${_dname}")"
         try "${ZFS_BIN} set mountpoint=${_mountpoint} '${_dname}'"
         try "${ZFS_BIN} mount '${_dname}'"
     }
