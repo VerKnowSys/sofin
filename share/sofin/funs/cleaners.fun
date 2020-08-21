@@ -79,6 +79,7 @@ perform_clean () {
 
 destroy_ramdisk_device () {
     if [ -n "${RAMDISK_DEV}" ]; then
+        _pwd="$(${PWD_BIN} 2>/dev/null)"
         cd
         debug "${0}: destroy_ramdisk_device(): RAM_DISK_DEVICE: $(distd "${RAMDISK_DEV}")"
         case "${SYSTEM_NAME}" in
@@ -96,6 +97,7 @@ destroy_ramdisk_device () {
                         && unset RAMDISK_DEV
                 ;;
         esac
+        cd "${_pwd}"
     fi
 }
 
