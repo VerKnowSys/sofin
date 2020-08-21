@@ -419,21 +419,15 @@ create_software_dir () {
         _dsname="${_dsbase}/${_dset_create}"
         debug "Create software dataset: '$(distd "${_dsname}")'"
 
-        receive_orig () {
+        receive_unshared_fs () {
             receive_origin "${_dsname}" "Software" "user" \
                 && debug "Received ZFS software-dataset: $(distd "${_dsname}")"
+
+            # sharing nothing by default:
+            try "${ZFS_BIN} set sharenfs=- '${_dsname}'"
         }
-        try "${ZFS_BIN} list -H -t filesystem '${_dsname}'" \
-            || receive_orig
 
-        # sharing nothing by default:
-        try "${ZFS_BIN} set sharenfs=- '${_dsbase}'"
-        try "${ZFS_BIN} set sharenfs=- '${_dsname}'"
-
-        # finally - configure and mount created dataset:
-        try "${ZFS_BIN} set mountpoint='${SOFTWARE_DIR}/${_dset_create}' '${_dsname}'"
-        try "${ZFS_BIN} mount '${_dsname}'"
-
+        try "${ZFS_BIN} list -H -t filesystem '${_dsname}'" || receive_unshared_fs
     else
         debug "Creating regular software-directory: $(distd "${SOFTWARE_DIR}/${_dset_create}")"
         try "${MKDIR_BIN} -p '${SOFTWARE_DIR}/${_dset_create}'"
