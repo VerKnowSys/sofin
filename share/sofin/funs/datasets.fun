@@ -423,8 +423,8 @@ create_software_dir () {
             || receive_orig
 
         # sharing nothing by default:
-        try "${ZFS_BIN} set sharenfs=inherit '${_dsbase}'"
-        try "${ZFS_BIN} set sharenfs=inherit '${_dsname}'"
+        try "${ZFS_BIN} set sharenfs=- '${_dsbase}'"
+        try "${ZFS_BIN} set sharenfs=- '${_dsname}'"
 
         # finally - configure and mount created dataset:
         try "${ZFS_BIN} set mountpoint='${SOFTWARE_DIR}/${_dset_create}' '${_dsname}'"
@@ -450,8 +450,8 @@ destroy_software_dir () {
 
         # make system writable, unshare any NFS shares associated with ZFS dataset,
         set_system_dataset_writable
-        try "${ZFS_BIN} set sharenfs=inherit '${_dsbase}'"
-        try "${ZFS_BIN} set sharenfs=inherit '${_dsname}'"
+        try "${ZFS_BIN} set sharenfs=- '${_dsbase}'"
+        try "${ZFS_BIN} set sharenfs=- '${_dsname}'"
         try "${ZFS_BIN} unshare '${_dsname}'"
 
         # finally proceed with guaranteed destroy:
