@@ -393,8 +393,8 @@ receive_origin () {
             _mountpoint="${SERVICES_DIR}/${_dname##*/}"
         fi
         debug "Set mountpoint: $(distd "${_mountpoint}") and mount: $(distd "${_dname}")"
+        # NOTE: When you change the mountpoint property from legacy or none to a specific path, ZFS automatically mounts the file system.
         run "${ZFS_BIN} set mountpoint=${_mountpoint} '${_dname}'"
-        try "${ZFS_BIN} mount '${_dname}'"
     }
 
     if [ -f "${_origin_file}" ]; then
