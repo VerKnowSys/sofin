@@ -454,7 +454,6 @@ destroy_software_dir () {
 
         # make system writable, unshare any NFS shares associated with ZFS dataset,
         set_system_dataset_writable
-        try "${ZFS_BIN} set sharenfs=- '${_dsbase}'"
         try "${ZFS_BIN} set sharenfs=- '${_dsname}'"
         try "${ZFS_BIN} unshare '${_dsname}'"
 
