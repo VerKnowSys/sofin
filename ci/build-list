@@ -79,7 +79,6 @@ for _software in $(${CAT_BIN} ${_working_state_file} 2>/dev/null); do
         }
 
         permnote "Removing software: $(distn "${_software}")"
-        try "${SOFIN_BIN} rm ${_software}"
         destroy_software_and_datadirs
 
         _bundle_time_start_s="$(${DATE_BIN} +%s 2>/dev/null)"
