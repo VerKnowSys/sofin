@@ -461,8 +461,8 @@ destroy_software_dir () {
         # finally proceed with guaranteed destroy:
         try "${ZFS_BIN} umount -f '${_dsname}'"
         try "${ZFS_BIN} destroy -fr '${_dsname}'" \
-            && debug "Destroyed software-dataset: $(distd "${_dsname}")" \
-                && try "${RM_BIN} -rf '${SOFTWARE_DIR}/${_dset_destroy}'"
+            && debug "Destroyed software-dataset: $(distd "${_dsname}")"
+        try "${RM_BIN} -rf '${SOFTWARE_DIR}/${_dset_destroy}'"
 
         # NOTE: set_system_dataset_readonly() is called in untrap_signals() once
     else
