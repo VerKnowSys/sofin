@@ -45,4 +45,6 @@ ${_tmux} send -t 0:0.1 "./build-list ${_split_name}-ab" C-m
 ${_tmux} send -t 0:0.2 "./build-list ${_split_name}-ac" C-m
 ${_tmux} send -t 0:0.3 "./build-list ${_split_name}-ad" C-m
 
+${_tmux} select-layout tiled
+
 ${_tmux} -2 attach-session -d
