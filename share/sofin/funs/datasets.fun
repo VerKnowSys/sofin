@@ -393,7 +393,7 @@ receive_origin () {
             _mountpoint="${SERVICES_DIR}/${_dname##*/}"
         fi
         debug "Set mountpoint: $(distd "${_mountpoint}") and mount: $(distd "${_dname}")"
-        try "${ZFS_BIN} set mountpoint=${_mountpoint} '${_dname}'"
+        run "${ZFS_BIN} set mountpoint=${_mountpoint} '${_dname}'"
         try "${ZFS_BIN} mount '${_dname}'"
     }
 
