@@ -514,19 +514,16 @@ create_builddir () {
 
 destroy_builddir () {
     _deste_bund_name="${1}"
-    _dset_sum="${2}"
+    _dset_hash="${2}"
     if [ -z "${_deste_bund_name}" ]; then
         error "First argument with $(diste "build-bundle-directory") is required!"
     fi
-    _bdir="${SOFTWARE_DIR}/${_deste_bund_name}/${DEFAULT_SRC_EXT}${_dset_sum}"
-    if [ -n "${CAP_SYS_BUILDHOST}" ]; then
+    _bdir="${SOFTWARE_DIR}/${_deste_bund_name}/${DEFAULT_SRC_EXT}${_dset_hash}"
+    if [ -n "${CAP_SYS_BUILDHOST}" ] && [ -d "${_bdir}" ]; then
         try destroy_ramdisk_device
-        try "${UMOUNT_BIN} -f ${_bdir}" \
-            && debug "Tmp build-dir force-unmounted: $(distd "${_bdir}")"
-        try "${RM_BIN} -rf '${_bdir}'" \
-            && debug "Tmp build-dir removed: $(distd "${_bdir}")"
+        try "${RM_BIN} -rf '${_bdir}'"
     fi
-    unset _deste_bund_name _bdir _deste_bund_name _dset_sum
+    unset _deste_bund_name _bdir _deste_bund_name _dset_hash
 }
 
 
