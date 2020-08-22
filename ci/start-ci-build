@@ -29,7 +29,7 @@ run "${SSH_BIN} sofin@software.verknowsys.com uname -a"
 # Curl binary utlility:
 _tmux="${SOFTWARE_DIR}/Tmux/exports/tmux"
 if [ ! -L "${_tmux}" ]; then
-    error "Please install Tmux, by calling: $(diste "s i Tmux") first."
+    run "s i Tmux"
 fi
 
 
