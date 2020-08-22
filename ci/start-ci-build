@@ -13,7 +13,7 @@ fi
 permnote "Wiping out all Sofin locks and cached bundle files"
 ${RM_BIN} -f ${HOME}/.sofin/locks/*.lock ${HOME}/.sofin/file-cache/*.zfs* 2>/dev/null
 
-_workers="4"
+_workers="6"
 _src_list="software.list"
 _lines="$(${GREP_BIN} -c '' "${_src_list}")"
 _split_name="sofin-ci"
@@ -44,6 +44,8 @@ ${_tmux} send -t 0:0.0 "./build-list ${_split_name}-aa" C-m
 ${_tmux} send -t 0:0.1 "./build-list ${_split_name}-ab" C-m
 ${_tmux} send -t 0:0.2 "./build-list ${_split_name}-ac" C-m
 ${_tmux} send -t 0:0.3 "./build-list ${_split_name}-ad" C-m
+${_tmux} send -t 0:0.4 "./build-list ${_split_name}-ae" C-m
+${_tmux} send -t 0:0.5 "./build-list ${_split_name}-af" C-m
 
 ${_tmux} select-layout tiled
 
