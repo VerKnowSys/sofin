@@ -461,6 +461,7 @@ compiler_setup () {
 
     # Don't enable safe-stack on unsupported platforms:
     if [ -n "${DEF_USE_SAFE_STACK}" ] \
+    && [ -z "${DEBUGBUILD}" ] \
     && [ "Darwin" != "${SYSTEM_NAME}" ] \
     && [ "Linux" != "${SYSTEM_NAME}" ] \
     && [ "Minix" != "${SYSTEM_NAME}" ]; then
