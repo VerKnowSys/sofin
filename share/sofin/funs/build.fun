@@ -307,9 +307,10 @@ build () {
             debug "Afterbuild for bundle: $(distd "${_bund_name_capit}")"
             finalize_afterbuild_tasks_for_bundle "${_bund_name_capit}"
 
-            debug "Non production mode, hence tracking useful/useless files, stripping bundles and creating bundle snapshot!"
-            afterbuild_manage_files_of_bundle
-            strip_bundle "${_bund_name_capit}"
+            if [ -z "${DEBUGBUILD}" ]; then
+                afterbuild_manage_files_of_bundle
+                strip_bundle "${_bund_name_capit}"
+            fi
 
             validate_pie_on_exports "${_bund_name_capit}"
             validate_bins_links "${_bund_name_capit}"
