@@ -84,6 +84,7 @@ HARDEN_CMACROS="-D_FORTIFY_SOURCE=2"
 HARDEN_CFLAGS="-fstack-protector-strong -fno-strict-overflow" # -fstack-protector-all
 CFLAGS_PRODUCTION="-fstack-protector -Wformat -Wformat-security -Wl,-z,relro,-z,now"
 LDFLAGS_PRODUCTION="-z relro -z now"
+DEFAULT_DWARF_VERSION="5" # http://www.dwarfstd.org/
 
 # Determine "file binary" output on PIE executable:
 case "${SYSTEM_VERSION}" in

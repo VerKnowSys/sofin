@@ -422,16 +422,25 @@ compiler_setup () {
     # CFLAGS, CXXFLAGS setup:
     set_c_and_cxx_flags "${_compiler_use_linker_flags}"
 
+    # pick version of DWARF format, it's known that dwarf-5 causes build failures on FreeBSD 11.x:
+    _dwarf_version="${DEFAULT_DWARF_VERSION}"
+    case "${SYSTEM_NAME}-${SYSTEM_VERSION}" in
+         FreeBSD-11*)
+            _dwarf_version="4"
+            ;;
+    esac
+
     # inject debug compiler options
     if [ -n "${DEBUGBUILD}" ]; then
-        _dbgflags="-O0 -gdwarf-4 -glldb ${ASAN_CFLAGS}"
-        note "DEBUGBUILD is enabled. Additional compiler flags: $(distn "${_dbgflags}")"
+        # NOTE: since we set ASAN_CFLAGS for DEBUG-builds we drop HARDEN_SAFE_STACK_FLAGS if DEBUGBUILD is set
+        _dbgflags="-O0 -gdwarf-${_dwarf_version} -glldb ${ASAN_CFLAGS}"
+        debug "DEBUGBUILD is enabled. Additional compiler flags: $(distd "${_dbgflags}")"
         CFLAGS="${CFLAGS} ${_dbgflags}"
         CXXFLAGS="${CXXFLAGS} ${_dbgflags}"
         # LDFLAGS="${LDFLAGS} ${_dbgflags}"
     else
-        CFLAGS="${CFLAGS} -gdwarf-4"
-        CXXFLAGS="${CXXFLAGS} -gdwarf-4"
+        CFLAGS="${CFLAGS} -gdwarf-${_dwarf_version}"
+        CXXFLAGS="${CXXFLAGS} -gdwarf-${_dwarf_version}"
     fi
 
     if [ -z "${DEF_NO_PIC}" ]; then
