@@ -16,6 +16,7 @@ Check
 Chicken
 Clang
 Clamav
+Collectd
 Curl
 Curl_lib
 Cppcheck
@@ -75,6 +76,7 @@ Kibana5
 Logstash5
 Make
 Mariadb
+Mariadb-client
 Mariadb104
 Mc
 Memcached
@@ -117,7 +119,6 @@ Redis
 Rhash
 Rlwrap
 Rsync
-Ruby24
 Ruby25
 Ruby26
 Rust-basic
