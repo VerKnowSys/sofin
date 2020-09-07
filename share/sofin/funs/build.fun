@@ -884,7 +884,7 @@ test_and_rate_def () {
 
             local_test_env_dispatch () {
                 _start_time="$(${DATE_BIN} +%F-%H%M-%s 2>/dev/null)"
-                printf "%b\n" "Test for ${_name} started at: ${_start_time}" >> "${PREFIX}/${_name}.test.log" 2>> "${PREFIX}/${_name}.test.log"
+                printf "%b\n" "Test for ${_name} started at: ${_start_time}" >> "${PREFIX}/${_name}.test.log"
 
                 eval "\
                     export TEST_JOBS=${CPUS} \
@@ -898,7 +898,7 @@ test_and_rate_def () {
                 _end_time="$(${DATE_BIN} +%F-%H%M-%s 2>/dev/null)"
 
                 debug "Test result for: $(distd "${_name}") is: $(distd "${_result}")"
-                printf "%b\n" "Test for ${_name} finished at: ${_end_time}" >> "${PREFIX}/${_name}.test.log" 2>> "${PREFIX}/${_name}.test.log"
+                printf "%b\n" "Test for ${_name} finished at: ${_end_time}" >> "${PREFIX}/${_name}.test.log"
 
                 unset _test_command _end_time _start_time
                 return ${_result}
