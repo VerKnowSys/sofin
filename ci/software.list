@@ -106,14 +106,16 @@ Perl
 Php72
 Php73
 Pkgconf
+Poppler
 Postgresql10
 Postgresql11
+Postgresql11-client
 Postgresql96
 Pptpd
+Pstree
 Python27
 Python36
 Python37
-Pstree
 Pwgen
 Redis
 Rhash
