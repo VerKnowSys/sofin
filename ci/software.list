@@ -36,6 +36,7 @@ Flac
 Freeipmi
 Galera
 Gcc
+Gd
 Geoip
 Geoipupdate
 Getopt
@@ -101,6 +102,7 @@ Openvpn
 Otp19
 Otp21
 Pass
+Patchelf
 Pax-utils
 Perl
 Php72
