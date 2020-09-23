@@ -29,7 +29,7 @@ int main(int argc, char *argv[]) {
         const int modifier = 100000;
         char buff[16];
         FILE *in;
-        in = popen("/usr/bin/uname -U", "r");
+        in = popen("/sbin/sysctl -n kern.osreldate", "r");
         fgets(buff, sizeof(buff), in);
         pclose(in);
         int ver = atoi(buff);
