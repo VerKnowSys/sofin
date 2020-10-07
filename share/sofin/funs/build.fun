@@ -660,9 +660,9 @@ process_flat () {
                         dump_software_build_configuration_options "${_configure_options_log}"
                         note "   ${NOTE_CHAR} Configuring: $(distn "${_definition_name}"), version: $(distn "${DEF_VERSION}")"
 
-                        try "${DEF_CONFIGURE_METHOD} . build --prefix=${PREFIX} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
-                            || try "${DEF_CONFIGURE_METHOD} . build --prefix=${PREFIX} --sysconfdir=${SERVICE_DIR}/etc 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
-                                || run "${DEF_CONFIGURE_METHOD} . build --prefix=${PREFIX}"
+                        try "${DEF_CONFIGURE_METHOD} . build --prefix=${PREFIX} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var ${DEF_CONFIGURE_ARGS} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
+                            || try "${DEF_CONFIGURE_METHOD} . build --prefix=${PREFIX} --sysconfdir=${SERVICE_DIR}/etc ${DEF_CONFIGURE_ARGS} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
+                                || run "${DEF_CONFIGURE_METHOD} . build --prefix=${PREFIX} ${DEF_CONFIGURE_ARGS}"
 
                         DEF_MAKE_METHOD="ninja -C build -j${CPUS}"
                         DEF_INSTALL_METHOD="ninja -C build install"
