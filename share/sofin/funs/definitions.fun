@@ -25,24 +25,21 @@ load_defs () {
         error "No definition name specified!"
     else
         for _given_def in $(to_iter "${_definitions}"); do
-            #echo "# L: ${_given_def}"
             _name_base="${_given_def##*/}"
             _def="$(lowercase "${_name_base}")"
             if [ -e "${DEFINITIONS_DIR}/${_def}${DEFAULT_DEF_EXT}" ]; then
-                env_pedantic
                 . "${DEFINITIONS_DIR}/${_def}${DEFAULT_DEF_EXT}"
-                env_forgivable
-
+            elif [ -e "${DEFINITIONS_DIR}/${_def#?}${DEFAULT_DEF_EXT}" ]; then
+                . "${DEFINITIONS_DIR}/${_def#?}${DEFAULT_DEF_EXT}"
             elif [ -e "${DEFINITIONS_DIR}/${_def}" ]; then
-                env_pedantic
                 . "${DEFINITIONS_DIR}/${_def}"
-                env_forgivable
-
-                _given_def="${_def%${DEFAULT_DEF_EXT}}"
+            elif [ -e "${DEFINITIONS_DIR}/${_def#?}" ]; then
+                . "${DEFINITIONS_DIR}/${_def#?}"
             else
                 # validate available alternatives and quit no matter the result
                 show_alt_definitions_and_exit "${_given_def}"
             fi
+            extend_requirement_lists
 
             # if definition lacks definition of DEF_SUFFIX, after loading
             # the definition file, try to infer DEF_SUFFIX:
