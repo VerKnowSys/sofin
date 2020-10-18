@@ -39,7 +39,17 @@ load_defs () {
                 # validate available alternatives and quit no matter the result
                 show_alt_definitions_and_exit "${_given_def}"
             fi
-            extend_requirement_lists
+            # extend_requirement_lists
+
+            _val="loopstart"
+            while [ -n "${_val}" ]; do
+                _val="$(echo "${DEF_REQUIREMENTS}" | ${GREP_BIN} "@")"
+                if [ "0" = "${?}" ]; then
+                    extend_requirement_lists
+                else
+                    break
+                fi
+            done
 
             # if definition lacks definition of DEF_SUFFIX, after loading
             # the definition file, try to infer DEF_SUFFIX:
