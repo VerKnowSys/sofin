@@ -6,13 +6,17 @@ extend_requirement_lists () {
     for _req_list in $(to_iter "${DEF_REQUIREMENTS}"); do
         echo "${_req_list}" | ${EGREP_BIN} "@" >/dev/null 2>&1
         if [ "0" = "${?}" ]; then
-            _req_list="$(echo "${_req_list}" | ${SED_BIN} -e "s|@||")"
-            _reqs_var="$(${GREP_BIN} "DEF_REQUIREMENTS" "${DEFINITIONS_DIR}/${_req_list}${DEFAULT_DEF_EXT}")"
+            _req_list="$(echo "${_req_list}" | ${SED_BIN} -e "s|@||" 2>/dev/null)"
+            _reqs_var="$(${GREP_BIN} "DEF_REQUIREMENTS" "${DEFINITIONS_DIR}/${_req_list}${DEFAULT_DEF_EXT}" 2>/dev/null)"
             _reqs_var="$(lowercase "_${_reqs_var}")"
-            eval "${_reqs_var}" # set ${_def_requirements}
-            DEF_REQUIREMENTS="$(echo "${DEF_REQUIREMENTS}" | ${SED_BIN} -e "s|@${_req_list}|${_def_requirements} ${_req_list}|")"
+            if [ "${#_reqs_var}" -gt "1" ]; then
+                eval "${_reqs_var}" # set ${_def_requirements}
+                DEF_REQUIREMENTS="$(echo "${DEF_REQUIREMENTS}" | ${SED_BIN} -e "s|@${_req_list}|${_def_requirements} ${_req_list}|")"
 
-            debug "Replacing requirement list: $(distd "@${_req_list}") with requirements: $(distd "${_def_requirements}"). Final DEF_REQUIREMENTS: $(distd "${DEF_REQUIREMENTS}")"
+                debug "Replacing requirement list: $(distd "@${_req_list}") with requirements: $(distd "${_def_requirements}"). Final DEF_REQUIREMENTS: $(distd "${DEF_REQUIREMENTS}")"
+            else
+                error "Definition list: $(diste "@${_req_list}"), lacks DEF_REQUIREMENTS or uses definition-inheritance which is not supported (YET)."
+            fi
         fi
         unset _req_list _reqs_var _def_requirements
     done
@@ -39,7 +43,6 @@ load_defs () {
                 # validate available alternatives and quit no matter the result
                 show_alt_definitions_and_exit "${_given_def}"
             fi
-            # extend_requirement_lists
 
             _val="loopstart"
             while [ -n "${_val}" ]; do
