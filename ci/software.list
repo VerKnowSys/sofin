@@ -81,7 +81,6 @@ Logstash5
 Make
 Mariadb
 Mariadb-client
-Mariadb104
 Mc
 Memcached
 Mongodb
@@ -125,6 +124,7 @@ Pwgen
 Redis
 Rhash
 Rlwrap
+Rocksdb
 Rsync
 Ruby25
 Ruby26
