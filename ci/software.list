@@ -67,8 +67,9 @@ Jq
 Jruby
 Lame
 Lftp
-Libressl
+Libarchive
 Libde265
+Libressl
 Lldb
 Llvm
 Lua51
@@ -109,6 +110,7 @@ Pax-utils
 Perl
 Php72
 Php73
+Php74
 Pkgconf
 Poppler
 Postgresql10
