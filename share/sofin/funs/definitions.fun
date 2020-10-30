@@ -1,6 +1,22 @@
 #!/usr/bin/env sh
 
 
+requirements_dedup () {
+    _orig="${*}"
+    for _term in $(to_iter "${_orig}"); do
+        _count="$(to_iter "${_orig}" | ${GREP_BIN} -Fc "${_term}")"
+        while [ "${_count}" -gt "1" ]; do
+            _term_rev="$(echo "${_term}" | ${REV_BIN})"
+            _orig="$(echo "${_orig}" | ${REV_BIN} | ${SED_BIN} "s/${_term_rev} *//; s/ {2,}/ /g" | ${REV_BIN} | ${TR_BIN} '\n' ' ' | ${SED_BIN} 's/ *$//')"
+            _count="$(to_iter "${_orig}" | ${GREP_BIN} -Fc "${_term}")"
+            debug "Requirement duplicate: $(distd "${_term}"); _orig: $(distd "${_orig}"), _count: $(distd "${_count}")"
+        done
+    done
+    printf "%b\n" "${_orig}"
+    unset _orig _count _term _term_rev
+}
+
+
 extend_requirement_lists () {
     # @definition list extension support:
     for _req_list in $(to_iter "${DEF_REQUIREMENTS}"); do
@@ -61,6 +77,9 @@ load_defs () {
             # check disabled definition state
             unset CURRENT_DEFINITION_DISABLED
             validate_definition_disabled
+
+            # deduplicate requirements
+            DEF_REQUIREMENTS="$(requirements_dedup "${DEF_REQUIREMENTS}")"
 
             if [ -z "${USE_NO_UTILS}" ] \
             && [ -n "${CAP_SYS_BUILDHOST}" ]; then
