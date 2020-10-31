@@ -10,31 +10,44 @@ requirements_dedup_test () {
     _a1="aaa bbb ccc ddd eee fff ggg hhh"
     test "${_a1}" = "${_q1}" \
         || error "QUESTION: $(diste "${_i1}"), EXPECTED ANSWER: $(diste "${_a1}"), GOT: '$(diste "${_q1}")'"
-    permnote "Test #1: OK: $(distn "${_a1}")"
+    permnote "Test #1: requirements_dedup_test(): OK: $(distn "${_a1}")"
 
     _i2="a111 a111 b2 c3 d4 a111 c2 a111 a111 a111 d4 e5"
     _q2="$(requirements_dedup "${_i2}")"
     _a2="a111 b2 c3 d4 c2 e5"
     test "${_a2}" = "${_q2}" \
         || error "QUESTION: $(diste "${_i2}"), EXPECTED ANSWER: $(diste "${_a2}"), GOT: '$(diste "${_q2}")'"
-    permnote "Test #2: OK: $(distn "${_a2}")"
+    permnote "Test #2: requirements_dedup_test(): OK: $(distn "${_a2}")"
 
     _i3="lzo lzop"
     _q3="$(requirements_dedup "${_i3}")"
     _a3="lzo lzop"
     test "${_a3}" = "${_q3}" \
         || error "QUESTION: $(diste "${_i3}"), EXPECTED ANSWER: $(diste "${_a3}"), GOT: '$(diste "${_q3}")'"
-    permnote "Test #3: OK: $(distn "${_a3}")"
+    permnote "Test #3: requirements_dedup_test(): OK: $(distn "${_a3}")"
 
     _i4="lzo lzop lzo lzop lzo lzop lz4 lzo lzop lzo lzop lzo lzop lz4 lz"
     _q4="$(requirements_dedup "${_i4}")"
     _a4="lzo lzop lz4 lz"
     test "${_a4}" = "${_q4}" \
         || error "QUESTION: $(diste "${_i4}"), EXPECTED ANSWER: $(diste "${_a4}"), GOT: '$(diste "${_q4}")'"
-    permnote "Test #4: OK: $(distn "${_a4}")"
+    permnote "Test #4: requirements_dedup_test(): OK: $(distn "${_a4}")"
+}
+
+
+extend_requirement_lists_test() {
+    _i5="@perl libressl"
+    DEF_REQUIREMENTS="${_i5}"
+    extend_requirement_lists
+    _q5="${DEF_REQUIREMENTS}"
+    _a5="libressl db perl libressl"
+    test "${DEF_REQUIREMENTS}" = "${_a5}" \
+        || error "QUESTION: $(diste "${_i5}"), EXPECTED ANSWER: $(diste "${_a5}"), GOT: '$(diste "${_q5}")'"
+    permnote "Test #5: extend_requirement_lists(): OK: $(distn "${_a5}")"
 }
 
 
 # Invoke tests:
 requirements_dedup_test && \
+extend_requirement_lists_test && \
 permnote "Everything as expected!"
