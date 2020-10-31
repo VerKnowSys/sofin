@@ -44,6 +44,15 @@ extend_requirement_lists_test() {
     test "${DEF_REQUIREMENTS}" = "${_a5}" \
         || error "QUESTION: $(diste "${_i5}"), EXPECTED ANSWER: $(diste "${_a5}"), GOT: '$(diste "${_q5}")'"
     permnote "Test #5: extend_requirement_lists(): OK: $(distn "${_a5}")"
+
+    _i6="@perl @perl @perl"
+    DEF_REQUIREMENTS="${_i6}"
+    extend_requirement_lists
+    _q6="${DEF_REQUIREMENTS}"
+    _a6="libressl db perl libressl db perl libressl db perl"
+    test "${DEF_REQUIREMENTS}" = "${_a6}" \
+        || error "QUESTION: $(diste "${_i6}"), EXPECTED ANSWER: $(diste "${_a6}"), GOT: '$(diste "${_q6}")'"
+    permnote "Test #6: extend_requirement_lists(): OK: $(distn "${_a6}")"
 }
 
 
