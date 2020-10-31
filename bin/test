@@ -39,6 +39,13 @@ requirements_dedup_test () {
     test "${_a5}" = "${_q5}" \
         || error "QUESTION: $(diste "${_i5}"), EXPECTED ANSWER: $(diste "${_a5}"), GOT: '$(diste "${_q5}")'"
     permnote "Test requirements_dedup_test() #5 - OK: $(distn "${_a5}")"
+
+    _i6="opus opus-tools apr apr apr-utils apr apr opus apr apr"
+    _q6="$(requirements_dedup "${_i6}")"
+    _a6="opus opus-tools apr apr-utils"
+    test "${_a6}" = "${_q6}" \
+        || error "QUESTION: $(diste "${_i6}"), EXPECTED ANSWER: $(diste "${_a6}"), GOT: '$(diste "${_q6}")'"
+    permnote "Test requirements_dedup_test() #6 - OK: $(distn "${_a6}")"
 }
 
 
