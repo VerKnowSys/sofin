@@ -2,7 +2,7 @@
 
 
 requirements_dedup () {
-    printf "%b\n" "${*}" | ${AWK_BIN} -v RS=' ' -v ORS=' ' '!seen[$1] {print} {++seen[$1]};' | ${SED_BIN} -e 's/ *$//'
+    printf "%b\n" "${*}" | ${AWK_BIN} -v RS=' ' -v ORS='' -v OFS='' '! ($1 in seen) { print( (NR > 1) ? " " : "", $1); seen[$1]=y }'
 }
 
 
