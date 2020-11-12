@@ -433,7 +433,7 @@ compiler_setup () {
     # inject debug compiler options
     if [ -n "${DEBUGBUILD}" ]; then
         # NOTE: since we set ASAN_CFLAGS for DEBUG-builds we drop HARDEN_SAFE_STACK_FLAGS if DEBUGBUILD is set
-        _dbgflags="-O0 -gdwarf-${_dwarf_version} -glldb ${ASAN_CFLAGS}"
+        _dbgflags="-O0 -gdwarf-${_dwarf_version} -glldb" # ${ASAN_CFLAGS}
         debug "DEBUGBUILD is enabled. Additional compiler flags: $(distd "${_dbgflags}")"
         CFLAGS="${CFLAGS} ${_dbgflags}"
         CXXFLAGS="${CXXFLAGS} ${_dbgflags}"
