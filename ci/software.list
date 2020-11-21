@@ -25,6 +25,7 @@ Dar
 Db
 Dhcp
 Dmidecode
+Expect
 Elasticsearch5
 Elixir
 Ettercap
@@ -147,6 +148,7 @@ Swig
 Sysbench
 Syslog-ng
 Tarsnap
+Tcl
 Tcpdump
 Telegraf
 Tig
