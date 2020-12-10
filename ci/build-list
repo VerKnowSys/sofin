@@ -35,8 +35,13 @@ slack_notification () {
         FAIL|FAILURE|ERROR)
             _color='#ff1111'
             ;;
-        *)
+
+        SUCCESS|OK)
             _color='#00ff11'
+            ;;
+
+        *)
+            _color="#FFF0F0"
             ;;
     esac
     _payload="{\"channel\": \"${_channel//\"/\\\"}\", \"attachments\": [{\"color\": \"${_color}\", \"author_name\": \"Sofin CI\", \"text\": \"${_message//\"/\\\"}\"}]}"
@@ -95,7 +100,7 @@ for _software in $(${CAT_BIN} ${_working_state_file} 2>/dev/null); do
         complete_subtask () {
             _bundle_time_finish_s="$(${DATE_BIN} +%s 2>/dev/null)"
             _bundle_time_total_s=$(( ${_bundle_time_finish_s} - ${_bundle_time_start_s} ))
-            slack_notification "INFO" "[${_host_quad}] Successfully deployed bundle: ${_software} (took: ${_bundle_time_total_s} seconds)."
+            slack_notification "SUCCESS" "[${_host_quad}] Successfully deployed bundle: ${_software} (took: ${_bundle_time_total_s} seconds)."
         }
 
         ${SOFIN_BIN} deploy "${_software}" \
