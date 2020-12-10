@@ -83,7 +83,7 @@ for _software in $(${CAT_BIN} ${_working_state_file} 2>/dev/null); do
 
         _bundle_time_start_s="$(${DATE_BIN} +%s 2>/dev/null)"
         permnote "Deploying software: $(distn "${_software}")"
-        slack_notification "INFO" "[${_host_quad}] Deploying software bundle: ${_software}${CHAR_DOTS}"
+        # slack_notification "INFO" "[${_host_quad}] Deploying software bundle: ${_software}${CHAR_DOTS}"
 
         remove_from_list_and_destroy () {
             try "${SED_BIN} -i '' -e \"/${_software}/d\" ${_working_state_file}"
