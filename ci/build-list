@@ -30,22 +30,24 @@ _host_quad="${HOST}: ${SYSTEM_NAME}-${SYSTEM_VERSION}-${SYSTEM_ARCH})"
 slack_notification () {
     _type="${1}"
     shift
-    _message="${_type}: ${*}"
+    _message="${*}"
     case "${_type}" in
         FAIL|FAILURE|ERROR)
-            _emoji=':dragon:'
+            _color='#ff1111'
             ;;
         *)
-            _emoji=':bird:'
+            _color='#00ff11'
             ;;
     esac
-    __slack_channel="${_slack_channel}"
-    _slack_webhook_url="${_slack_webhook}"
-    _payload="payload={\"channel\": \"${_channel//\"/\\\"}\", \"username\": \"${SofinCI//\"/\\\"}\", \"text\": \"${_message//\"/\\\"}\", \"icon_emoji\": \"${_emoji}\"}"
-    "${_curl}" -m 5 \
-        --data-urlencode "${_payload}" \
-        "${_slack_webhook_url}" \
-        -A 'SofinCI' \
+    _payload="{\"channel\": \"${_channel//\"/\\\"}\", \"attachments\": [{\"color\": \"${_color}\", \"author_name\": \"Sofin CI\", \"text\": \"${_message//\"/\\\"}\"}]}"
+
+    "${_curl}" \
+        -X POST \
+        -m 10 \
+        -A 'Sofin-CI' \
+        -H "Content-type: application/json" \
+        -d "${_payload}" \
+        "${_slack_webhook}" \
             >> "${LOG}" 2>> "${LOG}"
 }
 
