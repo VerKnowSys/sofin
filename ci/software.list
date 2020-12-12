@@ -107,6 +107,7 @@ Openntpd
 Openssl
 Openvpn
 Otp
+P11-kit
 Pass
 Patchelf
 Pax-utils
