@@ -4,7 +4,7 @@ clean_purge () {
     if [ -z "${CACHE_DIR}" ]; then
         error "Assertion failed: $(diste "CACHE_DIR") is empty!"
     fi
-    try "${RM_BIN} -rf '${CACHE_DIR}'" \
+    try "${RM_BIN} -rf '${GIT_CACHE_DIR}' '${LOGS_DIR}' '${FILE_CACHE_DIR}' '${LOCKS_DIR}'" \
         && debug "Clean: Purged everything."
 }
 
