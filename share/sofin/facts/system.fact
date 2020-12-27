@@ -70,7 +70,14 @@ CPP_NAME="${CC_NAME}-cpp"
 
 # Compiler flags:
 SINGLE_ERROR_CFLAGS="-ferror-limit=1"
-LTO_CFLAGS="-flto=thin -ffat-lto-objects -fuse-linker-plugin"
+LTO_MAX_SIZE=8g
+LTO_CFLAGS="-flto=thin -ffat-lto-objects -fuse-linker-plugin -Wl,--thinlto-jobs=${CPUS}"
+case "${SYSTEM_NAME}" in
+    FreeBSD) # on FreeBSD set thinklto cache dir to /tmp ramdisk:
+        LTO_CACHE_DIR="${CACHE_DIR}lto-cache"
+        LTO_CFLAGS="${LTO_CFLAGS} -Wl,--thinlto-cache-dir=${LTO_CACHE_DIR} -Wl,--thinlto-cache-policy,cache_size_bytes=${LTO_MAX_SIZE}"
+        ;;
+esac
 CFI_CFLAGS="-fsanitize=cfi -fvisibility=hidden"
 ASAN_CFLAGS="-fsanitize=address"
 CXX11_CXXFLAGS="-std=c++11"
