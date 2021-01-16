@@ -80,6 +80,9 @@ GOLD_SO="/usr/lib/LLVMgold.so" # Golden linker specific library
 NM_BIN="/usr/bin/nm"
 AR_BIN="/usr/bin/ar"
 AS_BIN="/usr/bin/as"
+if [ ! -x "${AS_BIN}" ] && [ -x "/usr/bin/llvm-as" ]; then
+    AS_BIN="/usr/bin/llvm-as"
+fi
 OPENSSL_BIN="/usr/bin/openssl"
 DTRACE_BIN="/usr/sbin/dtrace"
 JOT_BIN="/usr/bin/jot"
