@@ -72,13 +72,13 @@ default_compiler_features () {
         fi
 
         ${LD_BIN} -v 2>&1 \
-            | ${GREP_BIN} -E "^LLD \d*.\d*.\d*.*${SYSTEM_NAME} " >/dev/null 2>&1
+            | ${GREP_BIN} -E "^LLD [[:digit:]]*.[[:digit:]]*.[[:digit:]]*.*${SYSTEM_NAME} " >/dev/null 2>&1
         if [ "0" = "${?}" ]; then
             permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "LLVM LLD-linker" "${ColorDistinct}")"
         fi
 
         ${LD_BIN} -v 2>&1 \
-            | ${GREP_BIN} -E "GNU ld \d*.\d*.\d*.*${SYSTEM_NAME}" >/dev/null 2>&1
+            | ${GREP_BIN} -E "GNU ld [[:digit:]]*.[[:digit:]]*.[[:digit:]]*.*${SYSTEM_NAME}" >/dev/null 2>&1
         if [ "0" = "${?}" ]; then
             permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "GNU linker" "${ColorDistinct}")"
         fi
