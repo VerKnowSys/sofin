@@ -95,12 +95,12 @@ DEFAULT_DWARF_VERSION="5" # http://www.dwarfstd.org/
 
 # Determine "file binary" output on PIE executable:
 case "${SYSTEM_VERSION}" in
-    12*)
-        PIE_TYPE_ENTRY="LSB pie executable"
+    11*)
+        PIE_TYPE_ENTRY="LSB shared object"
         ;;
 
     *)
-        PIE_TYPE_ENTRY="LSB shared object"
+        PIE_TYPE_ENTRY="LSB pie executable"
         ;;
 esac
 
