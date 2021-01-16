@@ -734,7 +734,7 @@ export_binaries () {
     if [ -z "${DEF_EXPORTS}" ]; then
         permnote "Defined no exports of prefix: $(distn "${PREFIX}")"
     else
-        _an_amount="$(printf "%b\n" "${DEF_EXPORTS}" | ${WC_BIN} -w 2>/dev/null | ${TR_BIN} -d '\t|\r|\ ' 2>/dev/null)"
+        _an_amount="$(printf "%b\n" "${DEF_EXPORTS}" | ${AWK_BIN} '{print NF;}' 2>/dev/null)"
         debug "Exporting $(distd "${_an_amount}") binaries of prefixes: $(distd "${PREFIX}") + $(distd "${SERVICE_DIR}")"
         try "${MKDIR_BIN} -p ${PREFIX}/exports ${SERVICE_DIR}/exports"
         unset _expolist

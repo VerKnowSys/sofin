@@ -2,7 +2,7 @@
 
 # Guards:
 FIRST_ARG_GUARD="${CUT_BIN} -f1 2>/dev/null"
-WORDS_COUNT_GUARD="${WC_BIN} -w 2>/dev/null | ${SED_BIN} 's/ //g' 2>/dev/null"
+WORDS_COUNT_GUARD="${AWK_BIN} '{print NF;}' 2>/dev/null"
 NEWLINES_TO_SPACES_GUARD="${TR_BIN} '\n' ' ' 2>/dev/null"
 CUT_TRAILING_SPACES_GUARD="${SED_BIN} 's/ *$//g; s/  //g' 2>/dev/null"
 HOST_ADDRESS_GUARD="${CUT_BIN} -d' ' -f2 2>/dev/null | ${CUT_BIN} -d'#' -f1 2>/dev/null"
