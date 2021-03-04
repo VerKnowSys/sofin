@@ -118,6 +118,7 @@ Perl
 Php72
 Php73
 Php74
+Php8
 Pkgconf
 Poppler
 Postgresql10
@@ -125,6 +126,7 @@ Postgresql11
 Postgresql11-client
 Postgresql96
 Pptpd
+Protobuf
 Pstree
 Python27
 Python36
