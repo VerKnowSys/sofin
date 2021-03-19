@@ -10,6 +10,7 @@ Bison27
 Binutils
 Binutils-gold
 Boost
+Ccache
 Cdrtools
 Check
 Chicken
@@ -17,7 +18,7 @@ Clang
 Clamav
 Collectd
 Curl
-Curl_lib
+Cmake
 Cppcheck
 Ctags
 Dar
