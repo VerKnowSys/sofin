@@ -46,7 +46,6 @@ Geoipupdate
 Getopt
 Ghostscript
 Git-devel
-Glances
 Gperf
 Grafana
 Graphicsmagick
@@ -89,6 +88,7 @@ Mariadb
 Mariadb-client
 Mc
 Memcached
+Meson
 Mongodb
 Mosh
 Mysqltuner
