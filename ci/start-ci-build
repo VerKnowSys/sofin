@@ -27,7 +27,7 @@ permnote "Checking remote machine connection (shouldn't take more than a second)
 run "${SSH_BIN} sofin@software.verknowsys.com uname -a"
 
 # Curl binary utlility:
-_tmux="/Services/Sofin12/exports/tmux"
+_tmux="/Services/Sofin/exports/tmux"
 if [ ! -x "${_tmux}" ]; then
     run "s util Tmux-util"
 fi
