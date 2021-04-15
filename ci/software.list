@@ -1,4 +1,3 @@
-Apr-util
 Arping
 Automake
 Aspell
@@ -23,7 +22,7 @@ Cppcheck
 Ctags
 Dar
 Db
-Dhcp
+Dhcpd
 Dmidecode
 Expect
 Elasticsearch5
@@ -39,7 +38,6 @@ Fish
 Flac
 Fontconfig
 Freeipmi
-Galera
 Gcc
 Gd
 Geoip
