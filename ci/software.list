@@ -7,7 +7,6 @@ Bash
 Bison
 Bison27
 Binutils
-Binutils-gold
 Boost
 Ccache
 Cdrtools
@@ -124,7 +123,6 @@ Pptpd
 Protobuf
 Pstree
 Python27
-Python36
 Python37
 Python39
 Pwgen
