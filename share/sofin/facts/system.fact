@@ -73,6 +73,10 @@ SINGLE_ERROR_CFLAGS="-ferror-limit=1"
 LTO_MAX_SIZE=8g
 LTO_CFLAGS="-flto=thin -ffat-lto-objects -fuse-linker-plugin -Wl,--thinlto-jobs=${CPUS}"
 case "${SYSTEM_NAME}" in
+    Darwin)
+        LTO_CFLAGS="-flto=thin"
+        ;;
+
     FreeBSD) # on FreeBSD set thinklto cache dir to /tmp ramdisk:
         LTO_CACHE_DIR="${CACHE_DIR}lto-cache"
         LTO_CFLAGS="${LTO_CFLAGS} -Wl,--thinlto-cache-dir=${LTO_CACHE_DIR} -Wl,--thinlto-cache-policy,cache_size_bytes=${LTO_MAX_SIZE}"
