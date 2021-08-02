@@ -473,7 +473,9 @@ compiler_setup () {
     && [ -z "${DEBUGBUILD}" ] \
     && [ "Darwin" != "${SYSTEM_NAME}" ] \
     && [ "Linux" != "${SYSTEM_NAME}" ] \
-    && [ "Minix" != "${SYSTEM_NAME}" ]; then
+    && [ "Minix" != "${SYSTEM_NAME}" ] \
+    && [ "arm64" != "${SYSTEM_ARCH}" ] \
+    && [ "aarch64" != "${SYSTEM_ARCH}" ]; then
         CFLAGS="${CFLAGS} ${HARDEN_SAFE_STACK_FLAGS}"
         CXXFLAGS="${CXXFLAGS} ${HARDEN_SAFE_STACK_FLAGS}"
         # LDFLAGS="${LDFLAGS} ${HARDEN_SAFE_STACK_FLAGS}"
@@ -481,6 +483,8 @@ compiler_setup () {
 
     # Enable LTO only if LLVM LLD linker is available:
     if [ -n "${DEF_USE_LTO}" ] \
+    && [ "arm64" != "${SYSTEM_ARCH}" ] \
+    && [ "aarch64" != "${SYSTEM_ARCH}" ] \
     && [ -z "${DEBUGBUILD}" ] \
     && [ "YES" = "${CAP_SYS_LLVM_LD}" ]; then
         CFLAGS="${CFLAGS} ${LTO_CFLAGS}"

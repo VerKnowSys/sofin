@@ -98,7 +98,9 @@ default_compiler_features () {
     if [ -z "${DEF_NO_LINKER_DTAGS}" ]; then
         permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "linker-new-DTAGS" "${ColorDistinct}")"
     fi
-    if [ -n "${DEF_USE_LTO}" ]; then
+    if [ -n "${DEF_USE_LTO}" ] \
+    && [ "arm64" != "${SYSTEM_ARCH}" ] \
+    && [ "aarch64" != "${SYSTEM_ARCH}" ]; then
         permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "link-time-optimizations (LLVM-LTO)" "${ColorDistinct}")"
     fi
     if [ -n "${DEF_USE_CFI}" ]; then
@@ -123,7 +125,9 @@ default_compiler_features () {
         && permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "trap-signed-integer-overflow (TRAPV)" "${ColorDistinct}")"
 
 
-    if [ -n "${DEF_USE_SAFE_STACK}" ]; then
+    if [ -n "${DEF_USE_SAFE_STACK}" ] \
+    && [ "arm64" != "${SYSTEM_ARCH}" ] \
+    && [ "aarch64" != "${SYSTEM_ARCH}" ]; then
         permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "safe-stack" "${ColorDistinct}")"
     fi
     if [ -z "${DEF_NO_RETPOLINE}" ]; then
