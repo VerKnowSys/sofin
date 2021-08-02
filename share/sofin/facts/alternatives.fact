@@ -100,6 +100,8 @@ fi
 # Git
 if [ -x "/Software/Git/bin/git" ]; then
     GIT_BIN="/Software/Git/bin/git"
+elif [ -x "/Services/${SOFIN_BUNDLE_NAME}/exports/git" ]; then
+    GIT_BIN="/Services/${SOFIN_BUNDLE_NAME}/exports/git"
 elif [ -x "/usr/bin/git" ]; then
     GIT_BIN="/usr/bin/git"
 elif [ -x "/usr/pkg/bin/git" ]; then
