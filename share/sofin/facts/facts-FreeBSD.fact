@@ -26,7 +26,7 @@ LIMITS_BIN="/usr/bin/limits"
 DTRACE_BIN="/usr/sbin/dtrace"
 PWD_MKDB_BIN="/usr/sbin/pwd_mkdb"
 GEOM_BIN="/sbin/geom"
-BEADM_BIN="/usr/sbin/beadm"
+BECTL_BIN="/sbin/bectl"
 LDD_BIN="/usr/bin/ldd"
 
 # ServeD governor, FreeBSD specific:

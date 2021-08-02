@@ -404,10 +404,10 @@ untrap_signals () {
 
 set_system_dataset_readonly () {
     if [ "YES" = "${CAP_SYS_ZFS}" ] \
-    && [ -x "${BEADM_BIN}" ] \
+    && [ -x "${BECTL_BIN}" ] \
     && [ "root" = "${USER}" ] \
     && [ -z "${CAP_SYS_JAILED}" ]; then
-        _active_boot_env="$(${BEADM_BIN} list -H 2>/dev/null | ${EGREP_BIN} "R" 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)"
+        _active_boot_env="$(${BECTL_BIN} list -H 2>/dev/null | ${EGREP_BIN} "R" 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)"
         _boot_dataset="${DEFAULT_ZPOOL}/ROOT/${_active_boot_env}"
         if [ -n "${CAP_SYS_PRODUCTION}" ]; then
             try "${ZFS_BIN} set readonly=on '${_boot_dataset}'" \
@@ -426,10 +426,10 @@ set_system_dataset_readonly () {
 
 
 set_system_dataset_writable () {
-    if [ -x "${BEADM_BIN}" ] \
+    if [ -x "${BECTL_BIN}" ] \
     && [ "root" = "${USER}" ] \
     && [ -z "${CAP_SYS_JAILED}" ]; then
-        _active_boot_env="$(${BEADM_BIN} list -H | ${EGREP_BIN} "R" 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)"
+        _active_boot_env="$(${BECTL_BIN} list -H | ${EGREP_BIN} "R" 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)"
         try "${ZFS_BIN} set readonly=off '${DEFAULT_ZPOOL}/ROOT/${_active_boot_env}'" \
             && debug "System dataset: $(distd "${DEFAULT_ZPOOL}/ROOT/${_active_boot_env}") is now: WRITABLE"
     fi
