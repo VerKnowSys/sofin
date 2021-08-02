@@ -144,8 +144,8 @@ fallback_nonzfs_setup () {
 
 determine_system_capabilites () {
     env_forgivable
-    ${ZPOOL_BIN} list -H >/dev/null 2>&1
-    if [ "${?}" = "0" ]; then
+    _zpools="$(${ZPOOL_BIN} list -H >/dev/null 2>&1)"
+    if [ "${?}" = "0" ] && [ ! -z "${_zpools}" ]; then
         CAP_SYS_ZFS=YES
         if [ "${SYSTEM_NAME}" = "Darwin" ]; then
             fallback_nonzfs_setup
