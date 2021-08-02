@@ -2,7 +2,6 @@
 
 # FreeBSD specific configuration
 
-BHYVE_BIN="/usr/sbin/bhyve"
 JAIL_BIN="/usr/sbin/jail"
 JEXEC_BIN="/usr/sbin/jexec"
 JLS_BIN="/usr/sbin/jls"
