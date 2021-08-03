@@ -424,7 +424,7 @@ create_software_dir () {
                 && debug "Received ZFS software-dataset: $(distd "${_dsname}")"
 
             # sharing nothing by default:
-            try "${ZFS_BIN} set sharenfs=- '${_dsname}'"
+            try "${ZFS_BIN} set sharenfs=off '${_dsname}'"
         }
 
         try "${ZFS_BIN} list -H -t filesystem '${_dsname}'" || receive_unshared_fs
@@ -448,7 +448,7 @@ destroy_software_dir () {
 
         # make system writable, unshare any NFS shares associated with ZFS dataset,
         set_system_dataset_writable
-        try "${ZFS_BIN} set sharenfs=- '${_dsname}'"
+        try "${ZFS_BIN} set sharenfs=off '${_dsname}'"
         try "${ZFS_BIN} unshare '${_dsname}'"
 
         # finally proceed with guaranteed destroy:
