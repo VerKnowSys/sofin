@@ -395,6 +395,7 @@ receive_origin () {
         debug "Set mountpoint: $(distd "${_mountpoint}") and mount: $(distd "${_dname}")"
         # NOTE: When you change the mountpoint property from legacy or none to a specific path, ZFS automatically mounts the file system.
         run "${ZFS_BIN} set mountpoint=${_mountpoint} '${_dname}'"
+        run "${ZFS_BIN} mount '${_dname}'"
     }
 
     if [ -f "${_origin_file}" ]; then
@@ -547,12 +548,12 @@ create_software_bundle_archive () {
             _cdir="$(${PWD_BIN} 2>/dev/null)"
             cd
             try "${RM_BIN} -rf ${SOFTWARE_DIR}/${_csbname}/${DEFAULT_SRC_EXT}*"
-            try "${ZFS_BIN} snapshot '${_csbd_dataset}@${ORIGIN_ZFS_SNAP_NAME}'"
+            create_origin_snaphots
             try "${ZFS_BIN} umount -f '${_csbd_dataset}'"
             run "${ZFS_BIN} send ${ZFS_SEND_OPTS} '${_csbd_dataset}@${ORIGIN_ZFS_SNAP_NAME}' | ${SOFIN_LZ4_BIN} ${DEFAULT_LZ4_OPTS} > ${_cddestfile}" \
                 && debug "ZFS-send-ok: $(distd "${_csbd_dataset}") -> $(distd "${_cddestfile}")"
             cd "${_cdir}"
-            try "${ZFS_BIN} mount '${_csbd_dataset}'"
+            run "${ZFS_BIN} mount '${_csbd_dataset}'"
 
             # # set mountpoint for dataset explicitly:
             # _dsname="${DEFAULT_ZPOOL}${SOFTWARE_DIR}/${SYSTEM_DATASET}/${_csbname}"

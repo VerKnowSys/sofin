@@ -378,8 +378,8 @@ build () {
         fi
 
         if [ "YES" = "${CAP_SYS_ZFS}" ]; then
-            debug "Creating post build '$(distd "@${ORIGIN_ZFS_SNAP_NAME}")' snapshots${CHAR_DOTS}"
-            create_origin_snaphots
+            # debug "Creating post build '$(distd "@${ORIGIN_ZFS_SNAP_NAME}")' snapshots${CHAR_DOTS}"
+            # create_origin_snaphots
 
             _dataset_parent="${DEFAULT_ZPOOL}/Software/${SYSTEM_DATASET}"
             _dataset="${_dataset_parent}/${_bund_name_capit}"
