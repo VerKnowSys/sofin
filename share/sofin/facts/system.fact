@@ -148,8 +148,8 @@ fallback_nonzfs_setup () {
 
 determine_system_capabilites () {
     env_forgivable
-    _zpools="$(${ZPOOL_BIN} list -H >/dev/null 2>&1)"
-    if [ "${?}" = "0" ] && [ -n "${_zpools}" ]; then
+    ${ZFS_BIN} list -H "${DEFAULT_ZPOOL}/ROOT" >/dev/null 2>&1
+    if [ "${?}" = "0" ]; then
         CAP_SYS_ZFS=YES
         if [ "${SYSTEM_NAME}" = "Darwin" ]; then
             fallback_nonzfs_setup
