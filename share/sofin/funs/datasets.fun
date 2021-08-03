@@ -690,8 +690,8 @@ create_snapshot () {
 
             # # Try removing existing snaps:
             do_snaps_destroy () {
-                try "${ZFS_BIN} destroy -fr '${_pr_soft}@${_snap_name}'; ${ZFS_BIN} destroy -fr '${_pr_serv}@${_snap_name}';" \
-                    && return 0
+                try "${ZFS_BIN} destroy -fr '${_pr_soft}@${_snap_name}'; ${ZFS_BIN} destroy -fr '${_pr_serv}@${_snap_name}';"
+                return 0
             }
 
             # # Do snapshots:
