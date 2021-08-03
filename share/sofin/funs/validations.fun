@@ -340,7 +340,7 @@ validate_bins_links () {
         for _bin in $(${FIND_BIN} "${_a_dir}" -mindepth 1 -maxdepth 1 -type l 2>/dev/null); do
             if ${FILE_BIN} -L "${_bin}" | ${CUT_BIN} -d' ' -f2- | ${GREP_BIN} -E '(text|script|statically)' >/dev/null 2>&1; then
                 debug "$(distd "${_bin}") is statically linked or a script, skipping validation"
-            elif ${FILE_BIN} -L "${_bin}" | ${CUT_BIN} -d' ' -f2- | ${GREP_BIN} -E '(LSB shared object|LSB pie executable)' >/dev/null 2>&1; then
+            elif ${FILE_BIN} -L "${_bin}" | ${CUT_BIN} -d' ' -f2- | ${GREP_BIN} -E '(LSB shared object|LSB pie executable|LSB executable)' >/dev/null 2>&1; then
                 if [ "${SYSTEM_NAME}" = "Darwin" ]; then
                         _linked="$(${OTOOL_BIN} -L "${_bin}" | ${GREP_BIN} -Ev "(\s${SOFTWARE_DIR}/${_bun}(/|/bin/../)lib/)|(\s/usr/lib/)|(\s/lib/)|(\s/System/Library/Frameworks/)|(@rpath/)"  2>/dev/null)"
                 else
