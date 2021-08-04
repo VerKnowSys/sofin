@@ -12,10 +12,11 @@ extend_requirement_lists () {
         echo "${_req_list}" | ${EGREP_BIN} "@" >/dev/null 2>&1
         if [ "0" = "${?}" ]; then
             _req_list="$(echo "${_req_list}" | ${SED_BIN} -e "s|@||" 2>/dev/null)"
-            _reqs_var="$(${GREP_BIN} "DEF_REQUIREMENTS" "${DEFINITIONS_DIR}/${_req_list}${DEFAULT_DEF_EXT}" 2>/dev/null)"
+            _reqs_var="$(${GREP_BIN} "DEF_REQUIREMENTS" "${DEFINITIONS_DIR}/${_req_list}${DEFAULT_DEF_EXT}" 2>/dev/null | ${SED_BIN} -e 's/^ *//g')"
             _reqs_var="$(lowercase "_${_reqs_var}")"
             if [ "${#_reqs_var}" -gt "1" ]; then
-                eval "${_reqs_var}" # set ${_def_requirements}
+                debug "Evaluating: $(distd "${_reqs_var}")"
+                eval "${_reqs_var}"
                 DEF_REQUIREMENTS="$(echo "${DEF_REQUIREMENTS}" | ${SED_BIN} -e "s|@${_req_list}|${_def_requirements} ${_req_list}|")"
 
                 debug "Replacing requirement list: $(distd "@${_req_list}") with requirements: $(distd "${_def_requirements}"). Final DEF_REQUIREMENTS: $(distd "${DEF_REQUIREMENTS}")"
