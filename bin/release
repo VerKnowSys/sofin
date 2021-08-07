@@ -8,9 +8,9 @@ SOFIN_ORIGIN="git@github.com:VerKnowSys/sofin.git"
 note "Pulling from origin and mirror.."
 ${GIT_BIN} pull "${SOFIN_ORIGIN}" >/dev/null
 
-note "Pushing repo to origin: ${SOFIN_ORIGIN}"
-${GIT_BIN} push --all "${SOFIN_ORIGIN}" >/dev/null \
-    && ${GIT_BIN} push --tags "${SOFIN_ORIGIN}" >/dev/null
+# note "Pushing repo to origin: ${SOFIN_ORIGIN}"
+# ${GIT_BIN} push --all "${SOFIN_ORIGIN}" >/dev/null \
+#     && ${GIT_BIN} push --tags "${SOFIN_ORIGIN}" >/dev/null
 
 note "Cleaning natives"
 ${RM_BIN} -f bin/s-* src/.*.o
