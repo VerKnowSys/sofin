@@ -23,7 +23,7 @@ case "${SYSTEM_ARCH}" in
         ;;
 esac
 
-_src_list="software.list-${SYSTEM_ARCH}"
+_src_list="software-${SYSTEM_ARCH}.list"
 _lines="$(${GREP_BIN} -c '' "${_src_list}")"
 if [ "0" = "${_lines}" ]; then
     error "Empty lines in software list: $(diste "${_src_list}")!"
