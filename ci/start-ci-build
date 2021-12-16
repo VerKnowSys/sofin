@@ -13,9 +13,22 @@ fi
 permnote "Wiping out all Sofin locks and cached bundle files"
 ${RM_BIN} -f ${HOME}/.sofin/locks/*.lock ${HOME}/.sofin/file-cache/*.zfs* 2>/dev/null
 
-_workers="4"
+case "${SYSTEM_ARCH}" in
+    arm64)
+        _worker="2"
+        ;;
+
+    amd64|x86_64)
+        _worker="4"
+        ;;
+esac
+
 _src_list="software.list-${SYSTEM_ARCH}"
 _lines="$(${GREP_BIN} -c '' "${_src_list}")"
+if [ "0" = "${_lines}" ]; then
+    error "Empty lines in software list: $(diste "${_src_list}")!"
+fi
+
 _split_name="sofin-ci"
 _split_by="$(( (${_lines} / ${_workers}) + 1 ))"
 
