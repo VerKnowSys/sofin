@@ -1,6 +1,5 @@
 Arping
 Asciinema
-Aspell
 Automake
 Awscli
 Bash
@@ -24,12 +23,9 @@ Expect
 Fail2ban
 Ffmpeg
 Fftw
-Filebeat
 Fish
 Flac
 Fontconfig
-Freeipmi
-Gcc
 Gd
 Geoip
 Geoipupdate
@@ -37,7 +33,6 @@ Getopt
 Git-devel
 Gnupg
 Gnutls
-Gperf
 Gperf
 Gpgme
 Graphicsmagick
@@ -71,7 +66,6 @@ Meson
 Mysqltuner
 Nano
 Nasm
-Netdata
 Netdumpd
 Nginx-mainline
 Ninja
@@ -101,7 +95,6 @@ Python39
 Redis
 Rhash
 Rlwrap
-Rocksdb
 Rsync
 Ruby27
 Ruby3
