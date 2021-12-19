@@ -15,7 +15,7 @@ ${RM_BIN} -f ${HOME}/.sofin/locks/*.lock ${HOME}/.sofin/file-cache/*.zfs* 2>/dev
 
 case "${SYSTEM_ARCH}" in
     arm64)
-        _workers="2"
+        _workers="3"
         ;;
 
     amd64|x86_64)
@@ -55,13 +55,12 @@ done
 
 case "${SYSTEM_ARCH}" in
     arm64)
-        _worker="2"
         ${_tmux} send -t 0:0.0 "./build-list ${_split_name}-aa" C-m
         ${_tmux} send -t 0:0.1 "./build-list ${_split_name}-ab" C-m
+        ${_tmux} send -t 0:0.2 "./build-list ${_split_name}-ac" C-m
         ;;
 
     amd64|x86_64)
-        _worker="4"
         ${_tmux} send -t 0:0.0 "./build-list ${_split_name}-aa" C-m
         ${_tmux} send -t 0:0.1 "./build-list ${_split_name}-ab" C-m
         ${_tmux} send -t 0:0.2 "./build-list ${_split_name}-ac" C-m
