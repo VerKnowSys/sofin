@@ -83,11 +83,11 @@ install_sofin () {
         _zsh="${_zsh_maybe}"
     fi
 
-    ${SED_BIN} -i '' -e "s#/usr/bin/env sh#${_zsh}#" \
-        "${SOFIN_ROOT}/bin/s" \
-        "${SOFIN_ROOT}/share/loader" \
-        >/dev/null 2>&1 \
-            && permnote "${SOFIN_BUNDLE_NAME} v$(distn "${SOFIN_VERSION}") was installed successfully!"
+    # ${SED_BIN} -i '' -e "s#/usr/bin/env sh#${_zsh}#" \
+    #     "${SOFIN_ROOT}/bin/s" \
+    #     "${SOFIN_ROOT}/share/loader" \
+    #     >/dev/null 2>&1 \
+    permnote "${SOFIN_BUNDLE_NAME} v$(distn "${SOFIN_VERSION}") was installed successfully!"
 
     commit_origin
 

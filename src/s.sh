@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/usr/bin/env zsh
 # @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
 
 
