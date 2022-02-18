@@ -116,9 +116,14 @@ or
 s installed
 ```
 
-* Export "ruby" binary from "Passenger" bundle:
+* Show outdated bundles
 ```bash
-s export ruby Passenger
+s out
+```
+
+* Export "abc" script from from "Ruby3" bundle:
+```bash
+s export abc Ruby3
 ```
 
 * Uninstall installed software "SomeBundle"?
