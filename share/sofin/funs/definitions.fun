@@ -375,6 +375,31 @@ make_exports () {
 }
 
 
+show_available_versions_of_bundles () {
+    _bundles="${*}"
+    _resource="${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}"
+    debug "REMOTE resource: ${_resource}"
+
+    for _bundle in $(to_iter "${_bundles}"); do
+        permnote "Available versions of binary bundle: $(distd "${_bundle}")"
+
+        if [ -x "${CURL_BIN}" ]; then
+            ${CURL_BIN} -sL "${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}" \
+                | ${SED_BIN} -e 's/<[^>]*>//g' \
+                | ${GREP_BIN} "${_bundle}" \
+                | ${GREP_BIN} -v "${DEFAULT_CHKSUM_EXT}"
+        else
+            ${FETCH_BIN} -qo- "${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}" \
+                | ${SED_BIN} -e 's/<[^>]*>//g' \
+                | ${GREP_BIN} "${_bundle}" \
+                | ${GREP_BIN} -v "${DEFAULT_CHKSUM_EXT}"
+        fi
+    done
+
+    unset _bundle _bundles _resource
+}
+
+
 show_outdated () {
     _raw="${1}"
     load_defaults

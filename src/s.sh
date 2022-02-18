@@ -533,6 +533,11 @@ if [ -n "${SOFIN_COMMAND}" ]; then
             ;;
 
 
+        vs|vers|versions)
+            show_available_versions_of_bundles "${SOFIN_ARGS}"
+            ;;
+
+
         old|rusk)
             fail_on_bg_job "${SOFIN_ARGS}"
             show_outdated
