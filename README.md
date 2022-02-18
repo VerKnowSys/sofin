@@ -135,15 +135,15 @@ s get databases
 ## Usage examples (screenshots are worth more than 1000 words):
 
 
-![pic.1](https://s.verknowsys.com/8061d2ef93643178bbdc8db1f081bf4b.png)
+![pic.1](https://raw.githubusercontent.com/VerKnowSys/sofin/master/imgs/pic1.png?raw=true)
 > pic.1: Example of how to override/ create a software definition. Command was: `s dev elixir && s deploy Elixir` (followed by ctrl-d)
 
 
-![pic.2](https://s.verknowsys.com/6cc74a07ad3c342680a268377cf1c89d.png)
+![pic.2](https://raw.githubusercontent.com/VerKnowSys/sofin/master/imgs/pic2.png?raw=true)
 > pic.2: Example of build + deploy task in progress. Command was: `s d Elixir` (same as: `s deploy Elixir`).
 
 
-![pic.3](https://s.verknowsys.com/87b9c0d46c423619bbba606506ac4497.png)
+![pic.3](https://raw.githubusercontent.com/VerKnowSys/sofin/master/imgs/pic3.png?raw=true)
 > pic.3: Example of software installation from binary bundle (if available). Command was: `s up` and `s i Elixir` (same as: `s install Elixir` or `s get Elixir` or `s pick Elixir` or `s use Elixir`).
 
 
