@@ -135,21 +135,21 @@ s get databases
 ## Usage examples (screenshots are worth more than 1000 words):
 
 
-![pic.1](http://s.verknowsys.com/98d1e3cee9c63bd391522820928a58da.png)
-> pic.1: Example of how to override/ create a software definition. Command was: `s dev node11 && s deploy Node11`
+![pic.1](https://s.verknowsys.com/8061d2ef93643178bbdc8db1f081bf4b.png)
+> pic.1: Example of how to override/ create a software definition. Command was: `s dev elixir && s deploy Elixir` (followed by ctrl-d)
 
 
-![pic.2](http://s.verknowsys.com/92d7ddf5703a3ab789663606cd993303.png)
-> pic.2: Example of build + deploy task in progress. Command was: `s d Node` (same as: `s deploy Node`).
+![pic.2](https://s.verknowsys.com/6cc74a07ad3c342680a268377cf1c89d.png)
+> pic.2: Example of build + deploy task in progress. Command was: `s d Elixir` (same as: `s deploy Elixir`).
 
 
-![pic.3](http://s.verknowsys.com/52ce884956e2373fb3e4be609d97a5b0.png)
-> pic.3: Example of software installation from binary bundle (if available). Command was: `s up` and `s i Node` (same as: `s install Node` or `s get Node` or `s pick Node` or `s use Node`).
+![pic.3](https://s.verknowsys.com/87b9c0d46c423619bbba606506ac4497.png)
+> pic.3: Example of software installation from binary bundle (if available). Command was: `s up` and `s i Elixir` (same as: `s install Elixir` or `s get Elixir` or `s pick Elixir` or `s use Elixir`).
 
 
 
 ## Differences from [POSIX](https://en.wikipedia.org/wiki/POSIX) and [FHS](https://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard) standards:
-* Sofin provides a slightly different approach to shell PATH variable. By default user PATH variable is overriden to include APP-PREFIX/exports instead of default APP-PREFIX/(s)bin. After each successful software installation sofin will populate APP-PREFIX/exports with relative symlinks to existing binaries of bundle. Application exports are defined in "DEF_EXPORTS" variable (available for any definition).
+* Sofin provides a slightly different approach to shell PATH variable. By default user PATH variable is overriden to include DEF_PREFIX/exports instead of default DEF_PREFIX/(s)bin. After each successful software installation sofin will populate DEF_PREFIX/exports with relative symlinks to existing binaries of bundle. Application exports are defined in "DEF_EXPORTS" variable (available for any definition).
 * Sofin suggests empty /usr/local folder. It's caused by POSIX "shared nature" of /usr/local. Sofin was built against this rule to prevent cross requirements between prefixes, and to make sure that each software is easily movable between machines with same architecture.
 * Each application has own "root" directory (Similarly to Mac OS X software in .app folders).
 * Each software bundle includes all dependencies of given software, hence application bundle requires more disk
