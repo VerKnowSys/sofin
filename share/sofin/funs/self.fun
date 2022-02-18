@@ -77,11 +77,11 @@ install_sofin () {
             && install_sofin_files \
                 && printf "%b\n" "${SOFIN_VERSION}" > "${SOFIN_ROOT}/${SOFIN_NAME}${DEFAULT_INST_MARK_EXT}"
 
-    _zsh="${DEFAULT_SHELL_EXPORTS}/zsh"
-    _zsh_maybe="$(which zsh)"
-    if [ -x "${_zsh_maybe}" ]; then
-        _zsh="${_zsh_maybe}"
-    fi
+    # _zsh="${DEFAULT_SHELL_EXPORTS}/zsh"
+    # _zsh_maybe="$(which zsh)"
+    # if [ -x "${_zsh_maybe}" ]; then
+    #     _zsh="${_zsh_maybe}"
+    # fi
 
     # ${SED_BIN} -i '' -e "s#/usr/bin/env sh#${_zsh}#" \
     #     "${SOFIN_ROOT}/bin/s" \
