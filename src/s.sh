@@ -533,7 +533,7 @@ if [ -n "${SOFIN_COMMAND}" ]; then
             ;;
 
 
-        vs|vers|versions)
+        sv|vs|vers|versions)
             show_available_versions_of_bundles "${SOFIN_ARGS}"
             ;;
 
