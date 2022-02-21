@@ -386,12 +386,12 @@ show_available_versions_of_bundles () {
         if [ -x "${CURL_BIN}" ]; then
             ${CURL_BIN} -sL "${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}" \
                 | ${SED_BIN} -e 's/<[^>]*>//g' \
-                | ${GREP_BIN} "${_bundle}" \
+                | ${GREP_BIN} -i "${_bundle}" \
                 | ${GREP_BIN} -v "${DEFAULT_CHKSUM_EXT}"
         else
             ${FETCH_BIN} -qo- "${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}" \
                 | ${SED_BIN} -e 's/<[^>]*>//g' \
-                | ${GREP_BIN} "${_bundle}" \
+                | ${GREP_BIN} -i "${_bundle}" \
                 | ${GREP_BIN} -v "${DEFAULT_CHKSUM_EXT}"
         fi
     done
