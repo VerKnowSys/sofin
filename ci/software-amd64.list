@@ -116,9 +116,9 @@ Php74
 Php81
 Pkgconf
 Poppler
-Postgresql11
-Postgresql11-client
 Postgresql12
+Postgresql12-client
+Postgresql13
 Pptpd
 Protobuf
 Pstree
