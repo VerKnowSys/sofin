@@ -1,5 +1,7 @@
 #!/usr/bin/env zsh
 
+unset DEBUG TRACE
+
 SOFIN_ROOT="${SOFIN_ROOT:-/Software/Sofin}"
 . "${SOFIN_ROOT}/share/loader"
 
