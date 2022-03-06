@@ -120,8 +120,9 @@ update_defs () {
         return 0
     fi
     create_sofin_dirs
-    setup_defs_branch
-    setup_defs_repo
+    BRANCH="${BRANCH:-${DEFAULT_DEFINITIONS_BRANCH}}"
+    REPOSITORY="${REPOSITORY:-${DEFAULT_DEFINITIONS_REPOSITORY}}"
+
     _cwd="$(${PWD_BIN} 2>/dev/null)"
     if [ ! -x "${GIT_BIN}" ]; then
         permnote "Installing initial definition list from tarball to cache dir: $(distn "${CACHE_DIR}")"
@@ -149,8 +150,9 @@ update_defs () {
                 || try "${GIT_BIN} checkout ${_def_cur_branch}" \
                     || warn "Can't checkout branch: $(distw "${_def_cur_branch}")"
 
-            try "${GIT_BIN} pull ${DEFAULT_GIT_PULL_FETCH_OPTS} origin ${_def_cur_branch} 2>> ${LOG}" \
-                && note "Definitions branch: $(distn "${_def_cur_branch}") is now at: $(distn "${_def_head}")" \
+            printf "%b" "${ColorBlue}" >&2
+            ${GIT_BIN} pull ${DEFAULT_GIT_PULL_FETCH_OPTS} origin ${_def_cur_branch} \
+                && permnote "Definitions branch: $(distn "${_def_cur_branch}") is now at: $(distn "${_def_head}")" \
                     && return 0
 
         else # else use default branch
@@ -160,7 +162,8 @@ update_defs () {
                     || try "${GIT_BIN} checkout ${BRANCH}" \
                         || warn "Can't checkout branch: $(distw "${BRANCH}")"
             fi
-            try "${GIT_BIN} pull ${DEFAULT_GIT_PULL_FETCH_OPTS} origin ${BRANCH} 2>> ${LOG}" \
+            printf "%b" "${ColorBlue}" >&2
+            ${GIT_BIN} pull ${DEFAULT_GIT_PULL_FETCH_OPTS} origin ${BRANCH} \
                 && permnote "Definitions branch: $(distn "${BRANCH}") is at: $(distn "${_def_head}")" \
                     && return 0
         fi
@@ -199,7 +202,9 @@ update_defs () {
                     || warn "Can't checkout branch: $(distw "${BRANCH}")"
         fi
         _def_head="HEAD"
-        try "${GIT_BIN} pull --depth 1 --progress origin ${BRANCH} 2>> ${LOG}" \
+
+        printf "%b" "${ColorBlue}" >&2
+        ${GIT_BIN} pull --depth 1 --progress origin ${BRANCH} \
             && _def_head="$(${CAT_BIN} "${CACHE_DIR}${DEFINITIONS_BASE}/${DEFAULT_GIT_DIR_NAME}/refs/heads/${_def_cur_branch}" 2>/dev/null)"
 
         permnote "Repository: $(distn "${REPOSITORY}"), on branch: $(distn "${BRANCH}"). Commit HEAD: $(distn "${_def_head}")."

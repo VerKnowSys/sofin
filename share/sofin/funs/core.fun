@@ -292,17 +292,6 @@ retry () {
 }
 
 
-
-setup_defs_branch () {
-    BRANCH="${BRANCH:-${DEFAULT_DEFINITIONS_BRANCH}}"
-}
-
-
-setup_defs_repo () {
-    REPOSITORY="${REPOSITORY:-${DEFAULT_DEFINITIONS_REPOSITORY}}"
-}
-
-
 initialize () {
     trap_signals
 
