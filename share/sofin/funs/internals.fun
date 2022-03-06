@@ -384,20 +384,22 @@ show_diff () {
         || _sddefname="${_sddefname}${DEFAULT_DEF_EXT}"
     _beauty_defn="$(distn "${_sddefname}")"
 
-    cd "${DEFINITIONS_DIR}"
-    if [ -f "./${_sddefname}" ]; then
-        debug "Checking status for untracked files of: $(distd "${_sddefname}")"
-        ${GIT_BIN} status --short "${_sddefname}" 2>/dev/null | ${EGREP_BIN} '\?\?' >/dev/null 2>&1
-        if [ "${?}" = "0" ]; then # found "??" which means file is untracked..
-            permnote "No diff available for definition: ${_beauty_defn} (currently untracked)"
+    (
+        cd "${DEFINITIONS_DIR}"
+        if [ -f "./${_sddefname}" ]; then
+            debug "Checking status for untracked files of: $(distd "${_sddefname}")"
+            ${GIT_BIN} status --short "${_sddefname}" 2>/dev/null | ${EGREP_BIN} '\?\?' >/dev/null 2>&1
+            if [ "${?}" = "0" ]; then # found "??" which means file is untracked..
+                permnote "No diff available for definition: ${_beauty_defn} (currently untracked)"
+            else
+                permnote "Showing detailed modifications of defintion: ${_beauty_defn}"
+            fi
+            ${GIT_BIN} status -vv --long "${_sddefname}" 2>/dev/null
         else
-            permnote "Showing detailed modifications of defintion: ${_beauty_defn}"
+            permnote "Listing all modified definitions in local cache: ($(distn "${CACHE_DIR}"))"
+            ${GIT_BIN} status --short 2>/dev/null
         fi
-        ${GIT_BIN} status -vv --long "${_sddefname}" 2>/dev/null
-    else
-        permnote "Listing all modified definitions in local cache: ($(distn "${CACHE_DIR}"))"
-        ${GIT_BIN} status --short 2>/dev/null
-    fi
+    )
     unset _sddefname _beauty_defn
 }
 

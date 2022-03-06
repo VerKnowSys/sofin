@@ -153,11 +153,11 @@ build_service_dataset () {
             else
                 debug "Service origin unavailable! Creating new one."
                 try "${MKDIR_BIN} -p '${SERVICES_DIR}/${_ps_elem}'"
-                _pwd="$(${PWD_BIN} 2>/dev/null)"
-                cd "${SERVICES_DIR}"
-                try "${TAR_BIN} --lz4 --create --file ${FILE_CACHE_DIR}${_ps_snap_file} ${_ps_elem}" \
-                    || run "${TAR_BIN} -cJf ${FILE_CACHE_DIR}${_ps_snap_file} ${_ps_elem}"
-                cd "${_pwd}"
+                (
+                    cd "${SERVICES_DIR}"
+                    try "${TAR_BIN} --lz4 --create --file ${FILE_CACHE_DIR}${_ps_snap_file} ${_ps_elem}" \
+                        || run "${TAR_BIN} -cJf ${FILE_CACHE_DIR}${_ps_snap_file} ${_ps_elem}"
+                )
                 _snap_size="$(file_size "${FILE_CACHE_DIR}${_ps_snap_file}")"
                 if [ "${_snap_size}" = "0" ]; then
                     try "${RM_BIN} -f '${FILE_CACHE_DIR}${_ps_snap_file}'"
@@ -545,12 +545,12 @@ create_software_bundle_archive () {
         if [ -f "${SOFTWARE_DIR}/${_inst_ind}" ]; then
             _csbd_dataset="${DEFAULT_ZPOOL}${SOFTWARE_DIR}/${SYSTEM_DATASET}/${_csbname}"
             debug "Creating archive from snapshot: $(distd "${ORIGIN_ZFS_SNAP_NAME}") dataset: $(distd "${_csbd_dataset}") to file: $(distd "${_cddestfile}")"
-            _cdir="$(${PWD_BIN} 2>/dev/null)"
-            cd
+            _current_dir="$(${PWD_BIN} 2>/dev/null)" # change dir globally not only for a subshell
+            cd /
             try "${ZFS_BIN} umount -f '${_csbd_dataset}'"
             run "${ZFS_BIN} send ${ZFS_SEND_OPTS} '${_csbd_dataset}@${ORIGIN_ZFS_SNAP_NAME}' | ${SOFIN_LZ4_BIN} ${DEFAULT_LZ4_OPTS} > ${_cddestfile}" \
                 && debug "ZFS-send-ok: $(distd "${_csbd_dataset}") -> $(distd "${_cddestfile}")"
-            cd "${_cdir}"
+            cd "${_current_dir}"
             run "${ZFS_BIN} mount '${_csbd_dataset}'"
 
             # # set mountpoint for dataset explicitly:
@@ -563,14 +563,14 @@ create_software_bundle_archive () {
         fi
     else
         debug "No ZFS-binbuilds feature. Falling back to tarballs.."
-        _cdir="$(${PWD_BIN} 2>/dev/null)"
-        cd "${SOFTWARE_DIR}"
-        try "${TAR_BIN} --lz4 --create --file ${_cddestfile} ${_csbname}" \
-            || try "${TAR_BIN} -cJf ${_cddestfile} ${_csbname}" \
-                || error "Failed to create archive file: $(diste "${_cddestfile}")"
-        cd "${_cdir}"
+        (
+            cd "${SOFTWARE_DIR}"
+            try "${TAR_BIN} --lz4 --create --file ${_cddestfile} ${_csbname}" \
+                || try "${TAR_BIN} -cJf ${_cddestfile} ${_csbname}" \
+                    || error "Failed to create archive file: $(diste "${_cddestfile}")"
+        )
     fi
-    unset _csbname _csbelem _cddestfile _cdir _csversion _csbd_dataset
+    unset _csbname _csbelem _cddestfile _current_dir _csversion _csbd_dataset
 }
 
 

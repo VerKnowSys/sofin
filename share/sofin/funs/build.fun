@@ -496,348 +496,347 @@ process_flat () {
             try after_install_callback
             try after_install_snapshot
         else
-            _cwd="$(${PWD_BIN} 2>/dev/null)"
-            if [ -n "${BUILD_DIR}" ] \
-            && [ -n "${BUILD_NAMESUM}" ]; then
-                if [ -n "${CAP_SYS_BUILDHOST}" ]; then
-                    dump_debug_info
-                    dump_compiler_setup
-                fi
-
-                cd "${BUILD_DIR}"
-                if [ -z "${DEF_GIT_CHECKOUT}" ]; then # Standard "fetch source archive" method
-                    _base="${DEF_SOURCE_PATH##*/}"
-                    _dest_file="${FILE_CACHE_DIR}${_base}"
-                    # TODO: implement auto picking fetch method based on DEF_SOURCE_PATH contents
-                    if [ ! -e "${_dest_file}" ]; then
-                        retry "${FETCH_BIN} -o ${_dest_file} ${FETCH_OPTS} '${DEF_SOURCE_PATH}'" \
-                            || error "Failed to fetch source: $(diste "${DEF_SOURCE_PATH}")"
-                        debug "Source fetched: $(distd "${_base}")"
+            (
+                if [ -n "${BUILD_DIR}" ] \
+                && [ -n "${BUILD_NAMESUM}" ]; then
+                    if [ -n "${CAP_SYS_BUILDHOST}" ]; then
+                        dump_debug_info
+                        dump_compiler_setup
                     fi
-                    if [ -z "${DEF_SHA}" ]; then
-                        error "Missing SHA sum for source: $(diste "${_dest_file}")!"
-                    else
-                        _a_file_checksum="$(file_checksum "${_dest_file}")"
-                        if [ "${_a_file_checksum}" = "${DEF_SHA}" ]; then
-                            debug "$(distd "${SUCCESS_CHAR}" "${ColorGreen}"): $(distd "${_base}"): checksum matches: $(distd "${DEF_SHA}")"
+
+                    cd "${BUILD_DIR}"
+                    if [ -z "${DEF_GIT_CHECKOUT}" ]; then # Standard "fetch source archive" method
+                        _base="${DEF_SOURCE_PATH##*/}"
+                        _dest_file="${FILE_CACHE_DIR}${_base}"
+                        # TODO: implement auto picking fetch method based on DEF_SOURCE_PATH contents
+                        if [ ! -e "${_dest_file}" ]; then
+                            retry "${FETCH_BIN} -o ${_dest_file} ${FETCH_OPTS} '${DEF_SOURCE_PATH}'" \
+                                || error "Failed to fetch source: $(diste "${DEF_SOURCE_PATH}")"
+                            debug "Source fetched: $(distd "${_base}")"
+                        fi
+                        if [ -z "${DEF_SHA}" ]; then
+                            error "Missing SHA sum for source: $(diste "${_dest_file}")!"
                         else
-                            try "${RM_BIN} -f ${_dest_file}" \
-                                && debug "Removed corrupted partial file: $(distd "${_bname}")"
-                            error "Source tarball checksum mismatch: '$(diste "${_a_file_checksum}")' vs '$(diste "${DEF_SHA}")' for prefix: $(diste "${_prefix} == ${PREFIX}")"
-                        fi
-                        unset _bname _a_file_checksum
-                    fi
-
-                    _possible_old_build_dir="$(${TAR_BIN} -t --list --file "${_dest_file}" 2>/dev/null | ${HEAD_BIN} -n1 2>/dev/null | ${AWK_BIN} '{print $9;}' 2>/dev/null)"
-                    _pbd_basename="${_possible_old_build_dir##*/}"
-                    if [ "${_pbd_basename}" != "${_possible_old_build_dir}" ]; then # more than one path element?
-                        _possible_old_build_dir="${_possible_old_build_dir%%/${_pbd_basename}}"
-                    fi
-                    if [ -d "${BUILD_DIR}/${_possible_old_build_dir%/}" ]; then
-                        try "${RM_BIN} -rf '${BUILD_DIR}/${_possible_old_build_dir%/}'" \
-                            && debug "Previous dependency build dir was removed to avoid conflicts: $(distd "${BUILD_DIR}/${_possible_old_build_dir%/}")"
-                    fi
-
-                    try "${TAR_BIN} -xf ${_dest_file} --directory ${BUILD_DIR}" \
-                        || try "${TAR_BIN} -xjf ${_dest_file} --directory ${BUILD_DIR}" \
-                            || run "${TAR_BIN} -xJf ${_dest_file} --directory ${BUILD_DIR}"
-
-                    debug "Unpacked source for: $(distd "${DEF_NAME}${DEF_SUFFIX}"), version: $(distd "${DEF_VERSION}") into build-dir: $(distd "${BUILD_DIR}")"
-                else
-                    # git method:
-                    # .cache/git-cache => git bare repos
-                    # NOTE: if DEF_GIT_CHECKOUT is unset, use DEF_VERSION:
-                    clone_or_fetch_git_bare_repo "${DEF_SOURCE_PATH}" "${DEF_NAME}${DEF_SUFFIX}-bare" "${DEF_GIT_CHECKOUT:-${DEF_VERSION}}" "${BUILD_DIR}"
-                fi
-
-                unset _fd
-                _prm_nolib="$(printf "%b\n" "${_definition_name}" | ${SED_BIN} 's/lib//' 2>/dev/null)"
-                _prm_no_undrlne_and_minus="$(printf "%b\n" "${_definition_name}" | ${SED_BIN} 's/[-_].*$//' 2>/dev/null)"
-                # debug "Requirement: ${_definition_name} short: ${_prm_nolib}, nafter-: ${_prm_no_undrlne_and_minus}, DEF_NAME: ${DEF_NAME}, BUILD_DIR: ${BUILD_DIR}"
-                # NOTE: patterns sorted by safety
-                for _pati in    "*${_definition_name}*${DEF_VERSION}" \
-                                "*${_prm_no_undrlne_and_minus}*${DEF_VERSION}" \
-                                "*${_prm_nolib}*${DEF_VERSION}" \
-                                "*${DEF_NAME}*${DEF_VERSION}" \
-                                "*${_definition_name}*" \
-                                "*${_prm_no_undrlne_and_minus}*" \
-                                "*${_prm_nolib}*" \
-                                "*${DEF_NAME}*";
-                do
-                    _fd="$(${FIND_BIN} "${BUILD_DIR}" -maxdepth 1 -mindepth 1 -type d -iname "${_pati}" 2>/dev/null | ${HEAD_BIN} -n1 2>/dev/null)"
-                    if [ -n "${_fd}" ]; then
-                        debug "Found build dir: $(distd "${_fd}"), for definition: $(distd "${DEF_NAME}")"
-                        break
-                    fi
-                done
-                if [ -z "${_fd}" ]; then
-                    # NOTE: Handle one more case - inherited definitions, and there might be several of these..
-                    # TODO: add support for recursive check through inherited definitions
-                    # XXX: hardcoded name of function inherit() - which might be used in any definition file:
-                    _inherited="$(${GREP_BIN} 'inherit' "${_req_definition}" 2>/dev/null | ${SED_BIN} 's/inherit[ ]*//g' 2>/dev/null)"
-                    if [ -z "${_inherited}" ]; then
-                        error "No source dir found for definition: $(diste "${_definition_name}")?"
-                    else
-                        for _inh in $(to_iter "${_inherited}"); do
-                            debug "Trying inherited value: $(distd "${_inh}")"
-                            _fd="$(${FIND_BIN} "${BUILD_DIR}" -maxdepth 1 -mindepth 1 -type d -iname "*${_inh}*${DEF_VERSION}*" 2>/dev/null | ${HEAD_BIN} -n1 2>/dev/null)"
-                            if [ -n "${_fd}" ]; then
-                                debug "Found inherited build dir: $(distd "${_fd}"), for definition: $(distd "${DEF_NAME}")"
-                                break
-                            fi
-                        done
-                        # If nothing helps..
-                        if [ -z "${_fd}" ]; then
-                            error "No inherited source dir found for definition: $(diste "${_definition_name}")?"
-                        fi
-                    fi
-                fi
-                cd "${_fd}"
-                _pwd="${_fd}"
-
-                # Handle DEF_BUILD_DIR_SUFFIX here
-                if [ -n "${DEF_BUILD_DIR_SUFFIX}" ]; then
-                    ${MKDIR_BIN} -p "${_fd}/${DEF_BUILD_DIR_SUFFIX}"
-                    _pwd="${_fd}/${DEF_BUILD_DIR_SUFFIX}"
-                fi
-
-                cd "${_pwd}"
-                try after_unpack_callback
-                cd "${_pwd}"
-                try after_unpack_snapshot
-
-                cd "${_pwd}"
-                apply_definition_patches "${DEF_NAME}${DEF_SUFFIX}"
-
-                cd "${_pwd}"
-                try after_patch_callback
-                cd "${_pwd}"
-                try after_patch_snapshot
-                cd "${_pwd}"
-
-                # configuration log:
-                _configure_log="config.log"
-                _cmake_out_log="CMakeFiles/CMakeOutput.log"
-                _cmake_error_log="CMakeFiles/CMakeError.log"
-                _configure_options_log="${LOGS_DIR}${SOFIN_NAME}-${DEF_NAME}${DEF_SUFFIX}.config"
-                _configuration_result="${_configure_options_log}.result"
-                _cmake_configuration_result="${LOGS_DIR}${SOFIN_NAME}-${DEF_NAME}${DEF_SUFFIX}.cmake.result.log"
-
-                case "${DEF_CONFIGURE_METHOD}" in
-
-                    ignore)
-                        debug "Build type: $(distd "ignore")"
-                        note "   ${NOTE_CHAR} Configuration skipped for definition: $(distn "${_definition_name}")"
-                        ;;
-
-                    no-conf)
-                        debug "Build type: $(distd "no-conf")"
-                        note "   ${NOTE_CHAR} No configuration for definition: $(distn "${_definition_name}")"
-                        DEF_MAKE_METHOD="${DEF_MAKE_METHOD} PREFIX=${_prefix} CFLAGS='${CFLAGS}' CXXFLAGS='${CXXFLAGS}' LDFLAGS='${LDFLAGS}'"
-                        DEF_INSTALL_METHOD="${DEF_INSTALL_METHOD} PREFIX=${_prefix} CFLAGS='${CFLAGS}' CXXFLAGS='${CXXFLAGS}' LDFLAGS='${LDFLAGS}'"
-                        ;;
-
-                    binary)
-                        debug "Build type: $(distd "binary")"
-                        note "   ${NOTE_CHAR} Prebuilt definition of: $(distn "${_definition_name}")"
-                        DEF_MAKE_METHOD="true"
-                        DEF_INSTALL_METHOD="true"
-                        ;;
-
-                    posix)
-                        debug "Build type: $(distd "posix")"
-                        dump_software_build_configuration_options "${_configure_options_log}"
-
-                        note "   ${NOTE_CHAR} Configuring: $(distn "${_definition_name}"), version: $(distn "${DEF_VERSION}")"
-                        try "./configure -prefix ${_prefix} -cc '${CC_NAME} ${CFLAGS}' -libs '-L${PREFIX}/lib ${LDFLAGS}' -mandir ${PREFIX}/share/man -libdir ${PREFIX}/lib -aspp '${CC_NAME} ${CFLAGS} -c' ${DEF_CONFIGURE_ARGS} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
-                            || try "./configure -prefix ${_prefix} -cc '${CC_NAME} ${CFLAGS}' -libs '-L${PREFIX}/lib ${LDFLAGS}' -libdir ${PREFIX}/lib -aspp '${CC_NAME} ${CFLAGS} -c' ${DEF_CONFIGURE_ARGS} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
-                                || run "./configure -prefix ${_prefix} -cc '${CC_NAME} ${CFLAGS}' -libs '-L${PREFIX}/lib ${LDFLAGS}' -aspp '${CC_NAME} ${CFLAGS} -c' ${DEF_CONFIGURE_ARGS}"
-
-                        try "${INSTALL_BIN} '${_configure_log}' '${_configuration_result}'"
-                        ;;
-
-                    meson) # new player each year ;)
-                        debug "Build type: $(distd "meson")"
-                        dump_software_build_configuration_options "${_configure_options_log}"
-                        note "   ${NOTE_CHAR} Configuring: $(distn "${_definition_name}"), version: $(distn "${DEF_VERSION}")"
-
-                        try "${DEF_CONFIGURE_METHOD} . build -Dprefix=${PREFIX} -Dinstall_rpath=${PREFIX}/lib --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var ${DEF_CONFIGURE_ARGS} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
-                            || try "${DEF_CONFIGURE_METHOD} . build -Dprefix=${PREFIX} -Dinstall_rpath=${PREFIX}/lib --sysconfdir=${SERVICE_DIR}/etc ${DEF_CONFIGURE_ARGS} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
-                                || run "${DEF_CONFIGURE_METHOD} . build -Dprefix=${PREFIX} -Dinstall_rpath=${PREFIX}/lib ${DEF_CONFIGURE_ARGS}"
-
-                        DEF_MAKE_METHOD="ninja -C build -j${CPUS}"
-                        DEF_INSTALL_METHOD="ninja -C build install"
-                        ;;
-
-                    cmake)
-                        debug "Build type: $(distd "cmake")"
-                        note "   ${NOTE_CHAR} Configuring: $(distn "${_definition_name}"), version: $(distn "${DEF_VERSION}")"
-
-                        try "${MKDIR_BIN} -p build"
-                        _pwd="${_pwd}/build"
-                        cd "${_pwd}"
-                        _cmake_cmdline="${DEF_CONFIGURE_METHOD} ../ -LH -DCMAKE_INSTALL_RPATH=\"${_prefix}/lib;${_prefix}/libexec\" -DCMAKE_INSTALL_PREFIX=${_prefix} -DCMAKE_BUILD_TYPE=Release -DSYSCONFDIR=${SERVICE_DIR}/etc -DMAN_INSTALLDIR=${_prefix}/share/man -DDOCDIR=${_prefix}/share/doc -DJOB_POOL_COMPILE=${CPUS} -DJOB_POOL_LINK=${CPUS} -DCMAKE_C_FLAGS=\"${CFLAGS}\" -DCMAKE_CXX_FLAGS=\"${CXXFLAGS}\" ${DEF_CONFIGURE_ARGS}"
-
-                        # Makefile case: Use what's found in definition or set default calls:
-                        run "${RM_BIN} -f CMakeCache.txt; ${_cmake_cmdline} -G'Unix Makefiles' 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}"
-                        DEF_MAKE_METHOD="${DEF_MAKE_METHOD:-"make -s -j${CPUS}"}"
-                        DEF_INSTALL_METHOD="${DEF_INSTALL_METHOD:-"make -s install"}"
-                        unset _cmake_cmdline
-                        ;;
-
-                    *)
-                        debug "Build type: $(distd "autotools") (default)"
-                        unset _pic_optional
-                        if [ "${SYSTEM_NAME}" != "Darwin" ]; then
-                            _pic_optional="--with-pic"
-                        fi
-                        _addon="CFLAGS='${CFLAGS}' CXXFLAGS='${CXXFLAGS}' LDFLAGS='${LDFLAGS}'"
-
-                        dump_software_build_configuration_options "${_configure_options_log}"
-                        note "   ${NOTE_CHAR} Configuring: $(distn "${_definition_name}"), version: $(distn "${DEF_VERSION}")"
-
-                        if [ "${SYSTEM_NAME}" = "Linux" ]; then
-                            # NOTE: No /Services feature implemented for Linux.
-                            printf "%b\n" "${DEF_CONFIGURE_METHOD}" | ${GREP_BIN} -F 'configure' >/dev/null 2>&1
-                            if [ "${?}" = "0" ]; then
-                                # NOTE: by defaultautoconf configure accepts influencing variables as configure script params
-                                try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} ${_pic_optional} ${_addon} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
-                                    || try "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} ${_pic_optional} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
-                                        || try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} ${_addon} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
-                                            || run "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix}"
+                            _a_file_checksum="$(file_checksum "${_dest_file}")"
+                            if [ "${_a_file_checksum}" = "${DEF_SHA}" ]; then
+                                debug "$(distd "${SUCCESS_CHAR}" "${ColorGreen}"): $(distd "${_base}"): checksum matches: $(distd "${DEF_SHA}")"
                             else
-                                try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} ${_addon} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
-                                    || try "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
-                                        || try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} ${_addon} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
-                                            || run "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS}" # Trust definition
+                                try "${RM_BIN} -f ${_dest_file}" \
+                                    && debug "Removed corrupted partial file: $(distd "${_bname}")"
+                                error "Source tarball checksum mismatch: '$(diste "${_a_file_checksum}")' vs '$(diste "${DEF_SHA}")' for prefix: $(diste "${_prefix} == ${PREFIX}")"
                             fi
-                        else
-                            # do a simple check for "configure" in DEF_CONFIGURE_METHOD definition
-                            # this way we can tell if we want to put configure options as params
-                            printf "%b\n" "${DEF_CONFIGURE_METHOD}" | ${GREP_BIN} -F 'configure' >/dev/null 2>&1
-                            if [ "${?}" = "0" ]; then
-                                # TODO: add --docdir=${_prefix}/docs
-                                # NOTE: By default try to configure software with these options:
-                                #   --sysconfdir=${SERVICE_DIR}/etc
-                                #   --localstatedir=${SERVICE_DIR}/var
-                                #   --runstatedir=${SERVICE_DIR}/run
-                                #   --with-pic
-                                try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var ${_pic_optional} ${_addon} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
-                                    || try "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var ${_pic_optional} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
-                                        || try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var ${_addon} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
-                                            || try "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
-                                                || try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc ${_pic_optional} ${_addon} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
-                                                    || try "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc ${_pic_optional} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
-                                                        || try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc ${_addon} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
-                                                            || try "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
-                                                                || try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} ${_pic_optional} ${_addon} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
-                                                                    || try "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} ${_pic_optional} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
-                                                                        || try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} ${_addon} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
-                                                                            || run "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix}" # last two - only as a fallback
-
-                            else # fallback again:
-                                # NOTE: First - try to specify GNU prefix,
-                                # then trust prefix given in software definition.
-                                try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} ${_addon} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
-                                    || try "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
-                                        || try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} ${_addon} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
-                                            || run "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS}"
-                            fi
+                            unset _bname _a_file_checksum
                         fi
-                        ;;
-                esac
 
-                debug "Gathering configuration output logs${CHAR_DOTS}"
-                try "test -f '${_configure_log}' && ${INSTALL_BIN} '${_configure_log}' '${_configuration_result}'" \
-                    || try "test -f '${_cmake_out_log}' && ${INSTALL_BIN} '${_cmake_out_log}' '${_cmake_configuration_result}.stdout'; test -f '${_cmake_error_log}' && ${INSTALL_BIN} '${_cmake_error_log}' '${_cmake_configuration_result}.stderr'" \
-                            || debug "No configuration results!"
+                        _possible_old_build_dir="$(${TAR_BIN} -t --list --file "${_dest_file}" 2>/dev/null | ${HEAD_BIN} -n1 2>/dev/null | ${AWK_BIN} '{print $9;}' 2>/dev/null)"
+                        _pbd_basename="${_possible_old_build_dir##*/}"
+                        if [ "${_pbd_basename}" != "${_possible_old_build_dir}" ]; then # more than one path element?
+                            _possible_old_build_dir="${_possible_old_build_dir%%/${_pbd_basename}}"
+                        fi
+                        if [ -d "${BUILD_DIR}/${_possible_old_build_dir%/}" ]; then
+                            try "${RM_BIN} -rf '${BUILD_DIR}/${_possible_old_build_dir%/}'" \
+                                && debug "Previous dependency build dir was removed to avoid conflicts: $(distd "${BUILD_DIR}/${_possible_old_build_dir%/}")"
+                        fi
 
-                cd "${_pwd}"
-                try after_configure_callback
-                cd "${_pwd}"
-                try after_configure_snapshot
-            else
-                error "These values cannot be empty: BUILD_DIR, BUILD_NAMESUM"
-            fi
+                        try "${TAR_BIN} -xf ${_dest_file} --directory ${BUILD_DIR}" \
+                            || try "${TAR_BIN} -xjf ${_dest_file} --directory ${BUILD_DIR}" \
+                                || run "${TAR_BIN} -xJf ${_dest_file} --directory ${BUILD_DIR}"
 
-            # and common part between normal and continue modes:
-            cd "${_pwd}"
-            note "   ${NOTE_CHAR} Building requirement: $(distn "${_definition_name}"), version: $(distn "${DEF_VERSION}")"
-            run "${DEF_MAKE_METHOD}"
+                        debug "Unpacked source for: $(distd "${DEF_NAME}${DEF_SUFFIX}"), version: $(distd "${DEF_VERSION}") into build-dir: $(distd "${BUILD_DIR}")"
+                    else
+                        # git method:
+                        # .cache/git-cache => git bare repos
+                        # NOTE: if DEF_GIT_CHECKOUT is unset, use DEF_VERSION:
+                        clone_or_fetch_git_bare_repo "${DEF_SOURCE_PATH}" "${DEF_NAME}${DEF_SUFFIX}-bare" "${DEF_GIT_CHECKOUT:-${DEF_VERSION}}" "${BUILD_DIR}"
+                    fi
 
-            cd "${_pwd}"
-            try after_make_callback
-            cd "${_pwd}"
-            try after_make_snapshot
-
-
-            # OTE: after successful make, invoke "make test" by default:
-            unset _this_test_skipped
-            if [ -n "${DEF_SKIPPED_DEFINITION_TEST}" ]; then
-                debug "Defined DEF_SKIPPED_DEFINITION_TEST: $(distd "${DEF_SKIPPED_DEFINITION_TEST}")"
-
-                printf "%b\n" " ${DEF_SKIPPED_DEFINITION_TEST} " | ${EGREP_BIN} -F " ${_definition_name} " >/dev/null 2>&1 \
-                    && note "   ${NOTE_CHAR} Skipped tests for definition of: $(distn "${_definition_name}")" \
-                        && _this_test_skipped=1
-            fi
-
-            if [ -z "${USE_NO_TEST}" ] \
-            && [ -z "${_this_test_skipped}" ]; then
-                note "   ${NOTE_CHAR} Testing requirement: $(distn "${_definition_name}"), version: $(distn "${DEF_VERSION}")"
-                cd "${_pwd}"
-
-                # NOTE: mandatory on production machines:
-                test_and_rate_def "${_definition_name}" "${DEF_TEST_METHOD}"
-            else
-                note "   ${WARN_CHAR} Tests for definition: $(distn "${_definition_name}") skipped on demand"
-            fi
-            cd "${_pwd}"
-            try after_test_callback
-            cd "${_pwd}"
-            try after_test_snapshot
-
-            if [ -n "${_prefix}" ]; then
-                _whole_list=""
-                debug "Cleaning PREFIX man dir from previous dependencies, we want to install man pages that belong to LAST requirement which is app bundle itself"
-                for _stuff_of_other_defs in $(to_iter "share/man" "share/info" "share/doc" "share/docs" "docs" "share/html"); do # "man"
-                    if [ -d "${_prefix}/${_stuff_of_other_defs}" ]; then
-                        if [ -z "${_whole_list}" ]; then
-                            _whole_list="'${_prefix}/${_stuff_of_other_defs}'"
+                    unset _fd
+                    _prm_nolib="$(printf "%b\n" "${_definition_name}" | ${SED_BIN} 's/lib//' 2>/dev/null)"
+                    _prm_no_undrlne_and_minus="$(printf "%b\n" "${_definition_name}" | ${SED_BIN} 's/[-_].*$//' 2>/dev/null)"
+                    # debug "Requirement: ${_definition_name} short: ${_prm_nolib}, nafter-: ${_prm_no_undrlne_and_minus}, DEF_NAME: ${DEF_NAME}, BUILD_DIR: ${BUILD_DIR}"
+                    # NOTE: patterns sorted by safety
+                    for _pati in    "*${_definition_name}*${DEF_VERSION}" \
+                                    "*${_prm_no_undrlne_and_minus}*${DEF_VERSION}" \
+                                    "*${_prm_nolib}*${DEF_VERSION}" \
+                                    "*${DEF_NAME}*${DEF_VERSION}" \
+                                    "*${_definition_name}*" \
+                                    "*${_prm_no_undrlne_and_minus}*" \
+                                    "*${_prm_nolib}*" \
+                                    "*${DEF_NAME}*";
+                    do
+                        _fd="$(${FIND_BIN} "${BUILD_DIR}" -maxdepth 1 -mindepth 1 -type d -iname "${_pati}" 2>/dev/null | ${HEAD_BIN} -n1 2>/dev/null)"
+                        if [ -n "${_fd}" ]; then
+                            debug "Found build dir: $(distd "${_fd}"), for definition: $(distd "${DEF_NAME}")"
+                            break
+                        fi
+                    done
+                    if [ -z "${_fd}" ]; then
+                        # NOTE: Handle one more case - inherited definitions, and there might be several of these..
+                        # TODO: add support for recursive check through inherited definitions
+                        # XXX: hardcoded name of function inherit() - which might be used in any definition file:
+                        _inherited="$(${GREP_BIN} 'inherit' "${_req_definition}" 2>/dev/null | ${SED_BIN} 's/inherit[ ]*//g' 2>/dev/null)"
+                        if [ -z "${_inherited}" ]; then
+                            error "No source dir found for definition: $(diste "${_definition_name}")?"
                         else
-                            _whole_list="${_whole_list} ${_prefix}/${_stuff_of_other_defs}"
+                            for _inh in $(to_iter "${_inherited}"); do
+                                debug "Trying inherited value: $(distd "${_inh}")"
+                                _fd="$(${FIND_BIN} "${BUILD_DIR}" -maxdepth 1 -mindepth 1 -type d -iname "*${_inh}*${DEF_VERSION}*" 2>/dev/null | ${HEAD_BIN} -n1 2>/dev/null)"
+                                if [ -n "${_fd}" ]; then
+                                    debug "Found inherited build dir: $(distd "${_fd}"), for definition: $(distd "${DEF_NAME}")"
+                                    break
+                                fi
+                            done
+                            # If nothing helps..
+                            if [ -z "${_fd}" ]; then
+                                error "No inherited source dir found for definition: $(diste "${_definition_name}")?"
+                            fi
                         fi
                     fi
-                done
+                    cd "${_fd}"
+                    _pwd="${_fd}"
 
-                if [ -n "${_whole_list}" ]; then
-                    debug "Prepared list of unwanted files: $(distd "${_whole_list}"), from bundle with software PREFIX: $(distd "${_prefix}")."
-                    try "${RM_BIN} -fr ${_whole_list}"  \
-                        && debug "Unwanted files were destroyed."
+                    # Handle DEF_BUILD_DIR_SUFFIX here
+                    if [ -n "${DEF_BUILD_DIR_SUFFIX}" ]; then
+                        ${MKDIR_BIN} -p "${_fd}/${DEF_BUILD_DIR_SUFFIX}"
+                        _pwd="${_fd}/${DEF_BUILD_DIR_SUFFIX}"
+                    fi
+
+                    cd "${_pwd}"
+                    try after_unpack_callback
+                    cd "${_pwd}"
+                    try after_unpack_snapshot
+
+                    cd "${_pwd}"
+                    apply_definition_patches "${DEF_NAME}${DEF_SUFFIX}"
+
+                    cd "${_pwd}"
+                    try after_patch_callback
+                    cd "${_pwd}"
+                    try after_patch_snapshot
+                    cd "${_pwd}"
+
+                    # configuration log:
+                    _configure_log="config.log"
+                    _cmake_out_log="CMakeFiles/CMakeOutput.log"
+                    _cmake_error_log="CMakeFiles/CMakeError.log"
+                    _configure_options_log="${LOGS_DIR}${SOFIN_NAME}-${DEF_NAME}${DEF_SUFFIX}.config"
+                    _configuration_result="${_configure_options_log}.result"
+                    _cmake_configuration_result="${LOGS_DIR}${SOFIN_NAME}-${DEF_NAME}${DEF_SUFFIX}.cmake.result.log"
+
+                    case "${DEF_CONFIGURE_METHOD}" in
+
+                        ignore)
+                            debug "Build type: $(distd "ignore")"
+                            note "   ${NOTE_CHAR} Configuration skipped for definition: $(distn "${_definition_name}")"
+                            ;;
+
+                        no-conf)
+                            debug "Build type: $(distd "no-conf")"
+                            note "   ${NOTE_CHAR} No configuration for definition: $(distn "${_definition_name}")"
+                            DEF_MAKE_METHOD="${DEF_MAKE_METHOD} PREFIX=${_prefix} CFLAGS='${CFLAGS}' CXXFLAGS='${CXXFLAGS}' LDFLAGS='${LDFLAGS}'"
+                            DEF_INSTALL_METHOD="${DEF_INSTALL_METHOD} PREFIX=${_prefix} CFLAGS='${CFLAGS}' CXXFLAGS='${CXXFLAGS}' LDFLAGS='${LDFLAGS}'"
+                            ;;
+
+                        binary)
+                            debug "Build type: $(distd "binary")"
+                            note "   ${NOTE_CHAR} Prebuilt definition of: $(distn "${_definition_name}")"
+                            DEF_MAKE_METHOD="true"
+                            DEF_INSTALL_METHOD="true"
+                            ;;
+
+                        posix)
+                            debug "Build type: $(distd "posix")"
+                            dump_software_build_configuration_options "${_configure_options_log}"
+
+                            note "   ${NOTE_CHAR} Configuring: $(distn "${_definition_name}"), version: $(distn "${DEF_VERSION}")"
+                            try "./configure -prefix ${_prefix} -cc '${CC_NAME} ${CFLAGS}' -libs '-L${PREFIX}/lib ${LDFLAGS}' -mandir ${PREFIX}/share/man -libdir ${PREFIX}/lib -aspp '${CC_NAME} ${CFLAGS} -c' ${DEF_CONFIGURE_ARGS} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
+                                || try "./configure -prefix ${_prefix} -cc '${CC_NAME} ${CFLAGS}' -libs '-L${PREFIX}/lib ${LDFLAGS}' -libdir ${PREFIX}/lib -aspp '${CC_NAME} ${CFLAGS} -c' ${DEF_CONFIGURE_ARGS} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
+                                    || run "./configure -prefix ${_prefix} -cc '${CC_NAME} ${CFLAGS}' -libs '-L${PREFIX}/lib ${LDFLAGS}' -aspp '${CC_NAME} ${CFLAGS} -c' ${DEF_CONFIGURE_ARGS}"
+
+                            try "${INSTALL_BIN} '${_configure_log}' '${_configuration_result}'"
+                            ;;
+
+                        meson) # new player each year ;)
+                            debug "Build type: $(distd "meson")"
+                            dump_software_build_configuration_options "${_configure_options_log}"
+                            note "   ${NOTE_CHAR} Configuring: $(distn "${_definition_name}"), version: $(distn "${DEF_VERSION}")"
+
+                            try "${DEF_CONFIGURE_METHOD} . build -Dprefix=${PREFIX} -Dinstall_rpath=${PREFIX}/lib --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var ${DEF_CONFIGURE_ARGS} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
+                                || try "${DEF_CONFIGURE_METHOD} . build -Dprefix=${PREFIX} -Dinstall_rpath=${PREFIX}/lib --sysconfdir=${SERVICE_DIR}/etc ${DEF_CONFIGURE_ARGS} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
+                                    || run "${DEF_CONFIGURE_METHOD} . build -Dprefix=${PREFIX} -Dinstall_rpath=${PREFIX}/lib ${DEF_CONFIGURE_ARGS}"
+
+                            DEF_MAKE_METHOD="ninja -C build -j${CPUS}"
+                            DEF_INSTALL_METHOD="ninja -C build install"
+                            ;;
+
+                        cmake)
+                            debug "Build type: $(distd "cmake")"
+                            note "   ${NOTE_CHAR} Configuring: $(distn "${_definition_name}"), version: $(distn "${DEF_VERSION}")"
+
+                            try "${MKDIR_BIN} -p build"
+                            _pwd="${_pwd}/build"
+                            cd "${_pwd}"
+                            _cmake_cmdline="${DEF_CONFIGURE_METHOD} ../ -LH -DCMAKE_INSTALL_RPATH=\"${_prefix}/lib;${_prefix}/libexec\" -DCMAKE_INSTALL_PREFIX=${_prefix} -DCMAKE_BUILD_TYPE=Release -DSYSCONFDIR=${SERVICE_DIR}/etc -DMAN_INSTALLDIR=${_prefix}/share/man -DDOCDIR=${_prefix}/share/doc -DJOB_POOL_COMPILE=${CPUS} -DJOB_POOL_LINK=${CPUS} -DCMAKE_C_FLAGS=\"${CFLAGS}\" -DCMAKE_CXX_FLAGS=\"${CXXFLAGS}\" ${DEF_CONFIGURE_ARGS}"
+
+                            # Makefile case: Use what's found in definition or set default calls:
+                            run "${RM_BIN} -f CMakeCache.txt; ${_cmake_cmdline} -G'Unix Makefiles' 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}"
+                            DEF_MAKE_METHOD="${DEF_MAKE_METHOD:-"make -s -j${CPUS}"}"
+                            DEF_INSTALL_METHOD="${DEF_INSTALL_METHOD:-"make -s install"}"
+                            unset _cmake_cmdline
+                            ;;
+
+                        *)
+                            debug "Build type: $(distd "autotools") (default)"
+                            unset _pic_optional
+                            if [ "${SYSTEM_NAME}" != "Darwin" ]; then
+                                _pic_optional="--with-pic"
+                            fi
+                            _addon="CFLAGS='${CFLAGS}' CXXFLAGS='${CXXFLAGS}' LDFLAGS='${LDFLAGS}'"
+
+                            dump_software_build_configuration_options "${_configure_options_log}"
+                            note "   ${NOTE_CHAR} Configuring: $(distn "${_definition_name}"), version: $(distn "${DEF_VERSION}")"
+
+                            if [ "${SYSTEM_NAME}" = "Linux" ]; then
+                                # NOTE: No /Services feature implemented for Linux.
+                                printf "%b\n" "${DEF_CONFIGURE_METHOD}" | ${GREP_BIN} -F 'configure' >/dev/null 2>&1
+                                if [ "${?}" = "0" ]; then
+                                    # NOTE: by defaultautoconf configure accepts influencing variables as configure script params
+                                    try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} ${_pic_optional} ${_addon} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
+                                        || try "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} ${_pic_optional} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
+                                            || try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} ${_addon} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
+                                                || run "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix}"
+                                else
+                                    try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} ${_addon} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
+                                        || try "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
+                                            || try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} ${_addon} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
+                                                || run "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS}" # Trust definition
+                                fi
+                            else
+                                # do a simple check for "configure" in DEF_CONFIGURE_METHOD definition
+                                # this way we can tell if we want to put configure options as params
+                                printf "%b\n" "${DEF_CONFIGURE_METHOD}" | ${GREP_BIN} -F 'configure' >/dev/null 2>&1
+                                if [ "${?}" = "0" ]; then
+                                    # TODO: add --docdir=${_prefix}/docs
+                                    # NOTE: By default try to configure software with these options:
+                                    #   --sysconfdir=${SERVICE_DIR}/etc
+                                    #   --localstatedir=${SERVICE_DIR}/var
+                                    #   --runstatedir=${SERVICE_DIR}/run
+                                    #   --with-pic
+                                    try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var ${_pic_optional} ${_addon} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
+                                        || try "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var ${_pic_optional} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
+                                            || try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var ${_addon} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
+                                                || try "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
+                                                    || try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc ${_pic_optional} ${_addon} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
+                                                        || try "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc ${_pic_optional} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
+                                                            || try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc ${_addon} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
+                                                                || try "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
+                                                                    || try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} ${_pic_optional} ${_addon} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
+                                                                        || try "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} ${_pic_optional} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
+                                                                            || try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} ${_addon} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
+                                                                                || run "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix}" # last two - only as a fallback
+
+                                else # fallback again:
+                                    # NOTE: First - try to specify GNU prefix,
+                                    # then trust prefix given in software definition.
+                                    try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} ${_addon} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
+                                        || try "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
+                                            || try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} ${_addon} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
+                                                || run "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS}"
+                                fi
+                            fi
+                            ;;
+                    esac
+
+                    debug "Gathering configuration output logs${CHAR_DOTS}"
+                    try "test -f '${_configure_log}' && ${INSTALL_BIN} '${_configure_log}' '${_configuration_result}'" \
+                        || try "test -f '${_cmake_out_log}' && ${INSTALL_BIN} '${_cmake_out_log}' '${_cmake_configuration_result}.stdout'; test -f '${_cmake_error_log}' && ${INSTALL_BIN} '${_cmake_error_log}' '${_cmake_configuration_result}.stderr'" \
+                                || debug "No configuration results!"
+
+                    cd "${_pwd}"
+                    try after_configure_callback
+                    cd "${_pwd}"
+                    try after_configure_snapshot
                 else
-                    debug "No known files from previous definitions installed for software PREFIX: $(distd "${_prefix}")"
+                    error "These values cannot be empty: BUILD_DIR, BUILD_NAMESUM"
                 fi
 
-                # NOTE: this thing is a real trouble for some definitions that crashes after "make install" without these directories in _prefix: <facepalm>
-                try "${MKDIR_BIN} -p ${_prefix}/man ${_prefix}/docs"
-            else
-                error "Sofin-Assertion-Failed: EMPTY _prefix?! Undefined behavior is always a BUG! Please report this!"
-            fi
+                # and common part between normal and continue modes:
+                cd "${_pwd}"
+                note "   ${NOTE_CHAR} Building requirement: $(distn "${_definition_name}"), version: $(distn "${DEF_VERSION}")"
+                run "${DEF_MAKE_METHOD}"
 
-            cd "${_pwd}"
-            note "   ${NOTE_CHAR} Installing requirement: $(distn "${_definition_name}"), version: $(distn "${DEF_VERSION}")"
-            run "${DEF_INSTALL_METHOD}"
+                cd "${_pwd}"
+                try after_make_callback
+                cd "${_pwd}"
+                try after_make_snapshot
 
-            cd "${_pwd}"
-            try after_install_callback
-            cd "${_pwd}"
-            try after_install_snapshot
 
-            cd "${_pwd}"
-            printf "%b\n" "${DEF_VERSION}" > "${_prefix}/${_definition_name}${DEFAULT_INST_MARK_EXT}" \
-                && debug "Commited version: $(distd "${DEF_VERSION}") of software bundle: $(distd "${DEF_NAME}${DEF_SUFFIX}"). Bundle prefix: $(distd "${_prefix}")"
+                # OTE: after successful make, invoke "make test" by default:
+                unset _this_test_skipped
+                if [ -n "${DEF_SKIPPED_DEFINITION_TEST}" ]; then
+                    debug "Defined DEF_SKIPPED_DEFINITION_TEST: $(distd "${DEF_SKIPPED_DEFINITION_TEST}")"
 
-            cd "${_cwd}" 2>/dev/null
-            unset _cwd _addon _dsname _bund
+                    printf "%b\n" " ${DEF_SKIPPED_DEFINITION_TEST} " | ${EGREP_BIN} -F " ${_definition_name} " >/dev/null 2>&1 \
+                        && note "   ${NOTE_CHAR} Skipped tests for definition of: $(distn "${_definition_name}")" \
+                            && _this_test_skipped=1
+                fi
+
+                if [ -z "${USE_NO_TEST}" ] \
+                && [ -z "${_this_test_skipped}" ]; then
+                    note "   ${NOTE_CHAR} Testing requirement: $(distn "${_definition_name}"), version: $(distn "${DEF_VERSION}")"
+                    cd "${_pwd}"
+
+                    # NOTE: mandatory on production machines:
+                    test_and_rate_def "${_definition_name}" "${DEF_TEST_METHOD}"
+                else
+                    note "   ${WARN_CHAR} Tests for definition: $(distn "${_definition_name}") skipped on demand"
+                fi
+                cd "${_pwd}"
+                try after_test_callback
+                cd "${_pwd}"
+                try after_test_snapshot
+
+                if [ -n "${_prefix}" ]; then
+                    _whole_list=""
+                    debug "Cleaning PREFIX man dir from previous dependencies, we want to install man pages that belong to LAST requirement which is app bundle itself"
+                    for _stuff_of_other_defs in $(to_iter "share/man" "share/info" "share/doc" "share/docs" "docs" "share/html"); do # "man"
+                        if [ -d "${_prefix}/${_stuff_of_other_defs}" ]; then
+                            if [ -z "${_whole_list}" ]; then
+                                _whole_list="'${_prefix}/${_stuff_of_other_defs}'"
+                            else
+                                _whole_list="${_whole_list} ${_prefix}/${_stuff_of_other_defs}"
+                            fi
+                        fi
+                    done
+
+                    if [ -n "${_whole_list}" ]; then
+                        debug "Prepared list of unwanted files: $(distd "${_whole_list}"), from bundle with software PREFIX: $(distd "${_prefix}")."
+                        try "${RM_BIN} -fr ${_whole_list}"  \
+                            && debug "Unwanted files were destroyed."
+                    else
+                        debug "No known files from previous definitions installed for software PREFIX: $(distd "${_prefix}")"
+                    fi
+
+                    # NOTE: this thing is a real trouble for some definitions that crashes after "make install" without these directories in _prefix: <facepalm>
+                    try "${MKDIR_BIN} -p ${_prefix}/man ${_prefix}/docs"
+                else
+                    error "Sofin-Assertion-Failed: EMPTY _prefix?! Undefined behavior is always a BUG! Please report this!"
+                fi
+
+                cd "${_pwd}"
+                note "   ${NOTE_CHAR} Installing requirement: $(distn "${_definition_name}"), version: $(distn "${DEF_VERSION}")"
+                run "${DEF_INSTALL_METHOD}"
+
+                cd "${_pwd}"
+                try after_install_callback
+                cd "${_pwd}"
+                try after_install_snapshot
+
+                cd "${_pwd}"
+                printf "%b\n" "${DEF_VERSION}" > "${_prefix}/${_definition_name}${DEFAULT_INST_MARK_EXT}" \
+                    && debug "Commited version: $(distd "${DEF_VERSION}") of software bundle: $(distd "${DEF_NAME}${DEF_SUFFIX}"). Bundle prefix: $(distd "${_prefix}")"
+            )
+            unset _pwd _addon _dsname _bund
         fi
     else
 

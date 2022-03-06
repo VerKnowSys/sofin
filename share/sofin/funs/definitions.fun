@@ -123,7 +123,7 @@ update_defs () {
     BRANCH="${BRANCH:-${DEFAULT_DEFINITIONS_BRANCH}}"
     REPOSITORY="${REPOSITORY:-${DEFAULT_DEFINITIONS_REPOSITORY}}"
 
-    _cwd="$(${PWD_BIN} 2>/dev/null)"
+    (
     if [ ! -x "${GIT_BIN}" ]; then
         permnote "Installing initial definition list from tarball to cache dir: $(distn "${CACHE_DIR}")"
         try "${RM_BIN} -rf ${CACHE_DIR}${DEFINITIONS_BASE}; ${MKDIR_BIN} -p ${LOGS_DIR} ${CACHE_DIR}${DEFINITIONS_BASE}"
@@ -209,32 +209,32 @@ update_defs () {
 
         permnote "Repository: $(distn "${REPOSITORY}"), on branch: $(distn "${BRANCH}"). Commit HEAD: $(distn "${_def_head}")."
     fi
-    cd "${_cwd}"
-    unset _def_head _def_branch _def_cur_branch _out_file _cwd
+    )
+    unset _def_head _def_branch _def_cur_branch _out_file
 }
 
 
 reset_defs () {
-    _cwd="$(${PWD_BIN} 2>/dev/null)"
-    cd "${DEFINITIONS_DIR}"
-    try "${GIT_BIN} reset --hard HEAD" >> "${LOG}"
-    if [ -z "${BRANCH}" ]; then
-        BRANCH="stable"
-    fi
-    _rdefs_branch="$(${CAT_BIN} "${CACHE_DIR}${DEFINITIONS_BASE}/${DEFAULT_GIT_DIR_NAME}/refs/heads/${BRANCH}" 2>/dev/null)"
-    if [ -z "${_rdefs_branch}" ]; then
-        _rdefs_branch="HEAD"
-    fi
-    permnote "Definitions repository reset to: $(distn "${_rdefs_branch}")"
-    for _def_line in $(${GIT_BIN} status --short 2>/dev/null | ${CUT_BIN} -f2 -d' ' 2>/dev/null); do
-        unset _add_opt
-        printf "%b\n" "${_def_line}" | ${EGREP_BIN} -F 'patches/' >/dev/null 2>&1 \
-            && _add_opt="r"
-        try "${RM_BIN} -f${_add_opt} '${_def_line}'" \
-            && debug "Removed untracked file${_add_opt:-/dir} from definition repository: $(distd "${_def_line}")"
-    done
-    cd "${_cwd}"
-    unset _rdefs_branch _cwd
+    (
+        cd "${DEFINITIONS_DIR}"
+        try "${GIT_BIN} reset --hard HEAD" >> "${LOG}"
+        if [ -z "${BRANCH}" ]; then
+            BRANCH="stable"
+        fi
+        _rdefs_branch="$(${CAT_BIN} "${CACHE_DIR}${DEFINITIONS_BASE}/${DEFAULT_GIT_DIR_NAME}/refs/heads/${BRANCH}" 2>/dev/null)"
+        if [ -z "${_rdefs_branch}" ]; then
+            _rdefs_branch="HEAD"
+        fi
+        permnote "Definitions repository reset to: $(distn "${_rdefs_branch}")"
+        for _def_line in $(${GIT_BIN} status --short 2>/dev/null | ${CUT_BIN} -f2 -d' ' 2>/dev/null); do
+            unset _add_opt
+            printf "%b\n" "${_def_line}" | ${EGREP_BIN} -F 'patches/' >/dev/null 2>&1 \
+                && _add_opt="r"
+            try "${RM_BIN} -f${_add_opt} '${_def_line}'" \
+                && debug "Removed untracked file${_add_opt:-/dir} from definition repository: $(distd "${_def_line}")"
+        done
+    )
+    unset _rdefs_branch
 }
 
 
@@ -353,11 +353,11 @@ make_exports () {
         # SOFTWARE_DIR:
         if [ -e "${SOFTWARE_DIR}/${_bundle_name}${_bindir}${_export_bin}" ]; then
             permnote "Exporting binary: $(distn "${SOFTWARE_DIR}/${_bundle_name}${_bindir}${_export_bin}")"
-            _cdir="$(${PWD_BIN} 2>/dev/null)"
-            cd "${SOFTWARE_DIR}/${_bundle_name}${_bindir}"
-            try "${RM_BIN} -f ../exports/${_export_bin}; ${LN_BIN} -s ..${_bindir}/${_export_bin} ../exports/${_export_bin}"
-            cd "${_cdir}"
-            unset _cdir _bindir _bundle_name _export_bin
+            (
+                cd "${SOFTWARE_DIR}/${_bundle_name}${_bindir}"
+                try "${RM_BIN} -f ../exports/${_export_bin}; ${LN_BIN} -s ..${_bindir}/${_export_bin} ../exports/${_export_bin}"
+            )
+            unset _bindir _bundle_name _export_bin
             return 0
         else
             debug "Export not found: $(distd "${SOFTWARE_DIR}/${_bundle_name}${_bindir}${_export_bin}")"
@@ -366,11 +366,11 @@ make_exports () {
         # SERVICES_DIR:
         if [ -e "${SERVICES_DIR}/${_bundle_name}${_bindir}${_export_bin}" ]; then
             permnote "Exporting binary: $(distn "${SERVICES_DIR}/${_bundle_name}${_bindir}${_export_bin}")"
-            _cdir="$(${PWD_BIN} 2>/dev/null)"
-            cd "${SERVICES_DIR}/${_bundle_name}${_bindir}"
-            try "${RM_BIN} -f ../exports/${_export_bin}; ${LN_BIN} -s ..${_bindir}/${_export_bin} ../exports/${_export_bin}"
-            cd "${_cdir}"
-            unset _cdir _bindir _bundle_name _export_bin
+            (
+                cd "${SERVICES_DIR}/${_bundle_name}${_bindir}"
+                try "${RM_BIN} -f ../exports/${_export_bin}; ${LN_BIN} -s ..${_bindir}/${_export_bin} ../exports/${_export_bin}"
+            )
+            unset _bindir _bundle_name _export_bin
             return 0
         else
             debug "Export not found: $(distd "${SERVICES_DIR}/${_bundle_name}${_bindir}${_export_bin}")"
@@ -451,20 +451,22 @@ wipe_remote_archives () {
         read -r _ans
     fi
     if [ "${_ans}" = "YES" ]; then
-        cd "${SOFTWARE_DIR}"
-        for _wr_element in $(to_iter "${_bund_names}"); do
-            _lowercase_element="$(lowercase "${_wr_element}")"
-            _remote_ar_name="${_wr_element}-"
-            _wr_dig="$(${HOST_BIN} "${MAIN_SOFTWARE_ADDRESS}" 2>/dev/null | ${CUT_BIN} -d' ' -f4 2>/dev/null)"
-            if [ -z "${_wr_dig}" ]; then
-                error "No mirrors found in address: $(diste "${MAIN_SOFTWARE_ADDRESS}")"
-            fi
-            debug "Using defined mirror(s): $(distd "${_wr_dig}")"
-            for _wr_mirr in $(to_iter "${_wr_dig}"); do
-                permnote "Wiping out remote: $(distn "${_wr_mirr}") binary archives: $(distn "${_remote_ar_name}")"
-                retry "${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${SOFIN_SSH_PORT} ${SOFIN_NAME}@${_wr_mirr} \"${FIND_BIN} ${MAIN_BINARY_PREFIX}/${SYS_SPECIFIC_BINARY_REMOTE} -iname '${_remote_ar_name}' -delete\""
+        (
+            cd "${SOFTWARE_DIR}"
+            for _wr_element in $(to_iter "${_bund_names}"); do
+                _lowercase_element="$(lowercase "${_wr_element}")"
+                _remote_ar_name="${_wr_element}-"
+                _wr_dig="$(${HOST_BIN} "${MAIN_SOFTWARE_ADDRESS}" 2>/dev/null | ${CUT_BIN} -d' ' -f4 2>/dev/null)"
+                if [ -z "${_wr_dig}" ]; then
+                    error "No mirrors found in address: $(diste "${MAIN_SOFTWARE_ADDRESS}")"
+                fi
+                debug "Using defined mirror(s): $(distd "${_wr_dig}")"
+                for _wr_mirr in $(to_iter "${_wr_dig}"); do
+                    permnote "Wiping out remote: $(distn "${_wr_mirr}") binary archives: $(distn "${_remote_ar_name}")"
+                    retry "${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${SOFIN_SSH_PORT} ${SOFIN_NAME}@${_wr_mirr} \"${FIND_BIN} ${MAIN_BINARY_PREFIX}/${SYS_SPECIFIC_BINARY_REMOTE} -iname '${_remote_ar_name}' -delete\""
+                done
             done
-        done
+        )
     else
         error "Aborted remote wipe of: $(diste "${_bund_names}")"
     fi
@@ -774,20 +776,20 @@ export_binaries () {
 
                 _soft_to_exp="${PREFIX}${dir}${_xp}"
                 if [ -x "${_soft_to_exp}" ]; then
-                    _acurrdir="$(${PWD_BIN} 2>/dev/null)"
-                    cd "${PREFIX}${dir}"
-                    try "${RM_BIN} -f ../exports/${_xp}; ${LN_BIN} -s ..${dir}${_xp} ../exports/${_xp}"
-                    cd "${_acurrdir}"
+                    (
+                        cd "${PREFIX}${dir}"
+                        try "${RM_BIN} -f ../exports/${_xp}; ${LN_BIN} -s ..${dir}${_xp} ../exports/${_xp}"
+                    )
                     _expo_elem="${_soft_to_exp##*/}"
                     _expolist="${_expolist} ${_expo_elem}"
                 fi
 
                 _service_to_exp="${SERVICE_DIR}${dir}${_xp}"
                 if [ -x "${_service_to_exp}" ]; then
-                    _acurrdir="$(${PWD_BIN} 2>/dev/null)"
-                    cd "${SERVICE_DIR}${dir}"
-                    try "${RM_BIN} -f ../exports/${_xp}; ${LN_BIN} -s ..${dir}${_xp} ../exports/${_xp}"
-                    cd "${_acurrdir}"
+                    (
+                        cd "${SERVICE_DIR}${dir}"
+                        try "${RM_BIN} -f ../exports/${_xp}; ${LN_BIN} -s ..${dir}${_xp} ../exports/${_xp}"
+                    )
                     _expo_elem="${_service_to_exp##*/}"
                     _expolist="${_expolist} ${_expo_elem}"
                 fi
@@ -925,12 +927,12 @@ clone_or_fetch_git_bare_repo () {
     if [ "${?}" = "0" ]; then
         debug "Cloned bare repository: $(distd "${_bare_name}")"
     elif [ -d "${_git_cached}" ]; then
-        _cwddd="$(${PWD_BIN} 2>/dev/null)"
-        debug "Trying to update existing bare repository cache in: $(distd "${_git_cached}")"
-        cd "${_git_cached}"
-        try "${GIT_BIN} fetch ${DEFAULT_GIT_PULL_FETCH_OPTS} origin ${_chk_branch} >> ${LOG}" \
-            || warn "   ${WARN_CHAR} Failed to fetch an update from bare repository: $(distw "${_git_cached}") [branch: $(distw "${_chk_branch}")]"
-        cd "${_cwddd}"
+        (
+            debug "Trying to update existing bare repository cache in: $(distd "${_git_cached}")"
+            cd "${_git_cached}"
+            try "${GIT_BIN} fetch ${DEFAULT_GIT_PULL_FETCH_OPTS} origin ${_chk_branch} >> ${LOG}" \
+                || warn "   ${WARN_CHAR} Failed to fetch an update from bare repository: $(distw "${_git_cached}") [branch: $(distw "${_chk_branch}")]"
+        )
     elif [ ! -d "${_git_cached}/branches" ] \
       && [ ! -f "${_git_cached}/config" ]; then
         error "Failed to fetch source repository: $(diste "${_source_path}") [branch: $(diste "${_chk_branch}")]"
