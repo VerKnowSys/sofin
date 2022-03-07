@@ -234,7 +234,7 @@ reset_defs () {
                 && debug "Removed untracked file${_add_opt:-/dir} from definition repository: $(distd "${_def_line}")"
         done
     )
-    unset _rdefs_branch
+    unset _rdefs_branch _def_line _add_opt
 }
 
 
@@ -310,32 +310,38 @@ remove_bundles () {
 
 
 available_definitions () {
-    if [ -d "${DEFINITIONS_DIR}" ]; then
-        _alldefs="$(${FIND_BIN} "${DEFINITIONS_DIR}" -mindepth 1 -maxdepth 1 -type f -name "*${DEFAULT_DEF_EXT}" 2>/dev/null | ${SORT_BIN} )"
-        _sysdefs=""
-        permnote "All definitions defined in current cache: $(distn "$(echo "${_alldefs}" | ${AWK_BIN} -F/ '{print $NF}' | ${SED_BIN} "s/${DEFAULT_DEF_EXT}//g" 2>/dev/null | ${TR_BIN} '\n' ' ')")"
-
-        for _def in $(to_iter "${_alldefs}"); do
-            _deffile="$(echo ${_def%${DEFAULT_DEF_EXT}} | ${AWK_BIN} -F/ '{print $NF}')"
-            load_defaults
-            CURRENT_DEFINITION_DISABLED=""
-            . "${_def}"
-            validate_definition_disabled
-            if [ "${CURRENT_DEFINITION_DISABLED}" != "YES" ]; then
-                _sysdefs="${_sysdefs}\n${_deffile}"
-            fi
-        done
-
-        load_defaults
-        _sysdefs="$(echo ${_sysdefs} | ${SORT_BIN} | ${TR_BIN} '\n' ' ')"
-        permnote "Definitions available for $(distn "${SYSTEM_NAME}") system:$(distn "${_sysdefs}")"
-        permnote "Available definitions count: $(distn "$(printf "%b\n" "${_sysdefs}" | eval "${WORDS_COUNT_GUARD}")")"
-    fi
     if [ -d "${DEFINITIONS_LISTS_DIR}" ]; then
         _lists="$(${FIND_BIN} "${DEFINITIONS_LISTS_DIR}" -mindepth 1 -maxdepth 1 -type f 2>/dev/null | ${SORT_BIN} | ${AWK_BIN} -F/ '{print $NF}' | ${TR_BIN} '\n' ' ')"
-        permnote "Available lists: $(distn "${_lists}")"
+        permnote "Available definitions lists: $(distn "${_lists}")"
     fi
-    permnote "All definitions count: $(distn "$(printf "%b\n" "${_alldefs}" | eval "${WORDS_COUNT_GUARD}")")"
+    if [ -d "${DEFINITIONS_DIR}" ]; then
+        _alldefs="$(${FIND_BIN} "${DEFINITIONS_DIR}" -mindepth 1 -maxdepth 1 -type f -name "*${DEFAULT_DEF_EXT}" 2>/dev/null | ${SORT_BIN} )"
+        _alldefs_count="$(printf "%b\n" "${_alldefs}" | ${TR_BIN} '\n' ' ' | eval "${WORDS_COUNT_GUARD}")"
+        unset _disabled_defs
+        permnote "All definitions: $(distn "$(echo "${_alldefs}" | ${AWK_BIN} -F/ '{print $NF}' | ${SED_BIN} "s/${DEFAULT_DEF_EXT}//g" 2>/dev/null | ${TR_BIN} '\n' ' ')")"
+
+        for _def in $(to_iter "${_alldefs}"); do
+            _deffile="$(echo ${_def%"${DEFAULT_DEF_EXT}"} | ${AWK_BIN} -F/ '{print $NF}')"
+            load_defaults
+
+            unset CURRENT_DEFINITION_DISABLED
+            . "${_def}"
+            validate_definition_disabled
+            if [ "${CURRENT_DEFINITION_DISABLED}" = "YES" ]; then
+                _disabled_defs="${_disabled_defs}\n${ColorRed}${_deffile}"
+            fi
+        done
+        permnote "Definitions total: $(distn "${_alldefs_count:-0}")"
+
+        note
+        load_defaults
+        _disabled_defs="$(echo ${_disabled_defs} | ${SORT_BIN} | ${TR_BIN} '\n' ' ')"
+        permnote "Definitions disabled for the $(distn "${SYSTEM_NAME}-${SYSTEM_ARCH}") system:$(distn "${_disabled_defs}")"
+
+        _disabled_count="$(printf "%b\n" "${_disabled_defs}" | eval "${WORDS_COUNT_GUARD}")"
+        permnote "Disabled definitions total: $(distn "${_disabled_count}")"
+    fi
+    unset _disabled_defs _disabled_count _lists _alldefs _alldefs_count _def _deffile
 }
 
 
