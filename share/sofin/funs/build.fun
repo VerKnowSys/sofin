@@ -531,7 +531,7 @@ process_flat () {
                         _possible_old_build_dir="$(${TAR_BIN} -t --list --file "${_dest_file}" 2>/dev/null | ${HEAD_BIN} -n1 2>/dev/null | ${AWK_BIN} '{print $9;}' 2>/dev/null)"
                         _pbd_basename="${_possible_old_build_dir##*/}"
                         if [ "${_pbd_basename}" != "${_possible_old_build_dir}" ]; then # more than one path element?
-                            _possible_old_build_dir="${_possible_old_build_dir%%/${_pbd_basename}}"
+                            _possible_old_build_dir="${_possible_old_build_dir%%/"${_pbd_basename}"}"
                         fi
                         if [ -d "${BUILD_DIR}/${_possible_old_build_dir%/}" ]; then
                             try "${RM_BIN} -rf '${BUILD_DIR}/${_possible_old_build_dir%/}'" \
