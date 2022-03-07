@@ -137,12 +137,13 @@ update_defs () {
     fi
     if [ -d "${CACHE_DIR}${DEFINITIONS_BASE}/${DEFAULT_GIT_DIR_NAME}" ] \
     && [ -f "${DEFINITIONS_DEFAULTS}" ]; then
-        cd "${CACHE_DIR}${DEFINITIONS_BASE}"
-        _def_cur_branch="$(${GIT_BIN} rev-parse --abbrev-ref HEAD 2>/dev/null)"
-        _def_head="$(${CAT_BIN} "${CACHE_DIR}${DEFINITIONS_BASE}/${DEFAULT_GIT_DIR_NAME}/refs/heads/${_def_cur_branch}" 2>/dev/null)"
-        if [ -z "${_def_head}" ]; then
-            _def_head="HEAD"
-        fi
+        set_def_cur_branch_and_head () {
+            cd "${CACHE_DIR}${DEFINITIONS_BASE}"
+            _def_cur_branch="$(${GIT_BIN} rev-parse --abbrev-ref HEAD 2>/dev/null)"
+            _def_head="$(${CAT_BIN} "${CACHE_DIR}${DEFINITIONS_BASE}/${DEFAULT_GIT_DIR_NAME}/refs/heads/${_def_cur_branch}" 2>/dev/null)"
+        }
+
+        set_def_cur_branch_and_head
         debug "State of definitions repository was re-set to: $(distd "${_def_head}")"
         if [ "${_def_cur_branch}" != "${BRANCH}" ]; then # use _def_cur_branch value if branch isn't matching default branch
             debug "Checking out branch: $(distd "${_def_cur_branch}")"
@@ -164,6 +165,7 @@ update_defs () {
             fi
             printf "%b" "${ColorBlue}" >&2
             ${GIT_BIN} pull ${DEFAULT_GIT_PULL_FETCH_OPTS} origin ${BRANCH} \
+                && set_def_cur_branch_and_head \
                 && permnote "Definitions branch: $(distn "${BRANCH}") is at: $(distn "${_def_head}")" \
                     && return 0
         fi
