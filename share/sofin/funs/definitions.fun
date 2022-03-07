@@ -178,15 +178,6 @@ update_defs () {
             "$(fill)" \
             "${ColorReset}" \
                 2>/dev/null
-
-        show_log_if_available
-
-        # Render error footer for user
-        printf "\n%b%b%b\n\n" \
-            "${ColorRed}" \
-            "$(fill)" \
-            "${ColorReset}" \
-                2>/dev/null
     else
         # create cache; clone definitions repository:
         cd "${CACHE_DIR}"
