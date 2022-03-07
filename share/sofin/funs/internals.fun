@@ -504,15 +504,24 @@ show_alt_definitions_and_exit () {
     unset _an_app
 }
 
+
 list_unused_sources () {
-    _sourcelist="$("${CURL_BIN}" -s "${MAIN_SOURCE_REPOSITORY}" | "${GREP_BIN}" "href" | "${GREP_BIN}" -v "\/\"" \
+    if [ -x "${CURL_BIN}" ]; then
+        _fetch_cmd="${CURL_BIN}"
+        _fetch_opts="-s"
+    else
+        _fetch_cmd="${FETCH_BIN}"
+        _fetch_opts="-qo-"
+    fi
+
+    _sourcelist="$("${_fetch_cmd}" "${_fetch_opts}" "${MAIN_SOURCE_REPOSITORY}" | "${GREP_BIN}" "href" | "${GREP_BIN}" -v "\/\"" \
     | "${AWK_BIN}" -F"\"" '{print $2,$3}' | "${AWK_BIN}" '{print $1,$5}' | "${SORT_BIN}" -n -r -k 2 | "${SED_BIN}" -E 's/%2B/\+/g')"
 
     _alldefs="$(${FIND_BIN} "${DEFINITIONS_DIR}" -mindepth 1 -maxdepth 1 -type f -name "*${DEFAULT_DEF_EXT}" 2>/dev/null)"
 
     for _def in $(to_iter "${_alldefs}"); do
         . "${_def}"
-        _defsrc="$(echo "${DEF_SOURCE_PATH##*/}")"
+        _defsrc="${DEF_SOURCE_PATH##*/}"
         if [ -n "${_defsrc}" ]; then
             _sourcelist="$(echo "${_sourcelist}" | "${GREP_BIN}" -v "${_defsrc}")"
         fi
@@ -521,5 +530,5 @@ list_unused_sources () {
     load_defaults
     echo "${_sourcelist}" | "${AWK_BIN}" '{print $1}'
 
-    unset _sourcelist _def _alldefs _defsrc
+    unset _sourcelist _def _alldefs _defsrc _fetch_cmd _fetch_opts
 }
