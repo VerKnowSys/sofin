@@ -953,13 +953,18 @@ clone_or_fetch_git_bare_repo () {
     unset _git_cached _bare_name _chk_branch _build_dir _dest_repo
 }
 
+
 available_bundles () {
-    if [ -z "${CURL_BIN}" ]; then
-        error "Curl binary not found"
+    if [ -x "${CURL_BIN}" ]; then
+        _fetch_cmd="${CURL_BIN}"
+        _fetch_opts="-s"
+    else
+        _fetch_cmd="${FETCH_BIN}"
+        _fetch_opts="-qo-"
     fi
 
     permnote "Binary bundles available for $(distn "${OS_TRIPPLE}") system:"
-    _bundlelist="$("${CURL_BIN}" -s "${MAIN_BINARY_REPOSITORY}/${OS_TRIPPLE}/" | "${GREP_BIN}" -E "(${DEFAULT_ARCHIVE_TARBALL_EXT}|${DEFAULT_SOFTWARE_SNAPSHOT_EXT})" 2>/dev/null \
+    _bundlelist="$(${_fetch_cmd} ${_fetch_opts} "${MAIN_BINARY_REPOSITORY}/${OS_TRIPPLE}/" | "${GREP_BIN}" -E "(${DEFAULT_ARCHIVE_TARBALL_EXT}|${DEFAULT_SOFTWARE_SNAPSHOT_EXT})" 2>/dev/null \
     | "${GREP_BIN}" -v "sha1" 2>/dev/null | "${CUT_BIN}" -d "\"" -f2 | "${SED_BIN}" -E "s/-${OS_TRIPPLE}(\\${DEFAULT_ARCHIVE_TARBALL_EXT}|\\${DEFAULT_SOFTWARE_SNAPSHOT_EXT})//g")"
 
     for _bundle in $(to_iter "${_bundlelist}"); do
