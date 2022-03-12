@@ -70,7 +70,37 @@ extend_requirement_lists_test() {
 }
 
 
+next_version_test () {
+    _v1="1.2.3"
+    _v1_next="$(guess_next_versions "${_v1}")"
+    _v1_expected="1.2.4 1.3.0"
+    test "${_v1_expected}" = "${_v1_next}" \
+        || error "QUESTION: $(diste "'${_v1_expected}'") != $(diste "'${_v1_next}'")"
+
+    _v2="1.23"
+    _v2_next="$(guess_next_versions "${_v2}")"
+    _v2_expected="1.24 2.0"
+    test "${_v2_expected}" = "${_v2_next}" \
+        || error "QUESTION: $(diste "'${_v2_expected}'") != $(diste "'${_v2_next}'")"
+
+    _v3="1.23.0"
+    _v3_next="$(guess_next_versions "${_v3}")"
+    _v3_expected="1.24.0 1.23.1"
+    test "${_v3_expected}" = "${_v3_next}" \
+        || error "QUESTION: $(diste "'${_v3_expected}'") != $(diste "'${_v3_next}'")"
+
+    _v4="1.23e"
+    _v4_next="$(guess_next_versions "${_v4}")"
+    _v4_expected="1.23f 1.24a"
+    test "${_v4_expected}" = "${_v4_next}" \
+        || error "QUESTION: $(diste "'${_v4_expected}'") != $(diste "'${_v4_next}'")"
+
+    permnote "Test next_version_test() #3 - OK: $(distn "${_a2}")"
+}
+
+
 # Invoke tests:
-requirements_dedup_test \
+next_version_test \
+    && requirements_dedup_test \
     && extend_requirement_lists_test \
     && permnote "Everything as expected!"

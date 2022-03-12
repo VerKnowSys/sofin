@@ -981,3 +981,51 @@ available_bundles () {
 
     permnote "Bundles highlighted in $(distn "cyan") are the current versions to be installed by Sofin. Greyed out are versions or bundles currently disabled for your system version."
 }
+
+
+guess_next_versions () {
+    _version="${1}"
+    _major="$(printf "%b" "${_version}" | ${AWK_BIN} 'BEGIN {FS="."} {print $1}')"
+    _minor="$(printf "%b" "${_version}" | ${AWK_BIN} 'BEGIN {FS="."} {print $2}')"
+    _patch="$(printf "%b" "${_version}" | ${AWK_BIN} 'BEGIN {FS="."} {print $3}')"
+    debug "guess_next_versions input: $(distd "${_major} ${_minor} ${_patch}" )"
+
+    # handle no patch version:
+    case "${_patch}" in
+        "")
+            case "${_minor}" in
+                # TODO: handle case with _ or - in paths
+
+                *[a-z]|*[A-Z]) # case when version contains alphanumerics like "1.23b" should return "1.23c" or "1.24a"
+                    _minor_origin="${_minor}"
+
+                    _last_char="$(printf "%b" ${_minor} | ${AWK_BIN} '{print substr($0,length,1)}')"
+                    _last_char_next="$(printf "%b" "${_last_char}" | ${TR_BIN} "0-9a-z" "1-9a-z_")" # next char tr trick
+                    _minor="$(printf "%b" "${_minor}" | ${SED_BIN} -e "s/${_last_char}/${_last_char_next}/")"
+                    printf "%b.%b " "${_major}" "${_minor}"
+
+                    _next_number="$(printf "%b" "${_minor_origin}" | ${SED_BIN} -e "s/${_last_char}//")"
+                    _next_number="$(( ${_next_number} + 1))"
+                    _minor="${_next_number}a"
+                    printf "%b.%b" "${_major}" "${_minor}"
+                    ;;
+
+                *)
+                    printf "%b.%b " "${_major}" "$(( ${_minor} + 1 ))"
+                    printf "%b.%b" "$(( ${_major} + 1 ))" "0"
+                    ;;
+            esac
+            ;;
+
+        "0")
+            printf "%b.%b.%b " "${_major}" "$(( ${_minor} + 1 ))" "0"
+            printf "%b.%b.%b" "${_major}" "${_minor}" "$(( ${_patch} + 1 ))"
+            ;;
+
+        *)
+            printf "%b.%b.%b " "${_major}" "${_minor}" "$(( ${_patch} + 1 ))"
+            printf "%b.%b.%b" "${_major}" "$(( ${_minor} + 1 ))" "0"
+            ;;
+    esac
+    unset _version _major _minor _patch
+}
