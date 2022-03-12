@@ -52,6 +52,9 @@ usage_howto () {
     permnote "  $(distn "diff                                 ") displays changes in current definitions cache. Accepts any part of definition name"
     permnote "  $(distn "srccheck                             ") checks sources availability for all existing definitions in local definitions repository"
     permnote "  $(distn "oldsrc                               ") lists unused sources in main repository"
+    permnote
+    permnote "  $(distn "origins all                          ") checks origin of all definitions, for the new versions"
+    permnote "  $(distn "origins name othername               ") checks origin of specified software definitions, for the new versions"
 }
 
 

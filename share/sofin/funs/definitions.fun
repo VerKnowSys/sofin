@@ -1029,3 +1029,52 @@ guess_next_versions () {
     esac
     unset _version _major _minor _patch
 }
+
+
+show_new_origin_updates () {
+    _definitions="${*}"
+    if [ -x "${CURL_BIN}" ]; then
+        _fetch_cmd="${CURL_BIN}"
+        _fetch_opts="-sSfL -m5"
+    else
+        _fetch_cmd="${FETCH_BIN}"
+        _fetch_opts="-q -T5"
+    fi
+
+    # handle case when we wish to show all origin updates
+    if [ "all" = "${_definitions}" ]; then
+        _definitions="$(${FIND_BIN} "${DEFINITIONS_DIR}" -mindepth 1 -maxdepth 1 -type f -name "*${DEFAULT_DEF_EXT}" 2>/dev/null | ${SORT_BIN})"
+    fi
+
+    for _definition in $(to_iter "${_definitions}"); do
+        debug "Processing origin of bundle: $(distd "${_definition}")"
+        load_defaults
+        load_defs "${_definition}"
+
+        if [ -n "${DEF_ORIGIN}" ]; then
+            _possible_next_versions="$(guess_next_versions "${DEF_VERSION}")"
+            for _possible_next in $(to_iter "${_possible_next_versions}"); do
+                _possible_next="${_possible_next##*/}" # basename
+                case "${_possible_next}" in
+                    "defaults.def" | "skeleton.def")
+                        ;;
+
+                    *)
+                        _next_version_origin="$(printf "%b\n" "${DEF_ORIGIN}" | ${SED_BIN} -e "s/${DEF_VERSION}/${_possible_next}/g")"
+                        debug "next version origin: $(distd "${_next_version_origin}")"
+                        cd /tmp
+                        ${_fetch_cmd} ${_fetch_opts} "${_next_version_origin}" >/dev/null 2>&1
+                        if [ "0" = "${?}" ]; then
+                            warn "Possible new version of definition: $(distw "${DEF_NAME}${DEF_SUFFIX}") found. Origin: $(distw "${_next_version_origin}")"
+                        fi
+                        ${RM_BIN} -f "${_next_version_origin}"
+                        ;;
+                esac
+            done
+        else
+            debug "No origin for: $(distd "${_definition##*/}")"
+        fi
+    done
+
+    unset _bundles _bundle
+}
