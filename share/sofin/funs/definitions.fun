@@ -1066,9 +1066,11 @@ show_new_origin_updates () {
     fi
 
     # handle case when we wish to show all origin updates
-    if [ "all" = "${_definitions}" ]; then
-        _definitions="$(${FIND_BIN} "${DEFINITIONS_DIR}" -mindepth 1 -maxdepth 1 -type f -name "*${DEFAULT_DEF_EXT}" 2>/dev/null | ${SORT_BIN})"
-    fi
+    case "${_definitions}" in
+        "@" | "all")
+            _definitions="$(${FIND_BIN} "${DEFINITIONS_DIR}" -mindepth 1 -maxdepth 1 -type f -name "*${DEFAULT_DEF_EXT}" 2>/dev/null | ${SORT_BIN})"
+            ;;
+    esac
 
     for _definition in $(to_iter "${_definitions}"); do
         debug "Processing origin of bundle: $(distd "${_definition}")"
@@ -1078,14 +1080,14 @@ show_new_origin_updates () {
         if [ -n "${DEF_ORIGIN}" ]; then
             _possible_next_versions="$(guess_next_versions "${DEF_VERSION}")"
             for _possible_next in $(to_iter "${_possible_next_versions}"); do
-                _possible_next="${_possible_next##*/}" # basename
+                _possible_next="${_possible_next##*/}"
                 case "${_possible_next}" in
                     "defaults.def" | "skeleton.def")
                         ;;
 
                     *)
                         _next_version_origin="$(printf "%b\n" "${DEF_ORIGIN}" | ${SED_BIN} -e "s/${DEF_VERSION}/${_possible_next}/g")"
-                        debug "next version origin: $(distd "${_next_version_origin}")"
+                        debug "Next version of $(distd "${_definition##*/}") could have origin: $(distd "${_next_version_origin}")"
                         cd /tmp
                         ${_fetch_cmd} ${_fetch_opts} "${_next_version_origin}" >/dev/null 2>&1
                         if [ "0" = "${?}" ]; then
