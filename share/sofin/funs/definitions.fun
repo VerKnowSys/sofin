@@ -995,6 +995,18 @@ guess_next_versions () {
         "")
             case "${_minor}" in
                 # TODO: handle case with _ or - in paths
+                            _major_origin="${_major}"
+
+                            _last_char="$(printf "%b" ${_major} | ${AWK_BIN} '{print substr($0,length,1)}')"
+                            _last_char_next="$(printf "%b" "${_last_char}" | ${TR_BIN} "0-9a-z" "1-9a-z_")" # next char tr trick
+                            _major="$(printf "%b" "${_major}" | ${SED_BIN} -e "s/${_last_char}/${_last_char_next}/")"
+                            printf "%b " "${_major}"
+
+                            _next_number="$(printf "%b" "${_major_origin}" | ${SED_BIN} -e "s/${_last_char}//")"
+                            _next_number="$(( ${_next_number} + 1))"
+                            _major="${_next_number}a"
+                            printf "%b" "${_major}"
+                            ;;
 
                 *[a-z]|*[A-Z]) # case when version contains alphanumerics like "1.23b" should return "1.23c" or "1.24a"
                     _minor_origin="${_minor}"

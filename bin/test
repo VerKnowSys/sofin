@@ -95,6 +95,13 @@ next_version_test () {
     test "${_v4_expected}" = "${_v4_next}" \
         || error "QUESTION: $(diste "'${_v4_expected}'") != $(diste "'${_v4_next}'")"
 
+    _v5="9d"
+    _v5_next="$(guess_next_versions "${_v5}")"
+    _v5_expected="9e 10a"
+    test "${_v5_expected}" = "${_v5_next}" \
+        || error "QUESTION: $(diste "'${_v5_expected}'") != $(diste "'${_v5_next}'")"
+
+
     permnote "Test next_version_test() #3 - OK: $(distn "${_a2}")"
 }
 
