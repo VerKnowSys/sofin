@@ -994,7 +994,13 @@ guess_next_versions () {
     case "${_patch}" in
         "")
             case "${_minor}" in
-                # TODO: handle case with _ or - in paths
+                "")
+                    case "${_major}" in
+                        *[_-]*) # ignore versions like icu: "4c-70_1"
+                            debug "Skipping custom version pattern: $(distd "${_major}")"
+                            ;;
+
+                        *)
                             _major_origin="${_major}"
 
                             _last_char="$(printf "%b" ${_major} | ${AWK_BIN} '{print substr($0,length,1)}')"
@@ -1007,6 +1013,8 @@ guess_next_versions () {
                             _major="${_next_number}a"
                             printf "%b" "${_major}"
                             ;;
+                    esac
+                    ;;
 
                 *[a-z]|*[A-Z]) # case when version contains alphanumerics like "1.23b" should return "1.23c" or "1.24a"
                     _minor_origin="${_minor}"
@@ -1027,6 +1035,10 @@ guess_next_versions () {
                     printf "%b.%b" "$(( ${_major} + 1 ))" "0"
                     ;;
             esac
+            ;;
+
+        *[a-z]|*[A-Z]) # ignore versions like "2.8.9rel.1"
+            debug "Skipping custom patch version pattern: $(distd "${_patch}")"
             ;;
 
         "0")
