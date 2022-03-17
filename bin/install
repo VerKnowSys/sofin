@@ -1,4 +1,4 @@
-#!/usr/bin/env zsh
+#!/usr/bin/env sh
 # @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
 
 if [ "${1}" = "trace" ] || [ -n "${SOFIN_TRACE}" ]; then
