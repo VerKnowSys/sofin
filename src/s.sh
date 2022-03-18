@@ -22,7 +22,6 @@ debug "Sofin (cmdline: $(distd "${SOFIN_CMDLINE}"),  SOFIN_PID=$(distd "${SOFIN_
 # Set explicit +e for Sofin shell:
 env_forgivable
 validate_env
-performance max
 
 
 # Tracing of Sofin itself:

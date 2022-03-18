@@ -136,6 +136,9 @@ load_pax_file () {
 build () {
     _build_list="${*}"
 
+    # set system performance to max values
+    performance max
+
     # Update definitions and perform more checks
     if [ -n "${CAP_SYS_BUILDHOST}" ]; then
         load_sysctl_buildhost_hardening
