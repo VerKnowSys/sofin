@@ -112,7 +112,11 @@ build_sofin_natives () {
     for _prov in ${SOFIN_PROVIDES}; do
         if [ -f "src/${_prov}.cc" ]; then
             debug "${SOFIN_BUNDLE_NAME}: Build: ${CXX_NAME} -o bin/${_prov} ${CFLAGS} src/${_prov}.cc"
-            run "${CXX} ${CXX14_CXXFLAGS} ${HARDEN_CFLAGS} \
+            _compiler="${CXX}"
+            if [ -x "${CCACHE_BIN}" ]; then
+                _compiler="${CCACHE_BIN} ${CXX}"
+            fi
+            run "${_compiler} ${CXX14_CXXFLAGS} ${HARDEN_CFLAGS} \
                   ${DEFAULT_LINKER_FLAGS} \
                     src/${_prov}.cc \
                         -o bin/${_prov}" \
