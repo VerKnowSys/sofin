@@ -1042,8 +1042,18 @@ guess_next_versions () {
             esac
             ;;
 
-        *[a-z]|*[A-Z]) # ignore versions like "2.8.9rel.1"
-            debug "Skipping custom patch version pattern: $(distd "${_patch}")"
+        *[a-z]|*[A-Z])
+            _patch_origin="${_patch}"
+
+            _last_char="$(printf "%b" ${_patch} | ${AWK_BIN} '{print substr($0,length,1)}')"
+            _last_char_next="$(printf "%b" "${_last_char}" | ${TR_BIN} "0-9a-z" "1-9a-z_")" # next char tr trick
+            _patch="$(printf "%b" "${_patch}" | ${SED_BIN} -e "s/${_last_char}/${_last_char_next}/")"
+            printf "%b.%b.%b " "${_major}" "${_minor}" "${_patch}"
+
+            _next_number="$(printf "%b" "${_patch_origin}" | ${SED_BIN} -e "s/${_last_char}//")"
+            _next_number="$(( ${_next_number} + 1))"
+            _patch="${_next_number}a"
+            printf "%b.%b.%b" "${_major}" "${_minor}" "${_patch}"
             ;;
 
         "0")
