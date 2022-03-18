@@ -22,6 +22,7 @@ debug "Sofin (cmdline: $(distd "${SOFIN_CMDLINE}"),  SOFIN_PID=$(distd "${SOFIN_
 # Set explicit +e for Sofin shell:
 env_forgivable
 validate_env
+performance max
 
 
 # Tracing of Sofin itself:
@@ -143,6 +144,11 @@ if [ -n "${SOFIN_COMMAND}" ]; then
             update_defs
             ;;
 
+
+        performance|perf)
+            permnote "Setting performance: $(distn "${SOFIN_ARGS}")"
+            performance "${SOFIN_ARGS}"
+            ;;
 
         purge)
             initialize
