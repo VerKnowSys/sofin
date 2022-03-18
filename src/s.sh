@@ -117,7 +117,7 @@ if [ -n "${SOFIN_COMMAND}" ]; then
             ;;
 
 
-        origins)
+        origins|origin)
             show_new_origin_updates "${SOFIN_ARGS}"
             ;;
 
