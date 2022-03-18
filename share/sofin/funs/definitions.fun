@@ -1074,7 +1074,7 @@ show_new_origin_updates () {
     _definitions="${*}"
     if [ -x "${CURL_BIN}" ]; then
         _fetch_cmd="${CURL_BIN}"
-        _fetch_opts="-sSfL -m5"
+        _fetch_opts="-sSfL -m5 -O"
     else
         _fetch_cmd="${FETCH_BIN}"
         _fetch_opts="-q -T5"
@@ -1104,11 +1104,11 @@ show_new_origin_updates () {
                         _next_version_origin="$(printf "%b\n" "${DEF_ORIGIN}" | ${SED_BIN} -e "s/${DEF_VERSION}/${_possible_next}/g")"
                         debug "Next version of $(distd "${_definition##*/}") could have origin: $(distd "${_next_version_origin}")"
                         cd /tmp
-                        ${_fetch_cmd} ${_fetch_opts} "${_next_version_origin}" >/dev/null 2>&1
+                        try "${_fetch_cmd} ${_fetch_opts} ${_next_version_origin}"
                         if [ "0" = "${?}" ]; then
                             warn "Possible new version of definition: $(distw "${DEF_NAME}${DEF_SUFFIX}") found. Origin: $(distw "${_next_version_origin}")"
                         fi
-                        ${RM_BIN} -f "${_next_version_origin}"
+                        ${RM_BIN} -f "${_next_version_origin##*/}"
                         ;;
                 esac
             done
