@@ -283,6 +283,7 @@ retry () {
             error "Given an empty command to evaluate with retry()!"
         fi
         _ammo="$(printf "%b\n" "${_ammo}" | ${SED_BIN} 's/O//' 2>/dev/null)"
+        sleep 10
         debug "Remaining attempts: $(distd "${_ammo}")"
     done
     debug "All available ammo exhausted to invoke a command: $(distd "${_targets}")"
