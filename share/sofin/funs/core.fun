@@ -9,39 +9,41 @@ debug () {
     create_sofin_dirs
     if [ -n "${DEBUG}" ]; then
         if [ "YES" = "${CAP_TERM_INTERACTIVE}" ]; then
-            printf "%bλ %b%b%b\n" \
+            printf "%b%b λ %b%b%b\n" \
                     "${ColorDark}" \
+                    "$(${DATE_BIN} +"%F-%T")" \
                     "${ColorDebug}" \
                     "${_debug_msg}$(fill_interactive_line "${_debug_msg}")" \
                     "${ColorReset}" \
                         >&2
         else
-            printf "# %b%b%b\n" \
-                    "${ColorDebug}" \
+            printf "# %b # %b\n" \
+                    "$(${DATE_BIN} +"%F-%T")" \
                     "${_debug_msg}" \
-                    "${ColorReset}" \
                         >&2
         fi
     else
         if [ -n "${DEF_NAME}${DEF_SUFFIX}" ]; then
             # Definition log, log to stderr only
-            printf "# %b%b%b%b\n" \
+            printf "# %b%b: %b%b%b\n" \
+                    "${ColorDark}" \
+                    "$(${DATE_BIN} +"%F-%T")" \
                     "${ColorDebug}" \
                     "${_debug_msg}" \
                     "${ColorReset}" \
-                    "${_permdbg}" \
                         2>> "${LOG}-${DEF_NAME}${DEF_SUFFIX}" >&2
         else
             # Main log, all to stderr
-            printf "# %b%b%b%b\n" \
+            printf "# %b%b: %b%b%b\n" \
+                    "${ColorDark}" \
+                    "$(${DATE_BIN} +"%F-%T")" \
                     "${ColorDebug}" \
                     "${_debug_msg}" \
                     "${ColorReset}" \
-                    "${_permdbg}" \
                         2>> "${LOG}" >&2
         fi
     fi
-    unset _dbgnme _debug_msg _dbfn
+    unset _debug_msg
     return 0
 }
 
