@@ -293,21 +293,20 @@ retry () {
 
 
 performance () {
-    case "${1}" in
-        max|top|full)
-            try "service powerd stop"
-
-            _cmdline="${SYSCTL_BIN} "
-            for _idx in $(${SEQ_BIN} 0 "$(( ${CPUS} - 1 ))"); do
-                _core_freq_max="$(${SYSCTL_BIN} -n "dev.cpu.${_idx}.freq_levels" | ${AWK_BIN} '/[0-9]*/ { gsub("/-1", "", $1); print $1}')"
-                _cmdline="${_cmdline} dev.cpu.${_idx}.freq=${_core_freq_max}"
-            done
-            try "${_cmdline}"
-            unset _cmdline _core_freq_max _idx
-            ;;
-
-        min|powersave|min|normal)
-            try "service powerd start"
+    _a_level="${1}"
+    case "${SYSTEM_ARCH}" in
+        arm64|aarch64)
+            case "${_a_level}" in
+                max|top|full)
+                    _cmdline="${SYSCTL_BIN} "
+                    for _idx in $(${SEQ_BIN} 0 "$(( ${CPUS} - 1 ))"); do
+                        _core_freq_max="$(${SYSCTL_BIN} -n "dev.cpu.${_idx}.freq_levels" | ${AWK_BIN} '/[0-9]*/ { gsub("/-1", "", $1); print $1}')"
+                        _cmdline="${_cmdline} dev.cpu.${_idx}.freq=${_core_freq_max}"
+                    done
+                    try "${_cmdline}"
+                    unset _cmdline _core_freq_max _idx
+                    ;;
+            esac
             ;;
     esac
 }
