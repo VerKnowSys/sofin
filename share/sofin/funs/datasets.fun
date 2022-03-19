@@ -76,13 +76,13 @@ push_dset_zfs_stream () {
             debug "Service dataset file found existing on remote mirror: $(distd "${_psmirror}"). Service dataset origins can be stored only once (future ZFS-related features will rely on this!)"
         else
             _pushlogname="${LOG}-$(lowercase "${_pselement}")"
-            try "${CHMOD_BIN} -v a+r ${FILE_CACHE_DIR}${_psfin_snapfile}" \
+            run "${CHMOD_BIN} -v a+r ${FILE_CACHE_DIR}${_psfin_snapfile}" \
                 && debug "Archive access a+r for: $(distd "${_psfin_snapfile}")"
             retry "${SCP_BIN} ${DEFAULT_SSH_OPTS} ${DEFAULT_SCP_OPTS} -P ${SOFIN_SSH_PORT} ${FILE_CACHE_DIR}${_psfin_snapfile} ${SOFIN_NAME}@${_psmirror}:${COMMON_BINARY_REMOTE}/${_psfin_snapfile}${DEFAULT_PARTIAL_FILE_EXT} >> ${_pushlogname}"
             if [ "${?}" = "0" ]; then
                 debug "Service origin stream was sent to: $(distd "${MAIN_COMMON_NAME}") repository: $(distd "${MAIN_COMMON_REPOSITORY}/${_psfin_snapfile}")"
                 retry "${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${SOFIN_SSH_PORT} ${SOFIN_NAME}@${_psmirror} \"cd ${COMMON_BINARY_REMOTE} && ${MV_BIN} ${_psfin_snapfile}${DEFAULT_PARTIAL_FILE_EXT} ${_psfin_snapfile}\"" \
-                    && debug "Partial file renamed successfully"
+                    || error "Couldn't rename partial file after upload!?"
             else
                 error "Failed to send service stream of bundle: $(diste "${_pselement}") file: $(diste "${_psfin_snapfile}") to remote host: $(diste "${SOFIN_NAME}@${_psmirror}")!"
             fi
@@ -250,16 +250,17 @@ try_fetch_service_dir () {
         _svce_org_file="${FILE_CACHE_DIR}${_svce_origin}"
         if [ ! -f "${_svce_org_file}" ]; then
             retry "${FETCH_BIN} -o ${_svce_org_file} ${FETCH_OPTS} ${MAIN_COMMON_REPOSITORY}/${_svce_origin}" \
-                && debug "Service origin fetched successfully for bundle: $(distd "${_svce_origin}")"
+                || error "Couldn't fetch origin for bundle: $(diste "${_svce_origin}")!"
+            debug "Service origin fetched successfully for bundle: $(distd "${_svce_origin}")"
         fi
         if [ -f "${_svce_org_file}" ]; then
             # NOTE: each user dataset is made of same origin, hence you can apply snapshots amongst them..
             try "${ZFS_BIN} list '${DEFAULT_ZPOOL}${SERVICES_DIR}/${SYSTEM_DATASET}/${_dset_create}'"
-            if [ "0" = "$?" ]; then
+            if [ "0" = "${?}" ]; then
                 debug "Service origin is already present for bundle: $(distd "${_svce_origin}")"
             else
-                run "${SOFIN_LZ4CAT_BIN} '${_svce_org_file}' | ${ZFS_BIN} receive ${ZFS_RECEIVE_OPTS} '${DEFAULT_ZPOOL}${SERVICES_DIR}/${SYSTEM_DATASET}/${_dset_create}' | ${TAIL_BIN} -n1" \
-                    && debug "Service origin received successfully for bundle: $(distd "${_svce_origin}")"
+                run "${SOFIN_LZ4CAT_BIN} '${_svce_org_file}' | ${ZFS_BIN} receive ${ZFS_RECEIVE_OPTS} '${DEFAULT_ZPOOL}${SERVICES_DIR}/${SYSTEM_DATASET}/${_dset_create}' | ${TAIL_BIN} -n1"
+                debug "Service origin received successfully for bundle: $(distd "${_svce_origin}")"
             fi
         else
             debug "No Service origin file: '$(distd "${_svce_org_file}")' available! Skipped."
@@ -272,14 +273,15 @@ try_fetch_service_dir () {
             debug "Service origin file: '$(distd "${_svce_org_file}")' is present in local file-cache."
         else
             retry "${FETCH_BIN} -o ${_svce_org_file} ${FETCH_OPTS} ${MAIN_COMMON_REPOSITORY}/${_svce_origin}" \
-                && debug "Service origin fetched successfully: $(distd "${_svce_origin}")"
+                || error "Couldn't fetch origin: $(diste "${_svce_origin}")"
+            debug "Service origin fetched successfully: $(distd "${_svce_origin}")"
         fi
         if [ -f "${_svce_org_file}" ]; then
             if [ -d "${SERVICES_DIR}/${_dset_create}" ]; then
                 debug "Service dir: $(distd "${SERVICES_DIR}/${_dset_create}") already exists. Leaving untouched!"
             else
-                run "${TAR_BIN} -xf '${_svce_org_file}' --directory '${SERVICES_DIR}'" \
-                    && debug "Service origin received successfully: $(distd "${_svce_origin}")"
+                run "${TAR_BIN} -xf '${_svce_org_file}' --directory '${SERVICES_DIR}'"
+                debug "Service origin received successfully: $(distd "${_svce_origin}")"
             fi
         else
             debug "No Service origin file: '$(distd "${_svce_org_file}")' available! Skipped."
@@ -652,7 +654,8 @@ push_software_archive () {
         retry "${SCP_BIN} ${DEFAULT_SSH_OPTS} ${DEFAULT_SCP_OPTS} -P ${SOFIN_SSH_PORT} ${_bpfn_chksum_file} ${_bpfn_chksum_file_dest} >> ${_logname}" \
             || error "Failed to send the checksum file: $(diste "${_bpfn_chksum_file}") to: $(diste "${_bpfn_chksum_file_dest}")"
         retry "${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${SOFIN_SSH_PORT} ${SOFIN_NAME}@${_bpamirror} \"${MV_BIN} -f ${_bp_remotfs_file}${DEFAULT_PARTIAL_FILE_EXT} ${_bp_remotfs_file}\"" \
-            && debug "Partial file renamed to destination name: $(distd "${_bp_remotfs_file}")"
+            || error "Couldn't rename destination partial file: $(diste "${_bp_remotfs_file}")"
+        debug "Partial file renamed to destination name: $(distd "${_bp_remotfs_file}")"
     else
         error "Failed to push binary build of: $(diste "${_bpbundle_file}") to remote: $(diste "${_bp_remotfs_file}")"
     fi

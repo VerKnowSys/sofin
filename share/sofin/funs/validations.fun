@@ -247,7 +247,7 @@ validate_pie_on_exports () {
             else
                 for _bin in $(${FIND_BIN} "${_a_dir}" -mindepth 1 -maxdepth 1 -type l 2>/dev/null | ${XARGS_BIN} "${READLINK_BIN}" -f 2>/dev/null); do
                     try "${FILE_BIN} \"${_bin}\" | ${GREP_BIN} -F 'ELF'"
-                    if [ "$?" = "0" ]; then # it's ELF binary/library:
+                    if [ "${?}" = "0" ]; then # it's ELF binary/library:
                         big_fat_warn () {
                             warn "Security - Exported ELF binary: $(distw "${_bin}"), is not a $(distw "${PIE_TYPE_ENTRY}") (not-PIE)!"
                             printf "SECURITY: ELF binary: '%b', is not a '%b' (not-PIE)!\n" "${_bin}" "${PIE_TYPE_ENTRY}" >> "${_pie_indicator}.warn"
@@ -428,10 +428,10 @@ validate_sources () {
                 continue
             elif [ -n "${DEF_GIT_MODE}" ] || [ -n "${DEF_GIT_CHECKOUT}" ]; then
                 "${GIT_BIN}" ls-remote -h "${DEF_SOURCE_PATH}" >/dev/null 2>&1 \
-                || warn "Failed to access repository: $(distw "${DEF_SOURCE_PATH}") for $(distw "${_def}")"
+                    || warn "Failed to access repository: $(distw "${DEF_SOURCE_PATH}") for $(distw "${_def}")"
             else
                 _curlres="$("${CURL_BIN}" -s -o /dev/null -L -I -w "%{http_code}" "${DEF_SOURCE_PATH}")"
-                if [ "$?" != "0" ]; then
+                if [ "0" != "${?}" ]; then
                     warn "Not an URL: $(distw "${DEF_SOURCE_PATH}") in $(distw "${_def}")"
                 elif [ "${_curlres}" != "200" ]; then
                     warn "Response code $(distw "${_curlres}") for URL $(distw "${DEF_SOURCE_PATH}") in $(distw "${_def}")"
