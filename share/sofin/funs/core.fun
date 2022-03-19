@@ -155,7 +155,7 @@ error () {
             "*" \
                 >&2 >/dev/null
     fi
-    finalize_after_signal_interrupt "${ERRORCODE_TASK_FAILURE}"
+    finalize_and_quit_gracefully_with_exitcode "${ERRORCODE_TASK_FAILURE}"
 }
 
 

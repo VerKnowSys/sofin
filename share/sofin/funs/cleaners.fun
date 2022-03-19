@@ -143,6 +143,10 @@ finalize_and_quit_gracefully_with_exitcode () {
     fi
 
     debug "${0}: Exit: $(distd "${_errorcode}"). Pid: $(distd "${SOFIN_PID}")"
+    if [ "0" != "${_errorcode}" ]; then
+        ${KILL_BIN} -TERM ${SOFIN_PID}
+    fi
+
     exit "${_errorcode}"
 }
 
