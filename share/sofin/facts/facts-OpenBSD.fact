@@ -37,3 +37,5 @@ MAKE_OPTS="-s -j${CPUS:-${DEFAULT_CPUS}}"
 # Default options of "strip" utility:
 DEFAULT_STRIP_OPTS="--strip-debug --strip-unneeded --preserve-dates"
 MINIMAL_MAJOR_OS_VERSION="${MINIMAL_MAJOR_OS_VERSION:-7.1}"
+
+unset DTRACE_BIN KILLALL_BIN
