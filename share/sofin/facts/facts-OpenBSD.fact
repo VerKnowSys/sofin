@@ -1,0 +1,39 @@
+#!/usr/bin/env sh
+
+# OpenBSD specific configuration
+
+# JAIL_BIN="/usr/sbin/jail"
+# JEXEC_BIN="/usr/sbin/jexec"
+# JLS_BIN="/usr/sbin/jls"
+# TRUSS_BIN="/usr/bin/truss"
+MOUNT_BIN="/sbin/mount"
+UMOUNT_BIN="/sbin/umount"
+ROUTE_BIN="/sbin/route"
+# MOUNT_NULLFS="/sbin/mount_nullfs"
+# RCTL_BIN="/usr/bin/rctl"
+CHSH_BIN="/usr/bin/chsh"
+# PW_BIN="/usr/sbin/pw"
+CAP_MKDB_BIN="/usr/bin/cap_mkdb"
+# ZPOOL_BIN="/sbin/zpool"
+PFCTL_BIN="/sbin/pfctl"
+# DIALOG_BIN="/usr/bin/dialog"
+# DAEMON_BIN="/usr/sbin/daemon"
+# MERGEMASTER_BIN="/usr/sbin/mergemaster"
+# KLDLOAD_BIN="/sbin/kldload"
+# KLDSTAT_BIN="/sbin/kldstat"
+# MDMFS_BIN="/sbin/mdmfs"
+# LIMITS_BIN="/usr/bin/limits"
+# DTRACE_BIN="/usr/sbin/dtrace"
+PWD_MKDB_BIN="/usr/sbin/pwd_mkdb"
+# GEOM_BIN="/sbin/geom"
+LDD_BIN="/usr/bin/ldd"
+CHFLAGS_BIN="/usr/bin/chflags"
+
+# set core parameters:
+CPUS="$(${SYSCTL_BIN} -n hw.ncpu 2>/dev/null)"
+ALL_CPUS="${CPUS:-${DEFAULT_CPUS}}"
+MAKE_OPTS="-s -j${CPUS:-${DEFAULT_CPUS}}"
+
+# Default options of "strip" utility:
+DEFAULT_STRIP_OPTS="--strip-debug --strip-unneeded --preserve-dates"
+MINIMAL_MAJOR_OS_VERSION="${MINIMAL_MAJOR_OS_VERSION:-7.1}"
