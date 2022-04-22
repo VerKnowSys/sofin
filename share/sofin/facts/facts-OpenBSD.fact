@@ -30,6 +30,8 @@ LDD_BIN="/usr/bin/ldd"
 CHFLAGS_BIN="/usr/bin/chflags"
 MKFIFO_BIN="/sbin/mkfifo"
 PGREP_BIN="/usr/bin/pgrep"
+SHA_BIN="/bin/sha1"
+TAR_BIN="/bin/tar"
 
 # set core parameters:
 CPUS="$(${SYSCTL_BIN} -n hw.ncpu 2>/dev/null)"
@@ -40,4 +42,4 @@ MAKE_OPTS="-s -j${CPUS:-${DEFAULT_CPUS}}"
 DEFAULT_STRIP_OPTS="--strip-debug --strip-unneeded --preserve-dates"
 MINIMAL_MAJOR_OS_VERSION="${MINIMAL_MAJOR_OS_VERSION:-7.1}"
 
-unset DTRACE_BIN KILLALL_BIN SERVICE_BIN
+unset DTRACE_BIN KILLALL_BIN SERVICE_BIN UNZIP_BIN
