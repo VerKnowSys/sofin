@@ -73,7 +73,7 @@ SINGLE_ERROR_CFLAGS="-ferror-limit=1"
 LTO_MAX_SIZE=8g
 LTO_CFLAGS="-flto=thin -ffat-lto-objects -fuse-linker-plugin -Wl,--thinlto-jobs=${CPUS}"
 case "${SYSTEM_NAME}" in
-    Darwin)
+    Darwin|OpenBSD)
         LTO_CFLAGS="-flto=thin"
         ;;
 

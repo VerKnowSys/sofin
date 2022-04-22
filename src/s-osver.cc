@@ -24,6 +24,15 @@
 
 int main(int argc, char *argv[]) {
 
+    #ifdef __OpenBSD__
+        char buff[5];
+        FILE *in;
+        in = popen("/sbin/sysctl -n kern.osrelease", "r");
+        fgets(buff, sizeof(buff), in);
+        pclose(in);
+        printf("%s", buff);
+    #endif
+
     /* for FreeBSD, give major and minor version from OS cause there's only one FreeBSD :} */
     #ifdef __FreeBSD__
         const int modifier = 100000;

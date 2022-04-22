@@ -392,7 +392,7 @@ compiler_setup () {
 
     if [ -z "${DEF_NO_HARDEN_FLAGS}" ]; then
         case "${SYSTEM_NAME}" in
-            FreeBSD)
+            FreeBSD|OpenBSD)
                 DEFAULT_COMPILER_FLAGS="${SINGLE_ERROR_CFLAGS} ${CFLAGS_PRODUCTION} ${HARDEN_CFLAGS} ${CMACROS}"
                 DEFAULT_LINKER_FLAGS="${LDFLAGS_PRODUCTION}"
                 ;;
