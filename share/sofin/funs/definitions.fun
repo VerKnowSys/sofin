@@ -131,7 +131,7 @@ update_defs () {
         debug "Fetching latest tarball with initial definitions from: $(distd "${_initial_defs}")"
         _out_file="${FILE_CACHE_DIR}${DEFINITIONS_INITIAL_FILE_NAME}${DEFAULT_ARCHIVE_TARBALL_EXT}"
         retry "${FETCH_BIN} -o ${_out_file} ${FETCH_OPTS} '${_initial_defs}'" \
-            && try "${TAR_BIN} -xf ${_out_file} --directory ${CACHE_DIR}${DEFINITIONS_BASE}" \
+            && try "${TAR_BIN} -xf ${_out_file} ${TAR_DIRECTORY_ARG} ${CACHE_DIR}${DEFINITIONS_BASE}" \
                 && try "${RM_BIN} -vrf ${_initial_defs}" \
                     && return 0
     fi

@@ -224,7 +224,7 @@ fetch_dset_zfs_stream () {
         debug "Fetch service stream-tarball: $(distd "${FILE_CACHE_DIR}${_fdz_out_file}")"
         retry "${FETCH_BIN} -o ${FILE_CACHE_DIR}${_fdz_out_file} ${FETCH_OPTS} '${_commons_path}'"
         if [ "${?}" = "0" ]; then
-            try "${TAR_BIN} -xf ${FILE_CACHE_DIR}${_fdz_out_file} --directory ${SERVICES_DIR}" \
+            try "${TAR_BIN} -xf ${FILE_CACHE_DIR}${_fdz_out_file} ${TAR_DIRECTORY_ARG} ${SERVICES_DIR}" \
                 && permnote "Received service tarball for bundle: $(distn "${_fdz_bund_name}")"
             unset _tarball_name
         else
@@ -286,7 +286,7 @@ try_fetch_service_dir () {
             if [ -d "${SERVICES_DIR}/${_dset_create}" ]; then
                 debug "Service dir: $(distd "${SERVICES_DIR}/${_dset_create}") already exists. Leaving untouched!"
             else
-                run "${TAR_BIN} -xf '${_svce_org_file}' --directory '${SERVICES_DIR}'"
+                run "${TAR_BIN} -xf '${_svce_org_file}' ${TAR_DIRECTORY_ARG} '${SERVICES_DIR}'"
                 debug "Service origin received successfully: $(distd "${_svce_origin}")"
             fi
         else
@@ -618,7 +618,7 @@ install_software_from_binbuild () {
             && note "Installed: $(distn "${_isfb_fullname}")" \
                 && CURRENT_DEFINITION_SKIP_BUILD_DO_EXPORTS=YES
     else
-        try "${TAR_BIN} -xf ${FILE_CACHE_DIR}${_isfb_archive} --directory ${SOFTWARE_DIR}"
+        try "${TAR_BIN} -xf ${FILE_CACHE_DIR}${_isfb_archive} ${TAR_DIRECTORY_ARG} ${SOFTWARE_DIR}"
         if [ "${?}" = "0" ]; then
             note "Installed binary build: $(distn "${_isfb_fullname}")"
             CURRENT_DEFINITION_SKIP_BUILD_DO_EXPORTS=YES

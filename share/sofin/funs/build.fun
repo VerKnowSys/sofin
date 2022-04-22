@@ -541,9 +541,9 @@ process_flat () {
                                 && debug "Previous dependency build dir was removed to avoid conflicts: $(distd "${BUILD_DIR}/${_possible_old_build_dir%/}")"
                         fi
 
-                        try "${TAR_BIN} -xf ${_dest_file} --directory ${BUILD_DIR}" \
-                            || try "${TAR_BIN} -xjf ${_dest_file} --directory ${BUILD_DIR}" \
-                                || run "${TAR_BIN} -xJf ${_dest_file} --directory ${BUILD_DIR}"
+                        try "${TAR_BIN} -xf ${_dest_file} ${TAR_DIRECTORY_ARG} ${BUILD_DIR}" \
+                            || try "${TAR_BIN} -xjf ${_dest_file} ${TAR_DIRECTORY_ARG} ${BUILD_DIR}" \
+                                || run "${TAR_BIN} -xJf ${_dest_file} ${TAR_DIRECTORY_ARG} ${BUILD_DIR}"
 
                         debug "Unpacked source for: $(distd "${DEF_NAME}${DEF_SUFFIX}"), version: $(distd "${DEF_VERSION}") into build-dir: $(distd "${BUILD_DIR}")"
                     else

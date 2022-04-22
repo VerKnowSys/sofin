@@ -82,6 +82,15 @@ case "${SYSTEM_NAME}" in
         LTO_CFLAGS="${LTO_CFLAGS} -Wl,--thinlto-cache-dir=${LTO_CACHE_DIR} -Wl,--thinlto-cache-policy,cache_size_bytes=${LTO_MAX_SIZE}"
         ;;
 esac
+case "${SYSTEM_NAME}" in
+    OpenBSD)
+        TAR_DIRECTORY_ARG="-C"
+        ;;
+
+    *)
+        TAR_DIRECTORY_ARG="--directory"
+        ;;
+esac
 CFI_CFLAGS="-fsanitize=cfi -fvisibility=hidden"
 ASAN_CFLAGS="-fsanitize=address"
 CXX11_CXXFLAGS="-std=c++11"
