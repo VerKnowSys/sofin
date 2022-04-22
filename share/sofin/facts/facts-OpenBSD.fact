@@ -28,6 +28,7 @@ PWD_MKDB_BIN="/usr/sbin/pwd_mkdb"
 # GEOM_BIN="/sbin/geom"
 LDD_BIN="/usr/bin/ldd"
 CHFLAGS_BIN="/usr/bin/chflags"
+MKFIFO_BIN="/sbin/mkfifo"
 
 # set core parameters:
 CPUS="$(${SYSCTL_BIN} -n hw.ncpu 2>/dev/null)"
