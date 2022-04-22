@@ -531,15 +531,23 @@ process_flat () {
                             unset _bname _a_file_checksum
                         fi
 
-                        _possible_old_build_dir="$(${TAR_BIN} -t --list --file "${_dest_file}" 2>/dev/null | ${HEAD_BIN} -n1 2>/dev/null | ${AWK_BIN} '{print $9;}' 2>/dev/null)"
-                        _pbd_basename="${_possible_old_build_dir##*/}"
-                        if [ "${_pbd_basename}" != "${_possible_old_build_dir}" ]; then # more than one path element?
-                            _possible_old_build_dir="${_possible_old_build_dir%%/"${_pbd_basename}"}"
-                        fi
-                        if [ -d "${BUILD_DIR}/${_possible_old_build_dir%/}" ]; then
-                            try "${RM_BIN} -rf '${BUILD_DIR}/${_possible_old_build_dir%/}'" \
-                                && debug "Previous dependency build dir was removed to avoid conflicts: $(distd "${BUILD_DIR}/${_possible_old_build_dir%/}")"
-                        fi
+                        case "${SYSTEM_NAME}" in
+                            OpenBSD)
+                                ${MKDIR_BIN} -p "${BUILD_DIR}"
+                                ;;
+
+                            *)
+                                _possible_old_build_dir="$(${TAR_BIN} -t --list --file "${_dest_file}" 2>/dev/null | ${HEAD_BIN} -n1 2>/dev/null | ${AWK_BIN} '{print $9;}' 2>/dev/null)"
+                                _pbd_basename="${_possible_old_build_dir##*/}"
+                                if [ "${_pbd_basename}" != "${_possible_old_build_dir}" ]; then # more than one path element?
+                                    _possible_old_build_dir="${_possible_old_build_dir%%/"${_pbd_basename}"}"
+                                fi
+                                if [ -d "${BUILD_DIR}/${_possible_old_build_dir%/}" ]; then
+                                    try "${RM_BIN} -rf '${BUILD_DIR}/${_possible_old_build_dir%/}'" \
+                                        && debug "Previous dependency build dir was removed to avoid conflicts: $(distd "${BUILD_DIR}/${_possible_old_build_dir%/}")"
+                                fi
+                                ;;
+                        esac
 
                         try "${TAR_BIN} -xf ${_dest_file} ${TAR_DIRECTORY_ARG} ${BUILD_DIR}" \
                             || try "${TAR_BIN} -xzf ${_dest_file} ${TAR_DIRECTORY_ARG} ${BUILD_DIR}" \
