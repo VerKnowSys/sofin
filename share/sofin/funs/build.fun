@@ -542,8 +542,9 @@ process_flat () {
                         fi
 
                         try "${TAR_BIN} -xf ${_dest_file} ${TAR_DIRECTORY_ARG} ${BUILD_DIR}" \
+                            || try "${TAR_BIN} -xzf ${_dest_file} ${TAR_DIRECTORY_ARG} ${BUILD_DIR}" \
                             || try "${TAR_BIN} -xjf ${_dest_file} ${TAR_DIRECTORY_ARG} ${BUILD_DIR}" \
-                                || run "${TAR_BIN} -xJf ${_dest_file} ${TAR_DIRECTORY_ARG} ${BUILD_DIR}"
+                            || run "${TAR_BIN} -xJf ${_dest_file} ${TAR_DIRECTORY_ARG} ${BUILD_DIR}"
 
                         debug "Unpacked source for: $(distd "${DEF_NAME}${DEF_SUFFIX}"), version: $(distd "${DEF_VERSION}") into build-dir: $(distd "${BUILD_DIR}")"
                     else
