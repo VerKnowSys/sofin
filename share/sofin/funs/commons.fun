@@ -247,7 +247,7 @@ file_checksum () {
         error "Empty file name given for function: $(diste "file_checksum()")"
     fi
     case "${SYSTEM_NAME}" in
-        NetBSD|OpenBSD|Minix)
+        NetBSD|Minix)
             ${SHA_BIN} -n "${_fcsmname}" 2>/dev/null | ${CUT_BIN} -d' ' -f1 2>/dev/null
             ;;
 
@@ -255,7 +255,7 @@ file_checksum () {
             ${SHA_BIN} "${_fcsmname}" 2>/dev/null | ${CUT_BIN} -d' ' -f1 2>/dev/null
             ;;
 
-        FreeBSD)
+        FreeBSD|OpenBSD)
             ${SHA_BIN} -q "${_fcsmname}" 2>/dev/null
             ;;
 
