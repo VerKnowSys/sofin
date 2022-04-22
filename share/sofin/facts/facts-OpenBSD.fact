@@ -29,6 +29,7 @@ PWD_MKDB_BIN="/usr/sbin/pwd_mkdb"
 LDD_BIN="/usr/bin/ldd"
 CHFLAGS_BIN="/usr/bin/chflags"
 MKFIFO_BIN="/sbin/mkfifo"
+PGREP_BIN="/usr/bin/pgrep"
 
 # set core parameters:
 CPUS="$(${SYSCTL_BIN} -n hw.ncpu 2>/dev/null)"
