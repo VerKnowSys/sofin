@@ -303,7 +303,7 @@ performance () {
                 max|top|full)
                     _cmdline="${SYSCTL_BIN} "
                     for _idx in $(${SEQ_BIN} 0 "$(( ${CPUS} - 1 ))"); do
-                        _core_freq_max="$(${SYSCTL_BIN} -n "dev.cpu.${_idx}.freq_levels" | ${AWK_BIN} '/[0-9]*/ { gsub("/-1", "", $1); print $1}')"
+                        _core_freq_max="$(${SYSCTL_BIN} -n "dev.cpu.${_idx}.freq_levels" 2>/dev/null | ${AWK_BIN} '/[0-9]*/ { gsub("/-1", "", $1); print $1}')"
                         _cmdline="${_cmdline} dev.cpu.${_idx}.freq=${_core_freq_max}"
                     done
                     try "${_cmdline}"
