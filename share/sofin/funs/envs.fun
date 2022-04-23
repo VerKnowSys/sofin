@@ -306,7 +306,7 @@ compiler_setup () {
         #
 
         case "${SYSTEM_ARCH}" in
-            aarch64)
+            aarch64|arm64)
                 LD="ld.lld -m aarch64elf"
                 ;;
 
