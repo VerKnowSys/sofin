@@ -28,7 +28,6 @@ Elasticsearch6
 Elasticsearch7
 Elixir
 Ettercap
-Fail2ban
 Fftw
 Ffmpeg
 Filebeat
@@ -49,6 +48,7 @@ Gnutls
 Gperf
 Gpgme
 Go
+Gztool
 Haproxy
 Httpd
 Htop
