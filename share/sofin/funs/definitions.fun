@@ -926,8 +926,8 @@ clone_or_fetch_git_bare_repo () {
     _git_cached="${GIT_CACHE_DIR}${_bare_name}${DEFAULT_GIT_DIR_NAME}"
     try "${MKDIR_BIN} -p ${GIT_CACHE_DIR}"
     note "   ${NOTE_CHAR} Fetching source repository: $(distn "${_source_path}")"
-    try "${GIT_BIN} clone --depth 1 --jobs=3 --recursive --mirror ${_source_path} ${_git_cached}" \
-        || try "${GIT_BIN} clone --depth 1 --jobs=3 --mirror ${_source_path} ${_git_cached}"
+    try "${GIT_BIN} clone --jobs=${CPUS} --recursive --mirror ${_source_path} ${_git_cached}" \
+        || try "${GIT_BIN} clone --jobs=${CPUS} --mirror ${_source_path} ${_git_cached}"
     if [ "${?}" = "0" ]; then
         debug "Cloned bare repository: $(distd "${_bare_name}")"
     elif [ -d "${_git_cached}" ]; then
@@ -946,7 +946,7 @@ clone_or_fetch_git_bare_repo () {
     _dest_repo="${_build_dir}/${_bare_name}-${_chk_branch}"
     try "${RM_BIN} -rf '${_dest_repo}'"
     debug "Attempting to clone from cached repository: $(distd "${_git_cached}").."
-    run "${GIT_BIN} clone --progress --recursive --jobs=3 -b ${_chk_branch} ${_git_cached} ${_dest_repo}" \
+    run "${GIT_BIN} clone --depth 1 --progress --recursive --jobs=${CPUS} --branch ${_chk_branch} --single-branch ${_git_cached} ${_dest_repo}" \
         && debug "Cloned branch: $(distd "${_chk_branch}") from cached repository: $(distd "${_git_cached}")"
     unset _git_cached _bare_name _chk_branch _build_dir _dest_repo
 }
