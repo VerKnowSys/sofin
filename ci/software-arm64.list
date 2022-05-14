@@ -9,6 +9,7 @@ Bison27
 Boost
 Ccache
 Check
+Chicken
 Clamav
 Cmake
 Collectd
@@ -38,6 +39,7 @@ Gperf
 Gpgme
 Grafana
 Graphicsmagick
+Guile
 Gztool
 Haproxy
 Httpd
