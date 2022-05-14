@@ -15,16 +15,7 @@ fi
 permnote "Wiping out all Sofin locks and cached bundle files"
 ${RM_BIN} -f ${HOME}/.sofin/locks/*.lock ${HOME}/.sofin/file-cache/*.zfs* 2>/dev/null
 
-case "${SYSTEM_ARCH}" in
-    arm64)
-        _workers="3"
-        ;;
-
-    amd64|x86_64)
-        _workers="4"
-        ;;
-esac
-
+_workers="4"
 _src_list="software-${SYSTEM_ARCH}.list"
 _lines="$(${GREP_BIN} -c '' "${_src_list}")"
 if [ "0" = "${_lines}" ]; then
@@ -55,20 +46,10 @@ for _idx in $(${SEQ_BIN} 2 "${_workers}"); do
     ${_tmux} split-window -h zsh
 done
 
-case "${SYSTEM_ARCH}" in
-    arm64)
-        ${_tmux} send -t 0:0.0 "./build-list ${_split_name}-aa" C-m
-        ${_tmux} send -t 0:0.1 "./build-list ${_split_name}-ab" C-m
-        ${_tmux} send -t 0:0.2 "./build-list ${_split_name}-ac" C-m
-        ;;
-
-    amd64|x86_64)
-        ${_tmux} send -t 0:0.0 "./build-list ${_split_name}-aa" C-m
-        ${_tmux} send -t 0:0.1 "./build-list ${_split_name}-ab" C-m
-        ${_tmux} send -t 0:0.2 "./build-list ${_split_name}-ac" C-m
-        ${_tmux} send -t 0:0.3 "./build-list ${_split_name}-ad" C-m
-        ;;
-esac
+${_tmux} send -t 0:0.0 "./build-list ${_split_name}-aa" C-m
+${_tmux} send -t 0:0.1 "./build-list ${_split_name}-ab" C-m
+${_tmux} send -t 0:0.2 "./build-list ${_split_name}-ac" C-m
+${_tmux} send -t 0:0.3 "./build-list ${_split_name}-ad" C-m
 
 ${_tmux} select-layout tiled
 
