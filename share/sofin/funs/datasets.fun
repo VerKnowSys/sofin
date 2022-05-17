@@ -249,7 +249,7 @@ try_fetch_service_dir () {
         _svce_origin="${_dset_create}-${_dset_version}-${SYSTEM_NAME}${DEFAULT_SERVICE_SNAPSHOT_EXT}"
         _svce_org_file="${FILE_CACHE_DIR}${_svce_origin}"
         if [ ! -f "${_svce_org_file}" ]; then
-            retry "${FETCH_BIN} -o ${_svce_org_file} ${FETCH_OPTS} ${MAIN_COMMON_REPOSITORY}/${_svce_origin}"
+            try "${FETCH_BIN} -o ${_svce_org_file} ${FETCH_OPTS} ${MAIN_COMMON_REPOSITORY}/${_svce_origin}"
             if [ "0" = "${?}" ]; then
                 debug "Service origin fetched successfully for bundle: $(distd "${_svce_origin}")"
             else
@@ -275,7 +275,7 @@ try_fetch_service_dir () {
         if [ -f "${_svce_org_file}" ]; then
             debug "Service origin file: '$(distd "${_svce_org_file}")' is present in local file-cache."
         else
-            retry "${FETCH_BIN} -o ${_svce_org_file} ${FETCH_OPTS} ${MAIN_COMMON_REPOSITORY}/${_svce_origin}"
+            try "${FETCH_BIN} -o ${_svce_org_file} ${FETCH_OPTS} ${MAIN_COMMON_REPOSITORY}/${_svce_origin}"
             if [ "0" = "${?}" ]; then
                 debug "Service origin fetched successfully: $(distd "${_svce_origin}")"
             else
