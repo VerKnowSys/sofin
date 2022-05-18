@@ -75,7 +75,7 @@ USE_UPDATE=NO s build Git
 
 
 ## Examples:
-* By default Sofin uses: BRANCH=stable and REPOSITORY=http://github.com/VerKnowSys/s-definitions.git. To reset to defaults, do: `REPOSITORY= s setup`. To set custom Sofin definitions repository on given branch do:
+* By default Sofin uses: BRANCH=stable and REPOSITORY=https://github.com/VerKnowSys/sofin-definitions. To reset to defaults, do: `REPOSITORY= s setup`. To set custom Sofin definitions repository on given branch do:
 ```bash
 REPOSITORY=git://some.where.com:YourDefinitions.git BRANCH=mybranch s setup
 ```
