@@ -270,13 +270,13 @@ retry () {
     while [ -n "${_ammo}" ]; do
         if [ -n "${_targets}" ]; then
             if [ -z "${DEBUG}" ]; then # No DEBUG set -> discard both STDOUT and STDERR for try() calls${CHAR_DOTS}:
-                eval "PATH=${DEFAULT_PATH}${GIT_EXPORTS} ${_targets}" 2>/dev/null >&2  \
+                eval "PATH=${DEFAULT_PATH}${GIT_EXPORTS} ${_targets}" 2>/dev/null \
                     && check_result "${?}" "${_targets}" \
                         && unset _ammo _targets \
                             && return 0
             else
                 printf "%b\n" "${ColorBlue}" >&2
-                eval "PATH=${DEFAULT_PATH}${GIT_EXPORTS} ${_targets}" 2>> "${LOG}" >&2  \
+                eval "PATH=${DEFAULT_PATH}${GIT_EXPORTS} ${_targets}" 2>> "${LOG}" \
                     && check_result "${?}" "${_targets}" \
                         && unset _ammo _targets \
                             && return 0
