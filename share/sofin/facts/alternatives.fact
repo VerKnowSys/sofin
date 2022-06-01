@@ -190,7 +190,7 @@ if [ -x "/usr/bin/rsync" ]; then
 elif [ -x "/bin/rsync" ]; then
     RSYNC_BIN="/bin/rsync"
 elif [ -x "${SOFTWARE_DIR}/Rsync/bin/rsync" ]; then
-    RSYNC_BIN="${SOFTWARE_DIR}/rsync/bin/rsync"
+    RSYNC_BIN="${SOFTWARE_DIR}/Rsync/bin/rsync"
 elif [ -x "${SOFIN_UTILS_PATH}/rsync" ]; then
     RSYNC_BIN="${SOFIN_UTILS_PATH}/rsync"
 else
