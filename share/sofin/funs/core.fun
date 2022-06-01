@@ -453,9 +453,8 @@ create_sofin_dirs () {
     if [ ! -d "${LOGS_DIR}" ] \
     || [ ! -d "${FILE_CACHE_DIR}" ] \
     || [ ! -d "${LOCKS_DIR}" ]; then
-        ${MKDIR_BIN} -p "${FILE_CACHE_DIR}" "${LOCKS_DIR}" "${LOGS_DIR}" 2>/dev/null
-        ${TOUCH_BIN} "${LOG}" >/dev/null 2>&1 # touch default Sofin log file.
-        debug "create_sofin_dirs(): Done!"
+        ${MKDIR_BIN} -p "${FILE_CACHE_DIR}" "${LOCKS_DIR}" "${LOGS_DIR}"
+        ${TOUCH_BIN} "${LOG}"
     fi
 }
 
