@@ -476,3 +476,8 @@ link_utilities () {
     done
     unset _sofin_svc_dir _tool_bundle _export
 }
+
+
+disallow_util_being_found () {
+    try "${RM_BIN} -vr ${SERVICES_DIR}/${SOFIN_BUNDLE_NAME}/*-util/lib/pkgconfig"
+}

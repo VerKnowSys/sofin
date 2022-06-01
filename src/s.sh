@@ -370,6 +370,7 @@ if [ -n "${SOFIN_COMMAND}" ]; then
                     fi
                     note "Linking prebuilt utility: $(distn "${_util}") for: $(distn "${OS_TRIPPLE}")"
                     link_utilities
+                    disallow_util_being_found
                 done
                 permnote "Installed utilities: $(distn "${_utils}")"
                 finalize_complete_standard_task
