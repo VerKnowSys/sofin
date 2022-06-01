@@ -77,8 +77,15 @@ push_dset_zfs_stream () {
         else
             run "${CHMOD_BIN} -v a+r ${FILE_CACHE_DIR}${_psfin_snapfile}" \
                 && debug "Archive access a+r for: $(distd "${_psfin_snapfile}")"
-            retry "${SCP_BIN} ${DEFAULT_SSH_OPTS} ${DEFAULT_SCP_OPTS} -P ${SOFIN_SSH_PORT} ${FILE_CACHE_DIR}${_psfin_snapfile} ${SOFIN_NAME}@${_psmirror}:${COMMON_BINARY_REMOTE}/${_psfin_snapfile}${DEFAULT_PARTIAL_FILE_EXT}"
-            if [ "${?}" = "0" ]; then
+
+            if [ -x "${RSYNC_BIN}" ]; then
+                retry "${RSYNC_BIN} ${DEFAULT_RSYNC_OPTS} -e 'ssh -p ${SOFIN_SSH_PORT}' ${FILE_CACHE_DIR}${_psfin_snapfile} ${SOFIN_NAME}@${_psmirror}:${COMMON_BINARY_REMOTE}/${_psfin_snapfile}${DEFAULT_PARTIAL_FILE_EXT}"
+                _retryresult="${?}"
+            else
+                retry "${SCP_BIN} ${DEFAULT_SSH_OPTS} ${DEFAULT_SCP_OPTS} -P ${SOFIN_SSH_PORT} ${FILE_CACHE_DIR}${_psfin_snapfile} ${SOFIN_NAME}@${_psmirror}:${COMMON_BINARY_REMOTE}/${_psfin_snapfile}${DEFAULT_PARTIAL_FILE_EXT}"
+                _retryresult="${?}"
+            fi
+            if [ "${_retryresult}" = "0" ]; then
                 debug "Service origin stream was sent to: $(distd "${MAIN_COMMON_NAME}") repository: $(distd "${MAIN_COMMON_REPOSITORY}/${_psfin_snapfile}")"
                 retry "${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${SOFIN_SSH_PORT} ${SOFIN_NAME}@${_psmirror} \"cd ${COMMON_BINARY_REMOTE} && ${MV_BIN} ${_psfin_snapfile}${DEFAULT_PARTIAL_FILE_EXT} ${_psfin_snapfile}\"" \
                     || error "Couldn't rename partial file after upload!?"
@@ -89,7 +96,7 @@ push_dset_zfs_stream () {
     else
         debug "No service stream available for bundle: $(distd "${_pselement}")"
     fi
-    unset _psmirror _pselement _psfin_snapfile _psfin_snapfile _psversion_element
+    unset _retryresult _psmirror _pselement _psfin_snapfile _psfin_snapfile _psversion_element
 }
 
 
@@ -653,17 +660,29 @@ push_software_archive () {
         error "No sha checksum in file: $(diste "${_bpfn_chksum_file}")"
     fi
     debug "push_software_archive(): Bundle: $(distd "${_bpbundle_file}"), bundle_file: $(distd "${_bpbundle_file}"), repository address: $(distd "${_bpaddress}")"
-    retry "${SCP_BIN} ${DEFAULT_SSH_OPTS} ${DEFAULT_SCP_OPTS} -P ${SOFIN_SSH_PORT} ${_bpfn_file} ${_bpfn_file_dest}${DEFAULT_PARTIAL_FILE_EXT}"
-    if [ "${?}" = "0" ]; then
-        retry "${SCP_BIN} ${DEFAULT_SSH_OPTS} ${DEFAULT_SCP_OPTS} -P ${SOFIN_SSH_PORT} ${_bpfn_chksum_file} ${_bpfn_chksum_file_dest}" \
-            || error "Failed to send the checksum file: $(diste "${_bpfn_chksum_file}") to: $(diste "${_bpfn_chksum_file_dest}")"
+    if [ -x "${RSYNC_BIN}" ]; then
+        retry "${RSYNC_BIN} ${DEFAULT_RSYNC_OPTS} -e 'ssh -p ${SOFIN_SSH_PORT}' ${_bpfn_file} ${_bpfn_file_dest}${DEFAULT_PARTIAL_FILE_EXT}"
+        _res="${?}"
+    else
+        retry "${SCP_BIN} ${DEFAULT_SSH_OPTS} ${DEFAULT_SCP_OPTS} -P ${SOFIN_SSH_PORT} ${_bpfn_file} ${_bpfn_file_dest}${DEFAULT_PARTIAL_FILE_EXT}"
+        _res="${?}"
+    fi
+    if [ "${_res}" = "0" ]; then
+        if [ -x "${RSYNC_BIN}" ]; then
+            retry "${RSYNC_BIN} ${DEFAULT_RSYNC_OPTS} -e 'ssh -p ${SOFIN_SSH_PORT}' ${_bpfn_chksum_file} ${_bpfn_chksum_file_dest}" \
+                || error "Failed to send the checksum file: $(diste "${_bpfn_chksum_file}") to: $(diste "${_bpfn_chksum_file_dest}")"
+        else
+            retry "${SCP_BIN} ${DEFAULT_SSH_OPTS} ${DEFAULT_SCP_OPTS} -P ${SOFIN_SSH_PORT} ${_bpfn_chksum_file} ${_bpfn_chksum_file_dest}" \
+                || error "Failed to send the checksum file: $(diste "${_bpfn_chksum_file}") to: $(diste "${_bpfn_chksum_file_dest}")"
+        fi
+
         retry "${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${SOFIN_SSH_PORT} ${SOFIN_NAME}@${_bpamirror} \"${MV_BIN} -f ${_bp_remotfs_file}${DEFAULT_PARTIAL_FILE_EXT} ${_bp_remotfs_file}\"" \
             || error "Couldn't rename destination partial file: $(diste "${_bp_remotfs_file}")"
         debug "Partial file renamed to destination name: $(distd "${_bp_remotfs_file}")"
     else
         error "Failed to push binary build of: $(diste "${_bpbundle_file}") to remote: $(diste "${_bp_remotfs_file}")"
     fi
-    unset _bname _bpbundle_file _bpbundle_file _bpamirror _bpaddress _bpshortsha _bpfn_chksum_file _bp_remotfs_file _bpfn_chksum_file _bpfn_chksum_file_dest
+    unset _res _bname _bpbundle_file _bpbundle_file _bpamirror _bpaddress _bpshortsha _bpfn_chksum_file _bp_remotfs_file _bpfn_chksum_file _bpfn_chksum_file_dest
 }
 
 

@@ -183,3 +183,16 @@ elif [ -x "${HOME}/.cargo/bin/lw" ]; then
 else
     unset LW_BIN
 fi
+
+# Rsync only version of the above:
+if [ -x "/usr/bin/rsync" ]; then
+    RSYNC_BIN="/usr/bin/rsync"
+elif [ -x "/bin/rsync" ]; then
+    RSYNC_BIN="/bin/rsync"
+elif [ -x "${SOFTWARE_DIR}/Rsync/bin/rsync" ]; then
+    RSYNC_BIN="${SOFTWARE_DIR}/rsync/bin/rsync"
+elif [ -x "${SOFIN_UTILS_PATH}/rsync" ]; then
+    RSYNC_BIN="${SOFIN_UTILS_PATH}/rsync"
+else
+    unset RSYNC_BIN
+fi
