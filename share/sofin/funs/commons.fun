@@ -113,8 +113,9 @@ fill () {
         _times=${CAP_TERM_MAX_COLUMNS:-80}
     fi
     unset _buf
-    for i in $(${SEQ_BIN} 1 "${_times}" 2>/dev/null); do
+    while [ "${_times}" -gt "0" ]; do
         _buf="${_buf}${_char}"
+        _times="$(( ${_times} - 1 ))"
     done
     printf "%b\n" "${_buf}" 2>/dev/null
     unset _times _buf _char
