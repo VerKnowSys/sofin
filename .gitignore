@@ -5,3 +5,4 @@ src/.*.o
 ci/sofin-ci-*
 .*
 TheVolumeSettingsFolder
+*.sublime-workspace
