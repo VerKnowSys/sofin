@@ -137,7 +137,8 @@ build () {
     _build_list="${*}"
 
     # set system performance to max values
-    performance max
+    # unused since the arm64 build host is done via qemu where you get max performance OOTB
+    # performance max
 
     # Update definitions and perform more checks
     if [ -n "${CAP_SYS_BUILDHOST}" ]; then
