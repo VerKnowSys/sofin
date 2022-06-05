@@ -867,10 +867,12 @@ process_flat () {
 
 
 test_and_rate_def () {
-    # $1 => name of definition
     _name="${1}"
     shift
     _cmdline="${*}"
+    if [ -z "${_name}" ]; then
+        return 0
+    fi
 
     case "${_cmdline}" in
         :|true|false|disable|disabled|skip|no|NO|off|OFF)
@@ -878,42 +880,29 @@ test_and_rate_def () {
             ;;
 
         *)
-            if [ -z "${_name}" ]; then
-                return 0
-            fi
-
-            debug "Initializing test for: $(distd "${_name}")"
-            local_test_result () {
-                case "${1}" in
-                    passed)
-                        run "${TOUCH_BIN} '${PREFIX}/${_name}.test.passed' && ${RM_BIN} -f '${PREFIX}/${_name}.test.failed'"
-                        ;;
-
-                    *)
-                        run "${TOUCH_BIN} '${PREFIX}/${_name}.test.failed' && ${RM_BIN} -f '${PREFIX}/${_name}.test.passed'"
-                        ;;
-                esac
-            }
-
+            _test_result_log="${PREFIX}/${_name}.test.out"
+            _sofin_log="${LOG}-${DEF_NAME}"
+            debug "Initializing test for: $(distd "${_name}"), output to log: $(distd "${_test_result_log}")"
             local_test_env_dispatch () {
                 _start_time="$(${DATE_BIN} +%F-%H%M-%s 2>/dev/null)"
-                printf "%b\n" "Test for ${_name} started at: ${_start_time}" >> "${PREFIX}/${_name}.test.log"
 
+                printf "%b\n" "Test for ${_name} started at: ${_start_time}" > "${_test_result_log}"
                 eval "\
-                    export TEST_JOBS=${CPUS} \
-                        && export TEST_ENV=${DEF_TEST_ENV:-test} \
-                        && export PATH=${SERVICE_DIR}/bin:${SERVICE_DIR}/sbin:${PREFIX}/bin:${PREFIX}/sbin:${PREFIX}/libexec:${SOFIN_UTILS_PATH}:/bin:/usr/bin:/sbin:/usr/sbin \
-                        && export LD_LIBRARY_PATH=${PREFIX}/lib:${PREFIX}/libexec:${SERVICE_DIR}/lib \
-                        && export DYLD_LIBRARY_PATH=${PREFIX}/lib:${PREFIX}/libexec:${SERVICE_DIR}/lib \
-                        && ${SHELL} -c \"${_cmdline}\" >> \"${PREFIX}/${_name}.test.log\" 2>> \"${PREFIX}/${_name}.test.log\" \
-                "
+                    PATH=${PREFIX}/bin:${PREFIX}/sbin:${PREFIX}/libexec:${PATH} \
+                    TEST_JOBS=${CPUS} \
+                    TEST_ENV=${DEF_TEST_ENV:-test} \
+                    LD_LIBRARY_PATH=${PREFIX}/lib:${PREFIX}/libexec:${SERVICE_DIR}/lib \
+                    DYLD_LIBRARY_PATH=${PREFIX}/lib:${PREFIX}/libexec:${SERVICE_DIR}/lib \
+                        ${_cmdline}" >> "${_test_result_log}" 2>&1
                 _result="${?}"
                 _end_time="$(${DATE_BIN} +%F-%H%M-%s 2>/dev/null)"
+                printf "%b\n" "Test for ${_name} finished at: ${_end_time}. Test log below:" >> "${_test_result_log}"
 
-                debug "Test result for: $(distd "${_name}") is: $(distd "${_result}")"
-                printf "%b\n" "Test for ${_name} finished at: ${_end_time}" >> "${PREFIX}/${_name}.test.log"
+                debug "Test result for: $(distd "${_name}") is: $(distd "${_result}"). Appending test log to Sofin definition log…"
+                ${CAT_BIN} "${_test_result_log}" >> "${_sofin_log}"
+                printf "%b\n" "End of the test log" >> "${_test_result_log}"
 
-                unset _test_command _end_time _start_time
+                unset _test_command _end_time _start_time _test_result_log
                 return ${_result}
             }
             ;;
@@ -921,9 +910,9 @@ test_and_rate_def () {
 
     debug "Invoking software check/test: $(distd "${_name}") [DEF_TEST_METHOD='$(distd "${_cmdline}")']"
     local_test_env_dispatch \
-        && local_test_result passed \
+        && try "${TOUCH_BIN} ${PREFIX}/${_name}.test.passed; ${RM_BIN} -f ${PREFIX}/${_name}.test.failed" \
         && return 0
 
-    local_test_result failed
+    try "${TOUCH_BIN} ${PREFIX}/${_name}.test.failed; ${RM_BIN} -f ${PREFIX}/${_name}.test.passed"
     return 1
 }
