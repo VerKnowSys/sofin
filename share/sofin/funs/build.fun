@@ -875,12 +875,13 @@ test_and_rate_def () {
     fi
 
     case "${_cmdline}" in
-        :|true|false|disable|disabled|skip|no|NO|off|OFF)
+        ""|:|true|false|disable|disabled|skip|no|NO|off|OFF)
+            debug "Tests skipped since the DEF_TEST_METHOD is empty for definition: ${_name}"
             return 0
             ;;
 
         *)
-            _test_result_log="${PREFIX}/${_name}.test.out"
+            _test_result_log="${PREFIX}/${_name}.test.output"
             _sofin_log="${LOG}-${DEF_NAME}"
             debug "Initializing test for: $(distd "${_name}"), output to log: $(distd "${_test_result_log}")"
             local_test_env_dispatch () {
