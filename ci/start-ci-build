@@ -13,7 +13,7 @@ if [ ! -f "${SERVED_BUILDHOST_INDICATOR_FILE}" ]; then
 fi
 
 permnote "Wiping out all Sofin locks and cached bundle files"
-${RM_BIN} -f ${HOME}/.sofin/locks/*.lock ${HOME}/.sofin/file-cache/*.zfs* 2>/dev/null
+${RM_BIN} -f ${HOME}/.profile ${HOME}/.sofin/locks/*.lock ${HOME}/.sofin/file-cache/*.zfs* 2>/dev/null
 
 _workers="4"
 _src_list="software-${SYSTEM_ARCH}.list"
