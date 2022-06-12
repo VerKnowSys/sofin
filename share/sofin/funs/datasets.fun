@@ -124,7 +124,7 @@ build_service_dataset () {
                     try "${ZFS_BIN} destroy '${_full_dataset_name}@${ORIGIN_ZFS_SNAP_NAME}'"
                     run "${ZFS_BIN} snapshot '${_full_dataset_name}@${ORIGIN_ZFS_SNAP_NAME}'"
 
-                    note "Preparing to send service dataset: $(distn "${_full_dataset_name}"), for bundle: $(distn "${_ps_elem}")"
+                    permnote "Sending service dataset: $(distn "${_full_dataset_name}") for bundle: $(distn "${_ps_elem}")"
                     try "${ZFS_BIN} umount -f '${_full_dataset_name}'"
                     run "${ZFS_BIN} send ${ZFS_SEND_OPTS} '${_full_dataset_name}@${ORIGIN_ZFS_SNAP_NAME}' | ${SOFIN_LZ4_BIN} ${DEFAULT_LZ4_OPTS} > ${FILE_CACHE_DIR}${_ps_snap_file}"
                     try "${ZFS_BIN} mount '${_full_dataset_name}'"
