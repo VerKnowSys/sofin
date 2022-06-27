@@ -896,6 +896,9 @@ test_and_rate_def () {
                     DYLD_LIBRARY_PATH=${PREFIX}/lib:${PREFIX}/libexec:${SERVICE_DIR}/lib \
                         ${_cmdline}" >> "${_test_result_log}" 2>&1
                 _result="${?}"
+                if [ "0" != "${_result}" ]; then
+                    warn "Test failed for: $(distw "${DEF_NAME}")"
+                fi
                 _end_time="$(${DATE_BIN} +%F-%H%M-%s 2>/dev/null)"
                 printf "%b\n" "Test for ${_name} finished at: ${_end_time}. Test log below:" >> "${_test_result_log}"
 
