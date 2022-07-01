@@ -783,26 +783,15 @@ process_flat () {
                 cd "${_pwd}"
                 try after_make_snapshot
 
-
-                # OTE: after successful make, invoke "make test" by default:
-                unset _this_test_skipped
-                if [ -n "${DEF_SKIPPED_DEFINITION_TEST}" ]; then
-                    debug "Defined DEF_SKIPPED_DEFINITION_TEST: $(distd "${DEF_SKIPPED_DEFINITION_TEST}")"
-
-                    printf "%b\n" " ${DEF_SKIPPED_DEFINITION_TEST} " | ${EGREP_BIN} -F " ${_definition_name} " >/dev/null 2>&1 \
-                        && note "   ${NOTE_CHAR} Skipped tests for definition of: $(distn "${_definition_name}")" \
-                            && _this_test_skipped=1
-                fi
-
-                if [ -z "${USE_NO_TEST}" ] \
-                && [ -z "${_this_test_skipped}" ]; then
+                # OTE: after successful make, invoke DEF_TEST_METHOD of the definition:
+                if [ -n "${DEF_TEST_METHOD}" ]; then
                     note "   ${NOTE_CHAR} Testing requirement: $(distn "${_definition_name}"), version: $(distn "${DEF_VERSION}")"
                     cd "${_pwd}"
 
                     # NOTE: mandatory on production machines:
                     test_and_rate_def "${_definition_name}" "${DEF_TEST_METHOD}"
                 else
-                    note "   ${WARN_CHAR} Tests for definition: $(distn "${_definition_name}") skipped on demand"
+                    note "   ${WARN_CHAR} Skipped testing for: $(distn "${_definition_name}")"
                 fi
                 cd "${_pwd}"
                 try after_test_callback
