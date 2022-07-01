@@ -876,7 +876,7 @@ test_and_rate_def () {
             local_test_env_dispatch () {
                 _start_time="$(${DATE_BIN} +%F-%H%M-%s 2>/dev/null)"
 
-                printf "%b\n" "Test for ${_name} started at: ${_start_time}" > "${_test_result_log}"
+                printf "%b:\n%b\n" "$(capitalize "${_name}")" "Test started at: ${_start_time}" > "${_test_result_log}"
                 eval "\
                     PATH=${PREFIX}/bin:${PREFIX}/sbin:${PREFIX}/libexec:${PATH} \
                     TEST_JOBS=${CPUS} \
@@ -886,17 +886,14 @@ test_and_rate_def () {
                         ${_cmdline}" >> "${_test_result_log}" 2>&1
                 _result="${?}"
                 if [ "0" != "${_result}" ]; then
-                    warn "Test failed for: $(distw "${DEF_NAME}")"
+                    error "Test failed for: $(diste "${DEF_NAME}"). Installation aborted."
                 fi
                 _end_time="$(${DATE_BIN} +%F-%H%M-%s 2>/dev/null)"
-                printf "%b\n" "Test for ${_name} finished at: ${_end_time}. Test log below:" >> "${_test_result_log}"
-
-                debug "Test result for: $(distd "${_name}") is: $(distd "${_result}"). Appending test log to Sofin definition log…"
                 ${CAT_BIN} "${_test_result_log}" >> "${_sofin_log}"
-                printf "%b\n" "End of the test log" >> "${_test_result_log}"
+                printf "%b\n" "Test finished at: ${_end_time}" >> "${_test_result_log}"
 
-                unset _test_command _end_time _start_time _test_result_log
-                return ${_result}
+                unset _test_command _end_time _start_time _test_result_log _cmdline _result
+                return 0
             }
             ;;
     esac
