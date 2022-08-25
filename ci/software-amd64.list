@@ -72,6 +72,8 @@ Lldb
 Llvm
 Lua51
 Lua53
+Luajit
+Luarocks
 Lynx
 Lz4
 Lzop
@@ -102,6 +104,7 @@ Onig
 Openjdk8
 Openjdk11
 Openntpd
+Openresty
 Openssl
 Openvpn
 Otp

@@ -59,6 +59,8 @@ Libde265
 Libressl
 Lua51
 Lua53
+Luajit
+Luarocks
 Lynx
 Lz4
 Lzop
@@ -81,6 +83,8 @@ Ocaml
 Oidentd
 Onig
 Openntpd
+Openssl
+Openresty
 Openvpn
 P11-kit
 Patchelf
