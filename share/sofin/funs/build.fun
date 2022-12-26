@@ -674,7 +674,7 @@ process_flat () {
                             dump_software_build_configuration_options "${_configure_options_log}"
                             note "   ${NOTE_CHAR} Configuring: $(distn "${_definition_name}"), version: $(distn "${DEF_VERSION}")"
 
-                            try "${DEF_CONFIGURE_METHOD} . build -Dprefix=${PREFIX} -Dinstall_rpath=${PREFIX}/lib --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var ${DEF_CONFIGURE_ARGS} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
+                            try "${DEF_CONFIGURE_METHOD} . build -Dprefix=${PREFIX} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var ${DEF_CONFIGURE_ARGS} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
                                 || try "${DEF_CONFIGURE_METHOD} . build -Dprefix=${PREFIX} -Dinstall_rpath=${PREFIX}/lib --sysconfdir=${SERVICE_DIR}/etc ${DEF_CONFIGURE_ARGS} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
                                     || run "${DEF_CONFIGURE_METHOD} . build -Dprefix=${PREFIX} -Dinstall_rpath=${PREFIX}/lib ${DEF_CONFIGURE_ARGS}"
 
