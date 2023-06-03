@@ -686,6 +686,7 @@ process_flat () {
                             debug "Build type: $(distd "cmake")"
                             note "   ${NOTE_CHAR} Configuring: $(distn "${_definition_name}"), version: $(distn "${DEF_VERSION}")"
 
+                            try "${RM_BIN} -r build"
                             try "${MKDIR_BIN} -p build"
                             _pwd="${_pwd}/build"
                             cd "${_pwd}"
