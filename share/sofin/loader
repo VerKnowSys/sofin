@@ -2,7 +2,15 @@
 
 
 # NOTE: Load core.fact for basic definitions:
-SOFIN_ROOT="${SOFIN_ROOT:-/Software/Sofin}"
+case "$(uname)" in
+    Darwin)
+        SOFIN_ROOT="/Users/Shared/Software/Sofin"
+        ;;
+    *)
+        SOFIN_ROOT="/Software/Sofin"
+        ;;
+esac
+
 if [ -d "share/sofin/facts/" ] \
 && [ -f "share/sofin/facts/core.fact" ]; then
     . "share/sofin/facts/core.fact"

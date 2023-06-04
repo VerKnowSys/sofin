@@ -4,7 +4,15 @@
 
 # publish core values:
 SOFIN_PID="$$"
-SOFIN_ROOT="${SOFIN_ROOT:-/Software/Sofin}"
+case "$(uname)" in
+    Darwin)
+        SOFIN_ROOT="/Users/Shared/Software/Sofin"
+        ;;
+    *)
+        SOFIN_ROOT="/Software/Sofin"
+        ;;
+esac
+
 . "${SOFIN_ROOT}/share/loader"
 
 

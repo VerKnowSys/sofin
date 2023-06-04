@@ -34,9 +34,20 @@ DEFINITIONS_LISTS_FILE_NAME="lists" # NOTE: It's name of lists directory from "S
 DEFINITIONS_INITIAL_FILE_NAME="initial-definitions" # NOTE: if no git vailable in system, use initial snapshot
 DEFINITIONS_BASE="definitions" # NOTE: It's main directory in "Sofin-definitions" repository
 
+# no +w on / on Darwin, so we have to pick other writable directory
+case "$(uname)" in
+    Darwin)
+        SERVICES_DIR="${SERVICES_DIR:-/Users/Shared/Services}"
+        SOFTWARE_DIR="${SOFTWARE_DIR:-/Users/Shared/Software}"
+        ;;
+
+    *)
+        SERVICES_DIR="${SERVICES_DIR:-/Services}"
+        SOFTWARE_DIR="${SOFTWARE_DIR:-/Software}"
+        ;;
+esac
+
 # other default values:
-SERVICES_DIR="${SERVICES_DIR:-/Services}"
-SOFTWARE_DIR="${SOFTWARE_DIR:-/Software}"
 SOFIN_ROOT="${SOFTWARE_DIR}/${SOFIN_BUNDLE_NAME}"
 SOFIN_BIN="${SOFIN_ROOT}/bin/s"
 SOFIN_OS_VER_BIN="${SOFIN_ROOT}/bin/s-osver"

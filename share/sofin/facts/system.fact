@@ -117,12 +117,27 @@ case "${SYSTEM_VERSION}" in
         ;;
 esac
 
-
-SOFIN_SHELL_BLOCK=$(${CAT_BIN} <<EOF
+case "${SYSTEM_NAME}" in
+    Darwin)
+        SOFIN_SHELL_BLOCK=$(${CAT_BIN} <<EOF
 
 # Sofin launcher function:
 s () {
-    eval /Software/Sofin/bin/s \${@}
+    eval ${SOFIN_ROOT}/bin/s \${@}
+}
+
+# Trap USR2 to NOOP on Darwin:
+trap '' USR2
+EOF
+)
+        ;;
+
+    *)
+        SOFIN_SHELL_BLOCK=$(${CAT_BIN} <<EOF
+
+# Sofin launcher function:
+s () {
+    eval ${SOFIN_ROOT}/bin/s \${@}
 }
 
 # Trap USR2 signal to reload ~/.profile:
@@ -133,6 +148,8 @@ fi
 
 EOF
 )
+        ;;
+esac
 
 
 setup_zfs_default_setup () {
