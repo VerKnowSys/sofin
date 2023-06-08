@@ -165,13 +165,14 @@ default_compiler_features () {
 
 
 sofin_header () {
-    printf "\n     %b\n%b\n\n  %b\n  %b\n  %b\n\n  %b\n\n" \
+    printf "\n     %b\n%b\n\n  %b\n  %b\n  %b\n\n  %b\n  %b\n\n" \
         "$(distn 'Sof' "${ColorWhite}")$(distn 'tware' "${ColorGray}") $(distn 'In' "${ColorWhite}")$(distn 'staller v' "${ColorGray}")$(distn "${SOFIN_VERSION}" "${ColorWhite}")" \
         "$(distn "____________________________________" "${ColorGreen}")" \
         "design, implementation: $(distn "@dmilith")" \
         "developed since: $(distn "2011")" \
         "released under: $(distn "MIT/BSD")" \
-        "running os: $(distn "${OS_TRIPPLE}")"
+        "running os: $(distn "${OS_TRIPPLE}")" \
+        "running shell: $(distn "${SHELL}")"
 
     printf "  %b\n" "system capabilities:"
     IFS=\n set 2>/dev/null | ${EGREP_BIN} -I 'CAP_SYS_' 2>/dev/null | while IFS= read -r _envv; do
