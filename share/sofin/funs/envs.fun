@@ -12,7 +12,7 @@ env_reset () {
     unset CFLAGS CXXFLAGS CPPFLAGS LDFLAGS
 
     # env, shell:
-    unset LC_ALL LC_CTYPE LANGUAGE MAIL
+    unset LC_ALL LC_CTYPE LANGUAGE MAIL CDPATH
 
     LANG="${DEFAULT_LOCALE}"
     export LANG
