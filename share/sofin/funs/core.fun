@@ -479,7 +479,7 @@ link_utilities () {
 
 
 disallow_util_being_found () {
-    try "${RM_BIN} -vr ${SERVICES_DIR}/${SOFIN_BUNDLE_NAME}/*-util/bin/*-config"
+    try "${RM_BIN} -vr ${SERVICES_DIR}/${SOFIN_BUNDLE_NAME}/*-util/bin/curl-config" # NOTE: don't touch pkg-config!
     try "${RM_BIN} -vr ${SERVICES_DIR}/${SOFIN_BUNDLE_NAME}/*-util/lib/pkgconfig"
     try "${RM_BIN} -vr ${SERVICES_DIR}/${SOFIN_BUNDLE_NAME}/*-util/lib/cmake"
     try "${RM_BIN} -vr ${SERVICES_DIR}/${SOFIN_BUNDLE_NAME}/*-util/include"
