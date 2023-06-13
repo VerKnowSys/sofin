@@ -167,7 +167,17 @@ space than it does with "old fasioned, system wide, shared software".
 * Sofin assumes that /User is user data directory. On OSX, if you don't have /User directory, you might want to do `sudo ln -s ~ /User`. It will be also required under vanilla versions of HardenedBSD. Under ServeD-OS each worker user is located under /User by default (mounted from 'zroot/User/USER' dataset).
 
 
-## Installation info (platform specific):
+## Build-host requirements:
+
+Sofin uses the simplest approach by providing a platform-specific set of prebuilt build utilities that allows Sofin to build software bundles from the source.
+
+You may find the tools on [VerKnowSyS Software Site](https://software.verknowsys.com/binary/Utilities/).
+
+> On UNIX systems unpack them to /Services/Sofin/
+> On Darwin to /Users/Shared/Services/Sofin/
+
+
+## Installation info (platform-specific):
 
 ### HardenedBSD specific (no git available in vanilla):
   - Install base 64bit system - I used 64bit HardenedBSD 11.X bootonly iso here.
