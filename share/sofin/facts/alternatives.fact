@@ -80,7 +80,7 @@ elif [ -x "${SOFIN_UTILS_DIR}/exports/curl" ]; then
     FETCH_BIN="${SOFIN_UTILS_DIR}/exports/curl"
 elif [ -x "/usr/bin/fetch" ]; then
     FETCH_BIN="/usr/bin/fetch"
-    FETCH_OPTS="--timeout=5 --ca-cert=${DEFAULT_CACERT}"
+    FETCH_OPTS="--no-verify-peer --timeout=5 --ca-cert=${DEFAULT_CACERT}"
 elif [ -x "/usr/bin/ftp" ]; then
     FETCH_BIN="/usr/bin/ftp"
     FETCH_OPTS=""
