@@ -784,21 +784,6 @@ process_flat () {
                 cd "${_pwd}"
                 try after_make_snapshot
 
-                # OTE: after successful make, invoke DEF_TEST_METHOD of the definition:
-                if [ -n "${DEF_TEST_METHOD}" ]; then
-                    note "   ${NOTE_CHAR} Testing requirement: $(distn "${_definition_name}"), version: $(distn "${DEF_VERSION}")"
-                    cd "${_pwd}"
-
-                    # NOTE: mandatory on production machines:
-                    test_and_rate_def "${_definition_name}" "${DEF_TEST_METHOD}"
-                else
-                    note "   ${WARN_CHAR} Skipped testing for: $(distn "${_definition_name}")"
-                fi
-                cd "${_pwd}"
-                try after_test_callback
-                cd "${_pwd}"
-                try after_test_snapshot
-
                 if [ -n "${_prefix}" ]; then
                     _whole_list=""
                     debug "Cleaning PREFIX man dir from previous dependencies, we want to install man pages that belong to LAST requirement which is app bundle itself"
@@ -834,6 +819,21 @@ process_flat () {
                 try after_install_callback
                 cd "${_pwd}"
                 try after_install_snapshot
+
+                # OTE: after successful make, invoke DEF_TEST_METHOD of the definition:
+                if [ -n "${DEF_TEST_METHOD}" ]; then
+                    note "   ${NOTE_CHAR} Testing requirement: $(distn "${_definition_name}"), version: $(distn "${DEF_VERSION}")"
+                    cd "${_pwd}"
+
+                    # NOTE: mandatory on production machines:
+                    test_and_rate_def "${_definition_name}" "${DEF_TEST_METHOD}"
+                else
+                    note "   ${WARN_CHAR} Skipped testing for: $(distn "${_definition_name}")"
+                fi
+                cd "${_pwd}"
+                try after_test_callback
+                cd "${_pwd}"
+                try after_test_snapshot
 
                 cd "${_pwd}"
                 printf "%b\n" "${DEF_VERSION}" > "${_prefix}/${_definition_name}${DEFAULT_INST_MARK_EXT}" \
@@ -882,8 +882,6 @@ test_and_rate_def () {
                     PATH=${PREFIX}/bin:${PREFIX}/sbin:${PREFIX}/libexec:${PATH} \
                     TEST_JOBS=${CPUS} \
                     TEST_ENV=${DEF_TEST_ENV:-test} \
-                    LD_LIBRARY_PATH=${PREFIX}/lib:${PREFIX}/libexec:${SERVICE_DIR}/lib \
-                    DYLD_LIBRARY_PATH=${PREFIX}/lib:${PREFIX}/libexec:${SERVICE_DIR}/lib \
                         ${_cmdline}" >> "${_test_result_log}" 2>&1
                 _result="${?}"
                 if [ "0" != "${_result}" ]; then
