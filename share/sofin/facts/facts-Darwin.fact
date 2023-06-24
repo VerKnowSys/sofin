@@ -22,6 +22,6 @@ OTOOL_BIN="/usr/bin/otool"
 
 # set core parameters:
 ALL_CPUS="$(${SYSCTL_BIN} -n machdep.cpu.thread_count 2>/dev/null)"
-CPUS="$((${ALL_CPUS} - 4))"
+CPUS="$((${ALL_CPUS} - 5))"
 MAKE_OPTS="-s -j${CPUS:-${DEFAULT_CPUS}}"
-MINIMAL_MAJOR_OS_VERSION="10.11"
+MINIMAL_MAJOR_OS_VERSION="12.6"
