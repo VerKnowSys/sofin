@@ -579,6 +579,20 @@ if [ -n "${SOFIN_COMMAND}" ]; then
             list_unused_sources
             ;;
 
+        service-dir|serv-dir|sdir)
+            _svc_dir="${SERVICES_DIR}/$(capitalize "${1}")"
+            if [ -d "${_svc_dir}" ]; then
+                printf "%b\n" "${_svc_dir}"
+            fi
+            ;;
+
+        software-dir|soft-dir|dir)
+            _soft_dir="${SOFTWARE_DIR}/$(capitalize "${1}")"
+            if [ -d "${_soft_dir}" ]; then
+                printf "%b\n" "${_soft_dir}"
+            fi
+            ;;
+
         *)
             usage_howto
             ;;
