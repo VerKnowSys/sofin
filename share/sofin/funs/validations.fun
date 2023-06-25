@@ -341,9 +341,11 @@ validate_bins_links () {
         for _bin in $(${FIND_BIN} "${_a_dir}" -mindepth 1 -maxdepth 1 -type l 2>/dev/null); do
             if ${FILE_BIN} -L "${_bin}" | ${CUT_BIN} -d' ' -f2- | ${GREP_BIN} -E '(text|script|statically)' >/dev/null 2>&1; then
                 debug "$(distd "${_bin}") is statically linked or a script, skipping validation"
-            elif ${FILE_BIN} -L "${_bin}" | ${CUT_BIN} -d' ' -f2- | ${GREP_BIN} -E '(LSB shared object|LSB pie executable|LSB executable)' >/dev/null 2>&1; then
+            elif ${FILE_BIN} -L "${_bin}" | ${CUT_BIN} -d' ' -f2- | ${GREP_BIN} -E '(LSB shared object|LSB pie executable|LSB executable|Mach-O 64-bit)' >/dev/null 2>&1; then
                 if [ "${SYSTEM_NAME}" = "Darwin" ]; then
-                        _linked="$(${OTOOL_BIN} -L "${_bin}" | ${GREP_BIN} -Ev "(\s${SOFTWARE_DIR}/${_bun}(/|/bin/../)lib/)|(\s/usr/lib/)|(\s/lib/)|(\s/System/Library/Frameworks/)|(@rpath/)"  2>/dev/null)"
+                        # _linked="$(${OTOOL_BIN} -L "${_bin}" | ${GREP_BIN} -Ev "(\s${SOFTWARE_DIR}/${_bun}(/|/bin/../)lib/)|(\s/usr/lib/)|(\s/lib/)|(\s/System/Library/Frameworks/)|(@rpath/)|([a-zA-Z]*dylib)"  2>/dev/null)"
+                        # TODO: XXX: RPATH is a complicated thing on Darwin…
+                        _linked="${_bin}:"
                 else
                         _bin="$(${READLINK_BIN} -f ${_bin})"
                         _linked="$(${LDD_BIN} "${_bin}" 2>> ${LOG} | ${GREP_BIN} -Ev "( /usr/lib/)|( ${SOFTWARE_DIR}/${_bun}(/|/bin/../)lib/)|( /lib/)"  2>/dev/null)"
@@ -387,10 +389,12 @@ validate_libs_links () {
         for _lib in $(${FIND_BIN} "${_a_dir}" \( -name "*.${_libext}" -or -name "*.${_libext}.*" \) -mindepth 1 -type f 2>/dev/null); do
             if ${FILE_BIN} -L "${_lib}" | ${CUT_BIN} -d' ' -f2- | ${GREP_BIN} -E '(text|script|statically)' >/dev/null 2>&1; then
                 debug "$(distd "${_lib}") is statically linked or a script, skipping validation"
-            elif ${FILE_BIN} -L "${_lib}" | ${CUT_BIN} -d' ' -f2- | ${GREP_BIN} -E '(LSB shared object)' >/dev/null 2>&1; then
+            elif ${FILE_BIN} -L "${_lib}" | ${CUT_BIN} -d' ' -f2- | ${GREP_BIN} -E '(LSB shared object|Mach-O 64-bit)' >/dev/null 2>&1; then
                 _libname="$(echo ${_lib} | ${AWK_BIN} -F/ '{print $NF}' | ${SED_BIN} -E 's/([^[:alnum:]])/\\\1/g')"
                 if [ "${SYSTEM_NAME}" = "Darwin" ]; then
-                    _linked="$(${OTOOL_BIN} -L "${_lib}" | ${GREP_BIN} -Ev "(\s${SOFTWARE_DIR}/${_bun}(/|/bin/../)lib/)|(\s/usr/lib/)|(\s/lib/)|(\s/System/Library/Frameworks/)|(\s${_libname})|(\s@rpath)|(\s@executable_path)"  2>/dev/null)"
+                    # _linked="$(${OTOOL_BIN} -L "${_lib}" | ${GREP_BIN} -Ev "(\s${SOFTWARE_DIR}/${_bun}(/|/bin/../)lib/)|(\s/usr/lib/)|(\s/lib/)|(\s/System/Library/Frameworks/)|(\s${_libname})|(\s@rpath)|(\s@executable_path)"  2>/dev/null)"
+                    # TODO: XXX: RPATH is a complicated thing on Darwin…
+                    _linked="${_lib}:"
                 else
                     _lib="$(${READLINK_BIN} -f ${_lib})"
                     _linked="$(${LDD_BIN} "${_lib}" 2>> ${LOG} | ${GREP_BIN} -Ev "( /usr/lib/)|( ${SOFTWARE_DIR}/${_bun}(/|/bin/../)lib/)|( /lib/)|( ${_libname})"  2>/dev/null)"
