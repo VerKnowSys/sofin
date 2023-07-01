@@ -104,10 +104,13 @@ permnote () {
     _prm_note="${*}"
     if [ -n "${_prm_note}" ]; then
         if [ "YES" = "${CAP_TERM_INTERACTIVE}" ]; then
-            printf "\n%b%b%b%b%b\n" \
+            _prm_note_length="${#_prm_note}"
+            _spaces_count="$(( ${COLUMNS:-80} - ${_prm_note_length} - 3 ))"
+            printf "\n%b%b%b%${_spaces_count}b%b%b\n" \
                     "${ANSI_ONE_LINE_UP}" \
                     "${ColorGreen}" \
                     "  ${_prm_note}" \
+                    " " \
                     "${ColorReset}" \
                     "${ANSI_TWO_LINES_DOWN}" \
                         >&2
@@ -121,7 +124,7 @@ permnote () {
     else
         printf "\n" >&2
     fi
-    unset _prm_note
+    unset _prm_note _prm_note_length _spaces_count
     return 0
 }
 
