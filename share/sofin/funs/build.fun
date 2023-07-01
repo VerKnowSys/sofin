@@ -494,7 +494,7 @@ process_flat () {
 
     if [ -z "${CURRENT_DEFINITION_DISABLED}" ]; then
         if [ "${DEF_TYPE}" = "meta" ]; then
-            note "   ${NOTE_CHAR2} Meta bundle detected."
+            note "   ${NOTE_CHAR2} Meta bundle with version: $(distn "${DEF_VERSION}")"
 
             debug "Build type: $(distd "meta")"
             try after_install_callback
