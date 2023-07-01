@@ -593,6 +593,12 @@ if [ -n "${SOFIN_COMMAND}" ]; then
             fi
             ;;
 
+        utils-path|upath)
+            if [ -d "${SOFIN_UTILS_DIR}" ]; then
+                printf "%b\n" "${SOFIN_UTILS_DIR}/exports"
+            fi
+            ;;
+
         *)
             usage_howto
             ;;

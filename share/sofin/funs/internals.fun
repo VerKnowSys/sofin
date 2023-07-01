@@ -52,8 +52,9 @@ usage_howto () {
     permnote "  $(distn "diff                                 ") displays changes in current definitions cache. Accepts any part of definition name"
     permnote "  $(distn "srccheck                             ") checks sources availability for all existing definitions in local definitions repository"
     permnote "  $(distn "oldsrc                               ") lists unused sources in main repository"
-    permnote "  $(distn "service-dir|serv-dir|sdir bundle     ") prints the service path of a given bundle"
+    permnote "  $(distn "service-dir|serv-dir|sdir bundle     ") prints the service path of a given software bundle"
     permnote "  $(distn "software-dir|soft-dir|dir bundle     ") prints the software path of a given bundle"
+    permnote "  $(distn "utils-path|upath                     ") prints the Sofin utilities path (on the build hosts)"
     permnote
     permnote "  $(distn "origins all | @                      ") checks origin of all definitions, for the new versions"
     permnote "  $(distn "origins name othername               ") checks origin of specified software definitions, for the new versions"
