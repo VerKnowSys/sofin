@@ -482,8 +482,21 @@ link_utilities () {
 
 
 disallow_util_being_found () {
-    try "${RM_BIN} -vr ${SERVICES_DIR}/${SOFIN_BUNDLE_NAME}/*-util/bin/curl-config" # NOTE: don't touch pkg-config!
-    try "${RM_BIN} -vr ${SERVICES_DIR}/${SOFIN_BUNDLE_NAME}/*-util/lib/pkgconfig"
-    try "${RM_BIN} -vr ${SERVICES_DIR}/${SOFIN_BUNDLE_NAME}/*-util/lib/cmake"
-    try "${RM_BIN} -vr ${SERVICES_DIR}/${SOFIN_BUNDLE_NAME}/*-util/include"
+    _sofin_svc_dir="${SERVICES_DIR}/${SOFIN_BUNDLE_NAME}"
+    for _util_export in ${_sofin_svc_dir}/exports/*; do
+        echo "${_util_export##*/}" | ${GREP_BIN} -F 'config' >/dev/null 2>&1
+        if [ "0" = "${?}" ]; then
+            _export="$(echo "${_util_export##*/}" | ${AWK_BIN} '/^.*-config/ {if ($0 == "pkg-config") { print $0; }}')"
+            if [ -n "${_export}" ]; then
+                continue
+            else
+                debug "Will drop util export: ${_util_export}"
+                try "${RM_BIN} -f ${_util_export}"
+            fi
+        fi
+    done
+
+    try "${RM_BIN} -rf ${SERVICES_DIR}/${SOFIN_BUNDLE_NAME}/*-util/lib/pkgconfig"
+    try "${RM_BIN} -rf ${SERVICES_DIR}/${SOFIN_BUNDLE_NAME}/*-util/lib/cmake"
+    try "${RM_BIN} -rf ${SERVICES_DIR}/${SOFIN_BUNDLE_NAME}/*-util/include"
 }
