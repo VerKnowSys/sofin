@@ -15,8 +15,8 @@ fi
 permnote "Wiping out all Sofin locks and cached bundle files"
 ${RM_BIN} -f ${HOME}/.profile ${HOME}/.sofin/locks/*.lock ${HOME}/.sofin/file-cache/*.zfs* 2>/dev/null
 
-_workers="4"
-_src_list="software-${SYSTEM_ARCH}.list"
+_workers="3"
+_src_list="software-${SYSTEM_ARCH}-${SYSTEM_NAME}.list"
 _lines="$(${GREP_BIN} -c '' "${_src_list}")"
 if [ "0" = "${_lines}" ]; then
     error "Empty lines in software list: $(diste "${_src_list}")!"
