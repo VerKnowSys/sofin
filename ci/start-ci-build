@@ -55,9 +55,9 @@ for _idx in $(${SEQ_BIN} 2 "${_workers}"); do
     ${TMUX_BIN} split-window -h zsh
 done
 
-${TMUX_BIN} send -t 0:0.0 "./build-list ${_split_name}-aa" C-m
-${TMUX_BIN} send -t 0:0.1 "./build-list ${_split_name}-ab" C-m
-${TMUX_BIN} send -t 0:0.2 "./build-list ${_split_name}-ac" C-m
+${TMUX_BIN} send -t 0:0.0 "./build-list ${_split_name}-aa && exit" C-m
+${TMUX_BIN} send -t 0:0.1 "./build-list ${_split_name}-ab && exit" C-m
+${TMUX_BIN} send -t 0:0.2 "./build-list ${_split_name}-ac && exit" C-m
 # ${TMUX_BIN} send -t 0:0.3 "./build-list ${_split_name}-ad" C-m
 
 ${TMUX_BIN} select-layout tiled
