@@ -1,8 +1,16 @@
 #!/usr/bin/env zsh
 
+case "$(uname)" in
+    Darwin)
+        SOFIN_ROOT="/Users/Shared/Software/Sofin"
+        ;;
+    *)
+        SOFIN_ROOT="/Software/Sofin"
+        ;;
+esac
 
-SOFIN_ROOT="${SOFIN_ROOT:-/Software/Sofin}"
 . "${SOFIN_ROOT}/share/loader"
+
 
 _list_file="${1}"
 if [ -z "${_list_file}" ]; then
@@ -17,8 +25,8 @@ if [ -z "${_slack_webhook}" ]; then
 fi
 
 # Curl binary utlility:
-_curl="${SERVICES_DIR}/Sofin/exports/curl"
-if [ ! -L "${_curl}" ]; then
+CURL_BIN="${SERVICES_DIR}/Sofin/exports/curl"
+if [ ! -L "${CURL_BIN}" ]; then
     error "Please install Curl-minimal as an utility, by calling: $(diste "s util Curl-minimal") first."
 fi
 
@@ -46,7 +54,7 @@ slack_notification () {
     esac
     _payload="{\"channel\": \"${_channel//\"/\\\"}\", \"attachments\": [{\"color\": \"${_color}\", \"author_name\": \"Sofin CI\", \"text\": \"${_message//\"/\\\"}\"}]}"
 
-    "${_curl}" \
+    "${CURL_BIN}" \
         -X POST \
         -m 10 \
         -A 'Sofin-CI' \

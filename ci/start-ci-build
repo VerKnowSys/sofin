@@ -2,7 +2,17 @@
 
 unset DEBUG TRACE
 
-SOFIN_ROOT="${SOFIN_ROOT:-/Software/Sofin}"
+case "$(uname)" in
+    Darwin)
+        SOFIN_ROOT="/Users/Shared/Software/Sofin"
+        TMUX_BIN="/Users/Shared/Services/Sofin/exports/tmux"
+        ;;
+    *)
+        SOFIN_ROOT="/Software/Sofin"
+        TMUX_BIN="/Services/Sofin/exports/tmux"
+        ;;
+esac
+
 . "${SOFIN_ROOT}/share/loader"
 
 if [ ! -f "${SERVED_BUILDHOST_INDICATOR_FILE}" ]; then
@@ -33,24 +43,23 @@ permnote "Checking remote machine connection (shouldn't take more than a second)
 run "${SSH_BIN} sofin@software.verknowsys.com uname -a"
 
 # Curl binary utlility:
-_tmux="/Services/Sofin/exports/tmux"
-if [ ! -x "${_tmux}" ]; then
+if [ ! -x "${TMUX_BIN}" ]; then
     run "s util Tmux-util"
 fi
 
 
 permnote "Starting parallel build via Tmux"
 
-${_tmux} new-session -d zsh
+${TMUX_BIN} new-session -d zsh
 for _idx in $(${SEQ_BIN} 2 "${_workers}"); do
-    ${_tmux} split-window -h zsh
+    ${TMUX_BIN} split-window -h zsh
 done
 
-${_tmux} send -t 0:0.0 "./build-list ${_split_name}-aa" C-m
-${_tmux} send -t 0:0.1 "./build-list ${_split_name}-ab" C-m
-${_tmux} send -t 0:0.2 "./build-list ${_split_name}-ac" C-m
-${_tmux} send -t 0:0.3 "./build-list ${_split_name}-ad" C-m
+${TMUX_BIN} send -t 0:0.0 "./build-list ${_split_name}-aa" C-m
+${TMUX_BIN} send -t 0:0.1 "./build-list ${_split_name}-ab" C-m
+${TMUX_BIN} send -t 0:0.2 "./build-list ${_split_name}-ac" C-m
+# ${TMUX_BIN} send -t 0:0.3 "./build-list ${_split_name}-ad" C-m
 
-${_tmux} select-layout tiled
+${TMUX_BIN} select-layout tiled
 
-${_tmux} -2 attach-session -d
+${TMUX_BIN} -2 attach-session -d
