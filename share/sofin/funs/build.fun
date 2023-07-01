@@ -632,9 +632,9 @@ process_flat () {
                     _configure_log="config.log"
                     _cmake_out_log="CMakeFiles/CMakeOutput.log"
                     _cmake_error_log="CMakeFiles/CMakeError.log"
-                    _configure_options_log="$(lowercase "${LOGS_DIR}${SOFIN_NAME}-${DEF_NAME}${DEF_SUFFIX}.config")"
+                    _configure_options_log="${LOGS_DIR}${SOFIN_NAME}-${DEF_NAME}${DEF_SUFFIX}.config"
                     _configuration_result="${_configure_options_log}.result"
-                    _cmake_configuration_result="$(lowercase "${LOGS_DIR}${SOFIN_NAME}-${DEF_NAME}${DEF_SUFFIX}.cmake.result.log")"
+                    _cmake_configuration_result="${LOGS_DIR}${SOFIN_NAME}-${DEF_NAME}${DEF_SUFFIX}.cmake.result.log"
 
                     case "${DEF_CONFIGURE_METHOD}" in
 
