@@ -126,8 +126,7 @@ s () {
     eval ${SOFIN_ROOT}/bin/s \${@}
 }
 
-# Trap USR2 to NOOP on Darwin:
-trap '' USR2
+trap '. "\${HOME}/.zshrc"' USR2
 EOF
 )
         ;;
