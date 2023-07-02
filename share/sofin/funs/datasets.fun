@@ -214,7 +214,7 @@ fetch_dset_zfs_stream () {
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
         _commons_path="${MAIN_COMMON_REPOSITORY}/${_fdz_out_file}"
         debug "Fetch service stream-dataset: $(distd "${FILE_CACHE_DIR}${_fdz_out_file}")"
-        retry "${FETCH_BIN} -o ${FILE_CACHE_DIR}${_fdz_out_file} ${FETCH_OPTS} '${_commons_path}'"
+        retry "${FETCH_BIN} ${FETCH_OPTS} -o ${FILE_CACHE_DIR}${_fdz_out_file} '${_commons_path}'"
         if [ "${?}" = "0" ]; then
             _dataset_name="${DEFAULT_ZPOOL}${SERVICES_DIR}/${SYSTEM_DATASET}/${_fdz_bund_name}"
             try "${SOFIN_LZ4CAT_BIN} '${FILE_CACHE_DIR}${_fdz_out_file}' | ${ZFS_BIN} receive ${ZFS_RECEIVE_OPTS} '${_dataset_name}' | ${TAIL_BIN} -n1" \
@@ -228,7 +228,7 @@ fetch_dset_zfs_stream () {
         debug "ZFS feature disabled. Falling back to tarballs.."
         _commons_path="${MAIN_COMMON_REPOSITORY}/${_fdz_out_file}"
         debug "Fetch service stream-tarball: $(distd "${FILE_CACHE_DIR}${_fdz_out_file}")"
-        retry "${FETCH_BIN} -o ${FILE_CACHE_DIR}${_fdz_out_file} ${FETCH_OPTS} '${_commons_path}'"
+        retry "${FETCH_BIN} ${FETCH_OPTS} -o ${FILE_CACHE_DIR}${_fdz_out_file} '${_commons_path}'"
         if [ "${?}" = "0" ]; then
             try "${TAR_BIN} -xf ${FILE_CACHE_DIR}${_fdz_out_file} ${TAR_DIRECTORY_ARG} ${SERVICES_DIR}" \
                 && permnote "Received service tarball for bundle: $(distn "${_fdz_bund_name}")"
@@ -255,7 +255,7 @@ try_fetch_service_dir () {
         _svce_origin="${_dset_create}-${_dset_version}-${SYSTEM_NAME}${DEFAULT_SERVICE_SNAPSHOT_EXT}"
         _svce_org_file="${FILE_CACHE_DIR}${_svce_origin}"
         if [ ! -f "${_svce_org_file}" ]; then
-            try "${FETCH_BIN} -o ${_svce_org_file} ${FETCH_OPTS} ${MAIN_COMMON_REPOSITORY}/${_svce_origin}"
+            try "${FETCH_BIN} ${FETCH_OPTS} -o ${_svce_org_file} ${MAIN_COMMON_REPOSITORY}/${_svce_origin}"
             if [ "0" = "${?}" ]; then
                 debug "Service origin fetched successfully for bundle: $(distd "${_svce_origin}")"
             else
@@ -281,7 +281,7 @@ try_fetch_service_dir () {
         if [ -f "${_svce_org_file}" ]; then
             debug "Service origin file: '$(distd "${_svce_org_file}")' is present in local file-cache."
         else
-            try "${FETCH_BIN} -o ${_svce_org_file} ${FETCH_OPTS} ${MAIN_COMMON_REPOSITORY}/${_svce_origin}"
+            try "${FETCH_BIN} ${FETCH_OPTS} -o ${_svce_org_file} ${MAIN_COMMON_REPOSITORY}/${_svce_origin}"
             if [ "0" = "${?}" ]; then
                 debug "Service origin fetched successfully: $(distd "${_svce_origin}")"
             else
@@ -395,7 +395,7 @@ receive_origin () {
     fi
 
     if [ ! -f "${_origin_file}" ]; then
-        run "${FETCH_BIN} -o ${_origin_file} ${FETCH_OPTS} ${MAIN_COMMON_REPOSITORY}/${_origin_name}" \
+        run "${FETCH_BIN} ${FETCH_OPTS} -o ${_origin_file} ${MAIN_COMMON_REPOSITORY}/${_origin_name}" \
             && debug "Origin fetched successfully: $(distd "${_origin_name}")"
     fi
 

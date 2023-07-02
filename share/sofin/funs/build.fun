@@ -512,7 +512,7 @@ process_flat () {
                         _dest_file="${FILE_CACHE_DIR}${_base}"
                         # TODO: implement auto picking fetch method based on DEF_SOURCE_PATH contents
                         if [ ! -e "${_dest_file}" ]; then
-                            retry "${FETCH_BIN} -o ${_dest_file} ${FETCH_OPTS} '${DEF_SOURCE_PATH}'" \
+                            retry "${FETCH_BIN} ${FETCH_OPTS} -o ${_dest_file} '${DEF_SOURCE_PATH}'" \
                                 || error "Failed to fetch source: $(diste "${DEF_SOURCE_PATH}")"
                             debug "Source fetched: $(distd "${_base}")"
                         fi
