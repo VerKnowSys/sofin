@@ -126,7 +126,7 @@ s () {
     eval ${SOFIN_ROOT}/bin/s \${@}
 }
 
-trap '. "\${HOME}/.zshrc"' USR2
+trap '. \${HOME}/.profile && export PATH="\$PATH:\${HOME}/.cargo/bin:/usr/local/bin:/bin/usr/local/texlive/2023/bin/universal-darwin:/opt/homebrew/bin"' USR2
 EOF
 )
         ;;
