@@ -71,7 +71,8 @@ else
 fi
 
 # Curl default options:
-FETCH_OPTS="--progress-bar --connect-timeout 3 --remote-name --cacert ${DEFAULT_CACERT} --fail"
+# FETCH_OPTS="--progress-bar --connect-timeout 3 --remote-name "
+FETCH_OPTS="--progress-bar -C - -L --cacert ${DEFAULT_CACERT} --fail-early"
 if [ -x "/usr/bin/curl" ]; then
     FETCH_BIN="/usr/bin/curl"
 elif [ -x "/bin/curl" ]; then
