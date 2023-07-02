@@ -92,13 +92,11 @@ fetch_binbuild () {
         fi
         try "${MKDIR_BIN} -p '${FILE_CACHE_DIR}'"
         if [ ! -e "${FILE_CACHE_DIR}${_bb_archive}${DEFAULT_CHKSUM_EXT}" ]; then
-            try "${FETCH_BIN} -o ${FILE_CACHE_DIR}${_bb_archive}${DEFAULT_CHKSUM_EXT} ${FETCH_OPTS} '${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}${DEFAULT_CHKSUM_EXT}'" \
-                || try "${FETCH_BIN} -o ${FILE_CACHE_DIR}${_bb_archive}${DEFAULT_CHKSUM_EXT} ${FETCH_OPTS} '${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}${DEFAULT_CHKSUM_EXT}'"
+            printf "%b" "${ColorBlue}" >&2
+            eval "${FETCH_BIN} ${FETCH_OPTS} -o ${FILE_CACHE_DIR}${_bb_archive}${DEFAULT_CHKSUM_EXT} ${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}${DEFAULT_CHKSUM_EXT}"
             if [ "${?}" = "0" ]; then
-                try "${FETCH_BIN} -o ${FILE_CACHE_DIR}${_bb_archive} ${FETCH_OPTS} '${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}'" \
-                    || try "${FETCH_BIN} -o ${FILE_CACHE_DIR}${_bb_archive} ${FETCH_OPTS} '${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}'" \
-                        || try "${FETCH_BIN} -o ${FILE_CACHE_DIR}${_bb_archive} ${FETCH_OPTS} '${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}'" \
-                            || error "Failure fetching available binary build for: $(diste "${_bb_archive}"). Please check your network setup!"
+                eval "${FETCH_BIN} ${FETCH_OPTS} -o ${FILE_CACHE_DIR}${_bb_archive} ${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}/${_bb_archive}" \
+                    || error "Failure fetching available binary build for: $(diste "${_bb_archive}"). Please check your network setup!"
             else
                 permnote "No binary build available: $(distn "${_bb_archive}")"
             fi
