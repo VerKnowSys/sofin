@@ -355,6 +355,7 @@ make_exports () {
             (
                 cd "${SOFTWARE_DIR}/${_bundle_name}${_bindir}"
                 try "${RM_BIN} -f ../exports/${_export_bin}; ${LN_BIN} -s ..${_bindir}/${_export_bin} ../exports/${_export_bin}"
+                try "${CHMOD_BIN} a+x ${_export_bin}"
             )
             unset _bindir _bundle_name _export_bin
             return 0
@@ -368,6 +369,7 @@ make_exports () {
             (
                 cd "${SERVICES_DIR}/${_bundle_name}${_bindir}"
                 try "${RM_BIN} -f ../exports/${_export_bin}; ${LN_BIN} -s ..${_bindir}/${_export_bin} ../exports/${_export_bin}"
+                try "${CHMOD_BIN} a+x ${_export_bin}"
             )
             unset _bindir _bundle_name _export_bin
             return 0
