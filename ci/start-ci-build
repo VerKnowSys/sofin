@@ -62,4 +62,4 @@ ${TMUX_BIN} send -t 0:0.2 "./build-list ${_split_name}-ac && exit" C-m
 
 ${TMUX_BIN} select-layout tiled
 
-${TMUX_BIN} -2 attach-session -d
+# ${TMUX_BIN} -2 attach-session -d
