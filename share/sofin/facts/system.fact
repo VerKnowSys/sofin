@@ -70,7 +70,7 @@ CPP_NAME="${CC_NAME}-cpp"
 
 # Compiler flags:
 SINGLE_ERROR_CFLAGS="-ferror-limit=1"
-LTO_MAX_SIZE=8g
+LTO_MAX_SIZE=16g
 LTO_CFLAGS="-flto=thin -ffat-lto-objects -fuse-linker-plugin -Wl,--thinlto-jobs=${CPUS}"
 case "${SYSTEM_NAME}" in
     Darwin|OpenBSD)
