@@ -539,20 +539,25 @@ compiler_setup () {
 
     # C++ standard:
     if [ -n "${DEF_USE_CXX11}" ]; then
-        unset DEF_USE_CXX14 DEF_USE_CXX17
+        unset DEF_USE_CXX14 DEF_USE_CXX17 DEF_USE_CXX20
         CXXFLAGS="${CXXFLAGS} ${CXX11_CXXFLAGS}"
     fi
     if [ -n "${DEF_USE_CXX14}" ]; then
-        unset DEF_USE_CXX11 DEF_USE_CXX17
+        unset DEF_USE_CXX11 DEF_USE_CXX17 DEF_USE_CXX20
         CXXFLAGS="${CXXFLAGS} ${CXX14_CXXFLAGS}"
     fi
     if [ -n "${DEF_USE_CXX17}" ]; then
-        unset DEF_USE_CXX11 DEF_USE_CXX14
+        unset DEF_USE_CXX11 DEF_USE_CXX14 DEF_USE_CXX20
         CXXFLAGS="${CXXFLAGS} ${CXX17_CXXFLAGS}"
+    fi
+    if [ -n "${DEF_USE_CXX20}" ]; then
+        unset DEF_USE_CXX11 DEF_USE_CXX14 DEF_USE_CXX17
+        CXXFLAGS="${CXXFLAGS} ${CXX20_CXXFLAGS}"
     fi
     if [ -z "${DEF_USE_CXX11}" ] \
     && [ -z "${DEF_USE_CXX14}" ] \
-    && [ -z "${DEF_USE_CXX17}" ]; then
+    && [ -z "${DEF_USE_CXX17}" ] \
+    && [ -z "${DEF_USE_CXX20}" ]; then
         debug "Using $(distd "C++14") as C++ default standard."
         DEF_USE_CXX14=YES
         CXXFLAGS="${CXXFLAGS} ${CXX14_CXXFLAGS}"
