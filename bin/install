@@ -23,5 +23,5 @@ install_sofin
 if [ "Darwin" = "${SYSTEM_NAME}" ]; then
     printf "\n"
     permnote "NOTE: On Darwin, creating a new file: $(distn "/etc/sudoers.d/sofin") with a line below is recommended to handle the Quarantine feature."
-    printf "    %b\n" "${USER} ALL=(ALL) NOPASSWD: /usr/bin/xattr -r -d com.apple.quarantine *"
+    printf "    %b\n" "${USER} ALL=(ALL) NOPASSWD: /usr/bin/xattr -r -d com.apple.quarantine /Users/Shared/Software/*"
 fi
