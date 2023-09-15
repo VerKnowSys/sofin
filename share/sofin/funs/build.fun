@@ -296,6 +296,12 @@ build () {
 
         export_binaries "${_bund_lcase}"
         load_pax_file
+
+        if [ "Darwin" = "${SYSTEM_NAME}" ]; then
+            permnote "Dropping com.apple.quarantine flag from files of prefix: $(distn "${PREFIX}/")."
+            sudo xattr -r -d com.apple.quarantine "${PREFIX}/"
+        fi
+
         try after_export_callback
         try after_export_snapshot
 
