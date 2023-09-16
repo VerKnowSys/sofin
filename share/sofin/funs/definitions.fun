@@ -802,7 +802,7 @@ export_binaries () {
             error "Declared DEF_EXPORTS: $(diste "${DEF_EXPORTS}"), but nothing was experted for: $(diste "${DEF_NAME}${DEF_SUFFIX}")!"
         fi
 
-        permnote "Bundle exports:$(distn "${_expolist}")"
+        permnote "$(distn "$(capitalize "${_ebdef_name}")") bundle exports:$(distn "${_expolist}")"
     fi
     unset _expo_elem _acurrdir _an_amount _expolist _ebdef_name _soft_to_exp _service_to_exp
 }

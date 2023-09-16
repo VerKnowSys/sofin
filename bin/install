@@ -20,8 +20,9 @@ load_requirements
 create_sofin_dirs
 install_sofin
 
-if [ "Darwin" = "${SYSTEM_NAME}" ]; then
+if [ "Darwin" = "${SYSTEM_NAME}" ] \
+&& [ ! -f "/etc/sudoers.d/sofin" ]; then
     printf "\n"
-    permnote "NOTE: On Darwin, creating a new file: $(distn "/etc/sudoers.d/sofin") with a line below is recommended to handle the Quarantine feature."
-    printf "    %b\n" "${USER} ALL=(ALL) NOPASSWD: /usr/bin/xattr -r -d com.apple.quarantine /Users/Shared/Software/*"
+    permnote "NOTE: On Darwin (macOS), creating a new file: $(distn "/etc/sudoers.d/sofin") with a line below is recommended to handle the Quarantine feature:"
+    printf "\n  %b\n\n" "${USER} ALL=(ALL) NOPASSWD: /usr/bin/xattr -r -d com.apple.quarantine /Users/Shared/Software/*"
 fi

@@ -298,7 +298,9 @@ build () {
         load_pax_file
 
         if [ "Darwin" = "${SYSTEM_NAME}" ]; then
-            permnote "Dropping com.apple.quarantine flag from files of prefix: $(distn "${PREFIX}/")"
+            if [ ! -f "/etc/sudoers.d/sofin" ]; then
+                permnote "Clearing the quarantine flag from: $(distn "${PREFIX}/*")"
+            fi
             sudo xattr -r -d com.apple.quarantine "${PREFIX}/" 2>> "${LOG}-${DEF_NAME}${DEF_SUFFIX}"
         fi
 
