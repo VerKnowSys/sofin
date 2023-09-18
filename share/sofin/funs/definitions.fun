@@ -600,10 +600,10 @@ strip_bundle () {
             done
         else
             debug "Splitting debug information into separate files…"
-            local _debug_dest_dir="${PREFIX}/.debug"
+            _debug_dest_dir="${PREFIX}/.debug"
             mkdir -p "${_debug_dest_dir}"
             for _file in $(to_iter "${_to_be_stripped_list}"); do
-                local _dbgfile_basename="${_file##*/}.debug"
+                _dbgfile_basename="${_file##*/}.debug"
                 debug "Coying debug data from: $(distd "${_file}") to: $(distd "${_debug_dest_dir}/${_dbgfile_basename}")"
                 try "${OBJCOPY_BIN} --only-keep-debug ${_file} ${_debug_dest_dir}/${_dbgfile_basename}"
                 debug "Stripping $(distd "${_file}")"
@@ -613,7 +613,7 @@ strip_bundle () {
             done
         fi
     fi
-    unset _sbfdefinition_name _dirs_to_strip _files_counter _files _stripdir _bundlower _to_be_stripped_list
+    unset _sbfdefinition_name _dirs_to_strip _files_counter _file _stripdir _bundlower _to_be_stripped_list _debug_dest_dir _dbgfile_basename
 }
 
 

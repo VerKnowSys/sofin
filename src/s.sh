@@ -61,6 +61,47 @@ fi
 # this is internal version check for defaults.def
 unset COMPLIANCE_CHECK
 
+
+# deploy bundle helper function
+deploy_bundle () {
+    if [ -n "${CAP_SYS_PRODUCTION}" ]; then
+        warn "Bundle deployments are disabled on production systems!"
+        finalize_and_quit_gracefully_with_exitcode "${ERRORCODE_TASK_FAILURE}"
+    fi
+
+    validate_reqs
+    permnote "Deploying: $(distn "$(capitalize "${SOFIN_ARGS}")")"
+    fail_on_bg_job "${SOFIN_ARGS}"
+
+    # build and remove useless files of each definition:
+    for _bundle in $(to_iter "${SOFIN_ARGS}"); do
+        export USE_BINBUILD=NO \
+            && build "${_bundle}" \
+            && afterbuild_manage_files_of_bundle \
+            && push_binbuilds "${_bundle}" \
+            && continue
+
+        error "Process failed for bundle: $(diste "${_bundle}")!"
+    done
+    unset _bundle
+}
+
+
+# delete bundle helper function, since we use it in several places
+delete_bundle () {
+    fail_on_bg_job "${SOFIN_ARGS}"
+    for _arg in $(to_iter "${SOFIN_ARGS}"); do
+        _caparg="$(capitalize_abs "${_arg}")"
+        if [ -z "${_caparg}" ]; then
+            error "No software bundle names given?"
+        fi
+    done
+    remove_bundles "${SOFIN_ARGS}"
+    permnote "Removed bundle(s): $(distn "$(capitalize_abs "${SOFIN_ARGS}")")"
+    unset _arg _caparg
+}
+
+
 if [ -n "${SOFIN_COMMAND}" ]; then
     case ${SOFIN_COMMAND} in
         dump|defaults|compiler-defaults|dump-defaults|dmp|build-defaults)
@@ -475,27 +516,8 @@ if [ -n "${SOFIN_COMMAND}" ]; then
 
 
         d|deploy|p|push|send)
-            if [ -n "${CAP_SYS_PRODUCTION}" ]; then
-                warn "Bundle deployments are disabled on production systems!"
-                finalize_and_quit_gracefully_with_exitcode "${ERRORCODE_TASK_FAILURE}"
-            fi
             initialize
-            validate_reqs
-            permnote "Deploy bundle(s): $(distn "${SOFIN_ARGS}")"
-            fail_on_bg_job "${SOFIN_ARGS}"
-
-            # build and remove useless files of each definition:
-            for _bundle in $(to_iter "${SOFIN_ARGS}"); do
-                export USE_BINBUILD=NO \
-                    && build "${_bundle}" \
-                    && afterbuild_manage_files_of_bundle \
-                    && push_binbuilds "${_bundle}" \
-                    && continue
-
-                error "Process failed for bundle: $(diste "${_bundle}")!"
-            done
-            unset _bundle
-
+            deploy_bundle
             finalize_complete_standard_task
             ;;
 
@@ -515,16 +537,7 @@ if [ -n "${SOFIN_COMMAND}" ]; then
 
 
         delete|destroy|remove|uninstall|rm)
-            initialize
-            fail_on_bg_job "${SOFIN_ARGS}"
-            for _arg in $(to_iter "${SOFIN_ARGS}"); do
-                _caparg="$(capitalize_abs "${_arg}")"
-                if [ -z "${_caparg}" ]; then
-                    error "No software bundle names given?"
-                fi
-            done
-            remove_bundles "${SOFIN_ARGS}"
-            permnote "Removed bundle(s): $(distn "$(capitalize_abs "${SOFIN_ARGS}")")"
+            delete_bundle
             finalize_complete_standard_task
             ;;
 

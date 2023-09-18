@@ -13,7 +13,7 @@ debug () {
                     "${ColorDark}" \
                     "$(${DATE_BIN} +"%F-%T")" \
                     "${ColorDebug}" \
-                    "  ${_debug_msg}" \
+                    "${_debug_msg}" \
                     "${ColorReset}" \
                         >&2
         else
@@ -55,7 +55,7 @@ warn () {
             printf "\n%b%b%b%b%b\n" \
                     "${ANSI_ONE_LINE_UP}" \
                     "${ColorYellow}" \
-                    "  ${_wrn_msgs}" \
+                    "${_wrn_msgs}" \
                     "${ColorReset}" \
                     "${ANSI_TWO_LINES_DOWN}" \
                         | ${TEE_BIN} "${LOG}" >/dev/stdout 2>/dev/stderr
@@ -81,7 +81,7 @@ note () {
             printf "\n%b%b%b%b%b" \
                     "${ANSI_ONE_LINE_UP}" \
                     "${ColorGreen}" \
-                    "  ${_nte_msgs}" \
+                    "${_nte_msgs}" \
                     "${ColorReset}" \
                     "${ANSI_ONE_LINE_DOWN}" \
                         >&2
@@ -109,7 +109,7 @@ permnote () {
             printf "\n%b%b%b%${_spaces_count}b%b%b\n" \
                     "${ANSI_ONE_LINE_UP}" \
                     "${ColorGreen}" \
-                    "  ${_prm_note}" \
+                    "${_prm_note}" \
                     " " \
                     "${ColorReset}" \
                     "${ANSI_TWO_LINES_DOWN}" \
