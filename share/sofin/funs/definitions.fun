@@ -272,7 +272,7 @@ remove_bundles () {
     done
 
     if [ -n "${_destroyed}" ]; then
-        permnote "Software dataset(s) destroyed: $(distn "${_destroyed}")"
+        permnote "Bundle(s) destroyed: $(distn "${_destroyed}")"
     fi
     # for _bundle_name in $(to_iter "${_bundles}"); do
         # replace + with *

@@ -246,9 +246,9 @@ build () {
                     # NOTE: It's necessary to create build dir *after* binbuild check (which may create dataset itself)
                     create_builddir "${_bundl_name}" "${BUILD_NAMESUM}"
                     if [ -z "${DEF_REQUIREMENTS}" ]; then
-                        permnote "Installing: $(distn "${DEF_FULL_NAME:-${DEF_NAME}${DEF_SUFFIX}}"), version: $(distn "${DEF_VERSION}")"
+                        permnote "Details: $(distn "${DEF_FULL_NAME:-${DEF_NAME}${DEF_SUFFIX}}"), version: $(distn "${DEF_VERSION}")"
                     else
-                        permnote "Installing: $(distn "${DEF_FULL_NAME:-${DEF_NAME}${DEF_SUFFIX}}"), version: $(distn "${DEF_VERSION}"), with requirements: $(distn "${DEF_REQUIREMENTS}")"
+                        permnote "Details: $(distn "${DEF_FULL_NAME:-${DEF_NAME}${DEF_SUFFIX}}"), version: $(distn "${DEF_VERSION}"), with requirements: $(distn "${DEF_REQUIREMENTS}")"
                     fi
                     _req_amount="$(printf "%b\n" "${DEF_REQUIREMENTS}" | ${AWK_BIN} '{print NF;}' 2>/dev/null)"
                     _req_amount=$(( ${_req_amount} + 1 ))

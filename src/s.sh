@@ -93,7 +93,7 @@ delete_bundle () {
     for _arg in $(to_iter "${SOFIN_ARGS}"); do
         _caparg="$(capitalize_abs "${_arg}")"
         if [ -z "${_caparg}" ]; then
-            error "No software bundle names given?"
+            error "No software bundle name(s) given?"
         fi
     done
     remove_bundles "${SOFIN_ARGS}"
