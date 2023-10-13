@@ -12,7 +12,6 @@ Check
 Chicken
 Clamav
 Cmake
-Collectd
 Cppcheck
 Ctags
 Curl
@@ -45,7 +44,6 @@ Htop
 Icecast
 Iftop
 Iperf
-Jam
 Jbig2dec
 Jpeg
 Jq
@@ -89,7 +87,6 @@ P11-kit
 Patchelf
 Perl
 Pff
-Phc-winner-argon2
 Php74
 Php82
 Pkgconf

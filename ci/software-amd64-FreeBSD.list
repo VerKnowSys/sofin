@@ -13,7 +13,6 @@ Check
 Chicken
 Clang
 Clamav
-Collectd
 Curl
 Cmake
 Cppcheck
@@ -110,7 +109,6 @@ Patchelf
 Pax-utils
 Perl
 Pff
-Phc-winner-argon2
 Php74
 Php82
 Pkgconf
