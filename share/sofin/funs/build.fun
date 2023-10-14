@@ -688,6 +688,13 @@ process_flat () {
                             DEF_INSTALL_METHOD="ninja -C build install"
                             ;;
 
+                        build2)
+                            debug "Build type: $(distd "build2")"
+                            note "   ${NOTE_CHAR} Configuring: $(distn "${_definition_name}"), version: $(distn "${DEF_VERSION}")"
+                            DEF_MAKE_METHOD="b configure ${DEF_CONFIGURE_ARGS} config.cxx=clang++ config.cxx.coptions='${CXXFLAGS}' 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}"
+                            DEF_INSTALL_METHOD="b install config.install.root=${PREFIX} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}"
+                            ;;
+
                         cmake)
                             debug "Build type: $(distd "cmake")"
                             note "   ${NOTE_CHAR} Configuring: $(distn "${_definition_name}"), version: $(distn "${DEF_VERSION}")"
