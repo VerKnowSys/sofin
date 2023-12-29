@@ -12,7 +12,7 @@ extend_requirement_lists () {
         echo "${_req_list}" | ${EGREP_BIN} "@" >/dev/null 2>&1
         if [ "0" = "${?}" ]; then
             _req_list="$(echo "${_req_list}" | ${SED_BIN} -e "s|@||" 2>/dev/null)"
-            _reqs_var="$(${GREP_BIN} "DEF_REQUIREMENTS" "${DEFINITIONS_DIR}/${_req_list}${DEFAULT_DEF_EXT}" 2>/dev/null | ${SED_BIN} -e 's/^ *//g')"
+            _reqs_var="$(${AWK_BIN} '/^DEF_REQUIREMENTS=/ { print $0; }' ${DEFINITIONS_DIR}/${_req_list}${DEFAULT_DEF_EXT} 2>/dev/null)"
             _reqs_var="$(lowercase "_${_reqs_var}")"
             if [ "${#_reqs_var}" -gt "1" ]; then
                 debug "Evaluating: $(distd "${_reqs_var}")"
