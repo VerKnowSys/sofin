@@ -7,6 +7,7 @@ Bison
 Bison27
 Binutils
 Boost
+Build2
 Ccache
 Certsd
 Check
@@ -75,7 +76,7 @@ Krecik
 M4
 Make
 Mariadb
-Mariadb-client
+Mysql-lib
 Mc
 Memcached
 Meson

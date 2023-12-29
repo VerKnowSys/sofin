@@ -6,6 +6,7 @@ Binutils
 Bison
 Bison27
 Boost
+Build2
 Ccache
 Certsd
 Check
@@ -31,7 +32,6 @@ Geoipupdate
 Getopt
 Git-devel
 Gnupg
-Gnutls
 Go
 Gperf
 Gpgme
@@ -64,7 +64,7 @@ Lzop
 M4
 Make
 Mariadb
-Mariadb-client
+Mysql-lib
 Memcached
 Meson
 Mysqltuner
@@ -87,7 +87,6 @@ P11-kit
 Patchelf
 Perl
 Pff
-Php74
 Php82
 Pkgconf
 Poppler
@@ -97,7 +96,6 @@ Protobuf
 Pstree
 Pwgen
 Python311
-Python39
 Redis
 Rhash
 Rlwrap
@@ -108,7 +106,6 @@ Sed
 Shc
 Smartmontools
 Sox
-Sphinx
 Squid
 Ssmtp
 Subversion
