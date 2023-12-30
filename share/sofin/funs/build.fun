@@ -681,8 +681,8 @@ process_flat () {
                             note "   ${NOTE_CHAR} Configuring: $(distn "${_definition_name}"), version: $(distn "${DEF_VERSION}")"
 
                             try "${DEF_CONFIGURE_METHOD} . build -Dprefix=${PREFIX} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var ${DEF_CONFIGURE_ARGS} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
-                                || try "${DEF_CONFIGURE_METHOD} . build -Dprefix=${PREFIX} --sysconfdir=${SERVICE_DIR}/etc ${DEF_CONFIGURE_ARGS} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
-                                    || run "${DEF_CONFIGURE_METHOD} . build -Dprefix=${PREFIX} ${DEF_CONFIGURE_ARGS}"
+                                || try "${DEF_CONFIGURE_METHOD} . build -Dprefix=${PREFIX} -Dinstall_rpath=${PREFIX}/lib --sysconfdir=${SERVICE_DIR}/etc ${DEF_CONFIGURE_ARGS} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
+                                    || run "${DEF_CONFIGURE_METHOD} . build -Dprefix=${PREFIX} -Dinstall_rpath=${PREFIX}/lib ${DEF_CONFIGURE_ARGS}"
 
                             DEF_MAKE_METHOD="ninja -C build -j${CPUS}"
                             DEF_INSTALL_METHOD="ninja -C build install"
