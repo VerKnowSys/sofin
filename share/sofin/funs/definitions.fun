@@ -21,6 +21,7 @@ extend_requirement_lists () {
                 DEF_REQUIREMENTS="$(echo "${DEF_REQUIREMENTS}" | ${SED_BIN} -e "s|@${_req_list}|${_def_requirements} ${_req_list}|")"
             else
                 debug "No DEF_REQUIREMENTS defined, skipping"
+                break
             fi
         fi
         unset _req_list _reqs_var _def_requirements
