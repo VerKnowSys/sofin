@@ -14,9 +14,7 @@ extend_requirement_lists () {
             _req_list="$(echo "${_req_list}" | ${SED_BIN} -e "s|@||" 2>/dev/null)"
             _reqs_var="$(${AWK_BIN} '/^DEF_REQUIREMENTS=/ { print $0; }' ${DEFINITIONS_DIR}/${_req_list}${DEFAULT_DEF_EXT} 2>/dev/null)"
             _reqs_var="$(lowercase "_${_reqs_var}")"
-            # debug "Evaluating: $(distd "${_reqs_var}")"
             eval "${_reqs_var}" >/dev/null 2>/dev/null
-            # if [ "${#_reqs_var}" -gt "1" ]; then
             debug "Replacing requirement list: $(distd "@${_req_list}") with requirements: $(distd "${_def_requirements}")"
             DEF_REQUIREMENTS="$(echo "${DEF_REQUIREMENTS}" | ${SED_BIN} -e "s|@${_req_list}|${_def_requirements} ${_req_list}|")"
         fi
