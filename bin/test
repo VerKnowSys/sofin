@@ -54,7 +54,7 @@ extend_requirement_lists_test() {
     DEF_REQUIREMENTS="${_i1}"
     extend_requirement_lists
     _q1="${DEF_REQUIREMENTS}"
-    _a1="libressl perl libressl"
+    _a1="db perl libressl"
     test "${DEF_REQUIREMENTS}" = "${_a1}" \
         || error "QUESTION: $(diste "${_i1}"), EXPECTED ANSWER: $(diste "${_a1}"), GOT: '$(diste "${_q1}")'"
     permnote "Test extend_requirement_lists() #1 - OK: $(distn "${_a1}")"
@@ -63,7 +63,7 @@ extend_requirement_lists_test() {
     DEF_REQUIREMENTS="${_i2}"
     extend_requirement_lists
     _q2="${DEF_REQUIREMENTS}"
-    _a2="libressl perl libressl perl libressl perl"
+    _a2="db perl db perl db perl"
     test "${DEF_REQUIREMENTS}" = "${_a2}" \
         || error "QUESTION: $(diste "${_i2}"), EXPECTED ANSWER: $(diste "${_a2}"), GOT: '$(diste "${_q2}")'"
     permnote "Test extend_requirement_lists() #2 - OK: $(distn "${_a2}")"
