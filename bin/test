@@ -56,7 +56,7 @@ extend_requirement_lists_test() {
     _q1="${DEF_REQUIREMENTS}"
     _a1="db perl libressl"
     test "${DEF_REQUIREMENTS}" = "${_a1}" \
-        || error "QUESTION: $(diste "${_i1}"), EXPECTED ANSWER: $(diste "${_a1}"), GOT: '$(diste "${_q1}")'"
+        || error "QUESTION: $(diste "${_q1}"), EXPECTED ANSWER: $(diste "${_a1}"), GOT: '$(diste "${DEF_REQUIREMENTS}")'"
     permnote "Test extend_requirement_lists() #1 - OK: $(distn "${_a1}")"
 
     _i2="@perl @perl @perl"
@@ -65,8 +65,20 @@ extend_requirement_lists_test() {
     _q2="${DEF_REQUIREMENTS}"
     _a2="db perl db perl db perl"
     test "${DEF_REQUIREMENTS}" = "${_a2}" \
-        || error "QUESTION: $(diste "${_i2}"), EXPECTED ANSWER: $(diste "${_a2}"), GOT: '$(diste "${_q2}")'"
+        || error "QUESTION: $(diste "${_q2}"), EXPECTED ANSWER: $(diste "${_a2}"), GOT: '$(diste "${DEF_REQUIREMENTS}")'"
     permnote "Test extend_requirement_lists() #2 - OK: $(distn "${_a2}")"
+
+    _q3="@curl-openssl @libxslt gmp pcre2-jit onig libnet t1lib @gd libmcrypt libsodium mpdecimal icu libedit libuuid libpq @mysql-lib re2c phc-winner-argon2 libzip"
+    DEF_REQUIREMENTS="${_q3}"
+    extend_requirement_lists
+    extend_requirement_lists
+    extend_requirement_lists
+    extend_requirement_lists
+    _a3="jemalloc pcre2 libunistring openssl lzo xz lz4 zstd libffi libxml2 libidn2 libevent nghttp2 brotli curl-openssl libxml2 libgpg-error libgcrypt libxslt gmp pcre2-jit onig libnet t1lib xz libpng libxml2 autoconf texinfo automake freetype gperf fontconfig jpeg libpng tiff jbig2dec jbigkit libjpeg-turbo  x265 libde265 libheif gd libmcrypt libsodium mpdecimal icu libedit libuuid libpq xz lz4 zstd openssl libevent libedit icu protobuf boost mysql-lib re2c phc-winner-argon2 libzip"
+    test "${DEF_REQUIREMENTS}" = "${_a3}" \
+        || error "QUESTION: $(diste "${_q3}"), EXPECTED ANSWER: $(diste "${_a3}"), GOT: '$(diste "${DEF_REQUIREMENTS}")'"
+
+    permnote "Test extend_requirement_lists() #3 - OK: $(distn "${_a3}")"
 }
 
 
