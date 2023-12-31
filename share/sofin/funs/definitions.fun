@@ -17,11 +17,10 @@ extend_requirement_lists () {
             if [ "${#_reqs_var}" -gt "1" ]; then
                 debug "Evaluating: $(distd "${_reqs_var}")"
                 eval "${_reqs_var}"
-                DEF_REQUIREMENTS="$(echo "${DEF_REQUIREMENTS}" | ${SED_BIN} -e "s|@${_req_list}|${_def_requirements} ${_req_list}|")"
-
                 debug "Replacing requirement list: $(distd "@${_req_list}") with requirements: $(distd "${_def_requirements}"). Final DEF_REQUIREMENTS: $(distd "${DEF_REQUIREMENTS}")"
+                DEF_REQUIREMENTS="$(echo "${DEF_REQUIREMENTS}" | ${SED_BIN} -e "s|@${_req_list}|${_def_requirements} ${_req_list}|")"
             else
-                error "Definition list: $(diste "@${_req_list}"), lacks DEF_REQUIREMENTS or uses definition-inheritance which is not supported (YET)."
+                debug "No DEF_REQUIREMENTS defined, skipping"
             fi
         fi
         unset _req_list _reqs_var _def_requirements
