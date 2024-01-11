@@ -22,34 +22,7 @@ if [ ! -f "${SERVED_BUILDHOST_INDICATOR_FILE}" ]; then
     set_system_dataset_readonly
 fi
 
-permnote "Wiping out all Sofin locks, cached files and temporary files"
-for _service_dir in /Services/*; do
-    _service_name="${_service_dir##/Services/}"
-    case "${_service_name}" in
-        Git|Zsh|Sofin)
-            ;;
-
-        *)
-            ${FIND_BIN} "${_service_dir}" -delete
-            ;;
-    esac
-done
-${FIND_BIN} "/boot/kernel.old" -delete 2>/dev/null
-${FIND_BIN} "/tmp" -type f -delete 2>/dev/null
-${FIND_BIN} "${HOME}/.sofin/file-cache" -type f -delete 2>/dev/null
-${FIND_BIN} "${HOME}/.sofin/locks" -type f -delete 2>/dev/null
-${FIND_BIN} "/Projects" -name 'Utilities*' -type f -delete 2>/dev/null
-${RM_BIN} -f "${HOME}/.profile" "${HOME}/.vifm" 2>/dev/null
-
-permnote "Wiping out leftovers from previous builds"
-${FIND_BIN} "${HOME}/go" -delete 2>/dev/null
-${FIND_BIN} "${HOME}/.cpan" -delete 2>/dev/null
-${FIND_BIN} "${HOME}/.npm" -delete 2>/dev/null
-${FIND_BIN} "${HOME}/.cargo" -delete 2>/dev/null
-${FIND_BIN} "${HOME}/.cmake" -delete 2>/dev/null
-${FIND_BIN} "${HOME}/.cache/go-build" -delete 2>/dev/null
-${FIND_BIN} "${HOME}/.cache/node-gyp" -delete 2>/dev/null
-${FIND_BIN} "${HOME}/.cache/pip" -delete 2>/dev/null
+./clean-ci-build
 
 _workers="4"
 _src_list="software-${SYSTEM_ARCH}-${SYSTEM_NAME}.list"
