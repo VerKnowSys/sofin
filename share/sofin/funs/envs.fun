@@ -488,9 +488,9 @@ compiler_setup () {
     fi
 
     # Enable LTO only if LLVM LLD linker is available:
+    # && [ "arm64" != "${SYSTEM_ARCH}" ] \
+    # && [ "aarch64" != "${SYSTEM_ARCH}" ] \
     if [ -n "${DEF_USE_LTO}" ] \
-    && [ "arm64" != "${SYSTEM_ARCH}" ] \
-    && [ "aarch64" != "${SYSTEM_ARCH}" ] \
     && [ -z "${DEBUGBUILD}" ] \
     && [ "YES" = "${CAP_SYS_LLVM_LD}" ]; then
         CFLAGS="${CFLAGS} ${LTO_CFLAGS}"
