@@ -50,3 +50,6 @@ ${FIND_BIN} "${HOME}/.cmake" -delete 2>/dev/null
 ${FIND_BIN} "${HOME}/.cache/go-build" -delete 2>/dev/null
 ${FIND_BIN} "${HOME}/.cache/node-gyp" -delete 2>/dev/null
 ${FIND_BIN} "${HOME}/.cache/pip" -delete 2>/dev/null
+
+${RM_BIN} -f *.randomized 2>/dev/null
+
