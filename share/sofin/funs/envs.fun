@@ -146,6 +146,12 @@ dump_compiler_setup () {
     else
         debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "C++ standard: std-c++17" "${ColorGray}")"
     fi
+    printf "%b\n" "${CXXFLAGS}" | ${GREP_BIN} 'c++20' >/dev/null 2>&1
+    if [ "0" = "${?}" ]; then
+        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "C++ standard: std-c++20" "${ColorGreen}")"
+    else
+        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "C++ standard: std-c++20" "${ColorGray}")"
+    fi
 
     printf "%b\n" "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'flto' >/dev/null 2>&1
     if [ "0" = "${?}" ]; then
