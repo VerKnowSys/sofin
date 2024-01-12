@@ -674,7 +674,7 @@ afterbuild_manage_files_of_bundle () {
                             if [ "${_cu_dir}" = "${_subdir}" ]; then
                                 printf "%b\n" "${_cufile}" 2>/dev/null | ${EGREP_BIN} ".*(.${_pattern}).*" >/dev/null 2>&1
                                 if [ "${?}" = "0" ]; then
-                                    debug "got: '$(distd "${_cufile}")' match with: $(distd "${_subdir}") ~= '$(distd ".*(.${_pattern}).*")'"
+                                    # debug "got: '$(distd "${_cufile}")' match with: $(distd "${_subdir}") ~= '$(distd ".*(.${_pattern}).*")'"
                                     _cu_commit_removal=NO
                                     break; # we got match - one confirmation is enough!
                                 fi
@@ -686,8 +686,8 @@ afterbuild_manage_files_of_bundle () {
                             else
                                 _fordel="${_cufile} ${_fordel}"
                             fi
-                        else
-                            debug "File considered to as useful: $(distd "${_cufile}")"
+                        # else
+                        #     debug "File considered to be useful: $(distd "${_cufile}")"
                         fi
                     fi
                 done
