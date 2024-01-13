@@ -39,7 +39,7 @@ ${FIND_BIN} "/tmp" -type f -delete 2>/dev/null
 ${FIND_BIN} "${HOME}/.sofin/file-cache" -type f -delete 2>/dev/null
 ${FIND_BIN} "${HOME}/.sofin/locks" -type f -delete 2>/dev/null
 ${FIND_BIN} "/Projects" -name 'Utilities*' -type f -delete 2>/dev/null
-${RM_BIN} -f "${HOME}/.profile" "${HOME}/.vifm" 2>/dev/null
+${RM_BIN} -f "${HOME}/.vifm" 2>/dev/null
 
 permnote "Wiping out leftovers from previous builds"
 ${FIND_BIN} "${HOME}/go" -delete 2>/dev/null
