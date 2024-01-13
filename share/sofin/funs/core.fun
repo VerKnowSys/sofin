@@ -444,8 +444,8 @@ set_system_dataset_readonly () {
 set_system_dataset_writable () {
     if [ -x "${BECTL_BIN}" ] \
     && [ "root" = "${USER}" ] \
-    && [ -z "${CAP_SYS_JAILED}" ]; then
-
+    && [ -z "${CAP_SYS_JAILED}" ] \
+    && [ "YES" = "${CAP_SYS_ZFS}" ]; then
         try "${ZFS_BIN} set readonly=off '${DEFAULT_ZPOOL}/ROOT/${_active_boot_env}'" \
             && debug "System dataset: $(distd "${DEFAULT_ZPOOL}/ROOT/${_active_boot_env}") is now: WRITABLE"
     fi
