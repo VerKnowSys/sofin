@@ -31,18 +31,17 @@ prepare_and_manage_origin () {
 
         _any_snap="$(zfs list -H -r -t snapshot -o name "${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/${SOFIN_BUNDLE_NAME}" 2>/dev/null)"
         if [ -n "${_any_snap}" ]; then
-            _snaps="$(printf "%b\n" "${_any_snap}" | ${WC_BIN} -l 2>/dev/null)"
-            _snap_amount="${_snaps##* }"
+            _snap_count="$(printf "%b\n" "${_any_snap}" | ${GREP_BIN} -c '' 2>/dev/null)"
             # NOTE: handle potential problem with huge amount of snapshots later on. Keep max of N most recent snapshots:
-            if [ "${_snap_amount}" -gt "${DEFAULT_ZFS_MAX_SNAPSHOT_COUNT}" ]; then
-                debug "Old snapshots count: $(distd "${_snap_amount}")"
+            if [ "${_snap_count}" -gt "${DEFAULT_ZFS_MAX_SNAPSHOT_COUNT}" ]; then
+                debug "Old snapshots count: $(distd "${_snap_count}")"
                 for _a_snap in $(to_iter "${_any_snap}"); do
                     try "zfs destroy '${_a_snap}'" \
                         && permnote "Destroyed the oldest $(distn "@${ORIGIN_ZFS_SNAP_NAME}") snapshot: $(distn "${_a_snap}")." \
                             && break # - we want to remove at least one snapshot
                 done
             else
-                debug "Old ${SOFIN_BUNDLE_NAME} snapshots count: $(distd "${_snap_amount}")"
+                debug "Old ${SOFIN_BUNDLE_NAME} snapshots count: $(distd "${_snap_count}")"
             fi
 
             _timestamp_now="$(date +%F-%H%M-%s 2>/dev/null)"
