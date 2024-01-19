@@ -116,13 +116,27 @@ validate_reqs () {
     if [ "${SYSTEM_NAME}" != "Darwin" ]; then
         if [ -n "${CAP_SYS_BUILDHOST}" ]; then
             if [ -d "/usr/local/lib" ]; then
-                _a_files="$(${FIND_BIN} /usr/local/lib -name '*.so' -or -name '*.o' -or -name '*.la' -or -name '*.a' -maxdepth 5 -type f 2>/dev/null | ${WC_BIN} -l 2>/dev/null | ${SED_BIN} -e 's/^ *//g;s/ *$//g' 2>/dev/null)"
-                if [ "${_a_files}" != "0" ]; then
-                    warn "$(distw "/usr/local/lib") has been found with: $(distw "${_a_files}+") $(distw "possibly unfriendly") libraries!"
+                # NOTE: tolerate libpkg under /usr/local/lib
+                _unwanted_files="$(
+                    ${FIND_BIN} \
+                        /usr/local/lib \
+                        -name '*.so' \
+                        -or -name '*.o' \
+                        -or -name '*.la' \
+                        -or -name '*.a' \
+                        -maxdepth 5 \
+                        -type f \
+                        2>/dev/null \
+                            | ${GREP_BIN} -vE 'libpkg.(a|so)' \
+                            | ${GREP_BIN} -c '' \
+                            2>/dev/null \
+                )"
+                if [ "${_unwanted_files}" != "0" ]; then
+                    warn "$(distw "/usr/local/lib") has been found with: $(distw "${_unwanted_files}+") $(distw "possibly unfriendly") libraries!"
                 fi
             fi
         fi
-        unset _a_files _pstfix
+        unset _unwanted_files _pstfix
     fi
     if [ -n "${DEBUGBUILD}" ]; then
         warn "Debug build is enabled."
