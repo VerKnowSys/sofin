@@ -15,13 +15,6 @@ esac
 
 . "${SOFIN_ROOT}/share/loader"
 
-if [ ! -f "${SERVED_BUILDHOST_INDICATOR_FILE}" ]; then
-    set_system_dataset_writable
-    permnote "Marking current system as build host"
-    ${TOUCH_BIN} "${SERVED_BUILDHOST_INDICATOR_FILE}"
-    set_system_dataset_readonly
-fi
-
 ./clean-ci-build
 
 _workers="4"
