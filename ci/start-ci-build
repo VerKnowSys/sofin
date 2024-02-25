@@ -17,6 +17,11 @@ esac
 
 ./clean-ci-build
 
+permnote "Cleaning up the Sofin state and allowing build-host utilities in PATH"
+${SOFIN_ROOT}/bin/s reset
+${SOFIN_ROOT}/bin/s clean
+${SOFIN_ROOT}/bin/s env +Sofin
+
 _workers="4"
 _src_list_origin="software-${SYSTEM_ARCH}-${SYSTEM_NAME}.list"
 _src_list="software-${SYSTEM_ARCH}-${SYSTEM_NAME}.list.randomized"
