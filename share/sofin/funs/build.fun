@@ -491,6 +491,12 @@ process_flat () {
     if [ -n "${DEF_USE_TOOLS}" ]; then
         debug "Suffixing path: $(distd "${SOFIN_UTILS_PATH}") to local build path!"
         PATH="${DEFAULT_SHELL_EXPORTS}:${SERVICE_DIR}/bin:${SERVICE_DIR}/sbin:${_prefix}/bin:${_prefix}/sbin:${SOFIN_UTILS_PATH}:${DEFAULT_PATH}"
+        if [ "Darwin" = "${SYSTEM_NAME}" ]; then
+            # XXX: use Rust from local installation on workstations
+            if [ -d "${HOME}/.cargo/bin" ]; then
+                PATH="${PATH}:${HOME}/.cargo/bin"
+            fi
+        fi
     fi
 
     if [ -n "${CAP_SYS_BUILDHOST}" ]; then
