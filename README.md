@@ -186,9 +186,16 @@ You may find the tools on [VerKnowSyS Software Site](https://software.verknowsys
   - Start using Sofin as regular user.
 
 ### Darwin/ Mac OS X specific:
-  - Install Mac OS X 10.11+ with Command utilities package or Xcode installed.
-  - Type `sudo mkdir /Software; sudo chown ${USER} /Software; git clone https://github.com/VerKnowSys/sofin && cd sofin && bin/install` in your terminal, and you're ready to go.
+  - Install Mac OS X 13+ with Command utilities package or Xcode installed.
+  - Write one file as root:
 
+> /etc/sudoers.d/sofin
+
+```sudo
+YOUR-LOCAL-USER-NAME ALL=(ALL) NOPASSWD: /usr/bin/xattr -r -d com.apple.quarantine /Users/Shared/Software/*
+```
+
+  - `bin/install` to install Sofin to /Users/Shared/Software/Sofin
 
 ## Conflicts/ Problems/ Known issues:
 * Sofin build mechanism is known to be in conflict with other software managment solutions like: BSD Ports, HomeBrew, MacPorts, Fink. Keep that in mind before reporting problems, cause they're the root of true evil on your OS :)
