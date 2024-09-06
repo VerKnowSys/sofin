@@ -13,6 +13,8 @@ fi
 
 . share/sofin/funs/self.fun
 
+# export limited PATH as a space in PATH may lead to random errors…
+export PATH="/bin:/usr/bin:/usr/local/bin"
 # NOTE: don't send reload signal after installing (returns non 0 exit code)
 export NO_SIGNAL=1
 
