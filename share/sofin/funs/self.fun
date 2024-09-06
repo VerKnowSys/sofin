@@ -72,6 +72,7 @@ install_sofin () {
 
     permnote "Install $(distn "${SOFIN_BUNDLE_NAME}") to prefix: $(distn "${SOFIN_ROOT}")"
 
+    DEFAULT_LINKER_FLAG=""
     DEF_NO_LINKER_DTAGS=YES
     DEF_NO_RETPOLINE=YES
     HARDEN_CFLAGS=""
