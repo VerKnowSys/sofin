@@ -195,7 +195,7 @@ You may find the tools on [VerKnowSyS Software Site](https://software.verknowsys
 YOUR-LOCAL-USER-NAME ALL=(ALL) NOPASSWD: /usr/bin/xattr -r -d com.apple.quarantine /Users/Shared/Software/*
 ```
 
-  - `bin/install` to install Sofin to /Users/Shared/Software/Sofin
+  - `bin/install` as a YOUR-LOCAL-USER-NAME to install Sofin to /Users/Shared/Software/Sofin
 
 ## Conflicts/ Problems/ Known issues:
 * Sofin build mechanism is known to be in conflict with other software managment solutions like: BSD Ports, HomeBrew, MacPorts, Fink. Keep that in mind before reporting problems, cause they're the root of true evil on your OS :)
