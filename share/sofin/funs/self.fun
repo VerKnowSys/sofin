@@ -71,6 +71,10 @@ install_sofin () {
     prepare_and_manage_origin
 
     permnote "Install $(distn "${SOFIN_BUNDLE_NAME}") to prefix: $(distn "${SOFIN_ROOT}")"
+
+    DEF_NO_LINKER_DTAGS=YES
+    DEF_NO_RETPOLINE=YES
+    HARDEN_CFLAGS=""
     compiler_setup \
         && build_sofin_natives \
             && install_sofin_files \
