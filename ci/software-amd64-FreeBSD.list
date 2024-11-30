@@ -86,14 +86,10 @@ Netdata
 Netdumpd
 Nginx
 Nginx-mainline
-Ninja
-Nmap
 Node
 Ocaml
 Oidentd
 Onig
-Openjdk8
-Openjdk11
 Openntpd
 Openresty
 Openvpn
@@ -104,8 +100,6 @@ Patchelf
 Pax-utils
 Perl
 Pff
-Php74
-Php82
 Php83
 Pkgconf
 Poppler
@@ -113,9 +107,7 @@ Postgresql16
 Pptpd
 Protobuf
 Pstree
-Python27
-Python39
-Python311
+Python312
 Pwgen
 Redis
 Rhash

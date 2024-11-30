@@ -73,8 +73,6 @@ Neovim
 Netdumpd
 Nghttp2-utils
 Nginx
-Ninja
-Nmap
 Node
 Ocaml
 Oidentd
@@ -94,7 +92,7 @@ Pptpd
 Protobuf
 Pstree
 Pwgen
-Python311
+Python312
 Redis
 Rhash
 Rlwrap
