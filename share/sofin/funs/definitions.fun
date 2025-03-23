@@ -864,7 +864,10 @@ apply_patch () {
     _abspatch="${2}"
     for _level in $(${SEQ_BIN} 0 5 2>/dev/null); do # From p0 to-p5
         try "${PATCH_BIN} -p${_level} -N -f -i ${_abspatch} >> '${LOG}-${_def2patch}' 2>> '${LOG}-${_def2patch}'" \
-            && debug "Patch applied: $(distd "${_abspatch}") (level: $(distd "${_level}"))" \
+            && debug "Forward patch applied: $(distd "${_abspatch}") (level: $(distd "${_level}"))" \
+                && return 0
+        try "${PATCH_BIN} -p${_level} -R -f -i ${_abspatch} >> '${LOG}-${_def2patch}' 2>> '${LOG}-${_def2patch}'" \
+            && debug "Reversed patch applied: $(distd "${_abspatch}") (level: $(distd "${_level}"))" \
                 && return 0
     done
     warn "   ${WARN_CHAR} Failed to apply patch: $(distw "${_abspatch##*/}") for: $(distw "${_def2patch}")"
