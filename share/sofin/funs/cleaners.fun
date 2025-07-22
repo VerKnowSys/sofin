@@ -51,6 +51,27 @@ clean_all_bdirs_leftovers () {
 }
 
 
+clean_all_prebuilt_bundles () {
+    if [ -z "${FILE_CACHE_DIR}" ]; then
+        error "Assertion failed: $(diste "FILE_CACHE_DIR") is empty!"
+    fi
+    if [ "YES" = "${CAP_SYS_ZFS}" ]; then
+        find "${FILE_CACHE_DIR}" \
+            -type f \
+            -name "*${DEFAULT_CHKSUM_EXT}" \
+            -or -name "*${DEFAULT_SOFTWARE_SNAPSHOT_EXT}" \
+            -or -name "*${DEFAULT_SERVICE_SNAPSHOT_EXT}" \
+            -delete
+    else
+        find "${FILE_CACHE_DIR}" \
+            -type f \
+            -name "*${DEFAULT_CHKSUM_EXT}" \
+            -or -name "*${DEFAULT_ARCHIVE_TARBALL_EXT}" \
+            -delete
+    fi
+}
+
+
 perform_clean () {
     fail_any_bg_jobs
     case "${1}" in
@@ -71,6 +92,7 @@ perform_clean () {
             permnote "Clean: $(distn "clean_logs(), clean_all_bdirs_leftovers()")"
             clean_logs
             clean_all_bdirs_leftovers
+            clean_all_prebuilt_bundles
             ;;
     esac
     create_sofin_dirs
