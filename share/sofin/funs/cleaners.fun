@@ -56,18 +56,20 @@ clean_all_prebuilt_bundles () {
         error "Assertion failed: $(diste "FILE_CACHE_DIR") is empty!"
     fi
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
-        find "${FILE_CACHE_DIR}" \
+        for _file in $(find "${FILE_CACHE_DIR}" \
             -type f \
             -name "*${DEFAULT_CHKSUM_EXT}" \
             -or -name "*${DEFAULT_SOFTWARE_SNAPSHOT_EXT}" \
-            -or -name "*${DEFAULT_SERVICE_SNAPSHOT_EXT}" \
-            -delete
+            -or -name "*${DEFAULT_SERVICE_SNAPSHOT_EXT}"); do
+            rm -f "${_file}" # NOTE: we have no spaces in file names so it's safe
+        done
     else
-        find "${FILE_CACHE_DIR}" \
+        for _file in $(find "${FILE_CACHE_DIR}" \
             -type f \
             -name "*${DEFAULT_CHKSUM_EXT}" \
-            -or -name "*${DEFAULT_ARCHIVE_TARBALL_EXT}" \
-            -delete
+            -or -name "*${DEFAULT_ARCHIVE_TARBALL_EXT}"); do
+            rm -f "${_file}" # NOTE: we have no spaces in file names so it's safe
+        done
     fi
 }
 
