@@ -216,7 +216,11 @@ validate_definition_disabled () {
     for _def_disable_on in $(to_iter "${DEF_DISABLE_ON}"); do
         if [ "${SYSTEM_NAME}" = "${_def_disable_on}" ] \
         || [ "${SYSTEM_NAME}-${SYSTEM_VERSION}" = "${_def_disable_on}" ] \
-        || [ "${SYSTEM_NAME}-${SYSTEM_ARCH}" = "${_def_disable_on}" ]; then
+        || [ "${SYSTEM_NAME}-${SYSTEM_VERSION%.*}" = "${_def_disable_on}" ] \
+        || [ "${SYSTEM_NAME}-${SYSTEM_ARCH}" = "${_def_disable_on}" ] \
+        || [ "${SYSTEM_NAME}-${SYSTEM_ARCH}-${SYSTEM_VERSION}" = "${_def_disable_on}" ] \
+        || [ "${SYSTEM_NAME}-${SYSTEM_ARCH}-${SYSTEM_VERSION%.*}" = "${_def_disable_on}" ] \
+        ; then
             debug "Disabled: $(distd "${_def_disable_on}") on $(distd "${SYSTEM_NAME}")"
             CURRENT_DEFINITION_DISABLED=YES
         fi
