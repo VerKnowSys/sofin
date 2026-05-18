@@ -30,7 +30,6 @@ Gd
 Geoip
 Geoipupdate
 Getopt
-Git-devel
 Gnupg
 Go
 Gperf
@@ -86,6 +85,7 @@ Php83
 Pkgconf
 Poppler
 Postgresql16
+Postgresql18
 Pptpd
 Protobuf
 Pstree
