@@ -179,6 +179,10 @@ fi
 # log-watcher utility - lw - replaces "tail")
 if [ -x "/Services/Sofin/exports/lw" ]; then
     LW_BIN="/Services/Sofin/exports/lw"
+elif [ -x "/Users/Shared/Services/Sofin/exports/lw" ]; then
+    LW_BIN="/Users/Shared/Services/Sofin/exports/lw"
+elif [ -x "${HOME}/.cargo/bin/lw" ]; then
+    LW_BIN="${HOME}/.cargo/bin/lw"
 else
     unset LW_BIN
 fi
