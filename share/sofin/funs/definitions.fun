@@ -140,7 +140,7 @@ update_defs () {
         }
 
         set_def_cur_branch_and_head
-        eebug "State of definitions repository was re-set to: $(distd "${_def_head}")"
+        debug "State of definitions repository was re-set to: $(distd "${_def_head}")"
         if [ -z "${_requested_branch}" ] \
         && [ "${_def_cur_branch}" != "${BRANCH}" ]; then # use _def_cur_branch value if branch isn't matching default branch and no BRANCH was requested
             debug "Checking out branch: $(distd "${_def_cur_branch}")"
