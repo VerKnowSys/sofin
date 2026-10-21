@@ -220,7 +220,7 @@ fetch_dset_zfs_stream () {
         retry "${FETCH_BIN} ${FETCH_OPTS} -o ${FILE_CACHE_DIR}${_fdz_out_file} '${_commons_path}'"
         if [ "${?}" = "0" ]; then
             _dataset_name="${DEFAULT_ZPOOL}${SERVICES_DIR}/${SYSTEM_DATASET}/${_fdz_bund_name}"
-            try "${SOFIN_LZ4CAT_BIN} '${FILE_CACHE_DIR}${_fdz_out_file}' | ${ZFS_BIN} receive ${ZFS_RECEIVE_OPTS} '${_dataset_name}' | ${TAIL_BIN} -n1" \
+            try "${SOFIN_LZ4CAT_BIN} '${FILE_CACHE_DIR}${_fdz_out_file}' | ${ZFS_BIN} receive ${ZFS_RECEIVE_OPTS} '${_dataset_name}'" \
                 && permnote "Received service dataset for bundle: $(distn "${_dataset_name}")"
             unset _dataset_name
         else
@@ -271,7 +271,7 @@ try_fetch_service_dir () {
             if [ "0" = "${?}" ]; then
                 debug "Service origin is already present for bundle: $(distd "${_svce_origin}")"
             else
-                run "${SOFIN_LZ4CAT_BIN} '${_svce_org_file}' | ${ZFS_BIN} receive ${ZFS_RECEIVE_OPTS} '${DEFAULT_ZPOOL}${SERVICES_DIR}/${SYSTEM_DATASET}/${_dset_create}' | ${TAIL_BIN} -n1"
+                run "${SOFIN_LZ4CAT_BIN} '${_svce_org_file}' | ${ZFS_BIN} receive ${ZFS_RECEIVE_OPTS} '${DEFAULT_ZPOOL}${SERVICES_DIR}/${SYSTEM_DATASET}/${_dset_create}'"
                 debug "Service origin received successfully for bundle: $(distd "${_svce_origin}")"
             fi
         else
@@ -625,7 +625,7 @@ install_software_from_binbuild () {
             try "${ZFS_BIN} destroy -fr '${_isfb_dataset}'"
         fi
         debug "Installing ZFS based binary build to dataset: $(distd "${_isfb_dataset}")"
-        run "${SOFIN_LZ4CAT_BIN} '${FILE_CACHE_DIR}${_isfb_archive}' | ${ZFS_BIN} receive -F ${ZFS_RECEIVE_OPTS} '${_isfb_dataset}' | ${TAIL_BIN} -n1" \
+        run "${SOFIN_LZ4CAT_BIN} '${FILE_CACHE_DIR}${_isfb_archive}' | ${ZFS_BIN} receive -F ${ZFS_RECEIVE_OPTS} '${_isfb_dataset}'" \
             && note "Installed: $(distn "${_isfb_fullname}")" \
                 && CURRENT_DEFINITION_SKIP_BUILD_DO_EXPORTS=YES
     else
@@ -635,7 +635,7 @@ install_software_from_binbuild () {
             CURRENT_DEFINITION_SKIP_BUILD_DO_EXPORTS=YES
         else
             debug "No binary bundle available for: $(distd "${_isfb_fullname}")"
-            try "${RM_BIN} -f '${FILE_CACHE_DIR}${_isfb_archive} ${FILE_CACHE_DIR}${_isfb_archive}${DEFAULT_CHKSUM_EXT}'"
+            try "${RM_BIN} -f '${FILE_CACHE_DIR}${_isfb_archive}' '${FILE_CACHE_DIR}${_isfb_archive}${DEFAULT_CHKSUM_EXT}'"
         fi
     fi
 }

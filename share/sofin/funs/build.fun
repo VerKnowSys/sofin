@@ -162,7 +162,7 @@ build () {
         if [ "${CURRENT_DEFINITION_DISABLED}" = "YES" ]; then
             warn "Bundle: $(distw "${_bund_name_capit}") is disabled on: $(distw "${OS_TRIPPLE}")"
             destroy_software_dir "${_bund_name_capit}"
-            return 0
+            continue
         else
             create_software_dir "${_bund_name_capit}"
             for _req_name in ${DEFINITIONS_DIR}/${_bund_name}${DEFAULT_DEF_EXT}; do
@@ -553,14 +553,14 @@ process_flat () {
                                 ;;
 
                             *)
-                                _possible_old_build_dir="$(${TAR_BIN} -t --list --file "${_dest_file}" 2>/dev/null | ${HEAD_BIN} -n1 2>/dev/null | ${AWK_BIN} '{print $9;}' 2>/dev/null)"
-                                _pbd_basename="${_possible_old_build_dir##*/}"
-                                if [ "${_pbd_basename}" != "${_possible_old_build_dir}" ]; then # more than one path element?
-                                    _possible_old_build_dir="${_possible_old_build_dir%%/"${_pbd_basename}"}"
-                                fi
-                                if [ -d "${BUILD_DIR}/${_possible_old_build_dir%/}" ]; then
-                                    try "${RM_BIN} -rf '${BUILD_DIR}/${_possible_old_build_dir%/}'" \
-                                        && debug "Previous dependency build dir was removed to avoid conflicts: $(distd "${BUILD_DIR}/${_possible_old_build_dir%/}")"
+                                # NOTE: plain -tf listing works the same for BSD and GNU tar:
+                                _possible_old_build_dir="$(${TAR_BIN} -tf "${_dest_file}" 2>/dev/null | ${HEAD_BIN} -n1 2>/dev/null)"
+                                _possible_old_build_dir="${_possible_old_build_dir#./}"
+                                _possible_old_build_dir="${_possible_old_build_dir%%/*}" # top level dir of the archive
+                                if [ -n "${_possible_old_build_dir}" ] \
+                                && [ -d "${BUILD_DIR}/${_possible_old_build_dir}" ]; then
+                                    try "${RM_BIN} -rf '${BUILD_DIR}/${_possible_old_build_dir}'" \
+                                        && debug "Previous dependency build dir was removed to avoid conflicts: $(distd "${BUILD_DIR}/${_possible_old_build_dir}")"
                                 fi
                                 ;;
                         esac
@@ -909,7 +909,7 @@ test_and_rate_def () {
 
         *)
             _test_result_log="${PREFIX}/${_name}.test.output"
-            _sofin_log="${LOG}-${DEF_NAME}"
+            _sofin_log="${LOG}-${DEF_NAME}${DEF_SUFFIX}"
             debug "Initializing test for: $(distd "${_name}"), output to log: $(distd "${_test_result_log}")"
             local_test_env_dispatch () {
                 _start_time="$(${DATE_BIN} +%F-%H%M-%s 2>/dev/null)"

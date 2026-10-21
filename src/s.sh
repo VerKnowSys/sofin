@@ -172,12 +172,12 @@ if [ -n "${SOFIN_COMMAND}" ]; then
 
 
         log)
-            show_logs "${SOFIN_ARGS%${SOFIN_COMMAND}}"
+            show_logs "${SOFIN_ARGS}"
             ;;
 
 
         less|les|show)
-            less_logs "${SOFIN_ARGS%${SOFIN_COMMAND}}"
+            less_logs "${SOFIN_ARGS}"
             ;;
 
 
@@ -316,6 +316,7 @@ if [ -n "${SOFIN_COMMAND}" ]; then
                         printf "%b\n" "export CXXFLAGS=\"${_cxxfl}\""
                         printf "%b\n" "export LDFLAGS=\"${_ldfl}\""
                         printf "%b\n" "export PKG_CONFIG_PATH=\"${_pkgp}\""
+                        printf "%b\n" "export PATH=\"${_pth}\""
                         unset _pth _cfl _cxxfl _ldfl _pkgp _abundle
 
                         print_local_env_vars
@@ -350,6 +351,10 @@ if [ -n "${SOFIN_COMMAND}" ]; then
         upgrade|ug)
             _definition="${1}"
             _url="${2}"
+            if [ -z "${_definition}" ] \
+            || [ -z "${_url}" ]; then
+                error "Usage: $(diste "${SOFIN_SHORT_NAME} upgrade definition-name archive-url")"
+            fi
             _archive_name="${_url##*/}"
 
             case "${SYSTEM_NAME}" in
@@ -364,7 +369,7 @@ if [ -n "${SOFIN_COMMAND}" ]; then
             debug "Synchronizing archive: $(distd "${_archive_name}") to: $(distd "${MAIN_SOFTWARE_ADDRESS}")"
             _new_sha="$(${SSH_BIN} -p "${SOFIN_SSH_PORT}" "${SOFIN_NAME}@${MAIN_SOFTWARE_ADDRESS}" " \
                 cd ${MAIN_SOURCE_PREFIX} \
-                && test -f ${_archive_name} || curl -4 --progress-bar -C - -k -L -O '${_url}' > /tmp/sofin.sync.log 2>&1 \
+                && { test -f ${_archive_name} || curl -4 --progress-bar -C - -k -L -O '${_url}' > /tmp/sofin.sync.log 2>&1; } \
                 && ${_sha} \
                 && return 0; \
                 ${CAT_BIN} /tmp/sofin.sync.log; \
@@ -378,7 +383,7 @@ if [ -n "${SOFIN_COMMAND}" ]; then
             ${SED_BIN} -i '' -e "s#^DEF_VERSION=.*\$#DEF_VERSION=\"${_version}\"#" "${DEFINITIONS_DIR}/${_definition}${DEFAULT_DEF_EXT}"
             ${SED_BIN} -i '' -e "s#^DEF_SHA=.*\$#DEF_SHA=\"${_new_sha}\"#" "${DEFINITIONS_DIR}/${_definition}${DEFAULT_DEF_EXT}"
 
-            _local="/Projects/Sofin-definitions/definitions" # XXX: hardcoded.
+            _local="${SOFIN_LOCAL_DEFINITIONS_DIR:-/Volumes/Projects/Sofin-definitions/definitions}" # NOTE: local working copy of definitions
             if [ -d "${_local}" ]; then
                 debug "Projects definition: $(distd "${_definition}") with version: $(distd "${_version}")"
                 ${SED_BIN} -i '' -e "s#^DEF_VERSION=.*\$#DEF_VERSION=\"${_version}\"#" "${_local}/${_definition}${DEFAULT_DEF_EXT}"
@@ -413,7 +418,7 @@ if [ -n "${SOFIN_COMMAND}" ]; then
                     BUILD_DIR="${PREFIX}/${DEFAULT_SRC_EXT}${BUILD_NAMESUM}"
                     try "${MKDIR_BIN} -p ${BUILD_DIR}"
 
-                    if [ ! -f "${PREFIX}/${_util}${DEFAULT_INST_MARK_EXT}" ]; then
+                    if [ ! -f "${PREFIX}/$(lowercase "${_util}")${DEFAULT_INST_MARK_EXT}" ]; then
                         note "Buiding an utility: $(distn "${_util}") for: $(distn "${OS_TRIPPLE}")"
                         build "${_util}"
                     fi
@@ -488,7 +493,7 @@ if [ -n "${SOFIN_COMMAND}" ]; then
             done
 
             permnote "Building environment from local dependencies: $(distn "${_pickd_bundls}")"
-            eval "${SOFIN_SHORT_NAME} env +${_pickd_bundls}"
+            eval "${SOFIN_BIN} env +${_pickd_bundls}" # NOTE: `s` is a shell function, unavailable in scripts
 
             permnote "NOTE: You can return to default environment with: $(distn "${SOFIN_SHORT_NAME} env reset")"
             unset _pickd_bundls _bundls_amount

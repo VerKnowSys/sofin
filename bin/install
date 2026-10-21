@@ -6,7 +6,7 @@ if [ "${1}" = "trace" ] || [ -n "${SOFIN_TRACE}" ]; then
     set -x
 fi
 
-if [ "${1}" = "verbose" ] || [ -n "${SOFIN_TRACE}" ]; then
+if [ "${1}" = "verbose" ] || [ -n "${SOFIN_VERBOSE}" ]; then
     printf "Enabling verbose mode\n"
     set -v
 fi

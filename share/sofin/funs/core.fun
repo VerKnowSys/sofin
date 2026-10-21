@@ -58,7 +58,7 @@ warn () {
                     "${_wrn_msgs}" \
                     "${ColorReset}" \
                     "${ANSI_TWO_LINES_DOWN}" \
-                        | ${TEE_BIN} "${LOG}" >/dev/stdout 2>/dev/stderr
+                        | ${TEE_BIN} -a "${LOG}" >/dev/stdout 2>/dev/stderr
         else
             printf "%b%b%b\n" \
                     "${ColorYellow}" \
@@ -144,7 +144,7 @@ error () {
                 "${ColorRed}" \
                 "--------------------------------------------------------------------------------" \
                 "${ColorReset}" \
-                    | ${TEE_BIN} "${LOG}" >/dev/stdout 2>/dev/stderr
+                    | ${TEE_BIN} -a "${LOG}" >/dev/stdout 2>/dev/stderr
 
         if [ "error" = "${_err_root}" ]; then
             printf "%b  %b Try: %b%b\n\n" \
@@ -446,6 +446,11 @@ set_system_dataset_writable () {
     && [ "root" = "${USER}" ] \
     && [ -z "${CAP_SYS_JAILED}" ] \
     && [ "YES" = "${CAP_SYS_ZFS}" ]; then
+        _active_boot_env="$(${BECTL_BIN} list -H 2>/dev/null | ${EGREP_BIN} "R" 2>/dev/null | ${AWK_BIN} '{print $1;}' 2>/dev/null)"
+        if [ -z "${_active_boot_env}" ]; then
+            debug "No active boot environment found. System dataset is untouched."
+            return 0
+        fi
         try "${ZFS_BIN} set readonly=off '${DEFAULT_ZPOOL}/ROOT/${_active_boot_env}'" \
             && debug "System dataset: $(distd "${DEFAULT_ZPOOL}/ROOT/${_active_boot_env}") is now: WRITABLE"
     fi

@@ -36,7 +36,7 @@ enable_sofin_env () {
     fi
     debug "Enabling Sofin env for: $(distd "${_envs}")"
     for _env in $(to_iter "${_envs}"); do
-        ${GREP_BIN} -F "${_env}" "${SOFIN_ENV_ENABLED_INDICATOR_FILE}" >/dev/null 2>&1 \
+        ${GREP_BIN} -Fx "${_env}" "${SOFIN_ENV_ENABLED_INDICATOR_FILE}" >/dev/null 2>&1 \
             || printf "%b\n" "${_env}" >> "${SOFIN_ENV_ENABLED_INDICATOR_FILE}"
     done
     note "Enabled Sofin environment for bundles: $(distn "${_envs}")"
@@ -53,7 +53,11 @@ disable_sofin_env () {
             && debug "Environment file: $(distd "${SOFIN_ENV_ENABLED_INDICATOR_FILE}") removed."
     else
         for _env in $(to_iter "${_envs}"); do
-            ${SED_BIN} -i '' -e "/^.*${_env}.*$/ d" "${SOFIN_ENV_ENABLED_INDICATOR_FILE}" 2>/dev/null
+            if [ -f "${SOFIN_ENV_ENABLED_INDICATOR_FILE}" ]; then
+                # NOTE: remove exact line matches only (Git shouldn't remove Gitea):
+                ${GREP_BIN} -vFx "${_env}" "${SOFIN_ENV_ENABLED_INDICATOR_FILE}" > "${SOFIN_ENV_ENABLED_INDICATOR_FILE}.tmp" 2>/dev/null
+                ${MV_BIN} -f "${SOFIN_ENV_ENABLED_INDICATOR_FILE}.tmp" "${SOFIN_ENV_ENABLED_INDICATOR_FILE}"
+            fi
         done
         permnote "Disabled bundles: $(distn "${_envs}") from the Sofin environment"
     fi
@@ -624,11 +628,8 @@ acquire_lock_for () {
                 try "${KILL_BIN} -0 ${_lock_pid}"
                 if [ "${?}" = "0" ]; then # NOTE: process is alive
                     if [ "${_lock_pid}" = "${SOFIN_PID}" ] \
-                    || [ "${PPID}" = "${SOFIN_PID}" ]; then
+                    || [ "${PPID}" = "${_lock_pid}" ]; then
                         debug "Dealing with own process or it's fork, process may continue.."
-                    elif [ "${_lock_pid}" = "${SOFIN_PID}" ] \
-                      && [ -z "${PPID}" ]; then
-                        debug "Dealing with no fork, process may continue.."
                     else
                         error "Bundle: $(diste "${_bundle}") is locked due to background job pid: $(diste "${_lock_pid}")"
                     fi

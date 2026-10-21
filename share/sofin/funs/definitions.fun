@@ -115,6 +115,7 @@ update_defs () {
         return 0
     fi
     create_sofin_dirs
+    _requested_branch="${BRANCH}"
     BRANCH="${BRANCH:-${DEFAULT_DEFINITIONS_BRANCH}}"
     REPOSITORY="${REPOSITORY:-${DEFAULT_DEFINITIONS_REPOSITORY}}"
 
@@ -127,7 +128,7 @@ update_defs () {
         _out_file="${FILE_CACHE_DIR}${DEFINITIONS_INITIAL_FILE_NAME}${DEFAULT_ARCHIVE_TARBALL_EXT}"
         retry "${FETCH_BIN} -o ${_out_file} ${FETCH_OPTS} '${_initial_defs}'" \
             && try "${TAR_BIN} -xf ${_out_file} ${TAR_DIRECTORY_ARG} ${CACHE_DIR}${DEFINITIONS_BASE}" \
-                && try "${RM_BIN} -vrf ${_initial_defs}" \
+                && try "${RM_BIN} -vrf ${_out_file}" \
                     && return 0
     fi
     if [ -d "${CACHE_DIR}${DEFINITIONS_BASE}/${DEFAULT_GIT_DIR_NAME}" ] \
@@ -139,8 +140,9 @@ update_defs () {
         }
 
         set_def_cur_branch_and_head
-        debug "State of definitions repository was re-set to: $(distd "${_def_head}")"
-        if [ "${_def_cur_branch}" != "${BRANCH}" ]; then # use _def_cur_branch value if branch isn't matching default branch
+        eebug "State of definitions repository was re-set to: $(distd "${_def_head}")"
+        if [ -z "${_requested_branch}" ] \
+        && [ "${_def_cur_branch}" != "${BRANCH}" ]; then # use _def_cur_branch value if branch isn't matching default branch and no BRANCH was requested
             debug "Checking out branch: $(distd "${_def_cur_branch}")"
             try "${GIT_BIN} checkout -b ${_def_cur_branch}" \
                 || try "${GIT_BIN} checkout ${_def_cur_branch}" \
@@ -193,12 +195,12 @@ update_defs () {
 
         printf "%b" "${ColorBlue}" >&2
         ${GIT_BIN} pull --depth 1 --progress origin ${BRANCH} \
-            && _def_head="$(${CAT_BIN} "${CACHE_DIR}${DEFINITIONS_BASE}/${DEFAULT_GIT_DIR_NAME}/refs/heads/${_def_cur_branch}" 2>/dev/null)"
+            && _def_head="$(${GIT_BIN} rev-parse HEAD 2>/dev/null)"
 
         permnote "Repository: $(distn "${REPOSITORY}"), on branch: $(distn "${BRANCH}"). Commit HEAD: $(distn "${_def_head}")."
     fi
     )
-    unset _def_head _def_branch _def_cur_branch _out_file
+    unset _def_head _def_branch _def_cur_branch _out_file _requested_branch
 }
 
 
@@ -451,7 +453,7 @@ wipe_remote_archives () {
             cd "${SOFTWARE_DIR}"
             for _wr_element in $(to_iter "${_bund_names}"); do
                 _lowercase_element="$(lowercase "${_wr_element}")"
-                _remote_ar_name="${_wr_element}-"
+                _remote_ar_name="${_wr_element}-[0-9]*" # NOTE: Name-version* - matches both archives and their checksums
                 _wr_dig="$(${HOST_BIN} "${MAIN_SOFTWARE_ADDRESS}" 2>/dev/null | ${CUT_BIN} -d' ' -f4 2>/dev/null)"
                 if [ -z "${_wr_dig}" ]; then
                     error "No mirrors found in address: $(diste "${MAIN_SOFTWARE_ADDRESS}")"
@@ -550,15 +552,16 @@ strip_bundle () {
     #
     _files_counter="0"
     _to_be_stripped_list=""
-    unset _universal_ft
+    unset _exec_ft _lib_ft _universal_ft
     case "${SYSTEM_NAME}" in
         Darwin)
-            _exec_ft="Mach-O 64-bit executable x86_64"
-            _lib_ft="Mach-O 64-bit dynamically linked shared library x86_64"
+            # NOTE: no arch suffix, to match both x86_64 and arm64 binaries:
+            _exec_ft="Mach-O 64-bit executable"
+            _lib_ft="Mach-O 64-bit dynamically linked shared library"
             _universal_ft="Mach-O universal binary"
             ;;
 
-        FreeBSD)
+        FreeBSD|Linux)
             _exec_ft="ELF 64-bit LSB"
             _lib_ft="ELF 64-bit LSB shared object"
             ;;
@@ -569,18 +572,18 @@ strip_bundle () {
             for _file in $(${FIND_BIN} "${_stripdir}" -maxdepth 1 -type f -not -name '*.la' -not -name '*.sh' 2>/dev/null); do
                 _file_type="$(${FILE_BIN} -b "${_file}" 2>/dev/null)"
                 for _type in "${_exec_ft}" "${_lib_ft}" "${_universal_ft}"; do
+                    if [ -z "${_type}" ]; then # NOTE: empty pattern would match any file
+                        continue
+                    fi
                     printf "%b\n" "${_file_type}" | ${GREP_BIN} -F "${_type}" >/dev/null 2>&1
                     if [ "0" = "${?}" ]; then
                         _files_counter=$(( ${_files_counter} + 1 ))
                         if [ -z "${_to_be_stripped_list}" ]; then
                             _to_be_stripped_list="${_file}"
                         else
-                            # dedup:
-                            echo "${_to_be_stripped_list}" | ${GREP_BIN} -F "${_file} " >/dev/null 2>&1
-                            if [ "0" != "${?}" ]; then
-                                _to_be_stripped_list="${_to_be_stripped_list} ${_file}"
-                            fi
+                            _to_be_stripped_list="${_to_be_stripped_list} ${_file}"
                         fi
+                        break # NOTE: each file is listed once
                     fi
                 done
             done

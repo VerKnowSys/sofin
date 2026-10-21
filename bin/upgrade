@@ -1,9 +1,19 @@
 #!/usr/bin/env zsh
 # @author: Daniel (dmilith) Dettlaff (dmilith at me dot com)
 
+# NOTE: `s` is a shell function, so call Sofin binary directly:
+case "$(uname)" in
+    Darwin)
+        _sofin_bin="/Users/Shared/Software/Sofin/bin/s"
+        ;;
+    *)
+        _sofin_bin="/Software/Sofin/bin/s"
+        ;;
+esac
+
 which git >/dev/null 2>&1
 if [ "0" != "${?}" ]; then
-    s i Git
+    "${_sofin_bin}" i Git || exit 1
 fi
 git reset --hard
 git pull
