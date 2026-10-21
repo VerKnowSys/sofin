@@ -35,17 +35,15 @@ show_logs () {
         eval "${TAIL_BIN} -n ${LOG_LINES_AMOUNT} -F ${_all_files}"
 
     else
-        ${LW_BIN} "${LOGS_DIR}" 2>/dev/null \
-            && return
-
+        # NOTE: print last lines of logs matching the pattern (without following them):
         unset _all_files
         for _mr in $(${FIND_BIN} "${LOGS_DIR%/}" -name "${SOFIN_NAME}*${_logf_pattern}*" -not -name "*.result" -not -name "*.config" -not -name "*.strip" -type f 2>/dev/null); do
             _all_files="${_mr} ${_all_files}"
         done
         if [ -n "${_all_files}" ]; then
-            _2x_more_lines=$(( ${LOG_LINES_AMOUNT} * 2 ))
-            eval "${TAIL_BIN} -F -n ${_2x_more_lines} ${_all_files}"
+            eval "${TAIL_BIN} -n ${LOG_LINES_AMOUNT_ON_PATTERN} ${_all_files}"
         else
+            permnote "No logs matching the pattern: $(distn "${_logf_pattern}")"
             return 1
         fi
     fi
