@@ -151,6 +151,7 @@ build () {
     # disable_security_features
 
     debug "Sofin v$(distd "${SOFIN_VERSION}"): New build started for bundles: $(distd "${_build_list}")"
+    env_reset # NOTE: unset inherited variables (like CDPATH) before the first bundle is built
     for _bund_name in $(to_iter "${_build_list}"); do
         _bund_name="$(lowercase "${_bund_name}")"
         _bund_name="${_bund_name%=*}" # cut the version if specified using Bundlename=1.2.3
