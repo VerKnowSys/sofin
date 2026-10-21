@@ -35,7 +35,7 @@ build_bundle () {
                 _oldsum="$(${CAT_BIN} "${_cached_copy}" 2>/dev/null)"
                 debug "Comparing shasum of most recent stream and one from previous stream. Old-sum: $(distd "${_oldsum}"), new-sum: $(distd "${_newsum}")"
                 if [ "${_oldsum}" = "${_newsum}" ]; then
-                    try "${MV_BIN} -f '${FILE_CACHE_DIR}${_bsbelement}.old' '${FILE_CACHE_DIR}${_bsbelement}.old' ; ${MV_BIN} -f '${_cached_copy}' '${FILE_CACHE_DIR}${_bsbelement}${DEFAULT_CHKSUM_EXT}'" \
+                    try "${MV_BIN} -f '${FILE_CACHE_DIR}${_bsbelement}.old' '${FILE_CACHE_DIR}${_bsbelement}' ; ${MV_BIN} -f '${_cached_copy}' '${FILE_CACHE_DIR}${_bsbelement}${DEFAULT_CHKSUM_EXT}'" \
                         && debug "Checksums match! Upload unnecessary! Previous cache stream file was restored."
                 else
                     try "${RM_BIN} -f '${FILE_CACHE_DIR}${_bsbelement}.old' '${_cached_copy}'" \
@@ -104,7 +104,9 @@ fetch_binbuild () {
 
         if [ -e "${FILE_CACHE_DIR}${_bb_archive}" ]; then
             debug "BB-archive: $(distd "${_bb_archive}"). Expecting binbuild to be available in: $(distd "${FILE_CACHE_DIR}${_bb_archive}")"
-            validate_archive_sha1 "${FILE_CACHE_DIR}${_bb_archive}"
+            validate_archive_sha1 "${FILE_CACHE_DIR}${_bb_archive}" # NOTE: removes the archive if checksum doesn't match
+        fi
+        if [ -e "${FILE_CACHE_DIR}${_bb_archive}" ]; then
             install_software_from_binbuild "${_bb_archive}" "${_fbb_bundname}"
         else
             debug "Binary build unavailable for bundle: $(distd "${_fbb_bundname}")"
