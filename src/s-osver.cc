@@ -28,7 +28,10 @@ int main(int argc, char *argv[]) {
         char buff[5];
         FILE *in;
         in = popen("/sbin/sysctl -n kern.osrelease", "r");
-        fgets(buff, sizeof(buff), in);
+        if (in == NULL || fgets(buff, sizeof(buff), in) == NULL) {
+            if (in != NULL) pclose(in);
+            return EXIT_FAILURE;
+        }
         pclose(in);
         printf("%s", buff);
     #endif
@@ -39,7 +42,10 @@ int main(int argc, char *argv[]) {
         char buff[16];
         FILE *in;
         in = popen("/sbin/sysctl -n kern.osreldate", "r");
-        fgets(buff, sizeof(buff), in);
+        if (in == NULL || fgets(buff, sizeof(buff), in) == NULL) {
+            if (in != NULL) pclose(in);
+            return EXIT_FAILURE;
+        }
         pclose(in);
         int ver = atoi(buff);
         int major = ver / modifier;
@@ -51,24 +57,29 @@ int main(int argc, char *argv[]) {
         char buff[16];
         FILE *in;
         in = popen("/usr/bin/defaults read /System/Library/CoreServices/SystemVersion ProductUserVisibleVersion | /usr/bin/cut -d . -f1-2", "r");
-        fgets(buff, sizeof(buff), in);
+        if (in == NULL || fgets(buff, sizeof(buff), in) == NULL) {
+            if (in != NULL) pclose(in);
+            return EXIT_FAILURE;
+        }
         pclose(in);
         printf("%s", buff);
     #endif
 
     /* for Linux distribution, just give glibc major and minor version */
     #ifdef __linux__
-        char* version = new char[5];
-        strncpy(version, gnu_get_libc_version(), 4);
+        char version[5] = { 0 }; /* NOTE: zero-filled, so it's always NUL terminated */
+        strncpy(version, gnu_get_libc_version(), sizeof(version) - 1);
         printf("%s\n", version);
-        delete version;
     #endif
 
     #if defined(__minix)
         char buff[16];
         FILE *in;
         in = popen("/usr/bin/uname -r | /usr/bin/cut -d. -f1-2", "r");
-        fgets(buff, sizeof(buff), in);
+        if (in == NULL || fgets(buff, sizeof(buff), in) == NULL) {
+            if (in != NULL) pclose(in);
+            return EXIT_FAILURE;
+        }
         pclose(in);
         printf("%s", buff);
     #endif
