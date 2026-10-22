@@ -286,6 +286,28 @@ compiler_setup () {
     CPP="${_default_cpp}"
     unset _default_c _default_cxx _default_cpp
 
+    # NOTE: Darwin case: when the default SDK is newer than the running system, use SDK matching the system.
+    #       Newer SDK declares functions (f.e. pipe2() and dup3() in macOS 27 SDK) that are weak-linked,
+    #       so configure tests detect them, but these are NULL at runtime on older systems:
+    if [ "Darwin" = "${SYSTEM_NAME}" ] \
+    && [ -z "${SDKROOT}" ]; then
+        _os_major="${SYSTEM_VERSION%%.*}"
+        _sdk_version="$(xcrun --show-sdk-version 2>/dev/null)"
+        _matching_sdk="/Library/Developer/CommandLineTools/SDKs/MacOSX${_os_major}.sdk"
+        if [ -n "${_os_major}" ] \
+        && [ -n "${_sdk_version}" ] \
+        && [ "${_sdk_version%%.*}" -gt "${_os_major}" ]; then
+            if [ -d "${_matching_sdk}" ]; then
+                SDKROOT="${_matching_sdk}"
+                export SDKROOT
+                debug "Default SDK: $(distd "${_sdk_version}") is newer than system: $(distd "${SYSTEM_VERSION}"). Using SDK: $(distd "${SDKROOT}")"
+            else
+                warn "Default SDK: $(distw "${_sdk_version}") is newer than system: $(distw "${SYSTEM_VERSION}"), and no matching SDK found in: $(distw "${_matching_sdk}"). Built software may crash on this system!"
+            fi
+        fi
+        unset _os_major _sdk_version _matching_sdk
+    fi
+
     # TODO: make a alternatives / or capability
     if [ -z "${DEF_NO_CCACHE}" ]; then # ccache is supported by default but it's optional
         if [ -x "${CCACHE_BIN}" ]; then
