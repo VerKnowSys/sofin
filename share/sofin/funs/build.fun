@@ -307,6 +307,13 @@ build () {
             sudo xattr -r -d com.apple.quarantine "${PREFIX}/" 2>> "${LOG}-${DEF_NAME}${DEF_SUFFIX}"
         fi
 
+        # NOTE: strip before after-export callback - stripping rewrites the binaries,
+        #       which invalidates code signatures done in callbacks (f.e. entitlements on Darwin):
+        if [ "YES" = "${CAP_SYS_BUILDHOST}" ] \
+        && [ -z "${DEBUGBUILD}" ]; then
+            strip_bundle "${_bund_name_capit}"
+        fi
+
         try after_export_callback
         try after_export_snapshot
 
@@ -322,7 +329,6 @@ build () {
 
             if [ -z "${DEBUGBUILD}" ]; then
                 afterbuild_manage_files_of_bundle
-                strip_bundle "${_bund_name_capit}"
             fi
 
             validate_pie_on_exports "${_bund_name_capit}"

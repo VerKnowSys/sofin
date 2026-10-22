@@ -610,6 +610,8 @@ strip_bundle () {
                 try "${OBJCOPY_BIN} --add-gnu-debuglink=${_debug_dest_dir}/${_dbgfile_basename} ${_file}"
             done
         fi
+        # NOTE: mark bundle as stripped, so it's not stripped again on the next build:
+        try "${TOUCH_BIN} '${PREFIX}/${_sbfdefinition_name}${DEFAULT_STRIPPED_MARK_EXT}'"
     fi
     unset _sbfdefinition_name _dirs_to_strip _files_counter _file _stripdir _bundlower _to_be_stripped_list _debug_dest_dir _dbgfile_basename
 }
