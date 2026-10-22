@@ -570,6 +570,13 @@ strip_bundle () {
     for _stripdir in $(to_iter "${_dirs_to_strip}"); do
         if [ -d "${_stripdir}" ]; then
             for _file in $(${FIND_BIN} "${_stripdir}" -maxdepth 1 -type f -not -name '*.la' -not -name '*.sh' 2>/dev/null); do
+                # NOTE: Darwin: don't touch vendor signed binaries (f.e. prebuilt Vault, Consul).
+                #       Stripping breaks their Developer ID signature, and the system kills them on launch:
+                if [ "Darwin" = "${SYSTEM_NAME}" ] \
+                && /usr/bin/codesign -dv "${_file}" 2>&1 | ${GREP_BIN} -E "^TeamIdentifier=[A-Z0-9]" >/dev/null 2>&1; then
+                    debug "Skipping vendor signed file: $(distd "${_file}")"
+                    continue
+                fi
                 _file_type="$(${FILE_BIN} -b "${_file}" 2>/dev/null)"
                 for _type in "${_exec_ft}" "${_lib_ft}" "${_universal_ft}"; do
                     if [ -z "${_type}" ]; then # NOTE: empty pattern would match any file
