@@ -4,7 +4,7 @@
 
 unset OBJCOPY_BIN # not applicable
 unset SERVICE_BIN # not necessary
-unset DEFAULT_STRIP_OPTS # strip doesn't accept params under Darwin
+DEFAULT_STRIP_OPTS="-x" # NOTE: remove only local symbols. Plain strip removes global symbols of executables, needed by loadable modules (zsh modules, php extensions…)
 
 # Darwin specific:
 SHA_BIN="/usr/bin/shasum"
