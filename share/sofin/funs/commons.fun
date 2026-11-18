@@ -17,11 +17,11 @@ EOF
 check_result () {
     if [ "${1}" = "0" ]; then
         shift
-        debug "${ColorGreen:-${ColorDistinct}}${SUCCESS_CHAR}${ColorDebug} ${ColorDistinct}${@}${ColorDebug}"
+        debug "${ColorGreen}${SUCCESS_CHAR}${ColorDebug} ${ColorDistinct}${*}${ColorDebug}"
         return 0
     else
         shift
-        debug "${ColorRed:-${ColorDistinct}}${FAIL_CHAR}${ColorDebug} ${ColorDistinct}${@}${ColorDebug}"
+        debug "${ColorRed}${FAIL_CHAR}${ColorDebug} ${ColorDistinct}${*}${ColorDebug}"
         return 1
     fi
 }

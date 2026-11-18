@@ -7,18 +7,25 @@ debug () {
         return 0
     fi
     create_sofin_dirs
+    # NOTE: debug() is called for nearly every action, so avoid forking date(1):
+    #       zsh/datetime (loaded by determine_term_capabilites) provides strftime.
+    if [ -n "${EPOCHSECONDS}" ]; then
+        strftime -s _debug_ts "%F-%T" "${EPOCHSECONDS}"
+    else
+        _debug_ts="$(${DATE_BIN} +"%F-%T")"
+    fi
     if [ -n "${DEBUG}" ]; then
         if [ "YES" = "${CAP_TERM_INTERACTIVE}" ]; then
             printf "%b%b λ %b%b%b\n" \
                     "${ColorDark}" \
-                    "$(${DATE_BIN} +"%F-%T")" \
+                    "${_debug_ts}" \
                     "${ColorDebug}" \
                     "${_debug_msg}" \
                     "${ColorReset}" \
                         >&2
         else
             printf "# %b # %b\n" \
-                    "$(${DATE_BIN} +"%F-%T")" \
+                    "${_debug_ts}" \
                     "${_debug_msg}" \
                         >&2
         fi
@@ -27,7 +34,7 @@ debug () {
             # Definition log, log to stderr only
             printf "# %b%b: %b%b%b\n" \
                     "${ColorDark}" \
-                    "$(${DATE_BIN} +"%F-%T")" \
+                    "${_debug_ts}" \
                     "${ColorDebug}" \
                     "${_debug_msg}" \
                     "${ColorReset}" \
@@ -36,14 +43,14 @@ debug () {
             # Main log, all to stderr
             printf "# %b%b: %b%b%b\n" \
                     "${ColorDark}" \
-                    "$(${DATE_BIN} +"%F-%T")" \
+                    "${_debug_ts}" \
                     "${ColorDebug}" \
                     "${_debug_msg}" \
                     "${ColorReset}" \
                         2>> "${LOG}" >&2
         fi
     fi
-    unset _debug_msg
+    unset _debug_msg _debug_ts
     return 0
 }
 

@@ -56,6 +56,8 @@ determine_term_capabilites () {
     if [ -n "${ZSH_VERSION}" ]; then
         # if Zsh is still running as sh, so we want to load some Zsh fancy features:
         zmodload zsh/parameter 2>/dev/null
+        # NOTE: strftime builtin and EPOCHSECONDS, used by debug() instead of date(1):
+        zmodload zsh/datetime 2>/dev/null
         setopt debugbeforecmd 2>/dev/null
         setopt appendhistory 2>/dev/null
         setopt extendedhistory 2>/dev/null
