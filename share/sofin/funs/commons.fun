@@ -82,23 +82,33 @@ file_size () {
 }
 
 
+# NOTE: String helpers below use Zsh expansions instead of tr/awk pipelines.
+#       Hot paths should expand inline (no subshell at all):
+#         lowercase:      ${(L)var}
+#         capitalize:     ${(U)var[1]}${var[2,-1]}
+#         capitalize_abs: ${(U)var[1]}${(L)var[2,-1]}
+
+# Upper-case the first letter of each word, keep the rest (one line per argument):
 capitalize () {
-    printf "%b\n" "${@}" 2>/dev/null \
-        | ${AWK_BIN} '{for(i=1;i<=NF;i++){ $i=toupper(substr($i,1,1)) substr($i,2) }}1' 2>/dev/null
+    for _cap_line in "${@}"; do
+        _cap_out=""
+        for _cap_word in ${=_cap_line}; do
+            _cap_out="${_cap_out:+${_cap_out} }${(U)_cap_word[1]}${_cap_word[2,-1]}"
+        done
+        printf "%b\n" "${_cap_out}"
+    done
+    unset _cap_line _cap_word _cap_out
 }
 
 
 lowercase () {
-    printf "%b\n" "${@}" 2>/dev/null \
-        | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null
+    printf "%b\n" "${(L)@}"
 }
 
 
 # capitalize_abs => lowercase() + capitalize ()
 capitalize_abs () {
-    printf "%b\n" "${@}" 2>/dev/null \
-        | ${TR_BIN} '[A-Z]' '[a-z]' 2>/dev/null \
-        | ${AWK_BIN} '{for(i=1;i<=NF;i++){ $i=toupper(substr($i,1,1)) substr($i,2) }}1' 2>/dev/null
+    capitalize "${(L)@}"
 }
 
 
@@ -196,10 +206,10 @@ find_most_recent () {
 }
 
 
+# Remove the first occurrence of the second argument (taken literally) from the first one.
+# An empty second argument gives an empty result:
 difftext () {
-    _text_input="${1}"
-    _text_match="${2}"
-    printf "%b\n" "${_text_input}" | ${SED_BIN} -e "s#${_text_match}##" 2>/dev/null
+    printf "%b\n" "${2:+${1/${2}/}}"
 }
 
 

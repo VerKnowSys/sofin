@@ -153,9 +153,9 @@ build () {
     debug "Sofin v${ColorDistinct}${SOFIN_VERSION}${ColorDebug}: New build started for bundles: ${ColorDistinct}${_build_list}${ColorDebug}"
     env_reset # NOTE: unset inherited variables (like CDPATH) before the first bundle is built
     for _bund_name in $(to_iter "${_build_list}"); do
-        _bund_name="$(lowercase "${_bund_name}")"
+        _bund_name="${(L)_bund_name}"
         _bund_name="${_bund_name%=*}" # cut the version if specified using Bundlename=1.2.3
-        _bund_name_capit="$(capitalize "${_bund_name}")"
+        _bund_name_capit="${(U)_bund_name[1]}${_bund_name[2,-1]}"
         load_defaults
         load_defs "${_bund_name}"
         validate_loaded_def
@@ -167,9 +167,8 @@ build () {
             create_software_dir "${_bund_name_capit}"
             for _req_name in ${DEFINITIONS_DIR}/${_bund_name}${DEFAULT_DEF_EXT}; do
                 unset CURRENT_DEFINITION_SKIP_BUILD_DO_EXPORTS
+                # NOTE: the definition was loaded above already (load_defaults + load_defs)
                 debug "Reading definition: ${ColorDistinct}${_req_name}${ColorDebug}"
-                load_defaults
-                load_defs "${_req_name}"
                 pretouch_logs "${DEF_REQUIREMENTS}"
 
                 # NOTE: feature to specify custom version of bundle to install via: `s i Rust=1.31.1`:
@@ -181,7 +180,7 @@ build () {
                 # Note: this acutally may break definitions like ImageMagick..
                 #_bund_lcase="$(lowercase "${DEF_NAME}${DEF_SUFFIX}")"
                 _bund_lcase="${DEF_NAME}${DEF_SUFFIX}"
-                _bundl_name="$(capitalize_abs "${_bund_lcase}")"
+                _bundl_name="${(U)_bund_lcase[1]}${(L)_bund_lcase[2,-1]}"
                 DEF_NAME="${_bundl_name}"
 
                 # if definition requires root privileges, throw an "exception":
@@ -463,9 +462,9 @@ dump_debug_info () {
 
 
 process_flat () {
-    _definition_name="$(lowercase "${1}")"
+    _definition_name="${(L)1}"
     _prefix="${2}"
-    _bundlnm="$(capitalize_abs "${_definition_name}")"
+    _bundlnm="${(U)_definition_name[1]}${_definition_name[2,-1]}"
     if [ -z "${_definition_name}" ]; then
         error "First argument with ${ColorDistinct}requirement-name${ColorError} is required!"
     fi
@@ -479,7 +478,7 @@ process_flat () {
     if [ ! -e "${_req_definition}" ]; then
         error "Cannot read definition file: ${ColorDistinct}${_req_definition}${ColorError}!"
     fi
-    _req_defname="$(printf "%b\n" "${_req_definition##*/}" | ${SED_BIN} -e 's/\..*$//g' 2>/dev/null)"
+    _req_defname="${${_req_definition##*/}%%.*}"
     debug "Process requirement: ${ColorDistinct}${_req_defname}${ColorDebug} from definition: ${ColorDistinct}${_req_definition}${ColorDebug} for bundle with PREFIX: ${ColorDistinct}${_prefix}${ColorDebug}"
 
     # XXX: FIXME: OPTIMIZE: Each definition read twice... log bloat & shit
@@ -585,8 +584,8 @@ process_flat () {
                     fi
 
                     unset _fd
-                    _prm_nolib="$(printf "%b\n" "${_definition_name}" | ${SED_BIN} 's/lib//' 2>/dev/null)"
-                    _prm_no_undrlne_and_minus="$(printf "%b\n" "${_definition_name}" | ${SED_BIN} 's/[-_].*$//' 2>/dev/null)"
+                    _prm_nolib="${_definition_name/lib/}"
+                    _prm_no_undrlne_and_minus="${_definition_name%%[-_]*}"
                     # debug "Requirement: ${_definition_name} short: ${_prm_nolib}, nafter-: ${_prm_no_undrlne_and_minus}, DEF_NAME: ${DEF_NAME}, BUILD_DIR: ${BUILD_DIR}"
                     # NOTE: patterns sorted by safety
                     for _pati in    "*${_definition_name}*${DEF_VERSION}" \
@@ -653,9 +652,9 @@ process_flat () {
                     _configure_log="config.log"
                     _cmake_out_log="CMakeFiles/CMakeOutput.log"
                     _cmake_error_log="CMakeFiles/CMakeError.log"
-                    _configure_options_log="${LOGS_DIR}$(lowercase "${SOFIN_NAME}-${DEF_NAME}${DEF_SUFFIX}.config")"
+                    _configure_options_log="${LOGS_DIR}${(L):-${SOFIN_NAME}-${DEF_NAME}${DEF_SUFFIX}.config}"
                     _configuration_result="${_configure_options_log}.result"
-                    _cmake_configuration_result="${LOGS_DIR}$(lowercase "${SOFIN_NAME}-${DEF_NAME}${DEF_SUFFIX}.cmake.result.log")"
+                    _cmake_configuration_result="${LOGS_DIR}${(L):-${SOFIN_NAME}-${DEF_NAME}${DEF_SUFFIX}.cmake.result.log}"
 
                     case "${DEF_CONFIGURE_METHOD}" in
 

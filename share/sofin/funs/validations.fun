@@ -176,9 +176,9 @@ validate_archive_sha1 () {
 
 validate_def_suffix () {
     _arg1="${1%${DEFAULT_DEF_EXT}}" # <- cut extension
-    _defname="$(lowercase "${2}")"
-    _def_bundle_name="$(capitalize "${_defname}")"
-    _defmatch="$(lowercase "${_arg1##*/}")" # <- basename
+    _defname="${(L)2}"
+    _def_bundle_name="${(U)_defname[1]}${_defname[2,-1]}"
+    _defmatch="${(L)${_arg1##*/}}" # <- basename
 
     if [ -n "${DEF_SUFFIX}" ]; then
         unset _defname _arg1 _arg2
@@ -188,11 +188,11 @@ validate_def_suffix () {
 
     # handle case when DEF_SUFFIX was ommited => use definition file name difference as SUFFIX:
     if [ "${#_defname}" -gt "${#_defmatch}" ]; then
-        _defdiff="$(difftext "${_defname}" "${_defmatch}")"
+        _defdiff="${_defmatch:+${_defname/${_defmatch}/}}" # NOTE: empty pattern => empty diff
     fi
     if [ "${#_defmatch}" -gt "${#_defname}" ] \
     || [ "${#_defname}" = "${#_defmatch}" ]; then
-        _defdiff="$(difftext "${_defmatch}" "${_defname}")"
+        _defdiff="${_defname:+${_defmatch/${_defname}/}}" # NOTE: empty pattern => empty diff
     fi
 
     # assume, that length of a diff shouldn't match length of both specified names:
@@ -213,7 +213,7 @@ validate_def_suffix () {
 
 validate_definition_disabled () {
     # check requirement for disabled state:
-    for _def_disable_on in $(to_iter "${DEF_DISABLE_ON}"); do
+    for _def_disable_on in ${=DEF_DISABLE_ON}; do
         if [ "${SYSTEM_NAME}" = "${_def_disable_on}" ] \
         || [ "${SYSTEM_NAME}-${SYSTEM_VERSION}" = "${_def_disable_on}" ] \
         || [ "${SYSTEM_NAME}-${SYSTEM_VERSION%.*}" = "${_def_disable_on}" ] \
@@ -230,8 +230,8 @@ validate_definition_disabled () {
 
 
 validate_util_availability () {
-    _req_name="$(lowercase "${1}")"
-    _req_bundle_name="$(capitalize "${_req_name}")"
+    _req_name="${(L)1}"
+    _req_bundle_name="${(U)_req_name[1]}${_req_name[2,-1]}"
     _req_util_indicator="${SOFIN_UTILS_DIR}/${_req_bundle_name}/${_req_name}${DEFAULT_INST_MARK_EXT}"
     if [ -f "${_req_util_indicator}" ]; then
         debug "Utility available for: ${ColorDistinct}${_req_name}${ColorDebug}. Skipping requirement build. Will attempt to use utility."

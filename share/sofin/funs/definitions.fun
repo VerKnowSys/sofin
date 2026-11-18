@@ -1,22 +1,27 @@
 #!/usr/bin/env sh
 
 
+# Unique words of the arguments, first occurrence order kept:
 requirements_dedup () {
-    printf "%b\n" "${*}" | ${AWK_BIN} -v RS=' ' -v ORS='' -v OFS='' '! ($1 in seen) { print( (NR > 1) ? " " : "", $1); seen[$1]=y }'
+    printf "%b" "${(j: :)${(u)=*}}"
 }
 
 
 extend_requirement_lists () {
     # @definition list extension support:
-    for _req_list in $(to_iter "${DEF_REQUIREMENTS}"); do
-        _req_list="$(echo "${_req_list}" | ${SED_BIN} -e "s|@||" 2>/dev/null)"
+    for _req_list in ${=DEF_REQUIREMENTS}; do
+        case "${_req_list}" in
+            @*) ;;
+            *) continue ;; # NOTE: only @lists need expanding
+        esac
+        _req_list="${_req_list/@/}"
         _reqs_var="$(${AWK_BIN} '/^DEF_REQUIREMENTS=/ { print $0; }' ${DEFINITIONS_DIR}/${_req_list}${DEFAULT_DEF_EXT} 2>/dev/null)"
-        _reqs_var="$(lowercase "_${_reqs_var}")"
+        _reqs_var="${(L):-_${_reqs_var}}"
         eval "${_reqs_var}" >/dev/null 2>/dev/null
         if [ -n "${_def_requirements}" ]; then
-            DEF_REQUIREMENTS="$(echo "${DEF_REQUIREMENTS}" | ${SED_BIN} -e "s|@${_req_list}|${_def_requirements} ${_req_list}|")"
+            DEF_REQUIREMENTS="${DEF_REQUIREMENTS/@${_req_list}/${_def_requirements} ${_req_list}}"
         else
-            DEF_REQUIREMENTS="$(echo "${DEF_REQUIREMENTS}" | ${SED_BIN} -e "s|@${_req_list}|${_req_list}|")"
+            DEF_REQUIREMENTS="${DEF_REQUIREMENTS/@${_req_list}/${_req_list}}"
         fi
         unset _req_list _reqs_var _def_requirements
     done
@@ -31,7 +36,7 @@ load_defs () {
     else
         for _given_def in $(to_iter "${_definitions}"); do
             _name_base="${_given_def##*/}"
-            _def="$(lowercase "${_name_base}")"
+            _def="${(L)_name_base}"
             if [ -e "${DEFINITIONS_DIR}/${_def}${DEFAULT_DEF_EXT}" ]; then
                 . "${DEFINITIONS_DIR}/${_def}${DEFAULT_DEF_EXT}"
             elif [ -e "${DEFINITIONS_DIR}/${_def#?}${DEFAULT_DEF_EXT}" ]; then
@@ -45,14 +50,8 @@ load_defs () {
                 show_alt_definitions_and_exit "${_given_def}"
             fi
 
-            _val="loopstart"
-            while [ -n "${_val}" ]; do
-                _val="$(echo "${DEF_REQUIREMENTS}" | ${GREP_BIN} "@")"
-                if [ "0" = "${?}" ]; then
-                    extend_requirement_lists
-                else
-                    break
-                fi
+            while [[ "${DEF_REQUIREMENTS}" == *@* ]]; do
+                extend_requirement_lists
             done
 
             # if definition lacks definition of DEF_SUFFIX, after loading
@@ -64,7 +63,7 @@ load_defs () {
             validate_definition_disabled
 
             # deduplicate requirements
-            DEF_REQUIREMENTS="$(requirements_dedup "${DEF_REQUIREMENTS}")"
+            DEF_REQUIREMENTS="${(j: :)${(u)=DEF_REQUIREMENTS}}"
 
             if [ -z "${USE_NO_UTILS}" ] \
             && [ -n "${CAP_SYS_BUILDHOST}" ]; then
