@@ -804,13 +804,17 @@ process_flat () {
                                             esac
                                         fi
                                         # NOTE: Autoconf scripts list CFLAGS among "influential environment variables"
-                                        #       and accept them as arguments. Others get them in the environment (they're exported anyway):
+                                        #       and accept them as arguments. Hand-written ones (RHash) may mention CFLAGS
+                                        #       but reject it as an argument: they get it in the environment.
+                                        #       If configure still fails, fall back to the definition's own options only.
                                         case "${_configure_help}" in
-                                            *CFLAGS*)
-                                                run "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} ${_configure_opts} ${_addon} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}"
+                                            *"influential environment variables"*)
+                                                try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} ${_configure_opts} ${_addon} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
+                                                    || run "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}"
                                                 ;;
                                             *)
-                                                run "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} ${_configure_opts} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}"
+                                                try "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} ${_configure_opts} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
+                                                    || run "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}"
                                                 ;;
                                         esac
                                     fi
