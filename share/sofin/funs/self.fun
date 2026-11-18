@@ -34,14 +34,14 @@ prepare_and_manage_origin () {
             _snap_count="$(printf "%b\n" "${_any_snap}" | ${GREP_BIN} -c '' 2>/dev/null)"
             # NOTE: handle potential problem with huge amount of snapshots later on. Keep max of N most recent snapshots:
             if [ "${_snap_count}" -gt "${DEFAULT_ZFS_MAX_SNAPSHOT_COUNT}" ]; then
-                debug "Old snapshots count: $(distd "${_snap_count}")"
+                debug "Old snapshots count: ${ColorDistinct}${_snap_count}${ColorDebug}"
                 for _a_snap in $(to_iter "${_any_snap}"); do
                     try "zfs destroy '${_a_snap}'" \
-                        && permnote "Destroyed the oldest $(distn "@${ORIGIN_ZFS_SNAP_NAME}") snapshot: $(distn "${_a_snap}")." \
+                        && permnote "Destroyed the oldest ${ColorDistinct}@${ORIGIN_ZFS_SNAP_NAME}${ColorNote} snapshot: ${ColorDistinct}${_a_snap}${ColorNote}." \
                             && break # - we want to remove at least one snapshot
                 done
             else
-                debug "Old ${SOFIN_BUNDLE_NAME} snapshots count: $(distd "${_snap_count}")"
+                debug "Old ${SOFIN_BUNDLE_NAME} snapshots count: ${ColorDistinct}${_snap_count}${ColorDebug}"
             fi
 
             _timestamp_now="$(date +%F-%H%M-%s 2>/dev/null)"
@@ -55,7 +55,7 @@ prepare_and_manage_origin () {
 commit_origin () {
     if [ -n "${CAP_SYS_ZFS}" ]; then
         run "zfs snapshot ${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/${SOFIN_BUNDLE_NAME}@${ORIGIN_ZFS_SNAP_NAME}" \
-            && permnote "Created new $(distn "@${ORIGIN_ZFS_SNAP_NAME}") snapshot of bundle: $(distn "${SOFIN_BUNDLE_NAME}")."
+            && permnote "Created new ${ColorDistinct}@${ORIGIN_ZFS_SNAP_NAME}${ColorNote} snapshot of bundle: ${ColorDistinct}${SOFIN_BUNDLE_NAME}${ColorNote}."
 
         try "zfs set readonly=on ${DEFAULT_ZPOOL}${SOFTWARE_DIR}/root/${SOFIN_BUNDLE_NAME}"
     fi
@@ -70,7 +70,7 @@ install_sofin () {
 
     prepare_and_manage_origin
 
-    permnote "Install $(distn "${SOFIN_BUNDLE_NAME}") to prefix: $(distn "${SOFIN_ROOT}")"
+    permnote "Install ${ColorDistinct}${SOFIN_BUNDLE_NAME}${ColorNote} to prefix: ${ColorDistinct}${SOFIN_ROOT}${ColorNote}"
 
     DEFAULT_LINKER_FLAGS=""
     DEF_NO_LINKER_DTAGS=YES
@@ -91,7 +91,7 @@ install_sofin () {
     #     "${SOFIN_ROOT}/bin/s" \
     #     "${SOFIN_ROOT}/share/loader" \
     #     >/dev/null 2>&1 \
-    permnote "${SOFIN_BUNDLE_NAME} v$(distn "${SOFIN_VERSION}") was installed successfully!"
+    permnote "${SOFIN_BUNDLE_NAME} v${ColorDistinct}${SOFIN_VERSION}${ColorNote} was installed successfully!"
 
     commit_origin
 
@@ -111,7 +111,7 @@ update_defs () {
 
 
 build_sofin_natives () {
-    _okch="$(distn "${SUCCESS_CHAR}" "${ColorParams}")"
+    _okch="${ColorParams:-${ColorDistinct}}${SUCCESS_CHAR}${ColorNote}"
     compiler_setup
     for _prov in ${SOFIN_PROVIDES}; do
         if [ -f "src/${_prov}.cc" ]; then
@@ -134,7 +134,7 @@ build_sofin_natives () {
 
 try_sudo_installation () {
     _cmds="sudo ${MKDIR_BIN} -vp ${SOFTWARE_DIR} ${SERVICES_DIR} && sudo ${CHOWN_BIN} -R ${USER} ${SOFTWARE_DIR} ${SERVICES_DIR}"
-    permnote "Please provide password for commands: $(distn "${_cmds}")"
+    permnote "Please provide password for commands: ${ColorDistinct}${_cmds}${ColorNote}"
     eval "${_cmds}" \
         || exit 66
     unset _cmds
@@ -150,7 +150,7 @@ install_sofin_files () {
     ${MKDIR_BIN} -p "${SOFTWARE_DIR}" "${SERVICES_DIR}" "${SOFIN_ROOT}/bin" "${SOFIN_ROOT}/exports" "${SOFIN_ROOT}/share" \
         || try_sudo_installation
 
-    _okch="$(distn "${SUCCESS_CHAR}" "${ColorParams}")"
+    _okch="${ColorParams:-${ColorDistinct}}${SUCCESS_CHAR}${ColorNote}"
     for _prov in ${SOFIN_PROVIDES}; do
         if [ -f "bin/${_prov}" ]; then
             run "${INSTALL_BIN} bin/${_prov} ${SOFIN_ROOT}/bin"
@@ -165,8 +165,8 @@ install_sofin_files () {
     run "${INSTALL_BIN} -m 755 src/s.sh ${SOFIN_ROOT}/bin/s" \
         && permnote "  ${_okch} sofin launcher"
 
-    permnote "Read: $(distn "https://github.com/VerKnowSys/sofin") for more details."
-    permnote "Type: $(distn "s usage") for quick help."
+    permnote "Read: ${ColorDistinct}https://github.com/VerKnowSys/sofin${ColorNote} for more details."
+    permnote "Type: ${ColorDistinct}s usage${ColorNote} for quick help."
     return 0
 }
 

@@ -3,90 +3,90 @@
 usage_howto () {
     permnote "Built in tasks:"
     permnote
-    permnote "  $(distn "i | install | get | pick | use       ") installs software from list or from definition and switches exports for it ($(distn "example: "${SOFIN_BIN_SHORT}" install Rust" "${ColorExample}"))"
-    permnote "  $(distn "dependencies | deps | local          ") installs software from list defined in '$(distn "${DEFAULT_PROJECT_DEPS_LIST_FILE}")' file in current directory"
-    permnote "  $(distn "rm | uninstall | destroy | delete    ") removes an application or list ($(distn "example: "${SOFIN_BIN_SHORT}" uninstall Rust" "${ColorExample}"))"
-    permnote "  $(distn "list | installed                     ") gives short list of installed software"
-    permnote "  $(distn "full | fulllist | fullinstalled      ") gives detailed list with installed software including requirements"
-    permnote "  $(distn "available | avail                    ") lists available software definitions"
-    permnote "  $(distn "bundlelist | bundles                 ") lists available binary bundles"
-    permnote "  $(distn "export | exp | exportapp             ") adds given command to application exports ($(distn "example: "${SOFIN_BIN_SHORT}" export rails Rust" "${ColorExample}"))"
+    permnote "  ${ColorDistinct}i | install | get | pick | use       ${ColorNote} installs software from list or from definition and switches exports for it ($(distn "example: "${SOFIN_BIN_SHORT}" install Rust" "${ColorExample}"))"
+    permnote "  ${ColorDistinct}dependencies | deps | local          ${ColorNote} installs software from list defined in '${ColorDistinct}${DEFAULT_PROJECT_DEPS_LIST_FILE}${ColorNote}' file in current directory"
+    permnote "  ${ColorDistinct}rm | uninstall | destroy | delete    ${ColorNote} removes an application or list ($(distn "example: "${SOFIN_BIN_SHORT}" uninstall Rust" "${ColorExample}"))"
+    permnote "  ${ColorDistinct}list | installed                     ${ColorNote} gives short list of installed software"
+    permnote "  ${ColorDistinct}full | fulllist | fullinstalled      ${ColorNote} gives detailed list with installed software including requirements"
+    permnote "  ${ColorDistinct}available | avail                    ${ColorNote} lists available software definitions"
+    permnote "  ${ColorDistinct}bundlelist | bundles                 ${ColorNote} lists available binary bundles"
+    permnote "  ${ColorDistinct}export | exp | exportapp             ${ColorNote} adds given command to application exports ($(distn "example: "${SOFIN_BIN_SHORT}" export rails Rust" "${ColorExample}"))"
     permnote
-    permnote "  $(distn "dump                                 ") dumps current default compiler and environment settings"
-    permnote "  $(distn "dump definition-name                 ") dumps definition-specific compiler and environment settings"
+    permnote "  ${ColorDistinct}dump                                 ${ColorNote} dumps current default compiler and environment settings"
+    permnote "  ${ColorDistinct}dump definition-name                 ${ColorNote} dumps definition-specific compiler and environment settings"
     permnote
-    permnote "  $(distn "log                                  ") shows tail of all logs (for debug messages and verbose info)"
-    permnote "  $(distn "log @                                ") shows tail of all Sofin logs"
-    permnote "  $(distn "log -                                ") shows tail of Sofin internal log only"
-    permnote "  $(distn "log +                                ") shows and watches all recently modified files"
-    permnote "  $(distn "log any-part-of-def-name             ") shows and watches log(s) which name matches pattern"
+    permnote "  ${ColorDistinct}log                                  ${ColorNote} shows tail of all logs (for debug messages and verbose info)"
+    permnote "  ${ColorDistinct}log @                                ${ColorNote} shows tail of all Sofin logs"
+    permnote "  ${ColorDistinct}log -                                ${ColorNote} shows tail of Sofin internal log only"
+    permnote "  ${ColorDistinct}log +                                ${ColorNote} shows and watches all recently modified files"
+    permnote "  ${ColorDistinct}log any-part-of-def-name             ${ColorNote} shows and watches log(s) which name matches pattern"
     permnote
-    permnote "  $(distn "up | update                          ") only update definitions from remote repository and exit"
-    permnote "  $(distn "upgrade defname srcurl               ") upgrade given definition using url as source archive"
-    permnote "  $(distn "ver | version                        ") shows "${SOFIN_BIN_SHORT}" script version"
-    permnote "  $(distn "util Bundle1 B2 BundleN              ") build given definitions as Sofin utilities."
-    permnote "  $(distn "clean                                ") cleans binbuilds cache, unpacked source content and logs"
-    permnote "  $(distn "distclean                            ") cleans binbuilds cache, unpacked source content, logs and definitions"
-    permnote "  $(distn "purge                                ") cleans binbuilds cache, unpacked source content, logs, definitions, source cache and possible states"
-    permnote "  $(distn "out | outdated                       ") lists outdated software"
-    permnote "  $(distn "build                                ") does binary build from source for software specified as params"
-    permnote "  $(distn "deploy | push | send                 ") creates binary build of software bundle(s) and pushes it to remote server ($(distn "example: "${SOFIN_BIN_SHORT}" push Rust Vifm Curl" "${ColorExample}"))"
-    permnote "  $(distn "wipe                                 ") wipes binary builds (matching given name) from binary respositories ($(distn "example: "${SOFIN_BIN_SHORT}" wipe Rust Vifm" "${ColorExample}"))"
+    permnote "  ${ColorDistinct}up | update                          ${ColorNote} only update definitions from remote repository and exit"
+    permnote "  ${ColorDistinct}upgrade defname srcurl               ${ColorNote} upgrade given definition using url as source archive"
+    permnote "  ${ColorDistinct}ver | version                        ${ColorNote} shows "${SOFIN_BIN_SHORT}" script version"
+    permnote "  ${ColorDistinct}util Bundle1 B2 BundleN              ${ColorNote} build given definitions as Sofin utilities."
+    permnote "  ${ColorDistinct}clean                                ${ColorNote} cleans binbuilds cache, unpacked source content and logs"
+    permnote "  ${ColorDistinct}distclean                            ${ColorNote} cleans binbuilds cache, unpacked source content, logs and definitions"
+    permnote "  ${ColorDistinct}purge                                ${ColorNote} cleans binbuilds cache, unpacked source content, logs, definitions, source cache and possible states"
+    permnote "  ${ColorDistinct}out | outdated                       ${ColorNote} lists outdated software"
+    permnote "  ${ColorDistinct}build                                ${ColorNote} does binary build from source for software specified as params"
+    permnote "  ${ColorDistinct}deploy | push | send                 ${ColorNote} creates binary build of software bundle(s) and pushes it to remote server ($(distn "example: "${SOFIN_BIN_SHORT}" push Rust Vifm Curl" "${ColorExample}"))"
+    permnote "  ${ColorDistinct}wipe                                 ${ColorNote} wipes binary builds (matching given name) from binary respositories ($(distn "example: "${SOFIN_BIN_SHORT}" wipe Rust Vifm" "${ColorExample}"))"
 
     permnote
-    permnote "  $(distn "env                                  ") reads current Sofin environment."
-    permnote "  $(distn "env Bundle1 BundleN                  ") builds env for given bundles only (no persistence)."
-    permnote "  $(distn "env +Bundle1 +BundleN +Bund8 Any1    ") add given Bundle(s) to current env profile."
-    permnote "  $(distn "env +Bundle1 BundleN                 ") add given Bundle(s) to current env profile."
-    permnote "  $(distn "env -Bundle1 -Sup2 -BundleN          ") remove given Bundle(s) from current env profile."
-    permnote "  $(distn "env -Bundle1 Sup2 -BundleN           ") remove given Bundle(s) from current env profile."
-    permnote "  $(distn "env reset                            ") resets Sofin env to defaults."
-    permnote "  $(distn "env save MyProjectX                  ") saves Sofin env profile with given name."
-    permnote "  $(distn "env load MyProjectX                  ") loads Sofin env profile with given name (no persistence)."
-    permnote "  $(distn "env status                           ") shows Sofin status - list of Bundle(s) enabled for currently loaded profile."
-    permnote "  $(distn "env reload | rehash                  ") recreates and reloads Sofin shell environment"
+    permnote "  ${ColorDistinct}env                                  ${ColorNote} reads current Sofin environment."
+    permnote "  ${ColorDistinct}env Bundle1 BundleN                  ${ColorNote} builds env for given bundles only (no persistence)."
+    permnote "  ${ColorDistinct}env +Bundle1 +BundleN +Bund8 Any1    ${ColorNote} add given Bundle(s) to current env profile."
+    permnote "  ${ColorDistinct}env +Bundle1 BundleN                 ${ColorNote} add given Bundle(s) to current env profile."
+    permnote "  ${ColorDistinct}env -Bundle1 -Sup2 -BundleN          ${ColorNote} remove given Bundle(s) from current env profile."
+    permnote "  ${ColorDistinct}env -Bundle1 Sup2 -BundleN           ${ColorNote} remove given Bundle(s) from current env profile."
+    permnote "  ${ColorDistinct}env reset                            ${ColorNote} resets Sofin env to defaults."
+    permnote "  ${ColorDistinct}env save MyProjectX                  ${ColorNote} saves Sofin env profile with given name."
+    permnote "  ${ColorDistinct}env load MyProjectX                  ${ColorNote} loads Sofin env profile with given name (no persistence)."
+    permnote "  ${ColorDistinct}env status                           ${ColorNote} shows Sofin status - list of Bundle(s) enabled for currently loaded profile."
+    permnote "  ${ColorDistinct}env reload | rehash                  ${ColorNote} recreates and reloads Sofin shell environment"
 
     permnote
-    permnote "  $(distn "dev                                  ") puts definition content on the fly. Second argument is (lowercase) definition name (no extension). ($(distn "example: "${SOFIN_BIN_SHORT}" dev rubinius" "${ColorExample}"))"
-    permnote "  $(distn "reset                                ") resets local definitions repository"
-    permnote "  $(distn "diff                                 ") displays changes in current definitions cache. Accepts any part of definition name"
-    permnote "  $(distn "srccheck                             ") checks sources availability for all existing definitions in local definitions repository"
-    permnote "  $(distn "oldsrc                               ") lists unused sources in main repository"
-    permnote "  $(distn "service-dir|serv-dir|sdir bundle     ") prints the service path of a given software bundle"
-    permnote "  $(distn "software-dir|soft-dir|dir bundle     ") prints the software path of a given bundle"
-    permnote "  $(distn "utils-path|upath                     ") prints the Sofin utilities path (on the build hosts)"
+    permnote "  ${ColorDistinct}dev                                  ${ColorNote} puts definition content on the fly. Second argument is (lowercase) definition name (no extension). ($(distn "example: "${SOFIN_BIN_SHORT}" dev rubinius" "${ColorExample}"))"
+    permnote "  ${ColorDistinct}reset                                ${ColorNote} resets local definitions repository"
+    permnote "  ${ColorDistinct}diff                                 ${ColorNote} displays changes in current definitions cache. Accepts any part of definition name"
+    permnote "  ${ColorDistinct}srccheck                             ${ColorNote} checks sources availability for all existing definitions in local definitions repository"
+    permnote "  ${ColorDistinct}oldsrc                               ${ColorNote} lists unused sources in main repository"
+    permnote "  ${ColorDistinct}service-dir|serv-dir|sdir bundle     ${ColorNote} prints the service path of a given software bundle"
+    permnote "  ${ColorDistinct}software-dir|soft-dir|dir bundle     ${ColorNote} prints the software path of a given bundle"
+    permnote "  ${ColorDistinct}utils-path|upath                     ${ColorNote} prints the Sofin utilities path (on the build hosts)"
     permnote
-    permnote "  $(distn "origins all | @                      ") checks origin of all definitions, for the new versions"
-    permnote "  $(distn "origins name othername               ") checks origin of specified software definitions, for the new versions"
+    permnote "  ${ColorDistinct}origins all | @                      ${ColorNote} checks origin of all definitions, for the new versions"
+    permnote "  ${ColorDistinct}origins name othername               ${ColorNote} checks origin of specified software definitions, for the new versions"
 }
 
 
 default_compiler_features () {
     if [ "clang" = "${CC_NAME}" ] \
     && [ "clang++" = "${CXX_NAME}" ]; then
-        permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "LLVM compilers" "${ColorDistinct}")"
+        permnote "\t ${ColorGreen:-${ColorDistinct}}${SUCCESS_CHAR}${ColorNote} ${ColorDistinct:-${ColorDistinct}}LLVM compilers${ColorNote}"
     fi
     if [ -z "${DEF_NO_LLVM_LINKER}" ] && [ "YES" = "${CAP_SYS_LLVM_LD}" ]; then
-        permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "LLVM-LLD-linker" "${ColorDistinct}")"
+        permnote "\t ${ColorGreen:-${ColorDistinct}}${SUCCESS_CHAR}${ColorNote} ${ColorDistinct:-${ColorDistinct}}LLVM-LLD-linker${ColorNote}"
     elif [ -z "${DEF_NO_GOLDEN_LINKER}" ] && [ -n "${DEF_NO_LLVM_LINKER}" ] && [ "YES" = "${CAP_SYS_GOLD_LD}" ]; then
-        permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "GNU-GOLD-linker" "${ColorDistinct}")"
+        permnote "\t ${ColorGreen:-${ColorDistinct}}${SUCCESS_CHAR}${ColorNote} ${ColorDistinct:-${ColorDistinct}}GNU-GOLD-linker${ColorNote}"
     else
         ${LD_BIN} -v 2>&1 \
             | ${GREP_BIN} -F "Apple" >/dev/null 2>&1
         if [ "0" = "${?}" ]; then
-            permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "LD64 Dynamic-linker (Apple)" "${ColorDistinct}")"
+            permnote "\t ${ColorGreen:-${ColorDistinct}}${SUCCESS_CHAR}${ColorNote} ${ColorDistinct:-${ColorDistinct}}LD64 Dynamic-linker (Apple)${ColorNote}"
         fi
 
         ${LD_BIN} -v 2>&1 \
             | ${GREP_BIN} -E "^LLD [[:digit:]]*.[[:digit:]]*.[[:digit:]]*.*${SYSTEM_NAME} " >/dev/null 2>&1
         if [ "0" = "${?}" ]; then
-            permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "LLVM LLD-linker" "${ColorDistinct}")"
+            permnote "\t ${ColorGreen:-${ColorDistinct}}${SUCCESS_CHAR}${ColorNote} ${ColorDistinct:-${ColorDistinct}}LLVM LLD-linker${ColorNote}"
         fi
 
         ${LD_BIN} -v 2>&1 \
             | ${GREP_BIN} -E "GNU ld [[:digit:]]*.[[:digit:]]*.[[:digit:]]*.*${SYSTEM_NAME}" >/dev/null 2>&1
         if [ "0" = "${?}" ]; then
-            permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "GNU linker" "${ColorDistinct}")"
+            permnote "\t ${ColorGreen:-${ColorDistinct}}${SUCCESS_CHAR}${ColorNote} ${ColorDistinct:-${ColorDistinct}}GNU linker${ColorNote}"
         fi
     fi
 
@@ -95,73 +95,73 @@ default_compiler_features () {
     && [ -z "${DEF_NO_PIE}" ] \
     && [ -z "${DEF_NO_LLVM_LINKER}" ] \
     && [ "YES" = "${CAP_SYS_LLVM_LD}" ]; then
-        permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "position-independent-code (PIC)" "${ColorDistinct}")"
-        permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "position-independent-executable (PIE)" "${ColorDistinct}")"
-        permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "linker-RELRO" "${ColorDistinct}")"
-        permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "linker-BINDNOW" "${ColorDistinct}")"
+        permnote "\t ${ColorGreen:-${ColorDistinct}}${SUCCESS_CHAR}${ColorNote} ${ColorDistinct:-${ColorDistinct}}position-independent-code (PIC)${ColorNote}"
+        permnote "\t ${ColorGreen:-${ColorDistinct}}${SUCCESS_CHAR}${ColorNote} ${ColorDistinct:-${ColorDistinct}}position-independent-executable (PIE)${ColorNote}"
+        permnote "\t ${ColorGreen:-${ColorDistinct}}${SUCCESS_CHAR}${ColorNote} ${ColorDistinct:-${ColorDistinct}}linker-RELRO${ColorNote}"
+        permnote "\t ${ColorGreen:-${ColorDistinct}}${SUCCESS_CHAR}${ColorNote} ${ColorDistinct:-${ColorDistinct}}linker-BINDNOW${ColorNote}"
     fi
 
     if [ -z "${DEF_NO_LINKER_DTAGS}" ]; then
-        permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "linker-new-DTAGS" "${ColorDistinct}")"
+        permnote "\t ${ColorGreen:-${ColorDistinct}}${SUCCESS_CHAR}${ColorNote} ${ColorDistinct:-${ColorDistinct}}linker-new-DTAGS${ColorNote}"
     fi
     if [ -n "${DEF_USE_LTO}" ] \
     && [ "arm64" != "${SYSTEM_ARCH}" ] \
     && [ "aarch64" != "${SYSTEM_ARCH}" ]; then
-        permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "link-time-optimizations (LLVM-LTO)" "${ColorDistinct}")"
+        permnote "\t ${ColorGreen:-${ColorDistinct}}${SUCCESS_CHAR}${ColorNote} ${ColorDistinct:-${ColorDistinct}}link-time-optimizations (LLVM-LTO)${ColorNote}"
     fi
     if [ -n "${DEF_USE_CFI}" ]; then
-        permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "control-flow-integrity (LLVM-CFI)" "${ColorDistinct}")"
+        permnote "\t ${ColorGreen:-${ColorDistinct}}${SUCCESS_CHAR}${ColorNote} ${ColorDistinct:-${ColorDistinct}}control-flow-integrity (LLVM-CFI)${ColorNote}"
     fi
 
     # -fstack-protector-all check:
     printf "%b\n" "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'fstack-protector-all' >/dev/null 2>&1 \
-        && permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "stack-protector-all" "${ColorDistinct}")"
+        && permnote "\t ${ColorGreen:-${ColorDistinct}}${SUCCESS_CHAR}${ColorNote} ${ColorDistinct:-${ColorDistinct}}stack-protector-all${ColorNote}"
 
     # -fstack-protector-strong check:
     printf "%b\n" "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'fstack-protector-strong' >/dev/null 2>&1 \
-        && permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "stack-protector-strong" "${ColorDistinct}")"
+        && permnote "\t ${ColorGreen:-${ColorDistinct}}${SUCCESS_CHAR}${ColorNote} ${ColorDistinct:-${ColorDistinct}}stack-protector-strong${ColorNote}"
 
     # -fno-strict-overflow check:
     printf "%b\n" "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'fno-strict-overflow' >/dev/null 2>&1 \
-        && permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "no-strict-overflow" "${ColorDistinct}")"
+        && permnote "\t ${ColorGreen:-${ColorDistinct}}${SUCCESS_CHAR}${ColorNote} ${ColorDistinct:-${ColorDistinct}}no-strict-overflow${ColorNote}"
 
     # -ftrapv check:
     # NOTE: Signed integer overflow raises the signal SIGILL instead of SIGABRT/SIGSEGV:
     printf "%b\n" "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'ftrapv' >/dev/null 2>&1 \
-        && permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "trap-signed-integer-overflow (TRAPV)" "${ColorDistinct}")"
+        && permnote "\t ${ColorGreen:-${ColorDistinct}}${SUCCESS_CHAR}${ColorNote} ${ColorDistinct:-${ColorDistinct}}trap-signed-integer-overflow (TRAPV)${ColorNote}"
 
 
     if [ -n "${DEF_USE_SAFE_STACK}" ] \
     && [ "arm64" != "${SYSTEM_ARCH}" ] \
     && [ "aarch64" != "${SYSTEM_ARCH}" ]; then
-        permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "safe-stack" "${ColorDistinct}")"
+        permnote "\t ${ColorGreen:-${ColorDistinct}}${SUCCESS_CHAR}${ColorNote} ${ColorDistinct:-${ColorDistinct}}safe-stack${ColorNote}"
     fi
     if [ -z "${DEF_NO_RETPOLINE}" ]; then
-        permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "retpoline" "${ColorDistinct}")"
+        permnote "\t ${ColorGreen:-${ColorDistinct}}${SUCCESS_CHAR}${ColorNote} ${ColorDistinct:-${ColorDistinct}}retpoline${ColorNote}"
     fi
     if [ -n "${DEBUGBUILD}" ]; then
-        permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "debug-build" "${ColorDistinct}")"
+        permnote "\t ${ColorGreen:-${ColorDistinct}}${SUCCESS_CHAR}${ColorNote} ${ColorDistinct:-${ColorDistinct}}debug-build${ColorNote}"
     fi
     if [ -z "${DEF_NO_SSP_BUFFER_OVERRIDE}" ]; then
-        permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "ssp-buffer-override" "${ColorDistinct}")"
+        permnote "\t ${ColorGreen:-${ColorDistinct}}${SUCCESS_CHAR}${ColorNote} ${ColorDistinct:-${ColorDistinct}}ssp-buffer-override${ColorNote}"
     fi
     if [ -z "${DEF_NO_FORTIFY_SOURCE}" ]; then
-        permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "fortify-source" "${ColorDistinct}")"
+        permnote "\t ${ColorGreen:-${ColorDistinct}}${SUCCESS_CHAR}${ColorNote} ${ColorDistinct:-${ColorDistinct}}fortify-source${ColorNote}"
     fi
 
     # C++ standard used:
     if [ -n "${DEF_USE_CXX11}" ]; then
-        permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "std-c++11" "${ColorDistinct}")"
+        permnote "\t ${ColorGreen:-${ColorDistinct}}${SUCCESS_CHAR}${ColorNote} ${ColorDistinct:-${ColorDistinct}}std-c++11${ColorNote}"
     elif [ -n "${DEF_USE_CXX14}" ]; then
-        permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "std-c++14" "${ColorDistinct}")"
+        permnote "\t ${ColorGreen:-${ColorDistinct}}${SUCCESS_CHAR}${ColorNote} ${ColorDistinct:-${ColorDistinct}}std-c++14${ColorNote}"
     elif [ -n "${DEF_USE_CXX17}" ]; then
-        permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "std-c++17" "${ColorDistinct}")"
+        permnote "\t ${ColorGreen:-${ColorDistinct}}${SUCCESS_CHAR}${ColorNote} ${ColorDistinct:-${ColorDistinct}}std-c++17${ColorNote}"
     fi
     if [ -z "${DEF_USE_CXX11}" ] \
     && [ -z "${DEF_USE_CXX14}" ] \
     && [ -z "${DEF_USE_CXX17}" ]; then
         # 14 is current standard since Sofin v1.8
-        permnote "\t $(distn "${SUCCESS_CHAR}" "${ColorGreen}") $(distn "std-c++14" "${ColorDistinct}")"
+        permnote "\t ${ColorGreen:-${ColorDistinct}}${SUCCESS_CHAR}${ColorNote} ${ColorDistinct:-${ColorDistinct}}std-c++14${ColorNote}"
     fi
 
 }
@@ -169,20 +169,20 @@ default_compiler_features () {
 
 sofin_header () {
     printf "\n     %b\n%b\n\n  %b\n  %b\n  %b\n\n  %b\n  %b\n\n" \
-        "$(distn 'Sof' "${ColorWhite}")$(distn 'tware' "${ColorGray}") $(distn 'In' "${ColorWhite}")$(distn 'staller v' "${ColorGray}")$(distn "${SOFIN_VERSION}" "${ColorWhite}")" \
-        "$(distn "____________________________________" "${ColorGreen}")" \
-        "design, implementation: $(distn "@dmilith")" \
-        "developed since: $(distn "2011")" \
-        "released under: $(distn "MIT/BSD")" \
-        "running os: $(distn "${OS_TRIPPLE}")" \
-        "running shell: $(distn "${SHELL}")"
+        "$(distn 'Sof' "${ColorWhite}")$(distn 'tware' "${ColorGray}") $(distn 'In' "${ColorWhite}")$(distn 'staller v' "${ColorGray}")${ColorWhite:-${ColorDistinct}}${SOFIN_VERSION}${ColorNote}" \
+        "${ColorGreen:-${ColorDistinct}}____________________________________${ColorNote}" \
+        "design, implementation: ${ColorDistinct}@dmilith${ColorNote}" \
+        "developed since: ${ColorDistinct}2011${ColorNote}" \
+        "released under: ${ColorDistinct}MIT/BSD${ColorNote}" \
+        "running os: ${ColorDistinct}${OS_TRIPPLE}${ColorNote}" \
+        "running shell: ${ColorDistinct}${SHELL}${ColorNote}"
 
     printf "  %b\n" "system capabilities:"
     IFS=\n set 2>/dev/null | ${EGREP_BIN} -I 'CAP_SYS_' 2>/dev/null | while IFS= read -r _envv; do
         if [ -n "${_envv}" ]; then
             printf "\t %b %b\n" \
-                "$(distn "${SUCCESS_CHAR}" "${ColorGreen}")" \
-                "$(distn "$(lowercase "${_envv%=YES}")")"
+                "${ColorGreen:-${ColorDistinct}}${SUCCESS_CHAR}${ColorNote}" \
+                "${ColorDistinct}$(lowercase "${_envv%=YES}")${ColorNote}"
         fi
     done
 
@@ -190,8 +190,8 @@ sofin_header () {
     IFS=\n set 2>/dev/null | ${EGREP_BIN} -I 'CAP_TERM_' 2>/dev/null | while IFS= read -r _envv; do
         if [ -n "${_envv}" ]; then
             printf "\t %b %b\n" \
-                "$(distn "${SUCCESS_CHAR}" "${ColorGreen}")" \
-                "$(distn "$(lowercase "${_envv%=YES}")")"
+                "${ColorGreen:-${ColorDistinct}}${SUCCESS_CHAR}${ColorNote}" \
+                "${ColorDistinct}$(lowercase "${_envv%=YES}")${ColorNote}"
         fi
     done
 
@@ -219,7 +219,7 @@ processes_all_sofin () {
         fi
     done
     if [ -n "${_processes}" ]; then
-        debug "Sofin-tasks-locked by processes: $(distd "${_processes}")"
+        debug "Sofin-tasks-locked by processes: ${ColorDistinct}${_processes}${ColorDebug}"
         printf "%b\n" "${_processes}"
     fi
     return 0
@@ -368,13 +368,13 @@ list_bundles_full () {
             _lbflowercase="$(lowercase "${_lbfapp_name}")"
             _lbinstald_file="${SOFTWARE_DIR}/${_lbfapp_name}/${_lbflowercase}${DEFAULT_INST_MARK_EXT}"
             if [ -e "${_lbinstald_file}" ]; then
-                permnote "${SUCCESS_CHAR} $(distn "${_lbfapp_name}")"
+                permnote "${SUCCESS_CHAR} ${ColorDistinct}${_lbfapp_name}${ColorNote}"
             else
-                warn "$(distw "${FAIL_CHAR}" "${ColorRed}") ${_lbfapp_name} $(distw "[!]" "${ColorRed}")"
+                warn "${ColorRed:-${ColorDistinct}}${FAIL_CHAR}${ColorWarning} ${_lbfapp_name} ${ColorRed:-${ColorDistinct}}[!]${ColorWarning}"
             fi
             for _lbfreq in $(${FIND_BIN} "${_lbfapp}" -mindepth 1 -maxdepth 1 -iname "*${DEFAULT_INST_MARK_EXT}" 2>/dev/null | ${SORT_BIN} 2>/dev/null); do
                 _lbpp="$(printf "%b\n" "${_lbfreq##*/}" | ${SED_BIN} "s/${DEFAULT_INST_MARK_EXT}//" 2>/dev/null)"
-                note "   ${NOTE_CHAR} $(distn "${_lbpp}") $(distn "[" "${ColorGray}")$(distn "$(${CAT_BIN} "${_lbfreq}" 2>/dev/null)")$(distn "]" "${ColorGray}")"
+                note "   ${NOTE_CHAR} ${ColorDistinct}${_lbpp}${ColorNote} ${ColorGray:-${ColorDistinct}}[${ColorNote}${ColorDistinct}$(${CAT_BIN} "${_lbfreq}" 2>/dev/null)${ColorNote}${ColorGray:-${ColorDistinct}}]${ColorNote}"
             done
         fi
     done
@@ -395,12 +395,12 @@ show_diff () {
             _sddefname="${_sddefname}${DEFAULT_DEF_EXT}"
             ;;
     esac
-    _beauty_defn="$(distn "${_sddefname}")"
+    _beauty_defn="${ColorDistinct}${_sddefname}${ColorNote}"
 
     (
         cd "${DEFINITIONS_DIR}"
         if [ -f "./${_sddefname}" ]; then
-            debug "Checking status for untracked files of: $(distd "${_sddefname}")"
+            debug "Checking status for untracked files of: ${ColorDistinct}${_sddefname}${ColorDebug}"
             ${GIT_BIN} status --short "${_sddefname}" 2>/dev/null | ${EGREP_BIN} '\?\?' >/dev/null 2>&1
             if [ "${?}" = "0" ]; then # found "??" which means file is untracked..
                 permnote "No diff available for definition: ${_beauty_defn} (currently untracked)"
@@ -409,7 +409,7 @@ show_diff () {
             fi
             ${GIT_BIN} status -vv --long "${_sddefname}" 2>/dev/null
         else
-            permnote "Listing all modified definitions in local cache: ($(distn "${CACHE_DIR}"))"
+            permnote "Listing all modified definitions in local cache: (${ColorDistinct}${CACHE_DIR}${ColorNote})"
             ${GIT_BIN} status --short 2>/dev/null
         fi
     )
@@ -425,7 +425,7 @@ develop () {
     if [ -z "${_defname_input}" ]; then
         error "No definition file name specified as first param!"
     fi
-    permnote "Paste your definition below. Hit $(distn "[Enter]"), $(distn "Ctrl-D") to update definitions file: $(distn "${DEFINITIONS_DIR}/${_devname}${DEFAULT_DEF_EXT}")"
+    permnote "Paste your definition below. Hit ${ColorDistinct}[Enter]${ColorNote}, ${ColorDistinct}Ctrl-D${ColorNote} to update definitions file: ${ColorDistinct}${DEFINITIONS_DIR}/${_devname}${DEFAULT_DEF_EXT}${ColorNote}"
     ${CAT_BIN} > "${DEFINITIONS_DIR}/${_devname}${DEFAULT_DEF_EXT}" 2>/dev/null
     unset _defname_input _devname _defname_no_ext
 }
@@ -433,9 +433,9 @@ develop () {
 
 env_status () {
     if [ -f "${SOFIN_ENV_ENABLED_INDICATOR_FILE}" ]; then
-        permnote "Sofin environment of $(distn "specific") bundles: $(distn "$(${CAT_BIN} "${SOFIN_ENV_ENABLED_INDICATOR_FILE}" | ${TR_BIN} '\n' ' ' 2>/dev/null)")"
+        permnote "Sofin environment of ${ColorDistinct}specific${ColorNote} bundles: ${ColorDistinct}$(${CAT_BIN} "${SOFIN_ENV_ENABLED_INDICATOR_FILE}" | ${TR_BIN} '\n' ' ' 2>/dev/null)${ColorNote}"
     else
-        permnote "Sofin environment is $(distn "dynamic"). All installed software-bundles are included"
+        permnote "Sofin environment is ${ColorDistinct}dynamic${ColorNote}. All installed software-bundles are included"
     fi
 }
 
@@ -471,7 +471,7 @@ mark_installed () {
     fi
     _softfile="$(lowercase "${_softname}")"
     printf "%b\n" "${_verfile}" > "${PREFIX}/${_softfile}${DEFAULT_INST_MARK_EXT}" \
-        && debug "Stored version: $(distd "${_verfile}") of software: $(distd "${_softfile}") installed in: $(distd "${PREFIX}")"
+        && debug "Stored version: ${ColorDistinct}${_verfile}${ColorDebug} of software: ${ColorDistinct}${_softfile}${ColorDebug} installed in: ${ColorDistinct}${PREFIX}${ColorDebug}"
     unset _softname _verfile _softfile
 }
 
@@ -479,11 +479,11 @@ mark_installed () {
 mark_dependency_test_passed () {
     _softname="${1}"
     if [ -z "${_softname}" ]; then
-        error "To mark dependency '$(diste "PASSED")' - you must provide it's name first!"
+        error "To mark dependency '${ColorDistinct}PASSED${ColorError}' - you must provide it's name first!"
     fi
     _softfile="$(lowercase "${_softname}")"
     run "${TOUCH_BIN} '${PREFIX}/${_softfile}${DEFAULT_TEST_PASSED_EXT}'" \
-        && debug "Test suite $(distd "PASSED") for dependency: $(distd "${_softfile}")"
+        && debug "Test suite ${ColorDistinct}PASSED${ColorDebug} for dependency: ${ColorDistinct}${_softfile}${ColorDebug}"
     unset _softname _verfile _softfile
 }
 
@@ -494,7 +494,7 @@ show_done () {
     if [ -z "${_sdver}" ]; then
         _sdver="0"
     fi
-    note "${SUCCESS_CHAR} ${_sd_low_name} [$(distn "${_sdver}")]"
+    note "${SUCCESS_CHAR} ${_sd_low_name} [${ColorDistinct}${_sdver}${ColorNote}]"
     unset _sdver _sd_low_name
 }
 
@@ -507,9 +507,9 @@ show_alt_definitions_and_exit () {
             _contents="${_contents}$(printf "%b\n" "$(capitalize_abs "${_maybe##*/}")" | ${SED_BIN} 's/\..*//' 2>/dev/null) "
         done
         if [ -z "${_contents}" ]; then
-            warn "No such definition: $(distw "${_an_app}"). No alternatives found."
+            warn "No such definition: ${ColorDistinct}${_an_app}${ColorWarning}. No alternatives found."
         else
-            warn "No such definition: $(distw "${_an_app}"). Alternatives found: $(distw "${_contents}")"
+            warn "No such definition: ${ColorDistinct}${_an_app}${ColorWarning}. Alternatives found: ${ColorDistinct}${_contents}${ColorWarning}"
         fi
         unset _an_app _contents _maybe
         finalize_and_quit_gracefully_with_exitcode

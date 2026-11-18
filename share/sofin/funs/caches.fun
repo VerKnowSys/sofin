@@ -8,7 +8,7 @@ less_logs () {
 
 show_logs () {
     _logf_pattern="${1:-+}"
-    debug "Show logs pattern: '$(distd "${_logf_pattern}")'"
+    debug "Show logs pattern: '${ColorDistinct}${_logf_pattern}${ColorDebug}'"
     create_sofin_dirs
     if [ "-" = "${_logf_pattern}" ] \
     || [ "${SOFIN_NAME}" = "${_logf_pattern}" ]; then
@@ -43,7 +43,7 @@ show_logs () {
         if [ -n "${_all_files}" ]; then
             eval "${TAIL_BIN} -n ${LOG_LINES_AMOUNT_ON_PATTERN} ${_all_files}"
         else
-            permnote "No logs matching the pattern: $(distn "${_logf_pattern}")"
+            permnote "No logs matching the pattern: ${ColorDistinct}${_logf_pattern}${ColorNote}"
             return 1
         fi
     fi
@@ -54,11 +54,11 @@ show_logs () {
 pretouch_logs () {
     _params="${*}"
     if [ -n "${CAP_SYS_BUILDHOST}" ]; then
-        debug "Calling log-pretouch for: $(distd "$(printf "%b\n" "${_params}" | ${AWK_BIN} '{print NF;}' 2>/dev/null)") files${CHAR_DOTS}"
+        debug "Calling log-pretouch for: ${ColorDistinct}$(printf "%b\n" "${_params}" | ${AWK_BIN} '{print NF;}' 2>/dev/null)${ColorDebug} files${CHAR_DOTS}"
         unset _pret_list
         for _app in $(to_iter "${_params}"); do
             if [ -z "${_app}" ]; then
-                debug "Empty app given out of params: $(distd "${_params}")?"
+                debug "Empty app given out of params: ${ColorDistinct}${_params}${ColorDebug}?"
             else
                 if [ -z "${_pret_list}" ]; then
                     _pret_list="${LOGS_DIR}${SOFIN_NAME}-${_app}"
@@ -90,7 +90,7 @@ show_bundle_log_if_available () {
     elif [ -f "${LOG}" ]; then
         ${TAIL_BIN} -n "${LOG_LINES_AMOUNT_ON_ERR}" "${LOG}" 2>/dev/null
     else
-        permnote "No log for bundle: $(distn "${DEF_NAME}${DEF_SUFFIX}")"
+        permnote "No log for bundle: ${ColorDistinct}${DEF_NAME}${DEF_SUFFIX}${ColorNote}"
     fi
 }
 
@@ -98,17 +98,17 @@ show_bundle_log_if_available () {
 checksum_filecache_element () {
     _file_to_checksum="${1}"
     if [ -z "${_file_to_checksum}" ]; then
-        error "First argument with $(diste "file-name-to-chksum") is required!"
+        error "First argument with ${ColorDistinct}file-name-to-chksum${ColorError} is required!"
     fi
     _file_chksum="$(file_checksum "${FILE_CACHE_DIR}${_file_to_checksum}")"
     if [ -z "${_file_chksum}" ]; then
-        error "Empty checksum of file: $(diste "${FILE_CACHE_DIR}${_file_to_checksum}")"
+        error "Empty checksum of file: ${ColorDistinct}${FILE_CACHE_DIR}${_file_to_checksum}${ColorError}"
     elif [ ! -f "${FILE_CACHE_DIR}${_file_to_checksum}" ]; then
-        error "No such file found in file-cache: $(diste "${FILE_CACHE_DIR}${_file_to_checksum}")"
+        error "No such file found in file-cache: ${ColorDistinct}${FILE_CACHE_DIR}${_file_to_checksum}${ColorError}"
     else
         _chksum_file="${FILE_CACHE_DIR}${_file_to_checksum}${DEFAULT_CHKSUM_EXT}"
         printf "%b\n" "${_file_chksum}" > "${_chksum_file}" \
-            && debug "Stored chksum: $(distd "${_file_chksum}") of file: $(distd "${_file_to_checksum}") in path: $(distd "${FILE_CACHE_DIR}${_file_to_checksum}")"
+            && debug "Stored chksum: ${ColorDistinct}${_file_chksum}${ColorDebug} of file: ${ColorDistinct}${_file_to_checksum}${ColorDebug} in path: ${ColorDistinct}${FILE_CACHE_DIR}${_file_to_checksum}${ColorDebug}"
     fi
     unset _file_chksum _file_to_checksum _chksum_file
 }
@@ -126,9 +126,9 @@ dump_software_build_configuration_options () {
         printf "\t\t\t\t\r\r\n%b%b%b%b%b %b\n" \
             "${ColorDistinct}" \
             "\t\t\t\t\t\t${ANSI_ONE_LINE_UP}     ${ColorDark}${NOTE_CHAR} config:${ColorReset} "    \
-            "$(distn "${_config_log}" "${ColorExample}")" \
+            "${ColorExample:-${ColorDistinct}}${_config_log}${ColorNote}" \
             "${ColorDark} -> " \
-            "$(distn "${_config_result}" "${ColorExample}")" \
+            "${ColorExample:-${ColorDistinct}}${_config_result}${ColorNote}" \
             "${ColorReset}"
 
         if [ -n "${DEBUG}" ]; then # display detailed options  for each dependency... not too amusing ;)

@@ -21,11 +21,11 @@ SOFIN_COMMAND="${1}"
 if [ "${#}" -gt "0" ]; then
     shift
     SOFIN_ARGS="${*}"
-    _args="  args[$(distd "${#}")]: $(distd "${SOFIN_ARGS}"),"
+    _args="  args[${ColorDistinct}${#}${ColorDebug}]: ${ColorDistinct}${SOFIN_ARGS}${ColorDebug},"
 fi
 
 SOFIN_CMDLINE="${SOFIN_SHORT_NAME} ${SOFIN_COMMAND} ${SOFIN_ARGS}"
-debug "Sofin (cmdline: $(distd "${SOFIN_CMDLINE}"),  SOFIN_PID=$(distd "${SOFIN_PID}"),  SOFIN_PPID=$(distd "${PPID}"),  SOFIN_ROOT=$(distd "${SOFIN_ROOT}"))"
+debug "Sofin (cmdline: ${ColorDistinct}${SOFIN_CMDLINE}${ColorDebug},  SOFIN_PID=${ColorDistinct}${SOFIN_PID}${ColorDebug},  SOFIN_PPID=${ColorDistinct}${PPID}${ColorDebug},  SOFIN_ROOT=${ColorDistinct}${SOFIN_ROOT}${ColorDebug})"
 
 # Set explicit +e for Sofin shell:
 env_forgivable
@@ -70,7 +70,7 @@ deploy_bundle () {
     fi
 
     validate_reqs
-    permnote "Deploying: $(distn "$(capitalize "${SOFIN_ARGS}")")"
+    permnote "Deploying: ${ColorDistinct}$(capitalize "${SOFIN_ARGS}")${ColorNote}"
     fail_on_bg_job "${SOFIN_ARGS}"
 
     # build and remove useless files of each definition:
@@ -81,7 +81,7 @@ deploy_bundle () {
             && push_binbuilds "${_bundle}" \
             && continue
 
-        error "Process failed for bundle: $(diste "${_bundle}")!"
+        error "Process failed for bundle: ${ColorDistinct}${_bundle}${ColorError}!"
     done
     unset _bundle
 }
@@ -97,7 +97,7 @@ delete_bundle () {
         fi
     done
     remove_bundles "${SOFIN_ARGS}"
-    permnote "Removed bundle(s): $(distn "$(capitalize_abs "${SOFIN_ARGS}")")"
+    permnote "Removed bundle(s): ${ColorDistinct}$(capitalize_abs "${SOFIN_ARGS}")${ColorNote}"
     unset _arg _caparg
 }
 
@@ -108,7 +108,7 @@ if [ -n "${SOFIN_COMMAND}" ]; then
             _definition="${1:-defaults}"
             case "${_definition}" in
                 defaults)
-                    permnote "Loading definition-defaults: $(distn "${CHAR_DOTS}/${DEFINITIONS_DEFAULTS##*/}")"
+                    permnote "Loading definition-defaults: ${ColorDistinct}${CHAR_DOTS}/${DEFINITIONS_DEFAULTS##*/}${ColorNote}"
                     load_defaults
                     compiler_setup
 
@@ -118,9 +118,9 @@ if [ -n "${SOFIN_COMMAND}" ]; then
 
                 *)
                     _def2dump="${DEFINITIONS_DIR}/${_definition}${DEFAULT_DEF_EXT}"
-                    debug "Checking existence of definition file: $(distd "${_def2dump}")"
+                    debug "Checking existence of definition file: ${ColorDistinct}${_def2dump}${ColorDebug}"
                     if [ -f "${_def2dump}" ]; then
-                        permnote "Loading definitions: $(distn "${CHAR_DOTS}/${DEFINITIONS_DEFAULTS##*/}") + $(distn "${CHAR_DOTS}/${_definition}${DEFAULT_DEF_EXT}")"
+                        permnote "Loading definitions: ${ColorDistinct}${CHAR_DOTS}/${DEFINITIONS_DEFAULTS##*/}${ColorNote} + ${ColorDistinct}${CHAR_DOTS}/${_definition}${DEFAULT_DEF_EXT}${ColorNote}"
                         load_defaults
                         load_defs "${_definition}"
                         compiler_setup
@@ -128,7 +128,7 @@ if [ -n "${SOFIN_COMMAND}" ]; then
                         permnote "\n\n### Definition specific compiler-settings:"
                         DEBUG=1 dump_compiler_setup
                     else
-                        error "No such definition file: $(distw "${_def2dump}")!"
+                        error "No such definition file: ${ColorDistinct}${_def2dump}${ColorWarning}!"
                     fi
                     ;;
             esac
@@ -194,7 +194,7 @@ if [ -n "${SOFIN_COMMAND}" ]; then
 
 
         performance|perf)
-            permnote "Setting performance: $(distn "${SOFIN_ARGS}")"
+            permnote "Setting performance: ${ColorDistinct}${SOFIN_ARGS}${ColorNote}"
             performance "${SOFIN_ARGS}"
             ;;
 
@@ -225,7 +225,7 @@ if [ -n "${SOFIN_COMMAND}" ]; then
                         return 0
                     fi
                     enable_sofin_env "${_bundles}"
-                    permnote "Bundles: $(distn "${_bundles}") added to the environment."
+                    permnote "Bundles: ${ColorDistinct}${_bundles}${ColorNote} added to the environment."
                     ;;
 
                 -*) # remove N elements
@@ -245,14 +245,14 @@ if [ -n "${SOFIN_COMMAND}" ]; then
                         return 0
                     fi
                     disable_sofin_env "${_bundles}"
-                    permnote "Bundles: $(distn "${_bundles}") removed from the environment."
+                    permnote "Bundles: ${ColorDistinct}${_bundles}${ColorNote} removed from the environment."
                     ;;
 
                 !|store|save) # save profile
                     shift
                     _fname="${SOFIN_ENV_ENABLED_INDICATOR_FILE}.${1}"
                     run "${INSTALL_BIN} ${SOFIN_ENV_ENABLED_INDICATOR_FILE} ${_fname}" \
-                        && permnote "Saved new environment profile: $(distn "${_fname}")"
+                        && permnote "Saved new environment profile: ${ColorDistinct}${_fname}${ColorNote}"
                     ;;
 
                 ^|load|ld) # load profile
@@ -261,9 +261,9 @@ if [ -n "${SOFIN_COMMAND}" ]; then
                     _fname="${SOFIN_ENV_ENABLED_INDICATOR_FILE}.${_name}"
                     if [ -f "${_fname}" ]; then
                         run "${INSTALL_BIN} ${_fname} ${SOFIN_ENV_ENABLED_INDICATOR_FILE}" \
-                            && permnote "Loaded environment profile: $(distn "${_fname}")."
+                            && permnote "Loaded environment profile: ${ColorDistinct}${_fname}${ColorNote}."
                     else
-                        error "No such profile: $(diste "${_name}")"
+                        error "No such profile: ${ColorDistinct}${_name}${ColorError}"
                     fi
                     ;;
 
@@ -273,7 +273,7 @@ if [ -n "${SOFIN_COMMAND}" ]; then
 
                 reset)
                     ${RM_BIN} -f "${SOFIN_ENV_ENABLED_INDICATOR_FILE}" \
-                        && permnote "Sofin environment is now: $(distn "dynamic")"
+                        && permnote "Sofin environment is now: ${ColorDistinct}dynamic${ColorNote}"
                     ;;
 
                 r|reload|rehash) # NOTE: always done implicitly later
@@ -353,7 +353,7 @@ if [ -n "${SOFIN_COMMAND}" ]; then
             _url="${2}"
             if [ -z "${_definition}" ] \
             || [ -z "${_url}" ]; then
-                error "Usage: $(diste "${SOFIN_SHORT_NAME} upgrade definition-name archive-url")"
+                error "Usage: ${ColorDistinct}${SOFIN_SHORT_NAME} upgrade definition-name archive-url${ColorError}"
             fi
             _archive_name="${_url##*/}"
 
@@ -366,7 +366,7 @@ if [ -n "${SOFIN_COMMAND}" ]; then
                     ;;
             esac
 
-            debug "Synchronizing archive: $(distd "${_archive_name}") to: $(distd "${MAIN_SOFTWARE_ADDRESS}")"
+            debug "Synchronizing archive: ${ColorDistinct}${_archive_name}${ColorDebug} to: ${ColorDistinct}${MAIN_SOFTWARE_ADDRESS}${ColorDebug}"
             _new_sha="$(${SSH_BIN} -p "${SOFIN_SSH_PORT}" "${SOFIN_NAME}@${MAIN_SOFTWARE_ADDRESS}" " \
                 cd ${MAIN_SOURCE_PREFIX} \
                 && { test -f ${_archive_name} || curl -4 --progress-bar -C - -k -L -O '${_url}' > /tmp/sofin.sync.log 2>&1; } \
@@ -374,18 +374,18 @@ if [ -n "${SOFIN_COMMAND}" ]; then
                 && return 0; \
                 ${CAT_BIN} /tmp/sofin.sync.log; \
                 return 1; \
-                ")" || error "Failed to sync archive: $(diste "${_archive_name}")"
+                ")" || error "Failed to sync archive: ${ColorDistinct}${_archive_name}${ColorError}"
             _version="$(printf "%b\n" "${_archive_name}" | ${SED_BIN} -e 's#^.*-##; s#\.t[agx][rz]\..*$##;' 2>/dev/null)"
 
-            note "Url archive of: $(distn "${_definition}") version: $(distn "${_version}") synchronized: $(distn "${_url}") ($(distn "${_new_sha}"))"
+            note "Url archive of: ${ColorDistinct}${_definition}${ColorNote} version: ${ColorDistinct}${_version}${ColorNote} synchronized: ${ColorDistinct}${_url}${ColorNote} (${ColorDistinct}${_new_sha}${ColorNote})"
 
-            debug "Updating local definition: $(distd "${_definition}") with version: $(distd "${_version}")"
+            debug "Updating local definition: ${ColorDistinct}${_definition}${ColorDebug} with version: ${ColorDistinct}${_version}${ColorDebug}"
             ${SED_BIN} -i '' -e "s#^DEF_VERSION=.*\$#DEF_VERSION=\"${_version}\"#" "${DEFINITIONS_DIR}/${_definition}${DEFAULT_DEF_EXT}"
             ${SED_BIN} -i '' -e "s#^DEF_SHA=.*\$#DEF_SHA=\"${_new_sha}\"#" "${DEFINITIONS_DIR}/${_definition}${DEFAULT_DEF_EXT}"
 
             _local="${SOFIN_LOCAL_DEFINITIONS_DIR:-/Volumes/Projects/Sofin-definitions/definitions}" # NOTE: local working copy of definitions
             if [ -d "${_local}" ]; then
-                debug "Projects definition: $(distd "${_definition}") with version: $(distd "${_version}")"
+                debug "Projects definition: ${ColorDistinct}${_definition}${ColorDebug} with version: ${ColorDistinct}${_version}${ColorDebug}"
                 ${SED_BIN} -i '' -e "s#^DEF_VERSION=.*\$#DEF_VERSION=\"${_version}\"#" "${_local}/${_definition}${DEFAULT_DEF_EXT}"
                 ${SED_BIN} -i '' -e "s#^DEF_SHA=.*\$#DEF_SHA=\"${_new_sha}\"#" "${_local}/${_definition}${DEFAULT_DEF_EXT}"
             fi
@@ -402,7 +402,7 @@ if [ -n "${SOFIN_COMMAND}" ]; then
 
                 for _util in $(to_iter "${_utils}"); do
                     _util="$(capitalize_abs "${_util}")"
-                    debug "Starting utility build: $(distd "${_util}")"
+                    debug "Starting utility build: ${ColorDistinct}${_util}${ColorDebug}"
 
                     export SOFTWARE_DIR="${SERVICES_DIR}/${SOFIN_BUNDLE_NAME}/${_util}"
                     export SERVICE_DIR="${SOFTWARE_DIR}"
@@ -419,14 +419,14 @@ if [ -n "${SOFIN_COMMAND}" ]; then
                     try "${MKDIR_BIN} -p ${BUILD_DIR}"
 
                     if [ ! -f "${PREFIX}/$(lowercase "${_util}")${DEFAULT_INST_MARK_EXT}" ]; then
-                        note "Buiding an utility: $(distn "${_util}") for: $(distn "${OS_TRIPPLE}")"
+                        note "Buiding an utility: ${ColorDistinct}${_util}${ColorNote} for: ${ColorDistinct}${OS_TRIPPLE}${ColorNote}"
                         build "${_util}"
                     fi
-                    note "Linking prebuilt utility: $(distn "${_util}") for: $(distn "${OS_TRIPPLE}")"
+                    note "Linking prebuilt utility: ${ColorDistinct}${_util}${ColorNote} for: ${ColorDistinct}${OS_TRIPPLE}${ColorNote}"
                     link_utilities
                     disallow_util_being_found
                 done
-                permnote "Installed utilities: $(distn "${_utils}")"
+                permnote "Installed utilities: ${ColorDistinct}${_utils}${ColorNote}"
                 finalize_complete_standard_task
             fi
             ;;
@@ -452,7 +452,7 @@ if [ -n "${SOFIN_COMMAND}" ]; then
                 _buname_sh_escaped="$(echo "${_buname}" | ${SED_BIN} -E 's/[-+%]/_/g' 2>/dev/null)"
                 _specified_version_with_name="$(eval "echo \"\$${_buname_sh_escaped}\"" | ${SED_BIN} -E 's/=//;' 2>/dev/null)"
                 if [ -n "${_specified_version_with_name}" ]; then
-                    debug "Definition version is overriden to: '$(distd "${_specified_version_with_name}")'"
+                    debug "Definition version is overriden to: '${ColorDistinct}${_specified_version_with_name}${ColorDebug}'"
                     CURRENT_DEFINITION_VERSION_OVERRIDE="${_specified_version_with_name}"
                 else
                     debug "No version override. Using most recent bundle version"
@@ -463,12 +463,12 @@ if [ -n "${SOFIN_COMMAND}" ]; then
                     && _instld_bundls="${_instld_bundls} ${_buname}"
                 if [ "${USER}" != "root" ]; then
                     try "${CHOWN_BIN} -R ${USER} '${SOFTWARE_DIR}/${_buname}'" \
-                        && debug "OK: $(distd "chown -R ${USER} '${SOFTWARE_DIR}/${_buname}'")."
+                        && debug "OK: ${ColorDistinct}chown -R ${USER} '${SOFTWARE_DIR}/${_buname}'${ColorDebug}."
                     try "${CHOWN_BIN} -R ${USER} '${SERVICES_DIR}/${_buname}'" \
-                        && debug "OK: $(distd "chown -R ${USER} '${SERVICES_DIR}/${_buname}'")."
+                        && debug "OK: ${ColorDistinct}chown -R ${USER} '${SERVICES_DIR}/${_buname}'${ColorDebug}."
                 fi
             done
-            permnote "Installed bundles:$(distn "${_instld_bundls}")"
+            permnote "Installed bundles:${ColorDistinct}${_instld_bundls}${ColorNote}"
             unset _list_maybe _pickd_bundls _buname _specified_version_with_name _instld_bundls
             finalize_complete_standard_task
             ;;
@@ -482,20 +482,20 @@ if [ -n "${SOFIN_COMMAND}" ]; then
             fi
             fail_on_bg_job "${SOFIN_ARGS}"
             if [ ! -f "${DEFAULT_PROJECT_DEPS_LIST_FILE}" ]; then
-                error "Dependencies file not found! Expected file: $(diste "${DEFAULT_PROJECT_DEPS_LIST_FILE}") in current directory!"
+                error "Dependencies file not found! Expected file: ${ColorDistinct}${DEFAULT_PROJECT_DEPS_LIST_FILE}${ColorError} in current directory!"
             fi
             _pickd_bundls="$(${CAT_BIN} "${DEFAULT_PROJECT_DEPS_LIST_FILE}" 2>/dev/null | eval "${NEWLINES_TO_SPACES_GUARD}")"
             _bundls_amount="$(printf "%b\n" "${_pickd_bundls}" | eval "${WORDS_COUNT_GUARD}")"
 
-            permnote "Installing $(distn "${_bundls_amount}") bundle dependencies: $(distn "${_pickd_bundls}")"
+            permnote "Installing ${ColorDistinct}${_bundls_amount}${ColorNote} bundle dependencies: ${ColorDistinct}${_pickd_bundls}${ColorNote}"
             for _dep_bundle in $(to_iter "${_pickd_bundls}"); do
                 build "${_dep_bundle}"
             done
 
-            permnote "Building environment from local dependencies: $(distn "${_pickd_bundls}")"
+            permnote "Building environment from local dependencies: ${ColorDistinct}${_pickd_bundls}${ColorNote}"
             eval "${SOFIN_BIN} env +${_pickd_bundls}" # NOTE: `s` is a shell function, unavailable in scripts
 
-            permnote "NOTE: You can return to default environment with: $(distn "${SOFIN_SHORT_NAME} env reset")"
+            permnote "NOTE: You can return to default environment with: ${ColorDistinct}${SOFIN_SHORT_NAME} env reset${ColorNote}"
             unset _pickd_bundls _bundls_amount
             finalize_complete_standard_task
             ;;
@@ -508,7 +508,7 @@ if [ -n "${SOFIN_COMMAND}" ]; then
             fi
             initialize
             validate_reqs
-            permnote "Requested Build of: $(distn "${SOFIN_ARGS}")"
+            permnote "Requested Build of: ${ColorDistinct}${SOFIN_ARGS}${ColorNote}"
             fail_on_bg_job "${SOFIN_ARGS}"
             USE_UPDATE=NO
             USE_BINBUILD=NO
@@ -627,5 +627,5 @@ fi
 
 unset sofin_args_FULL SOFIN_ARGS SOFIN_COMMAND SOFIN_PID
 
-debug "${0}: Exit: $(distd "${ERRORCODE_NORMAL_EXIT}"). Pid: $(distd "${SOFIN_PID}")"
+debug "${0}: Exit: ${ColorDistinct}${ERRORCODE_NORMAL_EXIT}${ColorDebug}. Pid: ${ColorDistinct}${SOFIN_PID}${ColorDebug}"
 exit "${ERRORCODE_NORMAL_EXIT}"

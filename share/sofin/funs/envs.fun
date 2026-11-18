@@ -34,12 +34,12 @@ enable_sofin_env () {
     if [ -z "${_envs}" ]; then
         _envs="Doas Git Mc Vim Sofin Zsh"
     fi
-    debug "Enabling Sofin env for: $(distd "${_envs}")"
+    debug "Enabling Sofin env for: ${ColorDistinct}${_envs}${ColorDebug}"
     for _env in $(to_iter "${_envs}"); do
         ${GREP_BIN} -Fx "${_env}" "${SOFIN_ENV_ENABLED_INDICATOR_FILE}" >/dev/null 2>&1 \
             || printf "%b\n" "${_env}" >> "${SOFIN_ENV_ENABLED_INDICATOR_FILE}"
     done
-    note "Enabled Sofin environment for bundles: $(distn "${_envs}")"
+    note "Enabled Sofin environment for bundles: ${ColorDistinct}${_envs}${ColorNote}"
 }
 
 
@@ -50,7 +50,7 @@ disable_sofin_env () {
     fi
     if [ "@" = "${_envs}" ]; then
         ${RM_BIN} -f "${SOFIN_ENV_ENABLED_INDICATOR_FILE}" \
-            && debug "Environment file: $(distd "${SOFIN_ENV_ENABLED_INDICATOR_FILE}") removed."
+            && debug "Environment file: ${ColorDistinct}${SOFIN_ENV_ENABLED_INDICATOR_FILE}${ColorDebug} removed."
     else
         for _env in $(to_iter "${_envs}"); do
             if [ -f "${SOFIN_ENV_ENABLED_INDICATOR_FILE}" ]; then
@@ -59,7 +59,7 @@ disable_sofin_env () {
                 ${MV_BIN} -f "${SOFIN_ENV_ENABLED_INDICATOR_FILE}.tmp" "${SOFIN_ENV_ENABLED_INDICATOR_FILE}"
             fi
         done
-        permnote "Disabled bundles: $(distn "${_envs}") from the Sofin environment"
+        permnote "Disabled bundles: ${ColorDistinct}${_envs}${ColorNote} from the Sofin environment"
     fi
 }
 
@@ -80,180 +80,180 @@ set_c_and_cxx_flags () {
 
 dump_compiler_setup () {
     if [ -n "${DEBUGBUILD}" ]; then
-        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "debug-build" "${ColorGreen}")"
-        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "production-build" "${ColorGray}")"
+        debug " ${ColorGreen:-${ColorDistinct}}${SUCCESS_CHAR}${ColorDebug} ${ColorGreen:-${ColorDistinct}}debug-build${ColorDebug}"
+        debug " ${ColorYellow:-${ColorDistinct}}${FAIL_CHAR}${ColorDebug} ${ColorGray:-${ColorDistinct}}production-build${ColorDebug}"
     else
-        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "production-build" "${ColorGreen}")"
-        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "debug-build" "${ColorGray}")"
+        debug " ${ColorGreen:-${ColorDistinct}}${SUCCESS_CHAR}${ColorDebug} ${ColorGreen:-${ColorDistinct}}production-build${ColorDebug}"
+        debug " ${ColorYellow:-${ColorDistinct}}${FAIL_CHAR}${ColorDebug} ${ColorGray:-${ColorDistinct}}debug-build${ColorDebug}"
     fi
 
     if [ -z "${DEF_NO_HARDEN_FLAGS}" ]; then
-        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "extra-hardened-compiler-flags" "${ColorGreen}")"
+        debug " ${ColorGreen:-${ColorDistinct}}${SUCCESS_CHAR}${ColorDebug} ${ColorGreen:-${ColorDistinct}}extra-hardened-compiler-flags${ColorDebug}"
     else
-        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "extra-hardened-compiler-flags" "${ColorGray}")"
+        debug " ${ColorYellow:-${ColorDistinct}}${FAIL_CHAR}${ColorDebug} ${ColorGray:-${ColorDistinct}}extra-hardened-compiler-flags${ColorDebug}"
     fi
 
     if [ -z "${DEF_NO_CCACHE}" ]; then # ccache is supported by default but it's optional
-        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "ccached-build" "${ColorGreen}")"
+        debug " ${ColorGreen:-${ColorDistinct}}${SUCCESS_CHAR}${ColorDebug} ${ColorGreen:-${ColorDistinct}}ccached-build${ColorDebug}"
     else
-        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "ccached-build" "${ColorGray}")"
+        debug " ${ColorYellow:-${ColorDistinct}}${FAIL_CHAR}${ColorDebug} ${ColorGray:-${ColorDistinct}}ccached-build${ColorDebug}"
     fi
 
     if [ -z "${DEF_NO_RETPOLINE}" ]; then
-        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "cpu-branch-predict-mitigation (retpoline)" "${ColorGreen}")"
+        debug " ${ColorGreen:-${ColorDistinct}}${SUCCESS_CHAR}${ColorDebug} ${ColorGreen:-${ColorDistinct}}cpu-branch-predict-mitigation (retpoline)${ColorDebug}"
     else
-        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "cpu-branch-predict-mitigation (retpoline)" "${ColorGray}")"
+        debug " ${ColorYellow:-${ColorDistinct}}${FAIL_CHAR}${ColorDebug} ${ColorGray:-${ColorDistinct}}cpu-branch-predict-mitigation (retpoline)${ColorDebug}"
     fi
 
     if [ -z "${DEF_NO_SSP_BUFFER_OVERRIDE}" ]; then
-        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "ssp-buffer-override" "${ColorGreen}")"
+        debug " ${ColorGreen:-${ColorDistinct}}${SUCCESS_CHAR}${ColorDebug} ${ColorGreen:-${ColorDistinct}}ssp-buffer-override${ColorDebug}"
     else
-        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "ssp-buffer-override" "${ColorGray}")"
+        debug " ${ColorYellow:-${ColorDistinct}}${FAIL_CHAR}${ColorDebug} ${ColorGray:-${ColorDistinct}}ssp-buffer-override${ColorDebug}"
     fi
 
     if [ -z "${DEF_NO_FORTIFY_SOURCE}" ]; then
-        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "fortify-source" "${ColorGreen}")"
+        debug " ${ColorGreen:-${ColorDistinct}}${SUCCESS_CHAR}${ColorDebug} ${ColorGreen:-${ColorDistinct}}fortify-source${ColorDebug}"
     else
-        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "fortify-source" "${ColorGray}")"
+        debug " ${ColorYellow:-${ColorDistinct}}${FAIL_CHAR}${ColorDebug} ${ColorGray:-${ColorDistinct}}fortify-source${ColorDebug}"
     fi
 
     if [ -z "${DEF_NO_LLVM_LINKER}" ] && [ "YES" = "${CAP_SYS_LLVM_LD}" ]; then
-        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "llvm-lld-linker" "${ColorGreen}")"
-        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "gnu-gold-linker" "${ColorGray}")"
-        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "system-linker" "${ColorGray}")"
+        debug " ${ColorGreen:-${ColorDistinct}}${SUCCESS_CHAR}${ColorDebug} ${ColorGreen:-${ColorDistinct}}llvm-lld-linker${ColorDebug}"
+        debug " ${ColorYellow:-${ColorDistinct}}${FAIL_CHAR}${ColorDebug} ${ColorGray:-${ColorDistinct}}gnu-gold-linker${ColorDebug}"
+        debug " ${ColorYellow:-${ColorDistinct}}${FAIL_CHAR}${ColorDebug} ${ColorGray:-${ColorDistinct}}system-linker${ColorDebug}"
     elif [ -z "${DEF_NO_GOLDEN_LINKER}" ] && [ -n "${DEF_NO_LLVM_LINKER}" ] && [ "YES" = "${CAP_SYS_GOLD_LD}" ]; then
-        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "llvm-lld-linker" "${ColorGray}")"
-        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "gnu-gold-linker" "${ColorGreen}")"
-        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "system-linker" "${ColorGray}")"
+        debug " ${ColorYellow:-${ColorDistinct}}${FAIL_CHAR}${ColorDebug} ${ColorGray:-${ColorDistinct}}llvm-lld-linker${ColorDebug}"
+        debug " ${ColorGreen:-${ColorDistinct}}${SUCCESS_CHAR}${ColorDebug} ${ColorGreen:-${ColorDistinct}}gnu-gold-linker${ColorDebug}"
+        debug " ${ColorYellow:-${ColorDistinct}}${FAIL_CHAR}${ColorDebug} ${ColorGray:-${ColorDistinct}}system-linker${ColorDebug}"
     else
-        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "llvm-lld-linker" "${ColorGray}")"
-        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "gnu-gold-linker" "${ColorGray}")"
-        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "system-linker" "${ColorGreen}")"
+        debug " ${ColorYellow:-${ColorDistinct}}${FAIL_CHAR}${ColorDebug} ${ColorGray:-${ColorDistinct}}llvm-lld-linker${ColorDebug}"
+        debug " ${ColorYellow:-${ColorDistinct}}${FAIL_CHAR}${ColorDebug} ${ColorGray:-${ColorDistinct}}gnu-gold-linker${ColorDebug}"
+        debug " ${ColorGreen:-${ColorDistinct}}${SUCCESS_CHAR}${ColorDebug} ${ColorGreen:-${ColorDistinct}}system-linker${ColorDebug}"
     fi
 
     # C++ standard used:
     printf "%b\n" "${CXXFLAGS}" | ${GREP_BIN} 'c++11' >/dev/null 2>&1
     if [ "0" = "${?}" ]; then
-        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "C++ standard: std-c++11" "${ColorGreen}")"
+        debug " ${ColorGreen:-${ColorDistinct}}${SUCCESS_CHAR}${ColorDebug} ${ColorGreen:-${ColorDistinct}}C++ standard: std-c++11${ColorDebug}"
     else
-        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "C++ standard: std-c++11" "${ColorGray}")"
+        debug " ${ColorYellow:-${ColorDistinct}}${FAIL_CHAR}${ColorDebug} ${ColorGray:-${ColorDistinct}}C++ standard: std-c++11${ColorDebug}"
     fi
     printf "%b\n" "${CXXFLAGS}" | ${GREP_BIN} 'c++14' >/dev/null 2>&1
     if [ "0" = "${?}" ]; then
-        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "C++ standard: std-c++14" "${ColorGreen}")"
+        debug " ${ColorGreen:-${ColorDistinct}}${SUCCESS_CHAR}${ColorDebug} ${ColorGreen:-${ColorDistinct}}C++ standard: std-c++14${ColorDebug}"
     else
-        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "C++ standard: std-c++14" "${ColorGray}")"
+        debug " ${ColorYellow:-${ColorDistinct}}${FAIL_CHAR}${ColorDebug} ${ColorGray:-${ColorDistinct}}C++ standard: std-c++14${ColorDebug}"
     fi
     printf "%b\n" "${CXXFLAGS}" | ${GREP_BIN} 'c++17' >/dev/null 2>&1
     if [ "0" = "${?}" ]; then
-        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "C++ standard: std-c++17" "${ColorGreen}")"
+        debug " ${ColorGreen:-${ColorDistinct}}${SUCCESS_CHAR}${ColorDebug} ${ColorGreen:-${ColorDistinct}}C++ standard: std-c++17${ColorDebug}"
     else
-        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "C++ standard: std-c++17" "${ColorGray}")"
+        debug " ${ColorYellow:-${ColorDistinct}}${FAIL_CHAR}${ColorDebug} ${ColorGray:-${ColorDistinct}}C++ standard: std-c++17${ColorDebug}"
     fi
     printf "%b\n" "${CXXFLAGS}" | ${GREP_BIN} 'c++20' >/dev/null 2>&1
     if [ "0" = "${?}" ]; then
-        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "C++ standard: std-c++20" "${ColorGreen}")"
+        debug " ${ColorGreen:-${ColorDistinct}}${SUCCESS_CHAR}${ColorDebug} ${ColorGreen:-${ColorDistinct}}C++ standard: std-c++20${ColorDebug}"
     else
-        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "C++ standard: std-c++20" "${ColorGray}")"
+        debug " ${ColorYellow:-${ColorDistinct}}${FAIL_CHAR}${ColorDebug} ${ColorGray:-${ColorDistinct}}C++ standard: std-c++20${ColorDebug}"
     fi
 
     printf "%b\n" "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'flto' >/dev/null 2>&1
     if [ "0" = "${?}" ]; then
-        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "link-time-optimizations (LLVM-LTO)" "${ColorGreen}")"
+        debug " ${ColorGreen:-${ColorDistinct}}${SUCCESS_CHAR}${ColorDebug} ${ColorGreen:-${ColorDistinct}}link-time-optimizations (LLVM-LTO)${ColorDebug}"
     else
-        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "link-time-optimizations (LLVM-LTO)" "${ColorGray}")"
+        debug " ${ColorYellow:-${ColorDistinct}}${FAIL_CHAR}${ColorDebug} ${ColorGray:-${ColorDistinct}}link-time-optimizations (LLVM-LTO)${ColorDebug}"
     fi
 
     printf "%b\n" "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'fsanitize=cfi' >/dev/null 2>&1
     if [ "0" = "${?}" ]; then
-        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "control-flow-integrity-sanitizer (LLVM-CFI)" "${ColorGreen}")"
+        debug " ${ColorGreen:-${ColorDistinct}}${SUCCESS_CHAR}${ColorDebug} ${ColorGreen:-${ColorDistinct}}control-flow-integrity-sanitizer (LLVM-CFI)${ColorDebug}"
     else
-        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "control-flow-integrity-sanitizer (LLVM-CFI)" "${ColorGray}")"
+        debug " ${ColorYellow:-${ColorDistinct}}${FAIL_CHAR}${ColorDebug} ${ColorGray:-${ColorDistinct}}control-flow-integrity-sanitizer (LLVM-CFI)${ColorDebug}"
     fi
 
     # SAFE_STACK check:
     printf "%b\n" "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'fsanitize=safe-stack' >/dev/null 2>&1
     if [ "0" = "${?}" ]; then
-        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "safe-stack-sanitizer (LLVM-SAFE_STACK)" "${ColorGreen}")"
+        debug " ${ColorGreen:-${ColorDistinct}}${SUCCESS_CHAR}${ColorDebug} ${ColorGreen:-${ColorDistinct}}safe-stack-sanitizer (LLVM-SAFE_STACK)${ColorDebug}"
     else
-        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "safe-stack-sanitizer (LLVM-SAFE_STACK)" "${ColorGray}")"
+        debug " ${ColorYellow:-${ColorDistinct}}${FAIL_CHAR}${ColorDebug} ${ColorGray:-${ColorDistinct}}safe-stack-sanitizer (LLVM-SAFE_STACK)${ColorDebug}"
     fi
 
     # ASAN check:
     printf "%b\n" "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'fsanitize=address' >/dev/null 2>&1
     if [ "0" = "${?}" ]; then
-        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "address-sanitizer (LLVM-ASAN)" "${ColorGreen}")"
+        debug " ${ColorGreen:-${ColorDistinct}}${SUCCESS_CHAR}${ColorDebug} ${ColorGreen:-${ColorDistinct}}address-sanitizer (LLVM-ASAN)${ColorDebug}"
     else
-        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "address-sanitizer (LLVM-ASAN)" "${ColorGray}")"
+        debug " ${ColorYellow:-${ColorDistinct}}${FAIL_CHAR}${ColorDebug} ${ColorGray:-${ColorDistinct}}address-sanitizer (LLVM-ASAN)${ColorDebug}"
     fi
 
     # -fPIC check:
     printf "%b\n" "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'f[Pp][Ii][Cc]' >/dev/null 2>&1
     if [ "0" = "${?}" ]; then
-        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "position-independent-code" "${ColorGreen}")"
+        debug " ${ColorGreen:-${ColorDistinct}}${SUCCESS_CHAR}${ColorDebug} ${ColorGreen:-${ColorDistinct}}position-independent-code${ColorDebug}"
     else
-        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "position-independent-code" "${ColorGray}")"
+        debug " ${ColorYellow:-${ColorDistinct}}${FAIL_CHAR}${ColorDebug} ${ColorGray:-${ColorDistinct}}position-independent-code${ColorDebug}"
     fi
 
     # -fPIE check:
     printf "%b\n" "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'f[Pp][Ii][Ee]' >/dev/null 2>&1
     if [ "0" = "${?}" ]; then
-        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "position-independent-executable" "${ColorGreen}")"
+        debug " ${ColorGreen:-${ColorDistinct}}${SUCCESS_CHAR}${ColorDebug} ${ColorGreen:-${ColorDistinct}}position-independent-executable${ColorDebug}"
     else
-        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "position-independent-executable" "${ColorGray}")"
+        debug " ${ColorYellow:-${ColorDistinct}}${FAIL_CHAR}${ColorDebug} ${ColorGray:-${ColorDistinct}}position-independent-executable${ColorDebug}"
     fi
 
     # -fstack-protector check:
     printf "%b\n" "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'fstack-protector ' >/dev/null 2>&1
     if [ "0" = "${?}" ]; then
-        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "stack-protector" "${ColorGreen}")"
+        debug " ${ColorGreen:-${ColorDistinct}}${SUCCESS_CHAR}${ColorDebug} ${ColorGreen:-${ColorDistinct}}stack-protector${ColorDebug}"
     else
-        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "stack-protector" "${ColorGray}")"
+        debug " ${ColorYellow:-${ColorDistinct}}${FAIL_CHAR}${ColorDebug} ${ColorGray:-${ColorDistinct}}stack-protector${ColorDebug}"
     fi
 
     # -fstack-protector-strong check:
     printf "%b\n" "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'fstack-protector-strong' >/dev/null 2>&1
     if [ "0" = "${?}" ]; then
-        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "stack-protector-strong" "${ColorGreen}")"
+        debug " ${ColorGreen:-${ColorDistinct}}${SUCCESS_CHAR}${ColorDebug} ${ColorGreen:-${ColorDistinct}}stack-protector-strong${ColorDebug}"
     else
-        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "stack-protector-strong" "${ColorGray}")"
+        debug " ${ColorYellow:-${ColorDistinct}}${FAIL_CHAR}${ColorDebug} ${ColorGray:-${ColorDistinct}}stack-protector-strong${ColorDebug}"
     fi
 
     # -fstack-protector-all check:
     printf "%b\n" "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'fstack-protector-all' >/dev/null 2>&1
     if [ "0" = "${?}" ]; then
-        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "stack-protector-all" "${ColorGreen}")"
+        debug " ${ColorGreen:-${ColorDistinct}}${SUCCESS_CHAR}${ColorDebug} ${ColorGreen:-${ColorDistinct}}stack-protector-all${ColorDebug}"
     else
-        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "stack-protector-all" "${ColorGray}")"
+        debug " ${ColorYellow:-${ColorDistinct}}${FAIL_CHAR}${ColorDebug} ${ColorGray:-${ColorDistinct}}stack-protector-all${ColorDebug}"
     fi
 
     # -fno-strict-overflow check:
     printf "%b\n" "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'fno-strict-overflow' >/dev/null 2>&1
     if [ "0" = "${?}" ]; then
-        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "no-strict-overflow" "${ColorGreen}")"
+        debug " ${ColorGreen:-${ColorDistinct}}${SUCCESS_CHAR}${ColorDebug} ${ColorGreen:-${ColorDistinct}}no-strict-overflow${ColorDebug}"
     else
-        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "no-strict-overflow" "${ColorGray}")"
+        debug " ${ColorYellow:-${ColorDistinct}}${FAIL_CHAR}${ColorDebug} ${ColorGray:-${ColorDistinct}}no-strict-overflow${ColorDebug}"
     fi
 
     # -ftrapv check:
     # NOTE: Signed integer overflow raises the signal SIGILL instead of SIGABRT/SIGSEGV:
     printf "%b\n" "${CFLAGS} ${CXXFLAGS}" | ${EGREP_BIN} 'ftrapv' >/dev/null 2>&1
     if [ "0" = "${?}" ]; then
-        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "trap-signed-integer-overflow" "${ColorGreen}")"
+        debug " ${ColorGreen:-${ColorDistinct}}${SUCCESS_CHAR}${ColorDebug} ${ColorGreen:-${ColorDistinct}}trap-signed-integer-overflow${ColorDebug}"
     else
-        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "trap-signed-integer-overflow" "${ColorGray}")"
+        debug " ${ColorYellow:-${ColorDistinct}}${FAIL_CHAR}${ColorDebug} ${ColorGray:-${ColorDistinct}}trap-signed-integer-overflow${ColorDebug}"
     fi
 
     if [ -z "${DEF_NO_LINKER_DTAGS}" ]; then
-        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "enable-new-dtags" "${ColorGreen}")"
+        debug " ${ColorGreen:-${ColorDistinct}}${SUCCESS_CHAR}${ColorDebug} ${ColorGreen:-${ColorDistinct}}enable-new-dtags${ColorDebug}"
     else
-        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "enable-new-dtags" "${ColorGray}")"
+        debug " ${ColorYellow:-${ColorDistinct}}${FAIL_CHAR}${ColorDebug} ${ColorGray:-${ColorDistinct}}enable-new-dtags${ColorDebug}"
     fi
 
     if [ -z "${DEF_NO_FAST_MATH}" ]; then
-        debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "fast-math" "${ColorGreen}")"
+        debug " ${ColorGreen:-${ColorDistinct}}${SUCCESS_CHAR}${ColorDebug} ${ColorGreen:-${ColorDistinct}}fast-math${ColorDebug}"
     else
-        debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "fast-math" "${ColorGray}")"
+        debug " ${ColorYellow:-${ColorDistinct}}${FAIL_CHAR}${ColorDebug} ${ColorGray:-${ColorDistinct}}fast-math${ColorDebug}"
     fi
 }
 
@@ -263,9 +263,9 @@ dump_system_capabilities () {
     IFS=\n set 2>/dev/null | ${EGREP_BIN} -i 'CAP_SYS_' 2>/dev/null | while IFS= read -r _capab
     do
         if [ -n "${_capab}" ]; then
-            debug " $(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "${_capab}" "${ColorGreen}")"
+            debug " ${ColorGreen:-${ColorDistinct}}${SUCCESS_CHAR}${ColorDebug} ${ColorGreen:-${ColorDistinct}}${_capab}${ColorDebug}"
         else
-            debug " $(distd "${FAIL_CHAR}" "${ColorYellow}") $(distd "${_capab}" "${ColorGray}")"
+            debug " ${ColorYellow:-${ColorDistinct}}${FAIL_CHAR}${ColorDebug} ${ColorGray:-${ColorDistinct}}${_capab}${ColorDebug}"
         fi
     done
     unset _capab
@@ -300,9 +300,9 @@ compiler_setup () {
             if [ -d "${_matching_sdk}" ]; then
                 SDKROOT="${_matching_sdk}"
                 export SDKROOT
-                debug "Default SDK: $(distd "${_sdk_version}") is newer than system: $(distd "${SYSTEM_VERSION}"). Using SDK: $(distd "${SDKROOT}")"
+                debug "Default SDK: ${ColorDistinct}${_sdk_version}${ColorDebug} is newer than system: ${ColorDistinct}${SYSTEM_VERSION}${ColorDebug}. Using SDK: ${ColorDistinct}${SDKROOT}${ColorDebug}"
             else
-                warn "Default SDK: $(distw "${_sdk_version}") is newer than system: $(distw "${SYSTEM_VERSION}"), and no matching SDK found in: $(distw "${_matching_sdk}"). Built software may crash on this system!"
+                warn "Default SDK: ${ColorDistinct}${_sdk_version}${ColorWarning} is newer than system: ${ColorDistinct}${SYSTEM_VERSION}${ColorWarning}, and no matching SDK found in: ${ColorDistinct}${_matching_sdk}${ColorWarning}. Built software may crash on this system!"
             fi
         fi
         unset _os_major _sdk_version _matching_sdk
@@ -389,7 +389,7 @@ compiler_setup () {
                     STRIP="${_llvm_pfx}/${_llvm_target}/bin/strip"
                     debug "GNU-GOLD-LD linker configured."
                 else
-                    debug "Failed to get LLVM-host-target hint from llvm-config. Got: '$(distd "${_llvm_target}")'"
+                    debug "Failed to get LLVM-host-target hint from llvm-config. Got: '${ColorDistinct}${_llvm_target}${ColorDebug}'"
                     unset NM AR AS RANLIB STRIP
                     if [ -x "${GOLD_SO}" ] \
                     && [ -x "${LD_BIN}.gold" ]; then
@@ -466,7 +466,7 @@ compiler_setup () {
     if [ -n "${DEBUGBUILD}" ]; then
         # NOTE: since we set ASAN_CFLAGS for DEBUG-builds we drop HARDEN_SAFE_STACK_FLAGS if DEBUGBUILD is set
         _dbgflags="-O0 -gdwarf-${_dwarf_version} -glldb" # ${ASAN_CFLAGS}
-        debug "DEBUGBUILD is enabled. Additional compiler flags: $(distd "${_dbgflags}")"
+        debug "DEBUGBUILD is enabled. Additional compiler flags: ${ColorDistinct}${_dbgflags}${ColorDebug}"
         CFLAGS="${CFLAGS} ${_dbgflags}"
         CXXFLAGS="${CXXFLAGS} ${_dbgflags}"
         # LDFLAGS="${LDFLAGS} ${_dbgflags}"
@@ -590,7 +590,7 @@ compiler_setup () {
     && [ -z "${DEF_USE_CXX14}" ] \
     && [ -z "${DEF_USE_CXX17}" ] \
     && [ -z "${DEF_USE_CXX20}" ]; then
-        debug "Using $(distd "C++14") as C++ default standard."
+        debug "Using ${ColorDistinct}C++14${ColorDebug} as C++ default standard."
         DEF_USE_CXX14=YES
         CXXFLAGS="${CXXFLAGS} ${CXX14_CXXFLAGS}"
     fi
@@ -631,7 +631,7 @@ create_lock () {
     if [ -z "${_bundle_name}" ]; then
         error "No bundle name specified to lock!"
     fi
-    debug "Acquring bundle-lock for PID: $(distd "${SOFIN_PID}") of bundle: $(distd "${_bundle_name}")"
+    debug "Acquring bundle-lock for PID: ${ColorDistinct}${SOFIN_PID}${ColorDebug} of bundle: ${ColorDistinct}${_bundle_name}${ColorDebug}"
     try "${MKDIR_BIN} -p '${LOCKS_DIR}'"
     printf "%b\n" "${SOFIN_PID}" > "${LOCKS_DIR}${_bundle_cap}${DEFAULT_LOCK_EXT}"
     unset _bundle_cap _bundle_name
@@ -642,28 +642,28 @@ acquire_lock_for () {
     _bundles="${*}"
     for _bundle in $(to_iter "${_bundles}"); do
         _bundle="$(capitalize_abs "${_bundle%=*}")" # cut off possible postfix with custom version, f.e.: =1.2.3
-        debug "Acquiring lock for bundle: [$(distd "${_bundle}")]"
+        debug "Acquiring lock for bundle: [${ColorDistinct}${_bundle}${ColorDebug}]"
         if [ -f "${LOCKS_DIR}${_bundle}${DEFAULT_LOCK_EXT}" ]; then
             _lock_pid="$(${CAT_BIN} "${LOCKS_DIR}${_bundle}${DEFAULT_LOCK_EXT}" 2>/dev/null)"
             if [ -n "${_lock_pid}" ]; then
-                debug "Lock pid: $(distd "${_lock_pid}"). Sofin pid: $(distd "${SOFIN_PID}"), Sofin PPID: $(distd "${PPID}")"
+                debug "Lock pid: ${ColorDistinct}${_lock_pid}${ColorDebug}. Sofin pid: ${ColorDistinct}${SOFIN_PID}${ColorDebug}, Sofin PPID: ${ColorDistinct}${PPID}${ColorDebug}"
                 try "${KILL_BIN} -0 ${_lock_pid}"
                 if [ "${?}" = "0" ]; then # NOTE: process is alive
                     if [ "${_lock_pid}" = "${SOFIN_PID}" ] \
                     || [ "${PPID}" = "${_lock_pid}" ]; then
                         debug "Dealing with own process or it's fork, process may continue.."
                     else
-                        error "Bundle: $(diste "${_bundle}") is locked due to background job pid: $(diste "${_lock_pid}")"
+                        error "Bundle: ${ColorDistinct}${_bundle}${ColorError} is locked due to background job pid: ${ColorDistinct}${_lock_pid}${ColorError}"
                     fi
                 else # NOTE: process is dead
                     debug "Found lock file acquired by dead process. Acquring a new lock.."
                     create_lock "${_bundle}"
                 fi
             else
-                debug "Lock pid: $(distd "none"), Sofin pid: $(distd "${SOFIN_PID}")"
+                debug "Lock pid: ${ColorDistinct}none${ColorDebug}, Sofin pid: ${ColorDistinct}${SOFIN_PID}${ColorDebug}"
             fi
         else
-            debug "No file lock for bundle: $(distd "${_bundle}")"
+            debug "No file lock for bundle: ${ColorDistinct}${_bundle}${ColorDebug}"
             create_lock "${_bundle}"
         fi
     done
@@ -675,7 +675,7 @@ release_locks () {
     for _lock_file in $(${FIND_BIN} "${LOCKS_DIR}" -name '*.lock' 2>/dev/null); do
         _lock_pid="$(${CAT_BIN} "${_lock_file}")"
         if [ "${_lock_pid}" = "${SOFIN_PID}" ]; then
-            debug "Removing lock file: $(distd "${_lock_file##*/}") that contains current pid: $(distd "${SOFIN_PID}")"
+            debug "Removing lock file: ${ColorDistinct}${_lock_file##*/}${ColorDebug} that contains current pid: ${ColorDistinct}${SOFIN_PID}${ColorDebug}"
             ${RM_BIN} -f "${_lock_file}"
         fi
     done
@@ -686,25 +686,25 @@ release_locks () {
 destroy_dead_locks_of_bundle () {
     _pattern="${1}"
     if [ -n "${_pattern}" ]; then
-        debug "destroy_dead_locks_of_bundle(): With pattern: '$(distd "${_pattern}")'"
+        debug "destroy_dead_locks_of_bundle(): With pattern: '${ColorDistinct}${_pattern}${ColorDebug}'"
         _pid="${SOFIN_PID}"
         for _dlf in $(${FIND_BIN} "${LOCKS_DIR%/}" -mindepth 1 -maxdepth 1 -name "*${_pattern}*${DEFAULT_LOCK_EXT}" -print 2>/dev/null); do
             try "${EGREP_BIN} '^${_pid}$' ${_dlf}" \
                 && try "${RM_BIN} -f '${_dlf}'" \
-                    && debug "Removed currently owned pid lock: $(distd "${_dlf}")"
+                    && debug "Removed currently owned pid lock: ${ColorDistinct}${_dlf}${ColorDebug}"
 
             _possiblepid="$(${CAT_BIN} "${_dlf}" 2>/dev/null)"
             if [ -n "${_possiblepid}" ]; then
                 try "${KILL_BIN} -0 ${_possiblepid}"
                 if [ "${?}" != "0" ]; then
                     try "${RM_BIN} -f '${_dlf}'" \
-                        && debug "Pid: $(distd "${_pid}") appears to be already dead. Removed lock file: $(distd "${_dlf}")"
+                        && debug "Pid: ${ColorDistinct}${_pid}${ColorDebug} appears to be already dead. Removed lock file: ${ColorDistinct}${_dlf}${ColorDebug}"
                 else
-                    debug "Pid: $(distd "${_pid}") is alive. Leaving lock untouched."
+                    debug "Pid: ${ColorDistinct}${_pid}${ColorDebug} is alive. Leaving lock untouched."
                 fi
             fi
         done \
-            && debug "Finished locks cleanup using pattern: $(distd "${_pattern:-''}") that belong to pid: $(distd "${_pid}")"
+            && debug "Finished locks cleanup using pattern: ${ColorDistinct}${_pattern:-''}${ColorDebug} that belong to pid: ${ColorDistinct}${_pid}${ColorDebug}"
     fi
     unset _dlf _pid _possiblepid _pattern
 }
@@ -722,12 +722,12 @@ reload_shell () {
         # NOTE: PPID contains pid of parent shell of Sofin
         if [ -n "${PPID}" ]; then
             try "${KILL_BIN} -SIGUSR2 ${PPID}" \
-                && debug "Reload signal sent to parent pid: $(distd "${PPID}")"
+                && debug "Reload signal sent to parent pid: ${ColorDistinct}${PPID}${ColorDebug}"
         else
-            debug "Skipped reload_shell() for no $(distd PPID)"
+            debug "Skipped reload_shell() for no ${ColorDistinct}PPID${ColorDebug}"
         fi
     else
-        debug "Signal handler skipped on demand: $(distd "NO_SIGNAL=${NO_SIGNAL}")"
+        debug "Signal handler skipped on demand: ${ColorDistinct}NO_SIGNAL=${NO_SIGNAL}${ColorDebug}"
     fi
 }
 
@@ -740,11 +740,11 @@ update_system_shell_env_files () {
                 continue
             else
                 printf "\n\n%b\n" "${SOFIN_SHELL_BLOCK}" >> "${_env_file}" \
-                    && debug "Environment block appended to file: $(distd "${_env_file}")"
+                    && debug "Environment block appended to file: ${ColorDistinct}${_env_file}${ColorDebug}"
             fi
         else
             printf "\n\n%b\n" "${SOFIN_SHELL_BLOCK}" >> "${_env_file}" \
-                && debug "Environment block written to file: $(distd "${_env_file}")"
+                && debug "Environment block written to file: ${ColorDistinct}${_env_file}${ColorDebug}"
         fi
     done
     unset _default_envs _env_file
@@ -753,7 +753,7 @@ update_system_shell_env_files () {
 
 load_sysctl_system_defaults () {
     try "${SYSCTL_BIN} -f '${DEFAULT_SYSCTL_CONF}' >/dev/null 2>> ${LOG}" \
-        && debug "Restored sysctl system-defaults from: $(distd "${DEFAULT_SYSCTL_CONF}")."
+        && debug "Restored sysctl system-defaults from: ${ColorDistinct}${DEFAULT_SYSCTL_CONF}${ColorDebug}."
 }
 
 

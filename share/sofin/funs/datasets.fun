@@ -9,33 +9,33 @@ push_to_all_mirrors () {
     if [ "Darwin" = "${SYSTEM_NAME}" ]; then
         _pt_query="$(dig +short "${MAIN_SOFTWARE_ADDRESS}" 2>/dev/null)"
     fi
-    debug "Address: $(distd "${_pt_query}"), bundle: $(distd "${_pbto_bundle_name}"), name: $(distd "${_ptelm_file_name}")"
+    debug "Address: ${ColorDistinct}${_pt_query}${ColorDebug}, bundle: ${ColorDistinct}${_pbto_bundle_name}${ColorDebug}, name: ${ColorDistinct}${_ptelm_file_name}${ColorDebug}"
     if [ -z "${_pbto_bundle_name}" ]; then
-        error "First argument with a $(diste "BundleName") is required!"
+        error "First argument with a ${ColorDistinct}BundleName${ColorError} is required!"
     fi
     if [ -z "${_pversion_element}" ]; then
-        error "Second argument with a $(diste "version-string") is required!"
+        error "Second argument with a ${ColorDistinct}version-string${ColorError} is required!"
     fi
     if [ -z "${_pt_query}" ]; then
-        error "Unable to determine IP address of: $(diste "${MAIN_SOFTWARE_ADDRESS}")"
+        error "Unable to determine IP address of: ${ColorDistinct}${MAIN_SOFTWARE_ADDRESS}${ColorError}"
     else
-        debug "Processing mirror(s): $(distd "${_pt_query}")"
+        debug "Processing mirror(s): ${ColorDistinct}${_pt_query}${ColorDebug}"
     fi
     for _ptmirror in $(to_iter "${_pt_query}"); do
         _ptaddress="${SOFIN_NAME}@${_ptmirror}:${MAIN_BINARY_PREFIX}/${SYS_SPECIFIC_BINARY_REMOTE}"
         # if [ -n "${DEF_KEEP_DEBUG_SYMBOLS}" ]; then
         #     _ptaddress="${SOFIN_NAME}@${_ptmirror}:${MAIN_BINARY_PREFIX}-debug/${SYS_SPECIFIC_BINARY_REMOTE}"
         # fi
-        debug "Remote address inspect: $(distd "${_ptaddress}")"
+        debug "Remote address inspect: ${ColorDistinct}${_ptaddress}${ColorDebug}"
         try "${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${SOFIN_SSH_PORT} ${SOFIN_NAME}@${_ptmirror} '${MKDIR_BIN} -vp ${MAIN_BINARY_PREFIX}/${SYS_SPECIFIC_BINARY_REMOTE}'"
 
         build_bundle "${_pbto_bundle_name}" "${_ptelm_file_name}" "${_pversion_element}"
         checksum_filecache_element "${_ptelm_file_name}"
 
         try "${CHMOD_BIN} -v o+r ${FILE_CACHE_DIR}${_ptelm_file_name} ${FILE_CACHE_DIR}${_ptelm_file_name}${DEFAULT_CHKSUM_EXT}" \
-            && debug "Set read access for archives: $(distd "${_ptelm_file_name}"), $(distd "${_ptelm_file_name}${DEFAULT_CHKSUM_EXT}") before we send them to public remote"
+            && debug "Set read access for archives: ${ColorDistinct}${_ptelm_file_name}${ColorDebug}, ${ColorDistinct}${_ptelm_file_name}${DEFAULT_CHKSUM_EXT}${ColorDebug} before we send them to public remote"
 
-        debug "Deploying bin-bundle: $(distd "${_ptelm_file_name}") to mirror: $(distd "${_ptmirror}")"
+        debug "Deploying bin-bundle: ${ColorDistinct}${_ptelm_file_name}${ColorDebug} to mirror: ${ColorDistinct}${_ptmirror}${ColorDebug}"
         push_software_archive "${_ptelm_file_name}" "${_ptmirror}" "${_ptaddress}" "${_pbto_bundle_name}"
 
         build_service_dataset "${_pbto_bundle_name}" "${_pversion_element}"
@@ -46,7 +46,7 @@ push_to_all_mirrors () {
         fi
         push_dset_zfs_stream "${_pfin_svc_name}" "${_pbto_bundle_name}" "${_ptmirror}" "${_pversion_element}"
     done
-    permnote "Successfully deployed bundle: $(distn "${_pbto_bundle_name}")"
+    permnote "Successfully deployed bundle: ${ColorDistinct}${_pbto_bundle_name}${ColorNote}"
     unset _ptaddress _ptmirror _pversion_element _ptelm_file_name _pt_query
 }
 
@@ -57,18 +57,18 @@ push_dset_zfs_stream () {
     _psmirror="${3}"
     _psversion_element="${4}"
     if [ -z "${_psfin_snapfile}" ]; then
-        error "First argument with a $(diste "some-snapshot-file.txz") is required!"
+        error "First argument with a ${ColorDistinct}some-snapshot-file.txz${ColorError} is required!"
     fi
     if [ -z "${_pselement}" ]; then
-        error "Second argument with a $(diste "BundleName") is required!"
+        error "Second argument with a ${ColorDistinct}BundleName${ColorError} is required!"
     fi
     if [ -z "${_psmirror}" ]; then
-        error "Third argument with a $(diste "mirror-IP") is required!"
+        error "Third argument with a ${ColorDistinct}mirror-IP${ColorError} is required!"
     fi
     if [ -z "${_psversion_element}" ]; then
-        error "Fourth argument with a $(diste "version-string") is required!"
+        error "Fourth argument with a ${ColorDistinct}version-string${ColorError} is required!"
     fi
-    debug "push_dset_zfs_stream file: $(distd "${_psfin_snapfile}")"
+    debug "push_dset_zfs_stream file: ${ColorDistinct}${_psfin_snapfile}${ColorDebug}"
     if [ -f "${FILE_CACHE_DIR}${_psfin_snapfile}" ]; then
         # create required dirs and stuff:
         try "${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${SOFIN_SSH_PORT} ${SOFIN_NAME}@${_psmirror} \"${MKDIR_BIN} -p '${COMMON_BINARY_REMOTE}'; ${CHMOD_BIN} -v 0755 '${COMMON_BINARY_REMOTE}'\""
@@ -76,10 +76,10 @@ push_dset_zfs_stream () {
         # NOTE: check if service dataset bundle isn't already pushed. ZFS streams cannot be overwritten!
         try "${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${SOFIN_SSH_PORT} ${SOFIN_NAME}@${_psmirror} \"test -f ${COMMON_BINARY_REMOTE}/${_psfin_snapfile}\""
         if [ "${?}" = "0" ]; then
-            debug "Service dataset file found existing on remote mirror: $(distd "${_psmirror}"). Service dataset origins can be stored only once (future ZFS-related features will rely on this!)"
+            debug "Service dataset file found existing on remote mirror: ${ColorDistinct}${_psmirror}${ColorDebug}. Service dataset origins can be stored only once (future ZFS-related features will rely on this!)"
         else
             run "${CHMOD_BIN} -v a+r ${FILE_CACHE_DIR}${_psfin_snapfile}" \
-                && debug "Archive access a+r for: $(distd "${_psfin_snapfile}")"
+                && debug "Archive access a+r for: ${ColorDistinct}${_psfin_snapfile}${ColorDebug}"
 
             if [ -x "${RSYNC_BIN}" ]; then
                 retry "${RSYNC_BIN} ${DEFAULT_RSYNC_OPTS} -e 'ssh -p ${SOFIN_SSH_PORT}' ${FILE_CACHE_DIR}${_psfin_snapfile} ${SOFIN_NAME}@${_psmirror}:${COMMON_BINARY_REMOTE}/${_psfin_snapfile}${DEFAULT_PARTIAL_FILE_EXT}"
@@ -89,15 +89,15 @@ push_dset_zfs_stream () {
                 _retryresult="${?}"
             fi
             if [ "${_retryresult}" = "0" ]; then
-                debug "Service origin stream was sent to: $(distd "${MAIN_COMMON_NAME}") repository: $(distd "${MAIN_COMMON_REPOSITORY}/${_psfin_snapfile}")"
+                debug "Service origin stream was sent to: ${ColorDistinct}${MAIN_COMMON_NAME}${ColorDebug} repository: ${ColorDistinct}${MAIN_COMMON_REPOSITORY}/${_psfin_snapfile}${ColorDebug}"
                 retry "${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${SOFIN_SSH_PORT} ${SOFIN_NAME}@${_psmirror} \"cd ${COMMON_BINARY_REMOTE} && ${MV_BIN} ${_psfin_snapfile}${DEFAULT_PARTIAL_FILE_EXT} ${_psfin_snapfile}\"" \
                     || error "Couldn't rename partial file after upload!?"
             else
-                error "Failed to send service stream of bundle: $(diste "${_pselement}") file: $(diste "${_psfin_snapfile}") to remote host: $(diste "${SOFIN_NAME}@${_psmirror}")!"
+                error "Failed to send service stream of bundle: ${ColorDistinct}${_pselement}${ColorError} file: ${ColorDistinct}${_psfin_snapfile}${ColorError} to remote host: ${ColorDistinct}${SOFIN_NAME}@${_psmirror}${ColorError}!"
             fi
         fi
     else
-        debug "No service stream available for bundle: $(distd "${_pselement}")"
+        debug "No service stream available for bundle: ${ColorDistinct}${_pselement}${ColorDebug}"
     fi
     unset _retryresult _psmirror _pselement _psfin_snapfile _psfin_snapfile _psversion_element
 }
@@ -108,26 +108,26 @@ build_service_dataset () {
     _ps_ver_elem="${2}"
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
         if [ -z "${_ps_elem}" ]; then
-            error "First argument with a $(diste "BundleName") is required!"
+            error "First argument with a ${ColorDistinct}BundleName${ColorError} is required!"
         fi
         if [ -z "${_ps_ver_elem}" ]; then
-            error "Second argument with a $(diste "version-string") is required!"
+            error "Second argument with a ${ColorDistinct}version-string${ColorError} is required!"
         fi
         _full_dataset_name="${DEFAULT_ZPOOL}${SERVICES_DIR}/${SYSTEM_DATASET}/${_ps_elem}"
         _ps_snap_file="${_ps_elem}-${_ps_ver_elem}-${SYSTEM_NAME}${DEFAULT_SERVICE_SNAPSHOT_EXT}"
-        debug "Dataset name: $(distd "${_full_dataset_name}"), snapshot-file: $(distd "${_ps_snap_file}")"
+        debug "Dataset name: ${ColorDistinct}${_full_dataset_name}${ColorDebug}, snapshot-file: ${ColorDistinct}${_ps_snap_file}${ColorDebug}"
         if [ ! -f "${FILE_CACHE_DIR}${_ps_snap_file}" ]; then
             fetch_dset_zfs_stream "${_ps_elem}" "${_ps_snap_file}"
             if [ -f "${FILE_CACHE_DIR}${_ps_snap_file}" ]; then
                 debug "Service origin available!"
             else
-                debug "Service origin unavailable! Creating new one: $(distd "${_full_dataset_name}")"
+                debug "Service origin unavailable! Creating new one: ${ColorDistinct}${_full_dataset_name}${ColorDebug}"
                 try "${ZFS_BIN} list -H -t filesystem '${_full_dataset_name}'"
                 if [ "${?}" = "0" ]; then
                     try "${ZFS_BIN} destroy '${_full_dataset_name}@${ORIGIN_ZFS_SNAP_NAME}'"
                     run "${ZFS_BIN} snapshot '${_full_dataset_name}@${ORIGIN_ZFS_SNAP_NAME}'"
 
-                    permnote "Sending service dataset: $(distn "${_full_dataset_name}") for bundle: $(distn "${_ps_elem}")"
+                    permnote "Sending service dataset: ${ColorDistinct}${_full_dataset_name}${ColorNote} for bundle: ${ColorDistinct}${_ps_elem}${ColorNote}"
                     try "${ZFS_BIN} umount -f '${_full_dataset_name}'"
                     run "${ZFS_BIN} send ${ZFS_SEND_OPTS} '${_full_dataset_name}@${ORIGIN_ZFS_SNAP_NAME}' | ${SOFIN_LZ4_BIN} ${DEFAULT_LZ4_OPTS} > ${FILE_CACHE_DIR}${_ps_snap_file}"
                     try "${ZFS_BIN} mount '${_full_dataset_name}'"
@@ -135,26 +135,26 @@ build_service_dataset () {
                 _snap_size="$(file_size "${FILE_CACHE_DIR}${_ps_snap_file}")"
                 if [ "${_snap_size}" = "0" ]; then
                     try "${RM_BIN} -f '${FILE_CACHE_DIR}${_ps_snap_file}'"
-                    debug "Service dataset dump is empty for bundle: $(distd "${_ps_elem}-${_ps_ver_elem}")"
+                    debug "Service dataset dump is empty for bundle: ${ColorDistinct}${_ps_elem}-${_ps_ver_elem}${ColorDebug}"
                 else
-                    debug "Snapshot of size: $(distd "${_snap_size}") is ready for bundle: $(distd "${_ps_elem}")"
+                    debug "Snapshot of size: ${ColorDistinct}${_snap_size}${ColorDebug} is ready for bundle: ${ColorDistinct}${_ps_elem}${ColorDebug}"
                 fi
             fi
         else
-            debug "Service ${ORIGIN_ZFS_SNAP_NAME} snapshot file exists: $(distd "${FILE_CACHE_DIR}${_ps_snap_file}")"
+            debug "Service ${ORIGIN_ZFS_SNAP_NAME} snapshot file exists: ${ColorDistinct}${FILE_CACHE_DIR}${_ps_snap_file}${ColorDebug}"
         fi
         unset _snap_size _ps_ver_elem _full_dataset_name _ps_snap_file _ps_elem
     else
         # fallback for hosts without ZFS feature
         if [ -z "${_ps_elem}" ]; then
-            error "First argument with a $(diste "BundleName") is required!"
+            error "First argument with a ${ColorDistinct}BundleName${ColorError} is required!"
         fi
         if [ -z "${_ps_ver_elem}" ]; then
-            error "Second argument with a $(diste "version-string") is required!"
+            error "Second argument with a ${ColorDistinct}version-string${ColorError} is required!"
         fi
         _full_svc_dirname="${SERVICES_DIR}/${_ps_elem}"
         _ps_snap_file="${_ps_elem}-${_ps_ver_elem}-${SYSTEM_NAME}${DEFAULT_ARCHIVE_TARBALL_EXT}"
-        debug "Dir name: $(distd "${_full_svc_dirname}"), snapshot-file: $(distd "${_ps_snap_file}")"
+        debug "Dir name: ${ColorDistinct}${_full_svc_dirname}${ColorDebug}, snapshot-file: ${ColorDistinct}${_ps_snap_file}${ColorDebug}"
         if [ ! -f "${FILE_CACHE_DIR}${_ps_snap_file}" ]; then
             fetch_dset_zfs_stream "${_ps_elem}" "${_ps_snap_file}"
             if [ -f "${FILE_CACHE_DIR}${_ps_snap_file}" ]; then
@@ -170,13 +170,13 @@ build_service_dataset () {
                 _snap_size="$(file_size "${FILE_CACHE_DIR}${_ps_snap_file}")"
                 if [ "${_snap_size}" = "0" ]; then
                     try "${RM_BIN} -f '${FILE_CACHE_DIR}${_ps_snap_file}'"
-                    debug "Service tarball dump is empty for bundle: $(distd "${_ps_elem}-${_ps_ver_elem}")"
+                    debug "Service tarball dump is empty for bundle: ${ColorDistinct}${_ps_elem}-${_ps_ver_elem}${ColorDebug}"
                 else
-                    debug "Snapshot of size: $(distd "${_snap_size}") is ready for bundle: $(distd "${_ps_elem}")"
+                    debug "Snapshot of size: ${ColorDistinct}${_snap_size}${ColorDebug} is ready for bundle: ${ColorDistinct}${_ps_elem}${ColorDebug}"
                 fi
             fi
         else
-            debug "Service tarball file exists: $(distd "${FILE_CACHE_DIR}${_ps_snap_file}")"
+            debug "Service tarball file exists: ${ColorDistinct}${FILE_CACHE_DIR}${_ps_snap_file}${ColorDebug}"
         fi
         unset _snap_size _ps_ver_elem _full_svc_dirname _ps_snap_file _ps_elem
     fi
@@ -186,21 +186,21 @@ build_service_dataset () {
 create_service_dataset () {
     _bund_name="${1}"
     if [ -z "${_bund_name}" ]; then
-        error "First argument with: $(diste dataset_name) required!"
+        error "First argument with: ${ColorDistinct}dataset_name${ColorError} required!"
     fi
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
         _dataset_name="${DEFAULT_ZPOOL}${SERVICES_DIR}/${SYSTEM_DATASET}/${_bund_name}"
         try "${ZFS_BIN} list -H -o name -t filesystem '${_dataset_name}'"
         if [ "0" = "${?}" ]; then
-            debug "Service dataset already exists: $(distd "${_dataset_name}")"
+            debug "Service dataset already exists: ${ColorDistinct}${_dataset_name}${ColorDebug}"
         else
-            debug "Creating initial service dataset: $(distd "${_dataset_name}") for: $(distd "${_bund_name}")."
+            debug "Creating initial service dataset: ${ColorDistinct}${_dataset_name}${ColorDebug} for: ${ColorDistinct}${_bund_name}${ColorDebug}."
             run "${ZFS_BIN} create -p '${_dataset_name}'"
             run "${ZFS_BIN} set mountpoint=${SERVICES_DIR}/${_bund_name} '${_dataset_name}'"
         fi
     else
         debug "ZFS feature disabled"
-        debug "Creating regular service-directory: $(distd "${SERVICES_DIR}/${_bund_name}")"
+        debug "Creating regular service-directory: ${ColorDistinct}${SERVICES_DIR}/${_bund_name}${ColorDebug}"
         try "${MKDIR_BIN} -p '${SERVICES_DIR}/${_bund_name}'"
         try "${CHMOD_BIN} -v 0711 '${SERVICES_DIR}/${_bund_name}'"
     fi
@@ -212,32 +212,32 @@ fetch_dset_zfs_stream () {
     _fdz_bund_name="${1}"
     _fdz_out_file="${2}"
     if [ -z "${_fdz_bund_name}" ] || [ -z "${_fdz_out_file}" ]; then
-        error "Expected two arguments: $(diste "bundle-name") and $(diste "name-out-file")."
+        error "Expected two arguments: ${ColorDistinct}bundle-name${ColorError} and ${ColorDistinct}name-out-file${ColorError}."
     fi
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
         _commons_path="${MAIN_COMMON_REPOSITORY}/${_fdz_out_file}"
-        debug "Fetch service stream-dataset: $(distd "${FILE_CACHE_DIR}${_fdz_out_file}")"
+        debug "Fetch service stream-dataset: ${ColorDistinct}${FILE_CACHE_DIR}${_fdz_out_file}${ColorDebug}"
         retry "${FETCH_BIN} ${FETCH_OPTS} -o ${FILE_CACHE_DIR}${_fdz_out_file} '${_commons_path}'"
         if [ "${?}" = "0" ]; then
             _dataset_name="${DEFAULT_ZPOOL}${SERVICES_DIR}/${SYSTEM_DATASET}/${_fdz_bund_name}"
             try "${SOFIN_LZ4CAT_BIN} '${FILE_CACHE_DIR}${_fdz_out_file}' | ${ZFS_BIN} receive ${ZFS_RECEIVE_OPTS} '${_dataset_name}'" \
-                && permnote "Received service dataset for bundle: $(distn "${_dataset_name}")"
+                && permnote "Received service dataset for bundle: ${ColorDistinct}${_dataset_name}${ColorNote}"
             unset _dataset_name
         else
-            debug "Origin service dataset unavailable for bundle: $(distd "${_fdz_bund_name}")."
+            debug "Origin service dataset unavailable for bundle: ${ColorDistinct}${_fdz_bund_name}${ColorDebug}."
             return 1
         fi
     else
         debug "ZFS feature disabled. Falling back to tarballs.."
         _commons_path="${MAIN_COMMON_REPOSITORY}/${_fdz_out_file}"
-        debug "Fetch service stream-tarball: $(distd "${FILE_CACHE_DIR}${_fdz_out_file}")"
+        debug "Fetch service stream-tarball: ${ColorDistinct}${FILE_CACHE_DIR}${_fdz_out_file}${ColorDebug}"
         retry "${FETCH_BIN} ${FETCH_OPTS} -o ${FILE_CACHE_DIR}${_fdz_out_file} '${_commons_path}'"
         if [ "${?}" = "0" ]; then
             try "${TAR_BIN} -xf ${FILE_CACHE_DIR}${_fdz_out_file} ${TAR_DIRECTORY_ARG} ${SERVICES_DIR}" \
-                && permnote "Received service tarball for bundle: $(distn "${_fdz_bund_name}")"
+                && permnote "Received service tarball for bundle: ${ColorDistinct}${_fdz_bund_name}${ColorNote}"
             unset _tarball_name
         else
-            debug "Origin service tarball unavailable for bundle: $(distd "${_fdz_bund_name}")."
+            debug "Origin service tarball unavailable for bundle: ${ColorDistinct}${_fdz_bund_name}${ColorDebug}."
             return 1
         fi
     fi
@@ -248,11 +248,11 @@ fetch_dset_zfs_stream () {
 try_fetch_service_dir () {
     _dset_create="${1}"
     if [ -z "${_dset_create}" ]; then
-        error "First argument with $(diste "BundleName") is required!"
+        error "First argument with ${ColorDistinct}BundleName${ColorError} is required!"
     fi
     _dset_version="${2}"
     if [ -z "${_dset_version}" ]; then
-        error "Second argument with $(diste "version") is required!"
+        error "Second argument with ${ColorDistinct}version${ColorError} is required!"
     fi
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
         _svce_origin="${_dset_create}-${_dset_version}-${SYSTEM_NAME}${DEFAULT_SERVICE_SNAPSHOT_EXT}"
@@ -260,46 +260,46 @@ try_fetch_service_dir () {
         if [ ! -f "${_svce_org_file}" ]; then
             try "${FETCH_BIN} ${FETCH_OPTS} -o ${_svce_org_file} ${MAIN_COMMON_REPOSITORY}/${_svce_origin}"
             if [ "0" = "${?}" ]; then
-                debug "Service origin fetched successfully for bundle: $(distd "${_svce_origin}")"
+                debug "Service origin fetched successfully for bundle: ${ColorDistinct}${_svce_origin}${ColorDebug}"
             else
-                debug "Couldn't fetch origin for bundle: $(distd "${_svce_origin}")!"
+                debug "Couldn't fetch origin for bundle: ${ColorDistinct}${_svce_origin}${ColorDebug}!"
             fi
         fi
         if [ -f "${_svce_org_file}" ]; then
             # NOTE: each user dataset is made of same origin, hence you can apply snapshots amongst them..
             try "${ZFS_BIN} list '${DEFAULT_ZPOOL}${SERVICES_DIR}/${SYSTEM_DATASET}/${_dset_create}'"
             if [ "0" = "${?}" ]; then
-                debug "Service origin is already present for bundle: $(distd "${_svce_origin}")"
+                debug "Service origin is already present for bundle: ${ColorDistinct}${_svce_origin}${ColorDebug}"
             else
                 run "${SOFIN_LZ4CAT_BIN} '${_svce_org_file}' | ${ZFS_BIN} receive ${ZFS_RECEIVE_OPTS} '${DEFAULT_ZPOOL}${SERVICES_DIR}/${SYSTEM_DATASET}/${_dset_create}'"
-                debug "Service origin received successfully for bundle: $(distd "${_svce_origin}")"
+                debug "Service origin received successfully for bundle: ${ColorDistinct}${_svce_origin}${ColorDebug}"
             fi
         else
-            debug "No Service origin file: '$(distd "${_svce_org_file}")' available! Skipped."
+            debug "No Service origin file: '${ColorDistinct}${_svce_org_file}${ColorDebug}' available! Skipped."
         fi
     else
         # Only fetch service tarball, but don't create new one
         _svce_origin="${_dset_create}-${_dset_version}-${SYSTEM_NAME}${DEFAULT_ARCHIVE_TARBALL_EXT}"
         _svce_org_file="${FILE_CACHE_DIR}${_svce_origin}"
         if [ -f "${_svce_org_file}" ]; then
-            debug "Service origin file: '$(distd "${_svce_org_file}")' is present in local file-cache."
+            debug "Service origin file: '${ColorDistinct}${_svce_org_file}${ColorDebug}' is present in local file-cache."
         else
             try "${FETCH_BIN} ${FETCH_OPTS} -o ${_svce_org_file} ${MAIN_COMMON_REPOSITORY}/${_svce_origin}"
             if [ "0" = "${?}" ]; then
-                debug "Service origin fetched successfully: $(distd "${_svce_origin}")"
+                debug "Service origin fetched successfully: ${ColorDistinct}${_svce_origin}${ColorDebug}"
             else
-                debug "Couldn't fetch origin bundle: $(distd "${_svce_origin}")"
+                debug "Couldn't fetch origin bundle: ${ColorDistinct}${_svce_origin}${ColorDebug}"
             fi
         fi
         if [ -f "${_svce_org_file}" ]; then
             if [ -d "${SERVICES_DIR}/${_dset_create}" ]; then
-                debug "Service dir: $(distd "${SERVICES_DIR}/${_dset_create}") already exists. Leaving untouched!"
+                debug "Service dir: ${ColorDistinct}${SERVICES_DIR}/${_dset_create}${ColorDebug} already exists. Leaving untouched!"
             else
                 run "${TAR_BIN} -xf '${_svce_org_file}' ${TAR_DIRECTORY_ARG} '${SERVICES_DIR}'"
-                debug "Service origin received successfully: $(distd "${_svce_origin}")"
+                debug "Service origin received successfully: ${ColorDistinct}${_svce_origin}${ColorDebug}"
             fi
         else
-            debug "No Service origin file: '$(distd "${_svce_org_file}")' available! Skipped."
+            debug "No Service origin file: '${ColorDistinct}${_svce_org_file}${ColorDebug}' available! Skipped."
         fi
     fi
     unset _dset_create _svce_origin _svce_org_file _dset_version
@@ -392,14 +392,14 @@ receive_origin () {
     _origin_file="${SOFIN_ROOT}/share/origins/${_origin_name}"
     # Try origin files from local Sofin installation:
     if [ -f "${_origin_file}" ]; then
-        debug "Local origin found: '$(distd "${_origin_file}")'"
+        debug "Local origin found: '${ColorDistinct}${_origin_file}${ColorDebug}'"
     else
         _origin_file="${FILE_CACHE_DIR}/${_origin_name}"
     fi
 
     if [ ! -f "${_origin_file}" ]; then
         run "${FETCH_BIN} ${FETCH_OPTS} -o ${_origin_file} ${MAIN_COMMON_REPOSITORY}/${_origin_name}" \
-            && debug "Origin fetched successfully: $(distd "${_origin_name}")"
+            && debug "Origin fetched successfully: ${ColorDistinct}${_origin_name}${ColorDebug}"
     fi
 
     set_mountpoint_and_mount () {
@@ -409,7 +409,7 @@ receive_origin () {
         else
             _mountpoint="${SERVICES_DIR}/${_dname##*/}"
         fi
-        debug "Set mountpoint: $(distd "${_mountpoint}") and mount: $(distd "${_dname}")"
+        debug "Set mountpoint: ${ColorDistinct}${_mountpoint}${ColorDebug} and mount: ${ColorDistinct}${_dname}${ColorDebug}"
         # NOTE: When you change the mountpoint property from legacy or none to a specific path, ZFS automatically mounts the file system.
         run "${ZFS_BIN} set mountpoint=${_mountpoint} '${_dname}'"
         run "${ZFS_BIN} mount '${_dname}'"
@@ -419,9 +419,9 @@ receive_origin () {
         # NOTE: each user dataset is made of same origin, hence you can apply snapshots amongst them..
         run "${SOFIN_LZ4CAT_BIN} '${_origin_file}' | ${ZFS_BIN} receive -u ${ZFS_RECEIVE_OPTS} '${_dname}'" \
             && set_mountpoint_and_mount \
-            && debug "Origin received successfully: $(distd "${_dname}")"
+            && debug "Origin received successfully: ${ColorDistinct}${_dname}${ColorDebug}"
     else
-        error "No origin file available! That's mandatory to have this file: $(diste "${_origin_file}")"
+        error "No origin file available! That's mandatory to have this file: ${ColorDistinct}${_origin_file}${ColorError}"
     fi
     unset _dname _origin_file _mountpoint
 }
@@ -430,16 +430,16 @@ receive_origin () {
 create_software_dir () {
     _dset_create="${1}"
     if [ -z "${_dset_create}" ]; then
-        error "First argument with $(diste "BundleName") is required!"
+        error "First argument with ${ColorDistinct}BundleName${ColorError} is required!"
     fi
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
         _dsbase="${DEFAULT_ZPOOL}${SOFTWARE_DIR}/${SYSTEM_DATASET}"
         _dsname="${_dsbase}/${_dset_create}"
-        debug "Create software dataset: '$(distd "${_dsname}")'"
+        debug "Create software dataset: '${ColorDistinct}${_dsname}${ColorDebug}'"
 
         receive_unshared_fs () {
             receive_origin "${_dsname}" "Software" "user" \
-                && debug "Received ZFS software-dataset: $(distd "${_dsname}")"
+                && debug "Received ZFS software-dataset: ${ColorDistinct}${_dsname}${ColorDebug}"
 
             # sharing nothing by default:
             try "${ZFS_BIN} set sharenfs=off '${_dsname}'"
@@ -447,7 +447,7 @@ create_software_dir () {
 
         try "${ZFS_BIN} list -H -t filesystem '${_dsname}'" || receive_unshared_fs
     else
-        debug "Creating regular software-directory: $(distd "${SOFTWARE_DIR}/${_dset_create}")"
+        debug "Creating regular software-directory: ${ColorDistinct}${SOFTWARE_DIR}/${_dset_create}${ColorDebug}"
         try "${MKDIR_BIN} -p '${SOFTWARE_DIR}/${_dset_create}'"
     fi
     try "${CHMOD_BIN} 0755 '${SOFTWARE_DIR}/${_dset_create}'"
@@ -458,7 +458,7 @@ create_software_dir () {
 destroy_software_dir () {
     _dset_destroy="${1}"
     if [ -z "${_dset_destroy}" ]; then
-        error "First argument with $(diste "BundleName") to destroy is required!"
+        error "First argument with ${ColorDistinct}BundleName${ColorError} to destroy is required!"
     fi
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
         _dsbase="${DEFAULT_ZPOOL}${SOFTWARE_DIR}/${SYSTEM_DATASET}"
@@ -472,14 +472,14 @@ destroy_software_dir () {
         # finally proceed with guaranteed destroy:
         try "${ZFS_BIN} umount -f '${_dsname}'"
         try "${ZFS_BIN} destroy -fr '${_dsname}'" \
-            && debug "Destroyed software-dataset: $(distd "${_dsname}")"
+            && debug "Destroyed software-dataset: ${ColorDistinct}${_dsname}${ColorDebug}"
         try "${ZFS_BIN} set readonly=off '${_dsbase}'"
         try "${RM_BIN} -rf '${SOFTWARE_DIR}/${_dset_destroy}'"
         try "${ZFS_BIN} set readonly=on '${_dsbase}'"
 
         # NOTE: set_system_dataset_readonly() is called in untrap_signals() once
     else
-        debug "Removing regular software-directory: $(distd "${SOFTWARE_DIR}/${_dset_destroy}")"
+        debug "Removing regular software-directory: ${ColorDistinct}${SOFTWARE_DIR}/${_dset_destroy}${ColorDebug}"
         try "${RM_BIN} -rf '${SOFTWARE_DIR}/${_dset_destroy}'"
     fi
     unset _dset_destroy _dsname _dsbase
@@ -490,7 +490,7 @@ create_builddir () {
     _cb_bundle_name="${1}"
     _dset_namesum="${2}"
     if [ -z "${_cb_bundle_name}" ]; then
-        error "First argument with $(diste "BundleName") is required!"
+        error "First argument with ${ColorDistinct}BundleName${ColorError} is required!"
     fi
     _bdir="${SOFTWARE_DIR}/${_cb_bundle_name}/${DEFAULT_SRC_EXT}${_dset_namesum}"
     try "${MKDIR_BIN} -p ${_bdir}"
@@ -506,17 +506,17 @@ create_builddir () {
                     _ramfs_sectors=$((${_ramfs_size_mb}*1024*1024/512))
                     RAMDISK_DEV="$(${HDID_BIN} -nomount ram://${_ramfs_sectors} 2>/dev/null)"
 
-                    debug "Darwin ramdisk dev: $(distd "${RAMDISK_DEV}")"
+                    debug "Darwin ramdisk dev: ${ColorDistinct}${RAMDISK_DEV}${ColorDebug}"
                     run "${NEWFS_HFS_BIN} -v ${_cb_bundle_name} ${RAMDISK_DEV}"
                     run "${MOUNT_BIN} -o noatime -t hfs ${RAMDISK_DEV} ${_bdir}" \
-                        && debug "Mounted tmpfs build-directory: $(distd "${_bdir}")"
+                        && debug "Mounted tmpfs build-directory: ${ColorDistinct}${_bdir}${ColorDebug}"
                     ;;
 
                 FreeBSD)
                     RAMDISK_DEV="${_bdir}"
-                    debug "Mounting clean $(distd "${DEFAULT_RAMDISK_SIZE}") tmpfs build-dir: $(distd "${RAMDISK_DEV}")"
+                    debug "Mounting clean ${ColorDistinct}${DEFAULT_RAMDISK_SIZE}${ColorDebug} tmpfs build-dir: ${ColorDistinct}${RAMDISK_DEV}${ColorDebug}"
                     run "${MOUNT_BIN} -t tmpfs -o size=${DEFAULT_RAMDISK_SIZE},mode=0750 tmpfs ${RAMDISK_DEV}" \
-                        && debug "Mounted tmpfs build-directory: $(distd "${RAMDISK_DEV}")"
+                        && debug "Mounted tmpfs build-directory: ${ColorDistinct}${RAMDISK_DEV}${ColorDebug}"
                     ;;
             esac
             export RAMDISK_DEV
@@ -530,7 +530,7 @@ destroy_builddir () {
     _deste_bund_name="${1}"
     _dset_hash="${2}"
     if [ -z "${_deste_bund_name}" ]; then
-        error "First argument with $(diste "build-bundle-directory") is required!"
+        error "First argument with ${ColorDistinct}build-bundle-directory${ColorError} is required!"
     fi
     _bdir="${SOFTWARE_DIR}/${_deste_bund_name}/${DEFAULT_SRC_EXT}${_dset_hash}"
     if [ -n "${CAP_SYS_BUILDHOST}" ] && [ -d "${_bdir}" ]; then
@@ -546,13 +546,13 @@ create_software_bundle_archive () {
     _csbelem="${2}"
     _csversion="${3}"
     if [ -z "${_csbname}" ]; then
-        error "First argument with $(diste "BundleName") is required!"
+        error "First argument with ${ColorDistinct}BundleName${ColorError} is required!"
     fi
     if [ -z "${_csbelem}" ]; then
-        error "Second argument with $(diste "file-element-name") is required!"
+        error "Second argument with ${ColorDistinct}file-element-name${ColorError} is required!"
     fi
     if [ -z "${_csversion}" ]; then
-        error "Third argument with $(diste "version-string") is required!"
+        error "Third argument with ${ColorDistinct}version-string${ColorError} is required!"
     fi
     if [ "YES" = "${CAP_SYS_BUILDHOST}" ]; then
         debug "Making sure RAMdisk is not mounted at this point to avoid pushing PREFIX/.src_* build files into final archive."
@@ -563,12 +563,12 @@ create_software_bundle_archive () {
         _inst_ind="${_csbname}/$(lowercase "${_csbname}")${DEFAULT_INST_MARK_EXT}"
         if [ -f "${SOFTWARE_DIR}/${_inst_ind}" ]; then
             _csbd_dataset="${DEFAULT_ZPOOL}${SOFTWARE_DIR}/${SYSTEM_DATASET}/${_csbname}"
-            debug "Creating archive from snapshot: $(distd "${ORIGIN_ZFS_SNAP_NAME}") dataset: $(distd "${_csbd_dataset}") to file: $(distd "${_cddestfile}")"
+            debug "Creating archive from snapshot: ${ColorDistinct}${ORIGIN_ZFS_SNAP_NAME}${ColorDebug} dataset: ${ColorDistinct}${_csbd_dataset}${ColorDebug} to file: ${ColorDistinct}${_cddestfile}${ColorDebug}"
             _current_dir="$(${PWD_BIN} 2>/dev/null)" # change dir globally not only for a subshell
             cd /
             try "${ZFS_BIN} umount -f '${_csbd_dataset}'"
             run "${ZFS_BIN} send ${ZFS_SEND_OPTS} '${_csbd_dataset}@${ORIGIN_ZFS_SNAP_NAME}' | ${SOFIN_LZ4_BIN} ${DEFAULT_LZ4_OPTS} > ${_cddestfile}" \
-                && debug "ZFS-send-ok: $(distd "${_csbd_dataset}") -> $(distd "${_cddestfile}")"
+                && debug "ZFS-send-ok: ${ColorDistinct}${_csbd_dataset}${ColorDebug} -> ${ColorDistinct}${_cddestfile}${ColorDebug}"
             cd "${_current_dir}"
             run "${ZFS_BIN} mount '${_csbd_dataset}'"
 
@@ -578,7 +578,7 @@ create_software_bundle_archive () {
             # try "${ZFS_BIN} set mountpoint=${SOFTWARE_DIR}/${_csbname} '${_dsname}'"
             # try "${ZFS_BIN} mount '${_csbd_dataset}'"
         else
-            error "Can't build snapshot from broken/empty bundle dir: $(diste "${SOFTWARE_DIR}/${_inst_ind}")"
+            error "Can't build snapshot from broken/empty bundle dir: ${ColorDistinct}${SOFTWARE_DIR}/${_inst_ind}${ColorError}"
         fi
     else
         debug "No ZFS-binbuilds feature. Falling back to tarballs.."
@@ -586,7 +586,7 @@ create_software_bundle_archive () {
             cd "${SOFTWARE_DIR}"
             try "${TAR_BIN} --lz4 --create --file ${_cddestfile} ${_csbname}" \
                 || try "${TAR_BIN} -cJf ${_cddestfile} ${_csbname}" \
-                    || error "Failed to create archive file: $(diste "${_cddestfile}")"
+                    || error "Failed to create archive file: ${ColorDistinct}${_cddestfile}${ColorError}"
         )
     fi
     unset _csbname _csbelem _cddestfile _current_dir _csversion _csbd_dataset
@@ -618,23 +618,23 @@ install_software_from_binbuild () {
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
         # On systems with ZFS capability, we use zfs receive instead of tarballing:
         _isfb_dataset="${DEFAULT_ZPOOL}${SOFTWARE_DIR}/${SYSTEM_DATASET}/${_isfb_fullname}"
-        debug "isfb: $(distd "${_isfb_archive}"), isff: $(distd "${_isfb_fullname}"), isfbdset: $(distd "${_isfb_dataset}")"
+        debug "isfb: ${ColorDistinct}${_isfb_archive}${ColorDebug}, isff: ${ColorDistinct}${_isfb_fullname}${ColorDebug}, isfbdset: ${ColorDistinct}${_isfb_dataset}${ColorDebug}"
         try "${ZFS_BIN} list -H -t filesystem ${_isfb_dataset}"
         if [ "${?}" = "0" ]; then
             # note "Software dataset: $(distn "${_isfb_fullname}") already present. Will be destroyed!"
             try "${ZFS_BIN} destroy -fr '${_isfb_dataset}'"
         fi
-        debug "Installing ZFS based binary build to dataset: $(distd "${_isfb_dataset}")"
+        debug "Installing ZFS based binary build to dataset: ${ColorDistinct}${_isfb_dataset}${ColorDebug}"
         run "${SOFIN_LZ4CAT_BIN} '${FILE_CACHE_DIR}${_isfb_archive}' | ${ZFS_BIN} receive -F ${ZFS_RECEIVE_OPTS} '${_isfb_dataset}'" \
-            && note "Installed: $(distn "${_isfb_fullname}")" \
+            && note "Installed: ${ColorDistinct}${_isfb_fullname}${ColorNote}" \
                 && CURRENT_DEFINITION_SKIP_BUILD_DO_EXPORTS=YES
     else
         try "${TAR_BIN} -xf ${FILE_CACHE_DIR}${_isfb_archive} ${TAR_DIRECTORY_ARG} ${SOFTWARE_DIR}"
         if [ "${?}" = "0" ]; then
-            note "Installed binary build: $(distn "${_isfb_fullname}")"
+            note "Installed binary build: ${ColorDistinct}${_isfb_fullname}${ColorNote}"
             CURRENT_DEFINITION_SKIP_BUILD_DO_EXPORTS=YES
         else
-            debug "No binary bundle available for: $(distd "${_isfb_fullname}")"
+            debug "No binary bundle available for: ${ColorDistinct}${_isfb_fullname}${ColorDebug}"
             try "${RM_BIN} -f '${FILE_CACHE_DIR}${_isfb_archive}' '${FILE_CACHE_DIR}${_isfb_archive}${DEFAULT_CHKSUM_EXT}'"
         fi
     fi
@@ -647,13 +647,13 @@ push_software_archive () {
     _bpaddress="${3}"
     _bname="${4}" # optional bundle name
     if [ -z "${_bpbundle_file}" ]; then
-        error "First argument: $(diste "BundleName") is empty!"
+        error "First argument: ${ColorDistinct}BundleName${ColorError} is empty!"
     fi
     if [ -z "${_bpamirror}" ]; then
-        error "Third argument: $(diste "mirror-name") is empty!"
+        error "Third argument: ${ColorDistinct}mirror-name${ColorError} is empty!"
     fi
     if [ -z "${_bpaddress}" ]; then
-        error "Fourth argument: $(diste "mirror-address") is empty!"
+        error "Fourth argument: ${ColorDistinct}mirror-address${ColorError} is empty!"
     fi
     _bpfn_file="${FILE_CACHE_DIR}${_bpbundle_file}"
     _bpfn_file_dest="${_bpaddress}/${_bpbundle_file}"
@@ -662,9 +662,9 @@ push_software_archive () {
     _bpshortsha="$(${CAT_BIN} "${_bpfn_chksum_file}" 2>/dev/null | ${CUT_BIN} -c -16 2>/dev/null)"
     _bp_remotfs_file="${MAIN_BINARY_PREFIX}/${SYS_SPECIFIC_BINARY_REMOTE}/${_bpbundle_file}"
     if [ -z "${_bpshortsha}" ]; then
-        error "No sha checksum in file: $(diste "${_bpfn_chksum_file}")"
+        error "No sha checksum in file: ${ColorDistinct}${_bpfn_chksum_file}${ColorError}"
     fi
-    debug "push_software_archive(): Bundle: $(distd "${_bpbundle_file}"), bundle_file: $(distd "${_bpbundle_file}"), repository address: $(distd "${_bpaddress}")"
+    debug "push_software_archive(): Bundle: ${ColorDistinct}${_bpbundle_file}${ColorDebug}, bundle_file: ${ColorDistinct}${_bpbundle_file}${ColorDebug}, repository address: ${ColorDistinct}${_bpaddress}${ColorDebug}"
     if [ -x "${RSYNC_BIN}" ]; then
         retry "${RSYNC_BIN} ${DEFAULT_RSYNC_OPTS} -e 'ssh -p ${SOFIN_SSH_PORT}' ${_bpfn_file} ${_bpfn_file_dest}${DEFAULT_PARTIAL_FILE_EXT}"
         _res="${?}"
@@ -675,17 +675,17 @@ push_software_archive () {
     if [ "${_res}" = "0" ]; then
         if [ -x "${RSYNC_BIN}" ]; then
             retry "${RSYNC_BIN} ${DEFAULT_RSYNC_OPTS} -e 'ssh -p ${SOFIN_SSH_PORT}' ${_bpfn_chksum_file} ${_bpfn_chksum_file_dest}" \
-                || error "Failed to send the checksum file: $(diste "${_bpfn_chksum_file}") to: $(diste "${_bpfn_chksum_file_dest}")"
+                || error "Failed to send the checksum file: ${ColorDistinct}${_bpfn_chksum_file}${ColorError} to: ${ColorDistinct}${_bpfn_chksum_file_dest}${ColorError}"
         else
             retry "${SCP_BIN} ${DEFAULT_SSH_OPTS} ${DEFAULT_SCP_OPTS} -P ${SOFIN_SSH_PORT} ${_bpfn_chksum_file} ${_bpfn_chksum_file_dest}" \
-                || error "Failed to send the checksum file: $(diste "${_bpfn_chksum_file}") to: $(diste "${_bpfn_chksum_file_dest}")"
+                || error "Failed to send the checksum file: ${ColorDistinct}${_bpfn_chksum_file}${ColorError} to: ${ColorDistinct}${_bpfn_chksum_file_dest}${ColorError}"
         fi
 
         retry "${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${SOFIN_SSH_PORT} ${SOFIN_NAME}@${_bpamirror} \"${MV_BIN} -f ${_bp_remotfs_file}${DEFAULT_PARTIAL_FILE_EXT} ${_bp_remotfs_file}\"" \
-            || error "Couldn't rename destination partial file: $(diste "${_bp_remotfs_file}")"
-        debug "Partial file renamed to destination name: $(distd "${_bp_remotfs_file}")"
+            || error "Couldn't rename destination partial file: ${ColorDistinct}${_bp_remotfs_file}${ColorError}"
+        debug "Partial file renamed to destination name: ${ColorDistinct}${_bp_remotfs_file}${ColorDebug}"
     else
-        error "Failed to push binary build of: $(diste "${_bpbundle_file}") to remote: $(diste "${_bp_remotfs_file}")"
+        error "Failed to push binary build of: ${ColorDistinct}${_bpbundle_file}${ColorError} to remote: ${ColorDistinct}${_bp_remotfs_file}${ColorError}"
     fi
     unset _res _bname _bpbundle_file _bpbundle_file _bpamirror _bpaddress _bpshortsha _bpfn_chksum_file _bp_remotfs_file _bpfn_chksum_file _bpfn_chksum_file_dest
 }
@@ -717,7 +717,7 @@ create_snapshot () {
             _pr_name="${PREFIX##*/}"
             _pr_soft="${DEFAULT_ZPOOL}${SOFTWARE_DIR}/${SYSTEM_DATASET}/${_pr_name}"
             _pr_serv="${DEFAULT_ZPOOL}${SERVICES_DIR}/${SYSTEM_DATASET}/${_pr_name}"
-            debug "Ensure presence of origin snapshot under prefix='$(distd "${SOFTWARE_DIR}/${_pr_name}")' of software dataset='$(distd "${_pr_soft}")' with service dataset='$(distd "${_pr_serv}")'"
+            debug "Ensure presence of origin snapshot under prefix='${ColorDistinct}${SOFTWARE_DIR}/${_pr_name}${ColorDebug}' of software dataset='${ColorDistinct}${_pr_soft}${ColorDebug}' with service dataset='${ColorDistinct}${_pr_serv}${ColorDebug}'"
 
             # # Try removing existing snaps:
             do_snaps_destroy () {
@@ -743,7 +743,7 @@ create_snapshot () {
             return 1
         fi
     else
-        debug "Empty value of '$(distd "SYSTEM_DATASET")'!"
+        debug "Empty value of '${ColorDistinct}SYSTEM_DATASET${ColorDebug}'!"
     fi
 }
 
@@ -754,9 +754,9 @@ set_software_dataset_readonly () {
         _sofin_processes="$(processes_all_sofin)"
         if [ -z "${_sofin_processes}" ]; then
             try "${ZFS_BIN} set readonly=on '${_datas}'" \
-                && debug "No Sofin processes found in background. Dataset: '$(distd "${_datas}")' is now read-only."
+                && debug "No Sofin processes found in background. Dataset: '${ColorDistinct}${_datas}${ColorDebug}' is now read-only."
         else
-            debug "Background Sofin jobs are still around! Leaving readonly mode for dataset: '$(distd "${_datas}")'"
+            debug "Background Sofin jobs are still around! Leaving readonly mode for dataset: '${ColorDistinct}${_datas}${ColorDebug}'"
         fi
         unset _sofin_processes _datas
     fi
@@ -766,7 +766,7 @@ set_software_dataset_readonly () {
 set_software_dataset_writable () {
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
         try "${ZFS_BIN} set readonly=off '${DEFAULT_ZPOOL}/Software/${SYSTEM_DATASET}'" \
-            && debug "Dataset is now writable: $(distd "${DEFAULT_ZPOOL}/Software/${SYSTEM_DATASET}")"
+            && debug "Dataset is now writable: ${ColorDistinct}${DEFAULT_ZPOOL}/Software/${SYSTEM_DATASET}${ColorDebug}"
     fi
 }
 
@@ -821,6 +821,6 @@ after_export_snapshot () {
 
 
 create_origin_snaphots () {
-    debug "create_origin_snaphots(): Create $(distd "@origin") snapshot for software or service dataset of bundle of PREFIX: $(distd "${PREFIX}")."
+    debug "create_origin_snaphots(): Create ${ColorDistinct}@origin${ColorDebug} snapshot for software or service dataset of bundle of PREFIX: ${ColorDistinct}${PREFIX}${ColorDebug}."
     create_snapshot "${ORIGIN_ZFS_SNAP_NAME}"
 }

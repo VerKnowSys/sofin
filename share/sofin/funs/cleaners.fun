@@ -2,7 +2,7 @@
 
 clean_purge () {
     if [ -z "${CACHE_DIR}" ]; then
-        error "Assertion failed: $(diste "CACHE_DIR") is empty!"
+        error "Assertion failed: ${ColorDistinct}CACHE_DIR${ColorError} is empty!"
     fi
     try "${RM_BIN} -rf '${GIT_CACHE_DIR}' '${LOGS_DIR}' '${FILE_CACHE_DIR}' '${LOCKS_DIR}'" \
         && debug "Clean: Purged everything."
@@ -11,7 +11,7 @@ clean_purge () {
 
 clean_logs () {
     if [ -z "${LOGS_DIR}" ]; then
-        error "Assertion failed: $(diste "LOGS_DIR") is empty!"
+        error "Assertion failed: ${ColorDistinct}LOGS_DIR${ColorError} is empty!"
     fi
     try "${RM_BIN} -rf '${LOGS_DIR}'" \
         && debug "Clean: Logs wiped out."
@@ -20,7 +20,7 @@ clean_logs () {
 
 clean_filecache () {
     if [ -z "${FILE_CACHE_DIR}" ]; then
-        error "Assertion failed: $(diste "FILE_CACHE_DIR") is empty!"
+        error "Assertion failed: ${ColorDistinct}FILE_CACHE_DIR${ColorError} is empty!"
     fi
     try "${RM_BIN} -rf '${FILE_CACHE_DIR}'" \
         && debug "Clean: Files-cache wiped out."
@@ -29,7 +29,7 @@ clean_filecache () {
 
 clean_gitcache () {
     if [ -z "${GIT_CACHE_DIR}" ]; then
-        error "Assertion failed: $(diste "GIT_CACHE_DIR") is empty!"
+        error "Assertion failed: ${ColorDistinct}GIT_CACHE_DIR${ColorError} is empty!"
     fi
     try "${RM_BIN} -rf '${GIT_CACHE_DIR}'" \
         && debug "Clean: Git-cache wiped out."
@@ -40,11 +40,11 @@ clean_all_bdirs_leftovers () {
     if [ "YES" != "${CAP_SYS_ZFS}" ]; then
         if [ -z "${SOFTWARE_DIR}" ] \
         || [ -z "${DEFAULT_SRC_EXT}" ]; then
-            error "Assertion failed! $(diste "SOFTWARE_DIR") / $(diste "DEFAULT_SRC_EXT") are empty! Aborting unsafe clean_all_bdirs_leftovers()!"
+            error "Assertion failed! ${ColorDistinct}SOFTWARE_DIR${ColorError} / ${ColorDistinct}DEFAULT_SRC_EXT${ColorError} are empty! Aborting unsafe clean_all_bdirs_leftovers()!"
         fi
         for i in $(${FIND_BIN} "${SOFTWARE_DIR}" -mindepth 2 -maxdepth 2 -name "${DEFAULT_SRC_EXT}*" -type d 2>/dev/null); do
             try "${RM_BIN} -rf '${i}'" \
-                && debug "Empty dir removed using <slow-file-IO>: $(distd "${i}")"
+                && debug "Empty dir removed using <slow-file-IO>: ${ColorDistinct}${i}${ColorDebug}"
         done
         debug "Done cleaning of build-dir leftovers."
     fi
@@ -53,7 +53,7 @@ clean_all_bdirs_leftovers () {
 
 clean_all_prebuilt_bundles () {
     if [ -z "${FILE_CACHE_DIR}" ]; then
-        error "Assertion failed: $(diste "FILE_CACHE_DIR") is empty!"
+        error "Assertion failed: ${ColorDistinct}FILE_CACHE_DIR${ColorError} is empty!"
     fi
     if [ "YES" = "${CAP_SYS_ZFS}" ]; then
         for _file in $(find "${FILE_CACHE_DIR}" \
@@ -78,12 +78,12 @@ perform_clean () {
     fail_any_bg_jobs
     case "${1}" in
         purge) # purge
-            permnote "Purge clean: $(distd "clean_purge()")"
+            permnote "Purge clean: ${ColorDistinct}clean_purge()${ColorDebug}"
             clean_purge
             ;;
 
         dist) # distclean
-            permnote "Dist clean: $(distn "clean_logs(), clean_filecache(), clean_gitcache(), clean_all_bdirs_leftovers()")"
+            permnote "Dist clean: ${ColorDistinct}clean_logs(), clean_filecache(), clean_gitcache(), clean_all_bdirs_leftovers()${ColorNote}"
             clean_logs
             clean_filecache
             clean_gitcache
@@ -91,7 +91,7 @@ perform_clean () {
             ;;
 
         *) # clean
-            permnote "Clean: $(distn "clean_logs(), clean_all_bdirs_leftovers()")"
+            permnote "Clean: ${ColorDistinct}clean_logs(), clean_all_bdirs_leftovers()${ColorNote}"
             clean_logs
             clean_all_bdirs_leftovers
             clean_all_prebuilt_bundles
@@ -105,19 +105,19 @@ destroy_ramdisk_device () {
     if [ -n "${RAMDISK_DEV}" ]; then
         _pwd="$(${PWD_BIN} 2>/dev/null)" # change dir globally not only for a subshell
         cd /
-        debug "${0}: destroy_ramdisk_device(): RAM_DISK_DEVICE: $(distd "${RAMDISK_DEV}")"
+        debug "${0}: destroy_ramdisk_device(): RAM_DISK_DEVICE: ${ColorDistinct}${RAMDISK_DEV}${ColorDebug}"
         case "${SYSTEM_NAME}" in
             Darwin)
                 try "${DISKUTIL_BIN} unmountDisk ${RAMDISK_DEV}" \
-                    && debug "${0}: RAMdisk device unmounted: $(distd "${RAMDISK_DEV}")"
+                    && debug "${0}: RAMdisk device unmounted: ${ColorDistinct}${RAMDISK_DEV}${ColorDebug}"
                 try "${DISKUTIL_BIN} eject ${RAMDISK_DEV}" \
-                    && debug "${0}: RAMdisk device ejected: $(distd "${RAMDISK_DEV}")" \
+                    && debug "${0}: RAMdisk device ejected: ${ColorDistinct}${RAMDISK_DEV}${ColorDebug}" \
                         && unset RAMDISK_DEV
                 ;;
 
             *)
                 try "${UMOUNT_BIN} -f ${RAMDISK_DEV}" \
-                    && debug "${0}: RAMdisk device unmounted: $(distd "${RAMDISK_DEV}")" \
+                    && debug "${0}: RAMdisk device unmounted: ${ColorDistinct}${RAMDISK_DEV}${ColorDebug}" \
                         && unset RAMDISK_DEV
                 ;;
         esac
@@ -163,10 +163,10 @@ finalize_and_quit_gracefully_with_exitcode () {
     set_software_dataset_readonly
     if [ "YES" = "${CAP_TERM_INTERACTIVE}" ]; then
         ${STTY_BIN} echo \
-            && debug "Interactive Terminal Echo is now: $(distd "*enabled*")"
+            && debug "Interactive Terminal Echo is now: ${ColorDistinct}*enabled*${ColorDebug}"
     fi
 
-    debug "${0}: Exit: $(distd "${_errorcode}"). Pid: $(distd "${SOFIN_PID}")"
+    debug "${0}: Exit: ${ColorDistinct}${_errorcode}${ColorDebug}. Pid: ${ColorDistinct}${SOFIN_PID}${ColorDebug}"
     if [ "0" != "${_errorcode}" ]; then
         ${KILL_BIN} -TERM ${SOFIN_PID}
     fi
@@ -178,7 +178,7 @@ finalize_and_quit_gracefully_with_exitcode () {
 finalize_afterbuild_tasks_for_bundle () {
     _bund_name="${1}"
     if [ -n "${_bund_name}" ]; then
-        debug "finalize_afterbuild_tasks_for_bundle():: $(distd "${_bund_name}") with PREFIX=$(distd "${PREFIX}"), BUILD_NAMESUM: ${BUILD_NAMESUM}"
+        debug "finalize_afterbuild_tasks_for_bundle():: ${ColorDistinct}${_bund_name}${ColorDebug} with PREFIX=${ColorDistinct}${PREFIX}${ColorDebug}, BUILD_NAMESUM: ${BUILD_NAMESUM}"
         require_prefix_set
         require_namesum_set
         destroy_builddir "${PREFIX##*/}" "${BUILD_NAMESUM}"
@@ -192,7 +192,7 @@ finalize_afterbuild_tasks_for_bundle () {
 remove_useless_files_of_bundle () {
     _rufiles="${*}"
     if [ -n "${_rufiles}" ]; then
-        debug "Useless files to be wiped out: $(distd "${_rufiles}")"
+        debug "Useless files to be wiped out: ${ColorDistinct}${_rufiles}${ColorDebug}"
         for _rmfile in $(to_iter "${_rufiles}"); do
             try "${RM_BIN} -rf ${_rmfile}"
         done

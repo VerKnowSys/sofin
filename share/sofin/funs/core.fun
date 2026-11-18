@@ -150,7 +150,7 @@ error () {
             printf "%b  %b Try: %b%b\n\n" \
                     "${ColorRed}" \
                     "${NOTE_CHAR2}" \
-                    "$(diste "s log ${DEF_NAME}${DEF_SUFFIX}"), to read full task log." \
+                    "${ColorDistinct}s log ${DEF_NAME}${DEF_SUFFIX}${ColorError}, to read full task log." \
                     "${ColorReset}" \
                          >&2 >/dev/null
         fi
@@ -224,7 +224,7 @@ run () {
         error "Specified an empty command to run()!"
     fi
     unset _rnm
-    error "Failed: run( $(diste "${_run_params}") )!"
+    error "Failed: run( ${ColorDistinct}${_run_params}${ColorError} )!"
 }
 
 
@@ -290,9 +290,9 @@ retry () {
         fi
         _ammo="$(printf "%b\n" "${_ammo}" | ${SED_BIN} 's/O//' 2>/dev/null)"
         sleep 2
-        debug "Remaining attempts: $(distd "${_ammo}")"
+        debug "Remaining attempts: ${ColorDistinct}${_ammo}${ColorDebug}"
     done
-    debug "All available ammo exhausted to invoke a command: $(distd "${_targets}")"
+    debug "All available ammo exhausted to invoke a command: ${ColorDistinct}${_targets}${ColorDebug}"
     check_result "1" "${_targets}"
     unset _ammo _targets
     return 1
@@ -324,7 +324,7 @@ initialize () {
 
     if [ "YES" = "${CAP_TERM_INTERACTIVE}" ]; then
         ${STTY_BIN} -echo \
-            && debug "Interactive Terminal Echo is now: $(distd "*disabled*")"
+            && debug "Interactive Terminal Echo is now: ${ColorDistinct}*disabled*${ColorDebug}"
     fi
 
     set_system_dataset_writable
@@ -340,7 +340,7 @@ initialize () {
 
 signal_handler_interrupt () {
     warn "Received Interruption signal! Will shutdown immediatelly after completing required cleanup-duties${CHAR_DOTS}"
-    warn "Terminating task: $(distw "${SOFIN_CMDLINE}")!"
+    warn "Terminating task: ${ColorDistinct}${SOFIN_CMDLINE}${ColorWarning}!"
     finalize_after_signal_interrupt "${ERRORCODE_USER_INTERRUPT}"
 }
 
@@ -396,8 +396,8 @@ trap_signals () {
     trap 'signal_handler_no_operation' USR2 # This signal is used to "reload shell"-feature. Sofin should ignore it when triggered directly
     # trap 'signal_handler_no_operation' WINCH
 
-    debug "trap_signals(): Interruption triggers were associated with signals: $(distd "INT, QUIT, TERM")."
-    debug "trap_signals(): No-Op triggers were associated with signals: $(distd "HUP, INFO, USR1, USR2")!"
+    debug "trap_signals(): Interruption triggers were associated with signals: ${ColorDistinct}INT, QUIT, TERM${ColorDebug}."
+    debug "trap_signals(): No-Op triggers were associated with signals: ${ColorDistinct}HUP, INFO, USR1, USR2${ColorDebug}!"
     return 0
 }
 
@@ -413,7 +413,7 @@ untrap_signals () {
     trap - INFO
     # trap - WINCH
 
-    debug "untrap_signals(): Signal trigger handlers were unassociated for: $(distd "INT, QUIT, TERM, HUP, INFO, USR1, USR2, WINCH")."
+    debug "untrap_signals(): Signal trigger handlers were unassociated for: ${ColorDistinct}INT, QUIT, TERM, HUP, INFO, USR1, USR2, WINCH${ColorDebug}."
     return 0
 }
 
@@ -427,14 +427,14 @@ set_system_dataset_readonly () {
         _boot_dataset="${DEFAULT_ZPOOL}/ROOT/${_active_boot_env}"
         if [ -n "${CAP_SYS_PRODUCTION}" ]; then
             try "${ZFS_BIN} set readonly=on '${_boot_dataset}'" \
-                && debug "System dataset: $(distd "${_boot_dataset}") is now: READ-ONLY"
+                && debug "System dataset: ${ColorDistinct}${_boot_dataset}${ColorDebug} is now: READ-ONLY"
         else
             _sp="$(processes_all_sofin)"
             if [ -z "${_sp}" ]; then
                 try "${ZFS_BIN} set readonly=on '${_boot_dataset}'" \
-                    && debug "No background Sofin processes found. System dataset: '$(distd "${_boot_dataset}") is now: READ-ONLY'"
+                    && debug "No background Sofin processes found. System dataset: '${ColorDistinct}${_boot_dataset}${ColorDebug} is now: READ-ONLY'"
             else
-                debug "Background Sofin found in background! System dataset: '$(distd "${_boot_dataset}") is untouched.'"
+                debug "Background Sofin found in background! System dataset: '${ColorDistinct}${_boot_dataset}${ColorDebug} is untouched.'"
             fi
         fi
     fi
@@ -452,7 +452,7 @@ set_system_dataset_writable () {
             return 0
         fi
         try "${ZFS_BIN} set readonly=off '${DEFAULT_ZPOOL}/ROOT/${_active_boot_env}'" \
-            && debug "System dataset: $(distd "${DEFAULT_ZPOOL}/ROOT/${_active_boot_env}") is now: WRITABLE"
+            && debug "System dataset: ${ColorDistinct}${DEFAULT_ZPOOL}/ROOT/${_active_boot_env}${ColorDebug} is now: WRITABLE"
     fi
 }
 

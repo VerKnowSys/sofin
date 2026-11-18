@@ -20,7 +20,7 @@ extend_requirement_lists () {
         fi
         unset _req_list _reqs_var _def_requirements
     done
-    debug "Final DEF_REQUIREMENTS=$(distd "${DEF_REQUIREMENTS}")"
+    debug "Final DEF_REQUIREMENTS=${ColorDistinct}${DEF_REQUIREMENTS}${ColorDebug}"
 }
 
 
@@ -88,7 +88,7 @@ load_defaults () {
         if [ "0" = "${?}" ]; then
             COMPLIANCE_CHECK="passed"
         else
-            error "Versions mismatch!. DEF_COMPILIANCE='$(diste "${DEF_COMPLIANCE}")' and SOFIN_VERSION='$(diste "${SOFIN_VERSION}")' should match.\n  Hint: Update your definitions repository to latest version!"
+            error "Versions mismatch!. DEF_COMPILIANCE='${ColorDistinct}${DEF_COMPLIANCE}${ColorError}' and SOFIN_VERSION='${ColorDistinct}${SOFIN_VERSION}${ColorError}' should match.\n  Hint: Update your definitions repository to latest version!"
         fi
     fi
 }
@@ -101,10 +101,10 @@ inherit () {
     env_pedantic \
         && . "${_def_inherit}" \
             && env_forgivable \
-                && debug "Loaded parent definition: $(distd "${_def_inherit}")" \
+                && debug "Loaded parent definition: ${ColorDistinct}${_def_inherit}${ColorDebug}" \
                     && return 0
 
-    debug "NOT loaded parent definition: $(distd "${_def_inherit}")"
+    debug "NOT loaded parent definition: ${ColorDistinct}${_def_inherit}${ColorDebug}"
     return 0 # don't throw anything using this function?
 }
 
@@ -121,10 +121,10 @@ update_defs () {
 
     (
     if [ ! -x "${GIT_BIN}" ]; then
-        permnote "Installing initial definition list from tarball to cache dir: $(distn "${CACHE_DIR}")"
+        permnote "Installing initial definition list from tarball to cache dir: ${ColorDistinct}${CACHE_DIR}${ColorNote}"
         try "${RM_BIN} -rf ${CACHE_DIR}${DEFINITIONS_BASE}; ${MKDIR_BIN} -p ${LOGS_DIR} ${CACHE_DIR}${DEFINITIONS_BASE}"
         _initial_defs="${MAIN_SOURCE_REPOSITORY}${DEFINITIONS_INITIAL_FILE_NAME}${DEFAULT_ARCHIVE_TARBALL_EXT}"
-        debug "Fetching latest tarball with initial definitions from: $(distd "${_initial_defs}")"
+        debug "Fetching latest tarball with initial definitions from: ${ColorDistinct}${_initial_defs}${ColorDebug}"
         _out_file="${FILE_CACHE_DIR}${DEFINITIONS_INITIAL_FILE_NAME}${DEFAULT_ARCHIVE_TARBALL_EXT}"
         retry "${FETCH_BIN} -o ${_out_file} ${FETCH_OPTS} '${_initial_defs}'" \
             && try "${TAR_BIN} -xf ${_out_file} ${TAR_DIRECTORY_ARG} ${CACHE_DIR}${DEFINITIONS_BASE}" \
@@ -140,30 +140,30 @@ update_defs () {
         }
 
         set_def_cur_branch_and_head
-        debug "State of definitions repository was re-set to: $(distd "${_def_head}")"
+        debug "State of definitions repository was re-set to: ${ColorDistinct}${_def_head}${ColorDebug}"
         if [ -z "${_requested_branch}" ] \
         && [ "${_def_cur_branch}" != "${BRANCH}" ]; then # use _def_cur_branch value if branch isn't matching default branch and no BRANCH was requested
-            debug "Checking out branch: $(distd "${_def_cur_branch}")"
+            debug "Checking out branch: ${ColorDistinct}${_def_cur_branch}${ColorDebug}"
             try "${GIT_BIN} checkout -b ${_def_cur_branch}" \
                 || try "${GIT_BIN} checkout ${_def_cur_branch}" \
-                    || warn "Can't checkout branch: $(distw "${_def_cur_branch}")"
+                    || warn "Can't checkout branch: ${ColorDistinct}${_def_cur_branch}${ColorWarning}"
 
             printf "%b" "${ColorBlue}" >&2
             ${GIT_BIN} pull ${DEFAULT_GIT_PULL_FETCH_OPTS} origin ${_def_cur_branch} \
-                && permnote "Definitions branch: $(distn "${_def_cur_branch}") is now at: $(distn "${_def_head}")" \
+                && permnote "Definitions branch: ${ColorDistinct}${_def_cur_branch}${ColorNote} is now at: ${ColorDistinct}${_def_head}${ColorNote}" \
                     && return 0
 
         else # else use default branch
-            debug "Using default branch: $(distd "${BRANCH}")"
+            debug "Using default branch: ${ColorDistinct}${BRANCH}${ColorDebug}"
             if [ "${_def_cur_branch}" != "${BRANCH}" ]; then
                 try "${GIT_BIN} checkout -b ${BRANCH}" \
                     || try "${GIT_BIN} checkout ${BRANCH}" \
-                        || warn "Can't checkout branch: $(distw "${BRANCH}")"
+                        || warn "Can't checkout branch: ${ColorDistinct}${BRANCH}${ColorWarning}"
             fi
             printf "%b" "${ColorBlue}" >&2
             ${GIT_BIN} pull ${DEFAULT_GIT_PULL_FETCH_OPTS} origin ${BRANCH} \
                 && set_def_cur_branch_and_head \
-                && permnote "Definitions branch: $(distn "${BRANCH}") is at: $(distn "${_def_head}")" \
+                && permnote "Definitions branch: ${ColorDistinct}${BRANCH}${ColorNote} is at: ${ColorDistinct}${_def_head}${ColorNote}" \
                     && return 0
         fi
 
@@ -171,8 +171,8 @@ update_defs () {
         printf "\n%b%b\n%b\n%b\n%b%b\n%b\n" \
             "${ColorRed}" \
             "--------------------------------------------------------------------------------" \
-            "Failed to update repository: $(diste "${REPOSITORY}") (affected branch: $(diste "${BRANCH}"))" \
-            "Tt's most likely just a dirty state of local definitions cache. $(diste "${SOFIN_SHORT_NAME} reset") to reset cache to fresh state." \
+            "Failed to update repository: ${ColorDistinct}${REPOSITORY}${ColorError} (affected branch: ${ColorDistinct}${BRANCH}${ColorError})" \
+            "Tt's most likely just a dirty state of local definitions cache. ${ColorDistinct}${SOFIN_SHORT_NAME} reset${ColorError} to reset cache to fresh state." \
             "${ColorRed}" \
             "--------------------------------------------------------------------------------" \
             "${ColorReset}" \
@@ -180,16 +180,16 @@ update_defs () {
     else
         # create cache; clone definitions repository:
         cd "${CACHE_DIR}"
-        debug "Cloning repository: $(distd "${REPOSITORY}") from branch: $(distd "${BRANCH}"); LOGS_DIR: $(distd "${LOGS_DIR}"), CACHE_DIR: $(distd "${CACHE_DIR}")"
+        debug "Cloning repository: ${ColorDistinct}${REPOSITORY}${ColorDebug} from branch: ${ColorDistinct}${BRANCH}${ColorDebug}; LOGS_DIR: ${ColorDistinct}${LOGS_DIR}${ColorDebug}, CACHE_DIR: ${ColorDistinct}${CACHE_DIR}${ColorDebug}"
         try "${RM_BIN} -rf '${DEFINITIONS_BASE}' && ${GIT_BIN} clone --depth 1 ${DEFAULT_GIT_CLONE_OPTS} ${REPOSITORY} ${DEFINITIONS_BASE}" \
-            || error "Error cloning branch: $(diste "${BRANCH}") of repository: $(diste "${REPOSITORY}"). Please make sure that given repository and branch are valid!"
+            || error "Error cloning branch: ${ColorDistinct}${BRANCH}${ColorError} of repository: ${ColorDistinct}${REPOSITORY}${ColorError}. Please make sure that given repository and branch are valid!"
 
         cd "${CACHE_DIR}${DEFINITIONS_BASE}"
         _def_cur_branch="$(${GIT_BIN} rev-parse --abbrev-ref HEAD 2>/dev/null)"
         if [ "${BRANCH}" != "${_def_cur_branch}" ]; then
             try "${GIT_BIN} checkout -b ${BRANCH}" \
                 || try "${GIT_BIN} checkout ${BRANCH}" \
-                    || warn "Can't checkout branch: $(distw "${BRANCH}")"
+                    || warn "Can't checkout branch: ${ColorDistinct}${BRANCH}${ColorWarning}"
         fi
         _def_head="HEAD"
 
@@ -197,7 +197,7 @@ update_defs () {
         ${GIT_BIN} pull --depth 1 --progress origin ${BRANCH} \
             && _def_head="$(${GIT_BIN} rev-parse HEAD 2>/dev/null)"
 
-        permnote "Repository: $(distn "${REPOSITORY}"), on branch: $(distn "${BRANCH}"). Commit HEAD: $(distn "${_def_head}")."
+        permnote "Repository: ${ColorDistinct}${REPOSITORY}${ColorNote}, on branch: ${ColorDistinct}${BRANCH}${ColorNote}. Commit HEAD: ${ColorDistinct}${_def_head}${ColorNote}."
     fi
     )
     unset _def_head _def_branch _def_cur_branch _out_file _requested_branch
@@ -215,13 +215,13 @@ reset_defs () {
         if [ -z "${_rdefs_branch}" ]; then
             _rdefs_branch="HEAD"
         fi
-        permnote "Definitions repository reset to: $(distn "${_rdefs_branch}")"
+        permnote "Definitions repository reset to: ${ColorDistinct}${_rdefs_branch}${ColorNote}"
         for _def_line in $(${GIT_BIN} status --short 2>/dev/null | ${CUT_BIN} -f2 -d' ' 2>/dev/null); do
             unset _add_opt
             printf "%b\n" "${_def_line}" | ${EGREP_BIN} -F 'patches/' >/dev/null 2>&1 \
                 && _add_opt="r"
             try "${RM_BIN} -f${_add_opt} '${_def_line}'" \
-                && debug "Removed untracked file${_add_opt:-/dir} from definition repository: $(distd "${_def_line}")"
+                && debug "Removed untracked file${_add_opt:-/dir} from definition repository: ${ColorDistinct}${_def_line}${ColorDebug}"
         done
     )
     unset _rdefs_branch _def_line _add_opt
@@ -269,7 +269,7 @@ remove_bundles () {
     done
 
     if [ -n "${_destroyed}" ]; then
-        permnote "Bundle(s) destroyed: $(distn "${_destroyed}")"
+        permnote "Bundle(s) destroyed: ${ColorDistinct}${_destroyed}${ColorNote}"
     fi
     # for _bundle_name in $(to_iter "${_bundles}"); do
         # replace + with *
@@ -302,13 +302,13 @@ remove_bundles () {
 available_definitions () {
     if [ -d "${DEFINITIONS_LISTS_DIR}" ]; then
         _lists="$(${FIND_BIN} "${DEFINITIONS_LISTS_DIR}" -mindepth 1 -maxdepth 1 -type f 2>/dev/null | ${SORT_BIN} | ${AWK_BIN} -F/ '{print $NF}' | ${TR_BIN} '\n' ' ')"
-        permnote "Available definitions lists: $(distn "${_lists}")"
+        permnote "Available definitions lists: ${ColorDistinct}${_lists}${ColorNote}"
     fi
     if [ -d "${DEFINITIONS_DIR}" ]; then
         _alldefs="$(${FIND_BIN} "${DEFINITIONS_DIR}" -mindepth 1 -maxdepth 1 -type f -name "*${DEFAULT_DEF_EXT}" 2>/dev/null | ${SORT_BIN} )"
         _alldefs_count="$(printf "%b\n" "${_alldefs}" | ${TR_BIN} '\n' ' ' | eval "${WORDS_COUNT_GUARD}")"
         unset _disabled_defs
-        permnote "All definitions: $(distn "$(echo "${_alldefs}" | ${AWK_BIN} -F/ '{print $NF}' | ${SED_BIN} "s/${DEFAULT_DEF_EXT}//g" 2>/dev/null | ${TR_BIN} '\n' ' ')")"
+        permnote "All definitions: ${ColorDistinct}$(echo "${_alldefs}" | ${AWK_BIN} -F/ '{print $NF}' | ${SED_BIN} "s/${DEFAULT_DEF_EXT}//g" 2>/dev/null | ${TR_BIN} '\n' ' ')${ColorNote}"
 
         for _def in $(to_iter "${_alldefs}"); do
             _deffile="$(echo ${_def%"${DEFAULT_DEF_EXT}"} | ${AWK_BIN} -F/ '{print $NF}')"
@@ -321,15 +321,15 @@ available_definitions () {
                 _disabled_defs="${_disabled_defs}\n${ColorRed}${_deffile}"
             fi
         done
-        permnote "Definitions total: $(distn "${_alldefs_count:-0}")"
+        permnote "Definitions total: ${ColorDistinct}${_alldefs_count:-0}${ColorNote}"
 
         note
         load_defaults
         _disabled_defs="$(echo ${_disabled_defs} | ${SORT_BIN} | ${TR_BIN} '\n' ' ')"
-        permnote "Definitions disabled for the $(distn "${SYSTEM_NAME}-${SYSTEM_ARCH}") system:$(distn "${_disabled_defs}")"
+        permnote "Definitions disabled for the ${ColorDistinct}${SYSTEM_NAME}-${SYSTEM_ARCH}${ColorNote} system:${ColorDistinct}${_disabled_defs}${ColorNote}"
 
         _disabled_count="$(printf "%b\n" "${_disabled_defs}" | eval "${WORDS_COUNT_GUARD}")"
-        permnote "Disabled definitions total: $(distn "${_disabled_count}")"
+        permnote "Disabled definitions total: ${ColorDistinct}${_disabled_count}${ColorNote}"
     fi
     unset _disabled_defs _disabled_count _lists _alldefs _alldefs_count _def _deffile
 }
@@ -339,16 +339,16 @@ make_exports () {
     _export_bin="${1}"
     _bundle_name="$(capitalize_abs "${2}")"
     if [ -z "${_export_bin}" ]; then
-        error "First argument with $(diste "exported-bin") is required!"
+        error "First argument with ${ColorDistinct}exported-bin${ColorError} is required!"
     fi
     if [ -z "${_bundle_name}" ]; then
-        error "Second argument with $(diste "BundleName") is required!"
+        error "Second argument with ${ColorDistinct}BundleName${ColorError} is required!"
     fi
     try "${MKDIR_BIN} -p '${SOFTWARE_DIR}/${_bundle_name}/exports' '${SERVICES_DIR}/${_bundle_name}/exports'"
     for _bindir in "/bin/" "/sbin/" "/libexec/"; do
         # SOFTWARE_DIR:
         if [ -e "${SOFTWARE_DIR}/${_bundle_name}${_bindir}${_export_bin}" ]; then
-            permnote "Exporting binary: $(distn "${SOFTWARE_DIR}/${_bundle_name}${_bindir}${_export_bin}")"
+            permnote "Exporting binary: ${ColorDistinct}${SOFTWARE_DIR}/${_bundle_name}${_bindir}${_export_bin}${ColorNote}"
             (
                 cd "${SOFTWARE_DIR}/${_bundle_name}${_bindir}"
                 try "${RM_BIN} -f ../exports/${_export_bin}; ${LN_BIN} -s ..${_bindir}/${_export_bin} ../exports/${_export_bin}"
@@ -357,12 +357,12 @@ make_exports () {
             unset _bindir _bundle_name _export_bin
             return 0
         else
-            debug "Export not found: $(distd "${SOFTWARE_DIR}/${_bundle_name}${_bindir}${_export_bin}")"
+            debug "Export not found: ${ColorDistinct}${SOFTWARE_DIR}/${_bundle_name}${_bindir}${_export_bin}${ColorDebug}"
         fi
 
         # SERVICES_DIR:
         if [ -e "${SERVICES_DIR}/${_bundle_name}${_bindir}${_export_bin}" ]; then
-            permnote "Exporting binary: $(distn "${SERVICES_DIR}/${_bundle_name}${_bindir}${_export_bin}")"
+            permnote "Exporting binary: ${ColorDistinct}${SERVICES_DIR}/${_bundle_name}${_bindir}${_export_bin}${ColorNote}"
             (
                 cd "${SERVICES_DIR}/${_bundle_name}${_bindir}"
                 try "${RM_BIN} -f ../exports/${_export_bin}; ${LN_BIN} -s ..${_bindir}/${_export_bin} ../exports/${_export_bin}"
@@ -371,10 +371,10 @@ make_exports () {
             unset _bindir _bundle_name _export_bin
             return 0
         else
-            debug "Export not found: $(distd "${SERVICES_DIR}/${_bundle_name}${_bindir}${_export_bin}")"
+            debug "Export not found: ${ColorDistinct}${SERVICES_DIR}/${_bundle_name}${_bindir}${_export_bin}${ColorDebug}"
         fi
     done
-    error "No executable to export from bin paths of: $(diste "${_bundle_name}/\{bin,sbin,libexec\}/${_export_bin}")"
+    error "No executable to export from bin paths of: ${ColorDistinct}${_bundle_name}/\{bin,sbin,libexec\}/${_export_bin}${ColorError}"
 }
 
 
@@ -384,7 +384,7 @@ show_available_versions_of_bundles () {
     debug "REMOTE resource: ${_resource}"
 
     for _bundle in $(to_iter "${_bundles}"); do
-        permnote "Available versions of binary bundle: $(distd "${_bundle}")"
+        permnote "Available versions of binary bundle: ${ColorDistinct}${_bundle}${ColorDebug}"
 
         if [ -x "${CURL_BIN}" ]; then
             ${CURL_BIN} -sL "${MAIN_BINARY_REPOSITORY}${OS_TRIPPLE}" \
@@ -412,7 +412,7 @@ show_outdated () {
             _bundle="$(lowercase "${_bundle_cap}")"
             if [ ! -f "${_old_prefix}/${_bundle}${DEFAULT_INST_MARK_EXT}" ]; then
                 if [ -z "${_raw}" ]; then
-                    warn "Bundle: $(distw "${_bundle_cap}") is not yet installed or damaged."
+                    warn "Bundle: ${ColorDistinct}${_bundle_cap}${ColorWarning} is not yet installed or damaged."
                 fi
                 continue
             fi
@@ -420,7 +420,7 @@ show_outdated () {
             if [ ! -f "${DEFINITIONS_DIR}/${_bundle}${DEFAULT_DEF_EXT}" ]; then
                 if [ "${_bundle}" != "${SOFIN_NAME}" ]; then
                     if [ -z "${_raw}" ]; then
-                        warn "No such bundle: '$(distw "${_bundle_cap}")' of prefix: '$(distw "${_old_prefix##*/}")' found!"
+                        warn "No such bundle: '${ColorDistinct}${_bundle_cap}${ColorWarning}' of prefix: '${ColorDistinct}${_old_prefix##*/}${ColorWarning}' found!"
                     fi
                 fi
                 continue
@@ -445,7 +445,7 @@ wipe_remote_archives () {
     _bund_names="${*}"
     _ans="YES"
     if [ -z "${USE_FORCE}" ]; then
-        warn "Are you sure you want to wipe binary bundles: $(distw "${_bund_names}") from binary repository: $(distw "${MAIN_BINARY_REPOSITORY}")? (Type $(distw YES) to confirm)"
+        warn "Are you sure you want to wipe binary bundles: ${ColorDistinct}${_bund_names}${ColorWarning} from binary repository: ${ColorDistinct}${MAIN_BINARY_REPOSITORY}${ColorWarning}? (Type ${ColorDistinct}YES${ColorWarning} to confirm)"
         read -r _ans
     fi
     if [ "${_ans}" = "YES" ]; then
@@ -456,17 +456,17 @@ wipe_remote_archives () {
                 _remote_ar_name="${_wr_element}-[0-9]*" # NOTE: Name-version* - matches both archives and their checksums
                 _wr_dig="$(${HOST_BIN} "${MAIN_SOFTWARE_ADDRESS}" 2>/dev/null | ${CUT_BIN} -d' ' -f4 2>/dev/null)"
                 if [ -z "${_wr_dig}" ]; then
-                    error "No mirrors found in address: $(diste "${MAIN_SOFTWARE_ADDRESS}")"
+                    error "No mirrors found in address: ${ColorDistinct}${MAIN_SOFTWARE_ADDRESS}${ColorError}"
                 fi
-                debug "Using defined mirror(s): $(distd "${_wr_dig}")"
+                debug "Using defined mirror(s): ${ColorDistinct}${_wr_dig}${ColorDebug}"
                 for _wr_mirr in $(to_iter "${_wr_dig}"); do
-                    permnote "Wiping out remote: $(distn "${_wr_mirr}") binary archives: $(distn "${_remote_ar_name}")"
+                    permnote "Wiping out remote: ${ColorDistinct}${_wr_mirr}${ColorNote} binary archives: ${ColorDistinct}${_remote_ar_name}${ColorNote}"
                     retry "${SSH_BIN} ${DEFAULT_SSH_OPTS} -p ${SOFIN_SSH_PORT} ${SOFIN_NAME}@${_wr_mirr} \"${FIND_BIN} ${MAIN_BINARY_PREFIX}/${SYS_SPECIFIC_BINARY_REMOTE} -iname '${_remote_ar_name}' -delete\""
                 done
             done
         )
     else
-        error "Aborted remote wipe of: $(diste "${_bund_names}")"
+        error "Aborted remote wipe of: ${ColorDistinct}${_bund_names}${ColorError}"
     fi
     unset _wr_mirr _remote_ar_name _wr_dig _lowercase_element _wr_element
 }
@@ -512,10 +512,10 @@ strip_bundle () {
     load_defs "${_sbfdefinition_name}"
     if [ -z "${PREFIX}" ]; then
         PREFIX="${SOFTWARE_DIR}/$(capitalize_abs "${DEF_NAME}${DEF_SUFFIX}")"
-        debug "An empty prefix for: $(distd "${_sbfdefinition_name}"). Resetting to: $(distd "${PREFIX}")"
+        debug "An empty prefix for: ${ColorDistinct}${_sbfdefinition_name}${ColorDebug}. Resetting to: ${ColorDistinct}${PREFIX}${ColorDebug}"
     fi
     if [ -f "${PREFIX}/${_sbfdefinition_name}${DEFAULT_STRIPPED_MARK_EXT}" ]; then
-        debug "Bundle looks like already stripped: $(distd "${_sbfdefinition_name}")"
+        debug "Bundle looks like already stripped: ${ColorDistinct}${_sbfdefinition_name}${ColorDebug}"
         return 0
     fi
 
@@ -524,21 +524,21 @@ strip_bundle () {
     # TODO: chdir to SERVICE_DIR/ PREFIX to save up 4096 max input length for args
     case "${DEF_STRIP}" in
         no|NO|none|NONE|nothing|NOTHING)
-            debug "$(distd "${_sbfdefinition_name}"): No symbols will be stripped from bundle: $(distd "${_sbfdefinition_name}")"
+            debug "${ColorDistinct}${_sbfdefinition_name}${ColorDebug}: No symbols will be stripped from bundle: ${ColorDistinct}${_sbfdefinition_name}${ColorDebug}"
             ;;
 
         all|ALL)
-            debug "$(distd "${_sbfdefinition_name}"): Strip both binaries and libraries."
+            debug "${ColorDistinct}${_sbfdefinition_name}${ColorDebug}: Strip both binaries and libraries."
             _dirs_to_strip="${SERVICE_DIR}/bin ${SERVICE_DIR}/sbin ${SERVICE_DIR}/lib ${SERVICE_DIR}/libexec ${PREFIX}/bin ${PREFIX}/sbin ${PREFIX}/lib ${PREFIX}/libexec"
             ;;
 
         exports|export|bins|binaries|bin|BIN|BINS)
-            debug "$(distd "${_sbfdefinition_name}"): Strip exported binaries only"
+            debug "${ColorDistinct}${_sbfdefinition_name}${ColorDebug}: Strip exported binaries only"
             _dirs_to_strip="${SERVICE_DIR}/bin ${SERVICE_DIR}/sbin ${SERVICE_DIR}/libexec ${PREFIX}/bin ${PREFIX}/sbin ${PREFIX}/libexec"
             ;;
 
         libs|lib|libexec|LIB|LIBS)
-            debug "$(distd "${_sbfdefinition_name}"): Strip libraries only"
+            debug "${ColorDistinct}${_sbfdefinition_name}${ColorDebug}: Strip libraries only"
             _dirs_to_strip="${SERVICE_DIR}/lib ${PREFIX}/lib"
             ;;
     esac
@@ -574,7 +574,7 @@ strip_bundle () {
                 #       Stripping breaks their Developer ID signature, and the system kills them on launch:
                 if [ "Darwin" = "${SYSTEM_NAME}" ] \
                 && /usr/bin/codesign -dv "${_file}" 2>&1 | ${GREP_BIN} -E "^TeamIdentifier=[A-Z0-9]" >/dev/null 2>&1; then
-                    debug "Skipping vendor signed file: $(distd "${_file}")"
+                    debug "Skipping vendor signed file: ${ColorDistinct}${_file}${ColorDebug}"
                     continue
                 fi
                 _file_type="$(${FILE_BIN} -b "${_file}" 2>/dev/null)"
@@ -600,7 +600,7 @@ strip_bundle () {
         if [ -z "${DEF_KEEP_DEBUG_SYMBOLS}" ]; then
             debug "Stripping debug information from build products…"
             for _file in $(to_iter "${_to_be_stripped_list}"); do
-                debug "Stripping $(distd "${_file}")"
+                debug "Stripping ${ColorDistinct}${_file}${ColorDebug}"
                 try "${STRIP_BIN} ${DEFAULT_STRIP_OPTS} ${_file}"
             done
         else
@@ -609,9 +609,9 @@ strip_bundle () {
             mkdir -p "${_debug_dest_dir}"
             for _file in $(to_iter "${_to_be_stripped_list}"); do
                 _dbgfile_basename="${_file##*/}.debug"
-                debug "Coying debug data from: $(distd "${_file}") to: $(distd "${_debug_dest_dir}/${_dbgfile_basename}")"
+                debug "Coying debug data from: ${ColorDistinct}${_file}${ColorDebug} to: ${ColorDistinct}${_debug_dest_dir}/${_dbgfile_basename}${ColorDebug}"
                 try "${OBJCOPY_BIN} --only-keep-debug ${_file} ${_debug_dest_dir}/${_dbgfile_basename}"
-                debug "Stripping $(distd "${_file}")"
+                debug "Stripping ${ColorDistinct}${_file}${ColorDebug}"
                 try "${STRIP_BIN} ${DEFAULT_STRIP_OPTS} ${_file}"
                 debug "Associate separated debug file to debug file"
                 try "${OBJCOPY_BIN} --add-gnu-debuglink=${_debug_dest_dir}/${_dbgfile_basename} ${_file}"
@@ -656,7 +656,7 @@ afterbuild_manage_files_of_bundle () {
                 done
             fi
         else
-            error "$(distw "PREFIX=${PREFIX}") NOT found!"
+            error "${ColorDistinct}PREFIX=${PREFIX}${ColorWarning} NOT found!"
         fi
 
         unset _dbg_exp_lst
@@ -707,13 +707,13 @@ afterbuild_manage_files_of_bundle () {
         done
 
         if [ -n "${_dbg_exp_lst}" ]; then
-            debug "Found exports: $(distd "${_dbg_exp_lst}"). Proceeding with useless files cleanup of: $(distd "${_fordel}")"
+            debug "Found exports: ${ColorDistinct}${_dbg_exp_lst}${ColorDebug}. Proceeding with useless files cleanup of: ${ColorDistinct}${_fordel}${ColorDebug}"
             remove_useless_files_of_bundle "${_fordel}"
         else
             debug "Empty exports list? Useless files removal skipped (cause it's damn annoing). Remember to invoke afterbuild_manage_files_of_bundle() _after_ you do exports!"
         fi
     else
-        debug "Useless files cleanup skipped since DEF_CLEAN_USELESS=$(distd "${DEF_CLEAN_USELESS:-''}")!"
+        debug "Useless files cleanup skipped since DEF_CLEAN_USELESS=${ColorDistinct}${DEF_CLEAN_USELESS:-''}${ColorDebug}!"
     fi
     unset _cu_pattern _cufile _cuall_binaries _cu_commit_removal _cubase _fordel _dbg_exp_lst
 }
@@ -724,15 +724,15 @@ conflict_resolve () {
         debug "Sofin ENV is NOT set, performing conflicts resolve!"
         if [ -n "${DEF_CONFLICTS_WITH}" ]; then
             _appname="$(capitalize_abs "${DEF_NAME}${DEF_SUFFIX}")"
-            debug "Seeking possible bundle conflicts: $(distd "${DEF_CONFLICTS_WITH}")"
+            debug "Seeking possible bundle conflicts: ${ColorDistinct}${DEF_CONFLICTS_WITH}${ColorDebug}"
             for _app in $(to_iter "${DEF_CONFLICTS_WITH}"); do
                 for _soft in $(${FIND_BIN} "${SOFTWARE_DIR}" -maxdepth 1 -type d -iname "${_app}*" 2>/dev/null); do
                     _soft_name="${_soft##*/}"
                     if [ -d "${_soft}/exports" ] \
                     && [ "${_soft_name}" != "Zsh" ]; then # NOTE: Avoid task for one critical bundle: Zsh - since this may cause system turn to locked-state-without-default=$SHELL
-                        debug "conflict_resolve(name=$(distd "${_soft_name}"), def_name=$(distd "${_appname}")):"
+                        debug "conflict_resolve(name=${ColorDistinct}${_soft_name}${ColorDebug}, def_name=${ColorDistinct}${_appname}${ColorDebug}):"
                         if [ "${_soft_name}" != "${_appname}" ]; then
-                            debug "Disabling bundle exports of: $(distd "${_soft_name}") -> in conflict with: $(distd "${_appname}")"
+                            debug "Disabling bundle exports of: ${ColorDistinct}${_soft_name}${ColorDebug} -> in conflict with: ${ColorDistinct}${_appname}${ColorDebug}"
                             try "${MV_BIN} ${_soft}/exports ${_soft}/exports-disabled"
                         fi
                     fi
@@ -740,9 +740,9 @@ conflict_resolve () {
                 for _service in $(${FIND_BIN} "${SERVICES_DIR}" -maxdepth 1 -type d -iname "${_app}*" 2>/dev/null); do
                     _sv_name="${_service##*/}"
                     if [ -d "${_service}/exports" ]; then
-                        debug "conflict_resolve(name=$(distd "${_sv_name}"), def_name=$(distd "${_appname}")):"
+                        debug "conflict_resolve(name=${ColorDistinct}${_sv_name}${ColorDebug}, def_name=${ColorDistinct}${_appname}${ColorDebug}):"
                         if [ "${_sv_name}" != "${_appname}" ]; then
-                            debug "Disabling bundle exports of: $(distd "${_service}") -> in conflict with: $(distd "${_appname}")"
+                            debug "Disabling bundle exports of: ${ColorDistinct}${_service}${ColorDebug} -> in conflict with: ${ColorDistinct}${_appname}${ColorDebug}"
                             try "${MV_BIN} '${_service}/exports' '${_service}/exports-disabled'"
                         fi
                     fi
@@ -765,18 +765,18 @@ export_binaries () {
     conflict_resolve
 
     if [ -d "${PREFIX}/exports-disabled" ]; then # just bring back disabled exports
-        debug "Exporting back previously disabled exports dir from: '$(distd "${PREFIX}/exports-disabled")' to '$(distd "${PREFIX}/exports")'"
+        debug "Exporting back previously disabled exports dir from: '${ColorDistinct}${PREFIX}/exports-disabled${ColorDebug}' to '${ColorDistinct}${PREFIX}/exports${ColorDebug}'"
         run "${MV_BIN} ${PREFIX}/exports-disabled ${PREFIX}/exports"
     fi
     if [ -d "${SERVICE_DIR}/exports-disabled" ]; then # just bring back disabled exports
-        debug "Exporting back previously disabled exports dir from: '$(distd "${SERVICE_DIR}/exports-disabled")' to '$(distd "${SERVICE_DIR}/exports")'"
+        debug "Exporting back previously disabled exports dir from: '${ColorDistinct}${SERVICE_DIR}/exports-disabled${ColorDebug}' to '${ColorDistinct}${SERVICE_DIR}/exports${ColorDebug}'"
         run "${MV_BIN} ${SERVICE_DIR}/exports-disabled ${SERVICE_DIR}/exports"
     fi
     if [ -z "${DEF_EXPORTS}" ]; then
-        permnote "Defined no exports of prefix: $(distn "${PREFIX}")"
+        permnote "Defined no exports of prefix: ${ColorDistinct}${PREFIX}${ColorNote}"
     else
         _an_amount="$(printf "%b\n" "${DEF_EXPORTS}" | ${AWK_BIN} '{print NF;}' 2>/dev/null)"
-        debug "Exporting $(distd "${_an_amount}") binaries of prefixes: $(distd "${PREFIX}") + $(distd "${SERVICE_DIR}")"
+        debug "Exporting ${ColorDistinct}${_an_amount}${ColorDebug} binaries of prefixes: ${ColorDistinct}${PREFIX}${ColorDebug} + ${ColorDistinct}${SERVICE_DIR}${ColorDebug}"
         try "${MKDIR_BIN} -p ${PREFIX}/exports ${SERVICE_DIR}/exports"
         unset _expolist
         for _xp in $(to_iter "${DEF_EXPORTS}"); do
@@ -806,10 +806,10 @@ export_binaries () {
         done
 
         if [ -z "${_expolist}" ]; then
-            error "Declared DEF_EXPORTS: $(diste "${DEF_EXPORTS}"), but nothing was experted for: $(diste "${DEF_NAME}${DEF_SUFFIX}")!"
+            error "Declared DEF_EXPORTS: ${ColorDistinct}${DEF_EXPORTS}${ColorError}, but nothing was experted for: ${ColorDistinct}${DEF_NAME}${DEF_SUFFIX}${ColorError}!"
         fi
 
-        permnote "$(distn "$(capitalize "${_ebdef_name}")") bundle exports:$(distn "${_expolist}")"
+        permnote "${ColorDistinct}$(capitalize "${_ebdef_name}")${ColorNote} bundle exports:${ColorDistinct}${_expolist}${ColorNote}"
     fi
     unset _expo_elem _acurrdir _an_amount _expolist _ebdef_name _soft_to_exp _service_to_exp
 }
@@ -818,7 +818,7 @@ export_binaries () {
 after_unpack_callback () {
     if [ -n "${DEF_AFTER_UNPACK_METHOD}" ]; then
         run "${DEF_AFTER_UNPACK_METHOD}" \
-            && debug "Evaluated callback DEF_AFTER_UNPACK_METHOD: $(distd "${DEF_AFTER_UNPACK_METHOD}")"
+            && debug "Evaluated callback DEF_AFTER_UNPACK_METHOD: ${ColorDistinct}${DEF_AFTER_UNPACK_METHOD}${ColorDebug}"
     fi
 }
 
@@ -826,7 +826,7 @@ after_unpack_callback () {
 after_export_callback () {
     if [ -n "${DEF_AFTER_EXPORT_METHOD}" ]; then
         run "${DEF_AFTER_EXPORT_METHOD}" \
-            && debug "Evaluated callback DEF_AFTER_EXPORT_METHOD: $(distd "${DEF_AFTER_EXPORT_METHOD}")"
+            && debug "Evaluated callback DEF_AFTER_EXPORT_METHOD: ${ColorDistinct}${DEF_AFTER_EXPORT_METHOD}${ColorDebug}"
     fi
 }
 
@@ -834,7 +834,7 @@ after_export_callback () {
 after_patch_callback () {
     if [ -n "${DEF_AFTER_PATCH_METHOD}" ]; then
         run "${DEF_AFTER_PATCH_METHOD}" \
-            && debug "Evaluated callback DEF_AFTER_PATCH_METHOD: $(distd "${DEF_AFTER_PATCH_METHOD}")"
+            && debug "Evaluated callback DEF_AFTER_PATCH_METHOD: ${ColorDistinct}${DEF_AFTER_PATCH_METHOD}${ColorDebug}"
     fi
 }
 
@@ -842,7 +842,7 @@ after_patch_callback () {
 after_configure_callback () {
     if [ -n "${DEF_AFTER_CONFIGURE_METHOD}" ]; then
         run "${DEF_AFTER_CONFIGURE_METHOD}" \
-            && debug "Evaluated callback DEF_AFTER_CONFIGURE_METHOD: $(distd "${DEF_AFTER_CONFIGURE_METHOD}")"
+            && debug "Evaluated callback DEF_AFTER_CONFIGURE_METHOD: ${ColorDistinct}${DEF_AFTER_CONFIGURE_METHOD}${ColorDebug}"
     fi
 }
 
@@ -850,7 +850,7 @@ after_configure_callback () {
 after_make_callback () {
     if [ -n "${DEF_AFTER_MAKE_METHOD}" ]; then
         run "${DEF_AFTER_MAKE_METHOD}" \
-            && debug "Evaluated callback DEF_AFTER_MAKE_METHOD: $(distd "${DEF_AFTER_MAKE_METHOD}")"
+            && debug "Evaluated callback DEF_AFTER_MAKE_METHOD: ${ColorDistinct}${DEF_AFTER_MAKE_METHOD}${ColorDebug}"
     fi
 }
 
@@ -858,7 +858,7 @@ after_make_callback () {
 after_test_callback () {
     if [ -n "${DEF_AFTER_TEST_METHOD}" ]; then
         run "${DEF_AFTER_TEST_METHOD}" \
-            && debug "Evaluated callback DEF_AFTER_TEST_METHOD: $(distd "${DEF_AFTER_TEST_METHOD}")"
+            && debug "Evaluated callback DEF_AFTER_TEST_METHOD: ${ColorDistinct}${DEF_AFTER_TEST_METHOD}${ColorDebug}"
     fi
 }
 
@@ -866,7 +866,7 @@ after_test_callback () {
 after_install_callback () {
     if [ -n "${DEF_AFTER_INSTALL_METHOD}" ]; then
         run "${DEF_AFTER_INSTALL_METHOD}" \
-            && debug "Evaluated callback DEF_AFTER_INSTALL_METHOD: $(distd "${DEF_AFTER_INSTALL_METHOD}")"
+            && debug "Evaluated callback DEF_AFTER_INSTALL_METHOD: ${ColorDistinct}${DEF_AFTER_INSTALL_METHOD}${ColorDebug}"
     fi
 }
 
@@ -876,13 +876,13 @@ apply_patch () {
     _abspatch="${2}"
     for _level in $(${SEQ_BIN} 0 5 2>/dev/null); do # From p0 to-p5
         try "${PATCH_BIN} -p${_level} -N -f -i ${_abspatch} >> '${LOG}-${_def2patch}' 2>> '${LOG}-${_def2patch}'" \
-            && debug "Forward patch applied: $(distd "${_abspatch}") (level: $(distd "${_level}"))" \
+            && debug "Forward patch applied: ${ColorDistinct}${_abspatch}${ColorDebug} (level: ${ColorDistinct}${_level}${ColorDebug})" \
                 && return 0
         try "${PATCH_BIN} -p${_level} -R -f -i ${_abspatch} >> '${LOG}-${_def2patch}' 2>> '${LOG}-${_def2patch}'" \
-            && debug "Reversed patch applied: $(distd "${_abspatch}") (level: $(distd "${_level}"))" \
+            && debug "Reversed patch applied: ${ColorDistinct}${_abspatch}${ColorDebug} (level: ${ColorDistinct}${_level}${ColorDebug})" \
                 && return 0
     done
-    warn "   ${WARN_CHAR} Failed to apply patch: $(distw "${_abspatch##*/}") for: $(distw "${_def2patch}")"
+    warn "   ${WARN_CHAR} Failed to apply patch: ${ColorDistinct}${_abspatch##*/}${ColorWarning} for: ${ColorDistinct}${_def2patch}${ColorWarning}"
     unset _level _def2patch _abspatch
     return 1
 }
@@ -916,13 +916,13 @@ apply_definition_patches () {
         _ps_patches="$(${FIND_BIN} "${_common_patches_dir}/" -mindepth 1 -maxdepth 1 -type f 2>/dev/null)"
         if [ -n "${_ps_patches}" ]; then
             traverse_patchlevels "${_pcpaname}" "${_ps_patches}" && \
-                note "   ${NOTE_CHAR} Applied common patches for: $(distn "${_pcpaname}")"
+                note "   ${NOTE_CHAR} Applied common patches for: ${ColorDistinct}${_pcpaname}${ColorNote}"
         fi
         if [ -d "${_platform_patches_dir}/" ]; then
             _ps_patches="$(${FIND_BIN} "${_platform_patches_dir}/" -mindepth 1 -maxdepth 1 -type f 2>/dev/null)"
             if [ -n "${_ps_patches}" ]; then
                 traverse_patchlevels "${_pcpaname}" "${_ps_patches}" && \
-                    note "   ${NOTE_CHAR} Applied platform specific patches for: $(distn "${_pcpaname}/${SYSTEM_NAME}")"
+                    note "   ${NOTE_CHAR} Applied platform specific patches for: ${ColorDistinct}${_pcpaname}/${SYSTEM_NAME}${ColorNote}"
             fi
         fi
     fi
@@ -937,29 +937,29 @@ clone_or_fetch_git_bare_repo () {
     _build_dir="${4}"
     _git_cached="${GIT_CACHE_DIR}${_bare_name}${DEFAULT_GIT_DIR_NAME}"
     try "${MKDIR_BIN} -p ${GIT_CACHE_DIR}"
-    note "   ${NOTE_CHAR} Fetching source repository: $(distn "${_source_path}")"
+    note "   ${NOTE_CHAR} Fetching source repository: ${ColorDistinct}${_source_path}${ColorNote}"
     try "${GIT_BIN} clone --jobs=${CPUS} --recursive --mirror ${_source_path} ${_git_cached}" \
         || try "${GIT_BIN} clone --jobs=${CPUS} --mirror ${_source_path} ${_git_cached}"
     if [ "${?}" = "0" ]; then
-        debug "Cloned bare repository: $(distd "${_bare_name}")"
+        debug "Cloned bare repository: ${ColorDistinct}${_bare_name}${ColorDebug}"
     elif [ -d "${_git_cached}" ]; then
         (
-            debug "Trying to update existing bare repository cache in: $(distd "${_git_cached}")"
+            debug "Trying to update existing bare repository cache in: ${ColorDistinct}${_git_cached}${ColorDebug}"
             cd "${_git_cached}"
             try "${GIT_BIN} fetch ${DEFAULT_GIT_PULL_FETCH_OPTS} origin ${_chk_branch} >> ${LOG}" \
-                || warn "   ${WARN_CHAR} Failed to fetch an update from bare repository: $(distw "${_git_cached}") [branch: $(distw "${_chk_branch}")]"
+                || warn "   ${WARN_CHAR} Failed to fetch an update from bare repository: ${ColorDistinct}${_git_cached}${ColorWarning} [branch: ${ColorDistinct}${_chk_branch}${ColorWarning}]"
         )
     elif [ ! -d "${_git_cached}/branches" ] \
       && [ ! -f "${_git_cached}/config" ]; then
-        error "Failed to fetch source repository: $(diste "${_source_path}") [branch: $(diste "${_chk_branch}")]"
+        error "Failed to fetch source repository: ${ColorDistinct}${_source_path}${ColorError} [branch: ${ColorDistinct}${_chk_branch}${ColorError}]"
     fi
 
     # bare repository is already cloned, so we just clone from it now..
     _dest_repo="${_build_dir}/${_bare_name}-${_chk_branch}"
     try "${RM_BIN} -rf '${_dest_repo}'"
-    debug "Attempting to clone from cached repository: $(distd "${_git_cached}").."
+    debug "Attempting to clone from cached repository: ${ColorDistinct}${_git_cached}${ColorDebug}.."
     run "${GIT_BIN} clone --depth 1 --progress --recursive --jobs=${CPUS} --branch ${_chk_branch} --single-branch ${_git_cached} ${_dest_repo}" \
-        && debug "Cloned branch: $(distd "${_chk_branch}") from cached repository: $(distd "${_git_cached}")"
+        && debug "Cloned branch: ${ColorDistinct}${_chk_branch}${ColorDebug} from cached repository: ${ColorDistinct}${_git_cached}${ColorDebug}"
     unset _git_cached _bare_name _chk_branch _build_dir _dest_repo
 }
 
@@ -973,7 +973,7 @@ available_bundles () {
         _fetch_opts="-qo-"
     fi
 
-    permnote "Binary bundles available for $(distn "${OS_TRIPPLE}") system:"
+    permnote "Binary bundles available for ${ColorDistinct}${OS_TRIPPLE}${ColorNote} system:"
     _bundlelist="$(${_fetch_cmd} ${_fetch_opts} "${MAIN_BINARY_REPOSITORY}/${OS_TRIPPLE}/" | "${GREP_BIN}" -E "(${DEFAULT_ARCHIVE_TARBALL_EXT}|${DEFAULT_SOFTWARE_SNAPSHOT_EXT})" 2>/dev/null \
     | "${GREP_BIN}" -v "sha1" 2>/dev/null | "${CUT_BIN}" -d "\"" -f2 | "${SED_BIN}" -E "s/-${OS_TRIPPLE}(\\${DEFAULT_ARCHIVE_TARBALL_EXT}|\\${DEFAULT_SOFTWARE_SNAPSHOT_EXT})//g")"
 
@@ -985,18 +985,18 @@ available_bundles () {
         if [ -e "${DEFINITIONS_DIR}/$(lowercase "${_bname}")${DEFAULT_DEF_EXT}" ]; then
             load_defs "${_bname}"
         else
-            debug "Definition for bundle $(distd "${_bname}") not found, skipping."
+            debug "Definition for bundle ${ColorDistinct}${_bname}${ColorDebug} not found, skipping."
             continue
         fi
 
         if [ "${_bver}" = "${DEF_VERSION}" ] && [ "${CURRENT_DEFINITION_DISABLED}" != "YES" ]; then
-            permnote "$(distn "${_bname}") [$(distn "${_bver}")]"
+            permnote "${ColorDistinct}${_bname}${ColorNote} [${ColorDistinct}${_bver}${ColorNote}]"
         else
             printf "  %b%b%b\n" "${ColorDark}" "${_bname} [${_bver}]" ${ColorReset} >&2
         fi
     done
 
-    permnote "Bundles highlighted in $(distn "cyan") are the current versions to be installed by Sofin. Greyed out are versions or bundles currently disabled for your system version."
+    permnote "Bundles highlighted in ${ColorDistinct}cyan${ColorNote} are the current versions to be installed by Sofin. Greyed out are versions or bundles currently disabled for your system version."
 }
 
 
@@ -1005,7 +1005,7 @@ guess_next_versions () {
     _major="$(printf "%b" "${_version}" | ${AWK_BIN} 'BEGIN {FS="."} {print $1}')"
     _minor="$(printf "%b" "${_version}" | ${AWK_BIN} 'BEGIN {FS="."} {print $2}')"
     _patch="$(printf "%b" "${_version}" | ${AWK_BIN} 'BEGIN {FS="."} {print $3}')"
-    debug "guess_next_versions input: $(distd "${_major} ${_minor} ${_patch}" )"
+    debug "guess_next_versions input: ${ColorDistinct}${_major} ${_minor} ${_patch}${ColorDebug}"
 
     # handle no patch version:
     case "${_patch}" in
@@ -1014,7 +1014,7 @@ guess_next_versions () {
                 "")
                     case "${_major}" in
                         *[_-]*) # ignore versions like icu: "4c-70_1"
-                            debug "Skipping custom version pattern: $(distd "${_major}")"
+                            debug "Skipping custom version pattern: ${ColorDistinct}${_major}${ColorDebug}"
                             ;;
 
                         *)
@@ -1100,7 +1100,7 @@ show_new_origin_updates () {
     esac
 
     for _definition in $(to_iter "${_definitions}"); do
-        debug "Processing origin of bundle: $(distd "${_definition}")"
+        debug "Processing origin of bundle: ${ColorDistinct}${_definition}${ColorDebug}"
         load_defaults
         load_defs "${_definition}"
 
@@ -1114,18 +1114,18 @@ show_new_origin_updates () {
 
                     *)
                         _next_version_origin="$(printf "%b\n" "${DEF_ORIGIN}" | ${SED_BIN} -e "s/${DEF_VERSION}/${_possible_next}/g")"
-                        debug "Next version of $(distd "${_definition##*/}") could have origin: $(distd "${_next_version_origin}")"
+                        debug "Next version of ${ColorDistinct}${_definition##*/}${ColorDebug} could have origin: ${ColorDistinct}${_next_version_origin}${ColorDebug}"
                         cd /tmp
                         try "${_fetch_cmd} ${_fetch_opts} ${_next_version_origin}"
                         if [ "0" = "${?}" ]; then
-                            warn "Possible new version of definition: $(distw "${DEF_NAME}${DEF_SUFFIX}") found. Origin: $(distw "${_next_version_origin}")"
+                            warn "Possible new version of definition: ${ColorDistinct}${DEF_NAME}${DEF_SUFFIX}${ColorWarning} found. Origin: ${ColorDistinct}${_next_version_origin}${ColorWarning}"
                         fi
                         ${RM_BIN} -f "${_next_version_origin##*/}"
                         ;;
                 esac
             done
         else
-            debug "No origin for: $(distd "${_definition##*/}")"
+            debug "No origin for: ${ColorDistinct}${_definition##*/}${ColorDebug}"
         fi
     done
 

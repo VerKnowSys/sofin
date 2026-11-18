@@ -17,11 +17,11 @@ EOF
 check_result () {
     if [ "${1}" = "0" ]; then
         shift
-        debug "$(distd "${SUCCESS_CHAR}" "${ColorGreen}") $(distd "${@}")"
+        debug "${ColorGreen:-${ColorDistinct}}${SUCCESS_CHAR}${ColorDebug} ${ColorDistinct}${@}${ColorDebug}"
         return 0
     else
         shift
-        debug "$(distd "${FAIL_CHAR}" "${ColorRed}") $(distd "${@}")"
+        debug "${ColorRed:-${ColorDistinct}}${FAIL_CHAR}${ColorDebug} ${ColorDistinct}${@}${ColorDebug}"
         return 1
     fi
 }
@@ -147,7 +147,7 @@ find_all () {
                 printf "%b\n" "${_fafind_results}" 2>/dev/null
             fi
         else
-            error "Directory $(diste "${_fapath}") doesn't exist!"
+            error "Directory ${ColorDistinct}${_fapath}${ColorError} doesn't exist!"
         fi
     fi
     unset _fapath _famatcher _fatype _fafind_results
@@ -189,7 +189,7 @@ find_most_recent () {
                 printf "%b\n" "${_frfind_results}" 2>/dev/null
             fi
         else
-            error "Directory $(diste "${_frpath}") doesn't exist!"
+            error "Directory ${ColorDistinct}${_frpath}${ColorError} doesn't exist!"
         fi
     fi
     unset _frpath _frmatcher _frtype _frfind_results _frres_singleline
@@ -206,7 +206,7 @@ difftext () {
 text_checksum () {
     _fcsmname="${1}"
     if [ -z "${_fcsmname}" ]; then
-        error "Empty content string given for function: $(diste "text_checksum()")"
+        error "Empty content string given for function: ${ColorDistinct}text_checksum()${ColorError}"
     fi
     case "${SYSTEM_NAME}" in
         Darwin|Linux)
@@ -233,7 +233,7 @@ firstn () {
 file_checksum () {
     _fcsmname="${1}"
     if [ -z "${_fcsmname}" ]; then
-        error "Empty file name given for function: $(diste "file_checksum()")"
+        error "Empty file name given for function: ${ColorDistinct}file_checksum()${ColorError}"
     fi
     case "${SYSTEM_NAME}" in
         NetBSD|Minix)

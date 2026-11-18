@@ -5,7 +5,7 @@ check_version () { # $1 => installed version, $2 => available version
         if [ -n "${2}" ]; then
             if [ "${1}" != "${2}" ]; then
                 if [ -z "${4}" ]; then
-                    warn "Bundle: $(distw "$(capitalize_abs "${3}")"), version: $(distw "${2}") is definied, but installed version is: $(distw "${1}")"
+                    warn "Bundle: ${ColorDistinct}$(capitalize_abs "${3}")${ColorWarning}, version: ${ColorDistinct}${2}${ColorWarning} is definied, but installed version is: ${ColorDistinct}${1}${ColorWarning}"
                 else
                     printf "%b\n" "$(capitalize_abs "${3}")"
                 fi
@@ -23,7 +23,7 @@ validate_env () {
         do
             _var_value="${_envvar#*=}"
             if [ ! -x "${_var_value}" ]; then
-                error "Required binary is unavailable: $(diste "${_envvar}")"
+                error "Required binary is unavailable: ${ColorDistinct}${_envvar}${ColorError}"
             fi
         done \
             || finalize_and_quit_gracefully_with_exitcode "${ERRORCODE_VALIDATE_ENV_FAILURE}"
@@ -37,7 +37,7 @@ validate_env () {
 fail_on_bg_job () {
     _deps="${*}"
     if [ -n "${_deps}" ]; then
-        debug "fail_on_bg_job() => $(distd "$(printf "%b\n" "${_deps}" | eval "${NEWLINES_TO_SPACES_GUARD}")")"
+        debug "fail_on_bg_job() => ${ColorDistinct}$(printf "%b\n" "${_deps}" | eval "${NEWLINES_TO_SPACES_GUARD}")${ColorDebug}"
         acquire_lock_for "${_deps}"
     fi
     unset _deps
@@ -52,7 +52,7 @@ fail_any_bg_jobs () {
         if [ -n "${_lock_pid}" ]; then
             try "${KILL_BIN} -0 ${_lock_pid}"
             if [ "${?}" = "0" ]; then
-                error "Bundle: $(diste "${_bundle_name}") is currently locked by pid: $(diste "${_lock_pid}"). Other Sofin instance is still running in background!"
+                error "Bundle: ${ColorDistinct}${_bundle_name}${ColorError} is currently locked by pid: ${ColorDistinct}${_lock_pid}${ColorError}. Other Sofin instance is still running in background!"
             fi
         fi
     done
@@ -91,7 +91,7 @@ validate_loaded_def () {
                     if [ "${_check}=" = "${_required_field}" ] \
                     || [ "${_check}=." = "${_required_field}" ] \
                     || [ "${_check}=${DEFAULT_DEF_EXT}" = "${_required_field}" ]; then
-                        error "ASSERTION FAILURE: Empty or invalid value in required field: $(diste "${_check}"). Failed definition of bundle: $(diste "${DEF_NAME}${DEF_SUFFIX}")"
+                        error "ASSERTION FAILURE: Empty or invalid value in required field: ${ColorDistinct}${_check}${ColorError}. Failed definition of bundle: ${ColorDistinct}${DEF_NAME}${DEF_SUFFIX}${ColorError}"
                     else
                         # gather passed checks, but print it only once..
                         if [ -z "${_valid_checks}" ]; then
@@ -107,7 +107,7 @@ validate_loaded_def () {
         error "ASSERTION FAILURE: No SYSTEM_DATASET is set! Either HOST=${HOST} or USER=${USER} is not set!"
     fi
 
-    debug "Necessary values were validated: $(distd "${_valid_checks}")"
+    debug "Necessary values were validated: ${ColorDistinct}${_valid_checks}${ColorDebug}"
     unset _def _check _required_field _valid_checks
 }
 
@@ -132,7 +132,7 @@ validate_reqs () {
                             2>/dev/null \
                 )"
                 if [ "${_unwanted_files}" != "0" ]; then
-                    warn "$(distw "/usr/local/lib") has been found with: $(distw "${_unwanted_files}+") $(distw "possibly unfriendly") libraries!"
+                    warn "${ColorDistinct}/usr/local/lib${ColorWarning} has been found with: ${ColorDistinct}${_unwanted_files}+${ColorWarning} ${ColorDistinct}possibly unfriendly${ColorWarning} libraries!"
                 fi
             fi
         fi
@@ -148,12 +148,12 @@ validate_archive_sha1 () {
     _archive_name="${1}"
     if [ ! -f "${_archive_name}" ] \
     || [ -z "${_archive_name}" ]; then
-         error "Specified empty $(diste archive_name), or file doesn't exist: $(diste "${_archive_name}")"
+         error "Specified empty ${ColorDistinct}archive_name${ColorError}, or file doesn't exist: ${ColorDistinct}${_archive_name}${ColorError}"
     fi
     # checking archive sha1 checksum
     if [ -e "${_archive_name}" ]; then
         _current_archive_sha1="$(file_checksum "${_archive_name}")"
-        debug "current_archive_sha1: $(distd "${_current_archive_sha1}")"
+        debug "current_archive_sha1: ${ColorDistinct}${_current_archive_sha1}${ColorDebug}"
     else
         error "No bundle archive found?"
     fi
@@ -161,14 +161,14 @@ validate_archive_sha1 () {
     _sha1_value="$(${CAT_BIN} "${_current_sha_file}" 2>/dev/null)"
     if [ ! -f "${_current_sha_file}" ] \
     || [ -z "${_sha1_value}" ]; then
-        debug "No sha1 file available for archive, or sha1 value is empty! Removing local binary build(s) of: $(distd "${_archive_name}")"
+        debug "No sha1 file available for archive, or sha1 value is empty! Removing local binary build(s) of: ${ColorDistinct}${_archive_name}${ColorDebug}"
         try "${RM_BIN} -f ${_archive_name} ${_current_sha_file}"
     fi
     if [ "${_current_archive_sha1}" != "${_sha1_value}" ]; then
-        debug "Bundle archive checksum doesn't match (is: $(distd "${_current_archive_sha1}") but got: $(distd "${_sha1_value}"), removing binary builds and proceeding into build phase"
+        debug "Bundle archive checksum doesn't match (is: ${ColorDistinct}${_current_archive_sha1}${ColorDebug} but got: ${ColorDistinct}${_sha1_value}${ColorDebug}, removing binary builds and proceeding into build phase"
         try "${RM_BIN} -f ${_archive_name} ${_current_sha_file}"
     else
-        permnote "Received software bundle: $(distn "${_archive_name##*/}")"
+        permnote "Received software bundle: ${ColorDistinct}${_archive_name##*/}${ColorNote}"
     fi
     unset _sha1_value _current_sha_file _current_archive_sha1 _archive_name
 }
@@ -182,7 +182,7 @@ validate_def_suffix () {
 
     if [ -n "${DEF_SUFFIX}" ]; then
         unset _defname _arg1 _arg2
-        debug "validate_def_suffix(): Definition value of $(distd "DEF_SUFFIX=${DEF_SUFFIX}"). Final name: $(distd "${_def_bundle_name}${DEF_SUFFIX}")"
+        debug "validate_def_suffix(): Definition value of ${ColorDistinct}DEF_SUFFIX=${DEF_SUFFIX}${ColorDebug}. Final name: ${ColorDistinct}${_def_bundle_name}${DEF_SUFFIX}${ColorDebug}"
         return 0
     fi
 
@@ -198,13 +198,13 @@ validate_def_suffix () {
     # assume, that length of a diff shouldn't match length of both specified names:
     if [ "$(( ${#_defdiff} + ${#_defdiff} ))" = "$(( ${#_defmatch} + ${#_defname}))" ]; then
         unset _defdiff # unset value, since we wish to ignore malformed diff
-        debug "validate_def_suffix(): Concatenated values, setting diff to be empty for definition: $(distd "${_def_bundle_name}")."
+        debug "validate_def_suffix(): Concatenated values, setting diff to be empty for definition: ${ColorDistinct}${_def_bundle_name}${ColorDebug}."
     fi
 
     # finally if diff looks reasonable, let's guess DEF_SUFFIX:
     if [ -n "${_defdiff}" ]; then
         DEF_SUFFIX="${_defdiff}"
-        debug "validate_def_suffix(): Inferred: $(distd "DEF_SUFFIX=${DEF_SUFFIX}") => $(distd "${_def_bundle_name}${DEF_SUFFIX}"), 1: $(distd "${_defmatch}"), 2: $(distd "${_defname}"), DIFF: '$(distd "${_defdiff}")'"
+        debug "validate_def_suffix(): Inferred: ${ColorDistinct}DEF_SUFFIX=${DEF_SUFFIX}${ColorDebug} => ${ColorDistinct}${_def_bundle_name}${DEF_SUFFIX}${ColorDebug}, 1: ${ColorDistinct}${_defmatch}${ColorDebug}, 2: ${ColorDistinct}${_defname}${ColorDebug}, DIFF: '${ColorDistinct}${_defdiff}${ColorDebug}'"
     fi
 
     unset _defname _defmatch _defdiff _arg1 _arg2 _def_bundle_name
@@ -221,7 +221,7 @@ validate_definition_disabled () {
         || [ "${SYSTEM_NAME}-${SYSTEM_ARCH}-${SYSTEM_VERSION}" = "${_def_disable_on}" ] \
         || [ "${SYSTEM_NAME}-${SYSTEM_ARCH}-${SYSTEM_VERSION%.*}" = "${_def_disable_on}" ] \
         ; then
-            debug "Disabled: $(distd "${_def_disable_on}") on $(distd "${SYSTEM_NAME}")"
+            debug "Disabled: ${ColorDistinct}${_def_disable_on}${ColorDebug} on ${ColorDistinct}${SYSTEM_NAME}${ColorDebug}"
             CURRENT_DEFINITION_DISABLED=YES
         fi
     done
@@ -234,7 +234,7 @@ validate_util_availability () {
     _req_bundle_name="$(capitalize "${_req_name}")"
     _req_util_indicator="${SOFIN_UTILS_DIR}/${_req_bundle_name}/${_req_name}${DEFAULT_INST_MARK_EXT}"
     if [ -f "${_req_util_indicator}" ]; then
-        debug "Utility available for: $(distd "${_req_name}"). Skipping requirement build. Will attempt to use utility."
+        debug "Utility available for: ${ColorDistinct}${_req_name}${ColorDebug}. Skipping requirement build. Will attempt to use utility."
         CURRENT_DEFINITION_DISABLED=YES
     fi
     unset _req_name _req_bundle_name _req_util_indicator
@@ -247,7 +247,7 @@ validate_pie_on_exports () {
         error "At least single bundle name has to be specified for pie validation."
     fi
     if [ "YES" = "${CAP_SYS_HARDENED}" ]; then
-        debug "Checking PIE on exports: $(distd "${_bundz}")"
+        debug "Checking PIE on exports: ${ColorDistinct}${_bundz}${ColorDebug}"
         for _bun in $(to_iter "${_bundz}"); do
             _bun="${_bun%=*}"
             if [ -d "${SOFTWARE_DIR}/${_bun}/exports" ]; then
@@ -255,29 +255,29 @@ validate_pie_on_exports () {
             elif [ -d "${SOFTWARE_DIR}/${_bun}/exports-disabled" ]; then
                 _a_dir="${SOFTWARE_DIR}/${_bun}/exports-disabled"
             else
-                debug "No exports of bundle: $(distd "${_bun}"). PIE validation skipped."
+                debug "No exports of bundle: ${ColorDistinct}${_bun}${ColorDebug}. PIE validation skipped."
                 return 0
             fi
             _pie_indicator="${SOFTWARE_DIR}/${_bun}/$(lowercase "${_bun}")${DEFAULT_PIE_MARK_EXT}"
             if [ -f "${_pie_indicator}" ]; then
-                debug "PIE exports were checked already for bundle: $(distd "${_bun}")"
+                debug "PIE exports were checked already for bundle: ${ColorDistinct}${_bun}${ColorDebug}"
                 continue
             else
                 for _bin in $(${FIND_BIN} "${_a_dir}" -mindepth 1 -maxdepth 1 -type l 2>/dev/null | ${XARGS_BIN} "${READLINK_BIN}" -f 2>/dev/null); do
                     try "${FILE_BIN} \"${_bin}\" | ${GREP_BIN} -F 'ELF'"
                     if [ "${?}" = "0" ]; then # it's ELF binary/library:
                         big_fat_warn () {
-                            warn "Security - Exported ELF binary: $(distw "${_bin}"), is not a $(distw "${PIE_TYPE_ENTRY}") (not-PIE)!"
+                            warn "Security - Exported ELF binary: ${ColorDistinct}${_bin}${ColorWarning}, is not a ${ColorDistinct}${PIE_TYPE_ENTRY}${ColorWarning} (not-PIE)!"
                             printf "SECURITY: ELF binary: '%b', is not a '%b' (not-PIE)!\n" "${_bin}" "${PIE_TYPE_ENTRY}" >> "${_pie_indicator}.warn"
                         }
                         try "${FILE_BIN} '${_bin}' | ${GREP_BIN} -F 'ELF' | ${EGREP_BIN} -F '${PIE_TYPE_ENTRY}'" \
                             || big_fat_warn
                     else
-                        debug "Executable, but not an ELF: $(distd "${_bin}")"
+                        debug "Executable, but not an ELF: ${ColorDistinct}${_bin}${ColorDebug}"
                     fi
                 done
                 run "${TOUCH_BIN} '${_pie_indicator}'" \
-                    && debug "PIE check done for bundle: $(distd "${_bun}")"
+                    && debug "PIE check done for bundle: ${ColorDistinct}${_bun}${ColorDebug}"
             fi
         done
 
@@ -316,13 +316,13 @@ validate_sys_limits () {
     fi
 
     ulimit -n "${_ulimit_nofile}" >/dev/null 2>&1 \
-        || warn "Sofin has failed to set reasonable environment limit of open files: $(distw "${_ulimit_nofile}"). Local limit is: "$(ulimit -n 2>/dev/null)". Troubles may follow!"
+        || warn "Sofin has failed to set reasonable environment limit of open files: ${ColorDistinct}${_ulimit_nofile}${ColorWarning}. Local limit is: "$(ulimit -n 2>/dev/null)". Troubles may follow!"
 
     ulimit -s "${_ulimit_stackkb}" >/dev/null 2>&1 \
-        || warn "Sofin has failed to set reasonable environment limit of stack (in kb) to value: $(distw "${_ulimit_stackkb}"). Local limit is: "$(ulimit -s 2>/dev/null)". Troubles may follow!"
+        || warn "Sofin has failed to set reasonable environment limit of stack (in kb) to value: ${ColorDistinct}${_ulimit_stackkb}${ColorWarning}. Local limit is: "$(ulimit -s 2>/dev/null)". Troubles may follow!"
 
     ulimit -c "${_ulimit_core}" >/dev/null 2>&1 \
-        || warn "Sofin has failed to set core size limit to: $(distw "${_ulimit_core}"). Local limit is: "$(ulimit -c 2>/dev/null)".!"
+        || warn "Sofin has failed to set core size limit to: ${ColorDistinct}${_ulimit_core}${ColorWarning}. Local limit is: "$(ulimit -c 2>/dev/null)".!"
 
     # try "ulimit -u ${_ulimit_up_max_ps}" \
     #     || warn "Sofin has failed to set reasonable environment limit of running processes to: $(distw "${_ulimit_up_max_ps}"). Local limit is: "$(ulimit -u 2>/dev/null)". Troubles may follow!"
@@ -332,7 +332,7 @@ validate_sys_limits () {
 
 crash_if_mission_critical () {
     if [ -n "${DEF_CRITICAL}" ]; then
-        error "Bundle: $(diste "${1}") is marked as $(diste "Mission-Critical") and cannot be destroyed automatically. It has to be done manually."
+        error "Bundle: ${ColorDistinct}${1}${ColorError} is marked as ${ColorDistinct}Mission-Critical${ColorError} and cannot be destroyed automatically. It has to be done manually."
     fi
 }
 
@@ -344,7 +344,7 @@ validate_bins_links () {
     #Make sure LIBRARY_PATH is unset, else binaries without RUNPATH will report correct links on PREFIX/lib despite reporting them as not found later
     unset LD_LIBRARY_PATH
     unset DYLD_LIBRARY_PATH
-    debug "Validating links on exports: $(distd "${_bundz}")"
+    debug "Validating links on exports: ${ColorDistinct}${_bundz}${ColorDebug}"
     for _bun in $(to_iter "${_bundz}"); do
         _bun="$(capitalize_abs "${_bun%=*}")"
         if [ -d "${SOFTWARE_DIR}/${_bun}/exports" ]; then
@@ -352,13 +352,13 @@ validate_bins_links () {
         elif [ -d "${SOFTWARE_DIR}/${_bun}/exports-disabled" ]; then
             _a_dir="${SOFTWARE_DIR}/${_bun}/exports-disabled"
         else
-            debug "No exports of bundle: $(distd "${_bun}"). Link validation skipped."
+            debug "No exports of bundle: ${ColorDistinct}${_bun}${ColorDebug}. Link validation skipped."
             return 0
         fi
 
         for _bin in $(${FIND_BIN} "${_a_dir}" -mindepth 1 -maxdepth 1 -type l 2>/dev/null); do
             if ${FILE_BIN} -L "${_bin}" | ${CUT_BIN} -d' ' -f2- | ${GREP_BIN} -E '(text|script|statically)' >/dev/null 2>&1; then
-                debug "$(distd "${_bin}") is statically linked or a script, skipping validation"
+                debug "${ColorDistinct}${_bin}${ColorDebug} is statically linked or a script, skipping validation"
             elif ${FILE_BIN} -L "${_bin}" | ${CUT_BIN} -d' ' -f2- | ${GREP_BIN} -E '(LSB shared object|LSB pie executable|LSB executable|Mach-O 64-bit)' >/dev/null 2>&1; then
                 if [ "${SYSTEM_NAME}" = "Darwin" ]; then
                         # _linked="$(${OTOOL_BIN} -L "${_bin}" | ${GREP_BIN} -Ev "(\s${SOFTWARE_DIR}/${_bun}(/|/bin/../)lib/)|(\s/usr/lib/)|(\s/lib/)|(\s/System/Library/Frameworks/)|(@rpath/)|([a-zA-Z]*dylib)"  2>/dev/null)"
@@ -370,10 +370,10 @@ validate_bins_links () {
                 fi
 
                 if [ "${_linked}" != "${_bin}:" ]; then
-                    error "Invalid links for binary: $(diste "${_bin}")! See: \n $(diste "${_linked}")"
+                    error "Invalid links for binary: ${ColorDistinct}${_bin}${ColorError}! See: \n ${ColorDistinct}${_linked}${ColorError}"
                 fi
             else
-                error "$(diste "${_bin}") is not a proper executable or script!"
+                error "${ColorDistinct}${_bin}${ColorError} is not a proper executable or script!"
             fi
         done
 
@@ -389,7 +389,7 @@ validate_libs_links () {
     if [ -z "${_bundz}" ]; then
         error "At least single bundle name has to be specified."
     fi
-    debug "Validating libraries: $(distd "${_bundz}")"
+    debug "Validating libraries: ${ColorDistinct}${_bundz}${ColorDebug}"
     for _bun in $(to_iter "${_bundz}"); do
         _bun="$(capitalize_abs "${_bun%=*}")"
         if [ -d "${SOFTWARE_DIR}/${_bun}/lib" ]; then
@@ -406,7 +406,7 @@ validate_libs_links () {
 
         for _lib in $(${FIND_BIN} "${_a_dir}" \( -name "*.${_libext}" -or -name "*.${_libext}.*" \) -mindepth 1 -type f 2>/dev/null); do
             if ${FILE_BIN} -L "${_lib}" | ${CUT_BIN} -d' ' -f2- | ${GREP_BIN} -E '(text|script|statically)' >/dev/null 2>&1; then
-                debug "$(distd "${_lib}") is statically linked or a script, skipping validation"
+                debug "${ColorDistinct}${_lib}${ColorDebug} is statically linked or a script, skipping validation"
             elif ${FILE_BIN} -L "${_lib}" | ${CUT_BIN} -d' ' -f2- | ${GREP_BIN} -E '(LSB shared object|Mach-O 64-bit)' >/dev/null 2>&1; then
                 _libname="$(echo ${_lib} | ${AWK_BIN} -F/ '{print $NF}' | ${SED_BIN} -E 's/([^[:alnum:]])/\\\1/g')"
                 if [ "${SYSTEM_NAME}" = "Darwin" ]; then
@@ -419,10 +419,10 @@ validate_libs_links () {
                 fi
 
                 if [ "${_linked}" != "${_lib}:" ]; then
-                    error "Invalid links for library: $(diste "${_lib}")! See: \n $(diste "${_linked}")"
+                    error "Invalid links for library: ${ColorDistinct}${_lib}${ColorError}! See: \n ${ColorDistinct}${_linked}${ColorError}"
                 fi
             else
-                error "$(diste "${_lib}") is not a proper library or script!"
+                error "${ColorDistinct}${_lib}${ColorError} is not a proper library or script!"
             fi
         done
 
@@ -450,13 +450,13 @@ validate_sources () {
                 continue
             elif [ -n "${DEF_GIT_MODE}" ] || [ -n "${DEF_GIT_CHECKOUT}" ]; then
                 "${GIT_BIN}" ls-remote -h "${DEF_SOURCE_PATH}" >/dev/null 2>&1 \
-                    || warn "Failed to access repository: $(distw "${DEF_SOURCE_PATH}") for $(distw "${_def}")"
+                    || warn "Failed to access repository: ${ColorDistinct}${DEF_SOURCE_PATH}${ColorWarning} for ${ColorDistinct}${_def}${ColorWarning}"
             else
                 _curlres="$("${CURL_BIN}" -s -o /dev/null -L -I -w "%{http_code}" "${DEF_SOURCE_PATH}")"
                 if [ "0" != "${?}" ]; then
-                    warn "Not an URL: $(distw "${DEF_SOURCE_PATH}") in $(distw "${_def}")"
+                    warn "Not an URL: ${ColorDistinct}${DEF_SOURCE_PATH}${ColorWarning} in ${ColorDistinct}${_def}${ColorWarning}"
                 elif [ "${_curlres}" != "200" ]; then
-                    warn "Response code $(distw "${_curlres}") for URL $(distw "${DEF_SOURCE_PATH}") in $(distw "${_def}")"
+                    warn "Response code ${ColorDistinct}${_curlres}${ColorWarning} for URL ${ColorDistinct}${DEF_SOURCE_PATH}${ColorWarning} in ${ColorDistinct}${_def}${ColorWarning}"
                 fi
             fi
         done
