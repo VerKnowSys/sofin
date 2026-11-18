@@ -7,6 +7,36 @@ requirements_dedup () {
 }
 
 
+# DEF_REQUIREMENTS of definition ${1} as loading it would leave them,
+# without sourcing it: the list of the definition it inherits (recursively,
+# at most ${2:-8} levels; cleared by "unset DEF_REQUIREMENTS"), then its own
+# top-level DEF_REQUIREMENTS= lines evaluated on top of that list, so
+# DEF_REQUIREMENTS="${DEF_REQUIREMENTS} more" extends the parent's.
+definition_requirements () {
+    local _dr_file="${DEFINITIONS_DIR}/${1}${DEFAULT_DEF_EXT}"
+    local _dr_depth="${2:-8}"
+    local _dr_parent _dr_lines _dr_reqs=""
+    if [ ! -f "${_dr_file}" ]; then
+        return 0
+    fi
+    _dr_parent="$(${AWK_BIN} '/^inherit[ \t]/ { gsub(/["\047]/, "", $2); print $2; exit }' "${_dr_file}" 2>/dev/null)"
+    _dr_parent="${_dr_parent%${DEFAULT_DEF_EXT}}"
+    if [ -n "${_dr_parent}" ] \
+    && [ "${_dr_parent}" != "${1}" ] \
+    && [ "${_dr_depth}" -gt 0 ]; then
+        _dr_reqs="$(definition_requirements "${_dr_parent}" "$(( _dr_depth - 1 ))")"
+    fi
+    if ${GREP_BIN} -qE '^unset[[:space:]].*DEF_REQUIREMENTS' "${_dr_file}" 2>/dev/null; then
+        _dr_reqs=""
+    fi
+    _dr_lines="$(${AWK_BIN} '/^DEF_REQUIREMENTS=/ { print $0; }' "${_dr_file}" 2>/dev/null)"
+    if [ -n "${_dr_lines}" ]; then
+        eval "${_dr_lines//DEF_REQUIREMENTS/_dr_reqs}" >/dev/null 2>/dev/null
+    fi
+    printf "%b" "${(L)_dr_reqs}"
+}
+
+
 extend_requirement_lists () {
     # @definition list extension support:
     for _req_list in ${=DEF_REQUIREMENTS}; do
@@ -15,15 +45,15 @@ extend_requirement_lists () {
             *) continue ;; # NOTE: only @lists need expanding
         esac
         _req_list="${_req_list/@/}"
-        _reqs_var="$(${AWK_BIN} '/^DEF_REQUIREMENTS=/ { print $0; }' ${DEFINITIONS_DIR}/${_req_list}${DEFAULT_DEF_EXT} 2>/dev/null)"
-        _reqs_var="${(L):-_${_reqs_var}}"
-        eval "${_reqs_var}" >/dev/null 2>/dev/null
+        # NOTE: follows "inherit": @curl-lib lists curl's requirements
+        _def_requirements="$(definition_requirements "${_req_list}")"
+        _def_requirements="${_def_requirements## }"
         if [ -n "${_def_requirements}" ]; then
             DEF_REQUIREMENTS="${DEF_REQUIREMENTS/@${_req_list}/${_def_requirements} ${_req_list}}"
         else
             DEF_REQUIREMENTS="${DEF_REQUIREMENTS/@${_req_list}/${_req_list}}"
         fi
-        unset _req_list _reqs_var _def_requirements
+        unset _req_list _def_requirements
     done
     debug "Final DEF_REQUIREMENTS=${ColorDistinct}${DEF_REQUIREMENTS}${ColorDebug}"
 }
