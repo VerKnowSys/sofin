@@ -952,7 +952,25 @@ test_and_rate_def () {
                         ${_cmdline}" >> "${_test_result_log}" 2>&1
                 _result="${?}"
                 if [ "0" != "${_result}" ]; then
-                    error "Test failed for: ${ColorDistinct}${DEF_NAME}${ColorError}. Installation aborted."
+                    # NOTE: lines that usually tell what was wanted and what was given:
+                    unset _test_failures
+                    for _test_line in "${(@f)$(${GREP_BIN} -n -i -E "${TEST_FAILURE_PATTERN}" "${_test_result_log}" 2>/dev/null | ${TAIL_BIN} -n "${LOG_LINES_AMOUNT_ON_ERR}" 2>/dev/null)}"; do
+                        if [ -n "${_test_line}" ]; then
+                            _test_failures="${_test_failures}\n      ${_test_line[1,240]}"
+                        fi
+                    done
+                    if [ -n "${_test_failures}" ]; then
+                        _test_failures="\n\n    Failure lines of the test output (line: text):${_test_failures}"
+                    fi
+
+                    _end_time="$(${DATE_BIN} +%F-%H%M-%s 2>/dev/null)"
+                    printf "%b\n" "Test failed at: ${_end_time} (exit code: ${_result})" >> "${_test_result_log}"
+
+                    # NOTE: keep the whole test output in the definition log, so the crash
+                    #       log tail and "s log" show it:
+                    ${CAT_BIN} "${_test_result_log}" >> "${_sofin_log}"
+
+                    error "Test failed for: ${ColorDistinct}${DEF_NAME}${DEF_SUFFIX}${ColorError} (exit code: ${ColorDistinct}${_result}${ColorError}). Installation aborted.\n    Test command: ${ColorDistinct}${_cmdline}${ColorError}\n    Full test output: ${ColorDistinct}${_test_result_log}${ColorError}${_test_failures}"
                 fi
                 _end_time="$(${DATE_BIN} +%F-%H%M-%s 2>/dev/null)"
                 ${CAT_BIN} "${_test_result_log}" >> "${_sofin_log}"
