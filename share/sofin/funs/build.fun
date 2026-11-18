@@ -778,18 +778,43 @@ process_flat () {
                                     #   --localstatedir=${SERVICE_DIR}/var
                                     #   --runstatedir=${SERVICE_DIR}/run
                                     #   --with-pic
-                                    try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var ${_pic_optional} ${_addon} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
-                                        || try "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var ${_pic_optional} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
-                                            || try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var ${_addon} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
-                                                || try "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc --localstatedir=${SERVICE_DIR}/var 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
-                                                    || try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc ${_pic_optional} ${_addon} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
-                                                        || try "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc ${_pic_optional} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
-                                                            || try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc ${_addon} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
-                                                                || try "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} --sysconfdir=${SERVICE_DIR}/etc 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
-                                                                    || try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} ${_pic_optional} ${_addon} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
-                                                                        || try "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} ${_pic_optional} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
-                                                                            || try "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix} ${_addon} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}" \
-                                                                                || run "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix}" # last two - only as a fallback
+                                    # NOTE: Ask configure which of the standard options it supports, then run it once.
+                                    #       Retrying every option permutation ran a failing configure up to 12 times.
+                                    _configure_help="$(eval "${DEF_CONFIGURE_METHOD} --help" 2>/dev/null)"
+                                    if [ -z "${_configure_help}" ]; then
+                                        debug "No --help output from: ${ColorDistinct}${DEF_CONFIGURE_METHOD}${ColorDebug}. Configuring with --prefix only."
+                                        run "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} --prefix=${_prefix}"
+                                    else
+                                        _configure_opts="--prefix=${_prefix}"
+                                        case "${_configure_help}" in
+                                            *--sysconfdir*)
+                                                _configure_opts="${_configure_opts} --sysconfdir=${SERVICE_DIR}/etc"
+                                                ;;
+                                        esac
+                                        case "${_configure_help}" in
+                                            *--localstatedir*)
+                                                _configure_opts="${_configure_opts} --localstatedir=${SERVICE_DIR}/var"
+                                                ;;
+                                        esac
+                                        if [ -n "${_pic_optional}" ]; then
+                                            case "${_configure_help}" in
+                                                *--with-pic*)
+                                                    _configure_opts="${_configure_opts} ${_pic_optional}"
+                                                    ;;
+                                            esac
+                                        fi
+                                        # NOTE: Autoconf scripts list CFLAGS among "influential environment variables"
+                                        #       and accept them as arguments. Others get them in the environment (they're exported anyway):
+                                        case "${_configure_help}" in
+                                            *CFLAGS*)
+                                                run "${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} ${_configure_opts} ${_addon} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}"
+                                                ;;
+                                            *)
+                                                run "${_addon} ${DEF_CONFIGURE_METHOD} ${DEF_CONFIGURE_ARGS} ${_configure_opts} 2>> ${LOG}-${DEF_NAME}${DEF_SUFFIX}"
+                                                ;;
+                                        esac
+                                    fi
+                                    unset _configure_help _configure_opts
 
                                 else # fallback again:
                                     # NOTE: First - try to specify GNU prefix,
