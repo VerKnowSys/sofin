@@ -461,6 +461,23 @@ dump_debug_info () {
 }
 
 
+# Darwin: libraries built with CMake get an absolute install name
+# (${_prefix}/lib/libx.dylib) instead of CMake's default @rpath/libx.dylib,
+# so programs that link them without an rpath (autotools builds) still find
+# them. A definition can override it in DEF_CONFIGURE_ARGS (the last -D wins).
+cmake_darwin_args () {
+    case "${SYSTEM_NAME}" in
+        Darwin)
+            _cmake_darwin_args="-DCMAKE_INSTALL_NAME_DIR=${_prefix}/lib"
+            ;;
+
+        *)
+            unset _cmake_darwin_args
+            ;;
+    esac
+}
+
+
 process_flat () {
     _definition_name="${(L)1}"
     _prefix="${2}"
@@ -715,13 +732,14 @@ process_flat () {
                             try "${MKDIR_BIN} -p build"
                             _pwd="${_pwd}/build"
                             cd "${_pwd}"
-                            _cmake_cmdline="${DEF_CONFIGURE_METHOD} ../ -LH -DCMAKE_BUILD_RPATH=\"${PREFIX}/lib\" -DCMAKE_INSTALL_RPATH=\"${_prefix}/lib;${_prefix}/libexec\" -DCMAKE_INSTALL_PREFIX=${_prefix} -DCMAKE_BUILD_TYPE=Release -DSYSCONFDIR=${SERVICE_DIR}/etc -DMAN_INSTALLDIR=${_prefix}/share/man -DDOCDIR=${_prefix}/share/doc -DJOB_POOL_COMPILE=${CPUS} -DJOB_POOL_LINK=${CPUS} -DCMAKE_C_FLAGS=\"${CFLAGS}\" -DCMAKE_CXX_FLAGS=\"${CXXFLAGS}\" ${DEF_CONFIGURE_ARGS}"
+                            cmake_darwin_args
+                            _cmake_cmdline="${DEF_CONFIGURE_METHOD} ../ -LH -DCMAKE_BUILD_RPATH=\"${PREFIX}/lib\" -DCMAKE_INSTALL_RPATH=\"${_prefix}/lib;${_prefix}/libexec\" -DCMAKE_INSTALL_PREFIX=${_prefix} -DCMAKE_BUILD_TYPE=Release -DSYSCONFDIR=${SERVICE_DIR}/etc -DMAN_INSTALLDIR=${_prefix}/share/man -DDOCDIR=${_prefix}/share/doc -DJOB_POOL_COMPILE=${CPUS} -DJOB_POOL_LINK=${CPUS} -DCMAKE_C_FLAGS=\"${CFLAGS}\" -DCMAKE_CXX_FLAGS=\"${CXXFLAGS}\" ${_cmake_darwin_args} ${DEF_CONFIGURE_ARGS}"
 
                             # Makefile case: Use what's found in definition or set default calls:
                             run "${RM_BIN} -f CMakeCache.txt; ${_cmake_cmdline} -G'Ninja'"
                             DEF_MAKE_METHOD="ninja install"
                             DEF_INSTALL_METHOD="true"
-                            unset _cmake_cmdline
+                            unset _cmake_cmdline _cmake_darwin_args
                             ;;
 
                         cmake-make)
@@ -732,13 +750,14 @@ process_flat () {
                             try "${MKDIR_BIN} -p build"
                             _pwd="${_pwd}/build"
                             cd "${_pwd}"
-                            _cmake_cmdline="${DEF_CONFIGURE_METHOD%-make} ../ -LH -DCMAKE_BUILD_RPATH=\"${PREFIX}/lib\" -DCMAKE_INSTALL_RPATH=\"${_prefix}/lib;${_prefix}/libexec\" -DCMAKE_INSTALL_PREFIX=${_prefix} -DCMAKE_BUILD_TYPE=Release -DSYSCONFDIR=${SERVICE_DIR}/etc -DMAN_INSTALLDIR=${_prefix}/share/man -DDOCDIR=${_prefix}/share/doc -DJOB_POOL_COMPILE=${CPUS} -DJOB_POOL_LINK=${CPUS} -DCMAKE_C_FLAGS=\"${CFLAGS}\" -DCMAKE_CXX_FLAGS=\"${CXXFLAGS}\" ${DEF_CONFIGURE_ARGS}"
+                            cmake_darwin_args
+                            _cmake_cmdline="${DEF_CONFIGURE_METHOD%-make} ../ -LH -DCMAKE_BUILD_RPATH=\"${PREFIX}/lib\" -DCMAKE_INSTALL_RPATH=\"${_prefix}/lib;${_prefix}/libexec\" -DCMAKE_INSTALL_PREFIX=${_prefix} -DCMAKE_BUILD_TYPE=Release -DSYSCONFDIR=${SERVICE_DIR}/etc -DMAN_INSTALLDIR=${_prefix}/share/man -DDOCDIR=${_prefix}/share/doc -DJOB_POOL_COMPILE=${CPUS} -DJOB_POOL_LINK=${CPUS} -DCMAKE_C_FLAGS=\"${CFLAGS}\" -DCMAKE_CXX_FLAGS=\"${CXXFLAGS}\" ${_cmake_darwin_args} ${DEF_CONFIGURE_ARGS}"
 
                             # Makefile case: Use what's found in definition or set default calls:
                             run "${RM_BIN} -f CMakeCache.txt; ${_cmake_cmdline}"
                             DEF_MAKE_METHOD="make install"
                             DEF_INSTALL_METHOD="true"
-                            unset _cmake_cmdline
+                            unset _cmake_cmdline _cmake_darwin_args
                             ;;
 
                         *)
