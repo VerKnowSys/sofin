@@ -728,9 +728,11 @@ process_flat () {
                             debug "Build type: ${ColorDistinct}cmake${ColorDebug}"
                             note "   ${NOTE_CHAR} Configuring: ${ColorDistinct}${_definition_name}${ColorNote}, version: ${ColorDistinct}${DEF_VERSION}${ColorNote}"
 
-                            try "${RM_BIN} -r build"
-                            try "${MKDIR_BIN} -p build"
-                            _pwd="${_pwd}/build"
+                            # Out-of-source build in a directory no project ships: some
+                            # keep sources in their own ./build (Jasper: CMake modules, jasper.pc.in).
+                            try "${RM_BIN} -r sofin-build"
+                            try "${MKDIR_BIN} -p sofin-build"
+                            _pwd="${_pwd}/sofin-build"
                             cd "${_pwd}"
                             cmake_darwin_args
                             _cmake_cmdline="${DEF_CONFIGURE_METHOD} ../ -LH -DCMAKE_BUILD_RPATH=\"${PREFIX}/lib\" -DCMAKE_INSTALL_RPATH=\"${_prefix}/lib;${_prefix}/libexec\" -DCMAKE_INSTALL_PREFIX=${_prefix} -DCMAKE_BUILD_TYPE=Release -DSYSCONFDIR=${SERVICE_DIR}/etc -DMAN_INSTALLDIR=${_prefix}/share/man -DDOCDIR=${_prefix}/share/doc -DJOB_POOL_COMPILE=${CPUS} -DJOB_POOL_LINK=${CPUS} -DCMAKE_C_FLAGS=\"${CFLAGS}\" -DCMAKE_CXX_FLAGS=\"${CXXFLAGS}\" ${_cmake_darwin_args} ${DEF_CONFIGURE_ARGS}"
@@ -746,9 +748,11 @@ process_flat () {
                             debug "Build type: ${ColorDistinct}cmake-make${ColorDebug}"
                             note "   ${NOTE_CHAR} Configuring: ${ColorDistinct}${_definition_name}${ColorNote}, version: ${ColorDistinct}${DEF_VERSION}${ColorNote}"
 
-                            try "${RM_BIN} -r build"
-                            try "${MKDIR_BIN} -p build"
-                            _pwd="${_pwd}/build"
+                            # Out-of-source build in a directory no project ships: some
+                            # keep sources in their own ./build (Jasper: CMake modules, jasper.pc.in).
+                            try "${RM_BIN} -r sofin-build"
+                            try "${MKDIR_BIN} -p sofin-build"
+                            _pwd="${_pwd}/sofin-build"
                             cd "${_pwd}"
                             cmake_darwin_args
                             _cmake_cmdline="${DEF_CONFIGURE_METHOD%-make} ../ -LH -DCMAKE_BUILD_RPATH=\"${PREFIX}/lib\" -DCMAKE_INSTALL_RPATH=\"${_prefix}/lib;${_prefix}/libexec\" -DCMAKE_INSTALL_PREFIX=${_prefix} -DCMAKE_BUILD_TYPE=Release -DSYSCONFDIR=${SERVICE_DIR}/etc -DMAN_INSTALLDIR=${_prefix}/share/man -DDOCDIR=${_prefix}/share/doc -DJOB_POOL_COMPILE=${CPUS} -DJOB_POOL_LINK=${CPUS} -DCMAKE_C_FLAGS=\"${CFLAGS}\" -DCMAKE_CXX_FLAGS=\"${CXXFLAGS}\" ${_cmake_darwin_args} ${DEF_CONFIGURE_ARGS}"
