@@ -478,6 +478,34 @@ cmake_darwin_args () {
 }
 
 
+# Plain FreeBSD's counterpart of the DEF_NO_ASLR handling on HardenedBSD
+# (hbsdcontrol and .pax, at the end of a bundle's build): ELF binaries named
+# in DEF_APPLY_LOWER_SECURITY_ON (find -name patterns) under the bundle's
+# prefix ${1} get ASLR turned off in their own feature control note
+# (elfctl), which needs no replay on boot. It runs right after each
+# definition's install, requirements included, because a later requirement
+# of the same bundle may run them while it builds (Neovim's build runs LuaJIT).
+disable_aslr_with_elfctl () {
+    _dae_prefix="${1}"
+    if [ "FreeBSD" = "${SYSTEM_NAME}" ] \
+    && [ "YES" != "${CAP_SYS_HARDENED}" ] \
+    && [ -n "${DEF_NO_ASLR}" ] \
+    && [ -n "${ELFCTL_BIN}" ]; then
+        for _dae_name in $(to_iter "${DEF_APPLY_LOWER_SECURITY_ON}"); do
+            _dae_files="$(${FIND_BIN} "${_dae_prefix}/" -name "${_dae_name}" -type f 2>/dev/null)"
+            for _dae_file in $(to_iter "${_dae_files}"); do
+                if [ -x "${_dae_file}" ] \
+                && ${FILE_BIN} "${_dae_file}" | ${GREP_BIN} -F 'ELF 64-bit' >/dev/null 2>&1; then
+                    try "${ELFCTL_BIN} -e +noaslr '${_dae_file}'" \
+                        && debug "ASLR disabled (elfctl) for: ${ColorDistinct}${_dae_file}${ColorDebug}"
+                fi
+            done
+        done
+    fi
+    unset _dae_prefix _dae_name _dae_files _dae_file
+}
+
+
 process_flat () {
     _definition_name="${(L)1}"
     _prefix="${2}"
@@ -911,6 +939,8 @@ process_flat () {
 
                 cd "${_pwd}"
                 try after_install_callback
+                # NOTE: before a later requirement of this bundle runs its binaries:
+                disable_aslr_with_elfctl "${_prefix}"
                 cd "${_pwd}"
                 try after_install_snapshot
 

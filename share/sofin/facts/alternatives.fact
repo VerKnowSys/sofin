@@ -176,6 +176,11 @@ if [ -x "/usr/sbin/hbsdcontrol" ]; then
     HBSDCONTROL_BIN="/usr/sbin/hbsdcontrol"
 fi
 
+# elfctl (FreeBSD: ELF feature control notes, f.e. opting a binary out of ASLR)
+if [ -x "/usr/bin/elfctl" ]; then
+    ELFCTL_BIN="/usr/bin/elfctl"
+fi
+
 # log-watcher utility - lw - replaces "tail")
 if [ -x "/Services/Sofin/exports/lw" ]; then
     LW_BIN="/Services/Sofin/exports/lw"
