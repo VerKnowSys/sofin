@@ -21,10 +21,11 @@ Node
 Nut
 Pass
 Perl
-Php83
+Php85
 Pstree
-Python311
+Python314
 Qemu-m1
+Postgresql18
 Redis
 Rlwrap
 Rsync
