@@ -4,7 +4,6 @@ Aspell
 Awscli
 Bash
 Bison
-Bison27
 Binutils
 Boost
 Btop
@@ -15,7 +14,6 @@ Chicken
 Clamav
 Curl
 Cmake
-Cppcheck
 Ctags
 Dar
 Db
@@ -101,7 +99,6 @@ Php85
 Pkgconf
 Poppler
 Postgresql18
-Pptpd
 Protobuf
 Pstree
 Python314

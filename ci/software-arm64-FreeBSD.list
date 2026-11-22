@@ -13,7 +13,6 @@ Check
 Chicken
 Clamav
 Cmake
-Cppcheck
 Ctags
 Curl
 Dar
@@ -85,7 +84,6 @@ Php85
 Pkgconf
 Poppler
 Postgresql18
-Pptpd
 Protobuf
 Pstree
 Pwgen
