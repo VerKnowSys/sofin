@@ -1,5 +1,21 @@
 #!/usr/bin/env sh
 
+# Unpack Sofin's tarball ${1} into directory ${2}. Tarballs are made with
+# "tar --lz4" (xz when that's unsupported): an LZ4 one goes through Sofin's
+# own s-lz4cat, because libarchive without built-in LZ4 support (FreeBSD's
+# base tar) runs an external "lz4" for it, and fails without one
+# ("Child process exited with status 254").
+extract_tarball () {
+    _et_file="${1}"
+    _et_dir="${2}"
+    if [ "$(${HEAD_BIN} -c 4 "${_et_file}" 2>/dev/null)" = "$(printf '\004"M\030')" ]; then
+        ${SOFIN_LZ4CAT_BIN} "${_et_file}" | ${TAR_BIN} -xf - ${TAR_DIRECTORY_ARG} "${_et_dir}"
+    else
+        ${TAR_BIN} -xf "${_et_file}" ${TAR_DIRECTORY_ARG} "${_et_dir}"
+    fi
+}
+
+
 push_to_all_mirrors () {
     _pbto_bundle_name="${1}"
     _pversion_element="${2}"
@@ -233,7 +249,7 @@ fetch_dset_zfs_stream () {
         debug "Fetch service stream-tarball: ${ColorDistinct}${FILE_CACHE_DIR}${_fdz_out_file}${ColorDebug}"
         retry "${FETCH_BIN} ${FETCH_OPTS} -o ${FILE_CACHE_DIR}${_fdz_out_file} '${_commons_path}'"
         if [ "${?}" = "0" ]; then
-            try "${TAR_BIN} -xf ${FILE_CACHE_DIR}${_fdz_out_file} ${TAR_DIRECTORY_ARG} ${SERVICES_DIR}" \
+            try "extract_tarball '${FILE_CACHE_DIR}${_fdz_out_file}' '${SERVICES_DIR}'" \
                 && permnote "Received service tarball for bundle: ${ColorDistinct}${_fdz_bund_name}${ColorNote}"
             unset _tarball_name
         else
@@ -295,7 +311,7 @@ try_fetch_service_dir () {
             if [ -d "${SERVICES_DIR}/${_dset_create}" ]; then
                 debug "Service dir: ${ColorDistinct}${SERVICES_DIR}/${_dset_create}${ColorDebug} already exists. Leaving untouched!"
             else
-                run "${TAR_BIN} -xf '${_svce_org_file}' ${TAR_DIRECTORY_ARG} '${SERVICES_DIR}'"
+                run "extract_tarball '${_svce_org_file}' '${SERVICES_DIR}'"
                 debug "Service origin received successfully: ${ColorDistinct}${_svce_origin}${ColorDebug}"
             fi
         else
@@ -629,7 +645,7 @@ install_software_from_binbuild () {
             && note "Installed: ${ColorDistinct}${_isfb_fullname}${ColorNote}" \
                 && CURRENT_DEFINITION_SKIP_BUILD_DO_EXPORTS=YES
     else
-        try "${TAR_BIN} -xf ${FILE_CACHE_DIR}${_isfb_archive} ${TAR_DIRECTORY_ARG} ${SOFTWARE_DIR}"
+        try "extract_tarball '${FILE_CACHE_DIR}${_isfb_archive}' '${SOFTWARE_DIR}'"
         if [ "${?}" = "0" ]; then
             note "Installed binary build: ${ColorDistinct}${_isfb_fullname}${ColorNote}"
             CURRENT_DEFINITION_SKIP_BUILD_DO_EXPORTS=YES
