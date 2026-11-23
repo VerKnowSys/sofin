@@ -763,7 +763,7 @@ process_flat () {
                             _pwd="${_pwd}/sofin-build"
                             cd "${_pwd}"
                             cmake_darwin_args
-                            _cmake_cmdline="${DEF_CONFIGURE_METHOD} ../ -LH -DCMAKE_BUILD_RPATH=\"${PREFIX}/lib\" -DCMAKE_INSTALL_RPATH=\"${_prefix}/lib;${_prefix}/libexec\" -DCMAKE_INSTALL_PREFIX=${_prefix} -DCMAKE_POLICY_VERSION_MINIMUM=4.5 -DCMAKE_BUILD_TYPE=Release -DSYSCONFDIR=${SERVICE_DIR}/etc -DMAN_INSTALLDIR=${_prefix}/share/man -DDOCDIR=${_prefix}/share/doc -DJOB_POOL_COMPILE=${CPUS} -DJOB_POOL_LINK=${CPUS} -DCMAKE_C_FLAGS=\"${CFLAGS}\" -DCMAKE_CXX_FLAGS=\"${CXXFLAGS}\" ${_cmake_darwin_args} ${DEF_CONFIGURE_ARGS}"
+                            _cmake_cmdline="${DEF_CONFIGURE_METHOD} ../ -LH -DCMAKE_BUILD_RPATH=\"${PREFIX}/lib\" -DCMAKE_INSTALL_RPATH=\"${_prefix}/lib;${_prefix}/libexec\" -DCMAKE_INSTALL_PREFIX=${_prefix} -DCMAKE_BUILD_TYPE=Release -DSYSCONFDIR=${SERVICE_DIR}/etc -DMAN_INSTALLDIR=${_prefix}/share/man -DDOCDIR=${_prefix}/share/doc -DJOB_POOL_COMPILE=${CPUS} -DJOB_POOL_LINK=${CPUS} -DCMAKE_C_FLAGS=\"${CFLAGS}\" -DCMAKE_CXX_FLAGS=\"${CXXFLAGS}\" ${_cmake_darwin_args} ${DEF_CONFIGURE_ARGS}"
 
                             # Makefile case: Use what's found in definition or set default calls:
                             run "${RM_BIN} -f CMakeCache.txt; ${_cmake_cmdline} -G'Ninja'"
