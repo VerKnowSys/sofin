@@ -428,7 +428,7 @@ receive_origin () {
         debug "Set mountpoint: ${ColorDistinct}${_mountpoint}${ColorDebug} and mount: ${ColorDistinct}${_dname}${ColorDebug}"
         # NOTE: When you change the mountpoint property from legacy or none to a specific path, ZFS automatically mounts the file system.
         run "${ZFS_BIN} set mountpoint=${_mountpoint} '${_dname}'"
-        run "${ZFS_BIN} mount '${_dname}'"
+        try "${ZFS_BIN} mount '${_dname}'"
     }
 
     if [ -f "${_origin_file}" ]; then
