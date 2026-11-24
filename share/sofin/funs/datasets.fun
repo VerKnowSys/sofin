@@ -491,7 +491,7 @@ destroy_software_dir () {
             && debug "Destroyed software-dataset: ${ColorDistinct}${_dsname}${ColorDebug}"
         try "${ZFS_BIN} set readonly=off '${_dsbase}'"
         try "${RM_BIN} -rf '${SOFTWARE_DIR}/${_dset_destroy}'"
-        try "${ZFS_BIN} set readonly=on '${_dsbase}'"
+        # try "${ZFS_BIN} set readonly=on '${_dsbase}'"
 
         # NOTE: set_system_dataset_readonly() is called in untrap_signals() once
     else

@@ -388,9 +388,9 @@ build () {
                         done
                     done
 
-                    if [ "YES" = "${CAP_SYS_ZFS}" ]; then
-                        printf "%b\n" "${ZFS_BIN} set readonly=on '${_dataset_parent}'" >> "${_paxfile}"
-                    fi
+                    # if [ "YES" = "${CAP_SYS_ZFS}" ]; then
+                    #     printf "%b\n" "${ZFS_BIN} set readonly=on '${_dataset_parent}'" >> "${_paxfile}"
+                    # fi
                 fi
             fi
         fi

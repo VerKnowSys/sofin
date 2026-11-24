@@ -159,7 +159,7 @@ finalize_after_signal_interrupt () {
 finalize_and_quit_gracefully_with_exitcode () {
     _errorcode="${1:-${ERRORCODE_NORMAL_EXIT}}"
     load_sysctl_system_production_hardening
-    set_system_dataset_readonly
+    # set_system_dataset_readonly
     # TODO: figure out why this fails on fbsd16+zfs set_software_dataset_readonly
     if [ "YES" = "${CAP_TERM_INTERACTIVE}" ]; then
         ${STTY_BIN} echo \
